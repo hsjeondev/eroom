@@ -1,13 +1,10 @@
 package com.eroom.directory.entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,23 +21,18 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="profile")
-public class Profile {
-
+@Table(name="partner_directory")
+public class PartnerDirectory {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long profileNo; // 프로필 번호
+	private Long partnerDirectoryNo; // 협력업체 주소록 번호
 	
-	@Column(name = "profile_ori_name")
-	private String profileOriName;
-	@Column(name = "profile_new_name")
-	private String profileNewName;
-	@Column(name = "profile_path")
-	private String profilePath;
-	
-	@OneToOne
-	@JoinColumn(name="employee_no")
-	private Employee employeeNo;
-
-	
+	@Column(name = "partner_directory_name")
+	private String partnerDirectoryName; // 이름
+	@Column(name = "partner_directory_email")
+	private String partnerDirectoryEmail; // 이메일
+	@Column(name = "partner_directory_phone")
+	private String partnerDirectoryPhone; // 휴대폰 번호
+	@Column(name = "partner_directory_company_name")
+	private String partnerDirectoryCompanyName; // 협력업체 회사명
 }
