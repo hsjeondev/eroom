@@ -37,9 +37,9 @@ public class Profile {
 	private String profileNewName;
 	@Column(name = "profile_path")
 	private String profilePath;
-	
-//	@OneToOne
-//	@JoinColumn(name="employee_no")
-//	private Employee employee;
-//	
+
+	@OneToOne
+	@JoinColumn(name="employee_no")
+	private Employee employee;
+
 }
