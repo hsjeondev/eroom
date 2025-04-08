@@ -5,10 +5,20 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.eroom.chat.entity.Chatroom;
+import com.eroom.chat.repository.ChatroomRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class ChatroomService {
 
-	public List<Chatroom> selectChatRoomAll;
+	private final ChatroomRepository repository;
+	
+	public List<Chatroom> selectChatRoomAll(){
+		List<Chatroom> list = repository.findAll();
+		return list;
+	}
 
+	
 }

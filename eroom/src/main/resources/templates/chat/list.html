@@ -18,8 +18,9 @@ lang="ko-KR" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                 <li><a class="dropdown-item" href="#!">Unread</a></li>
               </ul>
             </div>
+            <!-- 검색기능 우선순위 최하위 -->
             <div class="form-icon-container mb-4 d-sm-none d-xl-block">
-              <input class="form-control form-icon-input" type="text" placeholder="People, Groups and Messages" /><span class="fas fa-user text-body fs-9 form-icon"></span>
+              <input class="form-control form-icon-input" type="text" placeholder="이름을 입력하세요" /><span class="fas fa-user text-body fs-9 form-icon"></span>
             </div>
             <ul class="nav nav-phoenix-pills mb-5 d-sm-none d-xl-flex" id="contactListTab" data-chat-thread-tab="data-chat-thread-tab" role="tablist">
               <li class="nav-item" role="presentation"><a class="nav-link cursor-pointer active" data-bs-toggle="tab" data-chat-thread-list="all" role="tab" aria-selected="true">전체</a></li>
@@ -31,9 +32,15 @@ lang="ko-KR" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                 <div data-chat-thread-tab-content="data-chat-thread-tab-content">
                   <ul class="nav chat-thread-tab flex-column list">
                   <!-- 채팅 리스트 읽은사람-->
-                    <li class="nav-item read" role="presentation"><a class="nav-link d-flex align-items-center justify-content-center p-2  active" data-bs-toggle="tab" data-chat-thread="data-chat-thread" href="#tab-thread-1" role="tab" aria-selected="true">
-                        <div class="avatar avatar-xl status-online position-relative me-2 me-sm-0 me-xl-2"><img class="rounded-circle border border-2 border-light-subtle" src="../assets/img/team/20.webp" alt="" />
-                        </div>
+                        <div th:if="${#lists.isEmpty(chatroomList)}">
+						  <p class="text-center text-muted mt-4">참여 중인 채팅방이 없습니다.</p>
+						</div>
+                    <li th:if="${!#lists.isEmpty(chatroomList)}" th:each="chatroom : ${chatroomList}" th:attr="data-room-no=${chatroom.chatroomNo}"
+                    class="nav-item read" role="presentation"><a class="nav-link d-flex align-items-center justify-content-center p-2  active" data-bs-toggle="tab" data-chat-thread="data-chat-thread" href="#tab-thread-1" role="tab" aria-selected="true">
+                    	<!-- 이미지 부분 -->
+                       <!--  <div class="avatar avatar-xl status-online position-relative me-2 me-sm-0 me-xl-2">
+                        	<img class="rounded-circle border border-2 border-light-subtle" src="../assets/img/team/20.webp" alt="" />
+                        </div> -->
                         <div class="flex-1 d-sm-none d-xl-block">
                           <div class="d-flex justify-content-between align-items-center">
                             <h5 class="text-body fw-normal name text-nowrap">이름 넣어야됨</h5>
@@ -46,7 +53,7 @@ lang="ko-KR" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                       </a></li> 
                        <!-- 여기까지 -->
                       <!-- 사람 1명 안읽은사람 -->
-                      <li class="nav-item unread" role="presentation"><a class="nav-link d-flex align-items-center justify-content-center p-2 unread " data-bs-toggle="tab" data-chat-thread="data-chat-thread" href="#tab-thread-4" role="tab" aria-selected="true">
+                      <!-- <li class="nav-item unread" role="presentation"><a class="nav-link d-flex align-items-center justify-content-center p-2 unread " data-bs-toggle="tab" data-chat-thread="data-chat-thread" href="#tab-thread-4" role="tab" aria-selected="true">
                         <div class="avatar avatar-xl status-online position-relative me-2 me-sm-0 me-xl-2"><img class="rounded-circle border border-2 border-light-subtle" src="../assets/img/team/25.webp" alt="" /><span class="bg-primary rounded-circle top-0 end-0 position-absolute text-white d-flex flex-center fs-10 fw-semibold d-none d-sm-flex d-xl-none lh-1" style="height: 1rem; width: 1rem;">3</span>
                         </div>
                         <div class="flex-1 d-sm-none d-xl-block">
@@ -58,7 +65,7 @@ lang="ko-KR" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                             <p class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">읽지않은메시지</p><span class="badge badge-phoenix badge-phoenix-primary px-1 unread-badge">3+</span>
                           </div>
                         </div>
-                      </a></li>
+                      </a></li> -->
                        <!-- 이 부분 까지 작업 -->
                   </ul>
                 </div>
