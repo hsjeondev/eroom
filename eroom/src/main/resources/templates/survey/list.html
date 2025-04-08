@@ -1,130 +1,146 @@
 <!DOCTYPE html>
-<html lang="en-US" dir="ltr" data-navigation-type="default"
-	data-navbar-horizontal-shape="default"
-	xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{/include/layout}">
-<th:block>
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
 <body>
-	<main class="main" id="top" layout:fragment="content">
-		<div class="pb-8">
-			<h2 class="mb-4">설문</h2>
-			<div id="reports"
-				data-list='{"valueNames":["title","text","priority","reportsby","reports","date"],"page":10,"pagination":true}'>
-				<div class="row g-3 justify-content-between mb-2">
-					<div class="col-12">
-						<div class="d-md-flex justify-content-between">
-							<div class="mb-3">
-								<button class="btn btn-primary me-4" onclick="openSurveyModal()">
-									<span class="fas fa-plus me-2"></span>설문 생성
-								</button>
-								<!-- 설문 생성 팝업창 -->
-								<div id="surveyModal" th:fragment="modal"
-									style="display: none; position: fixed; top: 20%; left: 30%; background: #fff; border: 1px solid #ccc; padding: 20px; z-index: 1000; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);">
-									<h2>설문 생성</h2>
-									<form th:action="@{/survey/create}" method="post">
-										<label>제목: <input type="text" name="surveyTitle" required></label><br><br>
-										<label>마감일: <input type="datetime-local" name="deadline"></label><br><br>
-										<label>익명 투표: <select name="anonymousVote">
-															<option value="Y">예</option>
-															<option value="N" selected>아니오</option>
-														</select>
-										</label><br><br>
-										<label>복수 선택: <select name="allowMultiple">
-															<option value="Y">허용</option>
-															<option value="N" selected>불허</option>
-										</select>
-										</label><br><br>
-										<button type="submit">등록</button>
-										<button type="button" onclick="closeSurveyModal()">닫기</button>
-									</form>
-								</div>
-								<!-- 문서화 버튼? -->
-								<!-- <button class="btn btn-link text-body px-0"><span class="fa-solid fa-file-export fs-9 me-2"></span>Export </button> -->
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row g-3 list" id="reportsList">
-					<div class="col-12 col-xl-6">
-						<div class="card h-100">
-							<div class="card-body">
-								<div class="border-bottom border-translucent">
-									<div class="d-flex align-items-start mb-1">
-										<div class="d-sm-flex align-items-center ps-2">
-											<a class="fw-bold fs-7 lh-sm title line-clamp-1 me-sm-4"
-												href="../../apps/crm/report-details.html">설문 제목</a>
-											<div class="d-flex align-items-center">
-												<span class="fa-solid fa-circle me-1 text-success"
-													data-fa-transform="shrink-6 up-1"></span><span
-													class="fw-bold fs-9 text-body lh-2">진행중</span>
+	<th:block layout:fragment="content">
+		<main class="main" id="top">
+			<div class="pb-8">
+				<h2 class="mb-4">설문</h2>
+				<div id="reports" data-list='{"valueNames":["title","text","priority","reportsby","reports","date"],"page":10,"pagination":true}'>
+					<div class="row g-3 justify-content-between mb-2">
+						<div class="col-12">
+							<div class="d-md-flex justify-content-between">
+								<div class="mb-3">
+									<!-- 설문 생성 팝업창 -->
+									<button class="btn btn-primary me-4" type="button" data-bs-toggle="modal" data-bs-target="#scrollingLong2">
+										<span class="fas fa-plus me-2"></span>설문 생성
+									</button>
+									<div class="modal fade" id="scrollingLong2" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
+										<div class="modal-dialog modal-dialog-scrollable">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h5 class="modal-title" id="scrollingLongModalLabel2">설문 생성</h5>
+													<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body">
+													<!-- 모달 본문 -->
+													<form>
+														<div class="row mb-3">
+															<label class="col-sm-2 col-form-label" for="surveyTitle">제목</label>
+															<div class="col-sm-8">
+																<input class="form-control" id="surveyTitle" type="text">
+															</div>
+														</div>
+														<div class="row mb-3">
+															<label class="col-sm-2 col-form-label" for="inputItem">항목</label>
+															<div class="col-sm-8" id="itemContainer">
+																<input class="form-control mb-2" name="item" type="text" />
+															</div>
+															<div class="container text-center">
+																<button class="btn btn-phoenix-primary me-1 mb-1" type="button" onclick="addItem()">+ 항목 추가</button>
+															</div>
+														</div>
+
+														<div class="row mb-3">
+															<div class="col-form-label col-sm-2 pt-0"></div>
+															<div class="col-sm-8">
+																<div class="form-check">
+																	<input class="form-check-input" id="gridCheck1" type="checkbox">
+																	<label class="form-check-label" for="gridCheck1">복수선택</label>
+																</div>
+																<div class="form-check">
+																	<input class="form-check-input" id="gridCheck2" type="checkbox">
+																	<label class="form-check-label" for="gridCheck2">익명투표</label>
+																</div>
+															</div>
+														</div>
+														<div class="row mb-3">
+															<label class="col-sm-2 col-form-label" for="basic-form-dob">마감일</label>
+															<div class="col-sm-8">
+																<input class="form-control" id="basic-form-dob" type="date" />
+															</div>
+														</div>
+													</form>
+												</div>
+												<div class="modal-footer">
+													<button class="btn btn-primary" type="button">생성</button>
+													<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">취소</button>
+												</div>
 											</div>
-											<div class="d-flex align-items-center">
-												<span class="fa-solid fa-circle me-1 text-danger"
-													data-fa-transform="shrink-6 up-1"></span><span
-													class="fw-bold fs-9 text-body lh-2">마감</span>
-											</div>
 										</div>
 									</div>
-									<p class="fs-9 fw-semibold text-body ms-1 text mb-4 ps-2">작성자</p>
-								</div>
-								<div class="row g-1 g-sm-3 mt-2 lh-1">
-									<!-- <div class="col-12 col-sm-auto flex-1 text-truncate"><p class="fw-semibold fs-9"><span class="fa-regular fa-folder me-2 reportsby"></span>응답자 수</p></div> -->
-									<div class="col-12 col-sm-auto">
-										<div class="d-flex align-items-center">
-											<span class="me-2" data-feather="grid"
-												style="stroke-width: 2;"></span>
-											<p class="mb-0 fs-9 fw-semibold text-body-tertiary reports">응답자
-												수</p>
-										</div>
-									</div>
-									<div class="col-12 col-sm-auto">
-										<div class="d-flex align-items-center">
-											<span class="me-2" data-feather="clock"
-												style="stroke-width: 2;"></span>
-											<p class="mb-0 fs-9 fw-semibold text-body-tertiary date">마감일
-												Dec 30, 2022</p>
-										</div>
-									</div>
+									<!-- 문서화 버튼? -->
+									<!-- <button class="btn btn-link text-body px-0"><span class="fa-solid fa-file-export fs-9 me-2"></span>Export </button> -->
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-				<div
-					class="row align-items-center justify-content-between py-2 pe-0 fs-9 mt-2">
-					<div class="col-auto d-flex">
-						<p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body"
-							data-list-info="data-list-info"></p>
-						<a class="fw-semibold" href="#!" data-list-view="*">View all<span
-							class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a><a
-							class="fw-semibold d-none" href="#!" data-list-view="less">View
-							Less<span class="fas fa-angle-right ms-1"
-							data-fa-transform="down-1"></span>
-						</a>
+					<div class="row g-3 list" id="reportsList">
+						<div class="col-12 col-xl-6">
+							<div class="card h-100">
+								<div class="card-body">
+									<div class="border-bottom border-translucent">
+										<div class="d-flex align-items-start mb-1">
+											<div class="d-sm-flex align-items-center ps-2">
+												<a class="fw-bold fs-7 lh-sm title line-clamp-1 me-sm-4" href="../../apps/crm/report-details.html">설문 제목</a>
+												<div class="d-flex align-items-center">
+													<span class="fa-solid fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1"></span><span class="fw-bold fs-9 text-body lh-2">진행중</span>
+												</div>
+												<div class="d-flex align-items-center">
+													<span class="fa-solid fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1"></span><span class="fw-bold fs-9 text-body lh-2">마감</span>
+												</div>
+											</div>
+										</div>
+										<p class="fs-9 fw-semibold text-body ms-1 text mb-4 ps-2">작성자</p>
+									</div>
+									<div class="row g-1 g-sm-3 mt-2 lh-1">
+										<!-- <div class="col-12 col-sm-auto flex-1 text-truncate"><p class="fw-semibold fs-9"><span class="fa-regular fa-folder me-2 reportsby"></span>응답자 수</p></div> -->
+										<div class="col-12 col-sm-auto">
+											<div class="d-flex align-items-center">
+												<span class="me-2" data-feather="users" style="stroke-width: 2;"></span>
+												<p class="mb-0 fs-9 fw-semibold text-body-tertiary reports">응답자 수</p>
+											</div>
+										</div>
+										<div class="col-12 col-sm-auto">
+											<div class="d-flex align-items-center">
+												<span class="me-2" data-feather="clock" style="stroke-width: 2;"></span>
+												<p class="mb-0 fs-9 fw-semibold text-body-tertiary date">마감일 Dec 30, 2022</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
-					<div class="col-auto d-flex">
-						<button class="page-link" data-list-pagination="prev">
-							<span class="fas fa-chevron-left"></span>
-						</button>
-						<ul class="mb-0 pagination"></ul>
-						<button class="page-link pe-0" data-list-pagination="next">
-							<span class="fas fa-chevron-right"></span>
-						</button>
+					<div class="row align-items-center justify-content-between py-2 pe-0 fs-9 mt-2">
+						<div class="col-auto d-flex">
+							<p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info"></p>
+							<a class="fw-semibold" href="#!" data-list-view="*">더보기<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a><a class="fw-semibold d-none" href="#!" data-list-view="less">접기<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span>
+							</a>
+						</div>
+						<div class="col-auto d-flex">
+							<button class="page-link" data-list-pagination="prev">
+								<span class="fas fa-chevron-left"></span>
+							</button>
+							<ul class="mb-0 pagination"></ul>
+							<button class="page-link pe-0" data-list-pagination="next">
+								<span class="fas fa-chevron-right"></span>
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	</main>
+		</main>
+	</th:block>
+	<script>
+		function addItem() {
+			const container = document.getElementById("itemContainer");
+			const newInput = document.createElement("input");
+			newInput.type = "text";
+			newInput.name = "item";
+			newInput.placeholder = "항목 입력";
+			newInput.className = "form-control mb-2";
+			container.appendChild(newInput);
+		}
+	</script>
 </body>
-</th:block>
-<script>
-  function openSurveyModal() {
-    document.getElementById("surveyModal").style.display = "block";
-  }
-
-  function closeSurveyModal() {
-    document.getElementById("surveyModal").style.display = "none";
-  }
-</script>
 </html>
