@@ -4,9 +4,369 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{/include/layout}">
+<head>
+  <style>
+    .deals-wrapper {
+	    max-width: 100%;
+	  	padding-left: 0;
+	  	padding-right: 0;
+	  	margin-left: 0;
+	  	margin-right: 0;
+
+     /*  max-width: 900px;
+      margin: 2rem auto; */
+    }
+
+    .deals {
+      display: flex;
+      justify-content: flex-start; /* ← 왼쪽 정렬 */
+      align-items: flex-start;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-left: 13rem; /* ← 여기서 왼쪽 여백 조정 */
+      margin-top: 5rem; /* 또는 3rem, 40px 정도 */
+    }
+
+    .deals-col {
+      width: 300px;
+      min-height: 300px;
+    }
+
+    .card-body .deals-company-agent {
+      margin-bottom: 1rem;
+    }
+    
+    .card-body {
+	  height: 150px;         /* 필요시 조절: 200~300px 추천 */
+	  padding: 1rem;
+	  display: flex;
+	  flex-direction: column;
+	   justify-content: space-between;
+	  gap: 1rem;
+	}
+
+    #products {
+      margin-top: 3rem;
+      padding: 2rem;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
   <body>
     <main class="main" id="top" layout:fragment="content">
-      <!-- 여기에 요소 넣으면 됩니다. -->d
+      <!-- 여기에 요소 넣으면 됩니다. -->
+      attendance/list 진입
+      
+      <div class="deals">
+				<!-- 카드1 START -->
+              <div class="deals-col me-4">
+                  <div class="w-100 min-vh-50" data-sortable="data-sortable">
+                      <div class="card mb-3">
+                        <div class="card-body">
+	                         
+	                           <div class="deals-company-agent d-flex flex-between-center">
+	                            <div class="d-flex align-items-center">
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Knitkake.inc</p>
+	                            </div>
+	                            <div class="d-flex align-items-center">
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Ally Aagaard</p>
+	                            </div>
+	                          </div>
+	                          
+	                           <div class="deals-company-agent d-flex flex-between-center">
+	                            <div class="d-flex align-items-center">
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Knitkake.inc</p>
+	                            </div>
+	                            <div class="d-flex align-items-center">
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Ally Aagaard</p>
+	                            </div>
+	                          </div>
+	                          
+	                          <div class="deals-company-agent d-flex flex-between-center">
+	                            <div class="d-flex align-items-center">
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Knitkake.inc</p>
+	                            </div>
+	                            <div class="d-flex align-items-center">
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Ally Aagaard</p>
+	                            </div>
+	                          </div>
+	                          
+                        </div>
+                      </div>
+                  </div>
+              </div>
+              <!-- 카드1 END -->
+              
+              
+              <!-- 카드2 START -->
+              <div class="deals-col me-4">
+
+                  <div class="w-100 min-vh-50" data-sortable="data-sortable">
+                   
+                      <div class="card mb-3">
+                        <div class="card-body">
+                         
+							 <div class="deals-company-agent d-flex flex-between-center">
+							   <div class="d-flex align-items-center">
+							     <p class="text-body-secondary fw-bold fs-9 mb-0">PBR Holdings</p>
+							   </div>
+							   <div class="d-flex align-items-center">
+							     <p class="text-body-secondary fw-bold fs-9 mb-0">Aida Moen</p>
+							   </div>
+							 </div>
+							<div class="deals-company-agent d-flex flex-between-center">
+							   <div class="d-flex align-items-center">
+							     <p class="text-body-secondary fw-bold fs-9 mb-0">PBR Holdings</p>
+							   </div>
+							   <div class="d-flex align-items-center">
+							     <p class="text-body-secondary fw-bold fs-9 mb-0">Aida Moen</p>
+							   </div>
+							 </div>
+                       	
+                        </div>
+                      </div>
+                   
+                  </div>
+              </div>
+			<!-- 카드2 END -->
+            
+
+            </div>
+      
+      
+      
+      
+      
+      
+      <div id="products" data-list="{&quot;valueNames&quot;:[&quot;customer&quot;,&quot;email&quot;,&quot;total-orders&quot;,&quot;total-spent&quot;,&quot;city&quot;,&quot;last-seen&quot;,&quot;last-order&quot;],&quot;page&quot;:10,&quot;pagination&quot;:true}">
+            <div class="mb-4">
+              <div class="row g-3">
+
+                <!-- 근태 기록 날짜 셀릭트 부분 -->
+                <div class="col-auto scrollbar overflow-hidden-y flex-grow-1">
+                  <div class="btn-group position-static" role="group">
+                    <div class="btn-group position-static text-nowrap">
+                      <button class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+                        Country<svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com --></button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">US</a></li>
+                        <li><a class="dropdown-item" href="#">Uk</a></li>
+                        <li><a class="dropdown-item" href="#">Australia</a></li>
+                      </ul>
+                    </div>
+                  
+                  </div>
+                </div>
+                
+                
+  
+              </div>
+            </div>
+            <div class="mx-n4 px-4 mx-lg-n6 px-lg-6 bg-body-emphasis border-top border-bottom border-translucent position-relative top-1">
+              <div class="table-responsive scrollbar-overlay mx-n1 px-1 simplebar-scrollable-x" data-simplebar="init"><div class="simplebar-wrapper" style="margin: 0px -4px;"><div class="simplebar-height-auto-observer-wrapper"><div class="simplebar-height-auto-observer"></div></div><div class="simplebar-mask"><div class="simplebar-offset" style="right: 0px; bottom: 0px;"><div class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content" style="height: auto; overflow: scroll hidden;"><div class="simplebar-content" style="padding: 0px 4px;">
+                <table class="table table-sm fs-9 mb-0">
+                  <thead>
+                    <tr>
+                      <th class="white-space-nowrap fs-9 align-middle ps-0">
+                        <div class="form-check mb-0 fs-8">
+                          <input class="form-check-input" id="checkbox-bulk-customers-select" type="checkbox" data-bulk-select="{&quot;body&quot;:&quot;customers-table-body&quot;}">
+                        </div>
+                      </th>
+                      <th class="sort align-middle pe-5" scope="col" data-sort="customer" style="width:10%;">CUSTOMER</th>
+                      <th class="sort align-middle pe-5" scope="col" data-sort="email" style="width:20%;">EMAIL</th>
+                      <th class="sort align-middle text-end" scope="col" data-sort="total-orders" style="width:10%">ORDERS</th>
+                      <th class="sort align-middle text-end ps-3" scope="col" data-sort="total-spent" style="width:10%">TOTAL SPENT</th>
+                      <th class="sort align-middle ps-7" scope="col" data-sort="city" style="width:25%;">CITY</th>
+                      <th class="sort align-middle text-end" scope="col" data-sort="last-seen" style="width:15%;">LAST SEEN</th>
+                      <th class="sort align-middle text-end pe-0" scope="col" data-sort="last-order" style="width:10%;min-width: 150px;">LAST ORDER</th>
+                    </tr>
+                  </thead>
+                  <tbody class="list" id="customers-table-body"><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                      <td class="fs-9 align-middle ps-0 py-3">
+                        <div class="form-check mb-0 fs-8">
+                          <input class="form-check-input" type="checkbox" data-bulk-select-row="{&quot;customer&quot;:{&quot;avatar&quot;:&quot;/team/32.webp&quot;,&quot;name&quot;:&quot;Carry Anna&quot;},&quot;email&quot;:&quot;annac34@gmail.com&quot;,&quot;city&quot;:&quot;Budapest&quot;,&quot;totalOrders&quot;:89,&quot;totalSpent&quot;:23987,&quot;lastSeen&quot;:&quot;34 min ago&quot;,&quot;lastOrder&quot;:&quot;Dec 12, 12:56 PM&quot;}">
+                        </div>
+                      </td>
+                      <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
+                          <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/32.webp" alt="">
+                          </div>
+                          <p class="mb-0 ms-3 text-body-emphasis fw-bold">Carry Anna</p>
+                        </a></td>
+                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:annac34@gmail.com">annac34@gmail.com</a></td>
+                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">89</td>
+                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis">$ 23987</td>
+                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7">Budapest</td>
+                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">34 min ago</td>
+                      <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Dec 12, 12:56 PM</td>
+                    </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                      <td class="fs-9 align-middle ps-0 py-3">
+                        <div class="form-check mb-0 fs-8">
+                          <input class="form-check-input" type="checkbox" data-bulk-select-row="{&quot;customer&quot;:{&quot;avatar&quot;:&quot;/team/avatar.webp&quot;,&quot;name&quot;:&quot;Milind Mikuja&quot;,&quot;placeholder&quot;:true},&quot;email&quot;:&quot;mimiku@yahoo.com&quot;,&quot;city&quot;:&quot;Manchester&quot;,&quot;totalOrders&quot;:76,&quot;totalSpent&quot;:21567,&quot;lastSeen&quot;:&quot;6 hours ago&quot;,&quot;lastOrder&quot;:&quot;Dec 9, 2:28 PM&quot;}">
+                        </div>
+                      </td>
+                      <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
+                          <div class="avatar avatar-m"><img class="rounded-circle avatar-placeholder" src="../../../assets/img/team/avatar.webp" alt="">
+                          </div>
+                          <p class="mb-0 ms-3 text-body-emphasis fw-bold">Milind Mikuja</p>
+                        </a></td>
+                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:mimiku@yahoo.com">mimiku@yahoo.com</a></td>
+                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">76</td>
+                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis">$ 21567</td>
+                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7">Manchester</td>
+                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">6 hours ago</td>
+                      <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Dec 9, 2:28 PM</td>
+                    </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                      <td class="fs-9 align-middle ps-0 py-3">
+                        <div class="form-check mb-0 fs-8">
+                          <input class="form-check-input" type="checkbox" data-bulk-select-row="{&quot;customer&quot;:{&quot;avatar&quot;:&quot;/team/35.webp&quot;,&quot;name&quot;:&quot;Stanly Drinkwater&quot;},&quot;email&quot;:&quot;stnlwasser@hotmail.com&quot;,&quot;city&quot;:&quot;Smallville&quot;,&quot;totalOrders&quot;:69,&quot;totalSpent&quot;:19872,&quot;lastSeen&quot;:&quot;43 min ago&quot;,&quot;lastOrder&quot;:&quot;Dec 4, 12:56 PM&quot;}">
+                        </div>
+                      </td>
+                      <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
+                          <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/35.webp" alt="">
+                          </div>
+                          <p class="mb-0 ms-3 text-body-emphasis fw-bold">Stanly Drinkwater</p>
+                        </a></td>
+                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:stnlwasser@hotmail.com">stnlwasser@hotmail.com</a></td>
+                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">69</td>
+                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis">$ 19872</td>
+                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7">Smallville</td>
+                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">43 min ago</td>
+                      <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Dec 4, 12:56 PM</td>
+                    </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                      <td class="fs-9 align-middle ps-0 py-3">
+                        <div class="form-check mb-0 fs-8">
+                          <input class="form-check-input" type="checkbox" data-bulk-select-row="{&quot;customer&quot;:{&quot;avatar&quot;:&quot;/team/57.webp&quot;,&quot;name&quot;:&quot;Josef Stravinsky&quot;},&quot;email&quot;:&quot;Josefsky@sni.it&quot;,&quot;city&quot;:&quot;Metropolis&quot;,&quot;totalOrders&quot;:67,&quot;totalSpent&quot;:17996,&quot;lastSeen&quot;:&quot;2 hours ago&quot;,&quot;lastOrder&quot;:&quot;Dec 1,  4:07 AM&quot;}">
+                        </div>
+                      </td>
+                      <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
+                          <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/57.webp" alt="">
+                          </div>
+                          <p class="mb-0 ms-3 text-body-emphasis fw-bold">Josef Stravinsky</p>
+                        </a></td>
+                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:Josefsky@sni.it">Josefsky@sni.it</a></td>
+                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">67</td>
+                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis">$ 17996</td>
+                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7">Metropolis</td>
+                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">2 hours ago</td>
+                      <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Dec 1, 4:07 AM</td>
+                    </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                      <td class="fs-9 align-middle ps-0 py-3">
+                        <div class="form-check mb-0 fs-8">
+                          <input class="form-check-input" type="checkbox" data-bulk-select-row="{&quot;customer&quot;:{&quot;avatar&quot;:&quot;/team/58.webp&quot;,&quot;name&quot;:&quot;Igor Borvibson&quot;},&quot;email&quot;:&quot;vibigorr@technext.it&quot;,&quot;city&quot;:&quot;Central city&quot;,&quot;totalOrders&quot;:61,&quot;totalSpent&quot;:16785,&quot;lastSeen&quot;:&quot;5 days ago&quot;,&quot;lastOrder&quot;:&quot;Nov 28, 7:28 PM&quot;}">
+                        </div>
+                      </td>
+                      <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
+                          <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/58.webp" alt="">
+                          </div>
+                          <p class="mb-0 ms-3 text-body-emphasis fw-bold">Igor Borvibson</p>
+                        </a></td>
+                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:vibigorr@technext.it">vibigorr@technext.it</a></td>
+                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">61</td>
+                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis">$ 16785</td>
+                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7">Central city</td>
+                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">5 days ago</td>
+                      <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Nov 28, 7:28 PM</td>
+                    </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                      <td class="fs-9 align-middle ps-0 py-3">
+                        <div class="form-check mb-0 fs-8">
+                          <input class="form-check-input" type="checkbox" data-bulk-select-row="{&quot;customer&quot;:{&quot;avatar&quot;:&quot;/team/59.webp&quot;,&quot;name&quot;:&quot;Katerina Karenin&quot;},&quot;email&quot;:&quot;karkat99@gmail.com&quot;,&quot;city&quot;:&quot;Gotham&quot;,&quot;totalOrders&quot;:58,&quot;totalSpent&quot;:14956,&quot;lastSeen&quot;:&quot;2 weeks ago&quot;,&quot;lastOrder&quot;:&quot;Nov 24, 10:16 AM&quot;}">
+                        </div>
+                      </td>
+                      <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
+                          <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/59.webp" alt="">
+                          </div>
+                          <p class="mb-0 ms-3 text-body-emphasis fw-bold">Katerina Karenin</p>
+                        </a></td>
+                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:karkat99@gmail.com">karkat99@gmail.com</a></td>
+                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">58</td>
+                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis">$ 14956</td>
+                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7">Gotham</td>
+                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">2 weeks ago</td>
+                      <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Nov 24, 10:16 AM</td>
+                    </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                      <td class="fs-9 align-middle ps-0 py-3">
+                        <div class="form-check mb-0 fs-8">
+                          <input class="form-check-input" type="checkbox" data-bulk-select-row="{&quot;customer&quot;:{&quot;avatar&quot;:&quot;&quot;,&quot;name&quot;:&quot;Roy Anderson&quot;},&quot;email&quot;:&quot;andersonroy@netflix.chill&quot;,&quot;city&quot;:&quot;Vancouver&quot;,&quot;totalOrders&quot;:52,&quot;totalSpent&quot;:12509,&quot;lastSeen&quot;:&quot;4 days ago&quot;,&quot;lastOrder&quot;:&quot;Nov 18, 5:43 PM&quot;}">
+                        </div>
+                      </td>
+                      <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
+                          <div class="avatar avatar-m">
+                            <div class="avatar-name rounded-circle"><span>R</span></div>
+                          </div>
+                          <p class="mb-0 ms-3 text-body-emphasis fw-bold">Roy Anderson</p>
+                        </a></td>
+                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:andersonroy@netflix.chill">andersonroy@netflix.chill</a></td>
+                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">52</td>
+                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis">$ 12509</td>
+                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7">Vancouver</td>
+                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">4 days ago</td>
+                      <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Nov 18, 5:43 PM</td>
+                    </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                      <td class="fs-9 align-middle ps-0 py-3">
+                        <div class="form-check mb-0 fs-8">
+                          <input class="form-check-input" type="checkbox" data-bulk-select-row="{&quot;customer&quot;:{&quot;avatar&quot;:&quot;/team/31.webp&quot;,&quot;name&quot;:&quot;Martina scorcese&quot;},&quot;email&quot;:&quot;cesetina1@gmail.com&quot;,&quot;city&quot;:&quot;Viena&quot;,&quot;totalOrders&quot;:49,&quot;totalSpent&quot;:11003,&quot;lastSeen&quot;:&quot;6 min ago&quot;,&quot;lastOrder&quot;:&quot;Nov 18, 2:09 AM&quot;}">
+                        </div>
+                      </td>
+                      <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
+                          <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/31.webp" alt="">
+                          </div>
+                          <p class="mb-0 ms-3 text-body-emphasis fw-bold">Martina scorcese</p>
+                        </a></td>
+                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:cesetina1@gmail.com">cesetina1@gmail.com</a></td>
+                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">49</td>
+                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis">$ 11003</td>
+                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7">Viena</td>
+                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">6 min ago</td>
+                      <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Nov 18, 2:09 AM</td>
+                    </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                      <td class="fs-9 align-middle ps-0 py-3">
+                        <div class="form-check mb-0 fs-8">
+                          <input class="form-check-input" type="checkbox" data-bulk-select-row="{&quot;customer&quot;:{&quot;avatar&quot;:&quot;/team/33.webp&quot;,&quot;name&quot;:&quot;Luis Bunuel&quot;},&quot;email&quot;:&quot;luisuel@live.com&quot;,&quot;city&quot;:&quot;Bangalore&quot;,&quot;totalOrders&quot;:44,&quot;totalSpent&quot;:7897,&quot;lastSeen&quot;:&quot;56 min ago&quot;,&quot;lastOrder&quot;:&quot;Nov 16, 3:22 PM&quot;}">
+                        </div>
+                      </td>
+                      <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
+                          <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/33.webp" alt="">
+                          </div>
+                          <p class="mb-0 ms-3 text-body-emphasis fw-bold">Luis Bunuel</p>
+                        </a></td>
+                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:luisuel@live.com">luisuel@live.com</a></td>
+                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">44</td>
+                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis">$ 7897</td>
+                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7">Bangalore</td>
+                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">56 min ago</td>
+                      <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Nov 16, 3:22 PM</td>
+                    </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                      <td class="fs-9 align-middle ps-0 py-3">
+                        <div class="form-check mb-0 fs-8">
+                          <input class="form-check-input" type="checkbox" data-bulk-select-row="{&quot;customer&quot;:{&quot;avatar&quot;:&quot;/team/34.webp&quot;,&quot;name&quot;:&quot;Jean Renoir&quot;},&quot;email&quot;:&quot;renoirjean1836@gmail.com&quot;,&quot;city&quot;:&quot;Chittagong&quot;,&quot;totalOrders&quot;:37,&quot;totalSpent&quot;:7781,&quot;lastSeen&quot;:&quot;Yesterday&quot;,&quot;lastOrder&quot;:&quot;Nov 09, 8:49 AM&quot;}">
+                        </div>
+                      </td>
+                      <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
+                          <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/34.webp" alt="">
+                          </div>
+                          <p class="mb-0 ms-3 text-body-emphasis fw-bold">Jean Renoir</p>
+                        </a></td>
+                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:renoirjean1836@gmail.com">renoirjean1836@gmail.com</a></td>
+                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">37</td>
+                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis">$ 7781</td>
+                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7">Chittagong</td>
+                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">Yesterday</td>
+                      <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Nov 09, 8:49 AM</td>
+                    </tr></tbody>
+                </table>
+              </div></div></div></div><div class="simplebar-placeholder" style="width: 810px; height: 611px;"></div></div><div class="simplebar-track simplebar-horizontal" style="visibility: visible;"><div class="simplebar-scrollbar" style="width: 676px; transform: translate3d(0px, 0px, 0px); display: block;"></div></div><div class="simplebar-track simplebar-vertical" style="visibility: hidden;"><div class="simplebar-scrollbar" style="height: 0px; display: none;"></div></div></div>
+              <div class="row align-items-center justify-content-between py-2 pe-0 fs-9">
+                <div class="col-auto d-flex">
+                  <p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info">1 to 10 <span class="text-body-tertiary"> Items of </span>15</p><a class="fw-semibold" href="#!" data-list-view="*">View all<svg class="svg-inline--fa fa-angle-right ms-1" data-fa-transform="down-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="" style="transform-origin: 0.3125em 0.5625em;"><g transform="translate(160 256)"><g transform="translate(0, 32)  scale(1, 1)  rotate(0 0 0)"><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z" transform="translate(-160 -256)"></path></g></g></svg><!-- <span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span> Font Awesome fontawesome.com --></a><a class="fw-semibold d-none" href="#!" data-list-view="less">View Less<svg class="svg-inline--fa fa-angle-right ms-1" data-fa-transform="down-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="" style="transform-origin: 0.3125em 0.5625em;"><g transform="translate(160 256)"><g transform="translate(0, 32)  scale(1, 1)  rotate(0 0 0)"><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z" transform="translate(-160 -256)"></path></g></g></svg><!-- <span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span> Font Awesome fontawesome.com --></a>
+                </div>
+                <div class="col-auto d-flex">
+                  <button class="page-link disabled" data-list-pagination="prev" disabled=""><svg class="svg-inline--fa fa-chevron-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"></path></svg><!-- <span class="fas fa-chevron-left"></span> Font Awesome fontawesome.com --></button>
+                  <ul class="mb-0 pagination"><li class="active"><button class="page" type="button" data-i="1" data-page="10">1</button></li><li><button class="page" type="button" data-i="2" data-page="10">2</button></li></ul>
+                  <button class="page-link pe-0" data-list-pagination="next"><svg class="svg-inline--fa fa-chevron-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"></path></svg><!-- <span class="fas fa-chevron-right"></span> Font Awesome fontawesome.com --></button>
+                </div>
+              </div>
+            </div>
+          </div>
     </main>
   </body>
 </html>

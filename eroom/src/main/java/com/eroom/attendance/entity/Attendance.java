@@ -28,25 +28,25 @@ public class Attendance {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="attendance_no")
-	private Long attendanceNo;
+	private Long attendanceNo; // 근태 번호
 	
 	@CreationTimestamp
 	@Column(updatable=false,name="attendance_check_in_time")
-	private LocalDateTime attendanceCheckInTime;
+	private LocalDateTime attendanceCheckInTime; // 출근 시간
 
 	@CreationTimestamp
 	@Column(updatable=false,name="attendance_check_out_time")
-	private LocalDateTime attendanceCheckOutTime;
+	private LocalDateTime attendanceCheckOutTime; // 퇴근 시간
 	
 	@Column(name="attendance_late_yn")
-	private String attendanceLateYn;
+	private String attendanceLateYn; // 지각 여부
 	
 	@Column(name="attendance_early_leave_yn")
-	private String attendanceEarlyLeaveYn;
+	private String attendanceEarlyLeaveYn; // 조퇴 여부
 	
 //	@ManyToOne
 //	@JoinColumn(name="employee_no")
-//	private Employee employee;
+//	private Employee employee; // 사번
 	
 	
 
