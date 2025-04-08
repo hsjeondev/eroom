@@ -14,6 +14,7 @@ public class ChatController {
 
 	@GetMapping("/list")
 	public String selectChatRoomAll(Model model) {
+		
 		return "chat/list";
 	}
 }

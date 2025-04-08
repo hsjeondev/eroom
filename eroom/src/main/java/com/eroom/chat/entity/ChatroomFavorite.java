@@ -17,27 +17,27 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="chatroom_attendee")
+@Table(name="chatroom_favorite")
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatRoomAttendee {
+public class ChatroomFavorite {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="chatroom_mapping_no")
-	// 채팅방매핑번호
-	private Long chatroomMappingNo;
+	@Column(name="chatroom_favorite_no")
+	private Long chatroomFavoriteNo; // 채팅방 즐겨찾기 번호
 	
-	// chatroom_no FK 연결
+	// 채팅방번호 FK 연결
 	
 	@CreationTimestamp
-	@Column(updatable=false, name="joined_at")
-	// 채팅방 참여 일시
-	private LocalDateTime joinedAt;
+	@Column(updatable=false, name="favorited_reg_date")
+	private LocalDateTime favoritedRegDate; // 즐겨찾기 등록일
 	
-	// 사번 FK 받아와야됨
+	// 사번 FK 연결
+	
+	
 	
 }

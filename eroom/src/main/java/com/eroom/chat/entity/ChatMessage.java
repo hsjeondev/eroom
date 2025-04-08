@@ -29,23 +29,19 @@ public class ChatMessage {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="chat_message_no")
-	// 메시지번호
-	private Long chatMessageNo;
+	private Long chatMessageNo; // 메시지번호
 	
 	// 챗룸번호 FK
 	
 	@Column(name="chat_message_content")
-	// 메시지 내용
-	private String chatMessageContent;
+	private String chatMessageContent; // 메시지 내용
 	
 	@CreationTimestamp
 	@Column(updatable=false, name="message_reg_date")
-	// 보낸시간
-	private LocalDateTime messageRegDate;
+	private LocalDateTime messageRegDate; // 보낸시간
 	
 	@Column(nullable=false, name="message_is_deleted_yn")
-	// 삭제여부
-	private String messageIsDeletedYn;
+	private String messageIsDeletedYn; // 삭제여부
 	
 	// 사번 FK
 	

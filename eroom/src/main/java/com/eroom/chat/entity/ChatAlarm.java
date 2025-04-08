@@ -28,19 +28,16 @@ public class ChatAlarm {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="chat_alarm_no")
-	// 채팅알림번호
-	private Long chatAlarmNo;
-	
+	private Long chatAlarmNo; // 채팅알림번호
+	 
 	// 채팅메시지 FK 
 	
 	@Column(nullable=false, name="chat_alarm_read_yn")
-	// 확인여부
-	private String chatAlarmReadYn;
+	private String chatAlarmReadYn; // 확인여부
 	
 	@CreationTimestamp
 	@Column(updatable=false, name="chat_alarm_reg_date")
-	// 등록일
-	private LocalDateTime chatAlarmRegDate;
+	private LocalDateTime chatAlarmRegDate; // 등록일
 	                  
 	
 	

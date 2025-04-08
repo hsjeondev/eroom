@@ -26,18 +26,14 @@ public class ChatAttach {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="chat_attach_no")
-	// 파일번호
-	private Long chatAttachNo;
+	private Long chatAttachNo; // 파일번호
 	
 	@Column(name="chat_attach_ori_name")
-	// 기존파일명
-	private String chatAttachOriName;
-	
+	private String chatAttachOriName; // 기존파일명
+	 
 	@Column(name="chat_attach_new_name")
-	// 변경파일명
-	private String chatAttachNewName;
+	private String chatAttachNewName; // 변경파일명
 	
 	@Column(name="chat_attach_path")
-	// 파일경로
-	private String chatAttachPath;
+	private String chatAttachPath; // 파일경로
 }

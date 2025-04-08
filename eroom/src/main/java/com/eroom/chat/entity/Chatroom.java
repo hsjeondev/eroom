@@ -24,34 +24,29 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatRoom {
+public class Chatroom {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="chatroom_no")
-	// 채팅방번호
-	private Long chatroomNo;
+	private Long chatroomNo; // 채팅방번호
 	
 	@Column(name="chatroom_name")
-	// 채팅방 이름
-	private String chatroomName;
+	private String chatroomName; // 채팅방 이름
 	
 	@Column(nullable=false, name="chat_is_group")
-	// 그룹채팅 여부
-	private String chatIsGroup;
+	private String chatIsGroup; // 그룹채팅 여부
 	
 	// creater(직원번호) FK 연결
 	
 	
 	@CreationTimestamp
 	@Column(updatable=false, name="chatroom_reg_date")
-	// 생성일
-	private LocalDateTime chatroomRegDate;
+	private LocalDateTime chatroomRegDate; // 생성일
 	
 	@UpdateTimestamp
 	@Column(insertable=false ,name="chatroom_mod_date")
-	// 수정일
-	private LocalDateTime chatroomModDate;
+	private LocalDateTime chatroomModDate; // 수정일
 	
 	
 	

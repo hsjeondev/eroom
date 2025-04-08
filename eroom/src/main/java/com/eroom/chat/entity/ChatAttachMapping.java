@@ -24,8 +24,7 @@ public class ChatAttachMapping {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="chat_attach_mapping_no")
-	// 파일매핑번호
-	private Long chatAttachMappingNo;
+	private Long chatAttachMappingNo; // 파일매핑번호
 	
 	// 첨부파일번호 FK
 	
