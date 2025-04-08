@@ -12,6 +12,7 @@ public class ChatroomSpecification {
 		return (root,query, CriteriaBuilder) ->
 			CriteriaBuilder.equal(root.get("formMember"),employee);
 	}
+	// 투멤버
 	public static Specification<Chatroom> toUserEquals(Employee employee){
 		return (root,query, CriteriaBuilder) ->
 			CriteriaBuilder.equal(root.get("creater"),employee);
