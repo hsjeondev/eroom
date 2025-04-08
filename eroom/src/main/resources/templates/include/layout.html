@@ -53,13 +53,15 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
     <link th:href="@{vendors/leaflet.markercluster/MarkerCluster.css}" rel="stylesheet">
     <link th:href="@{vendors/leaflet.markercluster/MarkerCluster.Default.css}" rel="stylesheet">
   </head>
-<body>
-	<th:block th:replace="~{include/header :: headerLayout}"></th:block>
+	<body>
+	<main class="main" id="top">
 	<th:block th:replace="~{include/nav :: navLayout}"></th:block>
+	<th:block th:replace="~{include/header :: headerLayout}"></th:block>
+	<div class="content">
+	<th:block layout:fragment="content"></th:block>
 	<!-- <th:block th:replace="~{include/footer :: footerLayout}"></th:block> -->
-	<div layout:fragment="content"></div>
-	
-	
+	</div>
+	</main>
 	<script>
         var navbarTopStyle = window.config.config.phoenixNavbarTopStyle;
         var navbarTop = document.querySelector('.navbar-top');
