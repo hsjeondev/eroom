@@ -31,10 +31,10 @@ public class Employee {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long employeeNo; // 사번
-	
-//	@Column(name="employee_id")
-//	private String employeeId;
-	
+
+	@Column(name="employee_id")
+	private String employeeId;
+
 	@Column(name="employee_pw")
 	private String employeePw; // 비밀번호
 	@Column(name="employee_name")
