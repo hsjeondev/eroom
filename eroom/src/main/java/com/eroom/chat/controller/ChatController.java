@@ -1,4 +1,4 @@
-package com.eroom.chat;
+package com.eroom.chat.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
