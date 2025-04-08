@@ -1,9 +1,14 @@
 package com.eroom.chat.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.eroom.chat.entity.Chatroom;
+import com.eroom.chat.service.ChatroomService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -12,9 +17,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ChatController {
 
+	private final ChatroomService chatroomService;
+	
 	@GetMapping("/list")
 	public String selectChatRoomAll(Model model) {
-		
+		List<Chatroom> resultList = chatroomService.selectChatRoomAll;
 		return "chat/list";
 	}
 }
