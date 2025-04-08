@@ -41,5 +41,6 @@ public class Profile {
 	@OneToOne
 	@JoinColumn(name="employee_no")
 	private Employee employeeNo;
+
 	
 }
