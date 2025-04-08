@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{/include/layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+ <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+  <script>
+    tinymce.init({
+      selector: '.tinymce',
+      height: 400,
+      menubar: false,
+      plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+      ],
+      toolbar: 'undo redo | blocks | bold italic backcolor | ' +
+               'alignleft aligncenter alignright alignjustify | ' +
+               'bullist numlist outdent indent | removeformat | help',
+      branding: false
+    });
+  </script>
+</head>
+<body>
+<main class="main" id="top" layout:fragment="content">
+	<div class="col">
+              <div class="card email-content">
+                <div class="card-body">
+                  <form class="d-flex flex-column h-100">
+                    <div class="row g-3 mb-2">
+                      <div class="col-4">
+                        <input class="form-control" type="email" placeholder="To" />
+                      </div>
+                      <div class="col-4">
+                        <input class="form-control" type="email" placeholder="CC" />
+                      </div>
+                      <div class="col-4">
+                        <input class="form-control" type="email" placeholder="BCC" />
+                      </div>
+                      <div class="col-12">
+                        <input class="form-control" type="text" placeholder="Subject" />
+                      </div>
+                    </div>
+                    <div class="mb-3 flex-1">
+                      <textarea class="tinymce email-textarea" name="content" data-tinymce='{"height":"100%"}'></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="d-flex">
+                        <label class="btn btn-link py-0 px-2 text-body fs-9" for="emailAttachment"> <span class="fa-solid fa-paperclip"></span></label>
+                        <input class="d-none" id="emailAttachment" type="file" />
+                        <label class="btn btn-link py-0 px-2 text-body fs-9" for="emailPhotos"><span class="fa-solid fa-image"></span></label>
+                        <input class="d-none" id="emailPhotos" type="file" accept="image/*" />
+                      </div>
+                      <div class="d-flex">
+                        <button class="btn btn-link text-body fs-10 text-decoration-none">Discard</button>
+                        <button class="btn btn-primary fs-10" type="submit">Send<span class="fa-solid fa-paper-plane ms-1"></span></button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            
+</main>
+</body>
+</html>

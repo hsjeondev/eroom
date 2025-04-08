@@ -15,4 +15,9 @@ public class MailController {
 	public String selectMailOne() {
 		return "mail/detail";
 	}
+	
+	@GetMapping("/mail/create")
+	public String createApi() {
+		return "mail/create";
+	}
 }

@@ -7,7 +7,7 @@
    <main class="main" id="top" layout:fragment="content">
    
       <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
-            <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" href="../../apps/email/compose.html">메일 쓰기</a>
+            <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mail/create}">메일 쓰기</a>
               <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button>
             </div>
             <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" href="../../apps/email/compose.html"> <span class="d-none d-sm-inline-block">Compose</span><span class="d-sm-none fas fa-plus"></span></a></div>
@@ -34,8 +34,9 @@
                     <button class="btn p-0" type="button"><span class="text-primary fa-solid fa-angle-right fs-10"></span></button>
                   </div> -->
                   <div class="d-flex">
-                  	<select >
+                  	<select class="form-control search-input search">
                   		<option value="latest">최신순</option>
+                  		<option value="latest">오래된순</option>
                   	</select>
                   </div>
                 </div>
@@ -251,9 +252,29 @@
                 </div>
               </div>
             </div>
-       
-       
-      <h1>hello</h1>
+            <div class="border-top border-translucent hover-actions-trigger pt-3">
+                  <div class="row justify-content-center">
+                    <div class="col-auto">
+                      <div class="d-flex justify-content-center">
+                        <h6 >페이징</h6>
+                      </div>
+                      </div>
+                      </div>
+                      
+                      </div>
+            
+            <!-- 하단바 -->
+      	<footer class="footer position-absolute">
+          <div class="row g-0 justify-content-between align-items-center h-100">
+            <div class="col-12 col-sm-auto text-center">
+              <p class="mb-0 mt-2 mt-sm-0 text-body">Thank you for creating with Phoenix<span class="d-none d-sm-inline-block"></span><span class="d-none d-sm-inline-block mx-1">|</span><br class="d-sm-none" />2025 &copy;<a class="mx-1" href="https://themewagon.com">Themewagon</a></p>
+            </div>
+            <div class="col-12 col-sm-auto text-center">
+              <p class="mb-0 text-body-tertiary text-opacity-85">v1.22.0</p>
+            </div>
+          </div>
+        </footer>
+       		<!-- 하단바 -->
     </main>
     
   </body>
