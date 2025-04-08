@@ -10,4 +10,9 @@ public class MailController {
 	public String selectMailAll() {
 		return "mail/list";
 	}
+	
+	@GetMapping("/mail/detail")
+	public String selectMailOne() {
+		return "mail/detail";
+	}
 }
