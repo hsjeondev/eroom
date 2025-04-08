@@ -38,8 +38,8 @@ public class Profile {
 	@Column(name = "profile_path")
 	private String profilePath;
 	
-	@OneToOne
-	@JoinColumn(name="employee_no")
-	private String employeeNo;
-	
+//	@OneToOne
+//	@JoinColumn(name="employee_no")
+//	private Employee employee;
+//	
 }
