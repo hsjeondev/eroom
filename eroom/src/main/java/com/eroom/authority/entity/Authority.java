@@ -1,5 +1,4 @@
-
-package com.eroom.directory.entity;
+package com.eroom.authority.entity;
 
 
 import jakarta.persistence.Column;
@@ -7,8 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,24 +22,12 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="profile")
-public class Profile {
+@Table(name="authority")
+public class Authority {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long profileNo; // 프로필 번호
-	
-	@Column(name = "profile_ori_name")
-	private String profileOriName;
-	@Column(name = "profile_new_name")
-	private String profileNewName;
-	@Column(name = "profile_path")
-	private String profilePath;
-	
-	@OneToOne
-	@JoinColumn(name="employee_no")
-	private Employee employeeNo;
-
-	
+	private Long authorityNo;
+	@Column(name = "authority_name")
+	private String authorityName;
 }
-

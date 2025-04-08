@@ -1,6 +1,4 @@
-
 package com.eroom.directory.entity;
-
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,24 +23,21 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="profile")
-public class Profile {
-
+@Table(name="employee_directory")
+public class EmployeeDirectory {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long profileNo; // 프로필 번호
+	private Long employeeDirectoryNo; // 직원 주소록 번호
 	
-	@Column(name = "profile_ori_name")
-	private String profileOriName;
-	@Column(name = "profile_new_name")
-	private String profileNewName;
-	@Column(name = "profile_path")
-	private String profilePath;
+	@Column(name = "employee_directory_email")
+	private String employeeDirectoryEmail; // 이메일
+	@Column(name = "employee_directory_phone")
+	private String employeeDirectoryPhone; // 휴대폰 번호
 	
 	@OneToOne
-	@JoinColumn(name="employee_no")
-	private Employee employeeNo;
-
+	@JoinColumn(name = "employee_no")
+	private Employee employee; // 사번
 	
-}
 
+}
