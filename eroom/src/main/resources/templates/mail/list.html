@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html 
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{/include/layout}">
+  <body>
+   <main class="main" id="top" layout:fragment="content">
+   
+      <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
+            <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" href="../../apps/email/compose.html">메일 쓰기</a>
+              <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button>
+            </div>
+            <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" href="../../apps/email/compose.html"> <span class="d-none d-sm-inline-block">Compose</span><span class="d-sm-none fas fa-plus"></span></a></div>
+            <div class="col-auto flex-1">
+              <div class="search-box w-100">
+                <form class="position-relative">
+                  <input class="form-control search-input search" type="search" placeholder="검색" aria-label="Search" />
+                  <span class="fas fa-search search-box-icon"></span>
+
+                </form>
+              </div>
+            </div>
+          </div>
+      <h1>hello</h1>
+    </main>
+    
+  </body>
+</html>
