@@ -14,26 +14,26 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
     <title>Eroom</title>
 
     <!--    Favicons-->
-    <link rel="apple-touch-icon" sizes="180x180" th:href="@{assets/img/favicons/apple-touch-icon.png}">
-    <link rel="icon" type="image/png" sizes="32x32" th:href="@{assets/img/favicons/favicon-32x32.png}">
-    <link rel="icon" type="image/png" sizes="16x16" th:href="@{assets/img/favicons/favicon-16x16.png}">
-    <link rel="shortcut icon" type="image/x-icon" th:href="@{assets/img/favicons/favicon.ico}">
-    <link rel="manifest" th:href="@{assets/img/favicons/manifest.json}">
-    <meta name="msapplication-TileImage" th:content="@{assets/img/favicons/mstile-150x150.png}">
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/assets/img/favicons/apple-touch-icon.png}">
+    <link rel="icon" type="image/png" sizes="32x32" th:href="@{/assets/img/favicons/favicon-32x32.png}">
+    <link rel="icon" type="image/png" sizes="16x16" th:href="@{/assets/img/favicons/favicon-16x16.png}">
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicons/favicon.ico}">
+    <link rel="manifest" th:href="@{/assets/img/favicons/manifest.json}">
+    <meta name="msapplication-TileImage" th:content="@{/assets/img/favicons/mstile-150x150.png}">
     <meta name="theme-color" content="#ffffff">
-    <script th:src="@{vendors/simplebar/simplebar.min.js}"></script>
-    <script th:src="@{assets/js/config.js}"></script>
+    <script th:src="@{/vendors/simplebar/simplebar.min.js}"></script>
+    <script th:src="@{/assets/js/config.js}"></script>
 
     <!--    Stylesheets-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&amp;display=swap" rel="stylesheet">
-    <link th:href="@{vendors/simplebar/simplebar.min.css}" rel="stylesheet">
+    <link th:href="@{/vendors/simplebar/simplebar.min.css}" rel="stylesheet">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
-    <link th:href="@{assets/css/theme-rtl.min.css}" type="text/css" rel="stylesheet" id="style-rtl">
-    <link th:href="@{assets/css/theme.min.css}" type="text/css" rel="stylesheet" id="style-default">
-    <link th:href="@{assets/css/user-rtl.min.css}" type="text/css" rel="stylesheet" id="user-style-rtl">
-    <link th:href="@{assets/css/user.min.css}" type="text/css" rel="stylesheet" id="user-style-default">
+    <link th:href="@{/assets/css/theme-rtl.min.css}" type="text/css" rel="stylesheet" id="style-rtl">
+    <link th:href="@{/assets/css/theme.min.css}" type="text/css" rel="stylesheet" id="style-default">
+    <link th:href="@{/assets/css/user-rtl.min.css}" type="text/css" rel="stylesheet" id="user-style-rtl">
+    <link th:href="@{/assets/css/user.min.css}" type="text/css" rel="stylesheet" id="user-style-default">
     <script>
       var phoenixIsRTL = window.config.config.phoenixIsRTL;
       if (phoenixIsRTL) {
@@ -49,14 +49,14 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
         userLinkRTL.setAttribute('disabled', true);
       }
     </script>
-    <link th:href="@{vendors/leaflet/leaflet.css}" rel="stylesheet">
-    <link th:href="@{vendors/leaflet.markercluster/MarkerCluster.css}" rel="stylesheet">
-    <link th:href="@{vendors/leaflet.markercluster/MarkerCluster.Default.css}" rel="stylesheet">
+    <link th:href="@{/vendors/leaflet/leaflet.css}" rel="stylesheet">
+    <link th:href="@{/vendors/leaflet.markercluster/MarkerCluster.css}" rel="stylesheet">
+    <link th:href="@{/vendors/leaflet.markercluster/MarkerCluster.Default.css}" rel="stylesheet">
   </head>
 	<body>
 	<main class="main" id="top">
-	<th:block th:replace="~{include/nav :: navLayout}"></th:block>
-	<th:block th:replace="~{include/header :: headerLayout}"></th:block>
+	<th:block th:replace="~{/include/nav :: navLayout}"></th:block>
+	<th:block th:replace="~{/include/header :: headerLayout}"></th:block>
 	<div class="content">
 	<th:block layout:fragment="content"></th:block>
 	<!-- <th:block th:replace="~{include/footer :: footerLayout}"></th:block> -->
@@ -76,21 +76,21 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
         }
       </script>
 	
-	<script th:src="@{vendors/popper/popper.min.js}"></script>
-    <script th:src="@{vendors/bootstrap/bootstrap.min.js}"></script>
-    <script th:src="@{vendors/anchorjs/anchor.min.js}"></script>
-    <script th:src="@{vendors/is/is.min.js}"></script>
-    <script th:src="@{vendors/fontawesome/all.min.js}"></script>
-    <script th:src="@{vendors/lodash/lodash.min.js}"></script>
-    <script th:src="@{vendors/list.js/list.min.js}"></script>
-    <script th:src="@{vendors/feather-icons/feather.min.js}"></script>
-    <script th:src="@{vendors/dayjs/dayjs.min.js}"></script>
-    <script th:src="@{vendors/leaflet/leaflet.js}"></script>
-    <script th:src="@{vendors/leaflet.markercluster/leaflet.markercluster.js}"></script>
-    <script th:src="@{vendors/leaflet.tilelayer.colorfilter/leaflet-tilelayer-colorfilter.min.js}"></script>
-    <script th:src="@{assets/js/phoenix.js}"></script>
-    <script th:src="@{vendors/echarts/echarts.min.js}"></script>
-    <script th:src="@{assets/js/dashboards/ecommerce-dashboard.js}"></script>
+	<script th:src="@{/vendors/popper/popper.min.js}"></script>
+    <script th:src="@{/vendors/bootstrap/bootstrap.min.js}"></script>
+    <script th:src="@{/vendors/anchorjs/anchor.min.js}"></script>
+    <script th:src="@{/vendors/is/is.min.js}"></script>
+    <script th:src="@{/vendors/fontawesome/all.min.js}"></script>
+    <script th:src="@{/vendors/lodash/lodash.min.js}"></script>
+    <script th:src="@{/vendors/list.js/list.min.js}"></script>
+    <script th:src="@{/vendors/feather-icons/feather.min.js}"></script>
+    <script th:src="@{/vendors/dayjs/dayjs.min.js}"></script>
+    <script th:src="@{/vendors/leaflet/leaflet.js}"></script>
+    <script th:src="@{/vendors/leaflet.markercluster/leaflet.markercluster.js}"></script>
+    <script th:src="@{/vendors/leaflet.tilelayer.colorfilter/leaflet-tilelayer-colorfilter.min.js}"></script>
+    <script th:src="@{/assets/js/phoenix.js}"></script>
+    <script th:src="@{/vendors/echarts/echarts.min.js}"></script>
+    <script th:src="@{/assets/js/dashboards/ecommerce-dashboard.js}"></script>
     
 </body>
 </html>
