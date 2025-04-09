@@ -13,5 +13,9 @@ public class DirectoryController {
 	public String selectDirectory01() {
 		return "directory/list";
 	}
+	@GetMapping("/directory2")
+	public String selectDirectory02() {
+		return "directory/list2";
+	}
 	
 }
