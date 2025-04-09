@@ -58,18 +58,12 @@ layout:decorate="~{/include/layout}">
         var userLinkRTL = document.getElementById('user-style-rtl');
         linkRTL.setAttribute('disabled', true);
         userLinkRTL.setAttribute('disabled', true);
-      }
+      }   
     </script>
-  </head>
-  
-  <style>
 
-  </style>
-
-
+</head>
   <body>
-    <main class="main" id="top" layout:fragment="content">
-   
+    <main class="main" id="top" layout:fragment="content"> 
       <div class="content">
         <div class="row g-0 mb-4 align-items-center">
           <div class="col-5 col-md-6">
@@ -99,27 +93,12 @@ layout:decorate="~{/include/layout}">
             </div>
           </div>
         </div>
-        <div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
-        <footer class="footer position-absolute">
-          <div class="row g-0 justify-content-between align-items-center h-100">
-            <div class="col-12 col-sm-auto text-center">
-              <p class="mb-0 mt-2 mt-sm-0 text-body">Thank you for creating with Phoenix<span class="d-none d-sm-inline-block"></span><span class="d-none d-sm-inline-block mx-1">|</span><br class="d-sm-none" />2025 &copy;<a class="mx-1" href="https://themewagon.com">Themewagon</a></p>
-            </div>
-            <div class="col-12 col-sm-auto text-center">
-              <p class="mb-0 text-body-tertiary text-opacity-85">v1.22.0</p>
-            </div>
-          </div>
-        </footer>
-      </div>
-
-
-
+        
 		<div class="modal fade" id="eventDetailsModal" tabindex="-1">
 			<div class="modal-dialog modal-dialog-centered">
 				<div class="modal-content border border-translucent"></div>
 			</div>
 		</div>
-
 		<div class="modal fade" id="addEventModal" tabindex="-1">
 			<div class="modal-dialog">
 				<div class="modal-content border border-translucent">
@@ -134,7 +113,6 @@ layout:decorate="~{/include/layout}">
 									data-bs-dismiss="modal" aria-label="Close">닫기</button>
 							</div>
 						</div>
-
 						<div class="modal-body p-card py-0">
 							<!-- 일정 제목 -->
 							<div class="form-floating mb-3">
@@ -142,39 +120,20 @@ layout:decorate="~{/include/layout}">
 									name="title" required placeholder="일정 제목" /> <label
 									for="eventTitle">일정 제목</label>
 							</div>
-
 							<!-- 일정 장소 -->
 							<div class="form-floating mb-3">
 								<input class="form-control" id="eventLocation" type="text"
 									name="location" placeholder="일정 장소" /> <label
 									for="eventLocation">일정 장소</label>
 							</div>
-
 							<!-- 시작 날짜 -->
-							<div class="flatpickr-input-container mb-3">
-								<div class="form-floating">
-									<input class="form-control datetimepicker" id="eventStartDate"
-										type="text" name="startDate" placeholder="yyyy/mm/dd hh:mm"
-										data-options='{"disableMobile":true,"enableTime":true,"dateFormat":"Y-m-d H:i"}' />
-									<span
-										class="uil uil-calendar-alt flatpickr-icon text-body-tertiary"></span>
-									<label class="ps-6" for="eventStartDate">시작 시간</label>
+								<div class="form-floating mb-3 position-relative">
+									<input class="form-control styled-datetime" id="eventStartDate"
+										type="datetime-local" name="startDate" placeholder="시작 시간"
+										required /> <label for="eventStartDate">시작 시간</label> <i
+										class="uil uil-calendar-alt calendar-icon"></i>
 								</div>
-							</div>
-
-							<!-- 종료 날짜 -->
-							<div class="flatpickr-input-container mb-3">
-								<div class="form-floating">
-									<input class="form-control datetimepicker" id="eventEndDate"
-										type="text" name="endDate" placeholder="yyyy/mm/dd hh:mm"
-										data-options='{"disableMobile":true,"enableTime":true,"dateFormat":"Y-m-d H:i"}' />
-									<span
-										class="uil uil-calendar-alt flatpickr-icon text-body-tertiary"></span>
-									<label class="ps-6" for="eventEndDate">종료 시간</label>
-								</div>
-							</div>
-
-							<!-- 공개 범위 -->
+								<!-- 공개 범위 -->
 							<div class="form-floating mb-3">
 								<select class="form-select" id="eventScope" name="scope">
 									<option value="private" selected>개인</option>
@@ -183,15 +142,13 @@ layout:decorate="~{/include/layout}">
 									<option value="company">회사 전체</option>
 								</select> <label for="eventScope">공개 범위</label>
 							</div>
-
 							<!-- 일정 설명 -->
 							<div class="form-floating mb-3">
 								<textarea class="form-control" id="eventDescription"
-									name="description" style="height: 120px" placeholder="일정 설명"></textarea>
+									name="calendar_description" style="height: 120px" placeholder="일정 설명"></textarea>
 								<label for="eventDescription">일정 설명</label>
 							</div>
 						</div>
-
 						<div
 							class="modal-footer d-flex justify-content-between align-items-center border-0">
 							<span></span>
@@ -201,20 +158,20 @@ layout:decorate="~{/include/layout}">
 				</div>
 			</div>
 		</div>
-		<script>
-			var navbarTopStyle = window.config.config.phoenixNavbarTopStyle;
-			var navbarTop = document.querySelector('.navbar-top');
-			if (navbarTopStyle === 'darker') {
-				navbarTop.setAttribute('data-navbar-appearance', 'darker');
-			}
+		
+		<div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
+        <footer class="footer position-absolute">
+          <div class="row g-0 justify-content-between align-items-center h-100">
+            <div class="col-12 col-sm-auto text-center">
+              <p class="mb-0 mt-2 mt-sm-0 text-body">Thank you for creating with Phoenix<span class="d-none d-sm-inline-block"></span><span class="d-none d-sm-inline-block mx-1">|</span><br class="d-sm-none" />2025 &copy;<a class="mx-1" href="https://themewagon.com">Themewagon</a></p>
+            </div>
+            <div class="col-12 col-sm-auto text-center">
+              <p class="mb-0 text-body-tertiary text-opacity-85">v1.22.0</p>
+            </div>
+          </div>
+        </footer>
+       </div>
 
-			var navbarVerticalStyle = window.config.config.phoenixNavbarVerticalStyle;
-			var navbarVertical = document.querySelector('.navbar-vertical');
-			if (navbarVertical && navbarVerticalStyle === 'darker') {
-				navbarVertical.setAttribute('data-navbar-appearance', 'darker');
-			}
-		</script>
-  
 
     <!-- ===============================================-->
     <!--    JavaScripts-->
