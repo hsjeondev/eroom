@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.eroom.authority.entity.AuthorityMapping;
+import com.eroom.chat.entity.Chatroom;
+import com.eroom.chat.entity.ChatroomAttendee;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -59,6 +61,14 @@ public class Employee {
 	@JoinColumn(name="team_no")
 	private Team team; // 팀번호
 	
+
+	// 채팅방 조인
+	@OneToMany(mappedBy="creater")
+	private List<Chatroom> creater;
+	// 채팅방매핑 조인
+	@OneToMany(mappedBy="attendee")
+	private List<ChatroomAttendee> attendeeList;
+
 	
 	
 	
@@ -67,4 +77,5 @@ public class Employee {
 	
     @OneToMany(mappedBy = "employee")
     private List<AuthorityMapping> authorityMappings;
+
 }
