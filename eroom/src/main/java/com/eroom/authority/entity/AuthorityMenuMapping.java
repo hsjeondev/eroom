@@ -27,7 +27,7 @@ public class AuthorityMenuMapping {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long authorityMenuMapping;
+	private Long authorityMenuMappingNo;
 	
 	@ManyToOne
 	@JoinColumn(name = "authority_no")
