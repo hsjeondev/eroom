@@ -3,8 +3,12 @@ package com.eroom.directory.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
+
+import com.eroom.authority.entity.AuthorityMapping;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -60,10 +64,21 @@ public class Employee {
 	@JoinColumn(name="team_no")
 	private Team team; // 팀번호
 	
+<<<<<<< HEAD
 	// 채팅방 조인
 	@OneToMany(mappedBy="creater")
 	private List<Chatroom> creater;
 	// 채팅방매핑 조인
 	@OneToMany(mappedBy="attendee")
 	private List<ChatroomAttendee> attendeeList;
+=======
+	
+	
+	
+	
+	
+	
+    @OneToMany(mappedBy = "employee")
+    private List<AuthorityMapping> authorityMappings;
+>>>>>>> refs/remotes/origin/develop
 }
