@@ -7,19 +7,60 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 <head>
 <style>
 	.deals {
-	  display: flex;
-	  flex-wrap: wrap;
-	  margin-left: 9rem;  /* ← 여기가 핵심 */
-	  gap: 3rem;
+		display: flex;
+		flex-wrap: wrap;
+		margin-left: 9rem;  /* ← 여기가 핵심 */
+		gap: 3rem;
+		  
+		margin-top: 6rem; /* 기존에 5rem이라면 6~7rem 정도로 늘려줘 */
+		margin-bottom: 0;
+		padding-bottom: 0;
+		justify-content: flex-start;
+		align-items: flex-start;
 	}
 	
 	.card-body {
 	  height: 200px; /* 고정 높이! 필요하면 조절 가능 */
 	  display: flex;
 	  flex-direction: column;
-	  justify-content: space-between; /* 요소 사이 간격 자동 균형 */
+	  justify-content: center; /* 요소 사이 간격 자동 균형 */
 	  padding: 1rem;
+	  gap: 2rem; /* 요소 간 간격 */
 	}
+	.card-body.card-two-elements {
+	  display: flex;
+	  flex-direction: column;
+	  justify-content: center; /* 수직 가운데 정렬 */
+	  align-items: stretch;
+	  height: 200px; /* 카드 높이는 고정되어야 균형 맞음 */
+	  padding: 1rem;
+	  gap: 3rem; /* 요소 간 간격 */
+	}
+
+	.col-auto {
+	  margin-left: auto;
+	}
+	
+.attendance-table th,
+.attendance-table td {
+	 text-align: center !important;
+	 vertical-align: middle !important;
+ }
+
+ .attendance-table th:nth-child(1),
+ .attendance-table td:nth-child(1) {
+   width: 10% !important;
+ }
+
+ .attendance-table th:nth-child(2),
+ .attendance-table td:nth-child(2),
+ .attendance-table th:nth-child(3),
+ .attendance-table td:nth-child(3),
+ .attendance-table th:nth-child(4),
+ .attendance-table td:nth-child(4) {
+	width: 30% !important;
+ }
+ 
 </style>
 </head>
   <body>
@@ -35,7 +76,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	                         
 	                           <div class="deals-company-agent d-flex flex-between-center">
 	                            <div class="d-flex align-items-center">
-	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Knitkake.inc</p>
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">총 연차</p>
 	                            </div>
 	                            <div class="d-flex align-items-center">
 	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Ally Aagaard</p>
@@ -44,7 +85,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	                          
 	                           <div class="deals-company-agent d-flex flex-between-center">
 	                            <div class="d-flex align-items-center">
-	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Knitkake.inc</p>
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">사용 연차</p>
 	                            </div>
 	                            <div class="d-flex align-items-center">
 	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Ally Aagaard</p>
@@ -53,7 +94,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	                          
 	                          <div class="deals-company-agent d-flex flex-between-center">
 	                            <div class="d-flex align-items-center">
-	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Knitkake.inc</p>
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">잔여 연차</p>
 	                            </div>
 	                            <div class="d-flex align-items-center">
 	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Ally Aagaard</p>
@@ -73,7 +114,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                   <div class="w-100 min-vh-50" data-sortable="data-sortable">
                    
                       <div class="card mb-3">
-                        <div class="card-body">
+                        <div class="card-body card-two-elements">
                          
 							 <div class="deals-company-agent d-flex flex-between-center">
 							   <div class="d-flex align-items-center">
@@ -101,6 +142,100 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             
 
             </div>
+            <!-- 근태 카드 끝 -->
+            
+<div id="products" data-list="{&quot;valueNames&quot;:[&quot;customer&quot;,&quot;email&quot;,&quot;total-orders&quot;,&quot;total-spent&quot;,&quot;city&quot;,&quot;last-seen&quot;,&quot;last-order&quot;],&quot;page&quot;:10,&quot;pagination&quot;:true}">
+
+	<!-- 날짜 셀렉트로 수정 예정  -->
+	<div class="mb-4">
+		<div class="row g-3 ">
+		
+			<div class="col-auto scrollbar overflow-hidden-y flex-grow-1">
+				<div class="btn-group position-static" role="group">
+					<div class="btn-group position-static text-nowrap">
+						<button class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+						  현재 날짜<svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com --></button>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="#">US</a></li>
+							<li><a class="dropdown-item" href="#">Uk</a></li>
+							<li><a class="dropdown-item" href="#">Australia</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		
+		</div>
+	</div>
+	<!-- 셀렉트 끝 -->
+	
+	<div class="mx-n4 px-4 mx-lg-n6 px-lg-6 bg-body-emphasis border-top border-bottom border-translucent position-relative top-1">
+		<div class="table-responsive scrollbar-overlay mx-n1 px-1 simplebar-scrollable-x" data-simplebar="init">
+			<div class="simplebar-wrapper" style="margin: 0px -4px;">
+				<div class="simplebar-height-auto-observer-wrapper">
+					<div class="simplebar-height-auto-observer"></div>
+				</div>
+				<div class="simplebar-mask">
+					<div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+						<div class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content" style="height: auto; overflow: scroll hidden;">
+							<div class="simplebar-content" style="padding: 0px 4px;">
+								<table class="table table-sm fs-9 mb-0 attendance-table">
+									<thead>
+										<tr>
+											<th class="white-space-nowrap fs-9 align-middle ps-0">
+											 
+											  번호
+											</th>
+											
+											<th class="sort align-middle ps-7" scope="col" data-sort="city" style="width:25%;">근무일</th>
+											<th class="sort align-middle text-end" scope="col" data-sort="last-seen" style="width:15%;">출근 시간</th>
+											<th class="sort align-middle text-end pe-0" scope="col" data-sort="last-order" style="width:10%;min-width: 150px;">퇴근 시간</th>
+										</tr>
+									</thead>
+									<tbody class="list" id="customers-table-body">
+										<tr class="hover-actions-trigger btn-reveal-trigger position-static">
+											<td class="fs-9 align-middle ps-0 py-3">
+											  
+											</td>
+											
+											<td class="city align-middle white-space-nowrap text-body-highlight ps-7">Budapest</td>
+											<td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">34 min ago</td>
+											<td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Dec 12, 12:56 PM</td>
+										 </tr>
+									  </tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="simplebar-placeholder" style="width: 686px; height: 611px;"></div>
+			</div>
+		<div class="simplebar-track simplebar-horizontal" style="visibility: visible;">
+		<div class="simplebar-scrollbar" style="width: 485px; display: block; transform: translate3d(0px, 0px, 0px);"></div>
+		</div>
+		<div class="simplebar-track simplebar-vertical" style="visibility: hidden;">
+		<div class="simplebar-scrollbar" style="height: 0px; display: none;"></div>
+			</div>
+			
+			
+		</div>
+		
+		<div class="row align-items-center justify-content-between py-2 pe-0 fs-9">
+			<div class="col-auto d-flex">
+				<p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info">1 to 10 <span class="text-body-tertiary"> Items of </span>15</p><a class="fw-semibold" href="#!" data-list-view="*">View all<svg class="svg-inline--fa fa-angle-right ms-1" data-fa-transform="down-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="" style="transform-origin: 0.3125em 0.5625em;"><g transform="translate(160 256)"><g transform="translate(0, 32)  scale(1, 1)  rotate(0 0 0)"><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z" transform="translate(-160 -256)"></path></g></g></svg><!-- <span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span> Font Awesome fontawesome.com --></a><a class="fw-semibold d-none" href="#!" data-list-view="less">View Less<svg class="svg-inline--fa fa-angle-right ms-1" data-fa-transform="down-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="" style="transform-origin: 0.3125em 0.5625em;"><g transform="translate(160 256)"><g transform="translate(0, 32)  scale(1, 1)  rotate(0 0 0)"><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z" transform="translate(-160 -256)"></path></g></g></svg><!-- <span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span> Font Awesome fontawesome.com --></a>
+			</div>
+			<div class="col-auto d-flex">
+				<button class="page-link disabled" data-list-pagination="prev" disabled=""><svg class="svg-inline--fa fa-chevron-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"></path></svg><!-- <span class="fas fa-chevron-left"></span> Font Awesome fontawesome.com --></button>
+				<ul class="mb-0 pagination"><li class="active"><button class="page" type="button" data-i="1" data-page="10">1</button></li><li><button class="page" type="button" data-i="2" data-page="10">2</button></li></ul>
+				<button class="page-link pe-0" data-list-pagination="next"><svg class="svg-inline--fa fa-chevron-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"></path></svg><!-- <span class="fas fa-chevron-right"></span> Font Awesome fontawesome.com --></button>
+			</div>
+		</div>
+	
+	</div>
+</div>
+            
+            
+            
+            
 
     </main>
   </body>
