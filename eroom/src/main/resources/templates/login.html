@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default">
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+xmlns:th="http://www.thymeleaf.org">
 
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta id="_csrf" name="_csrf" th:attr="content=${_csrf.token}">
+	<meta id="_csrf_header" name="_csrf_header" th:attr="content=${_csrf.headerName}">
 
     <!--    Document Title-->
     <title>Phoenix</title>
@@ -51,23 +55,26 @@
     <main class="main" id="top">
       <div class="container">
         <div class="row flex-center min-vh-100 py-5">
-          <div class="col-sm-10 col-md-8 col-lg-5 col-xl-5 col-xxl-3"><a class="d-flex flex-center text-decoration-none mb-4" href="@{/index.html}">
+          <div class="col-sm-10 col-md-8 col-lg-5 col-xl-5 col-xxl-3"><a class="d-flex flex-center text-decoration-none mb-4" th:href="@{/}">
               <div class="d-flex align-items-center fw-bolder fs-3 d-inline-block"><img th:src="@{/assets/img/icons/logo.png}" alt="phoenix" width="58" />
               </div>
             </a>
             <div class="text-center mb-7">
               <h3 class="text-body-highlight">로그인</h3>
             </div>
+            
+            <form name="login_employee_form" method="post" th:achtion="@{/login}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <div class="mb-3 text-start">
-              <label class="form-label" for="email">아이디</label>
+              <label class="form-label" for="employee_id">아이디</label>
               <div class="form-icon-container">
-                <input class="form-control form-icon-input" id="email" type="email" placeholder="아이디" /><span class="fas fa-user text-body fs-9 form-icon"></span>
+                <input class="form-control form-icon-input" name="username" id="employee_id" type="text" placeholder="아이디" /><span class="fas fa-user text-body fs-9 form-icon"></span>
               </div>
             </div>
             <div class="mb-3 text-start">
-              <label class="form-label" for="password">비밀번호</label>
+              <label class="form-label" for="employee_pw">비밀번호</label>
               <div class="form-icon-container" data-password="data-password">
-                <input class="form-control form-icon-input pe-6" id="password" type="password" placeholder="비밀번호" data-password-input="data-password-input" /><span class="fas fa-key text-body fs-9 form-icon"></span>
+                <input class="form-control form-icon-input pe-6" name="password" id="employee_pw" type="password" placeholder="비밀번호" data-password-input="data-password-input" /><span class="fas fa-key text-body fs-9 form-icon"></span>
                 <button class="btn px-3 py-0 h-100 position-absolute top-0 end-0 fs-7 text-body-tertiary" data-password-toggle="data-password-toggle"><span class="uil uil-eye show"></span><span class="uil uil-eye-slash hide"></span></button>
               </div>
             </div>
@@ -80,11 +87,30 @@
               </div>
               <div class="col-auto"><a class="fs-9 fw-semibold" th:href="@{/pages/authentication/simple/forgot-password.html}">Forgot Password?</a></div>
             </div>
-            <button class="btn btn-primary w-100 mb-3">Sign In</button>
+            <button class="btn btn-primary w-100 mb-3" data-bs-target="#verticallyCentered">Sign In</button>
+            </form>
+            
             <div class="text-center"><a class="fs-9 fw-bold" th:href="@{/pages/authentication/simple/sign-up.html}">Create an account</a></div>
           </div>
         </div>
-      </div>
+      </div> 
+      <!-- 모달창 -->
+      <div class="modal fade" id="verticallyCentered" tabindex="-1" aria-labelledby="verticallyCenteredModalLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="verticallyCenteredModalLabel">알림</h5>
+		        <button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+		      </div>
+		      <div class="modal-body">
+		        <p class="text-body-tertiary lh-lg mb-0"></p>
+		      </div>
+		      <div class="modal-footer">
+		        <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Okay</button>
+		      </div>
+		    </div>
+		  </div>
+	  </div>
       <script>
         var navbarTopStyle = window.config.config.phoenixNavbarTopStyle;
         var navbarTop = document.querySelector('.navbar-top');
@@ -112,6 +138,30 @@
     <script th:src="@{/vendors/dayjs/dayjs.min.js}"></script>
     <script th:src="@{/assets/js/phoenix.js}"></script>
 
+	<script>
+	  const form = document.login_employee_form;
+	  form.addEventListener('submit', (e) => {
+		  e.preventDefault();
+
+		  let vali_check = false;
+		  let vali_text = "";
+
+		  if (!form.employee_id.value) {
+		    vali_text += "아이디를 입력하세요";
+		  } else if (!form.employee_pw.value) {
+		    vali_text += "비밀번호를 입력하세요";
+		  } else {
+		    vali_check = true;
+		  }
+
+		  if (!vali_check) {
+		    modalBodyText.textContent = vali_text;
+		    modal.show();
+		  } else {
+		    form.submit();
+		  }
+		});
+	</script>
   </body>
 
 </html>

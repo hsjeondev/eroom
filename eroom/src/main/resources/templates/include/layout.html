@@ -7,8 +7,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 화면 전화 때는 고려할 필요 없지만 post, put, delete에서는 csrf 설정 필요 -->
 	<!-- 모든 화면에 적용되는 layout이기에 여기에 사용자 브라우저 정보를 가지고 있는 _csrf 설정 -->
-	<!-- <meta id="_csrf" name="_csrf" th:attr="content=${_csrf.token}">
-	<meta id="_csrf_header" name="_csrf_header" th:attr="content=${_csrf.headerName}"> -->
+	<meta id="_csrf" name="_csrf" th:attr="content=${_csrf.token}">
+	<meta id="_csrf_header" name="_csrf_header" th:attr="content=${_csrf.headerName}">
 
     <!--    Document Title-->
     <title>Eroom</title>
