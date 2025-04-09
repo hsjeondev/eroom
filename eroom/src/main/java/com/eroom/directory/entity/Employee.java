@@ -18,6 +18,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -71,20 +72,15 @@ public class Employee {
 	@OneToMany(mappedBy="attendee")
 	private List<ChatroomAttendee> attendeeList;
 
-	
-	
-	
-	
-	
-	
-//    @OneToMany(mappedBy = "employee")
-//    private List<AuthorityMapping> authorityMappings;
-	
 	@ManyToMany
 	@JoinTable(
 			name = "authority_mapping",
 			joinColumns = @JoinColumn(name="employee_no"),
 			inverseJoinColumns = @JoinColumn(name="authority_no"))
 	private List<Authority> authorities;
+    
+	@OneToOne
+	@JoinColumn(name = "employee_no")
+	private EmployeeDirectory employeeDirectory;
 
 }
