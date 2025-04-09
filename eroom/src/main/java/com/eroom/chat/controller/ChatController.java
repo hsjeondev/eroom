@@ -1,6 +1,7 @@
 package com.eroom.chat.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,4 +26,5 @@ public class ChatController {
 		model.addAttribute("chatroomList",resultList);
 		return "chat/list";
 	}
+	
 }
