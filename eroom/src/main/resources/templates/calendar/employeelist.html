@@ -115,7 +115,7 @@ layout:decorate="~{/include/layout}">
 						</div>
 						<div class="modal-body p-card py-0">
 							<!-- 일정 제목 -->
-						<!-- 	<div class="form-floating mb-3">
+							<!-- 	<div class="form-floating mb-3">
 								<input class="form-control" id="eventTitle" type="text"
 									name="title" placeholder="일정 제목" /> <label
 									for="eventTitle">일정 제목</label>
@@ -136,7 +136,7 @@ layout:decorate="~{/include/layout}">
 										/> <label for="eventStartDate">일정 시간</label> 
 								</div>
 								<!-- 공개 범위 -->
-						<!-- 	<div class="form-floating mb-3">
+							<!-- 	<div class="form-floating mb-3">
 								<select class="form-select" id="eventScope" name="scope">
 									<option value="private" selected>개인</option>
 									<option value="team">팀</option>
@@ -163,17 +163,39 @@ layout:decorate="~{/include/layout}">
 		
 		
 		<script>
+			//let empNo = document.addEventForm;
+			//console.log(empNo.employee_no.value);
 			//모달 창 안에 있는 정보 가져오기
-			const form = document.getElementById("addEventForm");
+			const form = document.addEventForm;
 				form.addEventListener("submit", function (e) {
 			      e.preventDefault(); // 
 				
-			      console.log(" 직원번호:", form.employee_no.value);
-			      console.log(" 일정 장소:", form.calendar_location.value);
-			      console.log(" 일정 시간:", form.calendar_date.value);
-			      console.log(" 일정 설명:", form.calendar_description.value);
-
-			    });		
+			      //console.log(" 직원번호:", form.employee_no.value);
+			      //console.log(" 일정 장소:", form.calendar_location.value);
+			      //console.log(" 일정 시간:", form.calendar_date.value);
+			      //console.log(" 일정 설명:", form.calendar_description.value);
+			      
+			      if(!form.calendar_location.value){
+			    	  alert("장소를 입력해주세요");
+			      }else{
+			    	const payload = new FormData(form);
+			    	fetch("/calendar/add",{
+			    		method: "post",
+			    		headers : {
+				              'header': document.querySelector('meta[name="_csrf_header"]').content,
+				              'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+							},
+			    		body: payload
+			    	})
+			    	.then(response => response.json())
+			    	.then(data => {
+			    		alert(data.res_msg);
+			    		if(data.res_code == 200){
+			    			location.reload();
+			    		}
+			    	})
+			      }
+				})
 		</script>
 		
 		<div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
