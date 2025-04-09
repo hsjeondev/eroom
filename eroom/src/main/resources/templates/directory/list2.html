@@ -112,7 +112,7 @@
                   
                   
                   <!-- 1줄 -->
-                    <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <!-- <tr class="hover-actions-trigger btn-reveal-trigger position-static">
                       <td class="fs-9 align-middle ps-0 py-3">
                         <div class="form-check mb-0 fs-8">
                           <input class="form-check-input" type="checkbox" data-bulk-select-row='{"customer":{"avatar":"/team/32.webp","name":"Carry Anna"},"email":"annac34@gmail.com","city":"Budapest","totalOrders":89,"totalSpent":23987,"lastSeen":"34 min ago","lastOrder":"Dec 12, 12:56 PM"}' />
@@ -122,6 +122,30 @@
                           <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/32.webp" alt="" />
                           </div>
                           <p class="mb-0 ms-3 text-body-emphasis fw-bold">Carry Anna</p>
+                        </a></td>
+                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:annac34@gmail.com">annac34@gmail.com</a></td>
+                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">89</td>
+                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis">$ 23987</td>
+                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7">Budapest</td>
+                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">34 min ago</td>
+                      <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Dec 12, 12:56 PM</td>
+                    </tr> -->
+                    
+                    <!-- 데이터 테스트 -->
+                    <tr class="hover-actions-trigger btn-reveal-trigger position-static"
+                    	th:if="${!#lists.isEmpty(resultList)}"
+                    	th:each="emp, empStatus : ${resultList}"
+                    	th:attr="data-emp-no=${emp.employee.employeeNo}"
+                    	>
+                      <td class="fs-9 align-middle ps-0 py-3">
+                        <div class="form-check mb-0 fs-8">
+                          <input class="form-check-input" type="checkbox" data-bulk-select-row='{"customer":{"avatar":"/team/32.webp","name":"Carry Anna"},"email":"annac34@gmail.com","city":"Budapest","totalOrders":89,"totalSpent":23987,"lastSeen":"34 min ago","lastOrder":"Dec 12, 12:56 PM"}' />
+                        </div>
+                      </td>
+                      <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
+                          <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/32.webp" alt="" />
+                          </div>
+                          <p class="mb-0 ms-3 text-body-emphasis fw-bold">이름</p>
                         </a></td>
                       <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:annac34@gmail.com">annac34@gmail.com</a></td>
                       <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">89</td>
@@ -155,7 +179,8 @@
             </div>
           </div>
         </div>
-        <footer class="footer position-absolute">
+        <!-- 푸터 -->
+<!--         <footer class="footer position-absolute">
           <div class="row g-0 justify-content-between align-items-center h-100">
             <div class="col-12 col-sm-auto text-center">
               <p class="mb-0 mt-2 mt-sm-0 text-body">Thank you for creating with Phoenix<span class="d-none d-sm-inline-block"></span><span class="d-none d-sm-inline-block mx-1">|</span><br class="d-sm-none" />2025 &copy;<a class="mx-1" href="https://themewagon.com">Themewagon</a></p>
@@ -164,7 +189,8 @@
               <p class="mb-0 text-body-tertiary text-opacity-85">v1.22.0</p>
             </div>
           </div>
-        </footer>
+        </footer> -->
+        
       <!-- </div> -->
       <div class="modal fade" id="searchBoxModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="true" data-phoenix-modal="data-phoenix-modal" style="--phoenix-backdrop-opacity: 1;">
         <div class="modal-dialog">

@@ -1,15 +1,22 @@
 package com.eroom.directory.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+
+import com.eroom.directory.entity.EmployeeDirectory;
+import com.eroom.directory.service.EmployeeDirectoryService;
 
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
 public class DirectoryController {
+	
+	private final EmployeeDirectoryService employeeDirectoryService;
+	
 
 	@GetMapping("/directory")
 	public String selectDirectory01() {
@@ -17,7 +24,9 @@ public class DirectoryController {
 	}
 	@GetMapping("/directory2")
 	public String selectDirectory02(Model model) {
+		List<EmployeeDirectory> resultList = employeeDirectoryService.selectDirectoryAll();
 		
+		model.addAttribute("resultList", resultList);
 		
 		return "directory/list2";
 	}
