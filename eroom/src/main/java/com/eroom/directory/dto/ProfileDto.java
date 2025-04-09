@@ -1,7 +1,7 @@
 package com.eroom.directory.dto;
 
-import com.eroom.directory.entity.Employee;
 import com.eroom.directory.entity.Profile;
+import com.eroom.employee.entity.Employee;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

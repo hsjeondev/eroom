@@ -1,4 +1,4 @@
-package com.eroom.controller;
+package com.eroom.employee.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,5 +10,4 @@ public class EmployeeController {
 	public String loginView() {
 		return "login";
 	}
-	
 }

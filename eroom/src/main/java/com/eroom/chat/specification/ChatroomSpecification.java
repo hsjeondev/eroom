@@ -3,7 +3,7 @@ package com.eroom.chat.specification;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.eroom.chat.entity.Chatroom;
-import com.eroom.directory.entity.Employee;
+import com.eroom.employee.entity.Employee;
 
 public class ChatroomSpecification {
 
