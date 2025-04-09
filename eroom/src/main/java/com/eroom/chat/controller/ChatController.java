@@ -1,7 +1,6 @@
 package com.eroom.chat.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.service.ChatroomService;
+import com.eroom.employee.entity.Employee;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +24,10 @@ public class ChatController {
 	public String selectChatRoomAll(Model model) {
 		List<Chatroom> resultList = chatroomService.selectChatRoomAll();
 		model.addAttribute("chatroomList",resultList);
+		
+		List<Employee> employeeList = chatroomService.selectEmployeeAll();
+		model.addAttribute("employeeList",employeeList);
+		
 		return "chat/list";
 	}
 	

@@ -1,132 +1,183 @@
 <!DOCTYPE html>
-<html 
-lang="ko-KR" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
-	  xmlns:th="http://www.thymeleaf.org"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{/include/layout}">
-  <body>
-    <main class="main" id="top" layout:fragment="content">
-      <!-- 여기에 요소 넣으면 됩니다. -->
-      <div class="chat d-flex phoenix-offcanvas-container pt-1 mt-n1 mb-9">
-          <div class="card p-3 p-xl-1 mt-xl-n1 chat-sidebar me-3 phoenix-offcanvas phoenix-offcanvas-start" id="chat-sidebar">
-            <button class="btn d-none d-sm-block d-xl-none mb-2" data-bs-toggle="modal" data-bs-target="#chatSearchBoxModal"><span class="fa-solid fa-magnifying-glass text-body-tertiary text-opacity-85 fs-7"></span></button>
-            <div class="d-none d-sm-block d-xl-none mb-5">
-              <button class="btn w-100 mx-auto" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-bars text-body-tertiary text-opacity-85 fs-7"></span></button>
-              <ul class="dropdown-menu dropdown-menu-end p-0">
-                <li><a class="dropdown-item" href="#!">All</a></li>
-                <li><a class="dropdown-item" href="#!">Read</a></li>
-                <li><a class="dropdown-item" href="#!">Unread</a></li>
-              </ul>
-            </div>
-            <!-- ✨ 새 채팅방 만들기 버튼 -->
-			<div class="d-grid gap-2 mb-3">
-			  <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createChatModal">
-			    + 새 채팅방 만들기
-			  </button>
-			</div>
-            <!-- 검색기능 우선순위 최하위 -->
-            <div class="form-icon-container mb-4 d-sm-none d-xl-block">
-              <input class="form-control form-icon-input" type="text" placeholder="이름을 입력하세요" /><span class="fas fa-user text-body fs-9 form-icon"></span>
-            </div>
-            <ul class="nav nav-phoenix-pills mb-5 d-sm-none d-xl-flex" id="contactListTab" data-chat-thread-tab="data-chat-thread-tab" role="tablist">
-            <!-- 정렬기능  -->
-              <li class="nav-item" role="presentation"><a class="nav-link cursor-pointer active" data-bs-toggle="tab" data-chat-thread-list="all" role="tab" aria-selected="true">전체</a></li>
-              <li class="nav-item" role="presentation"><a class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab" data-chat-thread-list="read" aria-selected="false">읽지않음</a></li>
-              <li class="nav-item" role="presentation"><a class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab" data-chat-thread-list="unread" aria-selected="false">읽음</a></li>
-            </ul>
-            <div class="scrollbar">
-              <div class="tab-content" id="contactListTabContent">
-                <div data-chat-thread-tab-content="data-chat-thread-tab-content">
-                  <ul class="nav chat-thread-tab flex-column list">
-                  
-                  	<!-- 참여중인 채팅방이 없을때 -->
-                    <div th:if="${#lists.isEmpty(chatroomList)}">
-					  <p class="text-center text-muted mt-4">참여 중인 채팅방이 없습니다.</p>
-					</div>
-					
-                  <!-- 채팅 리스트 읽은사람-->
-                    <li th:if="${!#lists.isEmpty(chatroomList)}" 
-	                    th:each="chatroom : ${chatroomList}" 
-	                    th:attr="data-room-no=${chatroom.chatroomNo}"
-                    class="nav-item read mb-1" role="presentation">
-                    <!-- 선택된 사람은 a class 끝에 active 넣으면됨 -->
-                    <a class="nav-link d-flex align-items-center justify-content-center p-2  " data-bs-toggle="tab" data-chat-thread="data-chat-thread" href="#tab-thread-1" role="tab" aria-selected="true">
-                    	<!-- 이미지 부분 -->
-                      	<!-- <div class="avatar avatar-xl status-online position-relative me-2 me-sm-0 me-xl-2">
+<html lang="ko-KR" dir="ltr" data-navigation-type="default"
+	data-navbar-horizontal-shape="default"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/include/layout}">
+<body>
+	<main class="main" id="top" layout:fragment="content">
+		<!-- 여기에 요소 넣으면 됩니다. -->
+		<div class="chat d-flex phoenix-offcanvas-container pt-1 mt-n1 mb-9">
+			<div
+				class="card p-3 p-xl-1 mt-xl-n1 chat-sidebar me-3 phoenix-offcanvas phoenix-offcanvas-start"
+				id="chat-sidebar">
+				<button class="btn d-none d-sm-block d-xl-none mb-2"
+					data-bs-toggle="modal" data-bs-target="#chatSearchBoxModal">
+					<span
+						class="fa-solid fa-magnifying-glass text-body-tertiary text-opacity-85 fs-7"></span>
+				</button>
+				<div class="d-none d-sm-block d-xl-none mb-5">
+					<button class="btn w-100 mx-auto" type="button"
+						data-bs-toggle="dropdown" data-boundary="window"
+						aria-haspopup="true" aria-expanded="false"
+						data-bs-reference="parent">
+						<span
+							class="fa-solid fa-bars text-body-tertiary text-opacity-85 fs-7"></span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-end p-0">
+						<li><a class="dropdown-item" href="#!">All</a></li>
+						<li><a class="dropdown-item" href="#!">Read</a></li>
+						<li><a class="dropdown-item" href="#!">Unread</a></li>
+					</ul>
+				</div>
+				<!-- ✨ 새 채팅방 만들기 버튼 -->
+				<div class="d-grid gap-2 mb-3">
+					<button class="btn btn-outline-primary" data-bs-toggle="modal"
+						data-bs-target="#createChatModal">+ 새 채팅방 만들기</button>
+				</div>
+				<!-- 검색기능 우선순위 최하위 -->
+				<div class="form-icon-container mb-4 d-sm-none d-xl-block">
+					<input class="form-control form-icon-input" type="text"
+						placeholder="이름을 입력하세요" /><span
+						class="fas fa-user text-body fs-9 form-icon"></span>
+				</div>
+				<ul class="nav nav-phoenix-pills mb-5 d-sm-none d-xl-flex"
+					id="contactListTab" data-chat-thread-tab="data-chat-thread-tab"
+					role="tablist">
+					<!-- 정렬기능  -->
+					<li class="nav-item" role="presentation"><a
+						class="nav-link cursor-pointer active" data-bs-toggle="tab"
+						data-chat-thread-list="all" role="tab" aria-selected="true">전체</a></li>
+					<li class="nav-item" role="presentation"><a
+						class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab"
+						data-chat-thread-list="read" aria-selected="false">읽지않음</a></li>
+					<li class="nav-item" role="presentation"><a
+						class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab"
+						data-chat-thread-list="unread" aria-selected="false">읽음</a></li>
+				</ul>
+				<div class="scrollbar">
+					<div class="tab-content" id="contactListTabContent">
+						<div data-chat-thread-tab-content="data-chat-thread-tab-content">
+							<ul class="nav chat-thread-tab flex-column list">
+
+								<!-- 참여중인 채팅방이 없을때 -->
+								<div th:if="${#lists.isEmpty(chatroomList)}">
+									<p class="text-center text-muted mt-4">참여 중인 채팅방이 없습니다.</p>
+								</div>
+
+								<!-- 채팅 리스트 읽은사람-->
+								<li th:if="${!#lists.isEmpty(chatroomList)}"
+									th:each="chatroom : ${chatroomList}"
+									th:attr="data-room-no=${chatroom.chatroomNo}"
+									class="nav-item read mb-1" role="presentation">
+									<!-- 선택된 사람은 a class 끝에 active 넣으면됨 --> <a
+									class="nav-link d-flex align-items-center justify-content-center p-2  "
+									data-bs-toggle="tab" data-chat-thread="data-chat-thread"
+									href="#tab-thread-1" role="tab" aria-selected="true"> <!-- 이미지 부분 -->
+										<!-- <div class="avatar avatar-xl status-online position-relative me-2 me-sm-0 me-xl-2">
                         	<img class="rounded-circle border border-2 border-light-subtle" src="../assets/img/team/20.webp" alt="" />
                         </div>  -->
-                        <div class="flex-1 d-sm-none d-xl-block">
-                          <div class="d-flex justify-content-between align-items-center">
-                            <h5 th:text="${chatroom.chatroomName}" class="text-body fw-normal name text-nowrap">
-                            	채팅방 이름
-                            </h5>
-                            <p class="fs-10 text-body-tertiary text-opacity-85 mb-0 text-nowrap">
-                            	시간은 일단 보류
-                            </p>
-                          </div>
-                          <div class="d-flex justify-content-between">
-                            <p th:text="${chatroom.chatLastMessage}" class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">
-                            	마지막메시지
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                     </li> 
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-         <!-- 새 채팅방 만들기 모달 -->
-			<!-- <div class="modal fade" id="createChatModal" tabindex="-1" aria-labelledby="createChatModalLabel" aria-hidden="true">
-			  <div class="modal-dialog modal-dialog-centered">
-			    <div class="modal-content">
-			    
-			      헤더
-			      <div class="modal-header">
-			        <h5 class="modal-title" id="createChatModalLabel">새 채팅방 만들기</h5>
-			        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-			      </div>
-			      
-			      <form th:action="@{/chat/create}" method="post"> 
-			        <div class="modal-body">
-			          <div class="mb-3">
-			            <label class="form-label">채팅방 이름</label>
-			            <input type="text" name="chatroomName" class="form-control" placeholder="예: 개발팀 채팅방" required>
-			          </div>
-			          <div class="mb-3">
-			            <label class="form-label">참여자 선택</label>
-			            <select name="participants" class="form-select" required>
-			              <option value="">-- 참여자 선택 --</option>
-			            </select>
-			          </div>
-			        </div>
-			        <div class="modal-footer">
-			          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-			          <button type="submit" class="btn btn-primary">생성</button>
-			        </div>
-			      </form>
-			    </div>
-			  </div>
-			</div> -->
-			
-		<!--채팅방 채팅방만들기 처음화면  -->
-		<div class="card tab-content flex-1 phoenix-offcanvas-container">
-            <div class="tab-pane h-100 fade active show" id="tab-thread-1" role="tabpanel" aria-labelledby="tab-thread-1">
-              <div class="d-flex flex-column h-100">
-       			<div class="d-flex flex-column justify-content-center align-items-center h-100">
-				  <h4 class="text-body-secondary mb-2">채팅방을 선택해주세요.</h4>
-				  <a href="#" class="fw-bold text-primary text-decoration-none" data-bs-toggle="modal" data-bs-target="#createChatModal">
-				    새 채팅방 만들기
-				  </a>
+										<div class="flex-1 d-sm-none d-xl-block">
+											<div
+												class="d-flex justify-content-between align-items-center">
+												<h5 th:text="${chatroom.chatroomName}"
+													class="text-body fw-normal name text-nowrap">채팅방 이름</h5>
+												<p
+													class="fs-10 text-body-tertiary text-opacity-85 mb-0 text-nowrap">
+													시간은 일단 보류</p>
+											</div>
+											<div class="d-flex justify-content-between">
+												<p th:text="${chatroom.chatLastMessage}"
+													class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">
+													마지막메시지</p>
+											</div>
+										</div>
+								</a>
+								</li>
+							</ul>
+						</div>
+					</div>
 				</div>
-           	</div>
-           </div>
-        </div>
-    </main>
-  </body>
-  <script>
-	  
-  
-  </script>
+			</div>
+			<div class="modal fade" id="createChatModal" tabindex="-1"
+				aria-labelledby="createChatModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="btn-close" data-bs-dismiss="modal"
+								aria-label="닫기"></button>
+						</div>
+
+				<form th:action="@{/chat/create}" method="post">
+					  <div class="modal-body">
+					    <div class="mb-3" id="chatroomNameBox">
+					      <label class="form-label">채팅방 이름</label>
+					      <input type="text" name="chatroomName" class="form-control"
+					             placeholder="예: 개발팀 채팅방">
+					    </div>
+					
+					    <!-- 부서 선택 -->
+					    <div class="mb-3">
+					      <label class="form-label">부서</label>
+					      <select class="form-select" id="departmentSelect" onchange="loadEmployeesByDept()">
+					        <option selected disabled>-- 부서 선택 --</option>
+					        <option th:if="${!#lists.isEmpty(employeeList)}"
+					  				th:each="empList : ${employeeList}"
+					  				th:text="${empList.department.departmentName}">
+					        </option>
+					      </select>
+					    </div>
+					    <!-- 참여자 선택 -->
+						<div class="mb-3">
+						  <label class="form-label">참여자 선택</label>
+						  <div class="d-flex"> 
+						    <select id="employeeSelect" class="form-select me-2" style="flex:1;">
+						      <option selected disabled>-- 참여자 선택 --</option>
+						      <option th:if="${!#lists.isEmpty(employeeList)}"
+					  				th:each="empList : ${employeeList}"
+					  				th:text="${empList.employeeName}">
+						    </select>
+						    <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">추가</button>
+						  </div>
+						</div>
+						
+						<!-- 선택된 참여자 보여주기 -->
+						<div class="mb-3">
+						  <label class="form-label">선택된 참여자</label>
+						  <div id="selectedParticipants">
+						    <!-- 여기에 badge 추가됨 -->
+						  </div>
+						</div>
+					  </div>
+					
+					  <div class="modal-footer">
+					    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+					    <button type="submit" class="btn btn-primary">생성</button>
+					  </div>
+					</form>
+
+					</div>
+				</div>
+			</div>
+			<!--채팅방 채팅방만들기 처음화면  -->
+			<div class="card tab-content flex-1 phoenix-offcanvas-container">
+				<div class="tab-pane h-100 fade active show" id="tab-thread-1"
+					role="tabpanel" aria-labelledby="tab-thread-1">
+					<div class="d-flex flex-column h-100">
+						<div id="default-chat-area"
+							class="d-flex flex-column justify-content-center align-items-center h-100">
+							<h4 class="text-body-secondary mb-2">채팅방을 선택해주세요.</h4>
+							<a href="#" class="fw-bold text-primary text-decoration-none"
+								data-bs-toggle="modal" data-bs-target="#createChatModal"> 새
+								채팅방 만들기 </a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+</body>
+	<script>
+		
+	</script>
 </html>
