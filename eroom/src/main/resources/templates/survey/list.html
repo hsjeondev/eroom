@@ -36,7 +36,7 @@
 																<input class="form-control mb-2" name="item" type="text" />
 															</div>
 															<div class="container text-center">
-																<button class="btn btn-phoenix-primary me-1 mb-1" type="button" onclick="addItem()">+ 항목 추가</button>
+																<button id="addItemBtn" class="btn btn-phoenix-primary me-1 mb-1" type="button">+ 항목 추가</button>
 															</div>
 														</div>
 
@@ -44,12 +44,10 @@
 															<div class="col-form-label col-sm-2 pt-0"></div>
 															<div class="col-sm-8">
 																<div class="form-check">
-																	<input class="form-check-input" id="gridCheck1" type="checkbox">
-																	<label class="form-check-label" for="gridCheck1">복수선택</label>
+																	<input class="form-check-input" id="gridCheck1" type="checkbox"> <label class="form-check-label" for="gridCheck1">복수선택</label>
 																</div>
 																<div class="form-check">
-																	<input class="form-check-input" id="gridCheck2" type="checkbox">
-																	<label class="form-check-label" for="gridCheck2">익명투표</label>
+																	<input class="form-check-input" id="gridCheck2" type="checkbox"> <label class="form-check-label" for="gridCheck2">익명투표</label>
 																</div>
 															</div>
 														</div>
@@ -132,7 +130,7 @@
 		</main>
 	</th:block>
 	<script>
-		function addItem() {
+		document.getElementById("addItemBtn").addEventListener("click", function() {
 			const container = document.getElementById("itemContainer");
 			const newInput = document.createElement("input");
 			newInput.type = "text";
@@ -140,7 +138,7 @@
 			newInput.placeholder = "항목 입력";
 			newInput.className = "form-control mb-2";
 			container.appendChild(newInput);
-		}
+		});
 	</script>
 </body>
 </html>
