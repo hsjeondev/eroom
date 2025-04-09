@@ -19,5 +19,10 @@ public class EmployeeDirectoryService {
 	public List<EmployeeDirectory> selectDirectoryAll() {
 		return employeeDirectoryRepository.findAll();
 	}
+
+//	public void selectDirectoryByDepartmentNo(Long id) {
+//		return employeeDirectoryRepository.findById(null)
+//		
+//	}
 	
 }
