@@ -1,7 +1,7 @@
-package com.eroom.authority.dto;
+package com.eroom.employee.dto;
 
 
-import com.eroom.authority.entity.AuthorityMenu;
+import com.eroom.employee.entity.AuthorityMenu;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

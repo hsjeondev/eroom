@@ -1,4 +1,4 @@
-package com.eroom.login.controller;
+package com.eroom.employee.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,4 +18,5 @@ public class LoginController {
 //		model.addAttribute("errorMsg", errorMsg);
 //		return "login";
 //	}
+	
 }
