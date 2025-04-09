@@ -6,7 +6,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.eroom.directory.entity.Employee;
+import com.eroom.employee.entity.Employee;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

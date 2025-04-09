@@ -1,10 +1,14 @@
-package com.eroom.authority.entity;
+package com.eroom.employee.entity;
+
+
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,21 +25,19 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="authority_menu")
-public class AuthorityMenu {
-
+@Table(name="department")
+public class Department {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long authorityMenuNo;
+	private Long departmentNo; // 부서 번호
 	
-	@Column(name = "authority_menu_url")
-	private String authorityMenuUrl;
-	@Column(name = "authority_menu_method")
-	private String authorityMenuMethod;
-	@Column(name = "authority_menu_name")
-	private String authorityMenuName;
-	@Column(name = "authority_menu_visible_yn")
-	private String authorityMenuVisibleYn;
-	@Column(name = "authority_menu_no_parent")
-	private Long authorityMenuNoParent;
+	@Column(name="department_name")
+	private String departmentName; // 부서 이름
+	@Column(name="department_order")
+	private Long departmentOrder; // 부서 번호
+	
+	@OneToMany(mappedBy = "department")
+	private List<Employee> employees;
+
 }

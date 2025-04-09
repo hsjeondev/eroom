@@ -1,5 +1,4 @@
-package com.eroom.directory.entity;
-
+package com.eroom.employee.entity;
 
 import java.util.List;
 
@@ -8,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -25,22 +26,25 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="department")
-public class Department {
+@Table(name="team")
+public class Team {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long departmentNo; // 부서 번호
+	private Long teamNo; // 팀 번호
 	
-	@Column(name="department_name")
-	private String departmentName; // 부서 이름
-	@Column(name="department_order")
-	private Long departmentOrder; // 부서 번호
+	@Column(name="team_name")
+	private String teamName; // 팀 이름
+	@Column(name="team_order")
+	private Long teamOrder; // 팀 순서
 	
-	@OneToMany(mappedBy = "department")
+	@ManyToOne
+	@JoinColumn(name="department_no")
+	private Department department; // 부서번호
+
+	@OneToMany(mappedBy = "team")
 	private List<Employee> employees;
-
-	@OneToMany(mappedBy = "department")
-	private List<Team> teams;
-
+	
+	
+	
 }

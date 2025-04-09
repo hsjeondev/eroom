@@ -75,6 +75,7 @@
   const prevMonth = dayjs && dayjs().subtract(1, 'month').format('MM');
   const nextMonth = dayjs && dayjs().add(1, 'month').format('MM');
   const currentYear = dayjs && dayjs().format('YYYY');
+<<<<<<< HEAD
   const events = [
     {
       title: 'Boot Camp',
@@ -181,6 +182,9 @@
       className: 'text-primary'
     }
   ];
+=======
+  const events = [];
+>>>>>>> refs/heads/develop
 
   const getTemplate = event => `
 <div class="modal-header ps-card border-bottom border-translucent justify-content-between">
