@@ -1,6 +1,7 @@
 package com.eroom.directory.dto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import com.eroom.directory.entity.Department;
 import com.eroom.directory.entity.Employee;
@@ -57,6 +58,21 @@ public class EmployeeDto {
 				.employee_end_yn(emp.getEmployeeEndYn())
 				.employee_position(emp.getEmployeePosition())
 				.build();
+	}
+	
+	public String getFormattedHireDate() {
+		if(employee_hire_date != null) {
+			return employee_hire_date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+		} else {
+			return "-";
+		}
+	}
+	public String getFormattedEndDate() {
+		if(employee_end_date != null) {
+			return employee_end_date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+		} else {
+			return "-";
+		}
 	}
 	
 }

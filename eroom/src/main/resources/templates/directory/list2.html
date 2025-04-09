@@ -7,7 +7,7 @@
 >
 <head>
 <meta charset="UTF-8">
-<title>주소록</title>
+<title>직원 주소록</title>
 </head>
 <body>
     <!-- ===============================================-->
@@ -90,13 +90,11 @@
               <div class="table-responsive scrollbar-overlay mx-n1 px-1">
               
               	<!-- 게시글 형태 테이블 -->
-                <table class="table table-sm fs-9 mb-0">
+                <table class="table table-sm fs-9 mb-0" style="text-align: center;">
                   <thead>
                     <tr>
-                      <th class="white-space-nowrap fs-9 align-middle ps-0">
-                        <div class="form-check mb-0 fs-8">
-                          <input class="form-check-input" id="checkbox-bulk-customers-select" type="checkbox" data-bulk-select='{"body":"customers-table-body"}' />
-                        </div>
+                      <th class="white-space-nowrap fs-9 align-middle ps-0" style="text-align: center;">
+                        <div>번호</div>
                       </th>
                       <th class="sort align-middle pe-5" scope="col" data-sort="customer" style="width:10%;">사원명</th>
                       <th class="sort align-middle pe-5" scope="col" data-sort="email" style="width:20%;">이메일</th>
@@ -137,21 +135,21 @@
                     	th:each="emp, empStatus : ${resultList}"
                     	th:attr="data-emp-no=${emp.employee.employeeNo}"
                     	>
-                      <td class="fs-9 align-middle ps-0 py-3">
-                        <div class="form-check mb-0 fs-8">
+                      <td class="fs-9 align-middle ps-0 py-3" th:text="${empStatus.count}">
+                        <!-- <div class="form-check mb-0 fs-8">
                           <input class="form-check-input" type="checkbox" data-bulk-select-row='{"customer":{"avatar":"/team/32.webp","name":"Carry Anna"},"email":"annac34@gmail.com","city":"Budapest","totalOrders":89,"totalSpent":23987,"lastSeen":"34 min ago","lastOrder":"Dec 12, 12:56 PM"}' />
-                        </div>
+                        </div> -->
                       </td>
                       <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
                           <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/32.webp" alt="" />
                           </div>
-                          <p class="mb-0 ms-3 text-body-emphasis fw-bold">이름</p>
+                          <p class="mb-0 ms-3 text-body-emphasis fw-bold" th:text="${emp.employee.employeeName}">이름</p>
                         </a></td>
-                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:annac34@gmail.com">annac34@gmail.com</a></td>
-                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">89</td>
-                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis">$ 23987</td>
-                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7">Budapest</td>
-                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">34 min ago</td>
+                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:annac34@gmail.com" th:text="${emp.employeeDirectoryEmail}">이메일</a></td>
+                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight" th:text="${emp.employeeDirectoryPhone}">핸드폰번호</td>
+                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis" th:text="${emp.employee.department?.departmentName}">부서명</td>
+                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7" th:text="${emp.employee.team?.teamName}">팀명</td>
+                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end" th:text="${emp.employee.formattedHireDate}">입사일</td>
                       <!-- <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Dec 12, 12:56 PM</td> -->
                     </tr>
                     
@@ -166,10 +164,10 @@
               	
               	
               </div>
-              <div class="row align-items-center justify-content-between py-2 pe-0 fs-9">
-                <div class="col-auto d-flex">
+              <div class="row align-items-center justify-content-center py-2 pe-0 fs-9">
+                <!-- <div class="col-auto d-flex">
                   <p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info"></p><a class="fw-semibold" href="#!" data-list-view="*">View all<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a><a class="fw-semibold d-none" href="#!" data-list-view="less">View Less<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a>
-                </div>
+                </div> -->
                 <div class="col-auto d-flex">
                   <button class="page-link" data-list-pagination="prev"><span class="fas fa-chevron-left"></span></button>
                   <ul class="mb-0 pagination"></ul>
