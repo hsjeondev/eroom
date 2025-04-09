@@ -5,8 +5,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.eroom.directory.entity.Employee;
-import com.eroom.login.repository.EmployeeRepository;
+import com.eroom.employee.entity.Employee;
+import com.eroom.employee.repository.EmployeeRepository;
 
 import lombok.RequiredArgsConstructor;
 
