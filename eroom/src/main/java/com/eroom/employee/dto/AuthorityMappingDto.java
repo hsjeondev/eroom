@@ -1,9 +1,9 @@
-package com.eroom.authority.dto;
+package com.eroom.employee.dto;
 
 
-import com.eroom.authority.entity.Authority;
-import com.eroom.authority.entity.AuthorityMapping;
-import com.eroom.directory.entity.Employee;
+import com.eroom.employee.entity.Authority;
+import com.eroom.employee.entity.AuthorityMapping;
+import com.eroom.employee.entity.Employee;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,5 +1,4 @@
-package com.eroom.authority.entity;
-
+package com.eroom.employee.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,12 +21,21 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="authority")
-public class Authority {
+@Table(name="authority_menu")
+public class AuthorityMenu {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long authorityNo;
-	@Column(name = "authority_name")
-	private String authorityName;
+	private Long authorityMenuNo;
+	
+	@Column(name = "authority_menu_url")
+	private String authorityMenuUrl;
+	@Column(name = "authority_menu_method")
+	private String authorityMenuMethod;
+	@Column(name = "authority_menu_name")
+	private String authorityMenuName;
+	@Column(name = "authority_menu_visible_yn")
+	private String authorityMenuVisibleYn;
+	@Column(name = "authority_menu_no_parent")
+	private Long authorityMenuNoParent;
 }

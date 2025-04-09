@@ -1,11 +1,14 @@
-package com.eroom.authority.entity;
+package com.eroom.employee.entity;
 
+
+import java.util.List;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,21 +25,16 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="authority_menu_mapping")
-public class AuthorityMenuMapping {
+@Table(name="authority")
+public class Authority {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long authorityMenuMappingNo;
+	private Long authorityNo;
 	
-	@ManyToOne
-	@JoinColumn(name = "authority_no")
-	private Authority authority;
+	@Column(name = "authority_name")
+	private String authorityName;
 	
-	@ManyToOne
-	@JoinColumn(name = "authority_menu_no")
-	private AuthorityMenu authorityMenu;
-	
-	
-	
+	@ManyToMany(mappedBy="authorities")
+	private List<Employee> employees;
 }

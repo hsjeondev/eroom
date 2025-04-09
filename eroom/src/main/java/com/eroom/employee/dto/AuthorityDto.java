@@ -1,6 +1,6 @@
-package com.eroom.authority.dto;
+package com.eroom.employee.dto;
 
-import com.eroom.authority.entity.Authority;
+import com.eroom.employee.entity.Authority;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

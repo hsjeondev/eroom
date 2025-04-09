@@ -1,15 +1,12 @@
-package com.eroom.directory.entity;
+package com.eroom.employee.entity;
 
-import java.util.List;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,25 +23,18 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="team")
-public class Team {
-	
+@Table(name="authority_mapping")
+public class AuthorityMapping {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long teamNo; // 팀 번호
-	
-	@Column(name="team_name")
-	private String teamName; // 팀 이름
-	@Column(name="team_order")
-	private Long teamOrder; // 팀 순서
+	private Long authorityMappingNo;
 	
 	@ManyToOne
-	@JoinColumn(name="department_no")
-	private Department department; // 부서번호
-
-	@OneToMany(mappedBy = "team")
-	private List<Employee> employees;
+	@JoinColumn(name = "employee_no")
+	private Employee employee;
 	
-	
-	
+	@ManyToOne
+	@JoinColumn(name = "authority_no")
+	private Authority authority;
 }
