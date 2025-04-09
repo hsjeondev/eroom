@@ -8,6 +8,8 @@ public class MailController {
 
 	@GetMapping("/mail")
 	public String selectMailAll() {
+		
+		
 		return "mail/list";
 	}
 	
