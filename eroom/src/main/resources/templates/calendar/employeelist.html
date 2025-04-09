@@ -102,7 +102,7 @@ layout:decorate="~{/include/layout}">
 		<div class="modal fade" id="addEventModal" tabindex="-1">
 			<div class="modal-dialog">
 				<div class="modal-content border border-translucent">
-					<form id="addEventForm" autocomplete="off">
+					<form id="addEventForm" autocomplete="off" name="addEventForm">
 						<div class="modal-header px-card border-0">
 							<div
 								class="w-100 d-flex justify-content-between align-items-start">
@@ -115,32 +115,35 @@ layout:decorate="~{/include/layout}">
 						</div>
 						<div class="modal-body p-card py-0">
 							<!-- 일정 제목 -->
-							<div class="form-floating mb-3">
+						<!-- 	<div class="form-floating mb-3">
 								<input class="form-control" id="eventTitle" type="text"
-									name="title" required placeholder="일정 제목" /> <label
+									name="title" placeholder="일정 제목" /> <label
 									for="eventTitle">일정 제목</label>
-							</div>
+									${#authentication.principal.member.memberName}
+							</div> -->
+							<input type="hidden" name="employee_no" th:value="${#authentication.principal.employee.employeeNo}" />
+							
 							<!-- 일정 장소 -->
 							<div class="form-floating mb-3">
 								<input class="form-control" id="eventLocation" type="text"
-									name="location" placeholder="일정 장소" /> <label
+									name="calendar_location" placeholder="일정 장소" /> <label
 									for="eventLocation">일정 장소</label>
 							</div>
 							<!-- 시작 날짜 -->
 								<div class="form-floating mb-3 position-relative">
 									<input class="form-control styled-datetime" id="eventStartDate"
-										type="datetime-local" name="startDate" placeholder="시작 시간"
-										required /> <label for="eventStartDate">시작 시간</label> 
+										type="datetime-local" name="calendar_date" placeholder="시작 시간"
+										/> <label for="eventStartDate">일정 시간</label> 
 								</div>
 								<!-- 공개 범위 -->
-							<div class="form-floating mb-3">
+						<!-- 	<div class="form-floating mb-3">
 								<select class="form-select" id="eventScope" name="scope">
 									<option value="private" selected>개인</option>
 									<option value="team">팀</option>
 									<option value="department">부서</option>
 									<option value="company">회사 전체</option>
 								</select> <label for="eventScope">공개 범위</label>
-							</div>
+							</div> -->
 							<!-- 일정 설명 -->
 							<div class="form-floating mb-3">
 								<textarea class="form-control" id="eventDescription"
@@ -157,6 +160,21 @@ layout:decorate="~{/include/layout}">
 				</div>
 			</div>
 		</div>
+		
+		
+		<script>
+			//모달 창 안에 있는 정보 가져오기
+			const form = document.getElementById("addEventForm");
+				form.addEventListener("submit", function (e) {
+			      e.preventDefault(); // 
+				
+			      console.log(" 직원번호:", form.employee_no.value);
+			      console.log(" 일정 장소:", form.calendar_location.value);
+			      console.log(" 일정 시간:", form.calendar_date.value);
+			      console.log(" 일정 설명:", form.calendar_description.value);
+
+			    });		
+		</script>
 		
 		<div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
     <!--     <footer class="footer position-absolute">
