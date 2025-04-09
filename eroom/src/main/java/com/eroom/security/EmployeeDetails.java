@@ -8,8 +8,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.eroom.authority.entity.Authority;
-import com.eroom.directory.entity.Employee;
+import com.eroom.employee.entity.Authority;
+import com.eroom.employee.entity.Employee;
 
 import lombok.RequiredArgsConstructor;
 

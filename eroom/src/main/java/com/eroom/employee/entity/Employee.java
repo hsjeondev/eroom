@@ -1,12 +1,12 @@
 
-package com.eroom.directory.entity;
+package com.eroom.employee.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.eroom.authority.entity.Authority;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
+import com.eroom.directory.entity.EmployeeDirectory;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

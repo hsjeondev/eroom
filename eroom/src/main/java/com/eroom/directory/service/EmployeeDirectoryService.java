@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.eroom.directory.entity.Employee;
 import com.eroom.directory.entity.EmployeeDirectory;
 import com.eroom.directory.repository.EmployeeDirectoryRepository;
+import com.eroom.employee.entity.Employee;
 
 import lombok.RequiredArgsConstructor;
 

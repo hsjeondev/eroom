@@ -1,11 +1,11 @@
-package com.eroom.directory.dto;
+package com.eroom.employee.dto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import com.eroom.directory.entity.Department;
-import com.eroom.directory.entity.Employee;
-import com.eroom.directory.entity.Team;
+import com.eroom.employee.entity.Department;
+import com.eroom.employee.entity.Employee;
+import com.eroom.employee.entity.Team;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
