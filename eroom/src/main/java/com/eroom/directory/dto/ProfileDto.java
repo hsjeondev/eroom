@@ -30,7 +30,7 @@ public class ProfileDto {
 				.profileOriName(profile_ori_name)
 				.profileNewName(profile_new_name)
 				.profilePath(profile_path)
-				.employee(Employee.builder().employeeNo(employee_no).build())
+				.employeeNo(Employee.builder().employeeNo(employee_no).build())
 				.build();
 	}
 	
