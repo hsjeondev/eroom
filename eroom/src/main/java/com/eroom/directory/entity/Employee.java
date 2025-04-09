@@ -1,3 +1,4 @@
+
 package com.eroom.directory.entity;
 
 import java.time.LocalDateTime;
@@ -29,7 +30,6 @@ import lombok.ToString;
 @Setter
 @ToString
 @Builder
-
 @Entity
 @Table(name="employee")
 public class Employee {
