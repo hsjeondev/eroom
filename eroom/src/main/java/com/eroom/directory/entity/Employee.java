@@ -64,6 +64,6 @@ public class Employee {
 	@OneToMany(mappedBy="creater")
 	private List<Chatroom> creater;
 	// 채팅방매핑 조인
-	@OneToMany(mappedBy="formMember")
-	private List<ChatroomAttendee> formMember;
+	@OneToMany(mappedBy="attendee")
+	private List<ChatroomAttendee> attendeeList;
 }

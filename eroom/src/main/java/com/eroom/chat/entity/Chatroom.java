@@ -59,7 +59,7 @@ public class Chatroom {
 	private String chatLastMessage; // 마지막메시지
 	
 	@OneToMany(mappedBy="chatroomNo")
-	private List<Chatroom> chatroomMapping; // 매핑이랑 조인됨
+	private List<ChatroomAttendee> chatroomMapping; // 매핑이랑 조인됨
 	
 	
 }

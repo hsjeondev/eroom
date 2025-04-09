@@ -44,5 +44,5 @@ public class ChatroomAttendee {
 	
 	@ManyToOne
 	@JoinColumn(name="employee_no")
-	private Employee formMember; // 사번이랑 조인
+	private Employee attendee; // 사번이랑 조인
 }
