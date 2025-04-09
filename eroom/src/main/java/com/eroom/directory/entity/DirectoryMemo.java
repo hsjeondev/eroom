@@ -1,6 +1,5 @@
 package com.eroom.directory.entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,23 +23,20 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="profile")
-public class Profile {
-
+@Table(name="directory_memo")
+public class DirectoryMemo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long profileNo; // 프로필 번호
+	private Long directoryMemoNo;
+	@Column(name = "directory_memo_target")
+	private String directoryMemoTarget;
+	@Column(name = "directory_memo_directory_no")
+	private Long directoryMemoDirectoryNo;
+	@Column(name = "directory_memo_content")
+	private String directoryMemoContent;
 	
-	@Column(name = "profile_ori_name")
-	private String profileOriName;
-	@Column(name = "profile_new_name")
-	private String profileNewName;
-	@Column(name = "profile_path")
-	private String profilePath;
 	
 	@OneToOne
-	@JoinColumn(name="employee_no")
-	private Employee employeeNo;
-
-	
+	@JoinColumn(name = "employee_no")
+	private Employee employee;
 }
