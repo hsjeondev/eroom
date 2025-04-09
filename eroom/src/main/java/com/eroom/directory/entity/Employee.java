@@ -4,7 +4,7 @@ package com.eroom.directory.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.eroom.authority.entity.AuthorityMapping;
+import com.eroom.authority.entity.Authority;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
 
@@ -14,6 +14,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -70,8 +72,12 @@ public class Employee {
 	@OneToMany(mappedBy="attendee")
 	private List<ChatroomAttendee> attendeeList;
 
-    @OneToMany(mappedBy = "employee")
-    private List<AuthorityMapping> authorityMappings;
+	@ManyToMany
+	@JoinTable(
+			name = "authority_mapping",
+			joinColumns = @JoinColumn(name="employee_no"),
+			inverseJoinColumns = @JoinColumn(name="authority_no"))
+	private List<Authority> authorities;
     
 	@OneToOne
 	@JoinColumn(name = "employee_no")
