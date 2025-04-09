@@ -1,7 +1,4 @@
-package com.eroom.authority.entity;
-
-
-import com.eroom.directory.entity.Employee;
+package com.eroom.employee.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,18 +22,21 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="authority_mapping")
-public class AuthorityMapping {
+@Table(name="authority_menu_mapping")
+public class AuthorityMenuMapping {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long authorityMappingNo;
-	
-	@ManyToOne
-	@JoinColumn(name = "employee_no")
-	private Employee employee;
+	private Long authorityMenuMappingNo;
 	
 	@ManyToOne
 	@JoinColumn(name = "authority_no")
 	private Authority authority;
+	
+	@ManyToOne
+	@JoinColumn(name = "authority_menu_no")
+	private AuthorityMenu authorityMenu;
+	
+	
+	
 }

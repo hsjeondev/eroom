@@ -1,11 +1,15 @@
 package com.eroom.security;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.eroom.directory.entity.Employee;
+import com.eroom.employee.entity.Authority;
+import com.eroom.employee.entity.Employee;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,8 +27,14 @@ private static final long serialVersionUID = 1L;
 	// 사용자 권한 설정
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-//		return List.of(new SimpleGrantedAuthority("user"));
-		return null;		
+	    List<GrantedAuthority> employeeAuthorities = new ArrayList<GrantedAuthority>();
+
+	    for (Authority authority : employee.getAuthorities()) {
+	        String roleName = authority.getAuthorityName();
+	        employeeAuthorities.add(new SimpleGrantedAuthority(roleName));
+	    }
+
+	    return employeeAuthorities;
 	}
 	
 	// 사용자 비밀번호 반환
