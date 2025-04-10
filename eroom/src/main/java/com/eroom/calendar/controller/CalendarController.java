@@ -20,12 +20,30 @@ public class CalendarController {
 	private final EmployeeCalendarService service;
 	
 	//캘린더 개인일정 목록으로 화면 전환
-	@GetMapping("/calendar/employee")
+	@GetMapping("/employeecalendar")
 	public String employeeCalendarView() {
 		return "calendar/employeelist";
 	}
 	
-	@PostMapping("/calendar/add")
+	//캘린더 마이팀일정 목록으로 화면 전환
+	@GetMapping("/myteamcalendar")
+	public String myTeamCalendarView() {
+		return "calendar/myteamlist";
+	}
+	
+	//캘린더 회사일정 목록으로 화면 전환
+	@GetMapping("/companycalendar")
+	public String companyCalendarView() {
+		return "calendar/companylist";
+	}
+	
+	@GetMapping("/departmentcalendar")
+	public String departMentCalendarView() {
+		return "calendar/departlist";
+	}
+	
+	
+	@PostMapping("/employeecalendar/add")
 	@ResponseBody
 	public Map<String,String> addEmployeeCalendarApi(EmployeeCalendarDto param){
 		Map<String,String> resultMap = new HashMap<String,String>();
