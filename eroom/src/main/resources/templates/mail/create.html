@@ -15,6 +15,7 @@
 <script src="../../vendors/feather-icons/feather.min.js"></script>
 <script src="../../vendors/dayjs/dayjs.min.js"></script> -->
 <script src="../../vendors/tinymce/tinymce.min.js"></script>
+
 </head>
 <body>
 <main class="main" id="top" layout:fragment="content">
@@ -74,12 +75,12 @@
 						body:payload
 					})
 					.then(response => response.json())
-					.then(data => {
-						console.log(data);
-					})
-					.catch(error=>{
-						console.log(error);
-					}) 
+					.then(data=>{
+						alert(data.res_msg);
+						if(data.res_code==200){
+							location.href='/mail';
+						}
+					});
             	})
             </script>
             

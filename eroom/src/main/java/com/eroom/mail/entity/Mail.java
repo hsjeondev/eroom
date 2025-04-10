@@ -2,6 +2,8 @@ package com.eroom.mail.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,9 +34,12 @@ public class Mail {
 	@Column(name="mail_content")
 	private String mailContent;
 	
+	@CreationTimestamp
 	@Column(name="mail_sent_time")
 	private LocalDateTime mailSentTime;
 	
+	@Column(name="mail_status")
+	private String mailStatus;
 //	@
 //	private Long employee_no;
 	

@@ -91,6 +91,56 @@
                 </div>
                 <!-- 첫번째 끝 -->
                 
+                <!-- test -->
+                <div th:if="${#lists.isEmpty(resultList)}">
+                	<input type="text" value="내용이 없습니다.">
+                </div>
+                 <div class="border-top border-translucent hover-actions-trigger py-3"
+                 		th:if="${!#lists.isEmpty(resultList)}"
+                 		th:each="mail : ${resultList}">
+                  <div class="row align-items-sm-center gx-2">
+                    <div class="col-auto">
+                      <div class="d-flex flex-column flex-sm-row">
+                        <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" />
+                        <button class="btn p-0"><span class="fas text-warning fa-star"></span></button>
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <div class="avatar avatar-s  rounded-circle">
+                        <img class="rounded-circle " src="../../assets/img/team/60.webp" alt="" />
+
+                      </div>
+                    </div>
+                    <div class="col-auto"><a class="text-body-emphasis fw-bold inbox-link fs-9" href="../../apps/email/email-detail.html">보낸 사람</a></div>
+                    <div class="col-auto ms-auto">
+                      <div class="hover-actions end-0">
+                        <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
+                        <div class="dropdown-menu dropdown-menu-end py-2">
+                        <!-- <a class="dropdown-item" href="#!">Mark Unread</a> -->
+                        <a class="dropdown-item" href="#!">⭐중요 표시</a>
+                        <a class="dropdown-item" href="#!">🗑️휴지통</a>
+                        <!-- <a class="dropdown-item" href="#!">다운로드</a> -->
+                        <!-- <a class="dropdown-item" href="#!">Print</a> -->
+                        <!-- <a class="dropdown-item" href="#!">Report Spam</a> -->
+                        <!-- <a class="dropdown-item" href="#!">Report Phishing</a> -->
+                        <!-- <a class="dropdown-item" href="#!">Mute Jessica Ball</a> -->
+                        <!-- <a class="dropdown-item" href="#!">Block Jessica Ball</a> -->
+                        <a class="dropdown-item text-danger" href="#!">삭제</a></div>
+                      </div>
+                      <span class="fs-10 fw-bold" >
+                      	<input 
+                      		th:test="${mail.mailSentTime}">
+                      </span>
+                    </div>
+                  </div>
+                  <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11"><a class="d-block inbox-link" th:href="@{mail/detail}"><span class="fs-9 line-clamp-1 text-body-emphasis">메일 제목</span>
+                      <p class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2">메일 내용</p>
+                    </a>
+                  </div>
+                </div>
+                
+                <!-- test -->
+                
                 <!-- 2번째 시작 -->
                 <div class="border-top border-translucent hover-actions-trigger py-3">
                   <div class="row align-items-sm-center gx-2">
