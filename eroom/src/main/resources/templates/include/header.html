@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" 
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">>
 <th:block th:fragment="headerLayout">
 	 <nav class="navbar navbar-top fixed-top navbar-expand" id="navbarDefault">
         <div class="collapse navbar-collapse justify-content-between">
           <div class="navbar-logo">
 
             <button class="btn navbar-toggler navbar-toggler-humburger-icon hover-bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse" aria-controls="navbarVerticalCollapse" aria-expanded="false" aria-label="Toggle Navigation"><span class="navbar-toggle-icon"><span class="toggle-line"></span></span></button>
-            <a class="navbar-brand me-1 me-sm-3" href="index.html">
+            <a class="navbar-brand me-1 me-sm-3" th:href="@{/}">
               <div class="d-flex align-items-center">
                 <div class="d-flex align-items-center"><img src="/assets/img/icons/logo.png" alt="phoenix" width="27" />
                   <h5 class="logo-text ms-2 d-none d-sm-block">Eroom</h5>
@@ -358,7 +359,9 @@
                         <img class="rounded-circle " src="/assets/img/team/72x72/57.webp" alt="" />
 
                       </div>
-                      <h6 class="mt-2 text-body-emphasis">Jerry Seinfield</h6>
+                      	<th:block sec:authorize="isAuthenticated()">
+    				  		<h6 class="mt-2 text-body-emphasis" sec:authentication="principal.employee.employeeName"></h6>
+						</th:block>
                     </div>
                     <div class="mb-3 mx-3">
                       <input class="form-control form-control-sm" id="statusUpdateInput" type="text" placeholder="Update your status" />
