@@ -34,16 +34,18 @@ layout:decorate="~{/include/layout}">
     <!--    Stylesheets-->
     <!-- ===============================================-->
 
-	<link th:href="@{/vendors/flatpickr/flatpickr.min.css}" rel="stylesheet">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-	<link th:href="@{/vendors/simplebar/simplebar.min.css}" rel="stylesheet">
-	<link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
-	<link th:href="@{/assets/css/theme-rtl.min.css}" type="text/css" rel="stylesheet" id="style-rtl">
-	<link th:href="@{/assets/css/theme.min.css}" type="text/css" rel="stylesheet" id="style-default">
-	<link th:href="@{/assets/css/user-rtl.min.css}" type="text/css" rel="stylesheet" id="user-style-rtl">
-	<link th:href="@{/assets/css/user.min.css}" type="text/css" rel="stylesheet" id="user-style-default">
+	
+	<link th:href="@{/vendors/flatpickr/flatpickr.min.css}" rel="stylesheet" />
+	<link th:href="@{/vendors/simplebar/simplebar.min.css}" rel="stylesheet" />
+	<link th:href="@{/assets/css/theme-rtl.min.css}" type="text/css" rel="stylesheet" id="style-rtl" />
+	<link th:href="@{/assets/css/theme.min.css}" type="text/css" rel="stylesheet" id="style-default" />
+	<link th:href="@{/assets/css/user-rtl.min.css}" type="text/css" rel="stylesheet" id="user-style-rtl" />
+	<link th:href="@{/assets/css/user.min.css}" type="text/css" rel="stylesheet" id="user-style-default" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css" />
+
 
     <script>
       var phoenixIsRTL = window.config.config.phoenixIsRTL;
@@ -102,7 +104,7 @@ layout:decorate="~{/include/layout}">
 		<div class="modal fade" id="addEventModal" tabindex="-1">
 			<div class="modal-dialog">
 				<div class="modal-content border border-translucent">
-					<form id="addEventForm" autocomplete="off">
+					<form id="addEventForm" autocomplete="off" name="addEventForm">
 						<div class="modal-header px-card border-0">
 							<div
 								class="w-100 d-flex justify-content-between align-items-start">
@@ -115,32 +117,36 @@ layout:decorate="~{/include/layout}">
 						</div>
 						<div class="modal-body p-card py-0">
 							<!-- 일정 제목 -->
-							<div class="form-floating mb-3">
+							<!-- 	<div class="form-floating mb-3">
 								<input class="form-control" id="eventTitle" type="text"
-									name="title" required placeholder="일정 제목" /> <label
+									name="title" placeholder="일정 제목" /> <label
 									for="eventTitle">일정 제목</label>
-							</div>
+									${#authentication.principal.member.memberName}
+							</div> -->
+							<input type="hidden" name="employee_no" th:value="${#authentication.principal.employee.employeeNo}" />
+							
 							<!-- 일정 장소 -->
 							<div class="form-floating mb-3">
 								<input class="form-control" id="eventLocation" type="text"
-									name="location" placeholder="일정 장소" /> <label
+									name="calendar_location" placeholder="일정 장소" /> <label
 									for="eventLocation">일정 장소</label>
 							</div>
 							<!-- 시작 날짜 -->
 								<div class="form-floating mb-3 position-relative">
-									<input class="form-control styled-datetime" id="eventStartDate"
-										type="datetime-local" name="startDate" placeholder="시작 시간"
-										required /> <label for="eventStartDate">시작 시간</label> 
+									
+                    				<label class="form-label" for="datetimepicker">일정 시간</label>
+                    				<input class="form-control datetimepicker flatpickr-input" id="datetimepicker" type="text" placeholder="dd/mm/yyyy hour : minute" data-options="{&quot;enableTime&quot;:true,&quot;dateFormat&quot;:&quot;d/m/y H:i&quot;,&quot;disableMobile&quot;:true}" readonly="readonly">
+                  
 								</div>
 								<!-- 공개 범위 -->
-							<div class="form-floating mb-3">
+							<!-- 	<div class="form-floating mb-3">
 								<select class="form-select" id="eventScope" name="scope">
 									<option value="private" selected>개인</option>
 									<option value="team">팀</option>
 									<option value="department">부서</option>
 									<option value="company">회사 전체</option>
 								</select> <label for="eventScope">공개 범위</label>
-							</div>
+							</div> -->
 							<!-- 일정 설명 -->
 							<div class="form-floating mb-3">
 								<textarea class="form-control" id="eventDescription"
@@ -158,8 +164,64 @@ layout:decorate="~{/include/layout}">
 			</div>
 		</div>
 		
-		<div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
-    <!--     <footer class="footer position-absolute">
+		
+		<script>
+			//let empNo = document.addEventForm;
+			//console.log(empNo.employee_no.value);
+			//모달 창 안에 있는 정보 가져오기
+			const form = document.addEventForm;
+				form.addEventListener("submit", function (e) {
+			      e.preventDefault(); // 
+				
+			      //console.log(" 직원번호:", form.employee_no.value);
+			      //console.log(" 일정 장소:", form.calendar_location.value);
+			      //console.log(" 일정 시간:", form.calendar_date.value);
+			      //console.log(" 일정 설명:", form.calendar_description.value);
+			      
+			      if(!form.calendar_location.value){
+			    	  alert("장소를 입력해주세요");
+			      }else{
+			    	const payload = new FormData(form);
+			    	fetch("/calendar/add",{
+			    		method: "post",
+			    		headers : {
+				              'header': document.querySelector('meta[name="_csrf_header"]').content,
+				              'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+							},
+			    		body: payload
+			    	})
+			    	.then(response => response.json())
+			    	.then(data => {
+			    		alert(data.res_msg);
+			    		if(data.res_code == 200){
+			    			 location.reload();
+			    		}
+			    	})
+			      }
+				})
+		</script>
+
+	<!-- 		<script>
+  				document.addEventListener("DOMContentLoaded", function () {
+    				const calendarEl = document.getElementById("appCalendar");
+    				const employeeNo = document.querySelector("input[name='employee_no']").value;
+
+    				fetch(`/calendar/employee/${employeeNo}`)
+      				.then(response => response.json())
+      				.then(events => {
+        			const calendar = new FullCalendar.Calendar(calendarEl, {
+         			initialView: 'dayGridMonth',
+          			locale: 'ko',
+          			events: events
+        		});
+
+        		calendar.render();
+      			});
+  			});
+		</script> -->
+
+			<div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
+     <footer class="footer position-absolute">
           <div class="row g-0 justify-content-between align-items-center h-100">
             <div class="col-12 col-sm-auto text-center">
               <p class="mb-0 mt-2 mt-sm-0 text-body">Thank you for creating with Phoenix<span class="d-none d-sm-inline-block"></span><span class="d-none d-sm-inline-block mx-1">|</span><br class="d-sm-none" />2025 &copy;<a class="mx-1" href="https://themewagon.com">Themewagon</a></p>
@@ -167,8 +229,8 @@ layout:decorate="~{/include/layout}">
             <div class="col-12 col-sm-auto text-center">
               <p class="mb-0 text-body-tertiary text-opacity-85">v1.22.0</p>
             </div>
-          </div>
-        </footer> -->
+          </div> 
+        </footer> 
        </div>
 
 
@@ -176,19 +238,19 @@ layout:decorate="~{/include/layout}">
     <!--    JavaScripts-->
     <!-- ===============================================-->
 	<script th:src="@{/vendors/popper/popper.min.js}"></script>
-    <script th:src="@{/vendors/bootstrap/bootstrap.min.js}"></script>
-    <script th:src="@{/vendors/anchorjs/anchor.min.js}"></script>
-    <script th:src="@{/vendors/is/is.min.js}"></script>
-    <script th:src="@{/vendors/fontawesome/all.min.js}"></script>
-    <script th:src="@{/vendors/lodash/lodash.min.js}"></script>
-    <script th:src="@{/vendors/list.js/list.min.js}"></script>
-    <script th:src="@{/vendors/feather-icons/feather.min.js}"></script>
-    <script th:src="@{/vendors/dayjs/dayjs.min.js}"></script>
-    <script th:src="@{/vendors/fullcalendar/index.global.min.js}"></script>
-    <script th:src="@{/vendors/dayjs/dayjs.min.js}"></script>
-    <script th:src="@{/vendors/flatpickr/flatpickr.min.js}"></script>
-    <script th:src="@{/assets/js/phoenix.js}"></script>
-    <script th:src="@{/assets/js/pages/calendar.js}"></script>
+	<script th:src="@{/vendors/bootstrap/bootstrap.min.js}"></script>
+	<script th:src="@{/vendors/anchorjs/anchor.min.js}"></script>
+	<script th:src="@{/vendors/is/is.min.js}"></script>
+	<script th:src="@{/vendors/fontawesome/all.min.js}"></script>
+	<script th:src="@{/vendors/lodash/lodash.min.js}"></script>
+	<script th:src="@{/vendors/list.js/list.min.js}"></script>
+	<script th:src="@{/vendors/feather-icons/feather.min.js}"></script>
+	<script th:src="@{/vendors/dayjs/dayjs.min.js}"></script> 
+	<script th:src="@{/vendors/fullcalendar/index.global.min.js}"></script>
+	<script th:src="@{/vendors/flatpickr/flatpickr.min.js}"></script>
+	<script th:src="@{/assets/js/phoenix.js}"></script>
+	<script th:src="@{/assets/js/pages/calendar.js}"></script>
+	
 	</main>
   </body>
 
