@@ -4,6 +4,7 @@ package com.eroom.employee.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.eroom.calendar.entity.EmployeeCalendar;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.directory.entity.EmployeeDirectory;
@@ -82,5 +83,9 @@ public class Employee {
 	@OneToOne
 	@JoinColumn(name = "employee_no")
 	private EmployeeDirectory employeeDirectory;
+	
+	//개인 캘린더 조인
+	@OneToMany(mappedBy="employee")
+	private List<EmployeeCalendar> employeeCalendars;
 
 }
