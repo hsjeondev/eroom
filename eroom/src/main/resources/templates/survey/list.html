@@ -28,7 +28,7 @@
 							<div class="mb-3">
 								<!-- 설문 생성 팝업창 -->
 								<form th:action="@{/survey/create}" method="post">
-									<div class="modal fade" id="scrollingLong2" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
+									<div class="modal fade" id="create-survey" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
 										<div class="modal-dialog modal-dialog-scrollable">
 											<div class="modal-content">
 												<div class="modal-header">
@@ -40,7 +40,7 @@
 													<div class="row mb-3">
 														<label class="col-sm-2 col-form-label text-end" for="surveyTitle">제목</label>
 														<div class="col-sm-8">
-															<input class="form-control" id="surveyTitle" name="title" type="text" style="width: 97.2%;">
+															<input class="form-control" id="surveyTitle" name="surveyTitle" type="text" style="width: 97.2%;">
 														</div>
 													</div>
 													<!-- 항목 div -->
@@ -77,7 +77,7 @@
 													</div>
 												</div>
 												<div class="modal-footer">
-													<button class="btn btn-primary" type="button">등록</button>
+													<button class="btn btn-primary" type="submit">등록</button>
 													<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">취소</button>
 												</div>
 											</div>
@@ -97,7 +97,23 @@
 								<div class="border-bottom border-translucent">
 									<div class="d-flex align-items-start mb-1">
 										<div class="d-sm-flex align-items-center ps-2">
-											<a class="fw-bold fs-7 lh-sm title line-clamp-1 me-sm-4" href="../../apps/crm/report-details.html">설문 제목</a>
+											<!-- 설문 상세 -->
+											<button class="btn btn-link me-1 mb-1 fs-6 p-0" type="button" data-bs-toggle="modal" data-bs-target="#survey-detail">설문 제목</button>
+											<div class="modal fade" id="survey-detail" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
+												<div class="modal-dialog modal-dialog-scrollable">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5 class="modal-title" id="scrollingLongModalLabel2">Modal title</h5>
+															<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+														</div>
+														<div class="modal-body">본문</div>
+														<div class="modal-footer">
+															<button class="btn btn-primary" type="button">Okay</button>
+															<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancel</button>
+														</div>
+													</div>
+												</div>
+											</div>
 											<div class="d-flex align-items-center">
 												<span class="fa-solid fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1"></span><span class="fw-bold fs-9 text-body lh-2">진행중</span>
 											</div>
@@ -109,7 +125,6 @@
 									<p class="fs-9 fw-semibold text-body ms-1 text mb-4 ps-2">작성자</p>
 								</div>
 								<div class="row g-1 g-sm-3 mt-2 lh-1">
-									<!-- <div class="col-12 col-sm-auto flex-1 text-truncate"><p class="fw-semibold fs-9"><span class="fa-regular fa-folder me-2 reportsby"></span>응답자 수</p></div> -->
 									<div class="col-12 col-sm-auto">
 										<div class="d-flex align-items-center">
 											<span class="me-2" data-feather="users" style="stroke-width: 2;"></span>
@@ -129,7 +144,7 @@
 				</div>
 				<div class="row align-items-center justify-content-between py-2 pe-0 fs-9 mt-2">
 					<div class="col-4 d-flex">
-						<button class="btn btn-subtle-primary me-1 mb-1" type="button" data-bs-toggle="modal" data-bs-target="#scrollingLong2">
+						<button class="btn btn-subtle-primary me-1 mb-1" type="button" data-bs-toggle="modal" data-bs-target="#create-survey">
 							<span class="fas fa-plus me-2"></span>설문 등록
 						</button>
 					</div>
@@ -182,7 +197,7 @@
 				wrapper.appendChild(removeBtn);
 				itemContainer.appendChild(wrapper);
 
-				// 스크롤 맨 아래로 자동 이동
+				// 설문 등록 항목 추가시 스크롤 맨 아래로 자동 이동
 				const scrollTarget = itemContainer.parentElement;
 				scrollTarget.scrollTop = scrollTarget.scrollHeight;
 			});
