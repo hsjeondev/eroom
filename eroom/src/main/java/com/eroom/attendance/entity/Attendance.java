@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.eroom.employee.entity.Employee;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -44,9 +46,9 @@ public class Attendance {
 	@Column(name="attendance_early_leave_yn")
 	private String attendanceEarlyLeaveYn; // 조퇴 여부
 	
-//	@ManyToOne
-//	@JoinColumn(name="employee_no")
-//	private Employee employee; // 사번
+	@ManyToOne
+	@JoinColumn(name="employee_no")
+	private Employee employee; // 사번
 	
 	
 

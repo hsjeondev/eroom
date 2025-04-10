@@ -61,6 +61,17 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	width: 30% !important;
  }
  
+.deal-label, .deal-value {
+font-size: 1.1rem !important;
+font-weight: 600 !important;
+line-height: 1 !important;
+display: inline-flex !important;
+align-items: center !important;
+justify-content: center !important;
+padding: 0 !important;
+margin: 0 !important;
+}
+ 
 </style>
 </head>
   <body>
@@ -74,30 +85,30 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                       <div class="card mb-3">
                         <div class="card-body">
 	                         
-	                           <div class="deals-company-agent d-flex flex-between-center">
+	                           <div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
 	                            <div class="d-flex align-items-center">
-	                              <p class="text-body-secondary fw-bold fs-9 mb-0">총 연차</p>
+	                              <span class="text-body-secondary fw-bold fs-15 mb-0 deal-label text-body-secondary">총 연차</span>
 	                            </div>
 	                            <div class="d-flex align-items-center">
-	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Ally Aagaard</p>
-	                            </div>
-	                          </div>
-	                          
-	                           <div class="deals-company-agent d-flex flex-between-center">
-	                            <div class="d-flex align-items-center">
-	                              <p class="text-body-secondary fw-bold fs-9 mb-0">사용 연차</p>
-	                            </div>
-	                            <div class="d-flex align-items-center">
-	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Ally Aagaard</p>
+	                              <span class="text-body-secondary fw-bold fs-15 mb-0 deal-value text-body-secondary">0</span>
 	                            </div>
 	                          </div>
 	                          
-	                          <div class="deals-company-agent d-flex flex-between-center">
+	                           <div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
 	                            <div class="d-flex align-items-center">
-	                              <p class="text-body-secondary fw-bold fs-9 mb-0">잔여 연차</p>
+	                              <span class="text-body-secondary fw-bold fs-15 mb-0 deal-label text-body-secondary">사용 연차</span>
 	                            </div>
 	                            <div class="d-flex align-items-center">
-	                              <p class="text-body-secondary fw-bold fs-9 mb-0">Ally Aagaard</p>
+	                              <span class="text-body-secondary fw-bold fs-15 mb-0 deal-value text-body-secondary">0</span>
+	                            </div>
+	                          </div>
+	                          
+	                          <div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+	                            <div class="d-flex align-items-center">
+	                              <span class="text-body-secondary fw-bold fs-15 mb-0 deal-label text-body-secondary">잔여 연차</span>
+	                            </div>
+	                            <div class="d-flex align-items-center">
+	                              <span class="text-body-secondary fw-bold fs-15 mb-0 deal-value text-body-secondary">0</span>
 	                            </div>
 	                          </div>
 	                          
@@ -107,9 +118,47 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
               </div>
               <!-- 카드1 END -->
               
+              <!-- 카드2 후보1(유력) -->
+              <div class="deals-col me-4">
+                  <div class="w-100 min-vh-50" data-sortable="data-sortable">
+                      <div class="card mb-3">
+                        <div class="card-body">
+	                         
+	                           <div class="deals-company-agent d-flex flex-between-center">
+	                            <div class="d-flex align-items-center">
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">지각</p>
+	                            </div>
+	                            <div class="d-flex align-items-center">
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">0</p>
+	                            </div>
+	                          </div>
+	                          
+	                           <div class="deals-company-agent d-flex flex-between-center">
+	                            <div class="d-flex align-items-center">
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">조퇴</p>
+	                            </div>
+	                            <div class="d-flex align-items-center">
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">0</p>
+	                            </div>
+	                          </div>
+	                          
+	                          <div class="deals-company-agent d-flex flex-between-center">
+	                            <div class="d-flex align-items-center">
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">결근</p>
+	                            </div>
+	                            <div class="d-flex align-items-center">
+	                              <p class="text-body-secondary fw-bold fs-9 mb-0">0</p>
+	                            </div>
+	                          </div>
+	                          
+                        </div>
+                      </div>
+                  </div>
+              </div>
+              
               
               <!-- 카드2 START -->
-              <div class="deals-col me-4">
+             <!--  <div class="deals-col me-4">
 
                   <div class="w-100 min-vh-50" data-sortable="data-sortable">
                    
@@ -137,16 +186,16 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                       </div>
                    
                   </div>
-              </div>
+              </div> -->
 			<!-- 카드2 END -->
             
 
             </div>
             <!-- 근태 카드 끝 -->
             
-<div id="products" data-list="{&quot;valueNames&quot;:[&quot;customer&quot;,&quot;email&quot;,&quot;total-orders&quot;,&quot;total-spent&quot;,&quot;city&quot;,&quot;last-seen&quot;,&quot;last-order&quot;],&quot;page&quot;:10,&quot;pagination&quot;:true}">
+<!-- <div id="products" data-list="{&quot;valueNames&quot;:[&quot;customer&quot;,&quot;email&quot;,&quot;total-orders&quot;,&quot;total-spent&quot;,&quot;city&quot;,&quot;last-seen&quot;,&quot;last-order&quot;],&quot;page&quot;:10,&quot;pagination&quot;:true}">
 
-	<!-- 날짜 셀렉트로 수정 예정  -->
+	날짜 셀렉트로 수정 예정 
 	<div class="mb-4">
 		<div class="row g-3 ">
 		
@@ -154,7 +203,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				<div class="btn-group position-static" role="group">
 					<div class="btn-group position-static text-nowrap">
 						<button class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-						  현재 날짜<svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com --></button>
+						  현재 날짜<svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com</button>
 						<ul class="dropdown-menu">
 							<li><a class="dropdown-item" href="#">US</a></li>
 							<li><a class="dropdown-item" href="#">Uk</a></li>
@@ -166,7 +215,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		
 		</div>
 	</div>
-	<!-- 셀렉트 끝 -->
+	셀렉트 끝
 	
 	<div class="mx-n4 px-4 mx-lg-n6 px-lg-6 bg-body-emphasis border-top border-bottom border-translucent position-relative top-1">
 		<div class="table-responsive scrollbar-overlay mx-n1 px-1 simplebar-scrollable-x" data-simplebar="init">
@@ -221,20 +270,130 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		
 		<div class="row align-items-center justify-content-between py-2 pe-0 fs-9">
 			<div class="col-auto d-flex">
-				<p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info">1 to 10 <span class="text-body-tertiary"> Items of </span>15</p><a class="fw-semibold" href="#!" data-list-view="*">View all<svg class="svg-inline--fa fa-angle-right ms-1" data-fa-transform="down-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="" style="transform-origin: 0.3125em 0.5625em;"><g transform="translate(160 256)"><g transform="translate(0, 32)  scale(1, 1)  rotate(0 0 0)"><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z" transform="translate(-160 -256)"></path></g></g></svg><!-- <span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span> Font Awesome fontawesome.com --></a><a class="fw-semibold d-none" href="#!" data-list-view="less">View Less<svg class="svg-inline--fa fa-angle-right ms-1" data-fa-transform="down-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="" style="transform-origin: 0.3125em 0.5625em;"><g transform="translate(160 256)"><g transform="translate(0, 32)  scale(1, 1)  rotate(0 0 0)"><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z" transform="translate(-160 -256)"></path></g></g></svg><!-- <span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span> Font Awesome fontawesome.com --></a>
+				<p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info">1 to 10 <span class="text-body-tertiary"> Items of </span>15</p><a class="fw-semibold" href="#!" data-list-view="*">View all<svg class="svg-inline--fa fa-angle-right ms-1" data-fa-transform="down-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="" style="transform-origin: 0.3125em 0.5625em;"><g transform="translate(160 256)"><g transform="translate(0, 32)  scale(1, 1)  rotate(0 0 0)"><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z" transform="translate(-160 -256)"></path></g></g></svg><span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span> Font Awesome fontawesome.com</a><a class="fw-semibold d-none" href="#!" data-list-view="less">View Less<svg class="svg-inline--fa fa-angle-right ms-1" data-fa-transform="down-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="" style="transform-origin: 0.3125em 0.5625em;"><g transform="translate(160 256)"><g transform="translate(0, 32)  scale(1, 1)  rotate(0 0 0)"><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z" transform="translate(-160 -256)"></path></g></g></svg><span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span> Font Awesome fontawesome.com</a>
 			</div>
 			<div class="col-auto d-flex">
-				<button class="page-link disabled" data-list-pagination="prev" disabled=""><svg class="svg-inline--fa fa-chevron-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"></path></svg><!-- <span class="fas fa-chevron-left"></span> Font Awesome fontawesome.com --></button>
+				<button class="page-link disabled" data-list-pagination="prev" disabled=""><svg class="svg-inline--fa fa-chevron-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"></path></svg><span class="fas fa-chevron-left"></span> Font Awesome fontawesome.com</button>
 				<ul class="mb-0 pagination"><li class="active"><button class="page" type="button" data-i="1" data-page="10">1</button></li><li><button class="page" type="button" data-i="2" data-page="10">2</button></li></ul>
-				<button class="page-link pe-0" data-list-pagination="next"><svg class="svg-inline--fa fa-chevron-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"></path></svg><!-- <span class="fas fa-chevron-right"></span> Font Awesome fontawesome.com --></button>
+				<button class="page-link pe-0" data-list-pagination="next"><svg class="svg-inline--fa fa-chevron-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"></path></svg><span class="fas fa-chevron-right"></span> Font Awesome fontawesome.com</button>
 			</div>
 		</div>
 	
 	</div>
+</div> -->
+            
+	<!-- advance tables -->    
+     
+<div id="tableExample4" data-list="{&quot;valueNames&quot;:[&quot;name&quot;,&quot;email&quot;,&quot;payment&quot;],&quot;page&quot;:5,&quot;pagination&quot;:true,&quot;filter&quot;:{&quot;key&quot;:&quot;payment&quot;}}">
+	<div class="row justify-content-end g-0">
+		<div class="col-auto px-3">
+			<select class="form-select form-select-sm mb-3" data-list-filter="data-list-filter">
+				<option selected="" value="">Select payment status</option>
+				<option value="Pending">Pending</option>
+				<option value="Success">Success</option>
+				<option value="Blocked">Blocked</option>
+			</select>
+		</div>
+	</div>
+	<div class="table-responsive">
+		<table class="table table-sm fs-9 mb-0 text-center">
+			<colgroup>
+				<col style="width: 10%;">
+				<col style="width: 30%;">
+				<col style="width: 30%;">
+				<col style="width: 30%;">
+			</colgroup>
+			<thead>
+				<tr class="bg-body-highlight">
+					<th class="sort border-top border-translucent ps-3 text-start" data-sort="name">번호</th>
+					<th class="sort border-top border-translucent text-center" data-sort="email">Email</th>
+					<th class="sort border-top border-translucent text-center" data-sort="email">Email</th>
+					<th class="sort border-top border-translucent pe-3" data-sort="payment">Payment</th>
+				</tr>
+			</thead>
+			<tbody class="list">
+				<tr>
+					<td class="align-middle text-start ps-3 name">1</td>
+					<td class="align-middle text-center email">john@gmail.com</td>
+					<td class="align-middle text-center email">john@gmail.com</td>
+					<td class="align-middle payment py-3 pe-3">
+						<!-- <div class="badge badge-phoenix fs-10 badge-phoenix-success">
+							<span class="fw-bold">Success</span>
+							<svg class="svg-inline--fa fa-check ms-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+								<path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path>
+							</svg><span class="ms-1 fas fa-check"></span> Font Awesome fontawesome.com
+						</div> -->
+						time
+					</td>
+				</tr>
+				
+				<!-- 여기부터 지우고 윗부분만 반복 돌리면 될듯 -->
+				<tr>
+					<td class="align-middle text-start ps-3 name">William Butler Yeats</td>
+					<td class="align-middle text-center email">william@gmail.com</td>
+					<td class="align-middle text-center email">william@gmail.com</td>
+					<td class="align-middle payment py-3 pe-3">
+						<!-- <div class="badge badge-phoenix fs-10 badge-phoenix-success">
+							<span class="fw-bold">Success</span>
+							<svg class="svg-inline--fa fa-check ms-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+								<path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path>
+							</svg><span class="ms-1 fas fa-check"></span> Font Awesome fontawesome.com
+						</div> -->
+						2025.04.09 10:45:30
+					</td>
+				</tr>
+				<tr>
+					<td class="align-middle text-start ps-3 name">Oscar Wilde</td>
+					<td class="align-middle text-center email">oscar@hotmail.com</td>
+					<td class="align-middle text-center email">oscar@hotmail.com</td>
+					<td class="align-middle payment py-3 pe-3">
+						<!-- <div class="badge badge-phoenix fs-10 badge-phoenix-success">
+							<span class="fw-bold">Success</span>
+							<svg class="svg-inline--fa fa-check ms-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+								<path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path>
+							</svg><span class="ms-1 fas fa-check"></span> Font Awesome fontawesome.com
+						</div> -->
+						2025.04.09 10:45:30
+					</td>
+				</tr>
+				<tr>
+					<td class="align-middle text-start ps-3 name">John Doe</td>
+					<td class="align-middle text-center email">doe@gmail.com</td>
+					<td class="align-middle text-center email">doe@gmail.com</td>
+					<td class="align-middle payment py-3 pe-3">
+						<!-- <div class="badge badge-phoenix fs-10 badge-phoenix-success">
+							<span class="fw-bold">Success</span>
+							<svg class="svg-inline--fa fa-check ms-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+								<path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path>
+							</svg><span class="ms-1 fas fa-check"></span> Font Awesome fontawesome.com
+						</div> -->
+						2025.04.09 10:45:30
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="d-flex justify-content-between mt-3"><span class="d-none d-sm-inline-block" data-list-info="data-list-info">1 to 4 <span class="text-body-tertiary"> Items of </span>10</span>
+		<div class="d-flex">
+			<button class="page-link disabled" data-list-pagination="prev" disabled="">
+				<svg class="svg-inline--fa fa-chevron-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="">
+					<path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"></path>
+				</svg><!-- <span class="fas fa-chevron-left"></span> Font Awesome fontawesome.com -->
+			</button>
+			<ul class="mb-0 pagination">
+				<li class="active">
+					<button class="page" type="button" data-i="1" data-page="5">1</button>
+				</li>
+			</ul>
+			<button class="page-link pe-0 disabled" data-list-pagination="next" disabled="">
+				<svg class="svg-inline--fa fa-chevron-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="">
+					<path fill="currentColor" d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"></path>
+				</svg><!-- <span class="fas fa-chevron-right"></span> Font Awesome fontawesome.com -->
+			</button>
+		</div>
+	</div>
 </div>
-            
-            
-            
+                           
             
 
     </main>
