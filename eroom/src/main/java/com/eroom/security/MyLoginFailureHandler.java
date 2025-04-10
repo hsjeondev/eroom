@@ -30,8 +30,8 @@ public class MyLoginFailureHandler implements AuthenticationFailureHandler {
 			errorMessage = "비밀번호 유효기간이 만료되었습니다.";
 		}
 		
-		errorMessage = URLEncoder.encode(errorMessage, "UTF-8");
-//		response.sendRedirect("/login?error=true&errorMsg="+errorMessage);
+		request.getSession().setAttribute("loginErrorMessage", errorMessage);
+		
 		response.sendRedirect("/login");
 		
 	}
