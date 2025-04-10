@@ -22,7 +22,7 @@ public class MailDto {
 	private LocalDateTime mail_sent_time;
 	private String mail_status;
 	
-	private Long employee_no;
+//	private Long employee_no;
 	
 	
 }

@@ -35,4 +35,7 @@ public class Mail {
 	@Column(name="mail_sent_time")
 	private LocalDateTime mailSentTime;
 	
+//	@
+//	private Long employee_no;
+	
 }
