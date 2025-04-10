@@ -101,7 +101,7 @@
                 
                 <!-- parent pages-->
               	<!-- 채팅 -->
-                <div class="nav-item-wrapper"><a class="nav-link label-1" th:href="@{/}" role="button" data-bs-toggle="" aria-expanded="false">
+                <div class="nav-item-wrapper"><a class="nav-link label-1" th:href="@{/chat/list}" role="button" data-bs-toggle="" aria-expanded="false">
                     <div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fa-solid fa-chart-gantt"></span></span><span class="nav-link-text-wrapper"><span class="nav-link-text">채팅</span></span>
                     </div>
                   </a>
@@ -313,25 +313,25 @@
                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse" id="nv-drive">
                       <li class="collapsed-nav-item-title d-none">드라이브
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/kanban/kanban.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/drive/company}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">회사 저장소</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/kanban/boards.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/drive/department}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">부서 저장소</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/kanban/create-kanban-board.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/drive/team}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">팀 저장소</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/kanban/create-kanban-board.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/drive/personal}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">개인 저장소</span>
                           </div>
                         </a>
