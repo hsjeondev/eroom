@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{/include/layout}">
+<head>
+<style>
+	.deals-container {
+		 display: flex;
+		 justify-content: center; /* deals를 화면 중앙에 */
+		 width: 100%;
+	}
+
+
+	.deals {
+		display: flex;
+		flex-wrap: wrap;
+		margin-left: 5rem;  /* ← 여기가 핵심 */ 
+		gap: 10rem;
+		  
+		margin-top: 9rem; /* 기존에 5rem이라면 6~7rem 정도로 늘리기*/
+		margin-bottom: 0;
+		padding-bottom: 0;
+		justify-content: flex-start;
+		align-items: flex-start;
+		max-width: 960px; /* 필요시 조절 */
+		width: 100%;
+	}
+		
+	.card-body {
+		height: 200px; /* 고정 높이! 필요하면 조절 가능 */
+		display: flex;
+		flex-direction: column;
+		justify-content: center; /* 요소 사이 간격 자동 균형 */
+		padding: 1rem;
+		gap: 2rem; /* 요소 간 간격 */
+	}
+	.card-body.card-two-elements {
+		display: flex;
+		flex-direction: column;
+		justify-content: center; /* 수직 가운데 정렬 */
+		align-items: stretch;
+		height: 200px; /* 카드 높이는 고정되어야 균형 맞음 */
+		padding: 1rem;
+		gap: 3rem; /* 요소 간 간격 */
+	}
+	
+	.col-auto {
+		margin-left: auto;
+	}
+		
+	.attendance-table th,
+	.attendance-table td {
+		text-align: center !important;
+		vertical-align: middle !important;
+	 }
+	
+	.attendance-table th:nth-child(1),
+	.attendance-table td:nth-child(1) {
+		width: 10% !important;
+	}
+	
+	.attendance-table th:nth-child(2),
+	.attendance-table td:nth-child(2),
+	.attendance-table th:nth-child(3),
+	.attendance-table td:nth-child(3),
+	.attendance-table th:nth-child(4),
+	.attendance-table td:nth-child(4) {
+		width: 30% !important;
+	}
+	 
+	.deal-label, .deal-value {
+		font-size: 1.1rem !important;
+		font-weight: 600 !important;
+		line-height: 1 !important;
+		display: inline-flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+		padding: 0 !important;
+		margin: 0 !important;
+	}
+ 
+</style>
+</head>
+<body>
+	<main class="main" id="top" layout:fragment="content">
+      <!-- 여기에 요소 넣으면 됩니다. -->
+		
+		<div class="d-flex justify-content-start">
+			<span class="fw-bold fs-7">근태</span>
+		</div>   
+		<div class="d-flex justify-content-center">
+			<span class="fw-bold fs-7">2025.04.10</span>
+		</div>
+		<div class="deals-container">   
+			<div class="deals">
+				<!-- 카드1 START -->
+				<div class="deals-col me-4">
+					<div class="w-100 min-vh-50" data-sortable="data-sortable">
+						<div class="card mb-3">
+							<div class="card-body">
+								<table class="w-100 text-center mx-auto w-auto text-center">
+									<tr class="py-2">
+										<td class="py-3 text-end pe-13 fw-bold fs-5">
+											<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+												<div class="d-flex align-items-center">
+													<span class="text-body-secondary fw-bold fs-15 mb-0 deal-label text-body-secondary">총 연차</span>
+												</div>
+											</div>		
+										</td>
+										<td class="py-3 text-start fw-bold fs-5">
+											<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+												<div class="d-flex align-items-center">
+													<span class="text-body-secondary fw-bold fs-15 mb-0 deal-value text-body-secondary">0</span>
+												</div>
+											</div>
+										</td>
+									</tr>
+									<tr class="py-2">
+										<td class="py-3 text-end pe-13 fw-bold fs-5">  
+											<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+												<div class="d-flex align-items-center">
+													<span class="text-body-secondary fw-bold fs-15 mb-0 deal-label text-body-secondary">사용 연차</span>
+												</div>
+											</div>
+										</td>
+										<td class="py-3 text-start fw-bold fs-5">
+											<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+												<div class="d-flex align-items-center">
+													<span class="text-body-secondary fw-bold fs-15 mb-0 deal-value text-body-secondary">0</span>
+												</div>
+											</div>
+										</td>
+									</tr>
+									<tr class="py-2">
+										<td class="py-3 text-end pe-13 fw-bold fs-5">
+											<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+												<div class="d-flex align-items-center">
+													<span class="text-body-secondary fw-bold fs-15 mb-0 deal-label text-body-secondary">잔여 연차</span>
+												</div>
+											</div>
+										</td>
+										<td class="py-3 text-start fw-bold fs-5">
+											<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+												<div class="d-flex align-items-center">
+													<span class="text-body-secondary fw-bold fs-15 mb-0 deal-value text-body-secondary">0</span>
+												</div>
+											</div>
+										</td>
+									</tr>
+								</table>
+							</div> <!-- card-body 끝 -->
+						</div> <!-- card mb-3 끝 -->
+					</div> <!-- w-100 min-vh-50 끝  -->
+				</div><!-- deals-col me-4 끝 -->
+	            <!-- 카드1 END -->
+	              
+	              
+	              
+	              
+				<div class="deals-col me-4">
+					<div class="w-100 min-vh-50" data-sortable="data-sortable">
+						<div class="card mb-3">
+							<div class="card-body">
+								<table class="w-100 text-center mx-auto w-auto text-center">
+									<tr class="py-2">
+										<td class="py-3 text-end pe-13 fw-bold fs-5">
+											<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+												<div class="d-flex align-items-center">
+													<span class="text-body-secondary fw-bold fs-15 mb-0 deal-label text-body-secondary">지각</span>
+												</div>
+											</div>		
+										</td>
+										<td class="py-3 text-start fw-bold fs-5">
+											<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+												<div class="d-flex align-items-center">
+													<span class="text-body-secondary fw-bold fs-15 mb-0 deal-value text-body-secondary">0</span>
+												</div>
+											</div>
+										</td>
+									</tr>
+									<tr class="py-2">
+										<td class="py-3 text-end pe-13 fw-bold fs-5">  
+											<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+												<div class="d-flex align-items-center">
+													<span class="text-body-secondary fw-bold fs-15 mb-0 deal-label text-body-secondary">조퇴</span>
+												</div>
+											</div>
+										</td>
+										<td class="py-3 text-start fw-bold fs-5">
+											<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+												<div class="d-flex align-items-center">
+													<span class="text-body-secondary fw-bold fs-15 mb-0 deal-value text-body-secondary">0</span>
+												</div>
+											</div>
+										</td>
+									</tr>
+									<tr class="py-2">
+										<td class="py-3 text-end pe-13 fw-bold fs-5">
+											<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+												<div class="d-flex align-items-center">
+													<span class="text-body-secondary fw-bold fs-15 mb-0 deal-label text-body-secondary">결근</span>
+												</div>
+											</div>
+										</td>
+										<td class="py-3 text-start fw-bold fs-5">
+											<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+												<div class="d-flex align-items-center">
+													<span class="text-body-secondary fw-bold fs-15 mb-0 deal-value text-body-secondary">0</span>
+												</div>
+											</div>
+										</td>
+									</tr>
+								</table>
+							</div> <!-- card-body 끝 -->
+						</div> <!-- card mb-3 끝 -->
+					</div> <!-- w-100 min-vh-50 끝  -->
+				</div><!-- deals-col me-4 끝 -->              
+			</div> <!-- deals 끝 -->
+		</div>
+        <!-- 근태 카드 끝 -->
+            
+            
+	<!-- advance tables -->    
+     
+		<div id="tableExample4" data-list="{&quot;valueNames&quot;:[&quot;name&quot;,&quot;email&quot;,&quot;payment&quot;],&quot;page&quot;:5,&quot;pagination&quot;:true,&quot;filter&quot;:{&quot;key&quot;:&quot;payment&quot;}}">
+			<!-- 셀렉트 부분 -->
+			<div class="row justify-content-between align-items-center g-0">
+				<div class="col text-start px-3">
+					<span class="fw-bold">근태 기록</span>
+				</div>
+				
+				<div class="col-auto px-3">
+					<select class="form-select form-select-sm mb-3" data-list-filter="data-list-filter">
+						<option selected="" value="">날짜 선택</option>
+						<option value="Pending">2025.01</option>
+						<option value="Success">2025.02</option>
+						<option value="Blocked">2025.03</option>
+					</select>
+				</div>
+			</div> <!-- 셀렉트 끝 -->
+			
+			<!-- 목록 -->
+			<div class="table-responsive">
+				<table class="table table-sm fs-9 mb-0 text-center">
+					<colgroup>
+					<col style="width: 10%;">
+					<col style="width: 30%;">
+					<col style="width: 30%;">
+					<col style="width: 30%;">
+					</colgroup>
+					<thead>
+						<tr class="bg-body-highlight">
+							<th class="sort border-top border-translucent ps-3 text-start" data-sort="name">번호</th>
+							<th class="sort border-top border-translucent text-center" data-sort="email">근무일</th>
+							<th class="sort border-top border-translucent text-center" data-sort="email">출근 시간</th>
+							<th class="sort border-top border-translucent pe-3" data-sort="payment">퇴근 시간</th>
+						</tr>
+					</thead>
+					<tbody class="list">
+						<tr>
+							<td class="align-middle text-start ps-3 name">1</td>
+							<td class="align-middle text-center email">2025.04.09</td>
+							<td class="align-middle text-center email">08:55:45</td>
+							<td class="align-middle payment py-3 pe-3">
+								18:01:23
+							</td>
+						</tr>
+					
+					<!-- 여기부터 지우고 윗부분만 반복 돌리면 될듯 -->
+						<tr>
+							<td class="align-middle text-start ps-3 name">2</td>
+							<td class="align-middle text-center email">2025.04.08</td>
+							<td class="align-middle text-center email">08:49:27</td>
+							<td class="align-middle payment py-3 pe-3">
+								<!-- <div class="badge badge-phoenix fs-10 badge-phoenix-success">
+									<span class="fw-bold">Success</span>
+									<svg class="svg-inline--fa fa-check ms-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+										<path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path>
+									</svg><span class="ms-1 fas fa-check"></span> Font Awesome fontawesome.com
+								</div> -->
+								18:00:30
+							</td>
+						</tr>
+						<tr>
+							<td class="align-middle text-start ps-3 name">3</td>
+							<td class="align-middle text-center email">2025.04.07</td>
+							<td class="align-middle text-center email">08:57:22</td>
+							<td class="align-middle payment py-3 pe-3">
+								<!-- <div class="badge badge-phoenix fs-10 badge-phoenix-success">
+									<span class="fw-bold">Success</span>
+									<svg class="svg-inline--fa fa-check ms-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+										<path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path>
+									</svg><span class="ms-1 fas fa-check"></span> Font Awesome fontawesome.com
+								</div> -->
+								18:05:22
+							</td>
+						</tr>
+						<tr>
+							<td class="align-middle text-start ps-3 name">4</td>
+							<td class="align-middle text-center email">2025.04.06</td>
+							<td class="align-middle text-center email">08:54:33</td>
+							<td class="align-middle payment py-3 pe-3">
+								<!-- <div class="badge badge-phoenix fs-10 badge-phoenix-success">
+									<span class="fw-bold">Success</span>
+									<svg class="svg-inline--fa fa-check ms-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+										<path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path>
+									</svg><span class="ms-1 fas fa-check"></span> Font Awesome fontawesome.com
+								</div> -->
+								18:03:47
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div> <!-- table-responsive 목록 끝 -->
+			<div class="d-flex justify-content-center mt-3"><!-- <span class="d-none d-sm-inline-block" data-list-info="data-list-info">1 to 4 <span class="text-body-tertiary"> Items of </span>10</span> -->
+				
+				<!-- 페이징 번호 -->
+				<div class="d-flex">
+					<button class="page-link disabled" data-list-pagination="prev" disabled="">
+						<svg class="svg-inline--fa fa-chevron-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="">
+							<path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"></path>
+						</svg><!-- <span class="fas fa-chevron-left"></span> Font Awesome fontawesome.com -->
+					</button>
+					<ul class="mb-0 pagination">
+						<li class="active">
+							<button class="page" type="button" data-i="1" data-page="5">1</button>
+						</li>
+					</ul>
+					<button class="page-link pe-0 disabled" data-list-pagination="next" disabled="">
+						<svg class="svg-inline--fa fa-chevron-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="">
+							<path fill="currentColor" d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"></path>
+						</svg><!-- <span class="fas fa-chevron-right"></span> Font Awesome fontawesome.com -->
+					</button>
+				</div>
+				<!-- 페이징 끝 -->
+			</div>
+		</div> <!-- tableExample4 끝 -->
+                           
+            
+
+	</main>
+</body>
+</html>

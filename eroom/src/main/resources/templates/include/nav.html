@@ -19,7 +19,7 @@
                 
              	<!-- parent pages-->
               	<!-- 근태 -->
-                <div class="nav-item-wrapper"><a class="nav-link label-1" th:href="@{/}" role="button" data-bs-toggle="" aria-expanded="false">
+                <div class="nav-item-wrapper"><a class="nav-link label-1" th:href="@{/attendance/list}" role="button" data-bs-toggle="" aria-expanded="false">
                     <div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fa-solid fa-chart-gantt"></span></span><span class="nav-link-text-wrapper"><span class="nav-link-text">근태</span></span>
                     </div>
                   </a>
@@ -37,13 +37,13 @@
                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse" id="nv-directory">
                       <li class="collapsed-nav-item-title d-none">주소록
                       </li>
-                      <li class="nav-item"><a class="nav-link" th:href="@{/}">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/directory/employee}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">회사</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" th:href="@{/}">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/directory/partner}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">협력업체</span>
                           </div>
                         </a>
@@ -64,7 +64,7 @@
                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse" id="nv-email">
                       <li class="collapsed-nav-item-title d-none">이메일
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/create-new.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/mail}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">받은 메일함</span>
                           </div>
                         </a>
@@ -101,7 +101,7 @@
                 
                 <!-- parent pages-->
               	<!-- 채팅 -->
-                <div class="nav-item-wrapper"><a class="nav-link label-1" th:href="@{/}" role="button" data-bs-toggle="" aria-expanded="false">
+                <div class="nav-item-wrapper"><a class="nav-link label-1" th:href="@{/chat/list}" role="button" data-bs-toggle="" aria-expanded="false">
                     <div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fa-solid fa-chart-gantt"></span></span><span class="nav-link-text-wrapper"><span class="nav-link-text">채팅</span></span>
                     </div>
                   </a>
@@ -118,31 +118,31 @@
                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse" id="nv-approval">
                       <li class="collapsed-nav-item-title d-none">결재
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/create-new.html">
+                      <li class="nav-item"><a class="nav-link" href="/approval/myRequestedApprovals">
                           <div class="d-flex align-items-center"><span class="nav-link-text">요청한 결재</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/project-list-view.html">
+                      <li class="nav-item"><a class="nav-link" href="/approval/receivedApprovals">
                           <div class="d-flex align-items-center"><span class="nav-link-text">요청 받은 결재</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/project-card-view.html">
+                      <li class="nav-item"><a class="nav-link" href="/approval/referencedApprovals">
                           <div class="d-flex align-items-center"><span class="nav-link-text">참조된 결재</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/project-board-view.html">
+                      <li class="nav-item"><a class="nav-link" href="/approval/agreementApprovals">
                           <div class="d-flex align-items-center"><span class="nav-link-text">합의된 결재</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/todo-list.html">
+                      <li class="nav-item"><a class="nav-link" href="/approval/withdrawnApprovals">
                           <div class="d-flex align-items-center"><span class="nav-link-text">회수한 결재</span>
                           </div>
                         </a>
@@ -313,25 +313,25 @@
                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse" id="nv-drive">
                       <li class="collapsed-nav-item-title d-none">드라이브
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/kanban/kanban.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/drive/company}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">회사 저장소</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/kanban/boards.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/drive/department}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">부서 저장소</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/kanban/create-kanban-board.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/drive/team}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">팀 저장소</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/kanban/create-kanban-board.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/drive/personal}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">개인 저장소</span>
                           </div>
                         </a>
@@ -413,19 +413,19 @@
                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse" id="nv-survey">
                       <li class="collapsed-nav-item-title d-none">설문조사
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/kanban/kanban.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/survey}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">전체 설문조사</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/kanban/boards.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/survey}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">진행중인 설문조사</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/kanban/create-kanban-board.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/survey}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">마감된 설문조사</span>
                           </div>
                         </a>
