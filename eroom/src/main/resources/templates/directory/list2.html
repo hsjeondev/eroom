@@ -59,11 +59,12 @@
 	                <!-- 필터 -->
                     <div class="btn-group position-static text-nowrap">
                       <button class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-                        Country<span class="fas fa-angle-down ms-2"></span></button>
+                        부서<span class="fas fa-angle-down ms-2"></span></button>
                       <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">US</a></li>
-                        <li><a class="dropdown-item" href="#">Uk</a></li>
-                        <li><a class="dropdown-item" href="#">Australia</a></li>
+                        <li><a class="dropdown-item" th:href="@{/directory/{id}}">기술부</a></li>
+                        <li><a class="dropdown-item" href="#">운영부</a></li>
+                        <li><a class="dropdown-item" href="#">제품부</a></li>
+                        <li><a class="dropdown-item" href="#">영업부</a></li>
                       </ul>
                     </div>
 	                <!-- 필터 -->
@@ -133,7 +134,7 @@
                     <tr class="hover-actions-trigger btn-reveal-trigger position-static"
                     	th:if="${!#lists.isEmpty(resultList)}"
                     	th:each="emp, empStatus : ${resultList}"
-                    	th:attr="data-emp-no=${emp.employee.employeeNo}"
+                    	th:attr="data-emp-no=${emp.employee_no}"
                     	>
                       <td class="fs-9 align-middle ps-0 py-3" th:text="${empStatus.count}">
                         <!-- <div class="form-check mb-0 fs-8">
@@ -143,13 +144,13 @@
                       <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
                           <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/32.webp" alt="" />
                           </div>
-                          <p class="mb-0 ms-3 text-body-emphasis fw-bold" th:text="${emp.employee.employeeName}">이름</p>
+                          <p class="mb-0 ms-3 text-body-emphasis fw-bold" th:text="${emp.employee_name}">이름</p>
                         </a></td>
-                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:annac34@gmail.com" th:text="${emp.employeeDirectoryEmail}">이메일</a></td>
-                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight" th:text="${emp.employeeDirectoryPhone}">핸드폰번호</td>
-                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis" th:text="${emp.employee.department?.departmentName}">부서명</td>
-                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7" th:text="${emp.employee.team?.teamName}">팀명</td>
-                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end" th:text="${emp.employee.formattedHireDate}">입사일</td>
+                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:annac34@gmail.com" th:text="${emp.employee_directory_email}">이메일</a></td>
+                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight" th:text="${emp.employee_directory_phone}">핸드폰번호</td>
+                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis" th:text="${emp.department_name}">부서명</td>
+                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7" th:text="${emp.team_name}">팀명</td>
+                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end" th:text="${emp.formattedHireDate}">입사일</td>
                       <!-- <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Dec 12, 12:56 PM</td> -->
                     </tr>
                     

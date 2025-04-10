@@ -10,4 +10,9 @@ public class EmployeeController {
 	public String loginView() {
 		return "login";
 	}
+	
+	@GetMapping("/admin")
+	public String adminView() {
+		return "admin";
+	}
 }
