@@ -1,14 +1,12 @@
-package com.eroom.directory.entity;
+package com.eroom.employee.entity;
 
-import com.eroom.employee.entity.Employee;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,20 +23,18 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="directory_memo")
-public class DirectoryMemo {
+@Table(name="authority_mapping")
+public class AuthorityMapping {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long directoryMemoNo;
-	@Column(name = "directory_memo_target")
-	private String directoryMemoTarget;
-	@Column(name = "directory_memo_directory_no")
-	private Long directoryMemoDirectoryNo;
-	@Column(name = "directory_memo_content")
-	private String directoryMemoContent;
+	private Long authorityMappingNo;
 	
-	
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "employee_no")
 	private Employee employee;
+	
+	@ManyToOne
+	@JoinColumn(name = "authority_no")
+	private Authority authority;
 }

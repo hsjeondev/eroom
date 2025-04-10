@@ -1,16 +1,14 @@
+package com.eroom.employee.entity;
 
-package com.eroom.directory.entity;
 
-
-import com.eroom.employee.entity.Employee;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,21 +25,16 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="profile")
-public class Profile {
+@Table(name="authority")
+public class Authority {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long profileNo; // 프로필 번호
+	private Long authorityNo;
 	
-	@Column(name = "profile_ori_name")
-	private String profileOriName;
-	@Column(name = "profile_new_name")
-	private String profileNewName;
-	@Column(name = "profile_path")
-	private String profilePath;
+	@Column(name = "authority_name")
+	private String authorityName;
 	
-	@OneToOne
-	@JoinColumn(name="employee_no")
-	private Employee employeeNo;
+	@ManyToMany(mappedBy="authorities")
+	private List<Employee> employees;
 }

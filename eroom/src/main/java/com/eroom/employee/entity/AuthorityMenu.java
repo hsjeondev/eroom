@@ -1,16 +1,10 @@
-
-package com.eroom.directory.entity;
-
-
-import com.eroom.employee.entity.Employee;
+package com.eroom.employee.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,21 +21,21 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="profile")
-public class Profile {
+@Table(name="authority_menu")
+public class AuthorityMenu {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long profileNo; // 프로필 번호
+	private Long authorityMenuNo;
 	
-	@Column(name = "profile_ori_name")
-	private String profileOriName;
-	@Column(name = "profile_new_name")
-	private String profileNewName;
-	@Column(name = "profile_path")
-	private String profilePath;
-	
-	@OneToOne
-	@JoinColumn(name="employee_no")
-	private Employee employeeNo;
+	@Column(name = "authority_menu_url")
+	private String authorityMenuUrl;
+	@Column(name = "authority_menu_method")
+	private String authorityMenuMethod;
+	@Column(name = "authority_menu_name")
+	private String authorityMenuName;
+	@Column(name = "authority_menu_visible_yn")
+	private String authorityMenuVisibleYn;
+	@Column(name = "authority_menu_no_parent")
+	private Long authorityMenuNoParent;
 }
