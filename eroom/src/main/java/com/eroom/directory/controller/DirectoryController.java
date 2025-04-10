@@ -21,12 +21,8 @@ public class DirectoryController {
 	private final EmployeeDirectoryService employeeDirectoryService;
 	
 
-//	@GetMapping("/directory")
-//	public String selectDirectory01() {
-//		return "directory/list";
-//	}
-	@GetMapping("/directory")
-	public String selectDirectoryList(Model model) {
+	@GetMapping("/directory/employee")
+	public String selectDirectoryEmployeeList(Model model) {
 		List<EmployeeDirectoryDto> resultList = new ArrayList<EmployeeDirectoryDto>();
 		List<EmployeeDirectory> temp = employeeDirectoryService.selectDirectoryAll();
 		
@@ -37,13 +33,21 @@ public class DirectoryController {
 		
 		model.addAttribute("resultList", resultList);
 		
-		return "directory/list2";
+		return "directory/employeeList";
 	}
-//	@GetMapping("/directory/{id}")
-//	public String selectDirectory03(@PathVariable("id") Long id, Model model) {
-//		
-//		
-//		return "directory/list2";
-//	}
+	@GetMapping("/directory/partner")
+	public String selectDirectoryPartnerList(Model model) {
+		List<EmployeeDirectoryDto> resultList = new ArrayList<EmployeeDirectoryDto>();
+		List<EmployeeDirectory> temp = employeeDirectoryService.selectDirectoryAll();
+		
+		for(EmployeeDirectory t : temp) {
+			EmployeeDirectoryDto dto = new EmployeeDirectoryDto();
+			resultList.add(dto.toDto(t));
+		}
+		
+		model.addAttribute("resultList", resultList);
+		
+		return "directory/partnerList";
+	}
 	
 }

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
+<th:block layout:fragment="content">
+	<style>
+/* 삭제 버튼 css */
+.item-wrapper {
+	position: relative;
+}
+
+.item-wrapper input.form-control {
+	padding-right: 2rem;
+}
+
+.item-wrapper .btn-close {
+	position: absolute;
+	top: 50%;
+	right: 0.2rem;
+	transform: translateY(-50%);
+}
+</style>
+	<main class="main" id="top">
+		<div class="pb-8">
+			<h2 class="mb-4">설문</h2>
+			<div id="reports" data-list='{"valueNames":["title","text","priority","reportsby","reports","date"],"page":10,"pagination":true}'>
+				<div class="row g-3 justify-content-between mb-2">
+					<div class="col-12">
+						<div class="d-md-flex justify-content-between">
+							<div class="mb-3">
+								<!-- 설문 생성 팝업창 -->
+								<form th:action="@{/survey/create}" method="post">
+									<div class="modal fade" id="create-survey" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
+										<div class="modal-dialog modal-dialog-scrollable">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h5 class="modal-title" id="scrollingLongModalLabel2">설문 등록</h5>
+													<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body">
+													<!-- 모달 본문 -->
+													<div class="row mb-3">
+														<label class="col-sm-2 col-form-label text-end" for="surveyTitle">제목</label>
+														<div class="col-sm-8">
+															<input class="form-control" id="surveyTitle" name="surveyTitle" type="text" style="width: 97.2%;">
+														</div>
+													</div>
+													<!-- 항목 div -->
+													<div class="row mb-3">
+														<label class="col-sm-2 col-form-label text-end" for="inputItem">항목</label>
+														<div class="col-sm-8">
+															<div id="itemScrollBox" style="max-height: 400px; overflow-y: auto;">
+																<div id="itemContainer">
+																	<input class="form-control mb-2" name="items" type="text" style="width: 97.2%;">
+																</div>
+															</div>
+															<!-- 항목 추가 버튼 -->
+															<div class="text-center mt-2">
+																<button class="btn btn-phoenix-primary" type="button" id="addItemBtn">+ 항목 추가</button>
+															</div>
+														</div>
+													</div>
+													<div class="row mb-3">
+														<div class="col-form-label col-sm-2 pt-0"></div>
+														<div class="col-sm-8">
+															<div class="form-check">
+																<input class="form-check-input" id="gridCheck1" name="multiple" type="checkbox"> <label class="form-check-label" for="gridCheck1">복수선택</label>
+															</div>
+															<div class="form-check">
+																<input class="form-check-input" id="gridCheck2" name="anonymous" type="checkbox"> <label class="form-check-label" for="gridCheck2">익명투표</label>
+															</div>
+														</div>
+													</div>
+													<div class="row mb-3">
+														<label class="col-sm-2 col-form-label text-end" for="basic-form-dob">마감일</label>
+														<div class="col-sm-8">
+															<input class="form-control" id="basic-form-dob" name="deadline" type="date" style="width: 97.2%;">
+														</div>
+													</div>
+												</div>
+												<div class="modal-footer">
+													<button class="btn btn-primary" type="submit">등록</button>
+													<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">취소</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</form>
+								<!-- 문서화 버튼? -->
+								<!-- <button class="btn btn-link text-body px-0"><span class="fa-solid fa-file-export fs-9 me-2"></span>Export </button> -->
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row g-3 list" id="reportsList">
+					<div class="col-12 col-xl-6">
+						<div class="card h-100">
+							<div class="card-body">
+								<div class="border-bottom border-translucent">
+									<div class="d-flex align-items-start mb-1">
+										<div class="d-sm-flex align-items-center ps-2">
+											<!-- 설문 상세 -->
+											<button class="btn btn-link me-1 mb-1 fs-6 p-0" type="button" data-bs-toggle="modal" data-bs-target="#survey-detail">설문 제목</button>
+											<div class="modal fade" id="survey-detail" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
+												<div class="modal-dialog modal-dialog-scrollable">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5 class="modal-title" id="scrollingLongModalLabel2">Modal title</h5>
+															<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+														</div>
+														<div class="modal-body">본문</div>
+														<div class="modal-footer">
+															<button class="btn btn-primary" type="button">Okay</button>
+															<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancel</button>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="d-flex align-items-center">
+												<span class="fa-solid fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1"></span><span class="fw-bold fs-9 text-body lh-2">진행중</span>
+											</div>
+											<div class="d-flex align-items-center">
+												<span class="fa-solid fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1"></span><span class="fw-bold fs-9 text-body lh-2">마감</span>
+											</div>
+										</div>
+									</div>
+									<p class="fs-9 fw-semibold text-body ms-1 text mb-4 ps-2">작성자</p>
+								</div>
+								<div class="row g-1 g-sm-3 mt-2 lh-1">
+									<div class="col-12 col-sm-auto">
+										<div class="d-flex align-items-center">
+											<span class="me-2" data-feather="users" style="stroke-width: 2;"></span>
+											<p class="mb-0 fs-9 fw-semibold text-body-tertiary reports">응답자 수</p>
+										</div>
+									</div>
+									<div class="col-12 col-sm-auto">
+										<div class="d-flex align-items-center">
+											<span class="me-2" data-feather="clock" style="stroke-width: 2;"></span>
+											<p class="mb-0 fs-9 fw-semibold text-body-tertiary date">마감일 Dec 30, 2022</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row align-items-center justify-content-between py-2 pe-0 fs-9 mt-2">
+					<div class="col-4 d-flex">
+						<button class="btn btn-subtle-primary me-1 mb-1" type="button" data-bs-toggle="modal" data-bs-target="#create-survey">
+							<span class="fas fa-plus me-2"></span>설문 등록
+						</button>
+					</div>
+					<div class="col-4 d-flex justify-content-center">
+						<button class="page-link" data-list-pagination="prev">
+							<span class="fas fa-chevron-left"></span>
+						</button>
+						<ul class="mb-0 pagination"></ul>
+						<button class="page-link pe-0" data-list-pagination="next">
+							<span class="fas fa-chevron-right"></span>
+						</button>
+					</div>
+					<div class="col-4 d-flex justify-content-end">
+						<p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info"></p>
+						<a class="fw-semibold" href="#!" data-list-view="*">더보기<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a><a class="fw-semibold d-none" href="#!" data-list-view="less">접기<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			const addItemButton = document.getElementById('addItemBtn');
+			const itemContainer = document.getElementById('itemContainer');
+
+			addItemButton.addEventListener('click', function() {
+				// wrapper div 생성
+				const wrapper = document.createElement('div');
+				wrapper.classList.add('d-flex', 'align-items-center', 'mb-2', 'item-wrapper');
+
+				// input 생성
+				const input = document.createElement('input');
+				input.setAttribute('type', 'text');
+				input.setAttribute('name', 'items');
+				input.classList.add('form-control', 'me-2');
+
+				// 삭제 버튼 생성
+				const removeBtn = document.createElement('button');
+				removeBtn.setAttribute('type', 'button');
+				removeBtn.classList.add('btn', 'btn-close', 'btn-sm');
+
+				// 삭제 버튼 클릭 이벤트
+				removeBtn.addEventListener('click', function() {
+					wrapper.remove();
+				});
+
+				// 요소 조립
+				wrapper.appendChild(input);
+				wrapper.appendChild(removeBtn);
+				itemContainer.appendChild(wrapper);
+
+				// 설문 등록 항목 추가시 스크롤 맨 아래로 자동 이동
+				const scrollTarget = itemContainer.parentElement;
+				scrollTarget.scrollTop = scrollTarget.scrollHeight;
+			});
+		});
+	</script>
+</th:block>
+</html>
