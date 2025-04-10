@@ -140,6 +140,11 @@ xmlns:th="http://www.thymeleaf.org">
 
 	<script>
 	  const form = document.login_employee_form;
+	  
+	  const modalElement = document.getElementById('verticallyCentered');
+	  const modalBodyText = modalElement.querySelector('.modal-body p');
+	  const modal = new bootstrap.Modal(modalElement);
+	  
 	  form.addEventListener('submit', (e) => {
 		  e.preventDefault();
 
@@ -162,6 +167,27 @@ xmlns:th="http://www.thymeleaf.org">
 		  }
 		});
 	</script>
+<!-- 	<script th:inline="javascript">
+  	window.addEventListener("DOMContentLoaded", () => {
+
+    /*<![CDATA[*/
+    let errorMessage = /*[[${session.loginErrorMessage}]]*/ null;
+    /*]]>*/
+
+    if (errorMessage !== null) {
+      modalBodyText.textContent = errorMessage;
+      modal.show();
+      
+      fetch('/remove-login-error', {
+          method: 'GET',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+    }
+  });
+</script> -->
+
   </body>
 
 </html>
