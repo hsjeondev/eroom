@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html 
+  lang="ko" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/include/layout}">
+<body>
+<main class="main" id="top" layout:fragment="content">
+
+  <div class="mb-3">
+    <h3 class="fw-bold mb-2">회사 드라이브</h3>
+    <button class="btn btn-primary" type="button">파일 올리기</button>
+  </div>
+
+  <div id="tableExample3" data-list='{"valueNames":["filename","description","writer","date","download"],"page":5,"pagination":true}'>
+    
+    <!-- 검색창 -->
+    <div class="search-box mb-3 mx-auto">
+      <form class="position-relative">
+        <input class="form-control search-input search form-control-sm" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
+        <svg class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+        </svg>
+      </form>
+    </div>
+
+    <!-- 테이블 본문 -->
+    <div class="table-responsive">
+      <table class="table table-striped table-sm fs-9 mb-0">
+        <thead class="align-middle">
+          <tr class="align-middle" style="vertical-align: middle;">
+            <th class="ps-3 py-2"><input class="form-check-input" type="checkbox" id="select-all" /></th>
+            <th class="sort py-2">파일</th>
+            <th class="sort py-2" data-sort="filename">파일명</th>
+            <th class="sort py-2" data-sort="description">파일설명</th>
+            <th class="sort py-2" data-sort="writer">작성자</th>
+            <th class="sort py-2" data-sort="date">등록일</th>
+            <th class="sort py-2" data-sort="download">다운로드횟수</th>
+            <th class="text-end pe-0 py-2">
+              <div class="btn-reveal-trigger position-static">
+                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+                  <i class="fas fa-ellipsis fs-10"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end py-2">
+                  <a class="dropdown-item" href="#!">일괄 다운로드</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item text-danger" href="#!">일괄 삭제</a>
+                </div>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="list">
+
+          <!-- 사람 1 -->
+          <tr>
+            <td class="align-middle ps-3"><input class="form-check-input row-checkbox" type="checkbox" /></td>
+            <td class="align-middle">
+			  <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="파일" width="24" height="24" />
+			</td>
+            <td class="align-middle filename">report_1Q.pdf</td>
+            <td class="align-middle description">2025년 1분기 실적</td>
+            <td class="align-middle writer">홍길동</td>
+            <td class="align-middle date">2025-04-10</td>
+            <td class="align-middle download">132</td>
+            <td class="align-middle text-end pe-0">
+              <div class="btn-reveal-trigger position-static">
+                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+                  <i class="fas fa-ellipsis fs-10"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end py-2">
+                  <a class="dropdown-item" href="#!">파일 다운로드</a>
+                  <a class="dropdown-item" href="#!">파일 수정</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item text-danger" href="#!">파일 삭제</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- 사람 2 -->
+          <tr>
+            <td class="align-middle ps-3"><input class="form-check-input row-checkbox" type="checkbox" /></td>
+            <td class="align-middle">
+			  <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="파일" width="24" height="24" />
+			</td>
+            <td class="align-middle filename">presentation_q2.pptx</td>
+            <td class="align-middle description">2분기 발표 자료</td>
+            <td class="align-middle writer">김민지</td>
+            <td class="align-middle date">2025-03-28</td>
+            <td class="align-middle download">89</td>
+            <td class="align-middle text-end pe-0">
+              <div class="btn-reveal-trigger position-static">
+                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+                  <i class="fas fa-ellipsis fs-10"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end py-2">
+                  <a class="dropdown-item" href="#!">파일 다운로드</a>
+                  <a class="dropdown-item" href="#!">파일 수정</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item text-danger" href="#!">파일 삭제</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- 사람 3 -->
+          <tr>
+            <td class="align-middle ps-3"><input class="form-check-input row-checkbox" type="checkbox" /></td>
+            <td class="align-middle">
+			  <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="파일" width="24" height="24" />
+			</td>
+            <td class="align-middle filename">monthly_report.xlsx</td>
+            <td class="align-middle description">3월 월간 보고서</td>
+            <td class="align-middle writer">박정우</td>
+            <td class="align-middle date">2025-04-01</td>
+            <td class="align-middle download">57</td>
+            <td class="align-middle text-end pe-0">
+              <div class="btn-reveal-trigger position-static">
+                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+                  <i class="fas fa-ellipsis fs-10"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end py-2">
+                  <a class="dropdown-item" href="#!">파일 다운로드</a>
+                  <a class="dropdown-item" href="#!">파일 수정</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item text-danger" href="#!">파일 삭제</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- 사람 4 -->
+          <tr>
+            <td class="align-middle ps-3"><input class="form-check-input row-checkbox" type="checkbox" /></td>
+            <td class="align-middle">
+			  <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="파일" width="24" height="24" />
+			</td>
+            <td class="align-middle filename">contract_final.docx</td>
+            <td class="align-middle description">최종 계약서</td>
+            <td class="align-middle writer">이서연</td>
+            <td class="align-middle date">2025-04-05</td>
+            <td class="align-middle download">203</td>
+            <td class="align-middle text-end pe-0">
+              <div class="btn-reveal-trigger position-static">
+                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+                  <i class="fas fa-ellipsis fs-10"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end py-2">
+                  <a class="dropdown-item" href="#!">파일 다운로드</a>
+                  <a class="dropdown-item" href="#!">파일 수정</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item text-danger" href="#!">파일 삭제</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 페이징? -->
+    <div class="d-flex justify-content-between mt-3">
+      <span class="d-none d-sm-inline-block" data-list-info="data-list-info">1 to 4 <span class="text-body-tertiary"> Items of </span>4</span>
+      <div class="d-flex">
+        <button class="page-link disabled" data-list-pagination="prev" disabled><i class="fas fa-chevron-left"></i></button>
+        <ul class="mb-0 pagination">
+          <li class="active"><button class="page" type="button" data-i="1" data-page="5">1</button></li>
+        </ul>
+        <button class="page-link pe-0" data-list-pagination="next" disabled><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const selectAll = document.getElementById('select-all');
+      const checkboxes = document.querySelectorAll('.row-checkbox');
+
+      selectAll.addEventListener('change', function () {
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = selectAll.checked;
+        });
+      });
+    });
+  </script>
+
+</main>
+</body>
+</html>
