@@ -45,4 +45,3 @@ public class Profile {
 	@JoinColumn(name="employee_no")
 	private Employee employeeNo;
 }
-

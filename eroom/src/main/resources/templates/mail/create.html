@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{/include/layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<!-- <script src="../../vendors/popper/popper.min.js"></script>
+<script src="../../vendors/bootstrap/bootstrap.min.js"></script>
+<script src="../../vendors/anchorjs/anchor.min.js"></script>
+<script src="../../vendors/is/is.min.js"></script>
+<script src="../../vendors/fontawesome/all.min.js"></script>
+<script src="../../vendors/lodash/lodash.min.js"></script>
+<script src="../../vendors/list.js/list.min.js"></script>
+<script src="../../vendors/feather-icons/feather.min.js"></script>
+<script src="../../vendors/dayjs/dayjs.min.js"></script> -->
+<script src="../../vendors/tinymce/tinymce.min.js"></script>
+
+</head>
+<body>
+<main class="main" id="top" layout:fragment="content">
+	<div class="col">
+              <div class="card email-content">
+                <div class="card-body">
+                  <form class="d-flex flex-column h-100"
+                  action="/mail/create" name="mail_create_form" enctype="multipart/form-data">
+                  <!-- 직관적이지만 header에 넣는게 더 정석적인 방법 -->
+                  <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
+                    <div class="row g-3 mb-2">
+                      <div class="col-4">
+                        <input class="form-control" type="email" name="to" placeholder="수신자" />
+                      </div>
+                      <div class="col-4">
+                        <input class="form-control" type="email" name="cc" placeholder="참조" />
+                      </div>
+                      <!-- <div class="col-4">
+                        <input class="form-control" type="email" placeholder="BCC" />
+                      </div> -->
+                      <div class="col-12">
+                        <input class="form-control" type="text" name="mail_title" placeholder="제목" />
+                      </div>
+                    </div>
+                    <div class="mb-3 flex-1">
+                      <textarea class="tinymce email-textarea" name="mail_content" data-tinymce='{"height":"100%"}'></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="d-flex">
+                        <label class="btn btn-link py-0 px-2 text-body fs-9" for="emailAttachment"> <span class="fa-solid fa-paperclip"></span></label>
+                        <input class="d-none" id="emailAttachment" type="file" />
+                        <label class="btn btn-link py-0 px-2 text-body fs-9" for="emailPhotos"><span class="fa-solid fa-image"></span></label>
+                        <input class="d-none" id="emailPhotos" type="file" accept="image/*" />
+                      </div>
+                      <div class="d-flex">
+                        <button class="btn btn-link text-body fs-10 text-decoration-none">Discard</button>
+                        <button class="btn btn-primary fs-10" type="submit">Send<span class="fa-solid fa-paper-plane ms-1"></span></button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <script>
+            	const form = document.mail_create_form;
+            	form.addEventListener('submit', (e)=>{
+    				 e.preventDefault();
+    				 tinymce.triggerSave();
+            		console.log(form);
+    				const payload = new FormData(form);
+    				fetch("/mail/create",{
+						method:'post',
+						headers : {
+							'header': document.querySelector('meta[name="_csrf_header"]').content,
+				            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+						},
+						body:payload
+					})
+					.then(response => response.json())
+					.then(data=>{
+						alert(data.res_msg);
+						if(data.res_code==200){
+							location.href='/mail';
+						}
+					});
+            	})
+            </script>
+            
+</main>
+
+</body>
+</html>
