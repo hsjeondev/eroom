@@ -20,9 +20,10 @@ public class SurveyController {
 	}
 	
 	@PostMapping("/survey/create")
-	public String createSurvey(SurveyDto surveyDto) {
-	    //surveyService.createSurvey(surveyDto); // 서비스에서 DB 저장 처리
-	    return "redirect:/survey"; // 목록 페이지로 리다이렉트
+	public String saveSurvey(SurveyDto surveyDto) {
+	    System.out.println("DTO 내용: " + surveyDto);
+
+	    return "redirect:/survey/list";
 	}
 
 }
