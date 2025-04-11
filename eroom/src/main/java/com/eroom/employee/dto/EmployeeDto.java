@@ -59,6 +59,10 @@ public class EmployeeDto {
 				.employee_position(emp.getEmployeePosition())
 				.build();
 	}
+	public EmployeeDto(Long employeeNo, String employeeName) {
+		this.employee_no = employeeNo;
+		this.employee_name = employeeName;
+	}
 	
 //	public String getFormattedHireDate() {
 //		if(employee_hire_date != null) {
