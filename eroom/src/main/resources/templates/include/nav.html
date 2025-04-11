@@ -323,49 +323,77 @@
 				</div>
                 
                 <!-- parent pages-->
-                <!-- 캘린더 -->
-                <div class="nav-item-wrapper"><a class="nav-link dropdown-indicator label-1" href="#nv-calender" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="nv-calender">
-                    <div class="d-flex align-items-center">
-                      <div class="dropdown-indicator-icon-wrapper"><span class="fas fa-caret-right dropdown-indicator-icon"></span></div><span class="nav-link-icon"><span data-feather="clipboard"></span></span><span class="nav-link-text">캘린더</span>
-                    </div>
-                  </a>
-                  <div class="parent-wrapper label-1">
-                    <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse" id="nv-calender">
-                      <li class="collapsed-nav-item-title d-none">캘린더
-                      </li>
-                      <li class="nav-item"><a class="nav-link" th:href="@{/calendar}">
-                          <div class="d-flex align-items-center"><span class="nav-link-text">전체</span>
-                          </div>
-                        </a>
-                        <!-- more inner pages-->
-                      </li>
-                      <li class="nav-item"><a class="nav-link"  th:href="@{/calendar/employee}">
-                          <div class="d-flex align-items-center"><span class="nav-link-text">개인</span>
-                          </div>
-                        </a>
-                        <!-- more inner pages-->
-                      </li>
-                      <li class="nav-item"><a class="nav-link" th:href="@{/calendar/myteam}">
-                          <div class="d-flex align-items-center"><span class="nav-link-text">팀</span>
-                          </div>
-                        </a>
-                        <!-- more inner pages-->
-                      </li>
-                      <li class="nav-item"><a class="nav-link"th:href="@{/calendar/department}">
-                          <div class="d-flex align-items-center"><span class="nav-link-text">부서</span>
-                          </div>
-                        </a>
-                        <!-- more inner pages-->
-                      </li>
-                      <li class="nav-item"><a class="nav-link" th:href="@{/calendar/company}">
-                          <div class="d-flex align-items-center"><span class="nav-link-text">회사</span>
-                          </div>
-                        </a>
-                        <!-- more inner pages-->
-                      </li>
-                    </ul>
-                  </div>
-                </div>
+				<!-- 캘린더 -->
+				<div class="nav-item-wrapper">
+				  <a class="nav-link dropdown-indicator label-1"
+				     href="#nv-calender"
+				     role="button"
+				     data-bs-toggle="collapse"
+				     th:attr="aria-expanded=${requestURI.startsWith('/calendar')}"
+				     aria-controls="nv-calender">
+				    <div class="d-flex align-items-center">
+				      <div class="dropdown-indicator-icon-wrapper"><span class="fas fa-caret-right dropdown-indicator-icon"></span></div>
+				      <span class="nav-link-icon"><span data-feather="clipboard"></span></span>
+				      <span class="nav-link-text">캘린더</span>
+				    </div>
+				  </a>
+				  <div class="parent-wrapper label-1">
+				    <ul class="nav collapse parent"
+				        data-bs-parent="#navbarVerticalCollapse"
+				        id="nv-calender"
+				        th:classappend="${requestURI.startsWith('/calendar')} ? ' show'">
+				
+				      <li class="collapsed-nav-item-title d-none">캘린더</li>
+				
+				      <!-- 전체 -->
+				      <li class="nav-item">
+				        <a class="nav-link"
+				           th:href="@{/calendar}"
+				           th:classappend="${requestURI == '/calendar'} ? 'active'">
+				          <div class="d-flex align-items-center"><span class="nav-link-text">전체</span></div>
+				        </a>
+				      </li>
+				
+				      <!-- 개인 -->
+				      <li class="nav-item">
+				        <a class="nav-link"
+				           th:href="@{/calendar/employee}"
+				           th:classappend="${requestURI.startsWith('/calendar/employee')} ? 'active'">
+				          <div class="d-flex align-items-center"><span class="nav-link-text">개인</span></div>
+				        </a>
+				      </li>
+				
+				      <!-- 팀 -->
+				      <li class="nav-item">
+				        <a class="nav-link"
+				           th:href="@{/calendar/myteam}"
+				           th:classappend="${requestURI.startsWith('/calendar/myteam')} ? 'active'">
+				          <div class="d-flex align-items-center"><span class="nav-link-text">팀</span></div>
+				        </a>
+				      </li>
+				
+				      <!-- 부서 -->
+				      <li class="nav-item">
+				        <a class="nav-link"
+				           th:href="@{/calendar/department}"
+				           th:classappend="${requestURI.startsWith('/calendar/department')} ? 'active'">
+				          <div class="d-flex align-items-center"><span class="nav-link-text">부서</span></div>
+				        </a>
+				      </li>
+				
+				      <!-- 회사 -->
+				      <li class="nav-item">
+				        <a class="nav-link"
+				           th:href="@{/calendar/company}"
+				           th:classappend="${requestURI.startsWith('/calendar/company')} ? 'active'">
+				          <div class="d-flex align-items-center"><span class="nav-link-text">회사</span></div>
+				        </a>
+				      </li>
+				
+				    </ul>
+				  </div>
+				</div>
+
                 
                 <!-- parent pages-->
 				<!-- 예약 -->
