@@ -153,6 +153,10 @@
                       <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end" th:text="${emp.formattedHireDate}">입사일</td>
                       <!-- <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Dec 12, 12:56 PM</td> -->
                     </tr>
+                    <tr class="hover-actions-trigger btn-reveal-trigger position-static"
+                    	th:if="${#lists.isEmpty(resultList)}">
+                    	<td colspan="7">조회된 인원이 없습니다.</td>
+                    </tr>
                     
                     
                     

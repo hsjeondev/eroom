@@ -29,5 +29,11 @@ public class ApprovalController {
 	public String selectWithdrawnApprovalsList() {
 		return "/approval/withdrawnApprovals";
 	}
+	@GetMapping("/approval/create")
+	public String selectApprovalCreate() {
+		
+		return "/approval/create";
+	}
+	
 
 }

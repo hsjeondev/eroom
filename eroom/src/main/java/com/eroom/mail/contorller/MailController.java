@@ -21,17 +21,14 @@ import lombok.RequiredArgsConstructor;
 public class MailController {
 
 	private final MailService service;
-	@GetMapping("/mail")
-	public String selectMailAll(Model model) {
-		// 조건 필요함  reveiver에 
-		// to일때는 내가 보낸거
-		// 조건이 cc면 받은거
-		
-		// 조건 더 필요함 status 'N'일때 임시저장x 즉, 발송된 메일
-		List<Mail> resultList = service.selectMailAll();
-		model.addAttribute("resultList",resultList);
-		return "mail/list";
-	}
+	/* 테스트로 만들어 놓은거
+	 * @GetMapping("/mail") public String selectMailAll(Model model) { // 조건 필요함
+	 * reveiver에 // to일때는 내가 보낸거 // 조건이 cc면 받은거
+	 * 
+	 * // 조건 더 필요함 status 'N'일때 임시저장x 즉, 발송된 메일 List<Mail> resultList =
+	 * service.selectMailAll(); model.addAttribute("resultList",resultList); return
+	 * "mail/list"; }
+	 */
 	
 	// 받은 메일
 	@GetMapping("/mail/receiverTo")
@@ -40,6 +37,7 @@ public class MailController {
 	}
 	
 	// 보낸 메일
+	// 지금은 이게 받은걸로 되어 있음
 	@GetMapping("/mail/sent")
 	public String selectSentMailAll(Model model) {
 		
@@ -81,17 +79,19 @@ public class MailController {
 		return "mail/mailTrash";
 	}
 	
-	
+	// 디테일
 	@GetMapping("/mail/detail")
-	public String selectMailOne() {
+	public String selectMailOne() { 
 		return "mail/mailDetail";
 	}
 	
-	@GetMapping("/mail/create")
+	// 메일 작성 페이지
+	@GetMapping("/mail/mailCreate")
 	public String createMailView() {
 		return "mail/mailCreate";
 	}
-	
+	// 메일 작성 로직
+	// mail DB에 데이터 넣는거만 가능
 	@PostMapping("/mail/create")
 	@ResponseBody
 	public Map<String, String> createMailApi(MailDto mailDto) {

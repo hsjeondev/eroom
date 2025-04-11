@@ -8,7 +8,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
     <main class="main" id="top" layout:fragment="content">
    
       <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
-            <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mail/create}">메일 쓰기</a>
+            <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mailCreate}">메일 쓰기</a>
               <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button>
             </div>
             <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" href="../../apps/email/compose.html"> <span class="d-none d-sm-inline-block">Compose</span><span class="d-sm-none fas fa-plus"></span></a></div>
@@ -69,6 +69,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
                       </div>
                     </div>
+                    
+                    
                     <div class="col-auto"><a class="text-body-emphasis fw-bold inbox-link fs-9" href="../../apps/email/email-detail.html">보낸 사람</a></div>
                     <div class="col-auto ms-auto">
                       <div class="hover-actions end-0">
@@ -84,10 +86,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                     </div>
                   </div>
                   <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11">
-                  	<a class="d-block inbox-link" th:href="@{mail/detail}">
+                  	<a class="d-block inbox-link" th:href="@{/mail/detail}">
                   		<span class="fs-9 line-clamp-1 text-body-emphasis" th:text="${mail.mailTitle}"></span>
-                    	<p class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2" th:text="${mail.mailContent}"></p>
+                  		<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2" th:text="${mail.mailContent}"></span>
                     </a>
+                    	<!-- <p class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2" th:text="${mail.mailContent}"></p> -->
                   </div>
                 </div>
 		 <h1>받은 메일</h1>
