@@ -75,22 +75,20 @@ xmlns:th="http://www.thymeleaf.org">
               <label class="form-label" for="employee_pw">비밀번호</label>
               <div class="form-icon-container" data-password="data-password">
                 <input class="form-control form-icon-input pe-6" name="password" id="employee_pw" type="password" placeholder="비밀번호" data-password-input="data-password-input" /><span class="fas fa-key text-body fs-9 form-icon"></span>
-                <button class="btn px-3 py-0 h-100 position-absolute top-0 end-0 fs-7 text-body-tertiary" data-password-toggle="data-password-toggle"><span class="uil uil-eye show"></span><span class="uil uil-eye-slash hide"></span></button>
+                <button type="button" class="btn px-3 py-0 h-100 position-absolute top-0 end-0 fs-7 text-body-tertiary" data-password-toggle="data-password-toggle"><span class="uil uil-eye show"></span><span class="uil uil-eye-slash hide"></span></button>
               </div>
             </div>
             <div class="row flex-between-center mb-7">
               <div class="col-auto">
                 <div class="form-check mb-0">
                   <input class="form-check-input" id="basic-checkbox" type="checkbox" checked="checked" />
-                  <label class="form-check-label mb-0" for="basic-checkbox">Remember me</label>
+                  <label class="form-check-label mb-0" for="basic-checkbox">자동 로그인</label>
                 </div>
               </div>
-              <div class="col-auto"><a class="fs-9 fw-semibold" th:href="@{/pages/authentication/simple/forgot-password.html}">Forgot Password?</a></div>
             </div>
             <button class="btn btn-primary w-100 mb-3" data-bs-target="#verticallyCentered">Sign In</button>
             </form>
             
-            <div class="text-center"><a class="fs-9 fw-bold" th:href="@{/pages/authentication/simple/sign-up.html}">Create an account</a></div>
           </div>
         </div>
       </div> 
