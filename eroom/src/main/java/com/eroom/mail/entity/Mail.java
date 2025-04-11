@@ -1,6 +1,7 @@
 package com.eroom.mail.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -9,7 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,8 +43,7 @@ public class Mail {
 	@Column(name="mail_status")
 	private String mailStatus;
 	
-//	@ManyToOne
-//	@Column(name="employee_no")
-//	private Long employee_no;
-	
+
+	@OneToMany(mappedBy = "mail")
+	private List<MailReceiver> receivers; // 수신자 목록
 }
