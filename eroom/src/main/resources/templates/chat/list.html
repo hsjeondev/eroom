@@ -99,6 +99,7 @@
 					</div>
 				</div>
 			</div>
+			<!-- 채팅방만들기 모달페이지-->
 			<div class="modal fade" id="createChatModal" tabindex="-1"
 				aria-labelledby="createChatModalLabel" aria-hidden="true">
 				<div class="modal-dialog modal-dialog-centered">
@@ -118,15 +119,15 @@
 					
 					    <!-- 부서 선택 -->
 					    <div class="mb-3">
-					      <label class="form-label">부서</label>
-					      <select class="form-select" id="departmentSelect" onchange="loadEmployeesByDept()">
-					        <option selected disabled>-- 부서 선택 --</option>
-					        <option th:if="${!#lists.isEmpty(employeeList)}"
-					  				th:each="empList : ${employeeList}"
-					  				th:text="${empList.department.departmentName}">
-					        </option>
-					      </select>
-					    </div>
+						  <label class="form-label">부서</label>
+						  <select class="form-select" id="departmentSelect" onchange="changeDepartment(this.value)">
+						    <option disabled selected>-- 부서 선택 --</option>
+						    <option th:each="dept : ${departmentList}" 
+						            th:value="${dept}" 
+						            th:text="${dept}" 
+						            th:selected="${dept == param.department}"></option>
+						  </select>
+						</div>
 					    <!-- 참여자 선택 -->
 						<div class="mb-3">
 						  <label class="form-label">참여자 선택</label>
@@ -177,7 +178,4 @@
 		</div>
 	</main>
 </body>
-	<script>
-		
-	</script>
 </html>

@@ -11,8 +11,50 @@
     <h3 class="fw-bold mb-2">부서 드라이브</h3>
     <button class="btn btn-primary" type="button">파일 올리기</button>
   </div>
+  <!-- 세부정보 부트스트랩  -->
+  <div>
+  <div class="card p-3 mb-4" style="max-width: 360px; font-size: 0.8rem;">
+  <div class="d-flex justify-content-between align-items-center">
+    <h6 class="fw-bold mb-0">드라이브 세부정보</h6>
+    <button class="btn btn-sm p-0 text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#storageDetailCollapse" aria-expanded="false" aria-controls="storageDetailCollapse">
+      <i class="fas fa-chevron-down"></i>
+    </button>
+  </div>
 
-  <div id="tableExample3" data-list='{"valueNames":["filename","description","writer","date","download"],"page":5,"pagination":true}'>
+  <div class="progress mt-2 mb-1" style="height: 6px;">
+    <div class="progress-bar bg-primary" style="width: 92%"></div>
+  </div>
+  <p class="mb-2 text-muted"><strong>45.8 GB</strong> / 50 GB 사용 중 (92%)</p>
+
+  <div class="collapse" id="storageDetailCollapse">
+    <ul class="list-unstyled mb-0 mt-2">
+      <li class="d-flex justify-content-between align-items-center mb-1">
+        <span><i class="fas fa-file-pdf text-primary me-1"></i> Images</span>
+        <span class="badge bg-light text-dark">22k</span>
+      </li>
+      <li class="d-flex justify-content-between align-items-center mb-1">
+        <span><i class="fas fa-video text-success me-1"></i> Videos</span>
+        <span class="badge bg-light text-dark">534</span>
+      </li>
+      <li class="d-flex justify-content-between align-items-center mb-1">
+        <span><i class="fas fa-music text-danger me-1"></i> Audio</span>
+        <span class="badge bg-light text-dark">55</span>
+      </li>
+      <li class="d-flex justify-content-between align-items-center mb-1">
+        <span><i class="fas fa-file-alt text-warning me-1"></i> Docs</span>
+        <span class="badge bg-light text-dark">65k</span>
+      </li>
+      <li class="d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-folder text-info me-1"></i> Others</span>
+        <span class="badge bg-light text-dark">12k</span>
+      </li>
+    </ul>
+  </div>
+</div>
+  
+  </div>
+
+  <div id="tableExample3" data-list='{"valueNames":["filename","filesize","description","writer","date","download"],"page":5,"pagination":true}'>
     
     <!-- 검색창 -->
     <div class="search-box mb-3 mx-auto">
@@ -32,6 +74,7 @@
             <th class="ps-3 py-2"><input class="form-check-input" type="checkbox" id="select-all" /></th>
             <th class="sort py-2">파일</th>
             <th class="sort py-2" data-sort="filename">파일명</th>
+            <th class="sort py-2" data-sort="filesize">파일크기</th>
             <th class="sort py-2" data-sort="description">파일설명</th>
             <th class="sort py-2" data-sort="writer">작성자</th>
             <th class="sort py-2" data-sort="date">등록일</th>
@@ -59,6 +102,7 @@
 			  <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="파일" width="24" height="24" />
 			</td>
             <td class="align-middle filename">report_1Q.pdf</td>
+            <td class="align-middle filesize">890KB</td>
             <td class="align-middle description">2025년 1분기 실적</td>
             <td class="align-middle writer">홍길동</td>
             <td class="align-middle date">2025-04-10</td>
@@ -85,6 +129,7 @@
 			  <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="파일" width="24" height="24" />
 			</td>
             <td class="align-middle filename">presentation_q2.pptx</td>
+             <td class="align-middle filesize">846KB</td>
             <td class="align-middle description">2분기 발표 자료</td>
             <td class="align-middle writer">김민지</td>
             <td class="align-middle date">2025-03-28</td>
@@ -111,6 +156,7 @@
 			  <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="파일" width="24" height="24" />
 			</td>
             <td class="align-middle filename">monthly_report.xlsx</td>
+             <td class="align-middle filesize">816KB</td>
             <td class="align-middle description">3월 월간 보고서</td>
             <td class="align-middle writer">박정우</td>
             <td class="align-middle date">2025-04-01</td>
@@ -137,6 +183,7 @@
 			  <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="파일" width="24" height="24" />
 			</td>
             <td class="align-middle filename">contract_final.docx</td>
+             <td class="align-middle filesize">500KB</td>
             <td class="align-middle description">최종 계약서</td>
             <td class="align-middle writer">이서연</td>
             <td class="align-middle date">2025-04-05</td>

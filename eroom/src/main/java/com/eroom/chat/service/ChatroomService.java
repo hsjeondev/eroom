@@ -43,6 +43,14 @@ public class ChatroomService {
 	public List<Employee> selectEmployeeAll() {
 		return employeeRepository.findAll();
 	}
+	// 부서명 중복 제거 목록
+	public List<String> findDistinctDepartmentNames() {
+		return employeeRepository.findDistinctDepartmentNames();
+	}
 
+	//  부서 이름으로 직원 조회
+	public List<Employee> findEmployeesByDepartmentName(String departmentName) {
+		return employeeRepository.findByDepartment_DepartmentName(departmentName);
+	}
 	
 }
