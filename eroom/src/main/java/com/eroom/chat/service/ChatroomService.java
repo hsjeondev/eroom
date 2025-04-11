@@ -1,6 +1,7 @@
 package com.eroom.chat.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.repository.ChatroomRepository;
 import com.eroom.chat.specification.ChatroomSpecification;
-import com.eroom.employee.entity.Employee;
+import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.security.EmployeeDetails;
 
@@ -39,10 +40,17 @@ public class ChatroomService {
 		List<Chatroom> list = repository.findAll(spec);
 		return list;
 	}
-
-	public List<Employee> selectEmployeeAll() {
-		return employeeRepository.findAll();
+	// EmployeeRepository 에 있는 부서명 중복 제거 목록
+	public List<String> findDistinctDepartmentNames() {
+		return employeeRepository.findDistinctDepartmentNames();
+	}
+	// EmployeeRepository 에 있는 특정 부서에 속한 직원 가져오기
+	public List<EmployeeDto> findEmployeesByDepartmentName(String departmentName) {
+	    return employeeRepository.findByDepartment_DepartmentName(departmentName)
+	    		.stream()
+	    		.map(emp -> new EmployeeDto(emp.getEmployeeNo(), emp.getEmployeeName()))
+	    		.collect(Collectors.toList());
 	}
 
-	
+
 }

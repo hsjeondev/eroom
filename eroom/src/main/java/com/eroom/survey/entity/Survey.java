@@ -1,5 +1,6 @@
 package com.eroom.survey.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -12,7 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name="survey")
@@ -31,7 +31,7 @@ public class Survey {
 	private String surveyTitle;
 	
 	@Column(name="deadline")
-	private LocalDateTime deadline;
+	private LocalDate deadline;
 	
 	@Column(name="anonymous_vote")
 	private String anonymousVote;
