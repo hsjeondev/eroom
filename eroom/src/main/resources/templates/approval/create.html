@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{/include/layout}">
+<head>
+<meta charset="UTF-8">
+<title>결재서 작성</title>
+</head>
+<body>
+	<main class="main" id="top" layout:fragment="content">
+	<div class="col-8 mx-auto">
+		<h2 class="mb-2 mx-auto">결재서 양식을 선택해주세요.</h2>
+      <form>
+      <div class="row">
+	      <div class="col-5">
+		        <div class="mb-1">
+		          <label class="form-label" for="basic-form-date">신청일</label>
+		          <input class="form-control" id="basic-form-date" type="text" placeholder="신청일">
+		        </div>
+		        <div class="mb-1">
+		          <label class="form-label" for="basic-form-dept">부서</label>
+		          <input class="form-control" id="basic-form-dept" type="text" placeholder="부서">
+		        </div>
+		        <div class="mb-1">
+		          <label class="form-label" for="basic-form-job">직급</label>
+		          <input class="form-control" id="basic-form-job" type="text" placeholder="직급">
+		        </div>
+		        <div class="mb-1">
+		          <label class="form-label" for="basic-form-name">신청자</label>
+		          <input class="form-control" id="basic-form-name" type="text" placeholder="신청자">
+		        </div>
+		        <div class="mb-1">
+		          <label class="form-label" for="basic-form-phone">전화번호</label>
+		          <input class="form-control" id="basic-form-phone" type="text" placeholder="전화번호">
+		        </div>
+	        </div>
+        	<div class="col-7 text-end">결재라인 작성위치</div>
+    	</div>
+        
+        
+        <!-- <div class="mb-3">
+          <label class="form-label" for="basic-form-dob">Date of Birth</label>
+          <input class="form-control" id="basic-form-dob" type="date">
+        </div> -->
+        <div class="mb-3">
+          <label class="form-label" for="basic-form-format">양식 선택</label>
+          <select class="form-select" id="basic-form-format" aria-label="Default select example">
+            <option selected="selected">양식을 선택해주세요.</option>
+            <option value="1">경조금</option>
+            <option value="2">법인카드</option>
+            <option value="3">시말서</option>
+            <option value="4">연장근무신청서</option>
+            <option value="5">재직증명서</option>
+            <option value="6">출장보고서</option>
+            <option value="7">휴가원</option>
+          </select>
+        </div>
+        <!-- <div class="mb-3">
+
+          <div class="form-check">
+
+            <input class="form-check-input" id="flexRadioDefault1" type="radio" name="flexRadioDefault">
+
+            <label class="form-check-label mb-0" for="flexRadioDefault1">Personal Account</label>
+          </div>
+          <div class="form-check">
+
+            <input class="form-check-input" id="flexRadioDefault2" type="radio" name="flexRadioDefault" checked="checked">
+
+            <label class="form-check-label mb-0" for="flexRadioDefault2">Business Account</label>
+          </div>
+        </div> -->
+        
+        <div class="mb-3">
+          <label class="form-label" for="basic-form-textarea">결재 작성</label>
+          <textarea class="form-control" id="basic-form-textarea" rows="15"></textarea>
+        </div>
+        
+        <!-- <div class="mb-3 form-check">
+          <input class="form-check-input" id="basic-form-checkbox" type="checkbox">
+          <label class="form-check-label" for="basic-form-checkbox">Remember me</label>
+        </div> -->
+        <div class="mb-3">
+          <label class="form-label">파일 업로드</label>
+          <input class="form-control" type="file">
+        </div>
+
+        <button class="btn btn-primary" type="submit">등록</button>
+      </form>
+      </div>
+	</main>              
+</body>
+</html>
