@@ -29,7 +29,7 @@
 
 
 
-		<div class="mx-n4 px-4 mx-lg-n6 px-lg-6 border-y border-translucent">
+	<!-- 	<div class="mx-n4 px-4 mx-lg-n6 px-lg-6 border-y border-translucent">
 			<div class="row py-3 gy-3 gx-0">
 				<div class="col-6 col-md-4 order-1 d-flex align-items-center">
 					<button class="btn btn-sm btn-phoenix-primary px-4"
@@ -59,7 +59,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 
 		<!-- 일정 등록 모달 -->
 		<div class="modal fade" id="addEventModal" tabindex="-1">
@@ -128,6 +128,77 @@
 		<div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
 
 
+
+		<!-- 	<script>
+				  document.addEventListener('DOMContentLoaded', function () {
+				    const calendarEl = document.getElementById('appCalendar');
+				    const employeeNo = document.addEventForm.employee_no.value;
+				
+				    const calendar = new FullCalendar.Calendar(calendarEl, {
+				      initialView: 'dayGridMonth',
+				      locale: 'ko',
+				      headerToolbar: {
+				        left: 'prev,next today',
+				        center: 'title',
+				        right: 'dayGridMonth,timeGridWeek'
+				      },
+				      events: function(fetchInfo, successCallback, failureCallback) {
+				        fetch('/employeecalendar/list/' + employeeNo)
+				          .then(response => response.json())
+				          .then(events => {
+				            successCallback(events);
+				          })
+				          .catch(error => {
+				            console.error("이벤트 불러오기 실패", error);
+				            failureCallback(error);
+				          });
+				      }
+				    });
+				
+				    calendar.render();
+  				});
+		</script> -->
+		<script>
+				document.addEventListener('DOMContentLoaded', function () {
+		  		const calendarEl = document.getElementById('appCalendar');
+		  		const employeeNo = document.addEventForm.employee_no.value;
+		
+		  	const calendar = new FullCalendar.Calendar(calendarEl, {
+		    initialView: 'dayGridMonth',
+		    locale: 'ko',
+		    headerToolbar: {
+		      left: 'prev,next today',
+		      center: 'title',
+		      right: 'dayGridMonth,timeGridWeek'
+		    },
+		    dayCellContent: function(info) {
+		        return info.date.getDate(); // '1일' -> '1'로
+		      },
+		    eventClick: function(info) {
+		      alert("제목: " + info.event.title + "\n설명: " + info.event.extendedProps.description);
+		    },
+		    eventDidMount: function(info) {
+		      // 툴팁 처리 (tippy.js를 쓴다면 더 예쁨)
+		      info.el.setAttribute("title", info.event.extendedProps.description || info.event.title);
+		    },
+		    events: function(fetchInfo, successCallback, failureCallback) {
+		      fetch('/employeecalendar/list/' + employeeNo)
+		        .then(response => response.json())
+		        .then(events => {
+		          successCallback(events);
+		        })
+		        .catch(error => {
+		          console.error("이벤트 불러오기 실패", error);
+		          failureCallback(error);
+		        });
+		    }
+		  });
+		
+		  calendar.render();
+});
+		</script>
+
+
 		<!-- 일정 등록 처리 스크립트 -->
 	<script>
     const form = document.addEventForm;
@@ -158,43 +229,6 @@
     });
   </script>
 
-		<script>
-		  const employeeNoForm = document.addEventForm;
-		
-		  document.addEventListener('DOMContentLoaded', function () {
-		    const calendarEl = document.getElementById('appCalendar');
-		
-		    const calendar = new FullCalendar.Calendar(calendarEl, {
-		      initialView: 'dayGridMonth',
-		      locale: 'ko',
-		      headerToolbar: {
-		        left: 'prev,next today',
-		        center: 'title',
-		        right: 'dayGridMonth,timeGridWeek'
-		      },
-		      events: function(fetchInfo, successCallback, failureCallback) {
-		        const employeeNo = employeeNoForm.employee_no.value;
-		
-		        fetch('/employeecalendar/list/'+employeeNoForm.employee_no.value)
-		          .then(response => response.json())
-		          .then(events => {
-		            successCallback(events);
-		          })
-		          .catch(error => {
-		            console.error("이벤트 불러오기 실패", error);
-		            failureCallback(error);
-		          });
-		      },
-		      eventClick: function(info) {
-		        alert(
-		          `📌 제목: ${info.event.title}\n📝 설명: ${info.event.extendedProps.description}\n📍 장소: ${info.event.extendedProps.location}`
-		        );
-		      }
-		    });
-		
-		    calendar.render();
-		  });
-	   </script>
 
 
 

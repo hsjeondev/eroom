@@ -1,11 +1,14 @@
 package com.eroom.calendar.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -67,6 +70,13 @@ public class CalendarController {
 		return resultMap;
 	}
 	
+	@GetMapping("/employeecalendar/list/{employeeNo}")
+	@ResponseBody
+	public List<Map<String, Object>> getCalendarList(@PathVariable("employeeNo") Long employeeNo) {
+	    return service.getCalendarList(employeeNo).stream()
+	        .map(EmployeeCalendarDto::toFullCalendarEvent)
+	        .collect(Collectors.toList());
+	}
 	
 
 }

@@ -1,5 +1,8 @@
 package com.eroom.calendar.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.eroom.calendar.dto.EmployeeCalendarDto;
@@ -17,6 +20,13 @@ public class EmployeeCalendarService {
 		EmployeeCalendar param = dto.toEntity();
 		EmployeeCalendar result = repository.save(param);
 		return new EmployeeCalendarDto().toDto(result);
+	}
+	
+	public List<EmployeeCalendarDto> getCalendarList(Long employeeNo) {
+	    List<EmployeeCalendar> list = repository.findByEmployeeEmployeeNo(employeeNo); // ✅ 정확한 메소드명
+	    return list.stream()
+	        .map(entity -> new EmployeeCalendarDto().toDto(entity))
+	        .collect(Collectors.toList());
 	}
 
 }
