@@ -22,8 +22,16 @@ public class SurveyService {
 	public int saveSurvey(SurveyDto surveyDto, SurveyItemDto surveyItemDto) {
 		int result = 0;
 		try {
-			Survey surveyEntity = surveyDto.toEntity();
-			List<SurveyItem> itemEntity = surveyItemDto.toEntityList();
+			Survey savedSurvey = surveyRepository.save(surveyDto.toEntity());
+			Long surveyNo = savedSurvey.getSurveyNo();
+			
+			for(String item : surveyItemDto.getItems()) {
+				SurveyItem surveyItem = SurveyItem.builder()
+						.item(item)
+						.surveyNo(surveyNo)
+						.build();
+				surveyItemRepository.save(surveyItem);
+			}
 			
 			result = 1;
 		} catch (Exception e) {
