@@ -64,9 +64,9 @@ public class CalendarController {
 			resultMap.put("res_code", "200");
 			resultMap.put("res_msg", "일정을 등록하였습니다!");
 		}
-		
-		
 		return resultMap;
 	}
+	
+	
 
 }
