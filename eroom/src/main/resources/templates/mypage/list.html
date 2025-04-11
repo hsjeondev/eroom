@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko-KR" dir="ltr" data-navigation-type="default"
+	data-navbar-horizontal-shape="default"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/include/layout}">
+<head>
+<meta charset="UTF-8">
+<title>마이페이지</title>
+</head>
+<body>
+<main class="main" id="top" layout:fragment="content">
+<div class="mb-9">
+          <div class="row align-items-center justify-content-between g-3 mb-4">
+            <div class="col-auto">
+              <h2 class="mb-0">Customer details</h2>
+            </div>
+            <div class="col-auto">
+              <div class="row g-3">
+                <div class="col-auto"><button class="btn btn-phoenix-danger"><svg class="svg-inline--fa fa-trash-can me-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-can" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z"></path></svg><!-- <span class="fa-solid fa-trash-can me-2"></span> Font Awesome fontawesome.com -->Delete customer</button></div>
+                <div class="col-auto"><button class="btn btn-phoenix-secondary"><svg class="svg-inline--fa fa-key me-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="key" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"></path></svg><!-- <span class="fas fa-key me-2"></span> Font Awesome fontawesome.com -->Reset password</button></div>
+              </div>
+            </div>
+          </div>
+          <div class="row g-5">
+            <div class="col-12 col-xxl-4">
+              <div class="row g-3 h-100">
+                <div class="col-12 col-md-7 col-xxl-12">
+                  <div class="card h-100 h-xxl-auto">
+                    <div class="card-body d-flex flex-column justify-content-between pb-3">
+                      <div class="row align-items-center g-5 mb-3 text-center text-sm-start">
+                        <div class="col-12 col-sm-auto mb-sm-2">
+                          <div class="avatar avatar-5xl"><img class="rounded-circle" src="../../../assets/img/team/15.webp" alt=""></div>
+                        </div>
+                        <div class="col-12 col-sm-auto flex-1">
+                        <!-- 마이 페이지에서 이름 정하는 곳 -->
+                          <h3>강성관</h3>
+                          <!-- 직급 -->
+                          <p class="text-body-secondary">CEO</p>
+                          <div><a class="me-2" href="#!"><svg class="svg-inline--fa fa-linkedin-in text-body-quaternary text-opacity-75 text-primary-hover" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="linkedin-in" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"></path></svg><!-- <span class="fab fa-linkedin-in text-body-quaternary text-opacity-75 text-primary-hover"></span> Font Awesome fontawesome.com --></a><a class="me-2" href="#!"><svg class="svg-inline--fa fa-facebook text-body-quaternary text-opacity-75 text-primary-hover" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="facebook" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 114.6 397.4 0 256 0S0 114.6 0 256C0 376 82.7 476.8 194.2 504.5V334.2H141.4V256h52.8V222.3c0-87.1 39.4-127.5 125-127.5c16.2 0 44.2 3.2 55.7 6.4V172c-6-.6-16.5-1-29.6-1c-42 0-58.2 15.9-58.2 57.2V256h83.6l-14.4 78.2H287V510.1C413.8 494.8 512 386.9 512 256h0z"></path></svg><!-- <span class="fab fa-facebook text-body-quaternary text-opacity-75 text-primary-hover"></span> Font Awesome fontawesome.com --></a><a href="#!"><svg class="svg-inline--fa fa-twitter text-body-quaternary text-opacity-75 text-primary-hover" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="twitter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"></path></svg><!-- <span class="fab fa-twitter text-body-quaternary text-opacity-75 text-primary-hover"></span> Font Awesome fontawesome.com --></a></div>
+                        </div>
+                      </div>
+                      <div class="d-flex flex-between-center border-top border-dashed pt-4">
+                        <div>
+                          <h6>Following</h6>
+                          <p class="fs-7 text-body-secondary mb-0">297</p>
+                        </div>
+                        <div>
+                          <h6>Projects</h6>
+                          <p class="fs-7 text-body-secondary mb-0">56</p>
+                        </div>
+                        <div>
+                          <h6>Completion</h6>
+                          <p class="fs-7 text-body-secondary mb-0">97</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-5 col-xxl-12">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="d-flex align-items-center mb-3">
+                        <h3 class="me-1">Default Address</h3><button class="btn btn-link p-0"><svg class="svg-inline--fa fa-pen fs-8 ms-3 text-body-quaternary" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="pen" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path></svg><!-- <span class="fas fa-pen fs-8 ms-3 text-body-quaternary"></span> Font Awesome fontawesome.com --></button>
+                      </div>
+                      <h5 class="text-body-secondary">Address</h5>
+                      <p class="text-body-secondary">Shatinon Mekalan<br>Vancouver, British Columbia<br>Canada</p>
+                      <div class="mb-3">
+                        <h5 class="text-body-secondary">Email</h5><a href="mailto:shatinon@jeemail.com">shatinon@jeemail.com</a>
+                      </div>
+                      <h5 class="text-body-secondary">Phone</h5><a class="text-body-secondary" href="tel:+1234567890">+1234567890</a>
+                    </div>
+                  </div>
+                </div>
+         
+              </div>
+            </div>
+            </div>
+            <div class="col-12 col-xxl-8">
+              <div class="mb-6">
+                <h3 class="mb-4">Orders <span class="text-body-tertiary fw-normal">(97)</span></h3>
+                <div class="border-top border-bottom border-translucent" id="customerOrdersTable" data-list="{&quot;valueNames&quot;:[&quot;order&quot;,&quot;total&quot;,&quot;payment_status&quot;,&quot;fulfilment_status&quot;,&quot;delivery_type&quot;,&quot;date&quot;],&quot;page&quot;:6,&quot;pagination&quot;:true}">
+                  <div class="table-responsive scrollbar">
+                    <table class="table table-sm fs-9 mb-0">
+                      <thead>
+                        <tr>
+                          <th class="sort white-space-nowrap align-middle ps-0 pe-3" scope="col" data-sort="order" style="width:10%;">ORDER</th>
+                          <th class="sort align-middle text-end pe-7" scope="col" data-sort="total" style="width:10%;">TOTAL</th>
+                          <th class="sort align-middle white-space-nowrap pe-3" scope="col" data-sort="payment_status" style="width:15%;">PAYMENT STATUS</th>
+                          <th class="sort align-middle white-space-nowrap text-start pe-3" scope="col" data-sort="fulfilment_status" style="width:20%;">FULFILMENT STATUS</th>
+                          <th class="sort align-middle white-space-nowrap text-start" scope="col" data-sort="delivery_type" style="width:30%;">DELIVERY TYPE</th>
+                          <th class="sort align-middle text-end pe-0" scope="col" data-sort="date">DATE</th>
+                          <th class="sort text-end align-middle pe-0 ps-5" scope="col"></th>
+                        </tr>
+                      </thead>
+                      <tbody class="list" id="customer-order-table-body"><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                          <td class="order align-middle white-space-nowrap ps-0"><a class="fw-semibold" href="#!">#2453</a></td>
+                          <td class="total align-middle text-end fw-semibold pe-7 text-body-highlight">$87</td>
+                          <td class="payment_status align-middle white-space-nowrap text-start fw-bold text-body-tertiary"><span class="badge badge-phoenix fs-10 badge-phoenix-success"><span class="badge-label">Paid</span><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check ms-1" style="height:12.8px;width:12.8px;"><polyline points="20 6 9 17 4 12"></polyline></svg></span></td>
+                          <td class="fulfilment_status align-middle white-space-nowrap text-start fw-bold text-body-tertiary"><span class="badge badge-phoenix fs-10 badge-phoenix-success"><span class="badge-label">Order Fulfilled</span><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check ms-1" style="height:12.8px;width:12.8px;"><polyline points="20 6 9 17 4 12"></polyline></svg></span></td>
+                          <td class="delivery_type align-middle white-space-nowrap text-body fs-9 text-start">Cash on delivery</td>
+                          <td class="date align-middle white-space-nowrap text-body-tertiary fs-9 ps-4 text-end">Dec 12, 12:56 PM</td>
+                          <td class="align-middle white-space-nowrap text-end pe-0 ps-5">
+                            <div class="btn-reveal-trigger position-static"><button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><svg class="svg-inline--fa fa-ellipsis fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"></path></svg><!-- <span class="fas fa-ellipsis-h fs-10"></span> Font Awesome fontawesome.com --></button>
+                              <div class="dropdown-menu dropdown-menu-end py-2"><a class="dropdown-item" href="#!">View</a><a class="dropdown-item" href="#!">Export</a>
+                                <div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="#!">Remove</a>
+                              </div>
+                            </div>
+                          </td>
+                        </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                          <td class="order align-middle white-space-nowrap ps-0"><a class="fw-semibold" href="#!">#2452</a></td>
+                          <td class="total align-middle text-end fw-semibold pe-7 text-body-highlight">$7264</td>
+                          <td class="payment_status align-middle white-space-nowrap text-start fw-bold text-body-tertiary"><span class="badge badge-phoenix fs-10 badge-phoenix-secondary"><span class="badge-label">Cancelled</span><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x ms-1" style="height:12.8px;width:12.8px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></td>
+                          <td class="fulfilment_status align-middle white-space-nowrap text-start fw-bold text-body-tertiary"><span class="badge badge-phoenix fs-10 badge-phoenix-info"><span class="badge-label">Ready to pickup</span><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info ms-1" style="height:12.8px;width:12.8px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span></td>
+                          <td class="delivery_type align-middle white-space-nowrap text-body fs-9 text-start">Free shipping</td>
+                          <td class="date align-middle white-space-nowrap text-body-tertiary fs-9 ps-4 text-end">Dec 9, 2:28PM</td>
+                          <td class="align-middle white-space-nowrap text-end pe-0 ps-5">
+                            <div class="btn-reveal-trigger position-static"><button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><svg class="svg-inline--fa fa-ellipsis fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"></path></svg><!-- <span class="fas fa-ellipsis-h fs-10"></span> Font Awesome fontawesome.com --></button>
+                              <div class="dropdown-menu dropdown-menu-end py-2"><a class="dropdown-item" href="#!">View</a><a class="dropdown-item" href="#!">Export</a>
+                                <div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="#!">Remove</a>
+                              </div>
+                            </div>
+                          </td>
+                        </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                          <td class="order align-middle white-space-nowrap ps-0"><a class="fw-semibold" href="#!">#2451</a></td>
+                          <td class="total align-middle text-end fw-semibold pe-7 text-body-highlight">$375</td>
+                          <td class="payment_status align-middle white-space-nowrap text-start fw-bold text-body-tertiary"><span class="badge badge-phoenix fs-10 badge-phoenix-warning"><span class="badge-label">Pending</span><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon ms-1" style="height:12.8px;width:12.8px;"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></span></td>
+                          <td class="fulfilment_status align-middle white-space-nowrap text-start fw-bold text-body-tertiary"><span class="badge badge-phoenix fs-10 badge-phoenix-warning"><span class="badge-label">Partial FulfiLled</span><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon ms-1" style="height:12.8px;width:12.8px;"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></span></td>
+                          <td class="delivery_type align-middle white-space-nowrap text-body fs-9 text-start">Local pickup</td>
+                          <td class="date align-middle white-space-nowrap text-body-tertiary fs-9 ps-4 text-end">Dec 4, 12:56 PM</td>
+                          <td class="align-middle white-space-nowrap text-end pe-0 ps-5">
+                            <div class="btn-reveal-trigger position-static"><button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><svg class="svg-inline--fa fa-ellipsis fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"></path></svg><!-- <span class="fas fa-ellipsis-h fs-10"></span> Font Awesome fontawesome.com --></button>
+                              <div class="dropdown-menu dropdown-menu-end py-2"><a class="dropdown-item" href="#!">View</a><a class="dropdown-item" href="#!">Export</a>
+                                <div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="#!">Remove</a>
+                              </div>
+                            </div>
+                          </td>
+                        </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                          <td class="order align-middle white-space-nowrap ps-0"><a class="fw-semibold" href="#!">#2450</a></td>
+                          <td class="total align-middle text-end fw-semibold pe-7 text-body-highlight">$657</td>
+                          <td class="payment_status align-middle white-space-nowrap text-start fw-bold text-body-tertiary"><span class="badge badge-phoenix fs-10 badge-phoenix-secondary"><span class="badge-label">Cancelled</span><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x ms-1" style="height:12.8px;width:12.8px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></td>
+                          <td class="fulfilment_status align-middle white-space-nowrap text-start fw-bold text-body-tertiary"><span class="badge badge-phoenix fs-10 badge-phoenix-secondary"><span class="badge-label">Order CancelLed</span><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x ms-1" style="height:12.8px;width:12.8px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></td>
+                          <td class="delivery_type align-middle white-space-nowrap text-body fs-9 text-start">Standard shipping</td>
+                          <td class="date align-middle white-space-nowrap text-body-tertiary fs-9 ps-4 text-end">Dec 1, 4:07 AM</td>
+                          <td class="align-middle white-space-nowrap text-end pe-0 ps-5">
+                            <div class="btn-reveal-trigger position-static"><button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><svg class="svg-inline--fa fa-ellipsis fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"></path></svg><!-- <span class="fas fa-ellipsis-h fs-10"></span> Font Awesome fontawesome.com --></button>
+                              <div class="dropdown-menu dropdown-menu-end py-2"><a class="dropdown-item" href="#!">View</a><a class="dropdown-item" href="#!">Export</a>
+                                <div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="#!">Remove</a>
+                              </div>
+                            </div>
+                          </td>
+                        </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                          <td class="order align-middle white-space-nowrap ps-0"><a class="fw-semibold" href="#!">#2449</a></td>
+                          <td class="total align-middle text-end fw-semibold pe-7 text-body-highlight">$9562</td>
+                          <td class="payment_status align-middle white-space-nowrap text-start fw-bold text-body-tertiary"><span class="badge badge-phoenix fs-10 badge-phoenix-danger"><span class="badge-label">Failed</span><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon ms-1" style="height:12.8px;width:12.8px;"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></span></td>
+                          <td class="fulfilment_status align-middle white-space-nowrap text-start fw-bold text-body-tertiary"><span class="badge badge-phoenix fs-10 badge-phoenix-success"><span class="badge-label">Order Fulfilled</span><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check ms-1" style="height:12.8px;width:12.8px;"><polyline points="20 6 9 17 4 12"></polyline></svg></span></td>
+                          <td class="delivery_type align-middle white-space-nowrap text-body fs-9 text-start">Express</td>
+                          <td class="date align-middle white-space-nowrap text-body-tertiary fs-9 ps-4 text-end">Nov 28, 7:28 PM</td>
+                          <td class="align-middle white-space-nowrap text-end pe-0 ps-5">
+                            <div class="btn-reveal-trigger position-static"><button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><svg class="svg-inline--fa fa-ellipsis fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"></path></svg><!-- <span class="fas fa-ellipsis-h fs-10"></span> Font Awesome fontawesome.com --></button>
+                              <div class="dropdown-menu dropdown-menu-end py-2"><a class="dropdown-item" href="#!">View</a><a class="dropdown-item" href="#!">Export</a>
+                                <div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="#!">Remove</a>
+                              </div>
+                            </div>
+                          </td>
+                        </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                          <td class="order align-middle white-space-nowrap ps-0"><a class="fw-semibold" href="#!">#2448</a></td>
+                          <td class="total align-middle text-end fw-semibold pe-7 text-body-highlight">$46</td>
+                          <td class="payment_status align-middle white-space-nowrap text-start fw-bold text-body-tertiary"><span class="badge badge-phoenix fs-10 badge-phoenix-success"><span class="badge-label">Paid</span><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check ms-1" style="height:12.8px;width:12.8px;"><polyline points="20 6 9 17 4 12"></polyline></svg></span></td>
+                          <td class="fulfilment_status align-middle white-space-nowrap text-start fw-bold text-body-tertiary"><span class="badge badge-phoenix fs-10 badge-phoenix-danger"><span class="badge-label">Delivery Delayed</span><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon ms-1" style="height:12.8px;width:12.8px;"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></span></td>
+                          <td class="delivery_type align-middle white-space-nowrap text-body fs-9 text-start">Local delivery</td>
+                          <td class="date align-middle white-space-nowrap text-body-tertiary fs-9 ps-4 text-end">Nov 24, 10:16 AM</td>
+                          <td class="align-middle white-space-nowrap text-end pe-0 ps-5">
+                            <div class="btn-reveal-trigger position-static"><button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><svg class="svg-inline--fa fa-ellipsis fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"></path></svg><!-- <span class="fas fa-ellipsis-h fs-10"></span> Font Awesome fontawesome.com --></button>
+                              <div class="dropdown-menu dropdown-menu-end py-2"><a class="dropdown-item" href="#!">View</a><a class="dropdown-item" href="#!">Export</a>
+                                <div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="#!">Remove</a>
+                              </div>
+                            </div>
+                          </td>
+                        </tr></tbody>
+                    </table>
+                  </div>
+              
+                
+           
+              <div class="mb-6">
+                <h3 class="mb-4">Wishlist <span class="text-body-tertiary fw-normal">(43)</span></h3>
+                <div class="border-translucent border-top border-bottom" id="customerWishlistTable" data-list="{&quot;valueNames&quot;:[&quot;products&quot;,&quot;color&quot;,&quot;size&quot;,&quot;price&quot;,&quot;quantity&quot;,&quot;total&quot;],&quot;page&quot;:5,&quot;pagination&quot;:true}">
+                  <div class="table-responsive scrollbar">
+                    <table class="table fs-9 mb-0">
+                      <thead>
+                        <tr>
+                          <th class="sort white-space-nowrap align-middle fs-10" scope="col" style="width:5%;"></th>
+                          <th class="sort white-space-nowrap align-middle" scope="col" style="width:35%; min-width:250px;" data-sort="products">PRODUCTS</th>
+                          <th class="sort align-middle" scope="col" data-sort="color" style="width:15%;">COLOR</th>
+                          <th class="sort align-middle" scope="col" data-sort="size" style="width:10%;">SIZE</th>
+                          <th class="sort align-middle text-end" scope="col" data-sort="price" style="width:15%;">PRICE</th>
+                          <th class="sort align-middle text-end" scope="col" data-sort="total" style="width:15%;">TOTAL</th>
+                        </tr>
+                      </thead>
+                      <tbody class="list" id="customer-wishlist-table-body"><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                          <td class="align-middle white-space-nowrap py-1"><a class="border border-translucent rounded-2 d-inline-block" href="../../../apps/e-commerce/landing/product-details.html"><img src="../../../assets/img//products/1.png" alt="" width="40" height="40"></a></td>
+                          <td class="products align-middle"><a class="fw-semibold mb-0" href="../../../apps/e-commerce/landing/product-details.html">Fitbit Sense Advanced Smartwatch wi...</a></td>
+                          <td class="color align-middle white-space-nowrap fs-9 text-body">Pure matte black</td>
+                          <td class="size align-middle white-space-nowrap text-body-tertiary fs-9 fw-semibold">42</td>
+                          <td class="price align-middle text-body fs-9 fw-semibold text-end">$57</td>
+                          <td class="total align-middle fw-bold text-body-highlight text-end">$57</td>
+                        </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                          <td class="align-middle white-space-nowrap py-1"><a class="border border-translucent rounded-2 d-inline-block" href="../../../apps/e-commerce/landing/product-details.html"><img src="../../../assets/img//products/7.png" alt="" width="40" height="40"></a></td>
+                          <td class="products align-middle"><a class="fw-semibold mb-0" href="../../../apps/e-commerce/landing/product-details.html">2021 Apple 12.9-inch iPad Pro (Wi‑Fi, ...</a></td>
+                          <td class="color align-middle white-space-nowrap fs-9 text-body">Black</td>
+                          <td class="size align-middle white-space-nowrap text-body-tertiary fs-9 fw-semibold">Pro</td>
+                          <td class="price align-middle text-body fs-9 fw-semibold text-end">$1,499</td>
+                          <td class="total align-middle fw-bold text-body-highlight text-end">$1499</td>
+                        </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                          <td class="align-middle white-space-nowrap py-1"><a class="border border-translucent rounded-2 d-inline-block" href="../../../apps/e-commerce/landing/product-details.html"><img src="../../../assets/img//products/6.png" alt="" width="40" height="40"></a></td>
+                          <td class="products align-middle"><a class="fw-semibold mb-0" href="../../../apps/e-commerce/landing/product-details.html">PlayStation 5 DualSense Wireless Cont...</a></td>
+                          <td class="color align-middle white-space-nowrap fs-9 text-body">White</td>
+                          <td class="size align-middle white-space-nowrap text-body-tertiary fs-9 fw-semibold">Regular</td>
+                          <td class="price align-middle text-body fs-9 fw-semibold text-end">$299</td>
+                          <td class="total align-middle fw-bold text-body-highlight text-end">$359</td>
+                        </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                          <td class="align-middle white-space-nowrap py-1"><a class="border border-translucent rounded-2 d-inline-block" href="../../../apps/e-commerce/landing/product-details.html"><img src="../../../assets/img//products/3.png" alt="" width="40" height="40"></a></td>
+                          <td class="products align-middle"><a class="fw-semibold mb-0" href="../../../apps/e-commerce/landing/product-details.html">Apple MacBook Pro 13 inch-M1-8/256G...</a></td>
+                          <td class="color align-middle white-space-nowrap fs-9 text-body">Space Gray</td>
+                          <td class="size align-middle white-space-nowrap text-body-tertiary fs-9 fw-semibold">Pro</td>
+                          <td class="price align-middle text-body fs-9 fw-semibold text-end">$1,699</td>
+                          <td class="total align-middle fw-bold text-body-highlight text-end">$1,799</td>
+                        </tr><tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                          <td class="align-middle white-space-nowrap py-1"><a class="border border-translucent rounded-2 d-inline-block" href="../../../apps/e-commerce/landing/product-details.html"><img src="../../../assets/img//products/4.png" alt="" width="40" height="40"></a></td>
+                          <td class="products align-middle"><a class="fw-semibold mb-0" href="../../../apps/e-commerce/landing/product-details.html">Apple iMac 24" 4K Retina Display M1 8 C...</a></td>
+                          <td class="color align-middle white-space-nowrap fs-9 text-body">Ocean Blue</td>
+                          <td class="size align-middle white-space-nowrap text-body-tertiary fs-9 fw-semibold">21"</td>
+                          <td class="price align-middle text-body fs-9 fw-semibold text-end">$65</td>
+                          <td class="total align-middle fw-bold text-body-highlight text-end">$65</td>
+                        </tr></tbody>
+                    </table>
+                  </div>
+                
+                </div>
+              </div>
+      
+            </div>
+          </div>
+        </div>
+</main>
+</body>
+</html>

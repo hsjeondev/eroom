@@ -18,6 +18,11 @@ import lombok.RequiredArgsConstructor;
 public class CalendarController {
 	
 	private final EmployeeCalendarService service;
+
+	@GetMapping("/calendar")
+	public String calendarView() {
+		return "calendar/list";
+	}
 	
 	//캘린더 개인일정 목록으로 화면 전환
 	@GetMapping("/employeecalendar")

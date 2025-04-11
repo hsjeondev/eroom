@@ -208,31 +208,31 @@
                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse" id="nv-calender">
                       <li class="collapsed-nav-item-title d-none">캘린더
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/create-new.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/calendar}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">전체</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/project-list-view.html">
+                      <li class="nav-item"><a class="nav-link"  th:href="@{/employeecalendar}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">개인</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/project-card-view.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/myteamcalendar}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">팀</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/project-board-view.html">
+                      <li class="nav-item"><a class="nav-link"th:href="@{/companycalendar}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">부서</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/todo-list.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/departmentcalendar}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">회사</span>
                           </div>
                         </a>
@@ -253,19 +253,19 @@
                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse" id="nv-reservation">
                       <li class="collapsed-nav-item-title d-none">예약
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/email/inbox.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/sleeprev}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">숙직실 예약</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/email/email-detail.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/vehiclerev}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">차량 예약</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/email/compose.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/meetingroomrev}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">회의실 예약</span>
                           </div>
                         </a>
@@ -343,7 +343,7 @@
                 
                 <!-- parent pages-->
               	<!-- 마이페이지 -->
-                <div class="nav-item-wrapper"><a class="nav-link label-1" th:href="@{/}" role="button" data-bs-toggle="" aria-expanded="false">
+                <div class="nav-item-wrapper"><a class="nav-link label-1" th:href="@{/mypage}" role="button" data-bs-toggle="" aria-expanded="false">
                     <div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fa-solid fa-chart-gantt"></span></span><span class="nav-link-text-wrapper"><span class="nav-link-text">마이페이지</span></span>
                     </div>
                   </a>
@@ -413,19 +413,19 @@
                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse" id="nv-survey">
                       <li class="collapsed-nav-item-title d-none">설문조사
                       </li>
-                      <li class="nav-item"><a class="nav-link" th:href="@{/survey}">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/survey/list}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">전체 설문조사</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" th:href="@{/survey}">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/survey/ongoing}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">진행중인 설문조사</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" th:href="@{/survey}">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/survey/closed}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">마감된 설문조사</span>
                           </div>
                         </a>
