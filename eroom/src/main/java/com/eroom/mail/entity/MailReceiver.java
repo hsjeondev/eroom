@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,11 +14,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="mail_receiver")
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name="mail_receiver")
 public class MailReceiver {
 
 	@Id
@@ -36,7 +38,7 @@ public class MailReceiver {
 	@Column(name="mail_receiver_important_yn")
 	private String mailReceiverImportantYn;
 	
-//	@ManyToOne
-//	mail_no
-//	employee_no
+	@ManyToOne
+	@JoinColumn(name = "mail_no")  // FK 컬럼명 명시
+	private Mail mail;
 }

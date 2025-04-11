@@ -24,11 +24,15 @@ public class MailDto {
 	private LocalDateTime mail_sent_time;
 	private String mail_status="N";
 	
-//	private Long employee_no;
+	
+	private Long employee_no;
+	// 받는 사람 나중에 List로 바꿀 예정
+	private String receiver;
 	
 	public Mail toEntity() {
 		return Mail.builder()
 				.mailNo(mail_no)
+//				.employee_no(employee_no)
 				.mailTitle(mail_title)
 				.mailContent(mail_content)
 				.mailSentTime(mail_sent_time)

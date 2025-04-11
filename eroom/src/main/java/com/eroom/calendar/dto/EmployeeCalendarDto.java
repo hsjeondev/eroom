@@ -1,6 +1,8 @@
 package com.eroom.calendar.dto;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.eroom.calendar.entity.EmployeeCalendar;
 import com.eroom.employee.entity.Employee;
@@ -52,6 +54,16 @@ public class EmployeeCalendarDto {
     			.calendar_reg_date(employeeCalendar.getCalendarRegDate())
     			.calendar_mod_date(employeeCalendar.getCalendarModDate())
     			.build();
+    }
+    
+    public Map<String, Object> toFullCalendarEvent() {
+        Map<String, Object> event = new HashMap<>();
+        event.put("title", this.calendar_title);
+        event.put("start", this.calendar_start.toString());
+        event.put("end", this.calendar_end.toString());
+        event.put("location", this.calendar_location);
+        event.put("description", this.calendar_description);
+        return event;
     }
 	
 

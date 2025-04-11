@@ -29,7 +29,7 @@
 
 
 
-		<div class="mx-n4 px-4 mx-lg-n6 px-lg-6 border-y border-translucent">
+	<!-- 	<div class="mx-n4 px-4 mx-lg-n6 px-lg-6 border-y border-translucent">
 			<div class="row py-3 gy-3 gx-0">
 				<div class="col-6 col-md-4 order-1 d-flex align-items-center">
 					<button class="btn btn-sm btn-phoenix-primary px-4"
@@ -59,7 +59,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 
 		<!-- 일정 등록 모달 -->
 		<div class="modal fade" id="addEventModal" tabindex="-1">
@@ -80,7 +80,7 @@
 						<div class="modal-body p-card py-0">
 							<input type="hidden" name="employee_no"
 								th:value="${#authentication.principal.employee.employeeNo}" />
-							<input type="hidden" name="separator" value="E001">
+							<!-- <input type="hidden" name="separator" value="E001"> -->
 
 							<div class="form-floating mb-3">
 								<input class="form-control" id="eventTitle" type="text"
@@ -128,8 +128,79 @@
 		<div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
 
 
-		<!-- 일정 등록 처리 스크립트 -->
+
+		<!-- 	<script>
+				  document.addEventListener('DOMContentLoaded', function () {
+				    const calendarEl = document.getElementById('appCalendar');
+				    const employeeNo = document.addEventForm.employee_no.value;
+				
+				    const calendar = new FullCalendar.Calendar(calendarEl, {
+				      initialView: 'dayGridMonth',
+				      locale: 'ko',
+				      headerToolbar: {
+				        left: 'prev,next today',
+				        center: 'title',
+				        right: 'dayGridMonth,timeGridWeek'
+				      },
+				      events: function(fetchInfo, successCallback, failureCallback) {
+				        fetch('/employeecalendar/list/' + employeeNo)
+				          .then(response => response.json())
+				          .then(events => {
+				            successCallback(events);
+				          })
+				          .catch(error => {
+				            console.error("이벤트 불러오기 실패", error);
+				            failureCallback(error);
+				          });
+				      }
+				    });
+				
+				    calendar.render();
+  				});
+		</script> -->
 		<script>
+				document.addEventListener('DOMContentLoaded', function () {
+		  		const calendarEl = document.getElementById('appCalendar');
+		  		const employeeNo = document.addEventForm.employee_no.value;
+		
+		  	const calendar = new FullCalendar.Calendar(calendarEl, {
+		    initialView: 'dayGridMonth',
+		    locale: 'ko',
+		    headerToolbar: {
+		      left: 'prev,next today',
+		      center: 'title',
+		      right: 'dayGridMonth,timeGridWeek'
+		    },
+		    dayCellContent: function(info) {
+		        return info.date.getDate(); // '1일' -> '1'로
+		      },
+		    eventClick: function(info) {
+		      alert("제목: " + info.event.title + "\n설명: " + info.event.extendedProps.description);
+		    },
+		    eventDidMount: function(info) {
+		      // 툴팁 처리 (tippy.js를 쓴다면 더 예쁨)
+		      info.el.setAttribute("title", info.event.extendedProps.description || info.event.title);
+		    },
+		    events: function(fetchInfo, successCallback, failureCallback) {
+		      fetch('/employeecalendar/list/' + employeeNo)
+		        .then(response => response.json())
+		        .then(events => {
+		          successCallback(events);
+		        })
+		        .catch(error => {
+		          console.error("이벤트 불러오기 실패", error);
+		          failureCallback(error);
+		        });
+		    }
+		  });
+		
+		  calendar.render();
+});
+		</script>
+
+
+		<!-- 일정 등록 처리 스크립트 -->
+	<script>
     const form = document.addEventForm;
     form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -159,19 +230,8 @@
   </script>
 
 
-		<script th:src="@{/vendors/popper/popper.min.js}"></script>
-		<script th:src="@{/vendors/bootstrap/bootstrap.min.js}"></script>
-		<script th:src="@{/vendors/anchorjs/anchor.min.js}"></script>
-		<script th:src="@{/vendors/is/is.min.js}"></script>
-		<script th:src="@{/vendors/fontawesome/all.min.js}"></script>
-		<script th:src="@{/vendors/lodash/lodash.min.js}"></script>
-		<script th:src="@{/vendors/list.js/list.min.js}"></script>
-		<script th:src="@{/vendors/feather-icons/feather.min.js}"></script>
-		<script th:src="@{/vendors/dayjs/dayjs.min.js}"></script>
-		<script th:src="@{/vendors/fullcalendar/index.global.min.js}"></script>
-		<script th:src="@{/vendors/flatpickr/flatpickr.min.js}"></script>
-		<script th:src="@{/assets/js/phoenix.js}"></script>
-		<script th:src="@{/assets/js/pages/calendar.js}"></script>
+
+
 
 	</main>
 </body>
