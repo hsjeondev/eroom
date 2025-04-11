@@ -7,6 +7,15 @@
 <body>
 	<main class="main" id="top" layout:fragment="content">
 		<!-- 여기에 요소 넣으면 됩니다. -->
+		<script>
+		  function changeDepartment(dept) {
+			  console.log("changeDepartment called: " + dept);
+		   /*  location.href = '/chat/list?department=' + encodeURIComponent(dept); */
+		   		// 비동기로 가져오기
+		  }
+		</script>
+		
+		
 		<div class="chat d-flex phoenix-offcanvas-container pt-1 mt-n1 mb-9">
 			<div
 				class="card p-3 p-xl-1 mt-xl-n1 chat-sidebar me-3 phoenix-offcanvas phoenix-offcanvas-start"
@@ -127,6 +136,7 @@
 						            th:text="${dept}" 
 						            th:selected="${dept == param.department}"></option>
 						  </select>
+						            <p th:text="'선택된 부서: ' + ${param.department}">[선택된 부서 없음]</p>
 						</div>
 					    <!-- 참여자 선택 -->
 						<div class="mb-3">
@@ -177,5 +187,6 @@
 			</div>
 		</div>
 	</main>
+	
 </body>
 </html>

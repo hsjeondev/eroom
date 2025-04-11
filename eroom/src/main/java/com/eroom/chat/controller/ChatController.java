@@ -28,10 +28,14 @@ public class ChatController {
 		
 		List<String> departmentList = chatroomService.findDistinctDepartmentNames();
 		model.addAttribute("departmentList", departmentList);
+		
+		if (department != null) {
+			department = department.trim(); // 
+		}
 
+		// 삼항 연산자 사용해서 특정 부서 인원만 가능?
 		List<Employee> employeeList = (department != null && !department.isEmpty())
-		    ? chatroomService.findEmployeesByDepartmentName(department)
-		    : chatroomService.selectEmployeeAll();
+		? chatroomService.findEmployeesByDepartmentName(department) : chatroomService.selectEmployeeAll();
 		model.addAttribute("employeeList", employeeList);
 		
 		return "chat/list";
