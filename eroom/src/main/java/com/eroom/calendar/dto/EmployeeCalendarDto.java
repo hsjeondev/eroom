@@ -21,7 +21,9 @@ import lombok.ToString;
 public class EmployeeCalendarDto {
 	private Long calendar_no;
     private String calendar_location;
-    private LocalDateTime calendar_date;
+    private LocalDateTime calendar_start;
+    private LocalDateTime calendar_end;
+    private String calendar_title;
     private String calendar_description;
     private LocalDateTime calendar_reg_date;
     private LocalDateTime calendar_mod_date;
@@ -31,7 +33,9 @@ public class EmployeeCalendarDto {
     	return EmployeeCalendar.builder()
     			.calendarNo(calendar_no)
     			.calendarLocation(calendar_location)
-    			.calendarDate(calendar_date)
+    			.calendarStart(calendar_start)
+    			.calendarEnd(calendar_end)
+    			.calendarTitle(calendar_title)
     			.calendarDescription(calendar_description)
     			.employee(Employee.builder().employeeNo(employee_no).build())
     			.build();		
@@ -41,7 +45,9 @@ public class EmployeeCalendarDto {
     	return EmployeeCalendarDto.builder()
     			.calendar_no(employeeCalendar.getCalendarNo())
     			.calendar_location(employeeCalendar.getCalendarLocation())
-    			.calendar_date(employeeCalendar.getCalendarDate())
+    			.calendar_start(employeeCalendar.getCalendarStart())
+    			.calendar_end(employeeCalendar.getCalendarEnd())
+    			.calendar_title(employeeCalendar.getCalendarTitle())
     			.calendar_description(employeeCalendar.getCalendarDescription())
     			.calendar_reg_date(employeeCalendar.getCalendarRegDate())
     			.calendar_mod_date(employeeCalendar.getCalendarModDate())
