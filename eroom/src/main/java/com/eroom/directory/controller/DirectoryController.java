@@ -47,7 +47,7 @@ public class DirectoryController {
 //		
 //		model.addAttribute("resultList", resultList);
 		
-		return "directory/partnerList";
+		return "directory/treetest";
 	}
 	
 }
