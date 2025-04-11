@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class CalendarController {
 	
 	private final EmployeeCalendarService service;
-	
+
 	@GetMapping("/calendar")
 	public String calendarView() {
 		return "calendar/list";
