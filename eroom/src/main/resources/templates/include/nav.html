@@ -64,31 +64,31 @@
                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse" id="nv-email">
                       <li class="collapsed-nav-item-title d-none">이메일
                       </li>
-                      <li class="nav-item"><a class="nav-link" th:href="@{/mail}">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/mail/receiverTo}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">받은 메일함</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/project-list-view.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/mail/receiverCc}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">보낸 메일함</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/project-card-view.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/mail/draft}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">임시 보관함</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/project-board-view.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/mail/important}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">중요 메일함</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/todo-list.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/mail/trash}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">휴지통</span>
                           </div>
                         </a>
@@ -286,13 +286,13 @@
                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse" id="nv-board">
                       <li class="collapsed-nav-item-title d-none">게시판
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/file-manager/grid-view.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/board/notice}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">공지 게시판</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/file-manager/list-view.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/board/anonymous}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">익명 게시판</span>
                           </div>
                         </a>

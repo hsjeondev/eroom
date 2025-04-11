@@ -23,20 +23,57 @@ public class MailController {
 	private final MailService service;
 	@GetMapping("/mail")
 	public String selectMailAll(Model model) {
+		// 조건 필요함  reveiver에 
+		// to일때는 내가 보낸거
+		// 조건이 cc면 받은거
 		
+		// 조건 더 필요함 status 'N'일때 임시저장x 즉, 발송된 메일
 		List<Mail> resultList = service.selectMailAll();
 		model.addAttribute("resultList",resultList);
 		return "mail/list";
 	}
 	
+	@GetMapping("/mail/receiverTo")
+	public String selectReceiverToAll() {
+		return "mail/mailReceiverTo";
+	}
+	
+	@GetMapping("/mail/receiverCc")
+	public String selectReceiverCcAll() {
+		return "mail/mailReceiverCc";
+	}
+	
+	// 임시 저장 조회할곳
+	@GetMapping("/mail/draft")
+	public String selectDraftMailAll() {
+		
+		return "mail/mailDraft";
+	}
+	
+	
+	// 중요한 메일 조회할곳
+	@GetMapping("/mail/important")
+	public String selectImportantMailAll() {
+		
+		return "mail/mailImportant";
+	}
+	
+	// 휴지통 조회할곳
+	@GetMapping("/mail/trash")
+	public String selectTrashMailAll() {
+		
+		return "mail/mailTrash";
+	}
+	
+	
 	@GetMapping("/mail/detail")
 	public String selectMailOne() {
-		return "mail/detail";
+		return "mail/mailDetail";
 	}
 	
 	@GetMapping("/mail/create")
 	public String createMailView() {
-		return "mail/create";
+		return "mail/mailCreate";
 	}
 	
 	@PostMapping("/mail/create")
@@ -54,4 +91,6 @@ public class MailController {
 		System.out.println("asd");
 		return resultMap;
 	}
+	
+	
 }
