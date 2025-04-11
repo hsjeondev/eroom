@@ -8,6 +8,18 @@
 	<main class="main" id="top" layout:fragment="content">
 		<!-- 여기에 요소 넣으면 됩니다. -->
 		<script>
+		  let isGroupChat = false;
+		  // "DOMContentLoaded" = HTML 이 다 그려지고 난 후 실행됨
+		  document.addEventListener("DOMContentLoaded", () => {
+		    const chatTypeRadios = document.querySelectorAll('input[name="chatIsGroup"]');
+		    chatTypeRadios.forEach(radio => {
+		      radio.addEventListener('change', (e) => {
+		        isGroupChat = e.target.value === 'Y';
+		        console.log("채팅 타입 변경됨:", isGroupChat ? '그룹' : '1:1');
+		      });
+		    });
+		  });
+		
 		  function changeDepartment(dept) {
 		    console.log("선택된 부서:", dept);
 		    fetch('/chat/employes?department=' + encodeURIComponent(dept))
@@ -15,20 +27,68 @@
 		      .then(data => {
 		        const select = document.getElementById('employeeSelect');
 		        select.innerHTML = '<option selected disabled>-- 참여자 선택 --</option>';
+		
 		        data.forEach(emp => {
 		          const option = document.createElement('option');
-		          option.text = emp.employeeName;
-		          option.value = emp.employeeId;
+		          option.text = emp.employee_name;
+		          console.log(option.text);
+		          option.value = emp.employee_no;
 		          select.appendChild(option);
 		        });
+		
+		        // 채팅 타입에 따라 참여자 선택 방식을 바꿔줌
+		        select.multiple = isGroupChat;
 		      })
 		      .catch(error => console.error('부서 직원 로딩 실패:', error));
 		  }
 		</script>
-
-
+		<script>
+		  function addParticipant() {
+		    const select = document.getElementById('employeeSelect');
+		    const selectedOption = select.options[select.selectedIndex];
 		
+		    if (!selectedOption || selectedOption.disabled) {
+		      alert('참여자를 선택해주세요.');
+		      return;
+		    }
 		
+		    const participantId = selectedOption.value;
+		    const participantName = selectedOption.text;
+		
+		    // 이미 추가된 참여자 수 확인
+		    const currentCount = document.querySelectorAll('#selectedParticipants .badge').length;
+		
+		    // 1:1 채팅일 경우 1명까지만 허용
+		    if (!isGroupChat && currentCount >= 1) {
+		      alert('1:1 채팅은 한 명만 선택할 수 있습니다.');
+		      return;
+		    }
+		
+		    // 중복 방지
+		    if (document.getElementById('participant-' + participantId)) {
+		      alert('이미 추가된 참여자입니다.');
+		      return;
+		    }
+		
+		    const badge = document.createElement('span');
+		    badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
+		    badge.id = 'participant-' + participantId;
+		
+		    badge.innerHTML = `
+		      ${participantName}
+		      <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeParticipant('${participantId}')"></button>
+		      <input type="hidden" name="participantIds" value="${participantId}">
+		      `;
+		
+		    document.getElementById('selectedParticipants').appendChild(badge);
+		  }
+		
+		  function removeParticipant(id) {
+		    const badge = document.getElementById('participant-' + id);
+		    if (badge) badge.remove();
+		  }
+		</script>
+
 		<div class="chat d-flex phoenix-offcanvas-container pt-1 mt-n1 mb-9">
 			<div
 				class="card p-3 p-xl-1 mt-xl-n1 chat-sidebar me-3 phoenix-offcanvas phoenix-offcanvas-start"
@@ -127,12 +187,20 @@
 				<div class="modal-dialog modal-dialog-centered">
 					<div class="modal-content">
 						<div class="modal-header">
+						<h3>새 채팅방 만들기</h3>
 							<button type="button" class="btn-close" data-bs-dismiss="modal"
 								aria-label="닫기"></button>
 						</div>
-
+				<!-- 🔘 채팅 종류 선택 -->
 				<form th:action="@{/chat/create}" method="post">
-					  <div class="modal-body">
+				  <div class="modal-body">
+					<div class="mb-3">
+					  <label class="form-label">채팅 종류</label>
+					  <div id="chatTypeGroup">
+					    <input type="radio" name="chatIsGroup" value="N" checked> 1:1 채팅
+					    <input type="radio" name="chatIsGroup" value="Y"> 그룹 채팅
+					  </div>
+					</div>
 					    <div class="mb-3" id="chatroomNameBox">
 					      <label class="form-label">채팅방 이름</label>
 					      <input type="text" name="chatroomName" class="form-control"
@@ -149,7 +217,6 @@
 						            th:text="${dept}" 
 						            th:selected="${dept == param.department}"></option>
 						  </select>
-						            <p th:text="'선택된 부서: ' + ${param.department}">[선택된 부서 없음]</p>
 						</div>
 					    <!-- 참여자 선택 -->
 						<div class="mb-3">

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.service.ChatroomService;
-import com.eroom.employee.entity.Employee;
+import com.eroom.employee.dto.EmployeeDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +34,7 @@ public class ChatController {
 	}
 	@GetMapping("/employes")
 	@ResponseBody
-	public List<Employee> getEmployeesByDepartment(@RequestParam(name = "department") String department){
+	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam(name = "department") String department){
 		return chatroomService.findEmployeesByDepartmentName(department);
 	}
 	
