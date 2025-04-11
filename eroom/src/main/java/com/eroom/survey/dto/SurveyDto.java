@@ -1,5 +1,6 @@
 package com.eroom.survey.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.eroom.survey.entity.Survey;
@@ -20,7 +21,7 @@ import lombok.ToString;
 public class SurveyDto {
 	private Long surveyNo;
 	private String surveyTitle;
-	private LocalDateTime deadline;
+	private LocalDate deadline;
     private String anonymousVote = "N";
     private String allowMultiple = "N";
 	private Long employeeNo;
