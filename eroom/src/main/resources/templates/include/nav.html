@@ -163,31 +163,31 @@
                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse" id="nv-project">
                       <li class="collapsed-nav-item-title d-none">프로젝트
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/create-new.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/project/all}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">전체</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/project-list-view.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/project/doing}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">진행 중</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/project-card-view.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/project/yet}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">진행 예정</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/project-board-view.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/project/done}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">완료</span>
                           </div>
                         </a>
                         <!-- more inner pages-->
                       </li>
-                      <li class="nav-item"><a class="nav-link" href="/apps/project-management/todo-list.html">
+                      <li class="nav-item"><a class="nav-link" th:href="@{/project/hold}">
                           <div class="d-flex align-items-center"><span class="nav-link-text">보류</span>
                           </div>
                         </a>
