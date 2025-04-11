@@ -39,18 +39,14 @@ public class ChatroomService {
 		List<Chatroom> list = repository.findAll(spec);
 		return list;
 	}
-
-	public List<Employee> selectEmployeeAll() {
-		return employeeRepository.findAll();
-	}
-	// 부서명 중복 제거 목록
+	// EmployeeRepository 에 있는 부서명 중복 제거 목록
 	public List<String> findDistinctDepartmentNames() {
 		return employeeRepository.findDistinctDepartmentNames();
 	}
-
-	//  부서 이름으로 직원 조회
+	// EmployeeRepository 에 있는 특정 부서에 속한 직원 가져오기
 	public List<Employee> findEmployeesByDepartmentName(String departmentName) {
-		return employeeRepository.findByDepartment_DepartmentName(departmentName);
+	    return employeeRepository.findByDepartment_DepartmentName(departmentName);
 	}
-	
+
+
 }

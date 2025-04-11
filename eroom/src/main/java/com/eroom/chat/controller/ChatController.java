@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.service.ChatroomService;
@@ -29,16 +30,12 @@ public class ChatController {
 		List<String> departmentList = chatroomService.findDistinctDepartmentNames();
 		model.addAttribute("departmentList", departmentList);
 		
-		if (department != null) {
-			department = department.trim(); // 
-		}
-
-		// 삼항 연산자 사용해서 특정 부서 인원만 가능?
-		List<Employee> employeeList = (department != null && !department.isEmpty())
-		? chatroomService.findEmployeesByDepartmentName(department) : chatroomService.selectEmployeeAll();
-		model.addAttribute("employeeList", employeeList);
-		
 		return "chat/list";
+	}
+	@GetMapping("/employes")
+	@ResponseBody
+	public List<Employee> getEmployeesByDepartment(@RequestParam(name = "department") String department){
+		return chatroomService.findEmployeesByDepartmentName(department);
 	}
 	
 }

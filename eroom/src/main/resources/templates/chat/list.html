@@ -9,11 +9,24 @@
 		<!-- 여기에 요소 넣으면 됩니다. -->
 		<script>
 		  function changeDepartment(dept) {
-			  console.log("changeDepartment called: " + dept);
-		   /*  location.href = '/chat/list?department=' + encodeURIComponent(dept); */
-		   		// 비동기로 가져오기
+		    console.log("선택된 부서:", dept);
+		    fetch('/chat/employes?department=' + encodeURIComponent(dept))
+		      .then(response => response.json())
+		      .then(data => {
+		        const select = document.getElementById('employeeSelect');
+		        select.innerHTML = '<option selected disabled>-- 참여자 선택 --</option>';
+		        data.forEach(emp => {
+		          const option = document.createElement('option');
+		          option.text = emp.employeeName;
+		          option.value = emp.employeeId;
+		          select.appendChild(option);
+		        });
+		      })
+		      .catch(error => console.error('부서 직원 로딩 실패:', error));
 		  }
 		</script>
+
+
 		
 		
 		<div class="chat d-flex phoenix-offcanvas-container pt-1 mt-n1 mb-9">
@@ -142,12 +155,9 @@
 						<div class="mb-3">
 						  <label class="form-label">참여자 선택</label>
 						  <div class="d-flex"> 
-						    <select id="employeeSelect" class="form-select me-2" style="flex:1;">
-						      <option selected disabled>-- 참여자 선택 --</option>
-						      <option th:if="${!#lists.isEmpty(employeeList)}"
-					  				th:each="empList : ${employeeList}"
-					  				th:text="${empList.employeeName}">
-						    </select>
+						      <select id="employeeSelect" class="form-select me-2" style="flex:1;">
+								  <option selected disabled>-- 참여자 선택 --</option>
+								</select>
 						    <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">추가</button>
 						  </div>
 						</div>
