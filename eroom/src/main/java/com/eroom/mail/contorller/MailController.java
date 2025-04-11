@@ -33,11 +33,27 @@ public class MailController {
 		return "mail/list";
 	}
 	
+	// 받은 메일
 	@GetMapping("/mail/receiverTo")
 	public String selectReceiverToAll() {
 		return "mail/mailReceiverTo";
 	}
 	
+	// 보낸 메일
+	@GetMapping("/mail/sent")
+	public String selectSentMailAll(Model model) {
+		
+		
+		
+		
+		// 04/11 지금은 전체 메일이 조회됨
+		List<Mail> resultList = service.selectMailAll();
+		model.addAttribute("resultList",resultList);
+		
+		return "mail/mailSent";
+	}
+	
+	// 참조자 메일 < 이건 나중에 메일 기능을 만든다고 하면 쓸 예정
 	@GetMapping("/mail/receiverCc")
 	public String selectReceiverCcAll() {
 		return "mail/mailReceiverCc";
