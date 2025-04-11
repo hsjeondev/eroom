@@ -34,8 +34,14 @@ public class EmployeeCalendar {
 	private Long calendarNo;
 	
 
-    @Column(name = "calendar_date")
-    private LocalDateTime calendarDate;
+    @Column(name = "calendar_start")
+    private LocalDateTime calendarStart;
+    
+    @Column(name = "calendar_end")
+    private LocalDateTime calendarEnd;
+    
+    @Column(name = "calendar_title")
+    private String calendarTitle;
 	
 	@Column(name="calendar_location")
 	private String calendarLocation;
