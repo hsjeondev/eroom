@@ -22,7 +22,7 @@ public class ChatController {
 	private final ChatroomService chatroomService;
 	
 	@GetMapping("/list")
-	public String selectChatRoomAll(@RequestParam(name = "department" ,required = false) String department,Model model) {
+	public String selectChatRoomAll(@RequestParam(name = "department" ,required = false) String department, Model model) {
 		List<Chatroom> resultList = chatroomService.selectChatRoomAll();
 		model.addAttribute("chatroomList",resultList);
 		
