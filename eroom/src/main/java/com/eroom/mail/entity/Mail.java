@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +41,9 @@ public class Mail {
 	
 	@Column(name="mail_status")
 	private String mailStatus;
-//	@
+	
+//	@ManyToOne
+//	@Column(name="employee_no")
 //	private Long employee_no;
 	
 }
