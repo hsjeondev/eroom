@@ -24,6 +24,8 @@ public class MailReceiverDto {
 	
 	
 	private Long mail_no;
+	
+	
 	private Long employee_no;
 	
 	

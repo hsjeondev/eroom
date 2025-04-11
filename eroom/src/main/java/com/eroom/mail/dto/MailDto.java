@@ -24,11 +24,12 @@ public class MailDto {
 	private LocalDateTime mail_sent_time;
 	private String mail_status="N";
 	
-//	private Long employee_no;
+	private Long employee_no;
 	
 	public Mail toEntity() {
 		return Mail.builder()
 				.mailNo(mail_no)
+//				.employee_no(employee_no)
 				.mailTitle(mail_title)
 				.mailContent(mail_content)
 				.mailSentTime(mail_sent_time)
