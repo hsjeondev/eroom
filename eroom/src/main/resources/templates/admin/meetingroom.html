@@ -6,7 +6,269 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  layout:decorate="~{/include/layout}">
   <body>
     <main class="main" id="top" layout:fragment="content">
-		회의실 목록
+    
+  <div class="mb-3">
+	    <div class="d-flex justify-content-start align-items-center mb-2">
+	    <i class="fas fa-building text-secondary me-2"></i>
+	    <span class="fw-bold fs-7">회의실 목록</span>
+	  </div>
+
+
+
+  <div id="meetingroomTable" data-list='{"valueNames":["no","meetingroom","location","capacity","date"], "page": 5, "pagination": true}'>
+    
+<!-- 검색창 + 추가 버튼 영역 -->
+<div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
+  <!-- 검색창 (가운데 정렬) -->
+  <div class="d-flex justify-content-center">
+    <form class="position-relative" style="width: 300px;">
+      <input class="form-control search-input search form-control-sm" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
+      <svg class="svg-inline--fa fa-magnifying-glass search-box-icon position-absolute top-50 end-0 translate-middle-y me-2"
+        aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img"
+        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="pointer-events: none;">
+        <path fill="currentColor"
+          d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z">
+        </path>
+      </svg>
+    </form>
+  </div>
+
+  <!-- 추가 버튼 (오른쪽 고정) -->
+  <button class="btn btn-sm btn-primary position-absolute top-0 end-0" type="button"
+  	data-bs-toggle="modal" data-bs-target="#addMeetingroomModal">
+    회의실 추가
+  </button>
+</div>
+
+    <!-- 테이블 본문 -->
+    <div class="table-responsive">
+      <table class="table table-striped table-sm fs-9 mb-0 text-center">
+        <thead class="text-center align-middle">
+          <tr>
+            <th class="sort" data-sort="no" style="width: 5%;">번호</th>
+            <th class="sort" data-sort="meetingroom" style="width: 30%;">회의실</th>
+            <th class="sort" data-sort="location" style="width: 20%;">위치</th>
+            <th class="sort" data-sort="capacity" style="width: 15%;">수용 인원</th>
+            <th class="sort" data-sort="date" style="width: 20%;">등록일</th>
+            <th style="width: 10%;"></th>
+          </tr>
+        </thead>
+        <tbody class="list align-middle">
+
+          <!-- 회의실 1 -->
+          <tr>
+            <td class="no">1</td>
+            <td class="meetingroom">회의실A</td>
+            <td class="location">1관 2층</td>
+            <td class="capacity">8명</td>
+            <td class="date">2025-04-10</td>
+            <td class="align-middle text-end pe-0">
+              <div class="btn-reveal-trigger position-static">
+                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+                  <i class="fas fa-ellipsis fs-10"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end py-2">
+                  <a class="dropdown-item" href="#!">수정</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item text-danger" href="#!">삭제</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- 회의실 2 -->
+          <tr>
+            <td class="align-middle no">2</td>
+            <td class="align-middle meetingroom">회의실B</td>
+            <td class="align-middle location">1관 3층</td>
+            <td class="align-middle capacity">5명</td>
+            <td class="align-middle date">2025-04-10</td>
+            <td class="align-middle text-end pe-0">
+              <div class="btn-reveal-trigger position-static">
+                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+                  <i class="fas fa-ellipsis fs-10"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end py-2">
+                  <a class="dropdown-item" href="#!">수정</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item text-danger" href="#!">삭제</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- 회의실 3 -->
+          <tr>
+            <td class="align-middle no">3</td>
+            <td class="align-middle meetingroom">회의실C</td>
+            <td class="align-middle location">1관 4층</td>
+            <td class="align-middle capacity">10명</td>
+            <td class="align-middle date">2025-04-10</td>
+            <td class="align-middle text-end pe-0">
+              <div class="btn-reveal-trigger position-static">
+                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+                  <i class="fas fa-ellipsis fs-10"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end py-2">
+                  <a class="dropdown-item" href="#!">수정</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item text-danger" href="#!">삭제</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 페이징? -->
+    <div class="d-flex justify-content-center mt-3">
+     <!--  <span class="d-none d-sm-inline-block" data-list-info="data-list-info">1 to 4 <span class="text-body-tertiary"> Items of </span>4</span> -->
+      <div class="d-flex">
+        <button class="page-link disabled" data-list-pagination="prev" disabled><i class="fas fa-chevron-left"></i></button>
+        <ul class="mb-0 pagination">
+          <li class="active"><button class="page" type="button" data-i="1" data-page="5">1</button></li>
+        </ul>
+        <button class="page-link pe-0" data-list-pagination="next" disabled><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>    
+</div>    
+    
+  <!-- 회의실 예약 목록 -->  
+  <div class="mb-3">
+	    <div class="d-flex justify-content-start align-items-center mb-2">
+	    <i class="fas fa-users text-secondary me-2"></i>
+	    <span class="fw-bold fs-7">회의실 예약 현황</span>
+	  </div>
+
+
+  <div id="reservationTable" data-list='{"valueNames":["no","meetingroom","reservation","capacity","date","time"], "page": 5, "pagination": true}'>
+    
+<!-- 검색창 + 추가 버튼 영역 -->
+<div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
+  <!-- 검색창 (가운데 정렬) -->
+  <div class="d-flex justify-content-center">
+    <form class="position-relative" style="width: 300px;">
+      <input class="form-control search-input search form-control-sm" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
+      <svg class="svg-inline--fa fa-magnifying-glass search-box-icon position-absolute top-50 end-0 translate-middle-y me-2"
+        aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img"
+        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="pointer-events: none;">
+        <path fill="currentColor"
+          d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z">
+        </path>
+      </svg>
+    </form>
+  </div>
+
+</div>
+
+    <!-- 테이블 본문 -->
+    <div class="table-responsive">
+      <table class="table table-striped table-sm fs-9 mb-0 text-center">
+        <thead class="text-center align-middle">
+          <tr>
+            <th class="sort" data-sort="no" style="width: 5%;">번호</th>
+            <th class="sort" data-sort="meetingroom" style="width: 15%;">회의실</th>
+            <th class="sort" data-sort="reservation" style="width: 10%;">예약자</th>
+            <th class="sort" data-sort="capacity" style="width: 30%;">참가 인원</th>
+            <th class="sort" data-sort="date" style="width: 20%;">예약일</th>
+            <th class="sort" data-sort="time" style="width: 20%;">예약 시간</th>
+          </tr>
+        </thead>
+        <tbody class="list align-middle">
+
+          <!-- 회의실 1 -->
+          <tr>
+            <td class="no">1</td>
+            <td class="meetingroom">회의실A</td>
+            <td class="reservation">강성관</td>
+            <td class="capacity">강성관, 권용규, 김태영, 이예준, 전홍식, 조은성, 조윤아</td>
+            <td class="date">2025-04-10</td>
+            <td class="time">10:00 ~ 12:00</td>
+          </tr>
+
+          <!-- 회의실 2 -->
+          <tr>
+            <td class="no">2</td>
+            <td class="meetingroom">회의실B</td>
+            <td class="reservation">조윤아</td>
+            <td class="capacity">조윤아, 이예준, 강성관</td>
+            <td class="date">2025-04-10</td>
+            <td class="time">13:00 ~ 14:00</td>
+          </tr>
+
+          <!-- 회의실 3 -->
+          <tr>
+            <td class="no">3</td>
+            <td class="meetingroom">회의실C</td>
+            <td class="reservation">전홍식</td>
+            <td class="capacity">전홍식, 조은성, 정재익, 양서원, 권용규, 황정현, 박수빈, 조윤아, 강성관, 이예준</td>
+            <td class="date">2025-04-10</td>
+            <td class="time">15:00 ~ 17:00</td>
+          </tr>
+
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 페이징? -->
+    <div class="d-flex justify-content-center mt-3">
+     <!--  <span class="d-none d-sm-inline-block" data-list-info="data-list-info">1 to 4 <span class="text-body-tertiary"> Items of </span>4</span> -->
+      <div class="d-flex">
+        <button class="page-link disabled" data-list-pagination="prev" disabled><i class="fas fa-chevron-left"></i></button>
+        <ul class="mb-0 pagination">
+          <li class="active"><button class="page" type="button" data-i="1" data-page="5">1</button></li>
+        </ul>
+        <button class="page-link pe-0" data-list-pagination="next" disabled><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>    
+</div>       
+
+
+<!-- 회의실 추가 모달 -->
+<div class="modal fade" id="addMeetingroomModal" tabindex="-1" aria-labelledby="addMeetingroomModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- 헤더 -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="addMeetingroomModalLabel">회의실 추가</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- 바디 -->
+      <div class="modal-body">
+        <form id="addMeetingroomForm">
+          <div class="mb-3">
+            <label for="roomName" class="form-label">회의실 이름</label>
+            <input type="text" class="form-control form-control-sm" id="roomName" placeholder="예: 회의실A">
+          </div>
+          <div class="mb-3">
+            <label for="roomLocation" class="form-label">위치</label>
+            <input type="text" class="form-control form-control-sm" id="roomLocation" placeholder="예: 1관 2층">
+          </div>
+          <div class="mb-3">
+            <label for="roomCapacity" class="form-label">수용 인원</label>
+            <input type="number" class="form-control form-control-sm" id="roomCapacity" placeholder="예: 10">
+          </div>
+        </form>
+      </div>
+
+      <!-- 푸터 -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+        <button type="submit" class="btn btn-primary btn-sm" form="addMeetingroomForm">등록</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
     </main>
   </body>
 </html>
