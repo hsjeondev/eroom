@@ -32,7 +32,7 @@ public class DirectoryController {
 		
 		model.addAttribute("resultList", resultList);
 		
-		return "directory/employeeList";
+		return "directory/employeeList2";
 	}
 	@GetMapping("/directory/partner")
 	public String selectDirectoryPartnerList(Model model) {
