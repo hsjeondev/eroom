@@ -36,7 +36,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
   <!-- 추가 버튼 (오른쪽 고정) -->
   <button class="btn btn-sm btn-primary position-absolute top-0 end-0" type="button"
   	data-bs-toggle="modal" data-bs-target="#addMeetingroomModal">
-    회의실 추가
+    회의실 등록
   </button>
 </div>
 
@@ -78,12 +78,12 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
           <!-- 회의실 2 -->
           <tr>
-            <td class="align-middle no">2</td>
-            <td class="align-middle meetingroom">회의실B</td>
-            <td class="align-middle location">1관 3층</td>
-            <td class="align-middle capacity">5명</td>
-            <td class="align-middle date">2025-04-10</td>
-            <td class="align-middle text-end pe-0">
+            <td class="no">2</td>
+            <td class="meetingroom">회의실B</td>
+            <td class="location">1관 3층</td>
+            <td class="capacity">5명</td>
+            <td class="date">2025-04-10</td>
+            <td class="text-end pe-0">
               <div class="btn-reveal-trigger position-static">
                 <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
                   <i class="fas fa-ellipsis fs-10"></i>
@@ -99,12 +99,12 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
           <!-- 회의실 3 -->
           <tr>
-            <td class="align-middle no">3</td>
-            <td class="align-middle meetingroom">회의실C</td>
-            <td class="align-middle location">1관 4층</td>
-            <td class="align-middle capacity">10명</td>
-            <td class="align-middle date">2025-04-10</td>
-            <td class="align-middle text-end pe-0">
+            <td class="no">3</td>
+            <td class="meetingroom">회의실C</td>
+            <td class="location">1관 4층</td>
+            <td class="capacity">10명</td>
+            <td class="date">2025-04-10</td>
+            <td class="text-end pe-0">
               <div class="btn-reveal-trigger position-static">
                 <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
                   <i class="fas fa-ellipsis fs-10"></i>
@@ -137,6 +137,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
   </div>    
 </div>    
     
+  <hr>  
   <!-- 회의실 예약 목록 -->  
   <div class="mb-3">
 	    <div class="d-flex justify-content-start align-items-center mb-2">
@@ -237,7 +238,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
       <!-- 헤더 -->
       <div class="modal-header">
-        <h5 class="modal-title" id="addMeetingroomModalLabel">회의실 추가</h5>
+        <h5 class="modal-title" id="addMeetingroomModalLabel">회의실 등록</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
@@ -261,7 +262,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
       <!-- 푸터 -->
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">닫기</button>
         <button type="submit" class="btn btn-primary btn-sm" form="addMeetingroomForm">등록</button>
       </div>
     </div>
