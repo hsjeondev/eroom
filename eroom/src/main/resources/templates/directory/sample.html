@@ -4,23 +4,18 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{/include/layout}">
-<head>
-<meta charset="UTF-8">
-<title>차량 목록</title>
-</head> 
-
   <body>
     <main class="main" id="top" layout:fragment="content">
     
   <div class="mb-3">
 	    <div class="d-flex justify-content-start align-items-center mb-2">
-	    <i class="fas fa-car me-2"></i>
-	    <span class="fw-bold fs-7"> 차량 목록</span>
+	    <i class="fas fa-building text-secondary me-2"></i>
+	    <span class="fw-bold fs-7">회의실 목록</span>
 	  </div>
 
 
 
-  <div id="vehicleTable" data-list='{"valueNames":["no","vehicle","passengers","date"], "page": 5, "pagination": true}'>
+  <div id="meetingroomTable" data-list='{"valueNames":["no","meetingroom","location","capacity","date"], "page": 5, "pagination": true}'>
     
 <!-- 검색창 + 추가 버튼 영역 -->
 <div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
@@ -40,8 +35,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
   <!-- 추가 버튼 (오른쪽 고정) -->
   <button class="btn btn-sm btn-primary position-absolute top-0 end-0" type="button"
-  	data-bs-toggle="modal" data-bs-target="#addVehicleModal">
-   	차량 등록
+  	data-bs-toggle="modal" data-bs-target="#addMeetingroomModal">
+    회의실 추가
   </button>
 </div>
 
@@ -51,21 +46,23 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
         <thead class="text-center align-middle">
           <tr>
             <th class="sort" data-sort="no" style="width: 5%;">번호</th>
-            <th class="sort" data-sort="vehicle" style="width: 25%;">차량</th>
-            <th class="sort" data-sort="passengers" style="width: 20%;">탑승 인원</th>
+            <th class="sort" data-sort="meetingroom" style="width: 30%;">회의실</th>
+            <th class="sort" data-sort="location" style="width: 20%;">위치</th>
+            <th class="sort" data-sort="capacity" style="width: 15%;">수용 인원</th>
             <th class="sort" data-sort="date" style="width: 20%;">등록일</th>
             <th style="width: 10%;"></th>
           </tr>
         </thead>
         <tbody class="list align-middle">
 
-          <!-- 차량 1 -->
-          <tr class="align-middle">
+          <!-- 회의실 1 -->
+          <tr>
             <td class="no">1</td>
-            <td class="vehicle">제네시스 G80[37주 2800]</td>
-            <td class="passengers">4명</td>
+            <td class="meetingroom">회의실A</td>
+            <td class="location">1관 2층</td>
+            <td class="capacity">8명</td>
             <td class="date">2025-04-10</td>
-            <td class="text-end pe-0">
+            <td class="align-middle text-end pe-0">
               <div class="btn-reveal-trigger position-static">
                 <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
                   <i class="fas fa-ellipsis fs-10"></i>
@@ -79,13 +76,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             </td>
           </tr>
 
-          <!-- 차량 2 -->
-          <tr class="align-middle">
-            <td class="no">2</td>
-            <td class="vehicle">아반떼[40마 4144]</td>
-            <td class="passengers">4명</td>
-            <td class="date">2025-04-10</td>
-            <td class="text-end pe-0">
+          <!-- 회의실 2 -->
+          <tr>
+            <td class="align-middle no">2</td>
+            <td class="align-middle meetingroom">회의실B</td>
+            <td class="align-middle location">1관 3층</td>
+            <td class="align-middle capacity">5명</td>
+            <td class="align-middle date">2025-04-10</td>
+            <td class="align-middle text-end pe-0">
               <div class="btn-reveal-trigger position-static">
                 <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
                   <i class="fas fa-ellipsis fs-10"></i>
@@ -99,13 +97,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             </td>
           </tr>
 
-          <!-- 차량 3 -->
-          <tr class="align-middle">
-            <td class="no">3</td>
-            <td class="vehicle">아이오닉[30다 5512]</td>
-            <td class="passengers">4명</td>
-            <td class="date">2025-04-10</td>
-            <td class="text-end pe-0">
+          <!-- 회의실 3 -->
+          <tr>
+            <td class="align-middle no">3</td>
+            <td class="align-middle meetingroom">회의실C</td>
+            <td class="align-middle location">1관 4층</td>
+            <td class="align-middle capacity">10명</td>
+            <td class="align-middle date">2025-04-10</td>
+            <td class="align-middle text-end pe-0">
               <div class="btn-reveal-trigger position-static">
                 <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
                   <i class="fas fa-ellipsis fs-10"></i>
@@ -138,16 +137,15 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
   </div>    
 </div>    
     
-    <hr>
-  <!-- 차량 예약 목록 -->  
+  <!-- 회의실 예약 목록 -->  
   <div class="mb-3">
 	    <div class="d-flex justify-content-start align-items-center mb-2">
-	    <i class="fas fa-edit me-2"></i>
-	    <span class="fw-bold fs-7"> 차량 예약 현황</span>
+	    <i class="fas fa-users text-secondary me-2"></i>
+	    <span class="fw-bold fs-7">회의실 예약 현황</span>
 	  </div>
 
 
-  <div id="reservationTable" data-list='{"valueNames":["no","vehicle","passengers","date"], "page": 5, "pagination": true}'>
+  <div id="reservationTable" data-list='{"valueNames":["no","meetingroom","reservation","capacity","date","time"], "page": 5, "pagination": true}'>
     
 <!-- 검색창 + 추가 버튼 영역 -->
 <div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
@@ -173,43 +171,43 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
         <thead class="text-center align-middle">
           <tr>
             <th class="sort" data-sort="no" style="width: 5%;">번호</th>
-            <th class="sort" data-sort="vehicle" style="width: 15%;">차량</th>
+            <th class="sort" data-sort="meetingroom" style="width: 15%;">회의실</th>
             <th class="sort" data-sort="reservation" style="width: 10%;">예약자</th>
-            <th class="sort" data-sort="passengers" style="width: 30%;">탑승인원</th>
+            <th class="sort" data-sort="capacity" style="width: 30%;">참가 인원</th>
             <th class="sort" data-sort="date" style="width: 20%;">예약일</th>
             <th class="sort" data-sort="time" style="width: 20%;">예약 시간</th>
           </tr>
         </thead>
         <tbody class="list align-middle">
 
-          <!-- 차량 1 -->
+          <!-- 회의실 1 -->
           <tr>
             <td class="no">1</td>
-            <td class="vehicle">아이오닉[30다 5512]</td>
-            <td class="reservation">이예준</td>
-            <td class="passengers">이예준, 조은성, 권용규</td>
+            <td class="meetingroom">회의실A</td>
+            <td class="reservation">강성관</td>
+            <td class="capacity">강성관, 권용규, 김태영, 이예준, 전홍식, 조은성, 조윤아</td>
             <td class="date">2025-04-10</td>
-            <td class="time">10:00 ~ 13:00</td>
+            <td class="time">10:00 ~ 12:00</td>
           </tr>
 
-          <!-- 차량 2 -->
+          <!-- 회의실 2 -->
           <tr>
             <td class="no">2</td>
-            <td class="vehicle">아반떼[40마 4144]</td>
-            <td class="reservation">김태영</td>
-            <td class="passengers">김태영</td>
+            <td class="meetingroom">회의실B</td>
+            <td class="reservation">조윤아</td>
+            <td class="capacity">조윤아, 이예준, 강성관</td>
             <td class="date">2025-04-10</td>
-            <td class="time">17:00 ~ 22:00</td>
+            <td class="time">13:00 ~ 14:00</td>
           </tr>
 
-          <!-- 차량 3 -->
+          <!-- 회의실 3 -->
           <tr>
             <td class="no">3</td>
-            <td class="vehicle">G80[37주 2800]</td>
+            <td class="meetingroom">회의실C</td>
             <td class="reservation">전홍식</td>
-            <td class="passengers">전홍식, 조윤아, 강성관</td>
-            <td class="date">2025-04-17</td>
-            <td class="time">10:00 ~ 18:00</td>
+            <td class="capacity">전홍식, 조은성, 정재익, 양서원, 권용규, 황정현, 박수빈, 조윤아, 강성관, 이예준</td>
+            <td class="date">2025-04-10</td>
+            <td class="time">15:00 ~ 17:00</td>
           </tr>
 
 
@@ -232,36 +230,39 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 </div>       
 
 
-<!-- 차량 추가 모달 -->
-<div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
+<!-- 회의실 추가 모달 -->
+<div class="modal fade" id="addMeetingroomModal" tabindex="-1" aria-labelledby="addMeetingroomModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
 
       <!-- 헤더 -->
       <div class="modal-header">
-        <h5 class="modal-title" id="addVehicleModalLabel">차량 등록</h5>
+        <h5 class="modal-title" id="addMeetingroomModalLabel">회의실 추가</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
       <!-- 바디 -->
       <div class="modal-body">
-        <form id="addVehicleForm">
+        <form id="addMeetingroomForm">
           <div class="mb-3">
-            <label for="vehicleName" class="form-label">차량[번호]</label>
-            <input type="text" class="form-control form-control-sm" id="vehicleName" placeholder="예: k9[20마 9330]">
+            <label for="roomName" class="form-label">회의실 이름</label>
+            <input type="text" class="form-control form-control-sm" id="roomName" placeholder="예: 회의실A">
           </div>
-         
           <div class="mb-3">
-            <label for="vehicleCapacity" class="form-label">탑승 인원</label>
-            <input type="number" class="form-control form-control-sm" id="vehicleCapacity" placeholder="예: 10">
+            <label for="roomLocation" class="form-label">위치</label>
+            <input type="text" class="form-control form-control-sm" id="roomLocation" placeholder="예: 1관 2층">
+          </div>
+          <div class="mb-3">
+            <label for="roomCapacity" class="form-label">수용 인원</label>
+            <input type="number" class="form-control form-control-sm" id="roomCapacity" placeholder="예: 10">
           </div>
         </form>
       </div>
 
       <!-- 푸터 -->
       <div class="modal-footer">
-        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">닫기</button>
-        <button type="submit" class="btn btn-primary btn-sm" form="addVehicleForm">등록</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+        <button type="submit" class="btn btn-primary btn-sm" form="addMeetingroomForm">등록</button>
       </div>
     </div>
   </div>
