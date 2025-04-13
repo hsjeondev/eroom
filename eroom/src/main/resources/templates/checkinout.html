@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko-KR" dir="ltr"
+  data-navigation-type="default"
+  data-navbar-horizontal-shape="default"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/include/layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>출퇴근 카드</title>
+  <style>
+    .attendance-card {
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    .attendance-card .card-body {
+      padding: 1.5rem;
+    }
+
+    .current-time {
+      font-size: 0.9rem;
+      color: #6c757d;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .profile-img {
+      width: 64px;
+      height: 64px;
+    }
+
+    .btn-wrap {
+      border-top: 1px dashed #dee2e6;
+      padding-top: 1rem;
+      margin-top: 1rem;
+    }
+
+    .btn-wrap .btn {
+      min-width: 120px;
+    }
+  </style>
+</head>
+<body>
+<main class="main" id="top" layout:fragment="content">
+
+  <div class="attendance-card">
+    <div class="card shadow-sm border-0">
+      <div class="card-body text-center">
+        <!-- 현재 시간 -->
+        <div class="current-time fw-semibold text-secondary fs-8 mb-0" id="currentTime"></div><br>
+
+        <!-- 프로필 + 이름 / 부서 + 직급 -->
+        <div class="d-flex justify-content-center mb-3">
+          <div class="d-flex align-items-center">
+            <img id="profileImage" class="rounded-circle me-3 profile-img" src="/assets/img/team/15.webp" alt="프로필">
+            <div class="text-start">
+              <p class="fw-semibold text-secondary fs-8 mb-0">조은성</p>
+              <small class="text-muted">영업팀 / 팀장</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- 출퇴근 버튼 -->
+        <div class="btn-wrap d-flex justify-content-center gap-2">
+          <button id="checkInBtn" class="btn btn-outline-primary btn-sm" onclick="handleCheckIn()">출근하기</button>
+          <button id="checkOutBtn" class="btn btn-primary btn-sm" disabled>퇴근하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 현재 시간 표시
+    function updateCurrentTime() {
+      const now = new Date();
+      
+      const year = now.getFullYear(); // 4자리 연도 -> 2025
+      const month = String(now.getMonth()+1).padStart(2,'0'); // 1월은 0부터 -> +1 해주기
+      const date = String(now.getDate()).padStart(2,'0'); // 일
+      
+      const hours = String(now.getHours()).padStart(2,'0'); // 시 (12시간 단위X 24시간단위)
+      const minutes = String(now.getMinutes()).padStart(2,'0'); // 7시 07
+      const seconds = String(now.getSeconds()).padStart(2,'0');
+      
+      const formattedDateTime = `${year}년${month}월${date}일 ${hours}:${minutes}:${seconds}`;
+      
+     /*  const timeString = now.toLocaleString('ko-KR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      }); */
+      document.getElementById('currentTime').innerText = formattedDateTime;
+    }
+    updateCurrentTime();
+    setInterval(updateCurrentTime, 1000);
+
+    // 출근 & 퇴근 버튼 로직
+    function handleCheckIn() {
+      const now = new Date();
+      
+      const hours = String(now.getHours()).padStart(2,'0'); // 시 (12시간 단위X 24시간단위)
+      const minutes = String(now.getMinutes()).padStart(2,'0');
+      const seconds = String(now.getSeconds()).padStart(2,'0');
+      
+      const time = `${hours}:${minutes}:${seconds}`;
+      /* const time = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }); */
+      const btn = document.getElementById('checkInBtn');
+      btn.innerText = `${time}`;
+      btn.disabled = true;
+      document.getElementById('checkOutBtn').disabled = false;
+    }
+
+    function handleCheckOut() {
+      const now = new Date();
+      
+      const hours = String(now.getHours()).padStart(2,'0'); // 시 (12시간 단위X 24시간단위)
+      const minutes = String(now.getMinutes()).padStart(2,'0');
+      const seconds = String(now.getSeconds()).padStart(2,'0');
+      
+      const time = `${hours}:${minutes}:${seconds}`; 
+     
+      const btn = document.getElementById('checkOutBtn');
+      btn.innerText = `${time}`;
+      btn.disabled = true;
+    }
+
+    document.getElementById('checkOutBtn').addEventListener('click', handleCheckOut);
+  </script>
+
+</main>
+</body>
+</html>

@@ -26,5 +26,11 @@ public class AttendanceController {
 		return "attendance/list";
 	}
 	
+	@GetMapping("/checkinout")
+	public String checkInOut() {
+		return "checkinout";
+	}
+
+	
 	
 }
