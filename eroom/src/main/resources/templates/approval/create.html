@@ -5,6 +5,13 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{/include/layout}">
 <head>
+<style>
+  .custom-table td,
+  .custom-table th {
+    padding: 0.5rem !important;
+    min-width: 75px;
+  }
+</style>
 <meta charset="UTF-8">
 <title>결재서 작성</title>
 </head>
@@ -13,7 +20,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	<div class="col-8 mx-auto">
 		<!-- <h2 class="mb-2 mx-auto">결재서 양식을 선택해주세요.</h2> -->
 		<div class="d-flex justify-content-start">
-			<span class="fw-bold fs-7">결재서 양식을 선택</span>
+			<span class="fw-bold fs-7">결재서 양식을 선택해주세요.</span>
 		</div>
       <form>
       <div class="row">
@@ -39,28 +46,45 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		          <input class="form-control" id="basic-form-phone" type="text" placeholder="전화번호">
 		        </div>
 	        </div>
-        	<div class="col-7 text-end">
-        		결재라인 작성위치
-				<table class="table table-bordered text-center align-middle col-3" style="width: 50%; max-width: 600px; float: right;">
-				  <thead class="table-light">
-				    <tr>
-				      <th>직급<br>결재자1</th>
-				      <th>직급<br>결재자2</th>
-				      <th>직급<br>결재자3</th>
-				    </tr>
-				  </thead>
-				  <tbody>
-				    <tr>
-				      <td style="height: 80px;">(서명)</td>
-				      <td>(서명)</td>
-				      <td>(서명)</td>
-				    </tr>
-				  </tbody>
-				</table>
+        	<div class="col-7">
+
+			  <!-- 결재자 테이블 -->
+			  <table class="table table-bordered text-center align-middle ms-auto custom-table" style="width: 45%;">
+			    <thead class="table-light">
+			      <tr>
+			        <th>직급<br>결재자1</th>
+			        <th>직급<br>결재자2</th>
+			        <th>직급<br>결재자3</th>
+			      </tr>
+			    </thead>
+			    <tbody>
+			      <tr>
+			        <td style="height: 80px;">(서명)</td>
+			        <td>(서명)</td>
+			        <td>(서명)</td>
+			      </tr>
+			    </tbody>
+			  </table>
+			
+			  <!-- 합의자 테이블 -->
+			  <table class="table table-bordered text-center align-middle mt-3 ms-auto custom-table" style="width: 30%;">
+			    <thead class="table-light">
+			      <tr>
+			        <th>직급<br>합의자1</th>
+			        <th>직급<br>합의자2</th>
+			      </tr>
+			    </thead>
+			    <tbody>
+			      <tr>
+			        <td style="height: 80px;">(서명)</td>
+			        <td>(서명)</td>
+			      </tr>
+			    </tbody>
+			  </table>
+			
+			</div>
 
 
-
-        	</div>
     	</div>
         
         
@@ -69,6 +93,9 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
           <input class="form-control" id="basic-form-dob" type="date">
         </div> -->
         <div class="mb-3">
+          <label class="form-label" for="basic-form-title">제목</label>
+          <input class="form-control" id="basic-form-title" type="text" placeholder="제목">
+          
           <label class="form-label" for="basic-form-format">양식 선택</label>
           <select class="form-select" id="basic-form-format" aria-label="Default select example">
             <option selected="selected">양식을 선택해주세요.</option>
@@ -118,8 +145,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
           <label class="form-label">파일 업로드</label>
           <input class="form-control" type="file" multiple>
         </div>
-
         <button class="btn btn-primary" type="submit">등록</button>
+		<button type="button" class="btn btn-light" onclick="history.back()">취소</button>
       </form>
       </div>
       <button type="button" id="testBtn">테스트</button>

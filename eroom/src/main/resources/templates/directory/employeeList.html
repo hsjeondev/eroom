@@ -24,6 +24,18 @@ td.name p {
 .table td {
 	overflow: hidden;
 }
+
+.profile-wrapper {
+	position: relative;
+	width: 128px;
+	height: 128px;
+}
+
+.profile-wrapper img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
 </style>
 </head>
 <body>
@@ -242,11 +254,13 @@ td.name p {
 								<tbody class="list align-middle" id="customers-table-body">
 									<tr>
 										<td class="no">1</td>
-										<td class="name"><a class="d-flex align-items-center text-body-emphasis ps-5" href="#">
+										<td class="name"><a class="d-flex align-items-center text-body-emphasis ps-5" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
+
 												<div class="avatar avatar-m me-2">
 													<img class="rounded-circle" src="../../../assets/img/team/23.webp" alt="">
 												</div>
 												<p class="mb-0 fw-bold text-truncate">강성관</p>
+
 										</a></td>
 										<td class="mail"><a class="fw-semibold" href="mailto:annac34@gmail.com">devksk@gmail.com</a></td>
 										<td class="phone">01022239983</td>
@@ -437,7 +451,7 @@ td.name p {
 							</div>
 							<div class="modal-body px-4">
 								<form>
-								<!-- 
+									<!-- 
 									이름
 									<div class="mb-3">
 										<label for="name" class="form-label fw-semibold">이름</label> <input type="text" class="form-control form-control-sm" id="name" placeholder="홍길동">
@@ -468,7 +482,7 @@ td.name p {
 									<div class="mb-3">
 										<label for="teamName" class="form-label fw-semibold">팀명</label> <input type="text" class="form-control form-control-sm" id="teamName" placeholder="ㅇㅇ팀">
 									</div>
-									
+
 									<!-- 
 									팀
 									<div class="mb-3">
@@ -519,30 +533,138 @@ td.name p {
 					</div>
 				</div>
 
+				<!-- 
+				(이름 클릭시)회원 정보 모달
+				프로필 모달
+				<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content p-4">
+
+							오른쪽 상단 아이콘
+							<a href="#" class="position-absolute top-0 end-0 mt-3 me-3 text-body-secondary"> <i class="fas fa-user-circle fa-lg"></i>
+							</a>
+
+							프로필 사진
+							<div class="text-center">
+								<img src="/assets/img/team/23.webp" alt="프로필" class="rounded-circle mb-3" style="width: 100px; height: 100px;">
+								<h5 class="fw-bold mb-1">전홍식</h5>
+								<p class="mb-1 text-muted">기술부 개발팀 부장</p>
+								<div class="d-flex justify-content-center align-items-center mb-3">
+									<i class="fas fa-phone me-2 text-muted"></i> <span class="text-muted">+1234567890</span>
+								</div>
+							</div>
+
+							<hr>
+
+							하단 버튼 영역
+							<div class="d-flex justify-content-around">
+								<a href="#" class="text-decoration-none text-center text-dark"> <i class="fas fa-envelope fa-lg mb-1"></i><br> <span class="small">메일 보내기</span>
+								</a> <a href="#" class="text-decoration-none text-center text-dark"> <i class="fas fa-comment-dots fa-lg mb-1"></i><br> <span class="small">1:1 채팅하기</span>
+								</a>
+							</div>
+
+						</div>
+					</div>
+				</div> -->
+				<!-- (이름 클릭시)회원 정보 모달 -->
+				<!-- 프로필 상세 모달 -->
+				<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content p-4 position-relative">
+
+							<!-- 닫기 & 별표 버튼 -->
+							<div class="position-absolute top-0 end-0 mt-2 me-2 d-flex gap-2">
+								<a href="#" class="text-warning" title="즐겨찾기"> <i class="fas fa-star"></i>
+								</a>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+
+							<!-- 프로필 정보 -->
+							<div class="text-center mb-4">
+								<img src="/assets/img/team/23.webp" alt="프로필" class="rounded-circle mb-2" style="width: 100px; height: 100px;">
+								<h5 class="fw-bold mb-0">강성관</h5>
+								<p class="text-muted small mb-0">운영부 (경영지원팀)</p>
+							</div>
+
+							<!-- 전화번호 / 이메일 / 직급 -->
+							<div class="border rounded p-3 mb-4 bg-light-subtle">
+								<div class="mb-2">
+									<label class="form-label fw-semibold mb-0">휴대전화번호</label>
+									<div class="ps-2">010-1234-1234</div>
+								</div>
+								<div class="mb-2">
+									<label class="form-label fw-semibold mb-0">이메일</label>
+									<div class="ps-2">goodee24@gmail.com</div>
+								</div>
+								<div>
+									<label class="form-label fw-semibold mb-0">직급</label>
+									<div class="ps-2">대표</div>
+								</div>
+							</div>
+
+							<!-- 메모 -->
+							<div class="mb-3">
+								<label for="memo" class="form-label fw-semibold">메모</label>
+								<textarea id="memo" class="form-control" rows="4" placeholder="이 메모는 본인에게만 보입니다."></textarea>
+							</div>
+
+							<!-- 저장 버튼 -->
+							<div class="d-grid mb-3">
+								<button type="button" class="btn btn-primary">+ 저장</button>
+							</div>
+
+							<!-- 하단 버튼 영역 -->
+							<div class="d-flex justify-content-between">
+								<a href="#" class="btn btn-outline-primary flex-fill me-2"> <i class="fas fa-paper-plane me-1"></i> 1:1 채팅하기
+								</a> <a href="#" class="btn btn-outline-secondary flex-fill"> <i class="fas fa-envelope me-1"></i> 이메일 보내기
+								</a>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 				<!-- ✅ 알림 영역 -->
 				<div id="alertContainer" class="mt-3" style="display: none;"></div>
 
 				<script>
-				
 					function showConfirm() {
-						const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+						const modal = new bootstrap.Modal(document
+								.getElementById('confirmModal'));
 						modal.show();
 					}
 
-					document.getElementById('confirmSubmitBtn').addEventListener('click', function() {
-						const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
-						confirmModal.hide();
-	
-						// 비동기 처리나 유효성 검사 후 결과에 따라 성공/실패 처리
-						const isSuccess = Math.random() > 0.5; // 예시: 랜덤 성공/실패 처리
-						const alertContainer = document
-								.getElementById('alertContainer');
-	
-						alertContainer.style.display = 'block';
-						alertContainer.innerHTML = isSuccess ? '<div class="alert alert-subtle-primary" role="alert">등록이 완료되었습니다!</div>'
-								: '<div class="alert alert-subtle-danger" role="alert">등록에 실패했습니다. 다시 시도해주세요.</div>';
-					});
-						
+					document
+							.getElementById('confirmSubmitBtn')
+							.addEventListener(
+									'click',
+									function() {
+										const confirmModal = bootstrap.Modal
+												.getInstance(document
+														.getElementById('confirmModal'));
+										confirmModal.hide();
+
+										// 비동기 처리나 유효성 검사 후 결과에 따라 성공/실패 처리
+										const isSuccess = Math.random() > 0.5; // 예시: 랜덤 성공/실패 처리
+										const alertContainer = document
+												.getElementById('alertContainer');
+
+										alertContainer.style.display = 'block';
+										alertContainer.innerHTML = isSuccess ? '<div class="alert alert-subtle-primary" role="alert">등록이 완료되었습니다!</div>'
+												: '<div class="alert alert-subtle-danger" role="alert">등록에 실패했습니다. 다시 시도해주세요.</div>';
+									});
 				</script>
 
 
