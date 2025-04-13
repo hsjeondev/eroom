@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{/include/layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>회원 상세 정보</title>
+ <style>
+    .profile-wrapper {
+      position: relative;
+      width: 128px;
+      height: 128px;
+    }
+
+    .profile-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .camera-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      opacity: 0;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .profile-wrapper:hover .camera-overlay {
+      opacity: 1;
+    }
+  </style> 
+</head>
+  <body>
+    <main class="main" id="top" layout:fragment="content">
+    	
+		<div class="mb-9">
+	<div class="row align-items-center justify-content-between g-3 mb-4">
+		<!-- 상단 제목 -->
+		<div class="d-flex justify-content-start">
+			<span class="fw-bold fs-7">회원 상세 정보</span>
+		</div>   
+	<!-- 삭제. 수정 버튼 col-auto로 하면 왼쪽 col-auto ms-auto 는 오른쪽 -->
+ 		<div class="col-auto ms-auto">
+			<div class="row g-3">
+			<!-- 삭제버튼 필요없을듯? -->
+				<!-- <div class="col-auto">
+					<button class="btn btn-phoenix-danger">
+						<svg class="svg-inline--fa fa-trash-can me-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-can" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+							<path fill="currentColor" d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z"></path>
+						</svg><span class="fa-solid fa-trash-can me-2"></span>
+						Delete customer
+					</button>
+				</div> -->
+				<div class="col-auto">
+					<button class="btn btn-primary">
+						연차 등록
+					</button>
+				</div>
+			</div>
+		</div> 
+	</div>
+
+	<div class="row g-5">
+		<div class="col-12 col-md-4 col-xxl-4">
+			<div class="row g-3">
+				<div class="col-12">
+					<div class="card h-100">
+						<div class="card-body">
+							<div class="row align-items-center g-5 mb-3 text-center text-sm-start">
+								<div class="col-12 col-sm-auto mb-sm-2">
+								
+								  <div class="profile-wrapper" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
+								    <img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
+								    <div class="camera-overlay">
+								      <svg class="svg-inline--fa fa-camera fs-4" aria-hidden="true" focusable="false"
+								        data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg"
+								        viewBox="0 0 512 512" style="width: 24px; height: 24px;">
+								        <path fill="currentColor"
+								          d="M149.1 64.3c7.8-14.3 22.9-23.1 39.4-23.1h134.9c16.5 0 31.6 8.9 39.4 23.1l14.9 27.4H464c26.5 0 48 21.5 48 48v272c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V139.7c0-26.5 21.5-48 48-48h86.1l14.9-27.4zM256 408c66.3 0 120-53.7 120-120s-53.7-120-120-120s-120 53.7-120 120s53.7 120 120 120zm0-48a72 72 0 1 0 0-144 72 72 0 1 0 0 144z">
+								        </path>
+								      </svg>
+								    </div>
+								  </div>
+								</div>
+								
+								
+
+								 <!-- 프로필 상단 -->
+								<div class="col-12 col-sm-auto flex-1">
+									<!-- 이름 -->
+									<div class="d-flex">
+										<span class="fw-bold fs-7">강성관</span>
+									</div>
+									<!-- 직급 -->
+									<p class="text-body-secondary">CEO</p>
+								</div>
+							</div>
+							<!-- 하단 정보 -->
+							<div class="d-flex flex-between-center border-top border-dashed pt-4">
+								<div>
+									<h6>Following</h6>
+									<p class="fs-7 text-body-secondary mb-0">297</p>
+								</div>
+								<div>
+									<h6>Projects</h6>
+									<p class="fs-7 text-body-secondary mb-0">56</p>
+								</div>
+								<div>
+									<h6>Completion</h6>
+									<p class="fs-7 text-body-secondary mb-0">97</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 주소록 정보 -->
+			<div class="col-12">
+			  <div class="card h-100 position-relative">
+			    <div class="card-body fs-9">
+			      <div class="d-flex align-items-center mb-2">
+			        <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span>
+			
+			        <!--  수정 버튼 -->
+			        <button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
+			                data-bs-toggle="modal" data-bs-target="#editInfoModal">
+			          <svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
+			               focusable="false" data-prefix="fas" data-icon="pen" role="img"
+			               xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+			            <path fill="currentColor"
+			                  d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
+			          </svg>
+			        </button>
+			      </div>
+			
+			      <!-- 기본 정보 -->
+			      <h5 class="text-body-secondary">직급</h5>
+			      <p class="text-body-secondary">CEO</p>
+			
+			      <h5 class="text-body-secondary">부서</h5>
+			      <p class="text-body-secondary">운영부</p>
+			
+			      <div class="mb-3">
+			        <h5 class="text-body-secondary">Email</h5>
+			        <a href="mailto:shatinon@jeemail.com" id="emailValue">shatinon@jeemail.com</a>
+			      </div>
+			
+			      <h5 class="text-body-secondary">Phone</h5>
+			      <p class="text-body-secondary" id="phoneValue">01011112222</p>
+			
+			      <h5 class="text-body-secondary">주소</h5>
+			      <p class="text-body-secondary" id="addressValue">서울특별시 금천구 가산디지털2로 95</p>
+			    </div>
+			  </div>
+			</div>
+			<!-- 주소록 끝 -->
+							
+			<!-- 정보 수정 모달 -->
+			<div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editInfoModalLabel" aria-hidden="true">
+			  <div class="modal-dialog modal-dialog-centered">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <h5 class="modal-title" id="editInfoModalLabel">정보 수정</h5>
+			        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+			      </div>
+			      <div class="modal-body">
+			        <form id="editInfoForm">
+			          <div class="mb-3">
+			            <label for="emailInput" class="form-label">이메일</label>
+			            <input type="email" class="form-control" id="emailInput" required>
+			          </div>
+			          <div class="mb-3">
+			            <label for="phoneInput" class="form-label">전화번호</label>
+			            <input type="text" class="form-control" id="phoneInput" required>
+			          </div>
+			          <div class="mb-3">
+			            <label for="addressInput" class="form-label">주소</label>
+			            <input type="text" class="form-control" id="addressInput" required>
+			          </div>
+			        </form>
+			      </div>
+			      <div class="modal-footer">
+			        <button class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+			        <button class="btn btn-primary" onclick="saveInfo()">저장</button>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+			
+			<script>
+			  // 모달 열릴 때 input에 기존 정보 세팅
+			  const editInfoModal = document.getElementById('editInfoModal');
+			  editInfoModal.addEventListener('show.bs.modal', function () {
+			    const email = document.getElementById('emailValue').textContent.trim();
+			    const phone = document.getElementById('phoneValue').textContent.trim();
+			    const address = document.getElementById('addressValue').textContent.trim();
+			
+			    document.getElementById('emailInput').value = email;
+			    document.getElementById('phoneInput').value = phone;
+			    document.getElementById('addressInput').value = address;
+			  });
+			
+			  // 저장 버튼 클릭 시 값 반영
+			  function saveInfo() {
+			    const email = document.getElementById('emailInput').value;
+			    const phone = document.getElementById('phoneInput').value;
+			    const address = document.getElementById('addressInput').value;
+			
+			    // 카드 안 텍스트 갱신
+			    document.getElementById('emailValue').textContent = email;
+			    document.getElementById('emailValue').href = "mailto:" + email;
+			    document.getElementById('phoneValue').textContent = phone;
+			    document.getElementById('addressValue').textContent = address;
+			
+			    // 모달 닫기
+			    const modal = bootstrap.Modal.getInstance(editInfoModal);
+			    modal.hide();
+			  }
+			</script>			
+				
+			
+			</div> <!-- 프로필 & 주소록 끝 -->
+		</div> <!-- col-12 col-md-4 col-xxl-4 -->
+		
+		<!-- 근태 카드 -->
+		<div class="col-12 col-md-8 col-xxl-8">
+			<div class="row g-4">			
+				<!-- 카드1 START -->
+				<div class="col-md-6">
+					<div class="deals-col me-4">
+						<div class="w-100 h-50" data-sortable="data-sortable">
+							<div class="card mb-3">
+								<div class="card-body">
+									<table class="w-100 text-center mx-auto w-auto text-center">
+										<tr class="py-2">
+											<td class="py-3 text-end pe-13 fw-bold fs-5">
+												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+													<div class="d-flex align-items-center">
+														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">총 연차</span>
+													</div>
+												</div>		
+											</td>
+											<td class="py-3 text-start fw-bold fs-5">
+												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+													<div class="d-flex align-items-center">
+														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr class="py-2">
+											<td class="py-3 text-end pe-13 fw-bold fs-5">  
+												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+													<div class="d-flex align-items-center">
+														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">사용 연차</span>
+													</div>
+												</div>
+											</td>
+											<td class="py-3 text-start fw-bold fs-5">
+												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+													<div class="d-flex align-items-center">
+														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr class="py-2">
+											<td class="py-3 text-end pe-13 fw-bold fs-5">
+												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+													<div class="d-flex align-items-center">
+														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">잔여 연차</span>
+													</div>
+												</div>
+											</td>
+											<td class="py-3 text-start fw-bold fs-5">
+												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+													<div class="d-flex align-items-center">
+														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
+													</div>
+												</div>
+											</td>
+										</tr>
+									</table>
+								</div> <!-- card-body 끝 -->
+							</div> <!-- card mb-3 끝 -->
+						</div> <!-- w-100 min-vh-50 끝  -->
+					</div><!-- deals-col me-4 끝 -->
+				</div><!-- col-md-6 -->
+	            <!-- 카드1 END -->		
+				
+				<div class="col-md-6">
+					<div class="deals-col me-4">
+						<div class="w-100 h-50" data-sortable="data-sortable">
+							<div class="card mb-3">
+								<div class="card-body">
+									<table class="w-100 text-center mx-auto w-auto text-center">
+										<tr class="py-2">
+											<td class="py-3 text-end pe-13 fw-bold fs-5">
+												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+													<div class="d-flex align-items-center">
+														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">지각</span>
+													</div>
+												</div>		
+											</td>
+											<td class="py-3 text-start fw-bold fs-5">
+												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+													<div class="d-flex align-items-center">
+														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr class="py-2">
+											<td class="py-3 text-end pe-13 fw-bold fs-5">  
+												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+													<div class="d-flex align-items-center">
+														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">조퇴</span>
+													</div>
+												</div>
+											</td>
+											<td class="py-3 text-start fw-bold fs-5">
+												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+													<div class="d-flex align-items-center">
+														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr class="py-2">
+											<td class="py-3 text-end pe-13 fw-bold fs-5">
+												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+													<div class="d-flex align-items-center">
+														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">결근</span>
+													</div>
+												</div>
+											</td>
+											<td class="py-3 text-start fw-bold fs-5">
+												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
+													<div class="d-flex align-items-center">
+														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
+													</div>
+												</div>
+											</td>
+										</tr>
+									</table>
+								</div> <!-- card-body 끝 -->
+							</div> <!-- card mb-3 끝 -->
+						</div> <!-- w-100 min-vh-50 끝  -->
+					</div><!-- deals-col me-4 끝 -->              
+				</div><!-- col-md-6 -->
+
+
+	<!-- advance tables -->    
+     
+		<div id="tableExample4" data-list="{&quot;valueNames&quot;:[&quot;name&quot;,&quot;email&quot;,&quot;payment&quot;],&quot;page&quot;:5,&quot;pagination&quot;:true,&quot;filter&quot;:{&quot;key&quot;:&quot;payment&quot;}}">
+			<!-- 셀렉트 부분 -->
+			<div class="row justify-content-between align-items-center g-0">
+				<div class="col text-start px-3">
+					<span class="fw-bold">근태 기록</span>
+				</div>
+				
+				<div class="col-auto px-3">
+					<select class="form-select form-select-sm mb-3" data-list-filter="data-list-filter">
+						<option selected="" value="">날짜 선택</option>
+						<option value="Pending">2025.01</option>
+						<option value="Success">2025.02</option>
+						<option value="Blocked">2025.03</option>
+					</select>
+				</div>
+			</div> <!-- 셀렉트 끝 -->
+			
+			<!-- 목록 -->
+			<div class="table-responsive">
+				<table class="table table-sm fs-9 mb-0 text-center">
+					<colgroup>
+					<col style="width: 10%;">
+					<col style="width: 30%;">
+					<col style="width: 30%;">
+					<col style="width: 30%;">
+					</colgroup>
+					<thead>
+						<tr class="bg-body-highlight">
+							<th class="sort border-top border-translucent ps-3 text-start" data-sort="name">번호</th>
+							<th class="sort border-top border-translucent text-center" data-sort="email">근무일</th>
+							<th class="sort border-top border-translucent text-center" data-sort="email">출근 시간</th>
+							<th class="sort border-top border-translucent pe-3" data-sort="payment">퇴근 시간</th>
+						</tr>
+					</thead>
+					<tbody class="list">
+						<tr>
+							<td class="align-middle text-start ps-3 name">1</td>
+							<td class="align-middle text-center email">2025.04.09</td>
+							<td class="align-middle text-center email">08:55:45</td>
+							<td class="align-middle payment py-3 pe-3">
+								18:01:23
+							</td>
+						</tr>
+					
+					<!-- 여기부터 지우고 윗부분만 반복 돌리면 될듯 -->
+						<tr>
+							<td class="align-middle text-start ps-3 name">2</td>
+							<td class="align-middle text-center email">2025.04.08</td>
+							<td class="align-middle text-center email">08:49:27</td>
+							<td class="align-middle payment py-3 pe-3">
+								<!-- <div class="badge badge-phoenix fs-10 badge-phoenix-success">
+									<span class="fw-bold">Success</span>
+									<svg class="svg-inline--fa fa-check ms-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+										<path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path>
+									</svg><span class="ms-1 fas fa-check"></span> Font Awesome fontawesome.com
+								</div> -->
+								18:00:30
+							</td>
+						</tr>
+						<tr>
+							<td class="align-middle text-start ps-3 name">3</td>
+							<td class="align-middle text-center email">2025.04.07</td>
+							<td class="align-middle text-center email">08:57:22</td>
+							<td class="align-middle payment py-3 pe-3">
+								<!-- <div class="badge badge-phoenix fs-10 badge-phoenix-success">
+									<span class="fw-bold">Success</span>
+									<svg class="svg-inline--fa fa-check ms-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+										<path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path>
+									</svg><span class="ms-1 fas fa-check"></span> Font Awesome fontawesome.com
+								</div> -->
+								18:05:22
+							</td>
+						</tr>
+						<tr>
+							<td class="align-middle text-start ps-3 name">4</td>
+							<td class="align-middle text-center email">2025.04.06</td>
+							<td class="align-middle text-center email">08:54:33</td>
+							<td class="align-middle payment py-3 pe-3">
+								<!-- <div class="badge badge-phoenix fs-10 badge-phoenix-success">
+									<span class="fw-bold">Success</span>
+									<svg class="svg-inline--fa fa-check ms-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+										<path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path>
+									</svg><span class="ms-1 fas fa-check"></span> Font Awesome fontawesome.com
+								</div> -->
+								18:03:47
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div> <!-- table-responsive 목록 끝 -->
+			<div class="d-flex justify-content-center mt-3"><!-- <span class="d-none d-sm-inline-block" data-list-info="data-list-info">1 to 4 <span class="text-body-tertiary"> Items of </span>10</span> -->
+				
+				<!-- 페이징 번호 -->
+				<div class="d-flex">
+					<button class="page-link disabled" data-list-pagination="prev" disabled="">
+						<svg class="svg-inline--fa fa-chevron-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="">
+							<path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"></path>
+						</svg><!-- <span class="fas fa-chevron-left"></span> Font Awesome fontawesome.com -->
+					</button>
+					<ul class="mb-0 pagination">
+						<li class="active">
+							<button class="page" type="button" data-i="1" data-page="5">1</button>
+						</li>
+					</ul>
+					<button class="page-link pe-0 disabled" data-list-pagination="next" disabled="">
+						<svg class="svg-inline--fa fa-chevron-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="">
+							<path fill="currentColor" d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"></path>
+						</svg><!-- <span class="fas fa-chevron-right"></span> Font Awesome fontawesome.com -->
+					</button>
+				</div>
+				<!-- 페이징 끝 -->
+			</div>
+		</div> <!-- tableExample4 끝 -->
+
+			</div> <!-- row g-4 끝 -->
+		
+		</div> <!-- col-12 col-md-8 col-xxl-8 -->	<!-- 우측 근태카드 + 차트 부분 끝 -->
+	</div>	<!-- row g-5 --> 
+</div><!-- mb-9 -->   <!-- 프로필, 근태, 차트 위치된 상단 부분. -->
+    </main>
+  </body>
+</html>
