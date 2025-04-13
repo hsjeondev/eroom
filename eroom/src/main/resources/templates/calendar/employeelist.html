@@ -74,44 +74,47 @@
 									data-bs-dismiss="modal" aria-label="Close">닫기</button>
 							</div>
 						</div>
-
-
-
+						
 						<div class="modal-body p-card py-0">
+						
 							<input type="hidden" name="employee_no"
 								th:value="${#authentication.principal.employee.employeeNo}" />
-							<!-- <input type="hidden" name="separator" value="E001"> -->
+								<input type="hidden" name="separator" value="E001" />				
 
 							<div class="form-floating mb-3">
-								<input class="form-control" id="eventTitle" type="text"
+								<input class="form-control" id="calendarTitle" type="text"
 									name="calendar_title" placeholder="일정 제목" /> <label
-									for="eventTitle">일정 제목</label>
+									for="calendarTitle">일정 제목</label>
 							</div>
 
 							<div class="form-floating mb-3">
-								<input class="form-control" id="eventLocation" type="text"
+								<input class="form-control" id="calendarLocation" type="text"
 									name="calendar_location" placeholder="일정 장소" /> <label
-									for="eventLocation">일정 장소</label>
+									for="calendarLocation">일정 장소</label>
 							</div>
 
 							<div class="form-floating mb-3">
-								<input class="form-control" id="startDatetime"
-									type="datetime-local" name="calendar_start" placeholder="시작 시간" />
-								<label for="startDatetime">시작 시간</label>
+								<input class="form-control" id="calendarStartTime"
+									type="datetime-local" name="calendar_start_time"
+									placeholder="시작 시간" /> <label for="calendarStartTime">시작
+									시간</label>
 							</div>
 
 							<div class="form-floating mb-3">
-								<input class="form-control" id="endDatetime"
-									type="datetime-local" name="calendar_end" placeholder="종료 시간" />
-								<label for="endDatetime">종료 시간</label>
+								<input class="form-control" id="calendarEndTime"
+									type="datetime-local" name="calendar_end_time"
+									placeholder="종료 시간" /> <label for="calendarEndTime">종료
+									시간</label>
 							</div>
 
 							<div class="form-floating mb-3">
-								<input class="form-control" id="eventDescription" type="text"
-									name="calendar_description" placeholder="일정 설명" /> <label
-									for="eventDescription">일정 설명</label>
+								<textarea class="form-control" id="calendarContent"
+									name="calendar_content" placeholder="일정 설명"
+									style="height: 120px;"></textarea>
+								<label for="calendarContent">일정 설명</label>
 							</div>
 						</div>
+				
 
 						<div
 							class="modal-footer d-flex justify-content-between align-items-center border-0">
