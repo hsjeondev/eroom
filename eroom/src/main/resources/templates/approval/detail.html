@@ -1,10 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+  <meta charset="UTF-8">
+  <title>결재 상세</title>
 </head>
-<body>
+<body class="bg-light">
+  <main class="main" id="top" layout:fragment="content">
+    <div class="container bg-white rounded shadow-sm p-4 mt-4" style="max-width: 1000px;">
 
+      <!-- 상단 제목 + 목록 버튼 -->
+      <div class="d-flex mb-3">
+        <span class="fw-bold fs-6">결재서 상세</span>
+        <button class="btn btn-light btn-sm ms-auto" onclick="history.back()">목록으로</button>
+      </div>
+
+      <!-- 기본 정보 + 결재선 테이블 병렬 정렬 -->
+      <div class="d-flex flex-wrap gap-4">
+        <!-- 기본 정보 -->
+        <div class="flex-fill">
+          <table class="table table-bordered text-dark">
+            <tbody>
+              <tr>
+                <th class="table-light text-center" style="width: 150px;">신청일</th>
+                <td>2025-04-13</td>
+                <th class="table-light text-center">신청자</th>
+                <td>홍길동</td>
+              </tr>
+              <tr>
+                <th class="table-light text-center">부서</th>
+                <td>개발팀</td>
+                <th class="table-light text-center">직급</th>
+                <td>대리</td>
+              </tr>
+              <tr>
+                <th class="table-light text-center">전화번호</th>
+                <td colspan="3">010-1234-5678</td>
+              </tr>
+              <tr>
+                <th class="table-light text-center">제목</th>
+                <td colspan="3">경조금 신청</td>
+              </tr>
+              <tr>
+                <th class="table-light text-center">양식 종류</th>
+                <td colspan="3">경조금</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 결재선 -->
+        <div style="min-width: 340px;">
+          <table class="table table-bordered text-center align-middle mb-3">
+            <thead class="table-light">
+              <tr>
+                <th>직급<br>결재자1</th>
+                <th>직급<br>결재자2</th>
+                <th>직급<br>결재자3</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>서명 완료</td>
+                <td>대기중</td>
+                <td>대기중</td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table table-bordered text-center align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>직급<br>합의자1</th>
+                <th>직급<br>합의자2</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>서명 완료</td>
+                <td>서명 완료</td>
+              </tr>
+            </tbody>
+          </table>
+		<!-- 참조자 텍스트 -->
+		<div class="text-end text-body-secondary fs-8 mt-1">
+			참조자: 홍보팀 김대리, 회계팀 이과장
+		</div>
+
+        </div>
+      </div>
+
+      <!-- 결재 내용 -->
+      <div class="bg-light rounded p-4 mt-4">
+        <h5 class="mb-3 text-dark">결재 내용</h5>
+        <p><strong>1. 내용:</strong> 부친상으로 인한 경조금 신청</p>
+        <p><strong>2. 본인과의 관계:</strong> 부</p>
+        <p><strong>3. 발생년월일:</strong> 2025-04-10</p>
+        <p><strong>4. 장소:</strong> 서울아산병원 장례식장</p>
+        <p><strong>5. 휴가기간:</strong> 2025-04-11 ~ 2025-04-13</p>
+        <p><strong>6. 금액:</strong> 300,000원</p>
+      </div>
+
+      <!-- 첨부 파일 -->
+      <div class="mt-4">
+        <h6 class="mb-2">첨부 파일</h6>
+        <ul class="ps-3">
+          <li><a href="#" class="text-primary text-decoration-underline" onmouseover="this.style.textDecoration='none'" onmouseout="this.style.textDecoration='underline'">경조금_신청서.pdf</a></li>
+          <li><a href="#" class="text-primary text-decoration-underline" onmouseover="this.style.textDecoration='none'" onmouseout="this.style.textDecoration='underline'">가족관계증명서.jpg</a></li>
+        </ul>
+      </div>
+
+      <!-- 승인/반려 버튼 -->
+      <div class="mt-4 text-end">
+        <button type="button" class="btn btn-primary me-2">결재 승인</button>
+        <button type="button" class="btn btn-outline-danger">반려</button>
+      </div>
+    </div>
+  </main>
 </body>
 </html>
