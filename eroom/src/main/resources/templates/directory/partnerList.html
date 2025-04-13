@@ -1,395 +1,191 @@
 <!DOCTYPE html>
-<html
-	lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
-	xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{/include/layout}"
->
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{/include/layout}">
 <head>
 <meta charset="UTF-8">
 <title>협력업체 주소록</title>
 </head>
-<body>
-    <!-- ===============================================-->
-    <!--    Main Content-->
-    <!-- ===============================================-->
+
+  <body>
     <main class="main" id="top" layout:fragment="content">
-      
-      <!-- <div class="content"> -->
-<!--         <nav class="mb-3" aria-label="breadcrumb">
-          <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="#!">Page 1</a></li>
-            <li class="breadcrumb-item"><a href="#!">Page 2</a></li>
-            <li class="breadcrumb-item active">Default</li>
-          </ol>
-        </nav> -->
-        <div class="mb-9">
-          <div class="row g-2 mb-4">
-            <div class="col-auto">
-              <h2 class="mb-0">협력업체 주소록</h2>
-            </div>
-          </div>
-          
-          <!-- 필터 -->
-          <ul class="nav nav-links mb-3 mb-lg-2 mx-n3">
-            <li class="nav-item"><a class="nav-link active" aria-current="page" href="#"><span>All </span><span class="text-body-tertiary fw-semibold">(68817)</span></a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><span>New </span><span class="text-body-tertiary fw-semibold">(6)</span></a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><span>Abandoned checkouts </span><span class="text-body-tertiary fw-semibold">(17)</span></a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><span>Locals </span><span class="text-body-tertiary fw-semibold">(6,810)</span></a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><span>Email subscribers </span><span class="text-body-tertiary fw-semibold">(8)</span></a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><span>Top reviews </span><span class="text-body-tertiary fw-semibold">(2)</span></a></li>
-          </ul>
-          
-          
-          <div id="products" data-list='{"valueNames":["customer","email","total-orders","total-spent","city","last-seen","last-order"],"page":10,"pagination":true}'>
-            <div class="mb-4">
-              <div class="row g-3">
-                <div class="col-auto">
-                  <div class="search-box">
-                    <form class="position-relative">
-                      <input class="form-control search-input search" type="search" placeholder="Search customers" aria-label="Search" />
-                      <span class="fas fa-search search-box-icon"></span>
+    
+  <div class="mb-3">
+	    <div class="d-flex justify-content-start align-items-center mb-2">
+	    <i class="fas fa-handshake text-secondary me-2"></i> <span class="fw-bold fs-7">협력업체 주소록</span>
+	  </div>
 
-                    </form>
-                  </div>
-                </div>
-                
-                <div class="col-auto scrollbar overflow-hidden-y flex-grow-1">
-                  <div class="btn-group position-static" role="group">
-	                <!-- 필터 -->
-                    <div class="btn-group position-static text-nowrap">
-                      <button class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-                        부서<span class="fas fa-angle-down ms-2"></span></button>
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" th:href="@{/directory/{id}}">기술부</a></li>
-                        <li><a class="dropdown-item" href="#">운영부</a></li>
-                        <li><a class="dropdown-item" href="#">제품부</a></li>
-                        <li><a class="dropdown-item" href="#">영업부</a></li>
-                      </ul>
-                    </div>
-	                <!-- 필터 -->
-                    <div class="btn-group position-static text-nowrap">
-                      <button class="btn btn-sm btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-                        VIP<span class="fas fa-angle-down ms-2"></span></button>
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">VIP 1</a></li>
-                        <li><a class="dropdown-item" href="#">VIP 2</a></li>
-                        <li><a class="dropdown-item" href="#">VIP 3</a></li>
-                        <li></li>
-                      </ul>
-                    </div>
-                    <button class="btn btn-phoenix-secondary px-7 flex-shrink-0">More filters</button>
-                  </div>
-                </div>
-                <div class="col-auto">
-                  <button class="btn btn-link text-body me-4 px-0"><span class="fa-solid fa-file-export fs-9 me-2"></span>Export</button>
-                  <button class="btn btn-primary"><span class="fas fa-plus me-2"></span>Add customer</button>
-                </div>
-              </div>
-            </div>
-            <div class="mx-n4 px-4 mx-lg-n6 px-lg-6 bg-body-emphasis border-top border-bottom border-translucent position-relative top-1">
-              <div class="table-responsive scrollbar-overlay mx-n1 px-1">
-              
-              	<!-- 게시글 형태 테이블 -->
-                <table class="table table-sm fs-9 mb-0" style="text-align: center;">
-                  <thead>
-                    <tr>
-                      <th class="white-space-nowrap fs-9 align-middle ps-0" style="text-align: center;">
-                        <div>번호</div>
-                      </th>
-                      <th class="sort align-middle pe-5" scope="col" data-sort="customer" style="width:10%;">사원명</th>
-                      <th class="sort align-middle pe-5" scope="col" data-sort="email" style="width:20%;">이메일</th>
-                      <th class="sort align-middle text-end" scope="col" data-sort="total-orders" style="width:10%">핸드폰번호</th>
-                      <th class="sort align-middle text-end ps-3" scope="col" data-sort="total-spent" style="width:10%">부서명</th>
-                      <th class="sort align-middle ps-7" scope="col" data-sort="city" style="width:25%;">팀명</th>
-                      <th class="sort align-middle text-end" scope="col" data-sort="last-seen" style="width:15%;">입사일</th>
-                      <!-- <th class="sort align-middle text-end pe-0" scope="col" data-sort="last-order" style="width:10%;min-width: 150px;">LAST ORDER</th> -->
-                    </tr>
-                  </thead>
-                  <tbody class="list" id="customers-table-body">
-                  
-                  
-                  
-                  <!-- 1줄 -->
-                    <!-- <tr class="hover-actions-trigger btn-reveal-trigger position-static">
-                      <td class="fs-9 align-middle ps-0 py-3">
-                        <div class="form-check mb-0 fs-8">
-                          <input class="form-check-input" type="checkbox" data-bulk-select-row='{"customer":{"avatar":"/team/32.webp","name":"Carry Anna"},"email":"annac34@gmail.com","city":"Budapest","totalOrders":89,"totalSpent":23987,"lastSeen":"34 min ago","lastOrder":"Dec 12, 12:56 PM"}' />
-                        </div>
-                      </td>
-                      <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
-                          <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/32.webp" alt="" />
-                          </div>
-                          <p class="mb-0 ms-3 text-body-emphasis fw-bold">Carry Anna</p>
-                        </a></td>
-                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:annac34@gmail.com">annac34@gmail.com</a></td>
-                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight">89</td>
-                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis">$ 23987</td>
-                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7">Budapest</td>
-                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end">34 min ago</td>
-                      <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Dec 12, 12:56 PM</td>
-                    </tr> -->
-                    
-                    <!-- 데이터 테스트 -->
-                    <tr class="hover-actions-trigger btn-reveal-trigger position-static"
-                    	th:if="${!#lists.isEmpty(resultList)}"
-                    	th:each="emp, empStatus : ${resultList}"
-                    	th:attr="data-emp-no=${emp.employee_no}"
-                    	>
-                      <td class="fs-9 align-middle ps-0 py-3" th:text="${empStatus.count}">
-                        <!-- <div class="form-check mb-0 fs-8">
-                          <input class="form-check-input" type="checkbox" data-bulk-select-row='{"customer":{"avatar":"/team/32.webp","name":"Carry Anna"},"email":"annac34@gmail.com","city":"Budapest","totalOrders":89,"totalSpent":23987,"lastSeen":"34 min ago","lastOrder":"Dec 12, 12:56 PM"}' />
-                        </div> -->
-                      </td>
-                      <td class="customer align-middle white-space-nowrap pe-5"><a class="d-flex align-items-center text-body-emphasis" href="../../../apps/e-commerce/admin/customer-details.html">
-                          <div class="avatar avatar-m"><img class="rounded-circle" src="../../../assets/img/team/32.webp" alt="" />
-                          </div>
-                          <p class="mb-0 ms-3 text-body-emphasis fw-bold" th:text="${emp.employee_name}">이름</p>
-                        </a></td>
-                      <td class="email align-middle white-space-nowrap pe-5"><a class="fw-semibold" href="mailto:annac34@gmail.com" th:text="${emp.employee_directory_email}">이메일</a></td>
-                      <td class="total-orders align-middle white-space-nowrap fw-semibold text-end text-body-highlight" th:text="${emp.employee_directory_phone}">핸드폰번호</td>
-                      <td class="total-spent align-middle white-space-nowrap fw-bold text-end ps-3 text-body-emphasis" th:text="${emp.department_name}">부서명</td>
-                      <td class="city align-middle white-space-nowrap text-body-highlight ps-7" th:text="${emp.team_name}">팀명</td>
-                      <td class="last-seen align-middle white-space-nowrap text-body-tertiary text-end" th:text="${emp.formattedHireDate}">입사일</td>
-                      <!-- <td class="last-order align-middle white-space-nowrap text-body-tertiary text-end">Dec 12, 12:56 PM</td> -->
-                    </tr>
-                    
-                    
-                    
-                    
-                  </tbody>
-                </table>
-              	<!-- 게시글 형태 테이블 -->
-              	
-              	
-              	
-              	
-              </div>
-              <div class="row align-items-center justify-content-center py-2 pe-0 fs-9">
-                <!-- <div class="col-auto d-flex">
-                  <p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info"></p><a class="fw-semibold" href="#!" data-list-view="*">View all<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a><a class="fw-semibold d-none" href="#!" data-list-view="less">View Less<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a>
-                </div> -->
-                <div class="col-auto d-flex">
-                  <button class="page-link" data-list-pagination="prev"><span class="fas fa-chevron-left"></span></button>
-                  <ul class="mb-0 pagination"></ul>
-                  <button class="page-link pe-0" data-list-pagination="next"><span class="fas fa-chevron-right"></span></button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- 푸터 -->
-<!--         <footer class="footer position-absolute">
-          <div class="row g-0 justify-content-between align-items-center h-100">
-            <div class="col-12 col-sm-auto text-center">
-              <p class="mb-0 mt-2 mt-sm-0 text-body">Thank you for creating with Phoenix<span class="d-none d-sm-inline-block"></span><span class="d-none d-sm-inline-block mx-1">|</span><br class="d-sm-none" />2025 &copy;<a class="mx-1" href="https://themewagon.com">Themewagon</a></p>
-            </div>
-            <div class="col-12 col-sm-auto text-center">
-              <p class="mb-0 text-body-tertiary text-opacity-85">v1.22.0</p>
-            </div>
-          </div>
-        </footer> -->
-        
-      <!-- </div> -->
-      <div class="modal fade" id="searchBoxModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="true" data-phoenix-modal="data-phoenix-modal" style="--phoenix-backdrop-opacity: 1;">
-        <div class="modal-dialog">
-          <div class="modal-content mt-15 rounded-pill">
-            <div class="modal-body p-0">
-              <div class="search-box navbar-top-search-box" data-list='{"valueNames":["title"]}' style="width: auto;">
-                <form class="position-relative" data-bs-toggle="search" data-bs-display="static">
-                  <input class="form-control search-input fuzzy-search rounded-pill form-control-lg" type="search" placeholder="Search..." aria-label="Search" />
-                  <span class="fas fa-search search-box-icon"></span>
 
-                </form>
-                <div class="btn-close position-absolute end-0 top-50 translate-middle cursor-pointer shadow-none" data-bs-dismiss="search">
-                  <button class="btn btn-link p-0" aria-label="Close"></button>
-                </div>
-                <div class="dropdown-menu border start-0 py-0 overflow-hidden w-100">
-                  <div class="scrollbar-overlay" style="max-height: 30rem;">
-                    <div class="list pb-3">
-                      <h6 class="dropdown-header text-body-highlight fs-10 py-2">24 <span class="text-body-quaternary">results</span></h6>
-                      <hr class="my-0" />
-                      <h6 class="dropdown-header text-body-highlight fs-9 border-bottom border-translucent py-2 lh-sm">Recently Searched </h6>
-                      <div class="py-2"><a class="dropdown-item" href="../../../apps/e-commerce/landing/product-details.html">
-                          <div class="d-flex align-items-center">
 
-                            <div class="fw-normal text-body-highlight title"><span class="fa-solid fa-clock-rotate-left" data-fa-transform="shrink-2"></span> Store Macbook</div>
-                          </div>
-                        </a>
-                        <a class="dropdown-item" href="../../../apps/e-commerce/landing/product-details.html">
-                          <div class="d-flex align-items-center">
+  <div class="col" id="directoryEmployeeTable" data-list='{"valueNames":["no", "name", "companyName", "email", "phone", "department", "team", "position"], "page": 5, "pagination": true}'>
+    
+<!-- 검색창 + 추가 버튼 영역 -->
+<div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
+  <!-- 검색창 (가운데 정렬) -->
+  <div class="d-flex justify-content-center">
+    <form class="position-relative" style="width: 300px;">
+      <input class="form-control search-input search form-control-sm" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
+      <svg class="svg-inline--fa fa-magnifying-glass search-box-icon position-absolute top-50 end-0 translate-middle-y me-2"
+        aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img"
+        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="pointer-events: none;">
+        <path fill="currentColor"
+          d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z">
+        </path>
+      </svg>
+    </form>
+  </div>
 
-                            <div class="fw-normal text-body-highlight title"> <span class="fa-solid fa-clock-rotate-left" data-fa-transform="shrink-2"></span> MacBook Air - 13″</div>
-                          </div>
-                        </a>
+  <!-- 추가 버튼 (오른쪽 고정) -->
+  <button class="btn btn-sm btn-primary position-absolute top-0 end-0" type="button"
+  	data-bs-toggle="modal" data-bs-target="#addPartnerDirectoryModal">
+    인원 추가
+  </button>
+</div>
 
-                      </div>
-                      <hr class="my-0" />
-                      <h6 class="dropdown-header text-body-highlight fs-9 border-bottom border-translucent py-2 lh-sm">Products</h6>
-                      <div class="py-2"><a class="dropdown-item py-2 d-flex align-items-center" href="../../../apps/e-commerce/landing/product-details.html">
-                          <div class="file-thumbnail me-2"><img class="h-100 w-100 object-fit-cover rounded-3" src="../../../assets/img/products/60x60/3.png" alt="" /></div>
-                          <div class="flex-1">
-                            <h6 class="mb-0 text-body-highlight title">MacBook Air - 13″</h6>
-                            <p class="fs-10 mb-0 d-flex text-body-tertiary"><span class="fw-medium text-body-tertiary text-opactity-85">8GB Memory - 1.6GHz - 128GB Storage</span></p>
-                          </div>
-                        </a>
-                        <a class="dropdown-item py-2 d-flex align-items-center" href="../../../apps/e-commerce/landing/product-details.html">
-                          <div class="file-thumbnail me-2"><img class="img-fluid" src="../../../assets/img/products/60x60/3.png" alt="" /></div>
-                          <div class="flex-1">
-                            <h6 class="mb-0 text-body-highlight title">MacBook Pro - 13″</h6>
-                            <p class="fs-10 mb-0 d-flex text-body-tertiary"><span class="fw-medium text-body-tertiary text-opactity-85">30 Sep at 12:30 PM</span></p>
-                          </div>
-                        </a>
+    <!-- 테이블 본문 -->
+    <div class="table-responsive">
+      <table class="table table-striped table-sm fs-9 mb-0 text-center">
+        <thead class="text-center align-middle">
+			<tr>
+				<th class="sort" data-sort="no" style="width: 5%;">번호</th>
+				<th class="sort" data-sort="name" style="width: 12%;">이름</th>
+				<th class="sort" data-sort="companyName" style="width: 15%;">회사명</th>
+				<th class="sort" data-sort="email" style="width: 17%;">이메일</th>
+				<th class="sort" data-sort="phone" style="width: 12%;">전화번호</th>
+				<th class="sort" data-sort="department" style="width: 12%;">부서명</th>
+				<th class="sort" data-sort="team" style="width: 12%;">팀명</th>
+				<th class="sort" data-sort="position" style="width: 10%;">직급</th>
+				<th style="width: 5%;"></th>
+			</tr>
+        </thead>
+        <tbody class="list align-middle">
 
-                      </div>
-                      <hr class="my-0" />
-                      <h6 class="dropdown-header text-body-highlight fs-9 border-bottom border-translucent py-2 lh-sm">Quick Links</h6>
-                      <div class="py-2"><a class="dropdown-item" href="../../../apps/e-commerce/landing/product-details.html">
-                          <div class="d-flex align-items-center">
+		<!-- 외부업체 인원 1 -->
+		<tr>
+			<td class="no">1</td>
+			<td class="name">정재익</td>
+			<td class="hiredate">에이스솔루션</td>
+			<td class="email">aceleft@acesol.co.kr</td>
+			<td class="phone">010-2345-6789</td>
+			<td class="department">기술지원부</td>
+			<td class="team">현장대응팀</td>
+			<td class="position">이사</td>
+			<td class="align-middle text-end pe-0">
+				<div class="btn-reveal-trigger position-static">
+					<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+						<i class="fas fa-ellipsis fs-10"></i>
+					</button>
+					<div class="dropdown-menu dropdown-menu-end py-2">
+						<a class="dropdown-item" href="#!">수정</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item text-danger" href="#!">삭제</a>
+					</div>
+				</div>
+			</td>
+		</tr>
+		<!-- 외부업체 인원 2 -->
+		<tr>
+			<td class="no">2</td>
+			<td class="name">황정현</td>
+			<td class="hiredate">넥스트링크</td>
+			<td class="email">hjh@nextlink.kr</td>
+			<td class="phone">010-9876-5432</td>
+			<td class="department">서비스운영부</td>
+			<td class="team">QA팀</td>
+			<td class="position">차장</td>
+			<td class="align-middle text-end pe-0">
+				<div class="btn-reveal-trigger position-static">
+					<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+						<i class="fas fa-ellipsis fs-10"></i>
+					</button>
+					<div class="dropdown-menu dropdown-menu-end py-2">
+						<a class="dropdown-item" href="#!">수정</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item text-danger" href="#!">삭제</a>
+					</div>
+				</div>
+			</td>
+		</tr>
 
-                            <div class="fw-normal text-body-highlight title"><span class="fa-solid fa-link text-body" data-fa-transform="shrink-2"></span> Support MacBook House</div>
-                          </div>
-                        </a>
-                        <a class="dropdown-item" href="../../../apps/e-commerce/landing/product-details.html">
-                          <div class="d-flex align-items-center">
 
-                            <div class="fw-normal text-body-highlight title"> <span class="fa-solid fa-link text-body" data-fa-transform="shrink-2"></span> Store MacBook″</div>
-                          </div>
-                        </a>
 
-                      </div>
-                      <hr class="my-0" />
-                      <h6 class="dropdown-header text-body-highlight fs-9 border-bottom border-translucent py-2 lh-sm">Files</h6>
-                      <div class="py-2"><a class="dropdown-item" href="../../../apps/e-commerce/landing/product-details.html">
-                          <div class="d-flex align-items-center">
+        </tbody>
+      </table>
+    </div>
 
-                            <div class="fw-normal text-body-highlight title"><span class="fa-solid fa-file-zipper text-body" data-fa-transform="shrink-2"></span> Library MacBook folder.rar</div>
-                          </div>
-                        </a>
-                        <a class="dropdown-item" href="../../../apps/e-commerce/landing/product-details.html">
-                          <div class="d-flex align-items-center">
-
-                            <div class="fw-normal text-body-highlight title"> <span class="fa-solid fa-file-lines text-body" data-fa-transform="shrink-2"></span> Feature MacBook extensions.txt</div>
-                          </div>
-                        </a>
-                        <a class="dropdown-item" href="../../../apps/e-commerce/landing/product-details.html">
-                          <div class="d-flex align-items-center">
-
-                            <div class="fw-normal text-body-highlight title"> <span class="fa-solid fa-image text-body" data-fa-transform="shrink-2"></span> MacBook Pro_13.jpg</div>
-                          </div>
-                        </a>
-
-                      </div>
-                      <hr class="my-0" />
-                      <h6 class="dropdown-header text-body-highlight fs-9 border-bottom border-translucent py-2 lh-sm">Members</h6>
-                      <div class="py-2"><a class="dropdown-item py-2 d-flex align-items-center" href="../../../pages/members.html">
-                          <div class="avatar avatar-l status-online  me-2 text-body">
-                            <img class="rounded-circle " src="../../../assets/img/team/40x40/10.webp" alt="" />
-
-                          </div>
-                          <div class="flex-1">
-                            <h6 class="mb-0 text-body-highlight title">Carry Anna</h6>
-                            <p class="fs-10 mb-0 d-flex text-body-tertiary">anna@technext.it</p>
-                          </div>
-                        </a>
-                        <a class="dropdown-item py-2 d-flex align-items-center" href="../../../pages/members.html">
-                          <div class="avatar avatar-l  me-2 text-body">
-                            <img class="rounded-circle " src="../../../assets/img/team/40x40/12.webp" alt="" />
-
-                          </div>
-                          <div class="flex-1">
-                            <h6 class="mb-0 text-body-highlight title">John Smith</h6>
-                            <p class="fs-10 mb-0 d-flex text-body-tertiary">smith@technext.it</p>
-                          </div>
-                        </a>
-
-                      </div>
-                      <hr class="my-0" />
-                      <h6 class="dropdown-header text-body-highlight fs-9 border-bottom border-translucent py-2 lh-sm">Related Searches</h6>
-                      <div class="py-2"><a class="dropdown-item" href="../../../apps/e-commerce/landing/product-details.html">
-                          <div class="d-flex align-items-center">
-
-                            <div class="fw-normal text-body-highlight title"><span class="fa-brands fa-firefox-browser text-body" data-fa-transform="shrink-2"></span> Search in the Web MacBook</div>
-                          </div>
-                        </a>
-                        <a class="dropdown-item" href="../../../apps/e-commerce/landing/product-details.html">
-                          <div class="d-flex align-items-center">
-
-                            <div class="fw-normal text-body-highlight title"> <span class="fa-brands fa-chrome text-body" data-fa-transform="shrink-2"></span> Store MacBook″</div>
-                          </div>
-                        </a>
-
-                      </div>
-                    </div>
-                    <div class="text-center">
-                      <p class="fallback fw-bold fs-7 d-none">No Result Found.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- 페이징? -->
+    <div class="d-flex justify-content-center mt-3">
+     <!--  <span class="d-none d-sm-inline-block" data-list-info="data-list-info">1 to 4 <span class="text-body-tertiary"> Items of </span>4</span> -->
+      <div class="d-flex">
+        <button class="page-link disabled" data-list-pagination="prev" disabled><i class="fas fa-chevron-left"></i></button>
+        <ul class="mb-0 pagination">
+          <li class="active"><button class="page" type="button" data-i="1" data-page="5">1</button></li>
+        </ul>
+        <button class="page-link pe-0" data-list-pagination="next" disabled><i class="fas fa-chevron-right"></i></button>
       </div>
-      <script>
-        var navbarTopStyle = window.config.config.phoenixNavbarTopStyle;
-        var navbarTop = document.querySelector('.navbar-top');
-        if (navbarTopStyle === 'darker') {
-          navbarTop.setAttribute('data-navbar-appearance', 'darker');
-        }
+    </div>
+  </div>    
+</div>    
+    
 
-        var navbarVerticalStyle = window.config.config.phoenixNavbarVerticalStyle;
-        var navbarVertical = document.querySelector('.navbar-vertical');
-        if (navbarVertical && navbarVerticalStyle === 'darker') {
-          navbarVertical.setAttribute('data-navbar-appearance', 'darker');
-        }
-      </script>
-      <div class="support-chat-container">
-        <div class="container-fluid support-chat">
-          <div class="card bg-body-emphasis">
-            <div class="card-header d-flex flex-between-center px-4 py-3 border-bottom border-translucent">
-              <h5 class="mb-0 d-flex align-items-center gap-2">Demo widget<span class="fa-solid fa-circle text-success fs-11"></span></h5>
-              <div class="btn-reveal-trigger">
-                <button class="btn btn-link p-0 dropdown-toggle dropdown-caret-none transition-none d-flex" type="button" id="support-chat-dropdown" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fas fa-ellipsis-h text-body"></span></button>
-                <div class="dropdown-menu dropdown-menu-end py-2" aria-labelledby="support-chat-dropdown"><a class="dropdown-item" href="#!">Request a callback</a><a class="dropdown-item" href="#!">Search in chat</a><a class="dropdown-item" href="#!">Show history</a><a class="dropdown-item" href="#!">Report to Admin</a><a class="dropdown-item btn-support-chat" href="#!">Close Support</a></div>
-              </div>
-            </div>
-            <div class="card-body chat p-0">
-              <div class="d-flex flex-column-reverse scrollbar h-100 p-3">
-                <div class="text-end mt-6"><a class="mb-2 d-inline-flex align-items-center text-decoration-none text-body-emphasis bg-body-hover rounded-pill border border-primary py-2 ps-4 pe-3" href="#!">
-                    <p class="mb-0 fw-semibold fs-9">I need help with something</p><span class="fa-solid fa-paper-plane text-primary fs-9 ms-3"></span>
-                  </a><a class="mb-2 d-inline-flex align-items-center text-decoration-none text-body-emphasis bg-body-hover rounded-pill border border-primary py-2 ps-4 pe-3" href="#!">
-                    <p class="mb-0 fw-semibold fs-9">I can’t reorder a product I previously ordered</p><span class="fa-solid fa-paper-plane text-primary fs-9 ms-3"></span>
-                  </a><a class="mb-2 d-inline-flex align-items-center text-decoration-none text-body-emphasis bg-body-hover rounded-pill border border-primary py-2 ps-4 pe-3" href="#!">
-                    <p class="mb-0 fw-semibold fs-9">How do I place an order?</p><span class="fa-solid fa-paper-plane text-primary fs-9 ms-3"></span>
-                  </a><a class="false d-inline-flex align-items-center text-decoration-none text-body-emphasis bg-body-hover rounded-pill border border-primary py-2 ps-4 pe-3" href="#!">
-                    <p class="mb-0 fw-semibold fs-9">My payment method not working</p><span class="fa-solid fa-paper-plane text-primary fs-9 ms-3"></span>
-                  </a>
-                </div>
-                <div class="text-center mt-auto">
-                  <div class="avatar avatar-3xl status-online"><img class="rounded-circle border border-3 border-light-subtle" src="../../../assets/img/team/30.webp" alt="" /></div>
-                  <h5 class="mt-2 mb-3">Eric</h5>
-                  <p class="text-center text-body-emphasis mb-0">Ask us anything – we’ll get back to you here or by email within 24 hours.</p>
-                </div>
-              </div>
-            </div>
-            <div class="card-footer d-flex align-items-center gap-2 border-top border-translucent ps-3 pe-4 py-3">
-              <div class="d-flex align-items-center flex-1 gap-3 border border-translucent rounded-pill px-4">
-                <input class="form-control outline-none border-0 flex-1 fs-9 px-0" type="text" placeholder="Write message" />
-                <label class="btn btn-link d-flex p-0 text-body-quaternary fs-9 border-0" for="supportChatPhotos"><span class="fa-solid fa-image"></span></label>
-                <input class="d-none" type="file" accept="image/*" id="supportChatPhotos" />
-                <label class="btn btn-link d-flex p-0 text-body-quaternary fs-9 border-0" for="supportChatAttachment"> <span class="fa-solid fa-paperclip"></span></label>
-                <input class="d-none" type="file" id="supportChatAttachment" />
-              </div>
-              <button class="btn p-0 border-0 send-btn"><span class="fa-solid fa-paper-plane fs-9"></span></button>
-            </div>
-          </div>
-        </div>
-        <button class="btn btn-support-chat p-0 border border-translucent"><span class="fs-8 btn-text text-primary text-nowrap">Chat demo</span><span class="ping-icon-wrapper mt-n4 ms-n6 mt-sm-0 ms-sm-2 position-absolute position-sm-relative"><span class="ping-icon-bg"></span><span class="fa-solid fa-circle ping-icon"></span></span><span class="fa-solid fa-headset text-primary fs-8 d-sm-none"></span><span class="fa-solid fa-chevron-down text-primary fs-7"></span></button>
+
+<!-- 회의실 추가 모달 -->
+<div class="modal fade" id="addPartnerDirectoryModal" tabindex="-1" aria-labelledby="addPartnerDirectoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- 헤더 -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="addPartnerDirectoryModalLabel">회의실 추가</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
+      <!-- 바디 -->
+      <div class="modal-body">
+        <form id="addPartnerDirectoryForm">
+          <div class="mb-3">
+            <label for="roomName" class="form-label">이름</label>
+            <input type="text" class="form-control form-control-sm" id="name" placeholder="예: 홍길동">
+          </div>
+          <div class="mb-3">
+            <label for="roomLocation" class="form-label">회사명</label>
+            <input type="text" class="form-control form-control-sm" id="companyName" placeholder="예: 이룸컴퍼니">
+          </div>
+          <div class="mb-3">
+            <label for="roomCapacity" class="form-label">이메일</label>
+            <input type="number" class="form-control form-control-sm" id="email" placeholder="예: example@exp.co.kr">
+          </div>
+          <div class="mb-3">
+            <label for="roomCapacity" class="form-label">전화번호</label>
+            <input type="number" class="form-control form-control-sm" id="phone" placeholder="예: 010-1234-5678">
+          </div>
+          <div class="mb-3">
+            <label for="roomCapacity" class="form-label">부서명</label>
+            <input type="number" class="form-control form-control-sm" id="department" placeholder="예: OO부">
+          </div>
+          <div class="mb-3">
+            <label for="roomCapacity" class="form-label">팀명</label>
+            <input type="number" class="form-control form-control-sm" id="team" placeholder="예: OO팀">
+          </div>
+          <div class="mb-3">
+            <label for="roomCapacity" class="form-label">직급</label>
+            <input type="number" class="form-control form-control-sm" id="job" placeholder="예: 부장">
+          </div>
+        </form>
+      </div>
+
+      <!-- 푸터 -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+        <button type="submit" class="btn btn-primary btn-sm" form="addMeetingroomForm">등록</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
     </main>
-    <!-- ===============================================-->
-    <!--    End of Main Content-->
-    <!-- ===============================================-->
-</body>
+  </body>
 </html>

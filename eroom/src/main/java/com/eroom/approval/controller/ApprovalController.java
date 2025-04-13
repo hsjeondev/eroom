@@ -34,6 +34,11 @@ public class ApprovalController {
 		
 		return "/approval/create";
 	}
+	@GetMapping("/approval/detail")
+	public String selectApprovalDetail() {
+		
+		return "/approval/detail";
+	}
 	
 
 }
