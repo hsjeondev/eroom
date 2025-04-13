@@ -22,15 +22,15 @@ public class DirectoryController {
 
 	@GetMapping("/directory/employee")
 	public String selectDirectoryEmployeeList(Model model) {
-		List<EmployeeDirectoryDto> resultList = new ArrayList<EmployeeDirectoryDto>();
-		List<EmployeeDirectory> temp = employeeDirectoryService.selectDirectoryAll();
-		
-		for(EmployeeDirectory t : temp) {
-			EmployeeDirectoryDto dto = new EmployeeDirectoryDto();
-			resultList.add(dto.toDto(t));
-		}
-		
-		model.addAttribute("resultList", resultList);
+//		List<EmployeeDirectoryDto> resultList = new ArrayList<EmployeeDirectoryDto>();
+//		List<EmployeeDirectory> temp = employeeDirectoryService.selectDirectoryAll();
+//		
+//		for(EmployeeDirectory t : temp) {
+//			EmployeeDirectoryDto dto = new EmployeeDirectoryDto();
+//			resultList.add(dto.toDto(t));
+//		}
+//		
+//		model.addAttribute("resultList", resultList);
 		
 		return "directory/employeeList";
 	}
@@ -46,7 +46,8 @@ public class DirectoryController {
 //		
 //		model.addAttribute("resultList", resultList);
 		
-		return "directory/treetest";
+		return "directory/partnerList";
+//		return "directory/sample";
 	}
 	
 }
