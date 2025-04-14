@@ -91,14 +91,15 @@
 					</div>
 				</div>
 				<div class="row g-3 list" id="reportsList">
+					<!-- 설문 상세 -->
+					<th:block th:each="survey : ${surveyList}">
 					<div class="col-12 col-xl-6">
 						<div class="card h-100">
 							<div class="card-body">
 								<div class="border-bottom border-translucent">
 									<div class="d-flex align-items-start mb-1">
 										<div class="d-sm-flex align-items-center ps-2">
-											<!-- 설문 상세 -->
-											<button class="btn btn-link me-1 mb-1 fs-6 p-0" type="button" data-bs-toggle="modal" data-bs-target="#survey-detail">설문 제목</button>
+											<button class="btn btn-link me-1 mb-1 fs-6 p-0" type="button" data-bs-toggle="modal" data-bs-target="#survey-detail" th:text="${survey.surveyTitle}">설문 제목</button>
 											<div class="modal fade" id="survey-detail" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
 												<div class="modal-dialog modal-dialog-scrollable">
 													<div class="modal-content">
@@ -141,6 +142,7 @@
 							</div>
 						</div>
 					</div>
+					</th:block>
 				</div>
 				<div class="row align-items-center justify-content-between py-2 pe-0 fs-9 mt-2">
 					<div class="col-4 d-flex">

@@ -39,4 +39,8 @@ public class SurveyService {
 		}
 		return result;
 	}
+
+	public List<Survey> findAllSurvey() {
+		return surveyRepository.findAll();
+	}
 }
