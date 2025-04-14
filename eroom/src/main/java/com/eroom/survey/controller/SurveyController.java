@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.eroom.employee.entity.Employee;
+import com.eroom.employee.service.EmployeeService;
 import com.eroom.survey.dto.SurveyDto;
 import com.eroom.survey.dto.SurveyItemDto;
 import com.eroom.survey.entity.Survey;
@@ -25,7 +27,11 @@ public class SurveyController {
 	public String surveyList(Model model, SurveyDto surveyDto, SurveyItemDto surveyItemDto) {
 		
 		List<Survey> surveyList = surveyService.findAllSurvey();
+//		List<Employee> empList = surveyService.findAllEmployee();
+		
 		model.addAttribute("surveyList", surveyList);
+//		model.addAttribute("empList", empList);
+		
 		return "survey/list";
 	}
 
