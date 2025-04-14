@@ -7,8 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.eroom.directory.dto.EmployeeDirectoryDto;
-import com.eroom.directory.entity.EmployeeDirectory;
+import com.eroom.directory.dto.DirectoryDto;
+import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.EmployeeDirectoryService;
 
 import lombok.RequiredArgsConstructor;

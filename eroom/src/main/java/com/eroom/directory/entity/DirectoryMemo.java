@@ -1,5 +1,7 @@
 package com.eroom.directory.entity;
 
+import java.time.LocalDateTime;
+
 import com.eroom.employee.entity.Employee;
 
 import jakarta.persistence.Column;
@@ -8,6 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -30,15 +34,27 @@ public class DirectoryMemo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long directoryMemoNo;
-	@Column(name = "directory_memo_target")
-	private String directoryMemoTarget;
-	@Column(name = "directory_memo_directory_no")
-	private Long directoryMemoDirectoryNo;
-	@Column(name = "directory_memo_content")
-	private String directoryMemoContent;
 	
-	
-	@OneToOne
+	@ManyToOne
+    @JoinColumn(name = "directory_no")
+    private Directory directory;
+	@ManyToOne
 	@JoinColumn(name = "employee_no")
 	private Employee employee;
+	
+	@Column(name = "directory_memo_content")
+	private String directoryMemoContent;
+	@Column(name = "directory_memo_creator")
+	private String directoryMemoCreator;
+	@Column(name = "directory_memo_editor")
+	private String directoryMemoEditor;
+	@Column(name = "visible_yn")
+	private String visibleYn;
+	
+	@Column(name = "directory_memo_reg_date")
+	private LocalDateTime directoryMemoRegDate;
+	@Column(name = "directory_memo_mod_date")
+	private LocalDateTime directoryMemoModDate;
+	
+	
 }
