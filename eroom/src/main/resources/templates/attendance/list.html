@@ -87,11 +87,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	<main class="main" id="top" layout:fragment="content">
       <!-- 여기에 요소 넣으면 됩니다. -->
 		
-		<div class="d-flex justify-content-start">
+		<div class="d-flex justify-content-start align-items-center mb-2">
+			<i class="fas fa-clock text-secondary me-2"></i>
+			<!-- <i class="fas fa-business-time text-secondary me-2"></i> -->
 			<span class="fw-bold fs-7">근태</span>
-		</div>   
+		</div>  
+		<!-- 현재 날짜 --> 
 		<div class="d-flex justify-content-center">
-			<span class="fw-bold fs-7">2025.04.10</span>
+			<span class="current-time fw-bold fs-7" id="currentTime"></span>
 		</div>
 		
 		<a th:href="@{/attendance/checkinout}">체크인test</a>
@@ -340,7 +343,21 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			</div>
 		</div> <!-- tableExample4 끝 -->
                            
-            
+<script>
+	function updateCurrentTime(){
+		const now = new Date();
+		
+		const year = now.getFullYear();
+		const month = String(now.getMonth()+1).padStart(2,'0');
+		const date = String(now.getDate()).padStart(2,'0');
+		
+		const formattedDate = `${year}.${month}.${date}`;
+		
+		document.getElementById('currentTime').innerText = formattedDate;
+	}
+	updateCurrentTime();
+
+</script>            
 
 	</main>
 </body>
