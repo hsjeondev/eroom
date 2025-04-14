@@ -59,9 +59,6 @@ public class DirectoryDto {
 	}
 	
 	public DirectoryDto toDto(Directory entity) {
-	    if (entity == null) return null;
-	    Employee emp = entity.getEmployee();
-	    
 	    return DirectoryDto.builder()
 	            .directory_no(entity.getDirectoryNo())
 	            .directory_email(entity.getDirectoryEmail())
@@ -71,8 +68,10 @@ public class DirectoryDto {
 	            .directory_creator(entity.getDirectoryCreator())
 				.directory_editor(entity.getDirectoryEditor())
 				.visible_yn(entity.getVisibleYn())
-				.directory_reg_date(entity.getDirectoryRegDate()) // 고쳐야함
-				.directory_mod_date(entity.getDirectoryModDate()) // 고쳐야함
+				.directory_reg_date(entity.getDirectoryRegDate())
+				.directory_mod_date(entity.getDirectoryModDate())
+				.employee_no(entity.getEmployee().getEmployeeNo())
+				.separator_code(entity.getSeparator().getSeparatorCode())
 	            .build();
 	}
 	
