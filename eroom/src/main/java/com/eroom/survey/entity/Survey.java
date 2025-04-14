@@ -26,6 +26,9 @@ public class Survey {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="survey_no")
 	private Long surveyNo;
+
+	@Column(name="writer")
+	private String writer;
 	
 	@Column(name="survey_title")
 	private String surveyTitle;
@@ -39,8 +42,6 @@ public class Survey {
 	@Column(name="allow_multiple")
 	private String allowMultiple;
 	
-	@Column(name="employee_no")
-	private Long employeeNo;
 	
 	@Column(name="reg_date")
 	private LocalDateTime regDate;
