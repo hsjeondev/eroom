@@ -35,12 +35,6 @@ public class DirectoryMemo {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long directoryMemoNo;
 	
-	@ManyToOne
-    @JoinColumn(name = "directory_no")
-    private Directory directory;
-	@ManyToOne
-	@JoinColumn(name = "employee_no")
-	private Employee employee;
 	
 	@Column(name = "directory_memo_content")
 	private String directoryMemoContent;
@@ -56,5 +50,11 @@ public class DirectoryMemo {
 	@Column(name = "directory_memo_mod_date")
 	private LocalDateTime directoryMemoModDate;
 	
+	@ManyToOne
+	@JoinColumn(name = "directory_no")
+	private Directory directory;
+	@ManyToOne
+	@JoinColumn(name = "employee_no")
+	private Employee employee;
 	
 }
