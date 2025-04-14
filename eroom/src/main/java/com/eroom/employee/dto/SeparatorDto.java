@@ -51,4 +51,5 @@ public class SeparatorDto {
 				.separator_mod_date(entity.getSeparatorModDate())
 				.build();
 	}
+	
 }

@@ -111,7 +111,7 @@
 						<button type="button" class="btn-close" data-bs-dismiss="modal"
 							aria-label="닫기"></button>
 					</div>
-					<form th:action="@{/chat/create}" method="post">
+					<form id="createChatForm" th:action="@{/chat/create}" method="post">
 						<div class="modal-body">
 							<!-- 채팅 종류 선택 (1:1, 그룹) -->
 							<div class="mb-3">
@@ -124,52 +124,44 @@
 
 							<div class="mb-3" id="chatroomNameBox">
 								<label class="form-label">채팅방 이름</label>
+								  <!-- 1:1 채팅일 때는 자동 제목으로 설정되며, 수정 불가 -->
 								<input type="text" name="chatroomName" class="form-control"
 									placeholder="예: 개발팀 채팅방">
 							</div>
 
-							<!-- 상위: 부서 선택 -->
-							<div class="mb-3">
-								<label class="form-label">부서</label>
-								<select class="form-select" id="departmentSelect" onchange="changeDepartment(this.value)">
-									<option disabled selected>-- 부서 선택 --</option>
-									<!-- 부서 목록은 컨트롤러에서 structureList로 전달 -->
-									 <option th:each="dept : ${structureList}" 
-							          th:value="${dept.structureCode}" 
-							          th:text="${dept.structureName}" 
-							          th:selected="${dept.structureCode == param.department}">
-									 </option>
-								</select>
+							<!-- 부서(소속) 선택 -->
+					        <div class="mb-3">
+					          <label class="form-label">소속</label>
+					          <select class="form-select" id="departmentSelect" onchange="changeDepartment(this.value)">
+					            <option disabled selected>-- 소속 선택 --</option>
+					            <!-- 부서 목록은 컨트롤러에서 structureList로 전달 -->
+					           <option th:each="dept : ${structureList}" 
+								       th:value="${dept.separator_code}" 
+								       th:text="${dept.separator_name}" 
+								       th:selected="${dept.separator_name == param.department}">
+							   </option>
+					          </select>
+					        </div>
+					
+					        <!-- 참여자 선택 (부서 선택 후 해당 부서의 구성원 불러옴) -->
+					        <div class="mb-3">
+					          <label class="form-label">참여자 선택</label>
+					          <div class="d-flex">
+					            <select id="employeeSelect" class="form-select me-2" style="flex:1;">
+					              <option disabled selected>-- 참여자 선택 --</option>
+					            </select>
+					            <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">추가</button>
+					          </div>
+					        </div>
+					
+					        <!-- 선택된 참여자 보여주기 -->
+					        <div class="mb-3">
+					          <label class="form-label">선택된 참여자</label>
+					          <div id="selectedParticipants">
+					            <!-- 여기에서 badge로 추가됨 -->
+					          </div>
+					        </div>
 							</div>
-
-							<!-- 중간: 팀 선택 (부서 선택 후 팀 목록 동적 생성) -->
-							<div class="mb-3">
-								<label class="form-label">팀</label>
-								<select class="form-select" id="teamSelect" onchange="changeTeam(this.value)">
-									<option disabled selected>-- 팀 선택 --</option>
-									<!-- 팀 목록은 부서 선택 시 JS를 통해 동적으로 추가 -->
-								</select>
-							</div>
-
-							<!-- 하위: 참여자 선택 (팀 선택 후 해당 팀의 구성원 불러옴) -->
-							<div class="mb-3">
-								<label class="form-label">참여자 선택</label>
-								<div class="d-flex">
-									<select id="employeeSelect" class="form-select me-2" style="flex:1;">
-										<option disabled selected>-- 참여자 선택 --</option>
-									</select>
-									<button type="button" class="btn btn-outline-primary" onclick="addParticipant()">추가</button>
-								</div>
-							</div>
-
-							<!-- 선택된 참여자 보여주기 -->
-							<div class="mb-3">
-								<label class="form-label">선택된 참여자</label>
-								<div id="selectedParticipants">
-									<!-- 여기에 badge가 추가됩니다. -->
-								</div>
-							</div>
-						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
 							<button type="submit" class="btn btn-primary">생성</button>
@@ -195,102 +187,107 @@
 				</div>
 			</div>
 		</div>
-		<script>
-		  let isGroupChat = false;
-		  document.addEventListener("DOMContentLoaded", () => {
-		    const chatTypeRadios = document.querySelectorAll('input[name="chatIsGroupYn"]');
-		    chatTypeRadios.forEach(radio => {
-		      radio.addEventListener('change', (e) => {
-		        isGroupChat = e.target.value === 'Y';
-		        console.log("채팅 타입 변경됨:", isGroupChat ? '그룹' : '1:1');
-		      });
-		    });
-		  });
-
-		  // 부서 선택 시 해당 부서의 팀 목록을 불러옵니다.
-		  function changeDepartment(deptId) {
-		    console.log("선택된 부서 ID:", deptId);
-		    // 팀 목록을 받아올 API 호출 (서버엔드포인트를 수정하세요)
-		    fetch('/chat/teams?departmentId=' + encodeURIComponent(deptId))
-		      .then(response => response.json())
-		      .then(data => {
-		        const teamSelect = document.getElementById('teamSelect');
-		        // 기존 옵션 초기화
-		        teamSelect.innerHTML = '<option disabled selected>-- 팀 선택 --</option>';
-		        data.forEach(team => {
-		          const option = document.createElement('option');
-		          option.value = team.teamId;
-		          option.text = team.teamName;
-		          teamSelect.appendChild(option);
-		        });
-		        // 부서 변경 시, 기존 참여자 목록 초기화
-		        document.getElementById('employeeSelect').innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
-		      })
-		      .catch(error => console.error('팀 로딩 실패:', error));
-		  }
-
-		  // 팀 선택 시 해당 팀의 직원 목록을 불러옵니다.
-		  function changeTeam(teamId) {
-		    console.log("선택된 팀 ID:", teamId);
-		    fetch('/chat/employes?teamId=' + encodeURIComponent(teamId))
-		      .then(response => response.json())
-		      .then(data => {
-		        const select = document.getElementById('employeeSelect');
-		        select.innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
-		        data.forEach(emp => {
-		          const option = document.createElement('option');
-		          option.value = emp.employee_no;
-		          option.text = emp.employee_name;
-		          select.appendChild(option);
-		        });
-		        // 채팅 타입에 따라 참여자 선택 방식을 설정 (1:1은 단일 선택)
-		        select.multiple = isGroupChat;
-		      })
-		      .catch(error => console.error('직원 로딩 실패:', error));
-		  }
-
-		  // 선택된 참여자를 추가하는 함수
-		  function addParticipant() {
-		    const select = document.getElementById('employeeSelect');
-		    const selectedOption = select.options[select.selectedIndex];
-		
-		    if (!selectedOption || selectedOption.disabled) {
-		      alert('참여자를 선택해주세요.');
-		      return;
-		    }
-		
-		    const participantId = selectedOption.value;
-		    const participantName = selectedOption.text;
-		
-		    // 이미 추가된 참여자 수 확인
-		    const currentCount = document.querySelectorAll('#selectedParticipants .badge').length;
-		
-		    // 1:1 채팅일 경우 1명까지만 허용
-		    if (!isGroupChat && currentCount >= 1) {
-		      alert('1:1 채팅은 한 명만 선택할 수 있습니다.');
-		      return;
-		   // 중복 추가 방지
-		    }else if(document.getElementById('participant-' + participantId)){
-		    	alert('이미 추가된 참여자입니다.');
-			      return;
-		    }
-		    const badge = document.createElement('span');
-		    badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
-		    badge.id = 'participant-' + participantId;
-		    badge.innerHTML = `
-		      ${participantName}
-		      <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeParticipant('${participantId}')"></button>
-		      <input type="hidden" name="participantIds" value="${participantId}">
-		    `;
-		
-		    document.getElementById('selectedParticipants').appendChild(badge);
-		  }
-		
-		  function removeParticipant(id) {
-		    const badge = document.getElementById('participant-' + id);
-		    if (badge) badge.remove();
-		  }
-		</script>
+		 <script>
+	      let isGroupChat = false;
+	      
+	      document.addEventListener("DOMContentLoaded", () => {
+	        const chatTypeRadios = document.querySelectorAll('input[name="chatIsGroupYn"]');
+	        const chatroomNameInput = document.getElementById("chatroomName");
+	        
+	        // 초기 상태 설정: 1:1 채팅이면 제목 입력란 비활성화
+	        chatroomNameInput.disabled = true;
+	        
+	        chatTypeRadios.forEach(radio => {
+	          radio.addEventListener('change', (e) => {
+	            isGroupChat = e.target.value === 'Y';
+	            console.log("채팅 타입 변경됨:", isGroupChat ? '그룹' : '1:1');
+	            // 1:1 채팅이면 제목 입력란 비활성화, 그룹 채팅이면 활성화
+	            chatroomNameInput.disabled = !isGroupChat;
+	            // 1:1 채팅일 때는 제목 입력란을 자동 설정할 예정이므로 초기화
+	            if (!isGroupChat) {
+	              chatroomNameInput.value = "";
+	            }
+	          });
+	        });
+	        
+	        // 그룹 채팅인 경우, 폼 제출 전 제목 입력 여부 확인
+	        document.getElementById("createChatForm").addEventListener("submit", function(e) {
+	          if (isGroupChat) {
+	            const chatRoomName = chatroomNameInput.value;
+	            if (chatRoomName.trim() === "") {
+	              alert("채팅방 제목을 입력해주세요.");
+	              e.preventDefault();
+	            }
+	          }
+	        });
+	      });
+	      
+	      // 부서(소속) 선택 시 해당 부서의 직원 목록을 불러오는 함수
+	      function changeDepartment(deptId) {
+	        console.log("선택된 부서 ID:", deptId);
+	        fetch('/chat/employes?separator_code=' + encodeURIComponent(deptId))
+	        .then(response => response.json())
+	        .then(data => {
+	          console.log(data);
+	          const select = document.getElementById('employeeSelect');
+	          select.innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
+	          data.forEach(emp => {
+	            const option = document.createElement('option');
+	            option.value = emp.employee_no;
+	            option.text = emp.employee_name;
+	            select.appendChild(option);
+	          });
+	          select.multiple = isGroupChat;
+	        })
+	        .catch(error => console.error('직원 로딩 실패:', error));
+	      }
+	      
+	      // 선택된 참여자를 추가하는 함수
+	      function addParticipant() {
+	        const select = document.getElementById('employeeSelect');
+	        const selectedOption = select.options[select.selectedIndex];
+	        if (!selectedOption || selectedOption.disabled) {
+	          alert('참여자를 선택해주세요.');
+	          return;
+	        }
+	        const participantId = selectedOption.value;
+	        const participantName = selectedOption.text;
+	        
+	        // 1:1 채팅은 한 명만 추가
+	        const currentCount = document.querySelectorAll('#selectedParticipants .badge').length;
+	        if (!isGroupChat && currentCount >= 1) {
+	          alert('1:1 채팅은 한 명만 선택할 수 있습니다.');
+	          return;
+	        }
+	        // 중복 추가 방지
+	        if (document.getElementById('participant-' + participantId)) {
+	          alert('이미 추가된 참여자입니다.');
+	          return;
+	        }
+	        const badge = document.createElement('span');
+	        badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
+	        badge.id = 'participant-' + participantId;
+	        badge.innerHTML = `
+	          ${participantName}
+	          <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeParticipant('${participantId}')"></button>
+	          <input type="hidden" name="participantIds" value="${participantId}">
+	        `;
+	        document.getElementById('selectedParticipants').appendChild(badge);
+	        // 만약 1:1 채팅이면, 채팅방 제목을 자동으로 참여자 이름으로 설정 (입력란은 이미 disabled됨)
+	        if (!isGroupChat) {
+	          document.getElementById("chatroomName").value = participantName;
+	        }
+	      }
+	      
+	      function removeParticipant(id) {
+	        const badge = document.getElementById('participant-' + id);
+	        if (badge) badge.remove();
+	        // 1:1 채팅인 경우, 참여자가 제거되면 제목도 초기화
+	        if (!isGroupChat) {
+	          document.getElementById("chatroomName").value = "";
+	        }
+	      }
+	    </script>
 	</main>
 	
 </body>
