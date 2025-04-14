@@ -39,6 +39,7 @@ import lombok.ToString;
 public class Employee {
 	
 	@Id
+	@Column(name="employee_no")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long employeeNo; // 사번
 
@@ -47,23 +48,32 @@ public class Employee {
 
 	@Column(name="employee_pw")
 	private String employeePw; // 비밀번호
+	
 	@Column(name="employee_name")
 	private String employeeName; // 이름
+	
 	@Column(name="employee_hire_date")
 	private LocalDateTime employeeHireDate; // 고용일
+	
 	@Column(name="employee_end_date")
 	private LocalDateTime employeeEndDate; // 퇴사일
-	@Column(name="employee_end_yn")
-	private String employeeEndYn; // 퇴사여부
+	
+	@Column(name="employee_employment_yn")
+	private String employeeEmploymentYn; // 퇴사여부
+	
 	@Column(name="employee_position")
-	private String employeePosition; // 직급	
+	private String employeePosition; // 직급
 	
 	@ManyToOne
-	@JoinColumn(name="department_no")
-	private Department department; // 부서번호
-	@ManyToOne
-	@JoinColumn(name="team_no")
-	private Team team; // 팀번호
+	@JoinColumn(name="structure_no")
+	private Structure structure;
+	
+//	@ManyToOne
+//	@JoinColumn(name="department_no")
+//	private Department department; // 부서번호
+//	@ManyToOne
+//	@JoinColumn(name="team_no")
+//	private Team team; // 팀번호
 	
 
 	// 채팅방 조인

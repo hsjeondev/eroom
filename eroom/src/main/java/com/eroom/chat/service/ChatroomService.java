@@ -46,7 +46,7 @@ public class ChatroomService {
 	}
 	// EmployeeRepository 에 있는 특정 부서에 속한 직원 가져오기
 	public List<EmployeeDto> findEmployeesByDepartmentName(String departmentName) {
-	    return employeeRepository.findByDepartment_DepartmentName(departmentName)
+	    return employeeRepository.findByStructure_CodeName(departmentName)
 	    		.stream()
 	    		.map(emp -> new EmployeeDto(emp.getEmployeeNo(), emp.getEmployeeName()))
 	    		.collect(Collectors.toList());

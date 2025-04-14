@@ -25,16 +25,17 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="employee_directory")
+@Table(name="directory")
 public class EmployeeDirectory {
 	
 	@Id
+	@Column(name="directory_no")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long employeeDirectoryNo; // 직원 주소록 번호
+	private Long directoryNo; // 직원 주소록 번호
 	
-	@Column(name = "employee_directory_email")
+	@Column(name = "directory_email")
 	private String employeeDirectoryEmail; // 이메일
-	@Column(name = "employee_directory_phone")
+	@Column(name = "directory_phone")
 	private String employeeDirectoryPhone; // 휴대폰 번호
 	
 	@OneToOne
