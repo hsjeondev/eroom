@@ -7,7 +7,8 @@ import java.util.List;
 import com.eroom.calendar.entity.EmployeeCalendar;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
-import com.eroom.directory.entity.EmployeeDirectory;
+import com.eroom.directory.entity.Directory;
+import com.eroom.directory.entity.DirectoryMemo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -90,12 +91,14 @@ public class Employee {
 			inverseJoinColumns = @JoinColumn(name="authority_no"))
 	private List<Authority> authorities;
     
-	@OneToOne
-	@JoinColumn(name = "employee_no")
-	private EmployeeDirectory employeeDirectory;
+	@OneToOne(mappedBy = "employee")
+	private Directory directory;
 	
 	//개인 캘린더 조인
-//	@OneToMany(mappedBy="employee")
-//	private List<EmployeeCalendar> employeeCalendars;
+	@OneToMany(mappedBy="employee")
+	private List<EmployeeCalendar> employeeCalendars;
+	
+	@OneToMany(mappedBy = "employee")
+	private List<DirectoryMemo> directoryMemos;
 
 }
