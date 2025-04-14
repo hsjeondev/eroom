@@ -85,7 +85,7 @@ public class Employee {
 	private EmployeeDirectory employeeDirectory;
 	
 	//개인 캘린더 조인
-	@OneToMany(mappedBy="employee")
-	private List<EmployeeCalendar> employeeCalendars;
+//	@OneToMany(mappedBy="employee")
+//	private List<EmployeeCalendar> employeeCalendars;
 
 }

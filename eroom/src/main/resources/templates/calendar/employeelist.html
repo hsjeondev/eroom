@@ -77,21 +77,26 @@
 						
 						<div class="modal-body p-card py-0">
 						
-							<input type="hidden" name="employee_no"
-								th:value="${#authentication.principal.employee.employeeNo}" />
-								<input type="hidden" name="separator" value="E001" />				
+						<!-- 	<input type="hidden" name="employee_no"
+								th:value="${#authentication.principal.employee.employeeNo}" /> -->
+								<input type="hidden" name="separator" value="E001" />
 
-							<div class="form-floating mb-3">
-								<input class="form-control" id="calendarTitle" type="text"
-									name="calendar_title" placeholder="일정 제목" /> <label
-									for="calendarTitle">일정 제목</label>
+							<div class="input-group input-group-sm mb-3">
+								<span class="input-group-text" id="inputGroup-sizing-sm">제목</span>
+								<input type="text" class="form-control" name="calendar_title"
+									id="calendarTitle" placeholder="일정 제목" aria-label="일정 제목"
+									aria-describedby="inputGroup-sizing-sm">
 							</div>
 
-							<div class="form-floating mb-3">
-								<input class="form-control" id="calendarLocation" type="text"
-									name="calendar_location" placeholder="일정 장소" /> <label
-									for="calendarLocation">일정 장소</label>
+							<!-- 장소 -->
+							<div class="input-group input-group-sm mb-3">
+								<span class="input-group-text" id="inputGroup-sizing-sm">장소</span>
+								<input type="text" class="form-control" name="calendar_location"
+									id="calendarLocation" placeholder="일정 장소" aria-label="일정 장소"
+									aria-describedby="inputGroup-sizing-sm">
 							</div>
+
+
 
 							<div class="form-floating mb-3">
 								<input class="form-control" id="calendarStartTime"
@@ -107,19 +112,18 @@
 									시간</label>
 							</div>
 
-							<div class="form-floating mb-3">
-								<textarea class="form-control" id="calendarContent"
-									name="calendar_content" placeholder="일정 설명"
-									style="height: 120px;"></textarea>
-								<label for="calendarContent">일정 설명</label>
+							<div class="input-group input-group-lg mb-3">
+								<span class="input-group-text" id="inputGroup-sizing-lg">설명</span>
+								<input type="text" class="form-control" name="calendar_content"
+									id="calendarContent" placeholder="일정 설명" aria-label="일정 설명"
+									aria-describedby="inputGroup-sizing-lg">
 							</div>
-						</div>
-				
 
-						<div
+							<div
 							class="modal-footer d-flex justify-content-between align-items-center border-0">
 							<span></span>
 							<button class="btn btn-primary px-4" type="submit">일정 등록</button>
+						</div>
 						</div>
 					</form>
 				</div>

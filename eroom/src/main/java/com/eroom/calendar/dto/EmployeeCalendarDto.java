@@ -1,8 +1,6 @@
 package com.eroom.calendar.dto;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.eroom.calendar.entity.EmployeeCalendar;
 import com.eroom.employee.entity.Employee;
@@ -28,9 +26,7 @@ public class EmployeeCalendarDto {
     private LocalDateTime calendar_end; // 종료 시간
     private String calendar_description; // 설명
     private Long employee_no; // 사번
-    private String separator; // 구분자 (ex: E001 - 개인)
-
-    // 자동 생성 필드는 생략 (DB에서 처리)
+    private String separator; // 구분자
     private LocalDateTime calendar_reg_date; 
     private LocalDateTime calendar_mod_date;
 	
@@ -42,7 +38,7 @@ public class EmployeeCalendarDto {
                 .calendarStart(calendar_start)
                 .calendarEnd(calendar_end)
                 .calendarDescription(calendar_description)
-                .employee(Employee.builder().employeeNo(employee_no).build()) // 연관 객체는 사번만으로 구성
+                .employeeNo(employee_no)
                 .separator(separator)
                 .visibleYn("Y") // 기본값 설정
                 .build();
@@ -57,7 +53,7 @@ public class EmployeeCalendarDto {
                 .calendar_start(employeeCalendar.getCalendarStart())
                 .calendar_end(employeeCalendar.getCalendarEnd())
                 .calendar_description(employeeCalendar.getCalendarDescription())
-                .employee_no(employeeCalendar.getEmployee().getEmployeeNo())
+                .employee_no(employeeCalendar.getEmployeeNo())
                 .separator(employeeCalendar.getSeparator())
                 .calendar_reg_date(employeeCalendar.getCalendarRegDate())
                 .calendar_mod_date(employeeCalendar.getCalendarModDate())

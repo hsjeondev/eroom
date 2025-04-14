@@ -70,6 +70,8 @@ public class EmployeeCalendar {
 
     @Column(name = "calendar_editor")
     private String calendarEditor;
+
+
 	
 
 }

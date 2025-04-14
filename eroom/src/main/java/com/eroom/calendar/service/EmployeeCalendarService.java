@@ -22,11 +22,11 @@ public class EmployeeCalendarService {
 		return new EmployeeCalendarDto().toDto(result);
 	}
 	
-	public List<EmployeeCalendarDto> getCalendarList(Long employeeNo) {
-	    List<EmployeeCalendar> list = repository.findByEmployeeEmployeeNo(employeeNo); // ✅ 정확한 메소드명
-	    return list.stream()
-	        .map(entity -> new EmployeeCalendarDto().toDto(entity))
-	        .collect(Collectors.toList());
-	}
+//	public List<EmployeeCalendarDto> getCalendarList(Long employeeNo) {
+//	    List<EmployeeCalendar> list = repository.findByEmployeeEmployeeNo(employeeNo); // ✅ 정확한 메소드명
+//	    return list.stream()
+//	        .map(entity -> new EmployeeCalendarDto().toDto(entity))
+//	        .collect(Collectors.toList());
+//	}
 
 }

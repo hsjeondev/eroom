@@ -70,13 +70,13 @@ public class CalendarController {
 		return resultMap;
 	}
 	
-	@GetMapping("/employeecalendar/list/{employeeNo}")
-	@ResponseBody
-	public List<Map<String, Object>> getCalendarList(@PathVariable("employeeNo") Long employeeNo) {
-	    return service.getCalendarList(employeeNo).stream()
-	        .map(EmployeeCalendarDto::toFullCalendarEvent)
-	        .collect(Collectors.toList());
-	}
+//	@GetMapping("/employeecalendar/list/{employeeNo}")
+//	@ResponseBody
+//	public List<Map<String, Object>> getCalendarList(@PathVariable("employeeNo") Long employeeNo) {
+//	    return service.getCalendarList(employeeNo).stream()
+//	        .map(EmployeeCalendarDto::toFullCalendarEvent)
+//	        .collect(Collectors.toList());
+//	}
 	
 
 }
