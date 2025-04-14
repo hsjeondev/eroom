@@ -33,29 +33,29 @@ public class EmployeeDirectoryDto {
 	
 	public EmployeeDirectory toEntity() {
 		return EmployeeDirectory.builder()
-				.employeeDirectoryNo(employee_directory_no)
+				.directoryNo(employee_directory_no)
 				.employeeDirectoryEmail(employee_directory_email)
 				.employeeDirectoryPhone(employee_directory_phone)
 				.employee(Employee.builder().employeeNo(employee_no).build())
 				.build();
 	}
 	
-	public EmployeeDirectoryDto toDto(EmployeeDirectory entity) {
-	    if (entity == null) return null;
-	    Employee emp = entity.getEmployee();
-	    
-	    return EmployeeDirectoryDto.builder()
-	            .employee_directory_no(entity.getEmployeeDirectoryNo())
-	            .employee_directory_email(entity.getEmployeeDirectoryEmail())
-	            .employee_directory_phone(entity.getEmployeeDirectoryPhone())
-	            .employee_no(emp != null ? emp.getEmployeeNo() : null)
-	            .employee_hire_date((emp != null && emp.getEmployeeHireDate() != null)? emp.getEmployeeHireDate() : null)
-	            .employee_end_date((emp != null && emp.getEmployeeEndDate() != null) ? emp.getEmployeeEndDate() : null)
-	            .employee_name((emp != null && emp.getEmployeeName() != null) ? emp.getEmployeeName() : null)
-	            .department_name((emp != null && emp.getDepartment() != null) ? emp.getDepartment().getDepartmentName() : null)
-	            .team_name((emp != null && emp.getTeam() != null) ? emp.getTeam().getTeamName() : null)
-	            .build();
-	}
+//	public EmployeeDirectoryDto toDto(EmployeeDirectory entity) {
+//	    if (entity == null) return null;
+//	    Employee emp = entity.getEmployee();
+//	    
+//	    return EmployeeDirectoryDto.builder()
+//	            .employee_directory_no(entity.getEmployeeDirectoryNo())
+//	            .employee_directory_email(entity.getEmployeeDirectoryEmail())
+//	            .employee_directory_phone(entity.getEmployeeDirectoryPhone())
+//	            .employee_no(emp != null ? emp.getEmployeeNo() : null)
+//	            .employee_hire_date((emp != null && emp.getEmployeeHireDate() != null)? emp.getEmployeeHireDate() : null)
+//	            .employee_end_date((emp != null && emp.getEmployeeEndDate() != null) ? emp.getEmployeeEndDate() : null)
+//	            .employee_name((emp != null && emp.getEmployeeName() != null) ? emp.getEmployeeName() : null)
+//	            .department_name((emp != null && emp.getDepartment() != null) ? emp.getDepartment().getDepartmentName() : null)
+//	            .team_name((emp != null && emp.getTeam() != null) ? emp.getTeam().getTeamName() : null)
+//	            .build();
+//	}
 	
 	public String getFormattedHireDate() {
 		if(employee_hire_date != null) {
