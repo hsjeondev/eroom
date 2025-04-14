@@ -3,6 +3,8 @@ package com.eroom.survey.dto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.eroom.survey.entity.Survey;
 
 import lombok.AllArgsConstructor;
@@ -22,9 +24,10 @@ public class SurveyDto {
 	private Long surveyNo;
 	private String surveyTitle;
 	private LocalDate deadline;
-    private String anonymousVote = "N";
-    private String allowMultiple = "N";
+    private String anonymousVote = "off";
+    private String allowMultiple = "off";
 	private Long employeeNo;
+	@CreationTimestamp
 	private LocalDateTime regDate;
 	
 	public Survey toEntity() {
@@ -32,8 +35,8 @@ public class SurveyDto {
 				.surveyNo(surveyNo)
 				.surveyTitle(surveyTitle)
 				.deadline(deadline)
-				.anonymousVote(anonymousVote != null ? anonymousVote : "N")
-				.allowMultiple(allowMultiple != null ? allowMultiple : "N")
+				.anonymousVote(anonymousVote)
+				.allowMultiple(allowMultiple)
 				.employeeNo(employeeNo)
 				.build();
 	}
