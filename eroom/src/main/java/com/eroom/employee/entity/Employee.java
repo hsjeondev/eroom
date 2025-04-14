@@ -94,9 +94,9 @@ public class Employee {
 	@OneToOne(mappedBy = "employee")
 	private Directory directory;
 	
-	//개인 캘린더 조인
-	@OneToMany(mappedBy="employee")
-	private List<EmployeeCalendar> employeeCalendars;
+//	//개인 캘린더 조인
+//	@OneToMany(mappedBy="employee")
+//	private List<EmployeeCalendar> employeeCalendars;
 	
 	@OneToMany(mappedBy = "employee")
 	private List<DirectoryMemo> directoryMemos;
