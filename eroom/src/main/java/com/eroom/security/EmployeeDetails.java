@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.eroom.employee.entity.Authority;
 import com.eroom.employee.entity.Employee;
 
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

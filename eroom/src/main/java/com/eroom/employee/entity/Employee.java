@@ -9,6 +9,7 @@ import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.entity.DirectoryMemo;
+import com.eroom.project.entity.ProjectMember;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -94,11 +95,14 @@ public class Employee {
 	@OneToOne(mappedBy = "employee")
 	private Directory directory;
 	
-	//개인 캘린더 조인
-	@OneToMany(mappedBy="employee")
-	private List<EmployeeCalendar> employeeCalendars;
+//	//개인 캘린더 조인
+//	@OneToMany(mappedBy="employee")
+//	private List<EmployeeCalendar> employeeCalendars;
 	
 	@OneToMany(mappedBy = "employee")
 	private List<DirectoryMemo> directoryMemos;
+	
+	@OneToMany(mappedBy="employee")
+	private List<ProjectMember> projectMembers;
 
 }
