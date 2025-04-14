@@ -22,11 +22,14 @@ public class EmployeeCalendarService {
 		return new EmployeeCalendarDto().toDto(result);
 	}
 	
-//	public List<EmployeeCalendarDto> getCalendarList(Long employeeNo) {
-//	    List<EmployeeCalendar> list = repository.findByEmployeeEmployeeNo(employeeNo); // ✅ 정확한 메소드명
-//	    return list.stream()
-//	        .map(entity -> new EmployeeCalendarDto().toDto(entity))
-//	        .collect(Collectors.toList());
-//	}
+	public List<EmployeeCalendarDto> getCalendarList(Long employeeNo) {
+	    List<EmployeeCalendar> list = repository.findByEmployeeNo(employeeNo);
+	    return list.stream()
+	        .map(employeeCalendar -> {
+	            EmployeeCalendarDto dto = new EmployeeCalendarDto();
+	            return dto.toDto(employeeCalendar); // EmployeeCalendar를 EmployeeCalendarDto로 변환
+	        })
+	        .collect(Collectors.toList());
+	}
 
 }

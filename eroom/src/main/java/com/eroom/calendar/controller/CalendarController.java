@@ -31,6 +31,7 @@ public class CalendarController {
 	//캘린더 개인일정 목록으로 화면 전환
 	@GetMapping("/calendar/employee")
 	public String employeeCalendarView() {
+//		EmployeeCalendarDto ecd = service.oneCalendar();
 		return "calendar/employeelist";
 	}
 	
@@ -70,13 +71,32 @@ public class CalendarController {
 		return resultMap;
 	}
 	
-//	@GetMapping("/employeecalendar/list/{employeeNo}")
-//	@ResponseBody
-//	public List<Map<String, Object>> getCalendarList(@PathVariable("employeeNo") Long employeeNo) {
-//	    return service.getCalendarList(employeeNo).stream()
-//	        .map(EmployeeCalendarDto::toFullCalendarEvent)
-//	        .collect(Collectors.toList());
-//	}
+	//해당 유저의 일정 목록을 조회
+	@GetMapping("/employeecalendar/list/{employeeNo}")
+	@ResponseBody
+	public List<Map<String, Object>> getCalendarList(@PathVariable("employeeNo") Long employeeNo) {
+	    return service.getCalendarList(employeeNo)
+	        .stream()
+	        .map(EmployeeCalendarDto::toFullCalendarEvent) // 이미 EmployeeCalendarDto이므로 바로 toFullCalendarEvent 호출
+	        .collect(Collectors.toList());
+	}
+	
+	/*@PostMapping("/calendar/update/{calendarNo}")
+	public Map<String,String>updateCalendar(@PathVariable Long calendarNo, Model model){
+		Map<String,String> resultMap = new HashMap<String,String>();
+		resultMap.put("res_code", "500");
+		resultMap.put("res_msg", "일정 수정을 실패하였습니다");
+		
+		System.out.println(calendarNo);*/
+		
+//		EmployeeCalendarDto edto = service.updateCalendar(calendarNo);
+//		if(edto != null) {
+//			resultMap.put("res_code", "200");
+//			resultMap.put("res_msg", "수정을 성공하였습니다!");
+//		}
+//		return resultMap;
+	
+	
 	
 
 }

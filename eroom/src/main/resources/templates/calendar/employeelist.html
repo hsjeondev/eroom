@@ -28,7 +28,7 @@
 
 
 
-
+<!-- 
 	 	<div class="mx-n4 px-4 mx-lg-n6 px-lg-6 border-y border-translucent">
 			<div class="row py-3 gy-3 gx-0">
 				<div class="col-6 col-md-4 order-1 d-flex align-items-center">
@@ -59,7 +59,7 @@
 					</div>
 				</div>
 			</div>
-		</div> 
+		</div>  -->
 
 		<!-- 일정 등록 모달 -->
 		<div class="modal fade" id="addEventModal" tabindex="-1">
@@ -82,6 +82,7 @@
 								<input type="hidden" name="separator" value="E001" />
 						 	<input type="hidden" name="calendar_creator"
 								th:value="${#authentication.principal.employee.employeeId}" /> 
+							<input type="hidden" name="calendar_no" value="">
 
 							<div class="input-group input-group-sm mb-3">
 								<span class="input-group-text" id="inputGroup-sizing-sm">제목</span>
@@ -135,78 +136,192 @@
 
 		<!-- 캘린더 위치 -->
 		<div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
-
-
-
-		<!-- 	<script>
-				  document.addEventListener('DOMContentLoaded', function () {
-				    const calendarEl = document.getElementById('appCalendar');
-				    const employeeNo = document.addEventForm.employee_no.value;
-				
-				    const calendar = new FullCalendar.Calendar(calendarEl, {
-				      initialView: 'dayGridMonth',
-				      locale: 'ko',
-				      headerToolbar: {
-				        left: 'prev,next today',
-				        center: 'title',
-				        right: 'dayGridMonth,timeGridWeek'
-				      },
-				      events: function(fetchInfo, successCallback, failureCallback) {
-				        fetch('/employeecalendar/list/' + employeeNo)
-				          .then(response => response.json())
-				          .then(events => {
-				            successCallback(events);
-				          })
-				          .catch(error => {
-				            console.error("이벤트 불러오기 실패", error);
-				            failureCallback(error);
-				          });
-				      }
-				    });
-				
-				    calendar.render();
-  				});
-		</script> -->
-<!-- 		<script>
-				document.addEventListener('DOMContentLoaded', function () {
-		  		const calendarEl = document.getElementById('appCalendar');
-		  		const employeeNo = document.addEventForm.employee_no.value;
 		
-		  	const calendar = new FullCalendar.Calendar(calendarEl, {
-		    initialView: 'dayGridMonth',
-		    locale: 'ko',
-		    headerToolbar: {
-		      left: 'prev,next today',
-		      center: 'title',
-		      right: 'dayGridMonth,timeGridWeek'
-		    },		  
-		    dayCellContent: function(info) {
-		        return info.date.getDate(); // '1일' -> '1'로
-		      },
-		    eventClick: function(info) {
-		      alert("제목: " + info.event.title + "\n설명: " + info.event.extendedProps.description);
-		    },
-		    eventDidMount: function(info) {
-		      // 툴팁 처리 (tippy.js를 쓴다면 더 예쁨)
-		      info.el.setAttribute("title", info.event.extendedProps.description || info.event.title);
-		    },
-		    events: function(fetchInfo, successCallback, failureCallback) {
-		      fetch('/employeecalendar/list/' + employeeNo)
-		        .then(response => response.json())
-		        .then(events => {
-		          successCallback(events);
-		        })
-		        .catch(error => {
-		          console.error("이벤트 불러오기 실패", error);
-		          failureCallback(error);
-		        });
-		    }
-		  });
 		
-		  calendar.render();
-	});
-		</script>
+		
+		<!-- 일정 상세 조회 모달 -->
+		
+		<button class="btn btn-primary" type="button" data-bs-toggle="modal"
+    	data-bs-target="#tooltipModal" style="display: none;" id="modalButton"></button>
 
+		<!-- 모달 창 -->
+		<div class="modal fade" id="tooltipModal" tabindex="-1"
+			aria-labelledby="tooltipModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="tooltipModalLabel">내 일정 상세조회</h5>
+						<button class="btn btn-close p-1" type="button"
+							data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body" id = "detailModal">
+						<strong>일정:</strong> <span id="eventTitle"></span>
+						<p>
+							<br> <strong>시간:</strong> <span id="eventDate"></span>
+						</p>
+						<p>
+							<strong>장소:</strong> <span id="eventLocation"></span>
+						</p>
+						<p>
+							<strong>설명:</strong> <span id="eventDescription"></span>
+						</p>
+						
+					</div>
+					
+					<div class="modal-footer d-flex justify-content-between">
+						<!-- 수정 및 삭제 버튼을 왼쪽 -->
+						<div class="d-flex">
+							<button class="btn btn-subtle-secondary me-1 mb-1" type="button" id="editEventBtn">수정</button>
+							<button class="btn btn-outline-info me-1 mb-1" type="button">삭제</button>
+						</div>
+						<!-- 확인 버튼을 오른쪽에 배치 -->
+						<div>
+							<button class="btn btn-primary" type="button"
+								data-bs-dismiss="modal">확인</button>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+
+	<script>
+  	document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('appCalendar');
+    const employeeNo = document.addEventForm.employee_no.value;
+   
+
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'ko',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: ''
+      },
+      dayMaxEventRows: true,
+      views: {
+        dayGridMonth: {
+          dayMaxEventRows: 3 // "more" 링크 생김
+        }
+      },
+      dayCellContent: function (info) {
+        return info.date.getDate();
+      },
+      dateClick: function (info) {
+        // 날짜 클릭 시 모달 열고, 해당 날짜를 시작시간에 자동 설정
+        const dateStr = info.dateStr + "T09:00";
+        document.getElementById('calendarStartTime').value = dateStr;
+        document.getElementById('calendarEndTime').value = info.dateStr + "T18:00";
+
+        const addEventModal = new bootstrap.Modal(document.getElementById('addEventModal'));
+        addEventModal.show();
+      },
+
+      eventClick: function (info) {
+        document.getElementById('eventTitle').textContent = info.event.title;
+        document.getElementById('eventDate').textContent = info.event.start.toISOString().slice(0, 16).replace("T", " ");
+        document.getElementById('eventLocation').textContent = info.event.extendedProps.location || '';
+        document.getElementById('eventDescription').textContent = info.event.extendedProps.description || '';
+        
+        selectedCalendarNo = info.event.extendedProps.calendar_no; // ✅ 이거 꼭 필요함!
+
+        document.getElementById('modalButton').click();
+      },
+      eventDidMount: function (info) {
+        const separator = info.event.extendedProps.separator || "";
+        let backgroundColor, borderColor, textColor;
+
+        switch (separator) {
+          case "E001":
+            backgroundColor = "#DFFBD9";
+            borderColor = "#DFFBD9";
+            textColor = "#000000";
+            break;
+        }
+
+        info.el.style.setProperty("background-color", backgroundColor, "important");
+        info.el.style.setProperty("border-color", borderColor, "important");
+        info.el.style.setProperty("color", textColor, "important");
+
+        const eventMain = info.el.querySelector('.fc-event-main');
+        if (eventMain) {
+          eventMain.style.setProperty("background-color", backgroundColor, "important");
+          eventMain.style.setProperty("border-color", borderColor, "important");
+          eventMain.style.setProperty("color", textColor, "important");
+        }
+      },
+      events: function (fetchInfo, successCallback, failureCallback) {
+        fetch('/employeecalendar/list/' + employeeNo)
+          .then(response => response.json())
+          .then(events => {
+            successCallback(events);
+          })
+          .catch(error => {
+            console.error("이벤트 불러오기 실패", error);
+            failureCallback(error);
+          });
+      	}
+    });
+
+    	calendar.render();
+		
+  	});
+  	
+  	document.getElementById('editEventBtn').addEventListener('click', function () {
+  	  // 1. 상세조회 모달 닫기
+  	  const tooltipModal = bootstrap.Modal.getInstance(document.getElementById('tooltipModal'));
+  	  tooltipModal.hide();
+
+  	  // 2. 상세조회 내용 → 등록 모달 input으로 복사
+  	  document.getElementById('calendarTitle').value = document.getElementById('eventTitle').textContent;
+  	  document.getElementById('calendarLocation').value = document.getElementById('eventLocation').textContent;
+  	  document.getElementById('calendarContent').value = document.getElementById('eventDescription').textContent;
+
+  	  // ✅ 시간은 eventDate에 있는 "yyyy-MM-dd HH:mm" 문자열에서 처리
+  	  const timeStr = document.getElementById('eventDate').textContent;
+  	  const formatted = timeStr.replace(" ", "T"); // datetime-local 형식
+  	  document.getElementById('calendarStartTime').value = formatted;
+  	  document.getElementById('calendarEndTime').value = formatted;
+
+  	  // ✅ calendarNo를 hidden input에 넣기
+  	  document.querySelector('input[name="calendar_no"]').value = selectedCalendarNo;
+
+  	  const addEventModal = new bootstrap.Modal(document.getElementById('addEventModal'));
+  	  addEventModal.show();
+  	});
+
+  	document.getElementById('addEventForm').addEventListener('submit', function (e) {
+  	  e.preventDefault();
+
+  	  const form = e.target;
+  	  const calendarNo = form.querySelector('input[name="calendar_no"]').value;
+
+  	  const formData = new FormData(form);
+
+  	  fetch('/calendar/update/' + calendarNo, {
+  	    method: 'POST',
+  	    headers: {
+  	      'header': document.querySelector('meta[name="_csrf_header"]').content,
+  	      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+  	    },
+  	    body: formData
+  	  })
+  	  .then(response => response.json())
+  	  .then(data => {
+  	    alert(data.res_msg);
+  	    if (data.res_code === 200) {
+  	      location.href = '/calendar';
+  	    }
+  	  })
+  	  .catch(error => {
+  	    console.error('Error:', error);
+  	  });
+  	});
+	</script>
+	
+	
 
 		<!-- 일정 등록 처리 스크립트 -->
 	<script>
