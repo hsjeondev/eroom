@@ -22,11 +22,13 @@ public class EmployeeCalendarDto {
 	private Long calendar_no;  // 캘린더 번호 (수정 시 사용)
     private String calendar_title; // 제목
     private String calendar_location; // 장소
-    private LocalDateTime calendar_start; // 시작 시간
-    private LocalDateTime calendar_end; // 종료 시간
-    private String calendar_description; // 설명
+    private LocalDateTime calendar_start_time; // 시작 시간
+    private LocalDateTime calendar_end_time; // 종료 시간
+    private String calendar_content; // 설명
+    private String calendar_creator;
     private Long employee_no; // 사번
     private String separator; // 구분자
+    private String visibleYn = "Y";
     private LocalDateTime calendar_reg_date; 
     private LocalDateTime calendar_mod_date;
 	
@@ -35,12 +37,13 @@ public class EmployeeCalendarDto {
                 .calendarNo(calendar_no)
                 .calendarTitle(calendar_title)
                 .calendarLocation(calendar_location)
-                .calendarStart(calendar_start)
-                .calendarEnd(calendar_end)
-                .calendarDescription(calendar_description)
+                .calendarStartTime(calendar_start_time)
+                .calendarEndTime(calendar_end_time)
+                .calendarContent(calendar_content)
+                .calendarCreator(calendar_creator)
                 .employeeNo(employee_no)
                 .separator(separator)
-                .visibleYn("Y") // 기본값 설정
+            
                 .build();
     }
     
@@ -50,9 +53,10 @@ public class EmployeeCalendarDto {
                 .calendar_no(employeeCalendar.getCalendarNo())
                 .calendar_title(employeeCalendar.getCalendarTitle())
                 .calendar_location(employeeCalendar.getCalendarLocation())
-                .calendar_start(employeeCalendar.getCalendarStart())
-                .calendar_end(employeeCalendar.getCalendarEnd())
-                .calendar_description(employeeCalendar.getCalendarDescription())
+                .calendar_start_time(employeeCalendar.getCalendarStartTime())
+                .calendar_end_time(employeeCalendar.getCalendarEndTime())
+                .calendar_content(employeeCalendar.getCalendarContent())
+                .calendar_creator(employeeCalendar.getCalendarCreator())
                 .employee_no(employeeCalendar.getEmployeeNo())
                 .separator(employeeCalendar.getSeparator())
                 .calendar_reg_date(employeeCalendar.getCalendarRegDate())
