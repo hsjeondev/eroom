@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.eroom.employee.entity.Employee;
+import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.survey.dto.SurveyDto;
 import com.eroom.survey.dto.SurveyItemDto;
 import com.eroom.survey.entity.Survey;
@@ -16,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class SurveyService {
+
+    private final EmployeeRepository employeeRepository;
 	private final SurveyRepository surveyRepository;
 	private final SurveyItemRepository surveyItemRepository;
 
@@ -39,4 +43,14 @@ public class SurveyService {
 		}
 		return result;
 	}
+
+	public List<Survey> findAllSurvey() {
+		return surveyRepository.findAll();
+	}
+
+	public List<Employee> findAllEmployee() {
+		return employeeRepository.findAll();
+	}
+	
+	
 }
