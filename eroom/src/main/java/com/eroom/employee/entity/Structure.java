@@ -1,12 +1,9 @@
 package com.eroom.employee.entity;
 
-
 import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -23,21 +20,30 @@ import lombok.ToString;
 @Setter
 @ToString
 @Builder
-
 @Entity
-@Table(name="department")
-public class Department {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long departmentNo; // 부서 번호
-	
-	@Column(name="department_name")
-	private String departmentName; // 부서 이름
-	@Column(name="department_order")
-	private Long departmentOrder; // 부서 번호
-	
-	@OneToMany(mappedBy = "department")
-	private List<Employee> employees;
+@Table(name="structure")
+public class Structure {
 
+	@Id
+	@Column(name="structure_no")
+	private Long structureNo;
+	
+	@Column(name="separator_code")
+	private String separatorCode;
+	
+	@Column(name="code_name")
+	private String codeName;
+	
+	@Column(name="order")
+	private Long order;
+	
+	@Column(name="parentCode")
+	private String parent_code;
+	
+	@Column(name="visible_yn")
+	private String visibleYn;
+	
+	@OneToMany(mappedBy = "structure")
+	private List<Employee> emplyees;
+	
 }
