@@ -41,12 +41,12 @@ public class ChatroomService {
 		return list;
 	}
 	// EmployeeRepository 에 있는 부서명 중복 제거 목록
-	public List<String> findDistinctDepartmentNames() {
-		return employeeRepository.findDistinctDepartmentNames();
+	public List<String> findDistinctStructureNames() {
+		return employeeRepository.findDistinctStructureNames();
 	}
 	// EmployeeRepository 에 있는 특정 부서에 속한 직원 가져오기
-	public List<EmployeeDto> findEmployeesByDepartmentName(String departmentName) {
-	    return employeeRepository.findByStructure_CodeName(departmentName)
+	public List<EmployeeDto> findEmployeesByStructureName(String structureName) {
+	    return employeeRepository.findByStructure_CodeName(structureName)
 	    		.stream()
 	    		.map(emp -> new EmployeeDto(emp.getEmployeeNo(), emp.getEmployeeName()))
 	    		.collect(Collectors.toList());

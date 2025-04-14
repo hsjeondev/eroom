@@ -27,15 +27,15 @@ public class ChatController {
 		List<Chatroom> resultList = chatroomService.selectChatRoomAll();
 		model.addAttribute("chatroomList",resultList);
 		
-		List<String> departmentList = chatroomService.findDistinctDepartmentNames();
-		model.addAttribute("departmentList", departmentList);
+		List<String> structureList = chatroomService.findDistinctStructureNames();
+		model.addAttribute("structureList", structureList);
 		
 		return "chat/list";
 	}
 	@GetMapping("/employes")
 	@ResponseBody
 	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam(name = "department") String department){
-		return chatroomService.findEmployeesByDepartmentName(department);
+		return chatroomService.findEmployeesByStructureName(department);
 	}
 	
 }

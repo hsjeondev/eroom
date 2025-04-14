@@ -19,7 +19,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 	
 	// 중복 제거 부서명 목록
 	@Query("SELECT DISTINCT e.structure.codeName FROM Employee e")
-	List<String> findDistinctDepartmentNames();
+	List<String> findDistinctStructureNames();
 	
 	// 특정 부서에 속한 직원
 	List<Employee> findByStructure_CodeName(String codeName);
