@@ -3,9 +3,7 @@ package com.eroom.employee.dto;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import com.eroom.employee.entity.Department;
 import com.eroom.employee.entity.Employee;
-import com.eroom.employee.entity.Team;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,10 +39,8 @@ public class EmployeeDto {
 				.employeeName(employee_name)
 				.employeeHireDate(employee_hire_date)
 				.employeeEndDate(employee_end_date)
-				.employeeEndYn(employee_end_yn)
+				.employeeEmploymentYn(employee_end_yn)
 				.employeePosition(employee_position)
-				.department(Department.builder().departmentNo(department_no).build())
-				.team(Team.builder().teamNo(team_no).build())
 				.build();
 	}
 	
@@ -55,7 +51,7 @@ public class EmployeeDto {
 				.employee_pw(emp.getEmployeePw())
 				.employee_hire_date(emp.getEmployeeHireDate())
 				.employee_end_date(emp.getEmployeeEndDate())
-				.employee_end_yn(emp.getEmployeeEndYn())
+				.employee_end_yn(emp.getEmployeeEmploymentYn())
 				.employee_position(emp.getEmployeePosition())
 				.build();
 	}
