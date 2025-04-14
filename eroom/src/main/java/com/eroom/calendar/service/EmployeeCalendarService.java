@@ -31,5 +31,22 @@ public class EmployeeCalendarService {
 	        })
 	        .collect(Collectors.toList());
 	}
+	
+	//단일 조회
+	public EmployeeCalendarDto findByCalendarNo(Long id) {
+        // 데이터베이스에서 일정 가져오기
+        EmployeeCalendar calendar = repository.findById(id).orElse(null);
+        
+        // 데이터가 없으면 null 반환
+        if (calendar == null) {
+            return null;
+        }
+
+        // EmployeeCalendarDto 객체 생성
+        EmployeeCalendarDto dto = new EmployeeCalendarDto();
+        
+        // toDto 호출
+        return dto.toDto(calendar);
+    }
 
 }

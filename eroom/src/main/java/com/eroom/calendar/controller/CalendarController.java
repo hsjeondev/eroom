@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -96,7 +98,23 @@ public class CalendarController {
 //		}
 //		return resultMap;
 	
+	// 수정을 위한 단일조회
+    @GetMapping("/employeecalendar/detail/{calendarNo}")
+    @ResponseBody
+    public ResponseEntity<EmployeeCalendarDto> selectCalendarOne(@PathVariable("calendarNo") Long calendarNo) {
+        try {
+            EmployeeCalendarDto calendar = service.findByCalendarNo(calendarNo);
+            if (calendar == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(calendar);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+}
+	
 	
 	
 
-}
+
