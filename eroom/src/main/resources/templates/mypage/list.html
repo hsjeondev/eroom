@@ -189,7 +189,7 @@
 			        </form>
 			      </div>
 			      <div class="modal-footer">
-			        <button class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+			        <button class="btn btn-light" data-bs-dismiss="modal">취소</button>
 			        <button class="btn btn-primary" onclick="saveInfo()">저장</button>
 			      </div>
 			    </div>
@@ -620,46 +620,46 @@
 </div> <!-- 북마크 목록 끝 -->      
  
 <!-- 모달 -->
-								<div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
-								  <div class="modal-dialog modal-dialog-centered">
-								    <div class="modal-content">
-								      <div class="modal-header">
-								        <h5 class="modal-title" id="profileUploadModalLabel">프로필 사진 변경</h5>
-								        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-								      </div>
-								      <div class="modal-body text-center">
-								        <button class="btn btn-outline-primary mb-3" onclick="setDefaultProfile()">
-								          기본 프로필 적용하기
-								        </button>
-								        <br>
-								        <label class="btn btn-primary" for="profileUploadInput">
-								          프로필 사진 업로드하기
-								        </label>
-								        <input type="file" id="profileUploadInput" class="d-none" accept="image/*" onchange="previewProfileImage(event)">
-								      </div>
-								    </div>
-								  </div>
-								</div>
-								
-								
-								<script>
-								  function setDefaultProfile() {
-								    const profileImage = document.getElementById('profileImage');
-								    profileImage.src = '/assets/img/team/avatar.webp'; // 부트스트랩 기본 프로필 이미지
-								    const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
-								    modal.hide();
-								  }
-								
-								  function previewProfileImage(event) {
-								    const file = event.target.files[0];
-								    if (file) {
-								      const profileImage = document.getElementById('profileImage');
-								      profileImage.src = URL.createObjectURL(file);
-								      const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
-								      modal.hide();
-								    }
-								  }
-								</script>                
+<div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="profileUploadModalLabel">프로필 사진 변경</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body text-center">
+        <button class="btn btn-outline-primary mb-3" onclick="setDefaultProfile()">
+          기본 프로필 적용하기
+        </button>
+        <br>
+        <label class="btn btn-primary" for="profileUploadInput">
+          프로필 사진 업로드하기
+        </label>
+        <input type="file" id="profileUploadInput" class="d-none" accept="image/*" onchange="previewProfileImage(event)">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  function setDefaultProfile() {
+    const profileImage = document.getElementById('profileImage');
+    profileImage.src = '/assets/img/team/avatar.webp'; // 부트스트랩 기본 프로필 이미지
+    const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
+    modal.hide();
+  }
+
+  function previewProfileImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const profileImage = document.getElementById('profileImage');
+      profileImage.src = URL.createObjectURL(file);
+      const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
+      modal.hide();
+    }
+  }
+</script>                
                 
                 
 </main>

@@ -45,10 +45,12 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 <div class="mb-9">
 	<div class="row align-items-center justify-content-between g-3 mb-4">
 		<!-- 상단 제목 -->
-		<div class="d-flex justify-content-start">
-			<i class="fas fa-user-tie text-secondary me-2"></i>
-			<span class="fw-bold fs-7">회원 상세 정보</span>
-		</div>   
+		<div class="row g-2 mb-4">
+			<div class="d-flex justify-content-start align-items-center mb-2">
+				<i class="fas fa-user-tie text-secondary me-2"></i>
+				<span class="fw-bold fs-7">회원 상세 정보</span>
+			</div>
+		</div> 
 	<!-- 삭제. 수정 버튼 col-auto로 하면 왼쪽 col-auto ms-auto 는 오른쪽 -->
 		<div class="col-auto ms-auto">
 			<div class="row g-3">
@@ -189,7 +191,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						</div>
 						
 						<div class="modal-footer">
-						  <button class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+						  <button class="btn btn-light" data-bs-dismiss="modal">취소</button>
 						  <button class="btn btn-primary" onclick="saveInfo()">저장</button>
 						</div>
 					</div>
@@ -375,7 +377,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
       <div class="search-box">
         <form class="position-relative">
           <input class="form-control form-control-sm search-input search" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
-          <svg class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <svg style="height:40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
             <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
           </svg>
         </form>
@@ -503,6 +505,48 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		</div> <!-- col-12 col-md-8 col-xxl-8 -->	<!-- 우측 근태카드 + 차트 부분 끝 -->
 	</div>	<!-- row g-5 --> 
 </div><!-- mb-9 -->   <!-- 프로필, 근태, 차트 위치된 상단 부분. -->
+
+<!-- 모달 -->
+<div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="profileUploadModalLabel">프로필 사진 변경</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body text-center">
+        <button class="btn btn-outline-primary mb-3" onclick="setDefaultProfile()">
+          기본 프로필 적용하기
+        </button>
+        <br>
+        <!-- <label class="btn btn-primary" for="profileUploadInput">
+          프로필 사진 업로드하기
+        </label>
+        <input type="file" id="profileUploadInput" class="d-none" accept="image/*" onchange="previewProfileImage(event)"> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  function setDefaultProfile() {
+    const profileImage = document.getElementById('profileImage');
+    profileImage.src = '/assets/img/team/avatar.webp'; // 부트스트랩 기본 프로필 이미지
+    const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
+    modal.hide();
+  }
+
+/*   function previewProfileImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const profileImage = document.getElementById('profileImage');
+      profileImage.src = URL.createObjectURL(file);
+      const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
+      modal.hide();
+    }
+  } */
+</script>                
     </main>
   </body>
 </html>
