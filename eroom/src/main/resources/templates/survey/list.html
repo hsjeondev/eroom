@@ -39,6 +39,7 @@
 												</div>
 												<div class="modal-body">
 													<!-- 모달 본문 -->
+													<!-- <input class="form-control" id="surveyWriter" name="surveyWriter" type="hidden" th:value="${#authentication.principal.employee.employeeName}"> -->
 													<div class="row mb-3">
 														<label class="col-sm-2 col-form-label text-end" for="surveyTitle">제목</label>
 														<div class="col-sm-8">
@@ -50,7 +51,7 @@
 														<label class="col-sm-2 col-form-label text-end" for="inputItem">항목</label>
 														<div class="col-sm-8">
 															<div id="itemScrollBox" style="max-height: 400px; overflow-y: auto;">
-																<div id="itemContainer">
+																<div id="itemContainer default">
 																	<input class="form-control mb-2" id="inputItem" name="items" type="text" style="width: 97.2%;">
 																</div>
 																<div id="itemContainer">
@@ -134,7 +135,7 @@
 												</div>
 											</div>
 										</div>
-										<p class="fs-9 fw-semibold text-body ms-1 text mb-4 ps-2" th:text="작성자">작성자</p>
+										<p class="fs-9 fw-semibold text-body ms-1 text mb-4 ps-2" th:text="'작성자 : ' + ${survey.writer}">작성자</p>
 									</div>
 									<div class="row g-1 g-sm-3 mt-2 lh-1">
 										<div class="col-12 col-sm-auto">

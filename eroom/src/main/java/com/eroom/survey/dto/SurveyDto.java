@@ -22,33 +22,33 @@ import lombok.ToString;
 @Builder
 public class SurveyDto {
 	private Long surveyNo;
+	private String writer;
 	private String surveyTitle;
 	private LocalDate deadline;
     private String anonymousVote = "off";
     private String allowMultiple = "off";
-	private Long employeeNo;
 	@CreationTimestamp
 	private LocalDateTime regDate;
 	
 	public Survey toEntity() {
 		return Survey.builder()
 				.surveyNo(surveyNo)
+				.writer(writer)
 				.surveyTitle(surveyTitle)
 				.deadline(deadline)
 				.anonymousVote(anonymousVote)
 				.allowMultiple(allowMultiple)
-				.employeeNo(employeeNo)
 				.build();
 	}
 	
 	public SurveyDto toDto(Survey survey) {
 		return SurveyDto.builder()
 				.surveyNo(survey.getSurveyNo())
+				.writer(survey.getWriter())
 				.surveyTitle(survey.getSurveyTitle())
 				.deadline(survey.getDeadline())
 				.anonymousVote(survey.getAnonymousVote())
 				.allowMultiple(survey.getAllowMultiple())
-				.employeeNo(survey.getEmployeeNo())
 				.build();
 	}
 }

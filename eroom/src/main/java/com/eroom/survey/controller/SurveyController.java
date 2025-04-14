@@ -2,6 +2,7 @@ package com.eroom.survey.controller;
 
 import java.util.List;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.eroom.employee.entity.Employee;
-import com.eroom.employee.service.EmployeeService;
+import com.eroom.security.EmployeeDetails;
 import com.eroom.survey.dto.SurveyDto;
 import com.eroom.survey.dto.SurveyItemDto;
 import com.eroom.survey.entity.Survey;
@@ -58,10 +59,22 @@ public class SurveyController {
 		for (String item : surveyItemDto.getItems()) {
 			System.out.println("- " + item);
 		}
+		
+		
+		EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder
+			    .getContext()
+			    .getAuthentication()
+			    .getPrincipal();
+
+		Employee employee = userDetails.getEmployee();
+		
+		
+		String writer = employee.getEmployeeName();
+		surveyDto.setWriter(writer);
 
 		int result = surveyService.saveSurvey(surveyDto, surveyItemDto);
 
-		return "survey/list";
+		return "redirect:/survey/list";
 	}
 
 }
