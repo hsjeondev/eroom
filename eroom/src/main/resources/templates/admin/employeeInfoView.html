@@ -365,7 +365,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
      
 <div id="attendanceTable" data-list='{"valueNames":["no","date","checkin","checkout"],"page":5,"pagination":true}'>
   <!-- 상단: 날짜 선택 + 검색창 -->
-  <div class="row justify-content-between align-items-center g-3 mb-3 px-3">
+<div class="d-flex justify-content-between align-items-center mb-3 px-3 gap-2 flex-wrap">
      <div class="row g-2 mb-4">
 		<div class="d-flex justify-content-start align-items-center mb-2">
 			<!-- <i class="fas fa-user-tie text-secondary me-2"></i> -->
@@ -373,8 +373,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		</div>
 	</div>
         <!-- 검색창 -->
-    <div class="col-auto">
-      <div class="search-box">
+    <div class="flex-grow-1 d-flex justify-content-center">
+      <div class="search-box w-50">
         <form class="position-relative">
           <input class="form-control form-control-sm search-input search" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
           <svg style="height:40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -384,7 +384,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
       </div>
     </div>
     <!-- 날짜 선택 -->
-    <div class="col-auto">
+    <div>
       <select class="form-select form-select-sm" data-list-filter="data-list-filter">
         <option selected value="">날짜 선택</option>
         <option value="2025.01">2025.01</option>
