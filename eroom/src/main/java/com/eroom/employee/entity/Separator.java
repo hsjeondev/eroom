@@ -25,7 +25,7 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="separator")
+@Table(name="`separator`")
 public class Separator {
 	
 	@Id
