@@ -18,9 +18,11 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 	Optional<Employee> findByEmployeeId(@Param("employeeId") String employeeId);
 	
 	// 중복 제거 부서명 목록
-	@Query("SELECT DISTINCT e.department.departmentName FROM Employee e")
+	@Query("SELECT DISTINCT e.structure.codeName FROM Employee e")
 	List<String> findDistinctDepartmentNames();
+	
 	// 특정 부서에 속한 직원
-	List<Employee> findByDepartment_DepartmentName(String departmentName);
+	List<Employee> findByStructure_CodeName(String codeName);
+
 
 }
