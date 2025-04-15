@@ -61,5 +61,6 @@ public class Chatroom {
 	@OneToMany(mappedBy="chatroomNo")
 	private List<ChatroomAttendee> chatroomMapping; // 매핑이랑 조인됨
 	
-	
+	@Column(nullable=true, name="chatroom_read_yn")
+	private String chatroomReadYn;
 }
