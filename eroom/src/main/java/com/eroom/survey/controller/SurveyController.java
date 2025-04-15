@@ -17,6 +17,7 @@ import com.eroom.employee.service.EmployeeService;
 import com.eroom.security.EmployeeDetails;
 import com.eroom.survey.dto.SurveyDto;
 import com.eroom.survey.dto.SurveyItemDto;
+import com.eroom.survey.dto.SurveyVoterDto;
 import com.eroom.survey.entity.Survey;
 import com.eroom.survey.service.SurveyItemService;
 import com.eroom.survey.service.SurveyService;
@@ -54,7 +55,7 @@ public class SurveyController {
 	}
 
 	@PostMapping("/create")
-	public String createSurvey(SurveyDto surveyDto, SurveyItemDto surveyItemDto) {
+	public String createSurvey(SurveyDto surveyDto, SurveyItemDto surveyItemDto, SurveyVoterDto surveyVoterDto) {
 		// SurveyDto 값 확인
 		System.out.println("제목: " + surveyDto.getSurveyTitle());
 		System.out.println("복수 선택: " + surveyDto.getAllowMultiple());
@@ -67,6 +68,11 @@ public class SurveyController {
 			System.out.println("- " + item);
 		}
 		
+		// SurveyVoterDto 값 확인
+		System.out.println("투표 권한자:");
+		for (Long voter : surveyVoterDto.getVoters()) {
+			System.out.println("- " + voter);
+		}
 		
 		EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder
 			    .getContext()
@@ -78,7 +84,7 @@ public class SurveyController {
 		
 		String writer = employee.getEmployeeName();
 		surveyDto.setWriter(writer);
-
+		
 		int result = surveyService.saveSurvey(surveyDto, surveyItemDto);
 
 		return "redirect:/survey/list";

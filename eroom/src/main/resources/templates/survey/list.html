@@ -51,7 +51,7 @@
 														<label class="col-sm-2 col-form-label text-end" for="inputItem">항목</label>
 														<div class="col-sm-8">
 															<div id="itemScrollBox" style="max-height: 400px; overflow-y: auto;">
-																<div id="itemContainer default">
+																<div id="itemContainer1">
 																	<input class="form-control mb-2" id="inputItem" name="items" type="text" style="width: 97.2%;">
 																</div>
 																<div id="itemContainer">
@@ -136,7 +136,7 @@
 									<div class="border-bottom border-translucent">
 										<div class="d-flex align-items-start mb-1">
 											<div class="d-sm-flex align-items-center ps-2">
-												<button class="btn btn-link me-1 mb-1 fs-6 p-0" type="button" th:attr="data-survey-id=${survey.surveyNo}" data-bs-toggle="modal" data-bs-target="#survey-detail" th:text="${survey.surveyTitle}">설문 제목</button>
+												<button class="btn btn-link me-1 mb-1 fs-6 p-0" th:attr="data-survey-id=${survey.surveyNo}" data-bs-toggle="modal" data-bs-target="#survey-detail" th:text="${survey.surveyTitle}">설문 제목</button>
 												<div class="modal fade" id="survey-detail" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
 													<div class="modal-dialog modal-dialog-scrollable">
 														<div class="modal-content">
@@ -262,7 +262,6 @@
 			      option.text = emp.employee_name;
 			      select.appendChild(option);
 			    });
-			    select.multiple = isGroupChat;
 			  })
 			  .catch(error => console.error('직원 로딩 실패:', error));
 			}

@@ -12,21 +12,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "survey_item")
+@Table(name="survey_voter")
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SurveyItem {
-
+public class SurveyVoter {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "item_no")
-	private Long itemNo;
-
+	@Column(name = "voter_no")
+	private Long voterNo;
+	
 	@Column(name = "survey_no")
 	private Long surveyNo;
-
-	@Column(name = "item")
-	private String item;
+	
+	@Column(name = "voter")
+	private Long voter;
 }
