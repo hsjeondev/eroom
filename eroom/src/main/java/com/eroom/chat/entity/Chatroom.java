@@ -40,8 +40,8 @@ public class Chatroom {
 	@Column(name="chatroom_name")
 	private String chatroomName; // 채팅방 이름
 	
-	@Column(nullable=false, name="chat_is_group")
-	private String chatIsGroup; // 그룹채팅 여부
+	@Column(nullable=false, name="chat_is_group_yn")
+	private String chatIsGroupYn; // 그룹채팅 여부
 	
 	@ManyToOne
 	@JoinColumn(name="creater")
@@ -55,8 +55,8 @@ public class Chatroom {
 	@Column(insertable=false ,name="chatroom_mod_date")
 	private LocalDateTime chatroomModDate; // 수정일
 	
-//	@Column(name="chat_last_message")
-//	private String chatLastMessage; // 마지막메시지
+	@Column(name="chat_last_message")
+	private String chatLastMessage; // 마지막메시지
 	
 	@OneToMany(mappedBy="chatroomNo")
 	private List<ChatroomAttendee> chatroomMapping; // 매핑이랑 조인됨

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.service.ChatroomService;
 import com.eroom.employee.dto.EmployeeDto;
+import com.eroom.employee.dto.SeparatorDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,15 +28,25 @@ public class ChatController {
 		List<Chatroom> resultList = chatroomService.selectChatRoomAll();
 		model.addAttribute("chatroomList",resultList);
 		
-		List<String> departmentList = chatroomService.findDistinctDepartmentNames();
-		model.addAttribute("departmentList", departmentList);
+		List<SeparatorDto> structureList = chatroomService.findDistinctStructureNames();
+		model.addAttribute("structureList", structureList);
 		
 		return "chat/list";
 	}
+	
 	@GetMapping("/employes")
 	@ResponseBody
-	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam(name = "department") String department){
-		return chatroomService.findEmployeesByDepartmentName(department);
+	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam(name = "separator_code") String separatorCode) {
+	String temp = separatorCode.substring(0,1);
+	System.out.println(temp + " | substring 자르기 1글자 나와야해");
+	if ("T".equals(temp)) {
+		// 팀(소속) 선택한 경우: separatorCode 기준 조회
+		return chatroomService.findEmployeesByStructureName(separatorCode);
+	} else {
+		// 부서를 선택한 경우: parentCode 기준 조회
+		return chatroomService.findEmployeesByParentCode(separatorCode);
 	}
+}
 	
+
 }
