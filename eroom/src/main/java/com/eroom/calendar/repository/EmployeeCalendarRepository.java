@@ -9,4 +9,6 @@ import com.eroom.calendar.entity.EmployeeCalendar;
 
 public interface EmployeeCalendarRepository extends JpaRepository<EmployeeCalendar,Long>,JpaSpecificationExecutor<EmployeeCalendar> {
 	List<EmployeeCalendar> findByEmployeeNo(Long employeeNo);
+	
+	
 }
