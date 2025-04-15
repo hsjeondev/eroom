@@ -54,6 +54,7 @@ public class EmployeeCalendarService {
 		EmployeeCalendar target = repository.findById(param.getCalendar_no()).orElse(null);
 		//target -> calendarNo값이 있으면 이걸 저장해줘
 		if(target != null) {
+	        param.setCalendar_creator(target.getCalendarCreator());
 			result = repository.save(param.toEntity());
 		}
 		return result;
@@ -62,13 +63,13 @@ public class EmployeeCalendarService {
 	public EmployeeCalendarDto deleteCalendar(Long id) {
 	    EmployeeCalendar target = repository.findById(id).orElse(null);
 	    if (target == null) {
-	        return null;
+	        return null;	    
 	    }
 
 	    EmployeeCalendarDto dto = new EmployeeCalendarDto().toDto(target);
 
 	    if ("Y".equals(dto.getVisibleYn())) {
-	        dto.setVisibleYn(null);
+	        dto.setVisibleYn("N");
 	    } else {
 	        dto.setVisibleYn("Y");
 	    }
