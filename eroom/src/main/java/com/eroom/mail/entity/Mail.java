@@ -5,11 +5,15 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.eroom.employee.entity.Employee;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -46,4 +50,8 @@ public class Mail {
 
 	@OneToMany(mappedBy = "mail")
 	private List<MailReceiver> receivers; // 수신자 목록
+	
+	@ManyToOne
+	@JoinColumn(name = "employee_no")  // mail 테이블에 외래키 컬럼 생성됨
+	private Employee sender;
 }
