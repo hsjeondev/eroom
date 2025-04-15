@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.entity.DirectoryMemo;
-import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
 
 import lombok.AllArgsConstructor;
@@ -44,19 +43,19 @@ public class DirectoryMemoDto {
 				.employee(Employee.builder().employeeNo(employee_no).build())
 				.build();
 	}
-//	public DirectoryMemoDto toDto(DirectoryMemo entity) {
-//		return DirectoryMemoDto.builder()
-//				.directory_memo_no(directory_memo_no)
-//				.directory_memo_content(directory_memo_content)
-//				.directory_memo_creator(directory_memo_creator)
-//				.directoryMemoEditor(directory_memo_editor)
-//				.visibleYn(visible_yn)
-//				.directoryMemoRegDate(directory_memo_reg_date)
-//				.directoryMemoModDate(directory_memo_mod_date)
-//				.directory(Directory.builder().directoryNo(directory_no).build())
-//				.employee(Employee.builder().employeeNo(employee_no).build())
-//				.build();
-//	}
+	public DirectoryMemoDto toDto(DirectoryMemo entity) {
+		return DirectoryMemoDto.builder()
+				.directory_memo_no(entity.getDirectoryMemoNo())
+				.directory_memo_content(entity.getDirectoryMemoContent())
+				.directory_memo_creator(entity.getDirectoryMemoCreator())
+				.directory_memo_editor(entity.getDirectoryMemoEditor())
+				.visible_yn(entity.getVisibleYn())
+				.directory_memo_reg_date(entity.getDirectoryMemoRegDate())
+				.directory_memo_mod_date(entity.getDirectoryMemoModDate())
+				.directory_no(entity.getDirectory().getDirectoryNo())
+				.employee_no(entity.getEmployee().getEmployeeNo())
+				.build();
+	}
 	
 	
 }

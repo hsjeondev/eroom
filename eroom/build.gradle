@@ -23,6 +23,12 @@ repositories {
 	mavenCentral()
 }
 
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
@@ -42,6 +48,9 @@ dependencies {
 	testImplementation'org.springframework.security:spring-security-test'
 	
 	// websocket
+	
+	// BIRT 의존성
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 tasks.named('test') {
