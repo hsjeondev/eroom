@@ -83,7 +83,7 @@
 						<div class="card h-100 position-relative">
 							<div class="card-body fs-9">
 								<div class="d-flex align-items-center mb-2">
-								    <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span>
+								    <span class="fw-bold text-dark fs-8 me-1 mb-0">00000001</span>
 								
 									<!--  수정 버튼
 									<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
@@ -162,13 +162,14 @@
 						  <canvas id="miniAttendanceChart" height="47 !important"></canvas>
 						</div>
 					</div>
+					
 					<!-- 근무시간 통합 차트 -->
 					<div class="card p-3 shadow-sm mb-4">
 						<div class="card-title d-flex justify-content-between align-items-center mb-3">
 						  <span class="fw-bold fs-8 text-secondary">근무시간 통합 차트</span>
 						  <p class="text-muted mb-0">이번달 총 근무시간: <strong class="text-primary">165시간 25분</strong></p>
 						</div>
-						<canvas id="workTimeMixedChart" height="250"></canvas>
+						<canvas id="workTimeMixedChart" height="260"></canvas>
 					</div>
 
 				</div> <!-- row g-4 끝 -->
@@ -343,7 +344,7 @@
 			datasets: [{
 				label: '횟수',
 				data: [15, 2, 1],
-				backgroundColor: ['#0d6efd', '#dc3545', '#ffc107']
+				backgroundColor: ['rgba(13, 110, 253, 0.7)', 'rgba(220, 53, 69, 0.7)', 'rgba(255, 193, 7, 0.7)']
 			}]
 		},
 		options: {
