@@ -8,6 +8,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
+import org.thymeleaf.web.IWebExchange;
+import org.thymeleaf.web.IWebRequest;
+import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,6 +26,8 @@ import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 public class PdfController {
 
     private final TemplateEngine templateEngine;
+//    final JakartaServletWebApplication application =
+//    	    JakartaServletWebApplication.buildApplication(null);
 
     // 생성자 주입 (Spring Boot에서 자동 주입됩니다)
     public PdfController(TemplateEngine templateEngine) {
@@ -40,11 +45,19 @@ public class PdfController {
             variables.put("message", "이것은 OpenHTMLtoPDF를 사용한 예제 PDF 내용입니다.");
 
             // 2. Thymeleaf 처리 컨텍스트 생성 (WebContext 사용)
-            WebContext context = new WebContext(request, response, request.getServletContext());
+//            JakartaServletWebApplication application =
+//            	    JakartaServletWebApplication.buildApplication(null);
+            JakartaServletWebApplication application =
+                    JakartaServletWebApplication.buildApplication(request.getServletContext());
+            IWebExchange webExchange = application.buildExchange(request, response);
+            IWebRequest webRequest = webExchange.getRequest();
+			WebContext context = new WebContext(webExchange, request.getLocale());
+
             context.setVariables(variables);
 
             // 3. 템플릿 처리: pdfTemplate.html 로부터 HTML 콘텐츠 생성
-            String htmlContent = templateEngine.process("pdfTemplate", context);
+//            String htmlContent = templateEngine.process("pdfTemplate", context);
+            String htmlContent = templateEngine.process("approval/detail", context);
 
             // 4. HTML 콘텐츠를 PDF로 변환
             ByteArrayOutputStream os = new ByteArrayOutputStream();

@@ -21,6 +21,10 @@ configurations {
 
 repositories {
 	mavenCentral()
+	// JasperReports에 필요한 iText 라이브러리를 위한 저장소 추가
+	maven {
+		url "https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/"
+	}
 }
 
 
@@ -39,7 +43,8 @@ dependencies {
 	
 	// Spring Security 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.5.RELEASE'
+	//implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 	testImplementation'org.springframework.security:spring-security-test'
 	
 	// websocket
