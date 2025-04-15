@@ -37,7 +37,7 @@ public class EmployeeCalendarDto {
 		return EmployeeCalendar.builder().calendarNo(calendar_no).calendarTitle(calendar_title)
 				.calendarLocation(calendar_location).calendarStartTime(calendar_start_time)
 				.calendarEndTime(calendar_end_time).calendarContent(calendar_content).calendarCreator(calendar_creator)
-				.employeeNo(employee_no).separator(separator)
+				.employeeNo(employee_no).separator(separator).visibleYn(visibleYn)
 
 				.build();
 	}
