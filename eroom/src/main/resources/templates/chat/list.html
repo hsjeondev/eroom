@@ -111,7 +111,7 @@
 						<button type="button" class="btn-close" data-bs-dismiss="modal"
 							aria-label="닫기"></button>
 					</div>
-					<form id="createChatForm" th:action="@{/chat/create}" method="post">
+					<form id="createChatForm">
 						<div class="modal-body">
 							<!-- 채팅 종류 선택 (1:1, 그룹) -->
 							<div class="mb-3">
@@ -125,10 +125,10 @@
 							<div class="mb-3" id="chatroomNameBox">
 								<label class="form-label">채팅방 이름</label>
 								  <!-- 1:1 채팅일 때는 자동 제목으로 설정되며, 수정 불가 -->
-								<input type="text" name="chatroomName" class="form-control"
-									placeholder="예: 개발팀 채팅방">
+								<input type="text" id="chatroomName" name="chatroomName" class="form-control"
+									placeholder="예: 개발팀 채팅방" readonly>
 							</div>
-
+			
 							<!-- 부서(소속) 선택 -->
 					        <div class="mb-3">
 					          <label class="form-label">소속</label>
@@ -153,7 +153,6 @@
 					            <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">추가</button>
 					          </div>
 					        </div>
-					
 					        <!-- 선택된 참여자 보여주기 -->
 					        <div class="mb-3">
 					          <label class="form-label">선택된 참여자</label>
@@ -165,6 +164,9 @@
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
 							<button type="submit" class="btn btn-primary">생성</button>
+						</div>
+						<div>
+						<input type="hidden" name="creater" th:value="${#authentication.principal.employee.employeeNo}">
 						</div>
 					</form>
 				</div><!-- modal-content -->
@@ -188,105 +190,150 @@
 			</div>
 		</div>
 		 <script>
-	      let isGroupChat = false;
-	      
-	      document.addEventListener("DOMContentLoaded", () => {
-	        const chatTypeRadios = document.querySelectorAll('input[name="chatIsGroupYn"]');
-	        const chatroomNameInput = document.getElementById("chatroomName");
-	        
-	        // 초기 상태 설정: 1:1 채팅이면 제목 입력란 비활성화
-	        chatroomNameInput.disabled = true;
-	        
-	        chatTypeRadios.forEach(radio => {
-	          radio.addEventListener('change', (e) => {
-	            isGroupChat = e.target.value === 'Y';
-	            console.log("채팅 타입 변경됨:", isGroupChat ? '그룹' : '1:1');
-	            // 1:1 채팅이면 제목 입력란 비활성화, 그룹 채팅이면 활성화
-	            chatroomNameInput.disabled = !isGroupChat;
-	            // 1:1 채팅일 때는 제목 입력란을 자동 설정할 예정이므로 초기화
-	            if (!isGroupChat) {
-	              chatroomNameInput.value = "";
-	            }
-	          });
-	        });
-	        
-	        // 그룹 채팅인 경우, 폼 제출 전 제목 입력 여부 확인
-	        document.getElementById("createChatForm").addEventListener("submit", function(e) {
-	          if (isGroupChat) {
-	            const chatRoomName = chatroomNameInput.value;
-	            if (chatRoomName.trim() === "") {
-	              alert("채팅방 제목을 입력해주세요.");
-	              e.preventDefault();
-	            }
-	          }
-	        });
-	      });
-	      
-	      // 부서(소속) 선택 시 해당 부서의 직원 목록을 불러오는 함수
-	      function changeDepartment(deptId) {
-	        console.log("선택된 부서 ID:", deptId);
-	        fetch('/chat/employes?separator_code=' + encodeURIComponent(deptId))
-	        .then(response => response.json())
-	        .then(data => {
-	          console.log(data);
-	          const select = document.getElementById('employeeSelect');
-	          select.innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
-	          data.forEach(emp => {
-	            const option = document.createElement('option');
-	            option.value = emp.employee_no;
-	            option.text = emp.employee_name;
-	            select.appendChild(option);
-	          });
-	          select.multiple = isGroupChat;
-	        })
-	        .catch(error => console.error('직원 로딩 실패:', error));
-	      }
-	      
-	      // 선택된 참여자를 추가하는 함수
-	      function addParticipant() {
-	        const select = document.getElementById('employeeSelect');
-	        const selectedOption = select.options[select.selectedIndex];
-	        if (!selectedOption || selectedOption.disabled) {
-	          alert('참여자를 선택해주세요.');
-	          return;
-	        }
-	        const participantId = selectedOption.value;
-	        const participantName = selectedOption.text;
-	        
-	        // 1:1 채팅은 한 명만 추가
-	        const currentCount = document.querySelectorAll('#selectedParticipants .badge').length;
-	        if (!isGroupChat && currentCount >= 1) {
-	          alert('1:1 채팅은 한 명만 선택할 수 있습니다.');
-	          return;
-	        }
-	        // 중복 추가 방지
-	        if (document.getElementById('participant-' + participantId)) {
-	          alert('이미 추가된 참여자입니다.');
-	          return;
-	        }
-	        const badge = document.createElement('span');
-	        badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
-	        badge.id = 'participant-' + participantId;
-	        badge.innerHTML = `
-	          ${participantName}
-	          <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeParticipant('${participantId}')"></button>
-	          <input type="hidden" name="participantIds" value="${participantId}">
-	        `;
-	        document.getElementById('selectedParticipants').appendChild(badge);
-	        // 만약 1:1 채팅이면, 채팅방 제목을 자동으로 참여자 이름으로 설정 (입력란은 이미 disabled됨)
-	        if (!isGroupChat) {
-	          document.getElementById("chatroomName").value = participantName;
-	        }
-	      }
-	      
-	      function removeParticipant(id) {
-	        const badge = document.getElementById('participant-' + id);
-	        if (badge) badge.remove();
-	        // 1:1 채팅인 경우, 참여자가 제거되면 제목도 초기화
-	        if (!isGroupChat) {
-	          document.getElementById("chatroomName").value = "";
-	        }
-	      }
+		 let isGroupChat = false;
+
+		 const chatTypeRadios = document.querySelectorAll('input[name="chatIsGroupYn"]');
+		 const chatroomNameInput = document.getElementById("chatroomName");
+
+		 // 초기 상태 설정: 1:1 채팅이면 제목 입력란 비활성화
+		 // chatroomNameInput.disabled = true;
+
+		 chatTypeRadios.forEach(radio => {
+		  radio.addEventListener('change', (e) => {
+		    isGroupChat = (e.target.value === 'Y');
+		    console.log("채팅 타입 변경됨:", isGroupChat ? '그룹' : '1:1');
+		
+		    // 그룹 채팅이면 readOnly = false, 1:1 채팅이면 readOnly = true
+		    chatroomNameInput.readOnly = !isGroupChat;
+		
+		    // 1:1 채팅일 때는 제목 입력란 자동 설정
+		    if (!isGroupChat) {
+		      chatroomNameInput.value = "";
+		         }
+		     });
+		 });
+
+		 // 그룹 채팅인 경우, 폼 제출 전 제목 입력 여부 확인
+		 document.getElementById("createChatForm").addEventListener("submit", function(e) {
+		    e.preventDefault();
+		    
+		    // 그룹 채팅일 경우 제목 입력 여부를 체크
+		    if (isGroupChat) {
+		        const chatRoomName = chatroomNameInput.value.trim();
+		        console.log("그룹 채팅 제목:", chatRoomName);
+		        if (chatRoomName === "") {
+		            alert("채팅방 제목을 입력해주세요.");
+		            return;
+		        }
+		    }
+		    
+		    // 폼 데이터 수집
+		    const formData = new FormData(this);
+		    
+		    // fetch 요청을 두 모드 모두에 대해 실행
+		    fetch('/chat/create', {
+		        method: 'post',
+		        body: formData
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        if (data.res_code === "200") {
+		            alert("채팅방이 성공적으로 생성되었습니다!");
+		            // 모달을 닫는 방법은 사용 중인 Bootstrap 버전에 따라 다를 수 있습니다.
+		            const modalElem = document.getElementById('createChatModal');
+		            const modalInstance = bootstrap.Modal.getInstance(modalElem);
+		            if (modalInstance) {
+		                modalInstance.hide();
+		            }
+		        } else {
+		            alert("오류: " + data.res_msg);
+		        }
+		    })
+		    .catch(error => {
+		        console.error('Error:', error);
+		        alert("채팅방 생성 중 오류가 발생했습니다.");
+		    });
+		});
+
+		 // 부서(소속) 선택 시 해당 부서의 직원 목록을 불러오는 함수
+		 function changeDepartment(deptId) {
+		     console.log("선택된 부서 ID:", deptId);
+		     fetch('/chat/employes?separator_code=' + encodeURIComponent(deptId))
+		     .then(response => response.json())
+		     .then(data => {
+		         console.log(data);
+		         const select = document.getElementById('employeeSelect');
+		         select.innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
+		         data.forEach(emp => {
+		             const option = document.createElement('option');
+		             option.value = emp.employee_no;
+		             option.text = emp.employee_name;
+		             select.appendChild(option);
+		         });
+		         select.multiple = isGroupChat;
+		     })
+		     .catch(error => console.error('직원 로딩 실패:', error));
+		 }
+
+		 // 선택된 참여자를 추가하는 함수
+		 function addParticipant() {
+		     const chatTypeRadio = document.querySelector('input[name="chatIsGroupYn"]:checked');
+		     const isGroupChat = chatTypeRadio && chatTypeRadio.value === 'Y'; 
+
+		     const select = document.getElementById('employeeSelect');
+		     const selectedOptions = Array.from(select.selectedOptions);
+
+		     if (selectedOptions.length === 0) {
+		         alert('참여자를 선택해주세요.');
+		         return;
+		     }
+
+		     const currentCount = document.querySelectorAll('#selectedParticipants .badge').length;
+
+		     if (!isGroupChat && (currentCount + selectedOptions.length > 1)) {
+		         alert('1:1 채팅은 한 명만 선택할 수 있습니다.');
+		         return;
+		     }
+
+		     selectedOptions.forEach(option => {
+		         const participantId = option.value;
+		         const participantName = option.text;
+
+		         console.log("선택된 참여자 이름:", participantName);
+		         
+		         if (document.getElementById('participant-' + participantId)) {
+		             alert('이미 추가된 참여자 입니다.')
+		             return; // 중복 방지
+		         }
+
+		         const badge = document.createElement('span');
+		         badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
+		         badge.id = 'participant-' + participantId;
+		         badge.innerHTML = `
+		           ${participantName}
+		           <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeParticipant('${participantId}')"></button>
+		           <input type="hidden" name="participantIds" value="${participantId}">
+		         `;
+		         document.getElementById('selectedParticipants').appendChild(badge);
+
+		         // 1:1 채팅인 경우 채팅방 이름 자동 설정
+		         if (!isGroupChat) {
+		             document.getElementById("chatroomName").value = participantName;
+		         }
+		     });
+
+		     select.selectedIndex = -1;
+		 }
+
+		 function removeParticipant(id) {
+		     const badge = document.getElementById('participant-' + id);
+		     if (badge) badge.remove();
+		     // 1:1 채팅인 경우, 참여자가 제거되면 제목도 초기화
+		     if (!isGroupChat) {
+		         document.getElementById("chatroomName").value = "";
+		     }
+		 }
+
 	    </script>
 	</main>
 	

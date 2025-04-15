@@ -22,14 +22,13 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 	@Query("SELECT DISTINCT s FROM Structure s")
 	List<Structure> findDistinctStructures();
 
-	
 	// 부서(소속) 이름(codeName) 기준으로 조회하는 메서드
 	List<Employee> findByStructure_CodeName(String codeName);
 	
 	// 부서(소속) 코드(separatorCode) 기준으로 조회
 	List<Employee> findByStructure_SeparatorCode(String separatorCode);
 	
-	// 특정 소속 (부모 코드)에 속한 직원 조회
+	// 특정 소속 (부모 코드)에 속한 직원 조회 | :parentCode(파라미터 값으로 가져오는것)
 	@Query("SELECT e FROM Employee e WHERE e.structure.parentCode = :parentCode")
 	List<Employee> findByStructureParentCode(@Param("parentCode") String parentCode);
 
