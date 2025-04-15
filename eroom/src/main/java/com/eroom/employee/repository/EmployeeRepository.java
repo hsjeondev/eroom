@@ -22,7 +22,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 	@Query("SELECT DISTINCT s FROM Structure s")
 	List<Structure> findDistinctStructures();
 
-	
 	// 부서(소속) 이름(codeName) 기준으로 조회하는 메서드
 	List<Employee> findByStructure_CodeName(String codeName);
 	

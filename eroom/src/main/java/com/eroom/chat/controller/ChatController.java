@@ -77,8 +77,6 @@ public class ChatController {
 	            dto.setChatroomName(participant.getEmployeeName());
 	        }
 	    }
-		
-		
 		ChatroomDto chatDto = chatroomService.createChatroom(dto);
 		if(chatDto != null) {
 			resultMap.put("res_code", "200");

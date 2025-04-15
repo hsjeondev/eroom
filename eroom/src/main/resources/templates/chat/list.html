@@ -111,7 +111,7 @@
 						<button type="button" class="btn-close" data-bs-dismiss="modal"
 							aria-label="닫기"></button>
 					</div>
-					<form id="createChatForm" th:action="@{/chat/create}" method="post">
+					<form id="createChatForm">
 						<div class="modal-body">
 							<!-- 채팅 종류 선택 (1:1, 그룹) -->
 							<div class="mb-3">
@@ -125,7 +125,7 @@
 							<div class="mb-3" id="chatroomNameBox">
 								<label class="form-label">채팅방 이름</label>
 								  <!-- 1:1 채팅일 때는 자동 제목으로 설정되며, 수정 불가 -->
-								<input type="text" name="chatroomName" class="form-control"
+								<input type="text" id="chatroomName" name="chatroomName" class="form-control"
 									placeholder="예: 개발팀 채팅방" readonly>
 							</div>
 			
@@ -196,51 +196,64 @@
 		 const chatroomNameInput = document.getElementById("chatroomName");
 
 		 // 초기 상태 설정: 1:1 채팅이면 제목 입력란 비활성화
-		 chatroomNameInput.disabled = true;
+		 // chatroomNameInput.disabled = true;
 
 		 chatTypeRadios.forEach(radio => {
-		     radio.addEventListener('change', (e) => {
-		         isGroupChat = e.target.value === 'Y';
-		         console.log("채팅 타입 변경됨:", isGroupChat ? '그룹' : '1:1');
-		         // 1:1 채팅이면 제목 입력란 비활성화, 그룹 채팅이면 활성화
-		         chatroomNameInput.readOnly = !isGroupChat;
-		         // 1:1 채팅일 때는 제목 입력란을 자동 설정할 예정이므로 초기화
-		         if (!isGroupChat) {
-		             chatroomNameInput.value = "";
+		  radio.addEventListener('change', (e) => {
+		    isGroupChat = (e.target.value === 'Y');
+		    console.log("채팅 타입 변경됨:", isGroupChat ? '그룹' : '1:1');
+		
+		    // 그룹 채팅이면 readOnly = false, 1:1 채팅이면 readOnly = true
+		    chatroomNameInput.readOnly = !isGroupChat;
+		
+		    // 1:1 채팅일 때는 제목 입력란 자동 설정
+		    if (!isGroupChat) {
+		      chatroomNameInput.value = "";
 		         }
 		     });
 		 });
 
 		 // 그룹 채팅인 경우, 폼 제출 전 제목 입력 여부 확인
 		 document.getElementById("createChatForm").addEventListener("submit", function(e) {
-		     e.preventDefault(); 
-		     if (isGroupChat) {
-		         const chatRoomName = chatroomNameInput.value.trim();
-		         if (chatRoomName === "") {
-		             alert("채팅방 제목을 입력해주세요.");
-		             return;
-		         }
-		     } else {
-		         const formData = new FormData(this);
-		         fetch('/chat/create', {
-		             method: 'POST',
-		             body: formData
-		         })
-		         .then(response => response.json())
-		         .then(data => {
-		             if (data.res_code === "200") {
-		                 alert("채팅방이 성공적으로 생성되었습니다!");
-		                 document.getElementById('createChatModal').modal('hide');
-		             } else {
-		                 alert("오류: " + data.res_msg);
-		             }
-		         })
-		         .catch(error => {
-		             console.error('Error:', error);
-		             alert("채팅방 생성 중 오류가 발생했습니다.");
-		         });
-		     }
-		 });
+		    e.preventDefault();
+		    
+		    // 그룹 채팅일 경우 제목 입력 여부를 체크
+		    if (isGroupChat) {
+		        const chatRoomName = chatroomNameInput.value.trim();
+		        console.log("그룹 채팅 제목:", chatRoomName);
+		        if (chatRoomName === "") {
+		            alert("채팅방 제목을 입력해주세요.");
+		            return;
+		        }
+		    }
+		    
+		    // 폼 데이터 수집
+		    const formData = new FormData(this);
+		    
+		    // fetch 요청을 두 모드 모두에 대해 실행
+		    fetch('/chat/create', {
+		        method: 'post',
+		        body: formData
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        if (data.res_code === "200") {
+		            alert("채팅방이 성공적으로 생성되었습니다!");
+		            // 모달을 닫는 방법은 사용 중인 Bootstrap 버전에 따라 다를 수 있습니다.
+		            const modalElem = document.getElementById('createChatModal');
+		            const modalInstance = bootstrap.Modal.getInstance(modalElem);
+		            if (modalInstance) {
+		                modalInstance.hide();
+		            }
+		        } else {
+		            alert("오류: " + data.res_msg);
+		        }
+		    })
+		    .catch(error => {
+		        console.error('Error:', error);
+		        alert("채팅방 생성 중 오류가 발생했습니다.");
+		    });
+		});
 
 		 // 부서(소속) 선택 시 해당 부서의 직원 목록을 불러오는 함수
 		 function changeDepartment(deptId) {
@@ -265,7 +278,7 @@
 		 // 선택된 참여자를 추가하는 함수
 		 function addParticipant() {
 		     const chatTypeRadio = document.querySelector('input[name="chatIsGroupYn"]:checked');
-		     const isGroupChat = chatTypeRadio && chatTypeRadio.value === 'Y'; // 최신값 반영
+		     const isGroupChat = chatTypeRadio && chatTypeRadio.value === 'Y'; 
 
 		     const select = document.getElementById('employeeSelect');
 		     const selectedOptions = Array.from(select.selectedOptions);
@@ -286,6 +299,8 @@
 		         const participantId = option.value;
 		         const participantName = option.text;
 
+		         console.log("선택된 참여자 이름:", participantName);
+		         
 		         if (document.getElementById('participant-' + participantId)) {
 		             alert('이미 추가된 참여자 입니다.')
 		             return; // 중복 방지
