@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.eroom.chat.dto.ChatroomDto;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.repository.ChatroomRepository;
 import com.eroom.chat.specification.ChatroomSpecification;
@@ -48,12 +49,15 @@ public class ChatroomService {
 	 // Repository에서 엔티티로 중복 제거된 부서(소속) 목록을 반환한 후, DTO로 변환
 	public List<SeparatorDto> findDistinctStructureNames() {
 	    List<Structure> structures = employeeRepository.findDistinctStructures();
-	    return structures.stream()
-	        .map(entity -> SeparatorDto.builder()
-	                .separator_code(entity.getSeparatorCode())
-	                .separator_name(entity.getCodeName())
-	                .build())
-	        .collect(Collectors.toList());
+	    List<SeparatorDto> separatorDtos = new ArrayList<>();
+	    for(Structure entity : structures) {
+	    	SeparatorDto separatorDto = SeparatorDto.builder()
+	    	.separator_code(entity.getSeparatorCode())
+            .separator_name(entity.getCodeName())
+            .build();
+	    	separatorDtos.add(separatorDto);
+	    }
+	    return separatorDtos;
 	}
 	
 	public List<EmployeeDto> findEmployeesByStructureName(String separatorCode) {
@@ -77,6 +81,11 @@ public class ChatroomService {
 			employeeDtos.add(employeeDto);
 		}
 		return employeeDtos;
+	}
+	public ChatroomDto createChatroom(ChatroomDto dto) {
+		Chatroom param = dto.toEntity();
+		Chatroom result = repository.save(param);
+		return new ChatroomDto().toDto(result);
 	}
 
 }
