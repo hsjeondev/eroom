@@ -20,12 +20,12 @@
                   <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
                     <div class="row g-3 mb-2">
                       <div class="col-4">
-                        <input class="form-control" type="email" name="to" placeholder="수신자" />
-                      </div>
-                      <div class="col-4">
-                        <input class="form-control" type="email" name="cc" placeholder="참조" />
+                        <input class="form-control" type="text" name="to" placeholder="받는 사람" />
                       </div>
                       <!-- <div class="col-4">
+                        <input class="form-control" type="email" name="cc" placeholder="참조" />
+                      </div>
+                      <div class="col-4">
                         <input class="form-control" type="email" placeholder="BCC" />
                       </div> -->
                       <div class="col-4">
@@ -73,7 +73,7 @@
 					.then(data=>{
 						alert(data.res_msg);
 						if(data.res_code==200){
-							location.href='/mail';
+							location.href='/mail/sent';
 						}
 					});
             	})
