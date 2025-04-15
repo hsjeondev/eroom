@@ -3,6 +3,8 @@
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
 <head>
   <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
   <title>결재 상세</title>
 </head>
 <body class="bg-light">
@@ -12,6 +14,7 @@
       <!-- 상단 제목 + 목록 버튼 -->
       <div class="d-flex mb-3">
         <span class="fw-bold fs-6">결재서 상세</span>
+        <button class="btn btn-light btn-sm ms-auto" id="topdf" type="button">pdf만들기</button>
         <button class="btn btn-light btn-sm ms-auto" onclick="history.back()">목록으로</button>
       </div>
 
@@ -115,6 +118,20 @@
         <button type="button" class="btn btn-outline-danger">반려</button>
       </div>
     </div>
+    
+<script>
+  document.getElementById("topdf").addEventListener("click", function() {
+    // meta 태그에서 CSRF 토큰과 헤더명 읽기
+    var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+    var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+
+    // GET 요청일 경우, 쿼리 파라미터로 CSRF 토큰 전달 (예: headerName=token)
+    // CSRF 토큰이 필요 없다면 Spring Security 설정에서 GET은 제외할 수도 있습니다.
+    window.location.href = "/approval/detail/pdf?" 
+        + encodeURIComponent(csrfHeader) + "=" + encodeURIComponent(csrfToken);
+  });
+</script>
+    
   </main>
 </body>
 </html>
