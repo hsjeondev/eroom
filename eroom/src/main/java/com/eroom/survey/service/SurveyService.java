@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SurveyService {
 
-    private final EmployeeRepository employeeRepository;
 	private final SurveyRepository surveyRepository;
 	private final SurveyItemRepository surveyItemRepository;
 
@@ -48,11 +47,4 @@ public class SurveyService {
 		return surveyRepository.findAll();
 	}
 
-	public List<Employee> findAllEmployee() {
-		return employeeRepository.findAll();
-	}
-
-
-	
-	
 }

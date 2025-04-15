@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
+import com.eroom.employee.service.EmployeeService;
 import com.eroom.security.EmployeeDetails;
 import com.eroom.survey.dto.SurveyDto;
 import com.eroom.survey.dto.SurveyItemDto;
@@ -27,13 +29,16 @@ import lombok.RequiredArgsConstructor;
 public class SurveyController {
 	private final SurveyService surveyService;
 	private final SurveyItemService surveyItemService;
+	private final EmployeeService employeeService;
 
 	@GetMapping("/list")
 	public String surveyList(Model model, SurveyDto surveyDto, SurveyItemDto surveyItemDto) {
 		
 		List<Survey> surveyList = surveyService.findAllSurvey();
+		List<SeparatorDto> structureList = employeeService.findDistinctStructureNames();
 		
 		model.addAttribute("surveyList", surveyList);
+		model.addAttribute("structureList", structureList);
 		
 		return "survey/list";
 	}
