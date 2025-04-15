@@ -9,10 +9,13 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.eroom.project.dto.GithubPullRequestDto;
 import com.eroom.project.dto.ProjectDto;
 import com.eroom.project.entity.Project;
 import com.eroom.project.repository.ProjectRepository;
 import com.eroom.rsacryption.RSACryptor;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,18 +52,16 @@ public class ProjectService {
     	return projectdto;
     }
     
-    public void fetchPullRequests(Long projectNo) {
+    public List<GithubPullRequestDto> fetchPullRequests(Long projectNo) {
         try {
-           
             Project project = projectRepository.findById(projectNo).orElse(null);
             if (project == null) {
                 System.out.println("해당 프로젝트가 없습니다: " + projectNo);
-                return;
+                return null;
             }
 
             String repoUrl = project.getProjectGithubUrl();
             String encryptedToken = project.getProjectGithubToken();
-
             String decryptedToken = rsaCryptor.decrypt(encryptedToken);
 
             String[] split = repoUrl.replace("https://github.com/", "").split("/");
@@ -80,12 +81,26 @@ public class ProjectService {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             System.out.println("Status: " + response.statusCode());
-            System.out.println("Response: " + response.body());
+
+            if (response.statusCode() == 200) {
+                String json = response.body();
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                return objectMapper.readValue(
+                        json,
+                        new TypeReference<List<GithubPullRequestDto>>() {}
+                );
+
+            } else {
+                return null;
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
     }
+
 
 
     

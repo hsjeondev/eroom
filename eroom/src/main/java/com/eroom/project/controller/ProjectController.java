@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.eroom.project.dto.GithubPullRequestDto;
 import com.eroom.project.dto.ProjectDto;
-import com.eroom.project.entity.Project;
 import com.eroom.project.service.ProjectService;
 
 import lombok.RequiredArgsConstructor;
@@ -58,23 +58,23 @@ public class ProjectController {
 	public String detailProjectView(@PathVariable("project_no") Long project_no, Model model) {
 		
 		ProjectDto project = projectService.findByProjectNo(project_no);
+		model.addAttribute("project", project);
+		
+		// 이 2줄은 나중에 프로젝트 디테일의 개발탭으로 이동
+	    List<GithubPullRequestDto> pullRequests = projectService.fetchPullRequests(project_no);
+	    model.addAttribute("pullRequests", pullRequests);
 		
 		model.addAttribute("project", project);
 		return "project/projectDetail";
 	}
 	
-	// github api 테스트 
 	@PostMapping("/create")
-	public String createProjectView(ProjectDto projectDto) {
+	public String createProjectView(ProjectDto projectDto, Model model) {
 		System.out.println(projectDto.getProject_no());
-		System.out.println(projectDto.getProject_github_url());
-		System.out.println(projectDto.getProject_github_token());
 		
 		// projectService.createProject(projectDto);
 		
-		projectService.fetchPullRequests(projectDto.getProject_no());
-		
-		return "project/allProject";
+	    return "";
 	}
 	
 }
