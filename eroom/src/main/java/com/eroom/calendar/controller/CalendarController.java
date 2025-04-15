@@ -152,7 +152,7 @@ public class CalendarController {
 		
 		if(deleteCalendar != null) {
 			result.put("res_code", "200");
-			result.put("res_msg", "수정을 성공하였습니다!");
+			result.put("res_msg", "일정을 삭제하였습니다!");
 		}
 		
 		return result;
