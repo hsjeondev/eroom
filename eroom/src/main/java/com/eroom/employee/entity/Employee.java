@@ -4,11 +4,12 @@ package com.eroom.employee.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.eroom.calendar.entity.EmployeeCalendar;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.entity.DirectoryMemo;
+import com.eroom.mail.entity.Mail;
+import com.eroom.mail.entity.MailReceiver;
 import com.eroom.project.entity.ProjectMember;
 
 import jakarta.persistence.Column;
@@ -105,4 +106,11 @@ public class Employee {
 	@OneToMany(mappedBy="employee")
 	private List<ProjectMember> projectMembers;
 
+	// 메일 조인
+	@OneToMany(mappedBy = "sender")
+	private List<Mail> sentMails; // 보낸 메일 목록
+	
+	@OneToMany(mappedBy = "receiver")
+	private List<MailReceiver> receivedMails; // 수신한 메일 목록
+	
 }

@@ -22,11 +22,11 @@ public class MailReceiverDto {
 	private String mail_recervier_type;
 	
 	// 읽음 여부
-	private String mail_recervier_read_yn;
+	private String mail_recervier_read_yn="N";
 	// 삭제 여부
-	private String mail_recervier_deleted_yn;
+	private String mail_recervier_deleted_yn="N";
 	// 중요 여부
-	private String mail_recervier_important_yn;
+	private String mail_recervier_important_yn="N";
 	
 	// 메일 번호
 	private Long mail_no;

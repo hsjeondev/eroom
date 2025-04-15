@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eroom.employee.entity.Employee;
 import com.eroom.mail.dto.MailDto;
 import com.eroom.mail.entity.Mail;
 import com.eroom.mail.service.MailService;
@@ -20,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MailController {
 
-	private final MailService service;
+	private final MailService mailService;
 	/* 테스트로 만들어 놓은거
 	 * @GetMapping("/mail") public String selectMailAll(Model model) { // 조건 필요함
 	 * reveiver에 // to일때는 내가 보낸거 // 조건이 cc면 받은거
@@ -45,7 +46,7 @@ public class MailController {
 		
 		
 		// 04/11 지금은 전체 메일이 조회됨
-		List<Mail> resultList = service.selectMailAll();
+		List<Mail> resultList = mailService.selectMailAll();
 		model.addAttribute("resultList",resultList);
 		
 		return "mail/mailSent";
@@ -98,13 +99,14 @@ public class MailController {
 		Map<String, String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "메일 등록중 오류가 발생하였습니다.");
-		int result = service.createMail(mailDto);
+		System.out.println(mailDto);
+		 
+		int result = mailService.createMail(mailDto);
 		if(result>0) {
 		resultMap.put("res_code", "200");
 		resultMap.put("res_msg", "메일이 발송되었습니다.");	
 		}
 		System.out.println(mailDto);
-		System.out.println("asd");
 		return resultMap;
 	}
 	

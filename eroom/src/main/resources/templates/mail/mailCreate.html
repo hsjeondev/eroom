@@ -16,12 +16,85 @@
                 <div class="card-body">
                   <form class="d-flex flex-column h-100"
                   action="/mail/create" name="mail_create_form" enctype="multipart/form-data">
-                  <!-- 직관적이지만 header에 넣는게 더 정석적인 방법 -->
-                  <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
+                  
+                  <!-- 본인 히든 처리 -->
+                  <input type="hidden" name="employee_no"
+								th:value="${#authentication.principal.employee.employeeNo}" />
+								
                     <div class="row g-3 mb-2">
-                      <div class="col-4">
-                        <input class="form-control" type="text" name="to" placeholder="받는 사람" />
-                      </div>
+                      <!-- <div class="col-4">
+                        <input class="form-control" type="text" name="receiver" placeholder="받는 사람" />
+                      </div> -->
+                      
+                      
+                      
+                      
+                      <!-- test  -->
+                   <div class="col-4">
+                   		<input class="form-control" type="text" name="receiver" placeholder="받는 사람" id="receiverInput" readonly data-bs-toggle="modal" data-bs-target="#orgModal" />
+                   </div>
+                      <div class="modal fade" id="orgModal" tabindex="-1" aria-labelledby="orgModalLabel" aria-hidden="true">
+						  <div class="modal-dialog modal-lg">
+						    <div class="modal-content">
+						      <div class="modal-header">
+						        <h5 class="modal-title" id="orgModalLabel">조직도에서 직원 선택</h5>
+						        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+						      </div>
+						      <div class="modal-body">
+						        <!-- Thymeleaf로 구성된 조직도 or 사원 리스트 -->
+						        <div class="row">
+						          <div class="col">
+						            <ul>
+						              <li th:each="emp : ${employeeList}">
+						                <button type="button" class="btn btn-light mb-1 select-employee-btn"
+						                  th:data-email="${emp.email}"
+						                  th:data-name="${emp.name}"
+						                  th:text="${emp.name + ' (' + emp.dept.name + ')'}">
+						                </button>
+						              </li>
+						            </ul>
+						          </div>
+						        </div>
+						      </div>
+						    </div>
+						  </div>
+					</div>
+                     <!-- test  -->  
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
                       <!-- <div class="col-4">
                         <input class="form-control" type="email" name="cc" placeholder="참조" />
                       </div>
@@ -59,8 +132,9 @@
             	form.addEventListener('submit', (e)=>{
     				 e.preventDefault();
     				 tinymce.triggerSave();
-            		console.log(form);
     				const payload = new FormData(form);
+            		console.log(form);
+    				console.log(payload)
     				fetch("/mail/create",{
 						method:'post',
 						headers : {
