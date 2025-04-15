@@ -67,6 +67,7 @@ public class EmployeeCalendarDto {
 	    event.put("description", this.calendar_content != null ? this.calendar_content : "");
 	    event.put("separator", this.separator != null ? this.separator : "");
 	    event.put("calendar_no", this.calendar_no);
+	    
 
 	    
 	    

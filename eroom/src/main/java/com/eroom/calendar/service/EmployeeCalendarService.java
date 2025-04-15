@@ -48,5 +48,15 @@ public class EmployeeCalendarService {
         // toDto 호출
         return dto.toDto(calendar);
     }
+	
+	public EmployeeCalendar updateCalendar(EmployeeCalendarDto param) {
+		EmployeeCalendar result = null;
+		EmployeeCalendar target = repository.findById(param.getCalendar_no()).orElse(null);
+		//target -> calendarNo값이 있으면 이걸 저장해줘
+		if(target != null) {
+			result = repository.save(param.toEntity());
+		}
+		return result;
+	}
 
 }
