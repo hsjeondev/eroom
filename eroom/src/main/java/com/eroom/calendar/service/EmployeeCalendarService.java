@@ -58,5 +58,31 @@ public class EmployeeCalendarService {
 		}
 		return result;
 	}
+	
+	public EmployeeCalendarDto deleteCalendar(Long id) {
+		EmployeeCalendar target = repository.findById(id).orElse(null);
+		EmployeeCalendarDto dto = EmployeeCalendarDto.builder()
+				.calendar_no(target.getCalendarNo())
+				.calendar_title(target.getCalendarTitle())
+				.calendar_location(target.getCalendarLocation())
+				.calendar_start_time(target.getCalendarStartTime())
+				.calendar_end_time(target.getCalendarEndTime())
+				.calendar_content(target.getCalendarContent())
+				.calendar_creator(target.getCalendarCreator())
+				.employee_no(target.getEmployeeNo())
+				.separator(target.getSeparator()).calendar_reg_date(target.getCalendarRegDate())
+				.calendar_mod_date(target.getCalendarModDate()).build();
+		if(target != null) {
+			if("Y".equals(target.getVisibleYn())) dto.setVisibleYn("N");
+			else {
+				dto.setVisibleYn("Y");
+			}
+			EmployeeCalendar saved = repository.save(target);
+			
+			return EmployeeCalendarDto.toDto(saved);
+				
+		}
+	}
+	
 
 }

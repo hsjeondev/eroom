@@ -173,7 +173,7 @@
 						<!-- 수정 및 삭제 버튼을 왼쪽 -->
 						<div class="d-flex">
 							<button class="btn btn-subtle-secondary me-1 mb-1" type="button" id="editEventBtn">수정</button>
-							<button class="btn btn-outline-info me-1 mb-1" type="button">삭제</button>
+							<button class="btn btn-outline-info me-1 mb-1" type="button" id="deleteEventBtn">삭제</button>
 						</div>
 						<!-- 확인 버튼을 오른쪽에 배치 -->
 						<div>
@@ -187,26 +187,38 @@
 		</div>
 		
 		
-		<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="eventModalLabel">일정 상세</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>제목:</strong> <span id="eventTitle"></span></p>
-                <p><strong>날짜:</strong> <span id="eventDate"></span></p>
-                <p><strong>장소:</strong> <span id="eventLocation"></span></p>
-                <p><strong>설명:</strong> <span id="eventDescription"></span></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                <button type="button" class="btn btn-primary" id="editEventButton">수정</button>
-            </div>
-        </div>
-    </div>
-</div>
+		<!-- 일정상세조회 모달창 -->
+<!-- 		<div class="modal fade" id="eventModal" tabindex="-1"
+			aria-labelledby="eventModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="eventModalLabel">일정 상세</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p>
+							<strong>제목:</strong> <span id="eventTitle"></span>
+						</p>
+						<p>
+							<strong>날짜:</strong> <span id="eventDate"></span>
+						</p>
+						<p>
+							<strong>장소:</strong> <span id="eventLocation"></span>
+						</p>
+						<p>
+							<strong>설명:</strong> <span id="eventDescription"></span>
+						</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">닫기</button>
+						<button type="button" class="btn btn-primary" id="editEventButton">수정</button>
+					</div>
+				</div>
+			</div>
+		</div> -->
 
 		<div class="modal fade" id="editEventModal" tabindex="-1">
 			<div class="modal-dialog">
@@ -444,9 +456,37 @@
           			}
         		});
 		    })
-
-		    calendar.render();
-		});
+		    
+		    
+			//일정 삭제 -> 사용여부를 Y 에서 N 으로!
+			document.getElementById('deleteEventBtn').addEventListener('click',function(){
+			const calendarNo = selectedCalendarNo;
+			//console.log(calendarNo);
+			const perMission = confirm('해당 일정을 삭제하시겠습니까?');
+			//console.log(perMission);
+			if(!perMission){
+				return;
+			}else{
+				fetch('/employeecalendar/delete/'+calendarNo,{
+					method: 'post',
+					headers: {
+			            'header': document.querySelector('meta[name="_csrf_header"]').content,
+			            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			        }
+				})
+				.then(response => response.json())
+				.then(data => {
+					alert(data.res_msg);
+					if(data.res_code == 200) location.reload();
+				})
+			}
+			
+			});
+		    
+			
+			calendar.render();
+		
+		})
   	
     </script>
   	
