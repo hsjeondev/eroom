@@ -1,5 +1,7 @@
 package com.eroom.mail.entity;
 
+import com.eroom.employee.entity.Employee;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -41,4 +43,8 @@ public class MailReceiver {
 	@ManyToOne
 	@JoinColumn(name = "mail_no")  // FK 컬럼명 명시
 	private Mail mail;
+	
+	@ManyToOne
+	@JoinColumn(name = "employee_no")  // 수신자 FK 컬럼
+	private Employee receiver;
 }
