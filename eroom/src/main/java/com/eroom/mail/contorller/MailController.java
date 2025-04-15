@@ -91,6 +91,7 @@ public class MailController {
 	public String createMailView(Model model) {
 		List<Employee> employeeList = mailService.selectEmployeeAll();
 		model.addAttribute("employeeList",employeeList);
+		
 		return "mail/mailCreate";
 	}
 	// 메일 작성 로직

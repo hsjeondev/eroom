@@ -30,10 +30,10 @@
                       
                       
                       <!-- test  -->
-                   <div class="col-4">
+                    <div class="col-4">
                    		<input class="form-control" type="text" name="receiver" placeholder="받는 사람" id="receiverInput" readonly data-bs-toggle="modal" data-bs-target="#orgModal" />
                    </div>
-                      <div class="modal fade" id="orgModal" tabindex="-1" aria-labelledby="orgModalLabel" aria-hidden="true">
+                     <!-- <div class="modal fade" id="orgModal" tabindex="-1" aria-labelledby="orgModalLabel" aria-hidden="true">
 						  <div class="modal-dialog modal-lg">
 						    <div class="modal-content">
 						      <div class="modal-header">
@@ -41,7 +41,7 @@
 						        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
 						      </div>
 						      <div class="modal-body">
-						        <!-- Thymeleaf로 구성된 조직도 or 사원 리스트 -->
+						        Thymeleaf로 구성된 조직도 or 사원 리스트
 						        <div class="row">
 						          <div class="col">
 						            <ul>
@@ -57,7 +57,46 @@
 						      </div>
 						    </div>
 						  </div>
+					</div> -->
+					<div class="modal fade" id="orgModal" tabindex="-1" aria-labelledby="orgModalLabel" aria-hidden="true">
+					  <div class="modal-dialog modal-md">
+					    <div class="modal-content">
+					      <div class="modal-header">
+					        <h5 class="modal-title" id="orgModalLabel">조직도에서 직원 선택</h5>
+					        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+					      </div>
+					      <div class="modal-body">
+					        <!-- 소속 선택 -->
+					        <label for="deptSelect" class="form-label">소속</label>
+					        <select class="form-select" id="deptSelect">
+					          <option selected>-- 소속 선택 --</option>
+					          <option th:each="dept : ${departments}" th:value="${dept}" th:text="${dept}"></option>
+					        </select>
+					
+					        <!-- 참여자 선택 -->
+					        <label for="employeeSelect" class="form-label mt-3">참여자 선택</label>
+					        <div class="d-flex">
+					          <select class="form-select me-2" id="employeeSelect">
+					            <option selected>-- 참여자 선택 --</option>
+					            <!-- JS로 채워짐 -->
+					          </select>
+					          <button type="button" class="btn btn-primary" id="addEmployeeBtn">추가</button>
+					        </div>
+					
+					        <!-- 선택된 참여자 표시 -->
+					        <div class="mt-3">
+					          <strong>선택된 참여자</strong>
+					          <ul id="selectedEmployeeList" class="list-unstyled mt-2"></ul>
+					        </div>
+					      </div>
+					      <div class="modal-footer">
+					        <button class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+					        <button class="btn btn-primary" id="confirmSelectionBtn" data-bs-dismiss="modal">선택</button>
+					      </div>
+					    </div>
+					  </div>
 					</div>
+					
                      <!-- test  -->  
                       
                       
