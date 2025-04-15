@@ -36,14 +36,15 @@ public class ChatController {
 	
 	@GetMapping("/employes")
 	@ResponseBody
-	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam(name = "separator_code") String separatorCode,
-	            									  @RequestParam(name = "type", required = false, defaultValue = "team") String type) {
-	if ("department".equals(type)) {
-		// 부서를 선택한 경우: parentCode 기준 조회
-		return chatroomService.findEmployeesByParentCode(separatorCode);
-	} else {
+	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam(name = "separator_code") String separatorCode) {
+	String temp = separatorCode.substring(0,1);
+	System.out.println(temp + " | substring 자르기 1글자 나와야해");
+	if ("T".equals(temp)) {
 		// 팀(소속) 선택한 경우: separatorCode 기준 조회
 		return chatroomService.findEmployeesByStructureName(separatorCode);
+	} else {
+		// 부서를 선택한 경우: parentCode 기준 조회
+		return chatroomService.findEmployeesByParentCode(separatorCode);
 	}
 }
 	
