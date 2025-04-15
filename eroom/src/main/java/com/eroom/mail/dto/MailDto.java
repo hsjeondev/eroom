@@ -25,7 +25,7 @@ public class MailDto {
 	private LocalDateTime mail_sent_time;
 	private String mail_status="N";
 	
-	
+	// directory 데이터로 바꿀 예정
 	private Long employee_no;
 	// 받는 사람 나중에 List로 바꿀 예정
 	private Employee receiver;
