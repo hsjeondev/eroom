@@ -37,8 +37,8 @@ public class Structure {
 	@Column(name="order")
 	private Long order;
 	
-	@Column(name="parentCode")
-	private String parent_code;
+	@Column(name="parent_code")
+	private String parentCode;
 	
 	@Column(name="visible_yn")
 	private String visibleYn;
