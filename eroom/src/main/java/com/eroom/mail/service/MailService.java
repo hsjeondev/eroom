@@ -1,10 +1,12 @@
 package com.eroom.mail.service;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.eroom.employee.dto.EmployeeDto;
+import com.eroom.employee.entity.Employee;
+import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.mail.dto.MailDto;
 import com.eroom.mail.dto.MailReceiverDto;
 import com.eroom.mail.entity.Mail;
@@ -20,11 +22,16 @@ public class MailService {
 
 	private final MailRepository repository;
 	private final MailReceiverRepository mailRecevierRepository;
-	
+	private final EmployeeRepository employeeRepository;
 
     
 	public List<Mail> selectMailAll(){
 		List<Mail> list = repository.findAll();
+		return list;
+	}
+	
+	public List<Employee> selectEmployeeAll(){
+		List<Employee> list = employeeRepository.findAll();
 		return list;
 	}
 	
@@ -38,7 +45,9 @@ public class MailService {
 			
 			
 			// 전송 메일 저장
-			MailReceiver mailReceiverEntity = MailReceiver.builder()
+			MailReceiverDto receiverDto=null;
+			MailReceiver mailReceiverEntity = receiverDto.toEntity();
+			MailReceiver mailReceiverSaver = MailReceiver.builder()
 //					.receiver(mailEntity.getReceivers())
 					.mail(mailSaver)
 					.build();
