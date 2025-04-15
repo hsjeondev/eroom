@@ -112,6 +112,7 @@
 							aria-label="닫기"></button>
 					</div>
 					<form id="createChatForm">
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 						<div class="modal-body">
 							<!-- 채팅 종류 선택 (1:1, 그룹) -->
 							<div class="mb-3">
@@ -215,6 +216,7 @@
 
 		 // 그룹 채팅인 경우, 폼 제출 전 제목 입력 여부 확인
 		 document.getElementById("createChatForm").addEventListener("submit", function(e) {
+			 debugger;
 		    e.preventDefault();
 		    
 		    // 그룹 채팅일 경우 제목 입력 여부를 체크
@@ -237,6 +239,7 @@
 		    })
 		    .then(response => response.json())
 		    .then(data => {
+		    	debugger;
 		        if (data.res_code === "200") {
 		            alert("채팅방이 성공적으로 생성되었습니다!");
 		            // 모달을 닫는 방법은 사용 중인 Bootstrap 버전에 따라 다를 수 있습니다.
