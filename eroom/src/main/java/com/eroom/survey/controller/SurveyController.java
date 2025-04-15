@@ -8,12 +8,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.employee.entity.Employee;
 import com.eroom.security.EmployeeDetails;
 import com.eroom.survey.dto.SurveyDto;
 import com.eroom.survey.dto.SurveyItemDto;
 import com.eroom.survey.entity.Survey;
+import com.eroom.survey.service.SurveyItemService;
 import com.eroom.survey.service.SurveyService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,15 +26,14 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/survey")
 public class SurveyController {
 	private final SurveyService surveyService;
+	private final SurveyItemService surveyItemService;
 
 	@GetMapping("/list")
 	public String surveyList(Model model, SurveyDto surveyDto, SurveyItemDto surveyItemDto) {
 		
 		List<Survey> surveyList = surveyService.findAllSurvey();
-//		List<Employee> empList = surveyService.findAllEmployee();
 		
 		model.addAttribute("surveyList", surveyList);
-//		model.addAttribute("empList", empList);
 		
 		return "survey/list";
 	}
@@ -76,5 +78,10 @@ public class SurveyController {
 
 		return "redirect:/survey/list";
 	}
-
+	
+	@GetMapping("/detail")
+	@ResponseBody
+	public List<String> surveyDetail(@RequestParam("id") Long surveyNo){
+		return surveyItemService.findItemsBySurveyNo(surveyNo);
+	}
 }

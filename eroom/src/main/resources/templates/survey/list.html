@@ -38,7 +38,7 @@
 													<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
 												</div>
 												<div class="modal-body">
-													<!-- 모달 본문 -->
+													<!-- 설문 등록 모달 본문 -->
 													<!-- <input class="form-control" id="surveyWriter" name="surveyWriter" type="hidden" th:value="${#authentication.principal.employee.employeeName}"> -->
 													<div class="row mb-3">
 														<label class="col-sm-2 col-form-label text-end" for="surveyTitle">제목</label>
@@ -55,7 +55,7 @@
 																	<input class="form-control mb-2" id="inputItem" name="items" type="text" style="width: 97.2%;">
 																</div>
 																<div id="itemContainer">
-																	<input class="form-control mb-2" id="inputItem" name="items" type="text" style="width: 97.2%;">
+																	<input class="form-control mb-2" name="items" type="text" style="width: 97.2%;">
 																</div>
 															</div>
 															<!-- 항목 추가 버튼 -->
@@ -111,7 +111,7 @@
 									<div class="border-bottom border-translucent">
 										<div class="d-flex align-items-start mb-1">
 											<div class="d-sm-flex align-items-center ps-2">
-												<button class="btn btn-link me-1 mb-1 fs-6 p-0" type="button" data-bs-toggle="modal" data-bs-target="#survey-detail" th:text="${survey.surveyTitle}">설문 제목</button>
+												<button class="btn btn-link me-1 mb-1 fs-6 p-0" type="button" th:attr="data-survey-id=${survey.surveyNo}" data-bs-toggle="modal" data-bs-target="#survey-detail" th:text="${survey.surveyTitle}">설문 제목</button>
 												<div class="modal fade" id="survey-detail" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
 													<div class="modal-dialog modal-dialog-scrollable">
 														<div class="modal-content">
@@ -119,7 +119,9 @@
 																<h5 class="modal-title" id="scrollingLongModalLabel2">Modal title</h5>
 																<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
 															</div>
-															<div class="modal-body">본문</div>
+															<div class="modal-body">
+																<ul id="surveyItemList" class="list-group"></ul>
+															</div>
 															<div class="modal-footer">
 																<button class="btn btn-primary" type="button">Okay</button>
 																<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancel</button>
@@ -215,6 +217,40 @@
 				const scrollTarget = itemContainer.parentElement;
 				scrollTarget.scrollTop = scrollTarget.scrollHeight;
 			});
+		});
+		
+		
+		
+		// 상세 조회
+		document.addEventListener('DOMContentLoaded', function () {
+		  const surveyModal = document.getElementById('survey-detail');
+		  const itemList = document.getElementById('surveyItemList');
+		
+		  document.querySelectorAll('button[data-survey-id]').forEach(button => {
+		    button.addEventListener('click', function () {
+		      const surveyId = this.getAttribute('data-survey-id');
+		      itemList.innerHTML = ''; // 기존 내용 초기화
+		
+		      fetch(`/survey/detail?id=${surveyId}`)
+		        .then(response => response.json())
+		        .then(items => {
+		          if (items.length === 0) {
+		            itemList.innerHTML = '<li class="list-group-item">항목이 없습니다.</li>';
+		          } else {
+		            items.forEach(item => {
+		              const li = document.createElement('li');
+		              li.className = 'list-group-item';
+		              li.textContent = item;
+		              itemList.appendChild(li);
+		            });
+		          }
+		        })
+		        .catch(err => {
+		          console.error('항목 불러오기 실패:', err);
+		          itemList.innerHTML = '<li class="list-group-item text-danger">불러오기 실패</li>';
+		        });
+		    });
+		  });
 		});
 	</script>
 </th:block>
