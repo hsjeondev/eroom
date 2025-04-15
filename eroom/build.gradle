@@ -23,6 +23,7 @@ repositories {
 	mavenCentral()
 }
 
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
@@ -42,6 +43,13 @@ dependencies {
 	testImplementation'org.springframework.security:spring-security-test'
 	
 	// websocket
+	
+	// dynamic report 의존성
+	implementation 'net.sourceforge.dynamicreports:dynamicreports-core:6.20.0'
+    implementation 'net.sf.jasperreports:jasperreports:6.20.0'
+    implementation 'com.github.librepdf:openpdf:1.3.30'
+
+
 }
 
 tasks.named('test') {
