@@ -6,9 +6,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.eroom.project.dto.ProjectDto;
+import com.eroom.project.entity.Project;
 import com.eroom.project.service.ProjectService;
 
 import lombok.RequiredArgsConstructor;
@@ -54,7 +56,25 @@ public class ProjectController {
 	
 	@GetMapping("/detail/{project_no}")
 	public String detailProjectView(@PathVariable("project_no") Long project_no, Model model) {
+		
+		ProjectDto project = projectService.findByProjectNo(project_no);
+		
+		model.addAttribute("project", project);
 		return "project/projectDetail";
+	}
+	
+	// github api 테스트 
+	@PostMapping("/create")
+	public String createProjectView(ProjectDto projectDto) {
+		System.out.println(projectDto.getProject_no());
+		System.out.println(projectDto.getProject_github_url());
+		System.out.println(projectDto.getProject_github_token());
+		
+		// projectService.createProject(projectDto);
+		
+		projectService.fetchPullRequests(projectDto.getProject_no());
+		
+		return "project/allProject";
 	}
 	
 }

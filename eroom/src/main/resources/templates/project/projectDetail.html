@@ -7,6 +7,22 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
   <body>
     <main class="main" id="top" layout:fragment="content">
     	<h1>프로젝트 디테일</h1>
+    	
+    	<form th:action="@{/project/create}" method="post">
+    	  <input type="hidden" name="project_no" th:value="${project.project_no}">
+		  <div class="mb-3">
+		    <label for="repo_url" class="form-label">GitHub Repository URL</label>
+		    <input type="text" class="form-control" id="repo_url" name="project_github_url" required>
+		  </div>
+		
+		  <div class="mb-3">
+		    <label for="token" class="form-label">GitHub Personal Access Token</label>
+		    <input type="password" class="form-control" id="token" name="project_github_token" required>
+		  </div>
+		
+		  <button type="submit" class="btn btn-primary">저장하기</button>
+		</form>
+   
     </main>
   </body>
 </html>

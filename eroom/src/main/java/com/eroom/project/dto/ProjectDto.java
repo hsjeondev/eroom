@@ -26,6 +26,8 @@ public class ProjectDto {
 	private String project_name;
 	private LocalDateTime project_start;
 	private LocalDateTime project_end;
+	private String project_github_url;
+	private String project_github_token;
 	private String proceed;
 	private List<ProjectMemberDto> project_members;
 
@@ -35,6 +37,8 @@ public class ProjectDto {
 				.projectName(project_name)
 				.projectStart(project_start)
 				.projectEnd(project_end)
+				.projectGithubUrl(project_github_url)
+				.projectGithubToken(project_github_token)
 				.proceed(proceed)
 				.build();
 
@@ -57,6 +61,8 @@ public class ProjectDto {
 				.project_start(project.getProjectStart())
 				.project_end(project.getProjectEnd())
 				.proceed(project.getProceed())
+				.project_github_url(project.getProjectGithubUrl())
+				.project_github_token(project.getProjectGithubToken())
 				.project_members(dtoList)
 				.build();
 	}
