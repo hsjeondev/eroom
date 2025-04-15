@@ -1,6 +1,8 @@
 package com.eroom.mail.dto;
 
 
+import com.eroom.employee.entity.Employee;
+import com.eroom.mail.entity.Mail;
 import com.eroom.mail.entity.MailReceiver;
 
 import lombok.AllArgsConstructor;
@@ -39,6 +41,8 @@ public class MailReceiverDto {
 	public MailReceiver toEntity() {
 		return MailReceiver.builder()
 				.mailReceiverNo(mail_receiver_no)
+				.mail(Mail.builder().mailNo(mail_no).build())
+				.receiver(Employee.builder().employeeNo(employee_no).build())
 				.mailReceiverReadYn(mail_receiver_read_yn)
 				.mailReceiverDeletedYn(mail_receiver_deleted_yn)
 				.mailReceiverImportantYn(mail_receiver_important_yn)

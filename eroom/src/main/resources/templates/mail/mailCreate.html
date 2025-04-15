@@ -47,9 +47,8 @@
 						            <ul>
 						              <li th:each="emp : ${employeeList}">
 						                <button type="button" class="btn btn-light mb-1 select-employee-btn"
-						                  th:data-email="${emp.email}"
-						                  th:data-name="${emp.name}"
-						                  th:text="${emp.name + ' (' + emp.dept.name + ')'}">
+						                  th:text="${emp.employeeName}"
+						                  >
 						                </button>
 						              </li>
 						            </ul>
