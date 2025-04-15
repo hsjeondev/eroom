@@ -237,9 +237,8 @@
 							<input type="hidden" name="calendar_no" id="calendar_no" /> <input
 								type="hidden" name="employee_no"
 								th:value="${#authentication.principal.employee.employeeNo}" />
-							<input type="hidden" name="separator" value="E001" /> <input
-								type="hidden" name="calendar_creator"
-								th:value="${#authentication.principal.employee.employeeId}" />
+							<input type="hidden" name="separator" value="E001" /> 
+							<input type="hidden" name="calendar_editor" th:value="${#authentication.principal.employee.employeeId}" />
 
 							<div class="input-group input-group-sm mb-3">
 								<span class="input-group-text" id="inputGroup-sizing-sm">제목</span>
@@ -438,6 +437,10 @@
 		    	//console.log("calendarNo:", selectedCalendarNo);
 		    	//console.log(updateForm.calendar_title.value);
 			const updateData = new FormData(updateForm);
+			  for (const [key, value] of updateData.entries()) {
+				    console.log(key, value); // 👈 이게 콘솔에 찍힘
+				  }
+
 		
 			//console.log(updateData);
 			fetch("/employeecalendar/update/"+selectedCalendarNo,{
