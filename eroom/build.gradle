@@ -56,6 +56,9 @@ dependencies {
     
     // Flying Saucer(OpenHTMLtoPDF) 라이브러리
 	implementation 'com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10'
+	implementation 'org.jsoup:jsoup:1.15.4'
+	implementation 'commons-io:commons-io:2.11.0'
+	
 }
 
 tasks.named('test') {
