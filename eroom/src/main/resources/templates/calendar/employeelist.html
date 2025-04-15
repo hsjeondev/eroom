@@ -229,11 +229,13 @@
 						</div>
 						<div class="mb-3">
 							<label>시작 시간</label> <input type="datetime-local"
-								name="calendar_start_time" class="form-control">
+								name="calendar_start_time" class="form-control"
+								id="calendarStartTime">
 						</div>
 						<div class="mb-3">
 							<label>종료 시간</label> <input type="datetime-local"
-								name="calendar_end_time" class="form-control">
+								name="calendar_end_time" class="form-control"
+								id="calendarEndTime">
 						</div>
 						<div class="mb-3">
 							<label>내용</label> <input type="text" name="calendar_content"
@@ -254,6 +256,7 @@
   	document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('appCalendar');
     const employeeNo = document.addEventForm.employee_no.value;
+    let selectedCalendarNo = null;
    
 
 
@@ -298,36 +301,7 @@
     		  selectedCalendarNo = calendarNo;
 
     		  document.getElementById('modalButton').click(); 
-
-    		  document.getElementById('editEventButton').addEventListener('click', function () {
-    			    const calendarNo = selectedCalendarNo; // eventClick에서 저장한 값
-
-    			    // 상세 모달 닫기
-    			    const eventModal = bootstrap.Modal.getInstance(document.getElementById('eventModal'));
-    			    eventModal.hide();
-
-    			    // 서버에서 데이터 가져와 수정 모달 채우기
-    			    fetch('/employeecalendar/detail/' + calendarNo)
-    			        .then(response => response.json())
-    			        .then(data => {
-    			            document.querySelector('input[name="calendar_no"]').value = data.calendar_no;
-    			            document.querySelector('input[name="calendar_title"]').value = data.calendar_title;
-    			            document.querySelector('input[name="calendar_location"]').value = data.calendar_location;
-    			            document.querySelector('input[name="calendar_start_time"]').value = data.calendar_start_time.slice(0, 16);
-    			            document.querySelector('input[name="calendar_end_time"]').value = data.calendar_end_time.slice(0, 16);
-    			            document.querySelector('input[name="calendar_content"]').value = data.calendar_content;
-
-    			            document.querySelector('#addEventModal h5').textContent = '일정 수정';
-
-    			            // 수정 모달 띄우기
-    			            const addEventModal = new bootstrap.Modal(document.getElementById('addEventModal'));
-    			            addEventModal.show();
-    			        })
-    			        .catch(error => {
-    			            console.error('일정 상세 조회 실패:', error);
-    			            alert('일정 데이터를 불러오지 못했습니다.');
-    			        });
-    			});
+	
     		},
    
 
@@ -359,7 +333,21 @@
         fetch('/employeecalendar/list/' + employeeNo)
           .then(response => response.json())
           .then(events => {
-            successCallback(events);
+              const formattedEvents = events.map(event => ({
+                  title: event.calendar_title,
+                  start: event.calendar_start_time,
+                  end: event.calendar_end_time,
+                  extendedProps: {
+                    calendar_no: event.calendar_no,
+                    location: event.calendar_location,
+                    description: event.calendar_content,
+                    separator: event.separator
+                  }
+                }));
+                
+                // 가공된 이벤트 목록을 FullCalendar로 전달
+                successCallback(formattedEvents);
+              
           })
           .catch(error => {
             console.error("이벤트 불러오기 실패", error);
@@ -372,11 +360,42 @@
 		
   	});
   	
+    document.getElementById('editEventButton').addEventListener('click', function () {
+        if (!selectedCalendarNo) {
+          alert('선택된 일정이 없습니다.');
+          return;
+        }
+
+        const eventModal = bootstrap.Modal.getInstance(document.getElementById('eventModal'));
+        eventModal.hide();
+
+        fetch('/employeecalendar/detail/' + selectedCalendarNo)
+          .then(response => response.json())
+          .then(data => {
+            document.querySelector('input[name="calendar_no"]').value = data.calendar_no;
+            document.querySelector('input[name="calendar_title"]').value = data.calendar_title;
+            document.querySelector('input[name="calendar_location"]').value = data.calendar_location;
+            document.querySelector('input[name="calendar_start_time"]').value = data.calendar_start_time.slice(0, 16);
+            document.querySelector('input[name="calendar_end_time"]').value = data.calendar_end_time.slice(0, 16);
+            document.querySelector('input[name="calendar_content"]').value = data.calendar_content;
+
+            document.querySelector('#addEventModal h5').textContent = '일정 수정';
+
+            const addEventModal = new bootstrap.Modal(document.getElementById('addEventModal'));
+            addEventModal.show();
+          })
+          .catch(error => {
+            console.error('일정 상세 조회 실패:', error);
+            alert('일정 데이터를 불러오지 못했습니다.');
+          });
+      });
+    </script>
+  	
  
   	
   	
 
-	</script>
+
 	
 	
 
