@@ -1,6 +1,8 @@
 package com.eroom.mail.dto;
 
 
+import com.eroom.mail.entity.MailReceiver;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,11 +24,11 @@ public class MailReceiverDto {
 	private String mail_recervier_type;
 	
 	// 읽음 여부
-	private String mail_recervier_read_yn="N";
+	private String mail_receiver_read_yn="N";
 	// 삭제 여부
-	private String mail_recervier_deleted_yn="N";
+	private String mail_receiver_deleted_yn="N";
 	// 중요 여부
-	private String mail_recervier_important_yn="N";
+	private String mail_receiver_important_yn="N";
 	
 	// 메일 번호
 	private Long mail_no;
@@ -34,6 +36,14 @@ public class MailReceiverDto {
 	private Long employee_no;
 	
 	
+	public MailReceiver toEntity() {
+		return MailReceiver.builder()
+				.mailReceiverNo(mail_receiver_no)
+				.mailReceiverReadYn(mail_receiver_read_yn)
+				.mailReceiverDeletedYn(mail_receiver_deleted_yn)
+				.mailReceiverImportantYn(mail_receiver_important_yn)
+				.build();
+	}
 	
 	
 	
