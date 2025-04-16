@@ -63,7 +63,7 @@ public class ApprovalController {
 		return "/approval/detail";
 	}
 	
-
+	
 
 	
 
