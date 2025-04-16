@@ -20,7 +20,7 @@
                 
              	<!-- parent pages-->
               	<!-- 근태 -->
-                <div class="nav-item-wrapper"><a class="nav-link label-1" th:href="@{/attendance/list}" th:classappend="${requestURI.startsWith('/attendance')} ? 'active'" role="button" data-bs-toggle="" aria-expanded="false">
+                <div class="nav-item-wrapper"><a class="nav-link label-1" th:href="@{/attendance/list}" th:classappend="${(requestURI != null and requestURI.startsWith('/attendance')) ? 'active' : ''}" role="button" data-bs-toggle="" aria-expanded="false">
                     <div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fa-solid fa-chart-gantt"></span></span><span class="nav-link-text-wrapper"><span class="nav-link-text">근태</span></span>
                     </div>
                   </a>
@@ -33,7 +33,7 @@
 				     href="#nv-directory"
 				     role="button"
 				     data-bs-toggle="collapse"
-				     th:attr="aria-expanded=${requestURI.startsWith('/directory')}"
+				     th:attr="aria-expanded=${(requestURI != null and requestURI.startsWith('/directory')) ? 'true' : ''}"
 				     aria-controls="nv-directory">
 				    <div class="d-flex align-items-center">
 				      <div class="dropdown-indicator-icon-wrapper">
@@ -47,7 +47,7 @@
 				    <ul class="nav collapse parent"
 				        data-bs-parent="#navbarVerticalCollapse"
 				        id="nv-directory"
-				        th:classappend="${requestURI.startsWith('/directory')} ? 'show'">
+				        th:classappend="${(requestURI != null and requestURI.startsWith('/directory')) ? 'show' : ''}">
 				      
 				      <li class="collapsed-nav-item-title d-none">주소록</li>
 				
@@ -55,7 +55,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/directory/employee}"
-				           th:classappend="${requestURI.startsWith('/directory/employee')} ? 'active'">
+				           th:classappend="${(requestURI != null and requestURI.startsWith('/directory/employee')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center">
 				            <span class="nav-link-text">회사</span>
 				          </div>
@@ -66,7 +66,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/directory/partner}"
-				           th:classappend="${requestURI.startsWith('/directory/partner')} ? 'active'">
+				           th:classappend="${(requestURI != null and requestURI.startsWith('/directory/partner')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center">
 				            <span class="nav-link-text">협력업체</span>
 				          </div>
@@ -76,6 +76,7 @@
 				    </ul>
 				  </div>
 				</div>
+				
 
                 
                 <!-- parent pages-->
@@ -85,7 +86,7 @@
 				     href="#nv-email"
 				     role="button"
 				     data-bs-toggle="collapse"
-				     th:attr="aria-expanded=${requestURI.startsWith('/mail')}"
+				     th:attr="aria-expanded=${(requestURI != null and requestURI.startsWith('/mail')) ? 'true' : ''}"
 				     aria-controls="nv-email">
 				    <div class="d-flex align-items-center">
 				      <div class="dropdown-indicator-icon-wrapper">
@@ -99,7 +100,7 @@
 				    <ul class="nav collapse parent"
 				        data-bs-parent="#navbarVerticalCollapse"
 				        id="nv-email"
-				        th:classappend="${requestURI.startsWith('/mail')} ? 'show'">
+				        th:classappend="${(requestURI != null and requestURI.startsWith('/mail')) ? 'show' : ''}">
 				      
 				      <li class="collapsed-nav-item-title d-none">이메일</li>
 				
@@ -107,7 +108,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/mail/sent}"
-				           th:classappend="${requestURI.startsWith('/mail/receiverTo')} ? 'active'">
+				           th:classappend="${(requestURI != null and requestURI.startsWith('/mail/receiverTo')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center">
 				            <span class="nav-link-text">받은 메일함</span>
 				          </div>
@@ -118,7 +119,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/mail/receiverTo}"
-				           th:classappend="${requestURI.startsWith('/mail/receiverCc')} ? 'active'">
+							th:classappend="${(requestURI != null and requestURI.startsWith('/mail/receiverCc')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center">
 				            <span class="nav-link-text">보낸 메일함</span>
 				          </div>
@@ -129,7 +130,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/mail/draft}"
-				           th:classappend="${requestURI.startsWith('/mail/draft')} ? 'active'">
+				           th:classappend="${(requestURI != null and requestURI.startsWith('/mail/draft')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center">
 				            <span class="nav-link-text">임시 보관함</span>
 				          </div>
@@ -140,7 +141,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/mail/important}"
-				           th:classappend="${requestURI.startsWith('/mail/important')} ? 'active'">
+				           th:classappend="${(requestURI != null and requestURI.startsWith('/mail/important')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center">
 				            <span class="nav-link-text">중요 메일함</span>
 				          </div>
@@ -151,7 +152,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/mail/trash}"
-				           th:classappend="${requestURI.startsWith('/mail/trash')} ? 'active'">
+				           th:classappend="${(requestURI != null and requestURI.startsWith('/mail/trash')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center">
 				            <span class="nav-link-text">휴지통</span>
 				          </div>
@@ -167,7 +168,7 @@
 				<div class="nav-item-wrapper">
 				  <a class="nav-link label-1"
 				     th:href="@{/chat/list}"
-				     th:classappend="${requestURI.startsWith('/chat')} ? 'active'"
+				     th:classappend="${(requestURI != null and requestURI.startsWith('/chat')) ? 'active' : ''}"
 				     role="button"
 				     data-bs-toggle=""
 				     aria-expanded="false">
@@ -185,7 +186,7 @@
 				     href="#nv-approval"
 				     role="button"
 				     data-bs-toggle="collapse"
-				     th:attr="aria-expanded=${requestURI.startsWith('/approval')}"
+				     th:attr="aria-expanded=${(requestURI != null and requestURI.startsWith('/approval')) ? 'true' : ''}"
 				     aria-controls="nv-approval">
 				    <div class="d-flex align-items-center">
 				      <div class="dropdown-indicator-icon-wrapper"><span class="fas fa-caret-right dropdown-indicator-icon"></span></div>
@@ -197,7 +198,8 @@
 				    <ul class="nav collapse parent"
 				        data-bs-parent="#navbarVerticalCollapse"
 				        id="nv-approval"
-				        th:classappend="${requestURI.startsWith('/approval')} ? 'show'">
+				        th:classappend="${(requestURI != null and requestURI.startsWith('/approval')) ? 'show' : ''}">
+				        
 				      
 				      <li class="collapsed-nav-item-title d-none">결재</li>
 				
@@ -205,7 +207,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/approval/myRequestedApprovals}"
-				           th:classappend="${requestURI.startsWith('/approval/myRequestedApprovals')} ? 'active'">
+				        	th:classappend="${(requestURI != null and requestURI.startsWith('/approval/myRequestedApprovals')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">요청한 결재</span></div>
 				        </a>
 				      </li>
@@ -214,7 +216,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/approval/receivedApprovals}"
-				           th:classappend="${requestURI.startsWith('/approval/receivedApprovals')} ? 'active'">
+			       		 	th:classappend="${(requestURI != null and requestURI.startsWith('/approval/receivedApprovals')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">요청 받은 결재</span></div>
 				        </a>
 				      </li>
@@ -223,7 +225,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/approval/referencedApprovals}"
-				           th:classappend="${requestURI.startsWith('/approval/referencedApprovals')} ? 'active'">
+				        	th:classappend="${(requestURI != null and requestURI.startsWith('/approval/referencedApprovals')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">참조된 결재</span></div>
 				        </a>
 				      </li>
@@ -232,7 +234,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/approval/agreementApprovals}"
-				           th:classappend="${requestURI.startsWith('/approval/agreementApprovals')} ? 'active'">
+				        	th:classappend="${(requestURI != null and requestURI.startsWith('/approval/agreementApprovals')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">합의된 결재</span></div>
 				        </a>
 				      </li>
@@ -241,7 +243,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/approval/withdrawnApprovals}"
-				           th:classappend="${requestURI.startsWith('/approval/withdrawnApprovals')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/approval/withdrawnApprovals')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">회수한 결재</span></div>
 				        </a>
 				      </li>
@@ -257,7 +259,7 @@
 				     href="#nv-project"
 				     role="button"
 				     data-bs-toggle="collapse"
-				     th:attr="aria-expanded=${requestURI.startsWith('/project')}"
+				     th:attr="aria-expanded=${(requestURI != null and requestURI.startsWith('/project')) ? 'true' : ''}"
 				     aria-controls="nv-project">
 				    <div class="d-flex align-items-center">
 				      <div class="dropdown-indicator-icon-wrapper"><span class="fas fa-caret-right dropdown-indicator-icon"></span></div>
@@ -269,7 +271,7 @@
 				    <ul class="nav collapse parent"
 				        data-bs-parent="#navbarVerticalCollapse"
 				        id="nv-project"
-				        th:classappend="${requestURI.startsWith('/project')} ? 'show'">
+				        th:classappend="${(requestURI != null and requestURI.startsWith('/project')) ? 'show' : ''}">
 				      
 				      <li class="collapsed-nav-item-title d-none">프로젝트</li>
 				
@@ -277,7 +279,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/project/all}"
-				           th:classappend="${requestURI.startsWith('/project/all')} ? 'active'">
+				        	th:classappend="${(requestURI != null and requestURI.startsWith('/project/all')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">전체</span></div>
 				        </a>
 				      </li>
@@ -286,7 +288,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/project/doing}"
-				           th:classappend="${requestURI.startsWith('/project/doing')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/project/doing')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">진행 중</span></div>
 				        </a>
 				      </li>
@@ -295,7 +297,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/project/yet}"
-				           th:classappend="${requestURI.startsWith('/project/yet')} ? 'active'">
+				        	th:classappend="${(requestURI != null and requestURI.startsWith('/project/yet')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">진행 예정</span></div>
 				        </a>
 				      </li>
@@ -304,7 +306,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/project/done}"
-				           th:classappend="${requestURI.startsWith('/project/done')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/project/done')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">완료</span></div>
 				        </a>
 				      </li>
@@ -313,7 +315,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/project/hold}"
-				           th:classappend="${requestURI.startsWith('/project/hold')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/project/hold')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">보류</span></div>
 				        </a>
 				      </li>
@@ -329,7 +331,7 @@
 				     href="#nv-calender"
 				     role="button"
 				     data-bs-toggle="collapse"
-				     th:attr="aria-expanded=${requestURI.startsWith('/calendar')}"
+				     th:attr="aria-expanded=${(requestURI != null and requestURI.startsWith('/calendar')) ? 'true' : ''}"
 				     aria-controls="nv-calender">
 				    <div class="d-flex align-items-center">
 				      <div class="dropdown-indicator-icon-wrapper"><span class="fas fa-caret-right dropdown-indicator-icon"></span></div>
@@ -341,7 +343,7 @@
 				    <ul class="nav collapse parent"
 				        data-bs-parent="#navbarVerticalCollapse"
 				        id="nv-calender"
-				        th:classappend="${requestURI.startsWith('/calendar')} ? ' show'">
+				        th:classappend="${(requestURI != null and requestURI.startsWith('/calendar')) ? 'show' : ''}">
 				
 				      <li class="collapsed-nav-item-title d-none">캘린더</li>
 				
@@ -358,7 +360,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/calendar/employee}"
-				           th:classappend="${requestURI.startsWith('/calendar/employee')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/calendar/employee')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">개인</span></div>
 				        </a>
 				      </li>
@@ -367,7 +369,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/calendar/myteam}"
-				           th:classappend="${requestURI.startsWith('/calendar/myteam')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/calendar/myteam')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">팀</span></div>
 				        </a>
 				      </li>
@@ -376,7 +378,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/calendar/department}"
-				           th:classappend="${requestURI.startsWith('/calendar/department')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/calendar/department')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">부서</span></div>
 				        </a>
 				      </li>
@@ -385,7 +387,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/calendar/company}"
-				           th:classappend="${requestURI.startsWith('/calendar/company')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/calendar/company')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">회사</span></div>
 				        </a>
 				      </li>
@@ -402,7 +404,7 @@
 				     href="#nv-reservation"
 				     role="button"
 				     data-bs-toggle="collapse"
-				     th:attr="aria-expanded=${requestURI.startsWith('/reservation')}"
+				     th:attr="aria-expanded=${(requestURI != null and requestURI.startsWith('/reservation')) ? 'true' : ''}"
 				     aria-controls="nv-reservation">
 				    <div class="d-flex align-items-center">
 				      <div class="dropdown-indicator-icon-wrapper"><span class="fas fa-caret-right dropdown-indicator-icon"></span></div>
@@ -414,7 +416,7 @@
 				    <ul class="nav collapse parent"
 				        data-bs-parent="#navbarVerticalCollapse"
 				        id="nv-reservation"
-				        th:classappend="${requestURI.startsWith('/reservation')} ? 'show'">
+				        th:classappend="${(requestURI != null and requestURI.startsWith('/reservation')) ? 'show' : ''}">
 				      
 				      <li class="collapsed-nav-item-title d-none">예약</li>
 				
@@ -422,7 +424,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/reservation/sleep}"
-				           th:classappend="${requestURI.startsWith('/reservation/sleep')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/reservation/sleep')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">숙직실 예약</span></div>
 				        </a>
 				      </li>
@@ -431,7 +433,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/reservation/vehicle}"
-				           th:classappend="${requestURI.startsWith('/reservation/vehicle')} ? 'active'">
+				        	th:classappend="${(requestURI != null and requestURI.startsWith('/reservation/vehicle')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">차량 예약</span></div>
 				        </a>
 				      </li>
@@ -440,7 +442,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/reservation/meetingroom}"
-				           th:classappend="${requestURI.startsWith('/reservation/meetingroom')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/reservation/meetingroom')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">회의실 예약</span></div>
 				        </a>
 				      </li>
@@ -456,7 +458,7 @@
 				     href="#nv-board"
 				     role="button"
 				     data-bs-toggle="collapse"
-				     th:attr="aria-expanded=${requestURI.startsWith('/board')}"
+				     th:attr="aria-expanded=${(requestURI != null and requestURI.startsWith('/board')) ? 'true' : ''}"
 				     aria-controls="nv-board">
 				    <div class="d-flex align-items-center">
 				      <div class="dropdown-indicator-icon-wrapper"><span class="fas fa-caret-right dropdown-indicator-icon"></span></div>
@@ -468,7 +470,7 @@
 				    <ul class="nav collapse parent"
 				        data-bs-parent="#navbarVerticalCollapse"
 				        id="nv-board"
-				        th:classappend="${requestURI.startsWith('/board')} ? 'show'">
+				        th:classappend="${(requestURI != null and requestURI.startsWith('/board')) ? 'show' : ''}">
 				      
 				      <li class="collapsed-nav-item-title d-none">게시판</li>
 				
@@ -476,7 +478,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/board/notice}"
-				           th:classappend="${requestURI.startsWith('/board/notice')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/board/notice')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">공지 게시판</span></div>
 				        </a>
 				      </li>
@@ -485,7 +487,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/board/anonymous}"
-				           th:classappend="${requestURI.startsWith('/board/anonymous')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/reservation/anonymous')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">익명 게시판</span></div>
 				        </a>
 				      </li>
@@ -501,7 +503,7 @@
 				     href="#nv-drive"
 				     role="button"
 				     data-bs-toggle="collapse"
-				     th:attr="aria-expanded=${requestURI.startsWith('/drive')}"
+				     th:attr="aria-expanded=${(requestURI != null and requestURI.startsWith('/drive')) ? 'true' : ''}"
 				     aria-controls="nv-drive">
 				    <div class="d-flex align-items-center">
 				      <div class="dropdown-indicator-icon-wrapper"><span class="fas fa-caret-right dropdown-indicator-icon"></span></div>
@@ -513,7 +515,7 @@
 				    <ul class="nav collapse parent"
 				        data-bs-parent="#navbarVerticalCollapse"
 				        id="nv-drive"
-				        th:classappend="${requestURI.startsWith('/drive')} ? 'show'">
+				        th:classappend="${(requestURI != null and requestURI.startsWith('/drive')) ? 'show' : ''}">
 				
 				      <li class="collapsed-nav-item-title d-none">드라이브</li>
 				
@@ -521,7 +523,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/drive/company}"
-				           th:classappend="${requestURI.startsWith('/drive/company')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/drive/company')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">회사 저장소</span></div>
 				        </a>
 				      </li>
@@ -530,7 +532,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/drive/department}"
-				           th:classappend="${requestURI.startsWith('/drive/department')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/drive/department')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">부서 저장소</span></div>
 				        </a>
 				      </li>
@@ -539,7 +541,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/drive/team}"
-				           th:classappend="${requestURI.startsWith('/drive/team')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/drive/team')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">팀 저장소</span></div>
 				        </a>
 				      </li>
@@ -548,7 +550,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/drive/personal}"
-				           th:classappend="${requestURI.startsWith('/drive/personal')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/drive/personal')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">개인 저장소</span></div>
 				        </a>
 				      </li>
@@ -562,7 +564,7 @@
 				<div class="nav-item-wrapper">
 				  <a class="nav-link label-1"
 				     th:href="@{/mypage}"
-				     th:classappend="${requestURI.startsWith('/mypage')} ? 'active'"
+				     th:classappend="${(requestURI != null and requestURI.startsWith('/mypage')) ? 'active' : ''}"
 				     role="button"
 				     data-bs-toggle=""
 				     aria-expanded="false">
@@ -580,7 +582,7 @@
 				     href="#nv-admin"
 				     role="button"
 				     data-bs-toggle="collapse"
-				     th:attr="aria-expanded=${requestURI.startsWith('/admin')}"
+				     th:attr="aria-expanded=${(requestURI != null and requestURI.startsWith('/admin')) ? 'true' : ''}"
 				     aria-controls="nv-admin">
 				    <div class="d-flex align-items-center">
 				      <div class="dropdown-indicator-icon-wrapper"><span class="fas fa-caret-right dropdown-indicator-icon"></span></div>
@@ -592,7 +594,7 @@
 				    <ul class="nav collapse parent"
 				        data-bs-parent="#navbarVerticalCollapse"
 				        id="nv-admin"
-				        th:classappend="${requestURI.startsWith('/admin')} ? 'show'">
+				        th:classappend="${(requestURI != null and requestURI.startsWith('/admin')) ? 'show' : ''}">
 				      
 				      <li class="collapsed-nav-item-title d-none">관리자 메뉴</li>
 				
@@ -600,7 +602,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/admin/meetingroom}"
-				           th:classappend="${requestURI.startsWith('/admin/meetingroom')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/admin/meetingroom')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">회의실 목록</span></div>
 				        </a>
 				      </li>
@@ -609,7 +611,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/admin/vehicle}"
-				           th:classappend="${requestURI.startsWith('/admin/vehicle')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/admin/vehicle')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">차량 목록</span></div>
 				        </a>
 				      </li>
@@ -618,7 +620,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/admin/sleep}"
-				           th:classappend="${requestURI.startsWith('/admin/sleep')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/admin/sleep')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">숙직실 목록</span></div>
 				        </a>
 				      </li>
@@ -627,7 +629,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/admin/directoryManagement}"
-				           th:classappend="${requestURI.startsWith('/admin/directoryManagement')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/admin/directoryManagement')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">주소록 관리</span></div>
 				        </a>
 				      </li>
@@ -636,7 +638,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/admin/employeeManagement}"
-				           th:classappend="${requestURI.startsWith('/admin/employeeManagement')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/admin/employeeManagement')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">회원 관리</span></div>
 				        </a>
 				      </li>
@@ -650,7 +652,7 @@
 				<div class="nav-item-wrapper">
 				  <a class="nav-link label-1"
 				     th:href="@{/notification}"
-				     th:classappend="${requestURI.startsWith('/notification')} ? 'active'"
+				     th:classappend="${(requestURI != null and requestURI.startsWith('/notification')) ? 'active' : ''}"
 				     role="button"
 				     data-bs-toggle=""
 				     aria-expanded="false">
@@ -668,7 +670,7 @@
 				     href="#nv-survey"
 				     role="button"
 				     data-bs-toggle="collapse"
-				     th:attr="aria-expanded=${requestURI.startsWith('/survey')}"
+				     th:attr="aria-expanded=${(requestURI != null and requestURI.startsWith('/survey')) ? 'true' : ''}"
 				     aria-controls="nv-survey">
 				    <div class="d-flex align-items-center">
 				      <div class="dropdown-indicator-icon-wrapper"><span class="fas fa-caret-right dropdown-indicator-icon"></span></div>
@@ -680,7 +682,7 @@
 				    <ul class="nav collapse parent"
 				        data-bs-parent="#navbarVerticalCollapse"
 				        id="nv-survey"
-				        th:classappend="${requestURI.startsWith('/survey')} ? 'show'">
+				        th:classappend="${(requestURI != null and requestURI.startsWith('/survey')) ? 'show' : ''}">
 				      
 				      <li class="collapsed-nav-item-title d-none">설문조사</li>
 				
@@ -688,7 +690,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/survey/list}"
-				           th:classappend="${requestURI.startsWith('/survey/list')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/survey/list')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">전체 설문조사</span></div>
 				        </a>
 				      </li>
@@ -697,7 +699,7 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/survey/ongoing}"
-				           th:classappend="${requestURI.startsWith('/survey/ongoing')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/survey/ongoing')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">진행중인 설문조사</span></div>
 				        </a>
 				      </li>
@@ -706,15 +708,15 @@
 				      <li class="nav-item">
 				        <a class="nav-link"
 				           th:href="@{/survey/closed}"
-				           th:classappend="${requestURI.startsWith('/survey/closed')} ? 'active'">
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/survey/closed')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">마감된 설문조사</span></div>
 				        </a>
 				      </li>
-				
+					
 				    </ul>
 				  </div>
 				</div>
-              
+              </li>
             </ul>
           </div>
         </div>

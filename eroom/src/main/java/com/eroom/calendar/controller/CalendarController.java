@@ -139,5 +139,23 @@ public class CalendarController {
 		return resultMap;
     }
 	
+    @PostMapping("/employeecalendar/delete/{calendarNo}")
+    @ResponseBody
+    public Map<String,String> deleteCalendar(@PathVariable("calendarNo") Long id){
+    	Map<String,String> result = new HashMap<String,String>();
+		result.put("res_code", "500");
+		result.put("res_msg", "삭제를 실패했습니다");
+		
+		//System.out.println("==================="+ id + "===================");
+		
+		EmployeeCalendarDto deleteCalendar = service.deleteCalendar(id);
+		
+		if(deleteCalendar != null) {
+			result.put("res_code", "200");
+			result.put("res_msg", "일정을 삭제하였습니다!");
+		}
+		
+		return result;
+    }
 
 }
