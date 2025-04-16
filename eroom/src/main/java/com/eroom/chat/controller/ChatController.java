@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +32,11 @@ public class ChatController {
 	private final ChatroomService chatroomService;
 	private final EmployeeService employeeService;
 	private final EmployeeRepository employeeRepository;
+	
+	@GetMapping("/test")
+	public String test123() {
+		return "chat/test";
+	}
 	
 	@GetMapping("/list")
 	public String selectChatRoomAll(@RequestParam(name = "department" ,required = false) String department, Model model) {
@@ -85,6 +91,16 @@ public class ChatController {
 			resultMap.put("res_msg", "새로운 채팅방을 등록하였습니다!");
 		} 
 		return resultMap;
+	}
+	@GetMapping("/roomDetail")
+	@ResponseBody
+	public ChatroomDto roomDetail(@RequestParam("roomNo") Long roomNo) {
+	    Chatroom chatroom = chatroomService.selectChatroomOne(roomNo);
+	    if (chatroom == null) {
+	        throw new RuntimeException("채팅방 정보를 찾을 수 없습니다.");
+	    }
+	    // ChatroomDto의 toDto() 메서드를 통해 필요한 데이터를 DTO에 담아서 반환
+	    return ChatroomDto.toDto(chatroom);
 	}
 
 }

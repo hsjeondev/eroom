@@ -1,342 +1,364 @@
 <!DOCTYPE html>
 <html lang="ko-KR" dir="ltr" data-navigation-type="default"
-	data-navbar-horizontal-shape="default"
-	xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{/include/layout}">
+    data-navbar-horizontal-shape="default"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{/include/layout}">
+    <style>
+	/* 기본 상태: 오른쪽 영역은 투명하고 오른쪽으로 약간 이동한 상태 */
+	.tab-pane {
+	  opacity: 0;
+	  transform: translateX(50px);
+	  transition: opacity 0.3s ease, transform 0.3s ease;
+	  pointer-events: none;
+	}
+	
+	/* 활성화된 상태: 클릭 시 'active' 클래스가 추가되어 나타남 */
+	.tab-pane.active {
+	  opacity: 1;
+	  transform: translateX(0);
+	  pointer-events: auto;
+	}
+	
+	</style>
 <body>
-	<main class="main" id="top" layout:fragment="content">
-		<!-- 여기에 요소 넣으면 됩니다. -->
-		
-
-		<div class="chat d-flex phoenix-offcanvas-container pt-1 mt-n1 mb-9">
-			<div
-				class="card p-3 p-xl-1 mt-xl-n1 chat-sidebar me-3 phoenix-offcanvas phoenix-offcanvas-start"
-				id="chat-sidebar">
-				<button class="btn d-none d-sm-block d-xl-none mb-2"
-					data-bs-toggle="modal" data-bs-target="#chatSearchBoxModal">
-					<span
-						class="fa-solid fa-magnifying-glass text-body-tertiary text-opacity-85 fs-7"></span>
-				</button>
-				<div class="d-none d-sm-block d-xl-none mb-5">
-					<button class="btn w-100 mx-auto" type="button"
-						data-bs-toggle="dropdown" data-boundary="window"
-						aria-haspopup="true" aria-expanded="false"
-						data-bs-reference="parent">
-						<span
-							class="fa-solid fa-bars text-body-tertiary text-opacity-85 fs-7"></span>
-					</button>
-					<ul class="dropdown-menu dropdown-menu-end p-0">
-						<li><a class="dropdown-item" href="#!">All</a></li>
-						<li><a class="dropdown-item" href="#!">Read</a></li>
-						<li><a class="dropdown-item" href="#!">Unread</a></li>
-					</ul>
-				</div>
-				<!-- ✨ 새 채팅방 만들기 버튼 -->
-				<div class="d-grid gap-2 mb-3">
-					<button class="btn btn-outline-primary" data-bs-toggle="modal"
-						data-bs-target="#createChatModal">+ 새 채팅방 만들기</button>
-				</div>
-				<!-- 검색기능 우선순위 최하위 -->
-				<div class="form-icon-container mb-4 d-sm-none d-xl-block">
-					<input class="form-control form-icon-input" type="text"
-						placeholder="이름을 입력하세요" /><span
-						class="fas fa-user text-body fs-9 form-icon"></span>
-				</div>
-				<ul class="nav nav-phoenix-pills mb-5 d-sm-none d-xl-flex"
-					id="contactListTab" data-chat-thread-tab="data-chat-thread-tab"
-					role="tablist">
-					<!-- 정렬기능  -->
-					<li class="nav-item" role="presentation"><a
-						class="nav-link cursor-pointer active" data-bs-toggle="tab"
-						data-chat-thread-list="all" role="tab" aria-selected="true">전체</a></li>
-					<li class="nav-item" role="presentation"><a
-						class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab"
-						data-chat-thread-list="read" aria-selected="false">읽지않음</a></li>
-					<li class="nav-item" role="presentation"><a
-						class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab"
-						data-chat-thread-list="unread" aria-selected="false">읽음</a></li>
-				</ul>
-				<div class="scrollbar">
-					<div class="tab-content" id="contactListTabContent">
-						<div data-chat-thread-tab-content="data-chat-thread-tab-content">
-							<ul class="nav chat-thread-tab flex-column list">
-
-								<!-- 참여중인 채팅방이 없을때 -->
-								<div th:if="${#lists.isEmpty(chatroomList)}">
-									<p class="text-center text-muted mt-4">참여 중인 채팅방이 없습니다.</p>
-								</div>
-
-								<!-- 채팅 리스트 읽은사람-->
-								<li th:if="${!#lists.isEmpty(chatroomList)}"
-									th:each="chatroom : ${chatroomList}"
-									th:attr="data-room-no=${chatroom.chatroomNo}"
-									class="nav-item read mb-1" role="presentation">
-									<!-- 선택된 사람은 a class 끝에 active 넣으면됨 --> <a
-									class="nav-link d-flex align-items-center justify-content-center p-2  "
-									data-bs-toggle="tab" data-chat-thread="data-chat-thread"
-									href="#tab-thread-1" role="tab" aria-selected="true"> 
-									<!-- 이미지 부분 -->
-										<div class="avatar avatar-xl status-online position-relative me-2 me-sm-0 me-xl-2">
-					                        	<img class="rounded-circle border border-2 border-light-subtle" src="../assets/img/team/20.webp" alt="" />
-					                        </div>  
-										<div class="flex-1 d-sm-none d-xl-block">
-											<div
-												class="d-flex justify-content-between align-items-center">
-												<h5 th:text="${chatroom.chatroomName}"
-													class="text-body fw-normal name text-nowrap">채팅방 이름</h5>
-												<p
-													class="fs-10 text-body-tertiary text-opacity-85 mb-0 text-nowrap">
-													시간은 일단 보류</p>
-											</div>
-											<div class="d-flex justify-content-between">
-												<p th:text="${chatroom.chatLastMessage}"
-													class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">
-													마지막메시지</p>
-											</div>
-										</div>
-								</a>
-								</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- 채팅방만들기 모달페이지-->
-			<div class="modal fade" id="createChatModal" tabindex="-1"
-			aria-labelledby="createChatModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h3>새 채팅방 만들기</h3>
-						<button type="button" class="btn-close" data-bs-dismiss="modal"
-							aria-label="닫기"></button>
-					</div>
-					<form id="createChatForm">
-					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-						<div class="modal-body">
-							<!-- 채팅 종류 선택 (1:1, 그룹) -->
-							<div class="mb-3">
-								<label class="form-label">채팅 종류</label>
-								<div id="chatTypeGroup">
-									<input type="radio" name="chatIsGroupYn" value="N" checked> 1:1 채팅
-									<input type="radio" name="chatIsGroupYn" value="Y"> 그룹 채팅
-								</div>
-							</div>
-
-							<div class="mb-3" id="chatroomNameBox">
-								<label class="form-label">채팅방 이름</label>
-								  <!-- 1:1 채팅일 때는 자동 제목으로 설정되며, 수정 불가 -->
-								<input type="text" id="chatroomName" name="chatroomName" class="form-control"
-									placeholder="예: 개발팀 채팅방" readonly>
-							</div>
-			
-							<!-- 부서(소속) 선택 -->
-					        <div class="mb-3">
-					          <label class="form-label">소속</label>
-					          <select class="form-select" id="departmentSelect" onchange="changeDepartment(this.value)">
-					            <option disabled selected>-- 소속 선택 --</option>
-					            <!-- 부서 목록은 컨트롤러에서 structureList로 전달 -->
-					           <option th:each="dept : ${structureList}" 
-								       th:value="${dept.separator_code}" 
-								       th:text="${dept.separator_name}" 
-								       th:selected="${dept.separator_name == param.department}">
-							   </option>
-					          </select>
-					        </div>
-					
-					        <!-- 참여자 선택 (부서 선택 후 해당 부서의 구성원 불러옴) -->
-					        <div class="mb-3">
-					          <label class="form-label">참여자 선택</label>
-					          <div class="d-flex">
-					            <select id="employeeSelect" class="form-select me-2" style="flex:1;">
-					              <option disabled selected>-- 참여자 선택 --</option>
-					            </select>
-					            <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">추가</button>
-					          </div>
-					        </div>
-					        <!-- 선택된 참여자 보여주기 -->
-					        <div class="mb-3">
-					          <label class="form-label">선택된 참여자</label>
-					          <div id="selectedParticipants">
-					            <!-- 여기에서 badge로 추가됨 -->
-					          </div>
-					        </div>
-							</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-							<button type="submit" class="btn btn-primary">생성</button>
-						</div>
-						<div>
-						<input type="hidden" name="creater" th:value="${#authentication.principal.employee.employeeNo}">
-						</div>
-					</form>
-				</div><!-- modal-content -->
-			</div><!-- modal-dialog -->
-		</div><!-- createChatModal -->
-		
-			<!--채팅방 채팅방만들기 처음화면  -->
-			<div class="card tab-content flex-1 phoenix-offcanvas-container">
-				<div class="tab-pane h-100 fade active show" id="tab-thread-1"
-					role="tabpanel" aria-labelledby="tab-thread-1">
-					<div class="d-flex flex-column h-100">
-						<div id="default-chat-area"
-							class="d-flex flex-column justify-content-center align-items-center h-100">
-							<h4 class="text-body-secondary mb-2">채팅방을 선택해주세요.</h4>
-							<a href="#" class="fw-bold text-primary text-decoration-none"
-								data-bs-toggle="modal" data-bs-target="#createChatModal"> 새
-								채팅방 만들기 </a>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+  <main class="main" id="top" layout:fragment="content">
+    <div class="chat d-flex phoenix-offcanvas-container pt-1 mt-n1 mb-9">
+      <!-- 왼쪽 채팅 목록 영역 -->
+      <div class="card p-3 p-xl-1 mt-xl-n1 chat-sidebar me-3 phoenix-offcanvas phoenix-offcanvas-start" id="chat-sidebar">
+        <button class="btn d-none d-sm-block d-xl-none mb-2" data-bs-toggle="modal" data-bs-target="#chatSearchBoxModal">
+          <span class="fa-solid fa-magnifying-glass text-body-tertiary text-opacity-85 fs-7"></span>
+        </button>
+        <div class="d-none d-sm-block d-xl-none mb-5">
+          <button class="btn w-100 mx-auto" type="button" data-bs-toggle="dropdown" data-boundary="window"
+            aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+            <span class="fa-solid fa-bars text-body-tertiary text-opacity-85 fs-7"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end p-0">
+            <li><a class="dropdown-item" href="#!">All</a></li>
+            <li><a class="dropdown-item" href="#!">Read</a></li>
+            <li><a class="dropdown-item" href="#!">Unread</a></li>
+          </ul>
+        </div>
+        <!-- 새 채팅방 만들기 버튼 -->
+        <div class="d-grid gap-2 mb-3">
+          <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createChatModal">
+            + 새 채팅방 만들기
+          </button>
+        </div>
+        <!-- 검색 입력란 (데스크탑) -->
+        <div class="form-icon-container mb-4 d-sm-none d-xl-block">
+          <input class="form-control form-icon-input" type="text" placeholder="이름을 입력하세요" />
+          <span class="fas fa-user text-body fs-9 form-icon"></span>
+        </div>
+        <!-- 탭 메뉴 (전체, 읽지않음, 읽음) -->
+        <ul class="nav nav-phoenix-pills mb-5 d-sm-none d-xl-flex"
+          id="contactListTab" data-chat-thread-tab="data-chat-thread-tab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a class="nav-link cursor-pointer active" data-bs-toggle="tab"
+              data-chat-thread-list="all" role="tab" aria-selected="true">전체</a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link cursor-pointer" data-bs-toggle="tab"
+              role="tab" data-chat-thread-list="read" aria-selected="false">읽지않음</a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link cursor-pointer" data-bs-toggle="tab"
+              role="tab" data-chat-thread-list="unread" aria-selected="false">읽음</a>
+          </li>
+        </ul>
+        <!-- 채팅 목록 -->
+        <div class="scrollbar">
+          <div class="tab-content" id="contactListTabContent">
+            <div data-chat-thread-tab-content="data-chat-thread-tab-content">
+              <ul class="nav chat-thread-tab flex-column list chat_list">
+                <!-- 채팅방이 없을 경우 -->
+                <div th:if="${#lists.isEmpty(chatroomList)}">
+                  <p class="text-center text-muted mt-4">참여 중인 채팅방이 없습니다.</p>
+                </div>
+                <!-- 채팅방 목록 (반복 렌더링) -->
+                <li th:if="${!#lists.isEmpty(chatroomList)}"
+                  th:each="chatroom : ${chatroomList}"
+                  th:attr="data-room-no=${chatroom.chatroomNo}"
+                  class="nav-item read mb-1" role="presentation">
+                  <a class="nav-link d-flex align-items-center justify-content-center p-2"
+                    data-bs-toggle="tab" data-chat-thread="data-chat-thread"
+                    th:href="'#chatroom-' + ${chatroom.chatroomNo}" role="tab" aria-selected="true">
+                    <!-- 아바타 이미지 -->
+                    <div class="avatar avatar-xl status-online position-relative me-2 me-sm-0 me-xl-2">
+                      <img class="rounded-circle border border-2 border-light-subtle" src="../assets/img/team/20.webp" alt="" />
+                    </div>
+                    <div class="flex-1 d-sm-none d-xl-block">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <h5 th:text="${chatroom.chatroomName}"
+                          class="text-body fw-normal name text-nowrap">채팅방 이름</h5>
+                        <p class="fs-10 text-body-tertiary text-opacity-85 mb-0 text-nowrap">시간은 일단 보류</p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p th:text="${chatroom.chatLastMessage}"
+                          class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">
+                          마지막메시지</p>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 채팅방 생성 모달 -->
+      <div class="modal fade" id="createChatModal" tabindex="-1"
+        aria-labelledby="createChatModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>새 채팅방 만들기</h3>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="닫기"></button>
+            </div>
+            <form id="createChatForm">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <div class="modal-body">
+                <!-- 채팅 종류 선택 -->
+                <div class="mb-3">
+                  <label class="form-label">채팅 종류</label>
+                  <div id="chatTypeGroup">
+                    <input type="radio" name="chatIsGroupYn" value="N" checked> 1:1 채팅
+                    <input type="radio" name="chatIsGroupYn" value="Y"> 그룹 채팅
+                  </div>
+                </div>
+                <div class="mb-3" id="chatroomNameBox">
+                  <label class="form-label">채팅방 이름</label>
+                  <input type="text" id="chatroomName" name="chatroomName" class="form-control"
+                    placeholder="예: 개발팀 채팅방" readonly>
+                </div>
+                <!-- 부서(소속) 선택 -->
+                <div class="mb-3">
+                  <label class="form-label">소속</label>
+                  <select class="form-select" id="departmentSelect" onchange="changeDepartment(this.value)">
+                    <option disabled selected>-- 소속 선택 --</option>
+                    <option th:each="dept : ${structureList}" 
+                      th:value="${dept.separator_code}" 
+                      th:text="${dept.separator_name}" 
+                      th:selected="${dept.separator_name == param.department}">
+                    </option>
+                  </select>
+                </div>
+                <!-- 참여자 선택 -->
+                <div class="mb-3">
+                  <label class="form-label">참여자 선택</label>
+                  <div class="d-flex">
+                    <select id="employeeSelect" class="form-select me-2" style="flex:1;">
+                      <option disabled selected>-- 참여자 선택 --</option>
+                    </select>
+                    <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">추가</button>
+                  </div>
+                </div>
+                <!-- 선택된 참여자 표시 -->
+                <div class="mb-3">
+                  <label class="form-label">선택된 참여자</label>
+                  <div id="selectedParticipants">
+                    <!-- badge 형태로 추가 -->
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="submit" class="btn btn-primary">생성</button>
+              </div>
+              <div>
+                <input type="hidden" name="creater" th:value="${#authentication.principal.employee.employeeNo}">
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 오른쪽 채팅 영역 (선택 전 기본 화면) -->
+      <div class="card tab-content flex-1 phoenix-offcanvas-container" id="chat-content">
+      
+        <div class="tab-pane h-100 fade active show" id="tab-thread-1"
+          role="tabpanel" aria-labelledby="tab-thread-1">
+          <div class="d-flex flex-column h-100">
+            <div id="default-chat-area" class="d-flex flex-column justify-content-center align-items-center h-100">
+              <h4 class="text-body-secondary mb-2">채팅방을 선택해주세요.</h4>
+              <a href="#" class="fw-bold text-primary text-decoration-none"
+                data-bs-toggle="modal" data-bs-target="#createChatModal">
+                새 채팅방 만들기
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
 		 <script>
+		// 채팅 종류 전환 및 채팅방 이름 readOnly 처리
 		 let isGroupChat = false;
-
 		 const chatTypeRadios = document.querySelectorAll('input[name="chatIsGroupYn"]');
 		 const chatroomNameInput = document.getElementById("chatroomName");
 
-		 // 초기 상태 설정: 1:1 채팅이면 제목 입력란 비활성화
-		 // chatroomNameInput.disabled = true;
-
 		 chatTypeRadios.forEach(radio => {
-		  radio.addEventListener('change', (e) => {
-		    isGroupChat = (e.target.value === 'Y');
-		    console.log("채팅 타입 변경됨:", isGroupChat ? '그룹' : '1:1');
-		
-		    // 그룹 채팅이면 readOnly = false, 1:1 채팅이면 readOnly = true
-		    chatroomNameInput.readOnly = !isGroupChat;
-		
-		    // 1:1 채팅일 때는 제목 입력란 자동 설정
-		    if (!isGroupChat) {
-		      chatroomNameInput.value = "";
-		         }
-		     });
+		   radio.addEventListener('change', (e) => {
+		     isGroupChat = (e.target.value === 'Y');
+		     console.log("채팅 타입 변경됨:", isGroupChat ? '그룹' : '1:1');
+		     chatroomNameInput.readOnly = !isGroupChat;
+		     if (!isGroupChat) {
+		       chatroomNameInput.value = "";
+		     }
+		   });
 		 });
 
-		 // 그룹 채팅인 경우, 폼 제출 전 제목 입력 여부 확인
+		 // 폼 제출 전 그룹 채팅 제목 유효성 체크 및 채팅방 생성 처리
 		 document.getElementById("createChatForm").addEventListener("submit", function(e) {
-			 debugger;
-		    e.preventDefault();
-		    
-		    // 그룹 채팅일 경우 제목 입력 여부를 체크
-		    if (isGroupChat) {
-		        const chatRoomName = chatroomNameInput.value.trim();
-		        console.log("그룹 채팅 제목:", chatRoomName);
-		        if (chatRoomName === "") {
-		            alert("채팅방 제목을 입력해주세요.");
-		            return;
-		        }
-		    }
-		    
-		    // 폼 데이터 수집
-		    const formData = new FormData(this);
-		    
-		    // fetch 요청을 두 모드 모두에 대해 실행
-		    fetch('/chat/create', {
-		        method: 'post',
-		        body: formData
-		    })
-		    .then(response => response.json())
-		    .then(data => {
-		    	debugger;
-		        if (data.res_code === "200") {
-		            alert("채팅방이 성공적으로 생성되었습니다!");
-		            // 모달을 닫는 방법은 사용 중인 Bootstrap 버전에 따라 다를 수 있습니다.
-		            const modalElem = document.getElementById('createChatModal');
-		            const modalInstance = bootstrap.Modal.getInstance(modalElem);
-		            if (modalInstance) {
-		                modalInstance.hide();
-		            }
-		        } else {
-		            alert("오류: " + data.res_msg);
-		        }
-		    })
-		    .catch(error => {
-		        console.error('Error:', error);
-		        alert("채팅방 생성 중 오류가 발생했습니다.");
-		    });
-		});
+		   e.preventDefault();
+		   if (isGroupChat) {
+		     const chatRoomName = chatroomNameInput.value.trim();
+		     if (chatRoomName === "") {
+		       alert("채팅방 제목을 입력해주세요.");
+		       return;
+		     }
+		   }
+		   const formData = new FormData(this);
+		   fetch('/chat/create', {
+		     method: 'post',
+		     body: formData
+		   })
+		   .then(response => response.json())
+		   .then(data => {
+		     if (data.res_code === "200") {
+		       alert("채팅방이 성공적으로 생성되었습니다!");
+		       const modalElem = document.getElementById('createChatModal');
+		       const modalInstance = bootstrap.Modal.getInstance(modalElem);
+		       if (modalInstance) {
+		         modalInstance.hide();
+		       }
+		     } else {
+		       alert("오류: " + data.res_msg);
+		     }
+		   })
+		   .catch(error => {
+		     console.error('Error:', error);
+		     alert("채팅방 생성 중 오류가 발생했습니다.");
+		   });
+		 });
 
-		 // 부서(소속) 선택 시 해당 부서의 직원 목록을 불러오는 함수
+		 // 부서 선택 시 직원 목록 로딩
 		 function changeDepartment(deptId) {
-		     console.log("선택된 부서 ID:", deptId);
-		     fetch('/chat/employes?separator_code=' + encodeURIComponent(deptId))
+		   console.log("선택된 부서 ID:", deptId);
+		   fetch('/chat/employes?separator_code=' + encodeURIComponent(deptId))
 		     .then(response => response.json())
 		     .then(data => {
-		         console.log(data);
-		         const select = document.getElementById('employeeSelect');
-		         select.innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
-		         data.forEach(emp => {
-		             const option = document.createElement('option');
-		             option.value = emp.employee_no;
-		             option.text = emp.employee_name;
-		             select.appendChild(option);
-		         });
-		         select.multiple = isGroupChat;
+		       console.log(data);
+		       const select = document.getElementById('employeeSelect');
+		       select.innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
+		       data.forEach(emp => {
+		         const option = document.createElement('option');
+		         option.value = emp.employee_no;
+		         option.text = emp.employee_name;
+		         select.appendChild(option);
+		       });
+		       select.multiple = isGroupChat;
 		     })
 		     .catch(error => console.error('직원 로딩 실패:', error));
 		 }
 
-		 // 선택된 참여자를 추가하는 함수
+		 // 참여자 추가 함수: 선택된 참여자를 badge 형태로 표시
 		 function addParticipant() {
-		     const chatTypeRadio = document.querySelector('input[name="chatIsGroupYn"]:checked');
-		     const isGroupChat = chatTypeRadio && chatTypeRadio.value === 'Y'; 
-
-		     const select = document.getElementById('employeeSelect');
-		     const selectedOptions = Array.from(select.selectedOptions);
-
-		     if (selectedOptions.length === 0) {
-		         alert('참여자를 선택해주세요.');
-		         return;
+		   const chatTypeRadio = document.querySelector('input[name="chatIsGroupYn"]:checked');
+		   const isGroupChat = chatTypeRadio && chatTypeRadio.value === 'Y'; 
+		   const select = document.getElementById('employeeSelect');
+		   const selectedOptions = Array.from(select.selectedOptions);
+		   
+		   if (selectedOptions.length === 0) {
+		     alert('참여자를 선택해주세요.');
+		     return;
+		   }
+		   const currentCount = document.querySelectorAll('#selectedParticipants .badge').length;
+		   if (!isGroupChat && (currentCount + selectedOptions.length > 1)) {
+		     alert('1:1 채팅은 한 명만 선택할 수 있습니다.');
+		     return;
+		   }
+		   selectedOptions.forEach(option => {
+		     const participantId = option.value;
+		     const participantName = option.text;
+		     if (document.getElementById('participant-' + participantId)) {
+		       alert('이미 추가된 참여자 입니다.');
+		       return;
 		     }
-
-		     const currentCount = document.querySelectorAll('#selectedParticipants .badge').length;
-
-		     if (!isGroupChat && (currentCount + selectedOptions.length > 1)) {
-		         alert('1:1 채팅은 한 명만 선택할 수 있습니다.');
-		         return;
-		     }
-
-		     selectedOptions.forEach(option => {
-		         const participantId = option.value;
-		         const participantName = option.text;
-
-		         console.log("선택된 참여자 이름:", participantName);
-		         
-		         if (document.getElementById('participant-' + participantId)) {
-		             alert('이미 추가된 참여자 입니다.')
-		             return; // 중복 방지
-		         }
-
-		         const badge = document.createElement('span');
-		         badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
-		         badge.id = 'participant-' + participantId;
-		         badge.innerHTML = `
-		           ${participantName}
-		           <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeParticipant('${participantId}')"></button>
-		           <input type="hidden" name="participantIds" value="${participantId}">
-		         `;
-		         document.getElementById('selectedParticipants').appendChild(badge);
-
-		         // 1:1 채팅인 경우 채팅방 이름 자동 설정
-		         if (!isGroupChat) {
-		             document.getElementById("chatroomName").value = participantName;
-		         }
-		     });
-
-		     select.selectedIndex = -1;
-		 }
-
-		 function removeParticipant(id) {
-		     const badge = document.getElementById('participant-' + id);
-		     if (badge) badge.remove();
-		     // 1:1 채팅인 경우, 참여자가 제거되면 제목도 초기화
+		     const badge = document.createElement('span');
+		     badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
+		     badge.id = 'participant-' + participantId;
+		     badge.innerHTML = `
+		       ${participantName}
+		       <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeParticipant('${participantId}')"></button>
+		       <input type="hidden" name="participantIds" value="${participantId}">
+		     `;
+		     document.getElementById('selectedParticipants').appendChild(badge);
 		     if (!isGroupChat) {
-		         document.getElementById("chatroomName").value = "";
+		       document.getElementById("chatroomName").value = participantName;
 		     }
+		   });
+		   select.selectedIndex = -1;
 		 }
+
+		 // 참여자 제거 함수: badge 제거 및 이름 초기화 (1:1 채팅 시)
+		 function removeParticipant(id) {
+		   const badge = document.getElementById('participant-' + id);
+		   if (badge) badge.remove();
+		   if (!isGroupChat) {
+		     document.getElementById("chatroomName").value = "";
+		   }
+		 }
+		 // 채팅방 디테일?
+		 document.querySelectorAll('[data-chat-thread]').forEach(chatLink => {
+			  chatLink.addEventListener('click', function (e) {
+			    e.preventDefault();
+
+			    // 1. 오른쪽 기본 안내 제거
+			    const defaultArea = document.getElementById('default-chat-area');
+			    if (defaultArea) {
+			      defaultArea.style.display = 'none';
+			    }
+
+			    // 2. 선택된 채팅방 정보 가져오기
+			    const chatroomName = this.querySelector('.name')?.innerText || '알 수 없음';
+			   
+
+			    // 3. 새로운 내용 동적 삽입
+			    const chatContent = document.getElementById('chat-content');
+
+			    // 기존 내용 제거하고 새로 추가
+			    chatContent.innerHTML = `
+			    	  <div class="tab-pane h-100 fade show active d-flex flex-column">
+
+			    	    <!-- 채팅내용이 들어가는 영역 (스크롤 가능 + 남는 공간 차지) -->
+			    	    <div class="flex-grow-1 overflow-auto p-4">
+			    	      <h4 class="mb-3">${chatroomName}</h4>
+			    	      <div class="chat-history">
+			    	        <hr>
+			    	        <p>📩 채팅 내용이 여기에 표시됩니다 (추가 가능)</p>
+			    	      </div>
+			    	    </div>
+
+			    	    <!-- 하단 고정된 입력창 -->
+			    	    <div class="chat-footer border-top p-3 d-flex align-items-center bg-white">
+			    	      <button class="btn btn-light me-2"><i class="fas fa-smile"></i></button>
+			    	      <label for="fileInput" class="btn btn-light me-2">
+			    	        <i class="fa-solid fa-paperclip"></i>
+			    	      </label>
+			    	      <input type="file" id="fileInput" style="display: none;">
+			    	      <input class="form-control me-2" type="text" placeholder="메시지를 입력하세요..." id="messageInput">
+			    	      <button class="btn btn-primary" onclick="sendMessage()">보내기</button>
+			    	    </div>
+
+			    	  </div>
+			    	`;
+
+			  });
+			});
 
 	    </script>
 	</main>

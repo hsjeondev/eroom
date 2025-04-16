@@ -59,4 +59,8 @@ public class ChatroomService {
 		return ChatroomDto.toDto(result);
 	}
 
+	public Chatroom selectChatroomOne(Long id) {
+		return repository.findById(id).orElse(null);
+	}
+
 }
