@@ -51,6 +51,8 @@ public class Mail {
 	@OneToMany(mappedBy = "mail")
 	private List<MailReceiver> receivers; // 수신자 목록
 	
+	
+	// 수정 예정
 	@ManyToOne
 	@JoinColumn(name = "employee_no")  // mail 테이블에 외래키 컬럼 생성됨
 	private Employee sender;
