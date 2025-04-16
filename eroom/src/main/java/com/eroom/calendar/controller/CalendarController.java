@@ -46,7 +46,6 @@ public class CalendarController {
 	//캘린더 회사일정 목록으로 화면 전환
 	@GetMapping("/calendar/company")
 	public String companyCalendarView(Model model) {
-		model.addAttribute("separator", "A001");
 		return "calendar/companylist";
 	}
 	
