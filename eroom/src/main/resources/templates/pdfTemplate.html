@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>PDF 예제</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    h1 { color: navy; }
+    p  { font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1 th:text="${title}">PDF 제목</h1>
+  <p th:text="${message}">이곳에 PDF 내용을 입력하세요.</p>
+</body>
+</html>

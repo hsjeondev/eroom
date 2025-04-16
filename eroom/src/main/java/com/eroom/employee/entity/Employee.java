@@ -4,6 +4,7 @@ package com.eroom.employee.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.eroom.attendance.entity.Attendance;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.directory.entity.Directory;
@@ -112,5 +113,9 @@ public class Employee {
 	
 	@OneToMany(mappedBy = "receiver")
 	private List<MailReceiver> receivedMails; // 수신한 메일 목록
+	
+	// 근태 조건
+	@OneToMany(mappedBy="employee")
+	private List<Attendance> attendanceList;
 	
 }

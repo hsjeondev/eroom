@@ -27,6 +27,7 @@ public class EmployeeCalendarDto {
 	private LocalDateTime calendar_end_time; // 종료 시간
 	private String calendar_content; // 설명
 	private String calendar_creator;
+	private String calendar_editor;
 	private Long employee_no; // 사번
 	private String separator; // 구분자
 	private String visibleYn = "Y";
@@ -37,7 +38,7 @@ public class EmployeeCalendarDto {
 		return EmployeeCalendar.builder().calendarNo(calendar_no).calendarTitle(calendar_title)
 				.calendarLocation(calendar_location).calendarStartTime(calendar_start_time)
 				.calendarEndTime(calendar_end_time).calendarContent(calendar_content).calendarCreator(calendar_creator)
-				.employeeNo(employee_no).separator(separator)
+				.employeeNo(employee_no).separator(separator).visibleYn(visibleYn).calendarEditor(calendar_editor)
 
 				.build();
 	}
@@ -50,6 +51,7 @@ public class EmployeeCalendarDto {
 				.calendar_end_time(employeeCalendar.getCalendarEndTime())
 				.calendar_content(employeeCalendar.getCalendarContent())
 				.calendar_creator(employeeCalendar.getCalendarCreator())
+				.calendar_editor(employeeCalendar.getCalendarEditor())
 				.employee_no(employeeCalendar.getEmployeeNo())
 				.separator(employeeCalendar.getSeparator()).calendar_reg_date(employeeCalendar.getCalendarRegDate())
 				.calendar_mod_date(employeeCalendar.getCalendarModDate()).build();
@@ -66,6 +68,7 @@ public class EmployeeCalendarDto {
 	    event.put("location", this.calendar_location != null ? this.calendar_location : "");
 	    event.put("description", this.calendar_content != null ? this.calendar_content : "");
 	    event.put("separator", this.separator != null ? this.separator : "");
+	    event.put("calendar_creator", this.calendar_creator != null ? this.calendar_creator : "");
 	    event.put("calendar_no", this.calendar_no);
 	    
 
