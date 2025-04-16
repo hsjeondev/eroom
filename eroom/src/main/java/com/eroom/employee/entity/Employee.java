@@ -70,6 +70,7 @@ public class Employee {
 	
 	@ManyToOne
 	@JoinColumn(name="structure_no")
+	@ToString.Exclude
 	private Structure structure;
 	
 //	@ManyToOne

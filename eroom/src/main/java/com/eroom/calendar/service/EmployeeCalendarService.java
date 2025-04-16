@@ -1,12 +1,13 @@
 package com.eroom.calendar.service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.eroom.calendar.dto.EmployeeCalendarDto;
 import com.eroom.calendar.entity.EmployeeCalendar;
+import com.eroom.calendar.repository.CompanyCalendarRepository;
 import com.eroom.calendar.repository.EmployeeCalendarRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -16,23 +17,28 @@ import lombok.RequiredArgsConstructor;
 public class EmployeeCalendarService {
 	private final EmployeeCalendarRepository repository;
 	
+	//개인 캘린더 일정 등록
 	public EmployeeCalendarDto addEmployeeCalendar(EmployeeCalendarDto dto) {
 		EmployeeCalendar param = dto.toEntity();
 		EmployeeCalendar result = repository.save(param);
 		return new EmployeeCalendarDto().toDto(result);
 	}
 	
+	
+	//해당 직원 일정 조회
 	public List<EmployeeCalendarDto> getCalendarList(Long employeeNo) {
-	    List<EmployeeCalendar> list = repository.findByEmployeeNoAndVisibleYn(employeeNo,"Y");
-	    return list.stream()
-	        .map(employeeCalendar -> {
-	            EmployeeCalendarDto dto = new EmployeeCalendarDto();
-	            return dto.toDto(employeeCalendar); // EmployeeCalendar를 EmployeeCalendarDto로 변환
-	        })
-	        .collect(Collectors.toList());
+	    List<EmployeeCalendar> list = repository.findByEmployeeNoAndVisibleYnAndSeparator(employeeNo, "Y", "E001");
+	    List<EmployeeCalendarDto> dtoList = new ArrayList<>();
+
+	    for (EmployeeCalendar employeeCalendar : list) {
+	        EmployeeCalendarDto dto = new EmployeeCalendarDto();
+	        dtoList.add(dto.toDto(employeeCalendar));
+	    }
+
+	    return dtoList;
 	}
 	
-	//단일 조회
+	//해당 직원 일정 단일 조회
 	public EmployeeCalendarDto findByCalendarNo(Long id) {
         // 데이터베이스에서 일정 가져오기
         EmployeeCalendar calendar = repository.findById(id).orElse(null);
@@ -48,6 +54,8 @@ public class EmployeeCalendarService {
         // toDto 호출
         return dto.toDto(calendar);
     }
+	
+	
 	
 	public EmployeeCalendar updateCalendar(EmployeeCalendarDto param) {
 		EmployeeCalendar result = null;

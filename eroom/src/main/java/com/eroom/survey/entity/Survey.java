@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 public class Survey {
 	
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="survey_no")
 	private Long surveyNo;
 

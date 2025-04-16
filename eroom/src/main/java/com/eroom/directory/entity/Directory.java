@@ -57,6 +57,12 @@ public class Directory {
 	private LocalDateTime directoryRegDate; // 생성시간
 	@Column(name = "directory_mod_date")
 	private LocalDateTime directoryModDate; // 수정시간
+	@Column(name = "directory_position")
+	private String directoryPosition; // 직급
+	@Column(name = "directory_department")
+	private String directoryDepartment; // 부서명
+	@Column(name = "directory_team")
+	private String directoryTeam; // 팀명
 	
 	@OneToOne
 	@JoinColumn(name = "employee_no")

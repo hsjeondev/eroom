@@ -46,4 +46,7 @@ public class ProjectMember {
 	@Column(name="github_username")
 	private String githubUsername;
 	
+	@Column(name="is_manager")
+	private String isManager;
+	
 }

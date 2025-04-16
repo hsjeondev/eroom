@@ -1,7 +1,6 @@
 package com.eroom.project.entity;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -36,11 +35,14 @@ public class Project {
 	@Column(name="project_name")
 	private String projectName;
 	
+	@Column(name="description")
+	private String description;
+	
 	@Column(name="project_start")
-	private LocalDateTime projectStart;
+	private LocalDate projectStart;
 	
 	@Column(name="project_end")
-	private LocalDateTime projectEnd;
+	private LocalDate projectEnd;
 	
 	@Column(name="proceed")
 	private String proceed;

@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
+import com.eroom.employee.dto.StructureDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
 import com.eroom.employee.repository.EmployeeRepository;
+import com.eroom.employee.repository.StructureRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EmployeeService {
 	private final EmployeeRepository employeeRepository;
+	private final StructureRepository structureRepository;
 	
 	// 전체 직원 조회
 	public List<Employee> findAllEmployee() {
@@ -56,5 +59,18 @@ public class EmployeeService {
 			employeeDtos.add(employeeDto);
 		}
 		return employeeDtos;
+	}
+	
+	
+	// 부서 하위의 모든 팀 조회
+	public List<StructureDto> findTeams() {
+		return structureRepository.findBySeparatorCodeStartingWith("T")
+                .stream()
+                .map(entity -> StructureDto.toDto(entity))
+                .collect(Collectors.toList());
+	}
+
+	public List<Employee> findEmployeesByTeamId(String teamId) {
+		return employeeRepository.findEmployeesByTeamId(teamId);
 	}
 }

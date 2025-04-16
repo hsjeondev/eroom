@@ -30,6 +30,8 @@ public class ProjectMemberDto {
 	
 	private String github_username;
 	
+	private String is_manager;
+	
 	
 	public ProjectMemberDto toDto(ProjectMember entity) {
 	    return ProjectMemberDto.builder()
@@ -38,6 +40,7 @@ public class ProjectMemberDto {
 	            .project_member(entity.getEmployee())
 	            .project_manager(entity.getProjectManager())
 	            .github_username(entity.getGithubUsername())
+	            .is_manager(entity.getIsManager())
 	            .build();
 	}
 
@@ -48,6 +51,7 @@ public class ProjectMemberDto {
 	            .employee(project_member)
 	            .projectManager(project_manager)
 	            .githubUsername(github_username)
+	            .isManager(is_manager)
 	            .build();
 	}
 
