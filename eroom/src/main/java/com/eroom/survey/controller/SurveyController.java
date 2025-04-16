@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.eroom.employee.dto.SeparatorDto;
+import com.eroom.employee.dto.StructureDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.security.EmployeeDetails;
@@ -36,7 +36,7 @@ public class SurveyController {
 	public String surveyList(Model model, SurveyDto surveyDto, SurveyItemDto surveyItemDto) {
 		
 		List<Survey> surveyList = surveyService.findAllSurvey();
-		List<SeparatorDto> structureList = employeeService.findDistinctStructureNames();
+		List<StructureDto> structureList = employeeService.findTeams();
 		
 		model.addAttribute("surveyList", surveyList);
 		model.addAttribute("structureList", structureList);
@@ -55,7 +55,7 @@ public class SurveyController {
 	}
 
 	@PostMapping("/create")
-	public String createSurvey(SurveyDto surveyDto, SurveyItemDto surveyItemDto, SurveyVoterDto surveyVoterDto) {
+	public String createSurvey(SurveyDto surveyDto, SurveyItemDto surveyItemDto, @RequestParam("selectedTeamIds") List<String> selectedTeamIds) {
 		// SurveyDto 값 확인
 		System.out.println("제목: " + surveyDto.getSurveyTitle());
 		System.out.println("복수 선택: " + surveyDto.getAllowMultiple());
@@ -68,24 +68,36 @@ public class SurveyController {
 			System.out.println("- " + item);
 		}
 		
-		// SurveyVoterDto 값 확인
-		System.out.println("투표 권한자:");
-		for (Long voter : surveyVoterDto.getVoters()) {
-			System.out.println("- " + voter);
-		}
-		
+		// 현재 사용자의 이름 가져오기
 		EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder
 			    .getContext()
 			    .getAuthentication()
 			    .getPrincipal();
-
 		Employee employee = userDetails.getEmployee();
-		
-		
+		if(employee == null) {
+			return "/login";
+		}
 		String writer = employee.getEmployeeName();
 		surveyDto.setWriter(writer);
 		
-		int result = surveyService.saveSurvey(surveyDto, surveyItemDto);
+		Long surveyNo = surveyService.saveSurvey(surveyDto, surveyItemDto);
+		
+		
+		// 선택된 팀에 투표권한 부여
+		int resultSaveVoters = 0;
+		for (String teamId : selectedTeamIds) {
+	        System.out.println("선택된 팀 ID: " + teamId);
+	        
+	        // 팀원 조회
+	        List<Employee> members = employeeService.findEmployeesByTeamId(teamId);
+	        for(Employee member : members) {
+	        	System.out.println(member.getEmployeeNo());
+	        	// survey_voter에 저장
+		        resultSaveVoters = surveyService.saveSurveyVoters(surveyNo, member.getEmployeeNo());
+	        }
+	        
+	        
+	    }
 
 		return "redirect:/survey/list";
 	}

@@ -12,31 +12,33 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Builder
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
-@Builder
 public class SurveyVoterDto {
 	private Long voterNo;
 	private Long surveyNo;
-	private List<Long> voters;
-	
-	public List<SurveyVoter> toEntityList() {
-		return voters.stream()
-				.map(voterStr -> SurveyVoter.builder()
-						.surveyNo(surveyNo)
-						.voter(voterStr)
-						.build())
-				.collect(Collectors.toList());
+	private List<Long> selectedTeam;     // 폼에서 선택된 팀 ID
+	private Long voter;
+
+	// 단일 DTO → 단일 엔티티로 변환
+	public SurveyVoter toEntity() {
+	    return SurveyVoter.builder()
+	            .surveyNo(surveyNo)
+	            .voter(voter)
+	            .build();
 	}
-	
+
+	// 단일 엔티티 → DTO 변환
 	public SurveyVoterDto toDto(SurveyVoter entity) {
 		return SurveyVoterDto.builder()
 				.voterNo(entity.getVoterNo())
 				.surveyNo(entity.getSurveyNo())
-				.voters(List.of(entity.getVoter()))
+				.voter(entity.getVoter())
 				.build();
 	}
+
 }
