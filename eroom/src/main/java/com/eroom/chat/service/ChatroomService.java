@@ -63,4 +63,16 @@ public class ChatroomService {
 		return repository.findById(id).orElse(null);
 	}
 
+	public Chatroom renameChatroom(ChatroomDto param) {
+		Chatroom result = null;
+		Chatroom target = repository.findById(param.getChatroomNo()).orElse(null);
+		if(target != null) {
+			param.setChatroomName(param.getChatroomName());
+			result = repository.save(param.toEntity());
+		}
+		return result;
+	}
+
+	
+
 }

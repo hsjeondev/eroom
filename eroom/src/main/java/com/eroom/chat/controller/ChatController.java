@@ -102,5 +102,23 @@ public class ChatController {
 	    // ChatroomDto의 toDto() 메서드를 통해 필요한 데이터를 DTO에 담아서 반환
 	    return ChatroomDto.toDto(chatroom);
 	}
-
+	
+	// 채팅방 업데이트
+	@PostMapping("/rename/{chatroomNo}")
+	@ResponseBody
+	public Map<String ,String> renameChatroom(ChatroomDto param ,@PathVariable("chatroomNo") Long chatroomNo){
+		Map<String,String> resultMap = new HashMap<String,String>();
+		resultMap.put("res_code", "500");
+		resultMap.put("res_msg", "채팅방 이름변경을 실패하였습니다.");
+		
+		param.setChatroomNo(chatroomNo);
+		
+		Chatroom update = chatroomService.renameChatroom(param);
+		if(update != null) {
+			resultMap.put("res_code", "200");
+			resultMap.put("res_msg", "수정을 성공하였습니다!");
+		}
+		return resultMap;
+	}
+		
 }
