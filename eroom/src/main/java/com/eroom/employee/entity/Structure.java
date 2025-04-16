@@ -44,6 +44,6 @@ public class Structure {
 	private String visibleYn;
 	
 	@OneToMany(mappedBy = "structure")
-	private List<Employee> emplyees;
+	private List<Employee> employees;
 	
 }
