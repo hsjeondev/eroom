@@ -31,5 +31,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 	// 특정 소속 (부모 코드)에 속한 직원 조회 | :parentCode(파라미터 값으로 가져오는것)
 	@Query("SELECT e FROM Employee e WHERE e.structure.parentCode = :parentCode")
 	List<Employee> findByStructureParentCode(@Param("parentCode") String parentCode);
+	
+	// 팀 번호로 소속 팀원 조회
+	@Query("SELECT e FROM Employee e WHERE e.structure.structureNo = :teamId")
+	List<Employee> findEmployeesByTeamId(@Param("teamId") String teamId);
 
 }

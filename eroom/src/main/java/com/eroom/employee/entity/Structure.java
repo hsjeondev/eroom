@@ -44,6 +44,7 @@ public class Structure {
 	private String visibleYn;
 	
 	@OneToMany(mappedBy = "structure")
-	private List<Employee> emplyees;
+	@ToString.Exclude
+	private List<Employee> employees;
 	
 }
