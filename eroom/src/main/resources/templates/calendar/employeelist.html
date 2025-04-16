@@ -13,9 +13,7 @@
 		<div class="row g-0 mb-4 align-items-center">
 			<div class="col-5 col-md-6">
 				<h4 class="mb-0 text-body-emphasis fw-bold fs-md-6">
-					<span class="calendar-day d-block d-md-inline mb-1"></span> <span
-						class="px-3 fw-thin text-body-quaternary d-none d-md-inline">|</span>
-					<span class="calendar-date"></span>
+					개인일정
 				</h4>
 			</div>
 			<div class="col-7 col-md-6 d-flex justify-content-end">
@@ -173,7 +171,7 @@
 						<!-- 수정 및 삭제 버튼을 왼쪽 -->
 						<div class="d-flex">
 							<button class="btn btn-subtle-secondary me-1 mb-1" type="button" id="editEventBtn">수정</button>
-							<button class="btn btn-outline-info me-1 mb-1" type="button">삭제</button>
+							<button class="btn btn-outline-info me-1 mb-1" type="button" id="deleteEventBtn">삭제</button>
 						</div>
 						<!-- 확인 버튼을 오른쪽에 배치 -->
 						<div>
@@ -186,27 +184,6 @@
 			</div>
 		</div>
 		
-		
-		<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="eventModalLabel">일정 상세</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>제목:</strong> <span id="eventTitle"></span></p>
-                <p><strong>날짜:</strong> <span id="eventDate"></span></p>
-                <p><strong>장소:</strong> <span id="eventLocation"></span></p>
-                <p><strong>설명:</strong> <span id="eventDescription"></span></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                <button type="button" class="btn btn-primary" id="editEventButton">수정</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 		<div class="modal fade" id="editEventModal" tabindex="-1">
 			<div class="modal-dialog">
@@ -225,9 +202,8 @@
 							<input type="hidden" name="calendar_no" id="calendar_no" /> <input
 								type="hidden" name="employee_no"
 								th:value="${#authentication.principal.employee.employeeNo}" />
-							<input type="hidden" name="separator" value="E001" /> <input
-								type="hidden" name="calendar_creator"
-								th:value="${#authentication.principal.employee.employeeId}" />
+							<input type="hidden" name="separator" value="E001" /> 
+							<input type="hidden" name="calendar_editor" th:value="${#authentication.principal.employee.employeeId}" />
 
 							<div class="input-group input-group-sm mb-3">
 								<span class="input-group-text" id="inputGroup-sizing-sm">제목</span>
@@ -345,29 +321,48 @@
 		      },
 				
 		      //일정의 색상을 정해주는 event, E001 -> 개인 캘린더는 연한 연두색으로 지정
-		      eventDidMount: function (info) {
-		        const separator = info.event.extendedProps.separator || "";
-		        let backgroundColor, borderColor, textColor;
+		 	eventDidMount: function (info) {
+ 			 	const separator = info.event.extendedProps.separator || "";
+  				let backgroundColor, borderColor, textColor;
 
-		        switch (separator) {
-		          case "E001":
-		            backgroundColor = "#DFFBD9";
-		            borderColor = "#DFFBD9";
-		            textColor = "#000000";
-		            break;
-		        }
+				// 기본 색상 설정
+				switch (separator) {
+    				case "E001":
+    				  backgroundColor = "#C1F0E3"; // 연한 연두색
+				      borderColor = "#A3E4A0"; // 살짝 진한 테두리
+				      textColor = "#1A3C1A"; // 어두운 초록 텍스트 (가독성 향상)
+				      break;
+  					}
 
-		        info.el.style.setProperty("background-color", backgroundColor, "important");
-		        info.el.style.setProperty("border-color", borderColor, "important");
-		        info.el.style.setProperty("color", textColor, "important");
+				// 이벤트 스타일 설정
+				const eventEl = info.el;
+				eventEl.style.setProperty("background-color", backgroundColor, "important");
+				eventEl.style.setProperty("border", `1px solid ${borderColor}`, "important");
+				eventEl.style.setProperty("color", textColor, "important");
+				eventEl.style.setProperty("border-radius", "8px", "important"); 
+				eventEl.style.setProperty("padding", "4px 8px", "important");
+				eventEl.style.setProperty("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.1)", "important"); 
+				eventEl.style.setProperty("font-weight", "500", "important"); 
+				eventEl.style.setProperty("font-size", "14px", "important"); 
+				
 
-		        const eventMain = info.el.querySelector('.fc-event-main');
-		        if (eventMain) {
-		          eventMain.style.setProperty("background-color", backgroundColor, "important");
-		          eventMain.style.setProperty("border-color", borderColor, "important");
-		          eventMain.style.setProperty("color", textColor, "important");
-		        }
-		      },
+				// 회색 점 제거
+				const eventDot = eventEl.querySelector(".fc-daygrid-event-dot");
+				if (eventDot) {
+				  eventDot.style.display = "none";
+				 }
+
+  			  // 이벤트 메인 콘텐츠 스타일
+			  const eventMain = eventEl.querySelector(".fc-event-main");
+			  if (eventMain) {
+			    eventMain.style.setProperty("background-color", backgroundColor, "important");
+			    eventMain.style.setProperty("border-color", borderColor, "important");
+			    eventMain.style.setProperty("color", textColor, "important");
+			    eventMain.style.setProperty("border-radius", "8px", "important");
+			  }
+		 	},
+
+		
 			  
 		      //해당 직원의 캘린더 일정을 가져오는 FETCH
 		      events: function (fetchInfo, successCallback, failureCallback) {
@@ -426,6 +421,10 @@
 		    	//console.log("calendarNo:", selectedCalendarNo);
 		    	//console.log(updateForm.calendar_title.value);
 			const updateData = new FormData(updateForm);
+			  for (const [key, value] of updateData.entries()) {
+				    console.log(key, value); // 👈 이게 콘솔에 찍힘
+				  }
+
 		
 			//console.log(updateData);
 			fetch("/employeecalendar/update/"+selectedCalendarNo,{
@@ -444,9 +443,37 @@
           			}
         		});
 		    })
-
-		    calendar.render();
-		});
+		    
+		    
+			//일정 삭제 -> 사용여부를 Y 에서 N 으로!
+			document.getElementById('deleteEventBtn').addEventListener('click',function(){
+			const calendarNo = selectedCalendarNo;
+			//console.log(calendarNo);
+			const perMission = confirm('해당 일정을 삭제하시겠습니까?');
+			//console.log(perMission);
+			if(!perMission){
+				return;
+			}else{
+				fetch('/employeecalendar/delete/'+calendarNo,{
+					method: 'post',
+					headers: {
+			            'header': document.querySelector('meta[name="_csrf_header"]').content,
+			            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			        }
+				})
+				.then(response => response.json())
+				.then(data => {
+					alert(data.res_msg);
+					if(data.res_code == 200) location.reload();
+				})
+			}
+			
+			});
+		    
+			
+			calendar.render();
+		
+		})
   	
     </script>
   	

@@ -114,5 +114,8 @@ public class Employee {
 	@OneToMany(mappedBy = "receiver")
 	private List<MailReceiver> receivedMails; // 수신한 메일 목록
 	
-	
+	// 근태 조건
+	@OneToMany(mappedBy="employee")
+	private List<Attendance> attendanceList;
+
 }
