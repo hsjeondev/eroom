@@ -1,8 +1,6 @@
 package com.eroom.chat.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
@@ -11,12 +9,11 @@ import org.springframework.stereotype.Service;
 
 import com.eroom.chat.dto.ChatroomDto;
 import com.eroom.chat.entity.Chatroom;
+import com.eroom.chat.entity.ChatroomAttendee;
+import com.eroom.chat.repository.ChatroomAttendeeRepository;
 import com.eroom.chat.repository.ChatroomRepository;
 import com.eroom.chat.specification.ChatroomSpecification;
-import com.eroom.employee.dto.EmployeeDto;
-import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
-import com.eroom.employee.entity.Structure;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.security.EmployeeDetails;
 
@@ -28,7 +25,7 @@ public class ChatroomService {
 
 	private final ChatroomRepository repository;
 	private final EmployeeRepository employeeRepository;
-	
+	private final ChatroomAttendeeRepository chatroomAttendeeRepository;
 	
 	public List<Chatroom> selectChatRoomAll(){
 		// 현재 로그인한 사람 설정해야됨
@@ -50,7 +47,16 @@ public class ChatroomService {
 	public ChatroomDto createChatroom(ChatroomDto dto) {
 		Chatroom param = dto.toEntity();
 		Chatroom result = repository.save(param);
-		return new ChatroomDto().toDto(result);
+		
+		if(dto.getParticipantIds() != null && !dto.getParticipantIds().isEmpty()) {
+			for(Long participantid : dto.getParticipantIds()) {
+				Employee participant = employeeRepository.findById(participantid).orElse(null);
+				ChatroomAttendee attendeeMapping = ChatroomAttendee.builder().chatroomNo(result).attendee(participant).build();
+				
+				chatroomAttendeeRepository.save(attendeeMapping);
+			}
+		}
+		return ChatroomDto.toDto(result);
 	}
 
 }
