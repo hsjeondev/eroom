@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html 
+  lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/include/layout}">
+  <body>
+    <main class="main" id="top" layout:fragment="content">
+      <h1>프로젝트 생성</h1>
+      <br>
+      <!-- 폼 시작 -->
+      <form name="project_create_form">
+        <div class="mb-3">
+          <label class="form-label" for="project_name">프로젝트명</label>
+          <input class="form-control" id="project_name" name="project_name" type="text" placeholder="프로젝트명">
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6 mb-3">
+            <label class="form-label" for="github_url">github 주소</label>
+            <input class="form-control" id="github_url" name="project_github_url" type="text" placeholder="https://github.com/username/repository.git">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label" for="github_token">github 토큰</label>
+            <input class="form-control" id="github_token" name="project_github_token" type="password" placeholder="토큰">
+          </div>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6 mb-3">
+            <label class="form-label" for="managers">관리자</label>
+            <div class="position-relative">
+              <!-- 관리자 선택 결과는 이 readonly input에 표시 -->
+              <input class="form-control pe-5" id="managers" name="managerNames" type="text" placeholder="관리자" 
+                     data-bs-toggle="modal" data-bs-target="#select_manager_modal" readonly>
+              <i class="uil uil-search fs-8 position-absolute"
+                 style="top: 50%; right: 15px; transform: translateY(-50%); pointer-events: none;"></i>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label" for="participants">참가자</label>
+            <div class="position-relative">
+              <!-- 참가자 선택 결과는 이 readonly input에 표시 -->
+              <input class="form-control pe-5" id="participant" name="participantNames" type="text" placeholder="참가자" 
+                     data-bs-toggle="modal" data-bs-target="#select_participant_modal" readonly>
+              <i class="uil uil-search fs-8 position-absolute"
+                 style="top: 50%; right: 15px; transform: translateY(-50%); pointer-events: none;"></i>
+            </div>
+          </div>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-4 mb-3">
+            <label class="form-label" for="pm">PM</label>
+            <!-- PM 표시용: readonly -->
+            <input class="form-control" id="pm_display" type="text" placeholder="" readonly th:value="${#authentication.principal.employee.employeeName}">
+            <!-- PM의 employee_no: hidden -->
+            <input class="form-control" id="pm_hidden" name="employee_no" type="hidden" th:value="${#authentication.principal.employee.employeeNo}">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label" for="start_date">시작일</label>
+            <input class="form-control" id="start_date" name="project_start" type="date" />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label" for="end_date">종료일</label>
+            <input class="form-control" id="end_date" name="project_end" type="date" />
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="description">설명</label>
+          <textarea class="form-control" id="description" name="description" rows="10" placeholder="프로젝트 설명"></textarea>
+        </div>
+        <!-- 폼 내부 hidden 컨테이너: 관리자와 참가자 ID들을 담음 -->
+        <div id="managerIdsContainer" style="display: none;"></div>
+        <div id="participantIdsContainer" style="display: none;"></div>
+        <div class="text-end">
+          <button class="btn btn-primary" type="button">취소</button>
+          <button class="btn btn-primary" type="submit">생성</button>
+        </div>
+      </form>
+      <!-- 폼 끝 -->
+
+      <!-- 관리자 선택 모달 -->
+      <div class="modal fade" id="select_manager_modal" tabindex="-1"
+           aria-labelledby="selectManagerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 id="selectManagerModalLabel">관리자 선택</h3>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"
+                      aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+              <!-- 부서(소속) 선택 -->
+              <div class="mb-3">
+                <label class="form-label">소속 선택</label>
+                <select class="form-select" id="managerDepartmentSelect" onchange="changeManagerDepartment(this.value)">
+                  <option disabled selected>-- 소속 선택 --</option>
+                  <!-- 부서 목록은 fetch로 채워집니다 -->
+                </select>
+              </div>
+              <!-- 관리자 선택 -->
+              <div class="mb-3">
+                <label class="form-label">관리자 선택</label>
+                <div class="d-flex">
+                  <select id="managerEmployeeSelect" class="form-select me-2" style="flex:1;">
+                    <option disabled selected>-- 관리자 선택 --</option>
+                  </select>
+                  <button type="button" class="btn btn-outline-primary" onclick="addManager()">추가</button>
+                </div>
+              </div>
+              <!-- 선택된 관리자 보여주기 -->
+              <div class="mb-3">
+                <label class="form-label">선택된 관리자</label>
+                <div id="selectedManagers">
+                  <!-- 선택된 관리자들이 badge로 추가됩니다 -->
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+              <button type="button" class="btn btn-primary" onclick="confirmManagerSelection()">선택</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 참가자 선택 모달 -->
+      <div class="modal fade" id="select_participant_modal" tabindex="-1"
+           aria-labelledby="selectParticipantModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 id="selectParticipantModalLabel">참가자 선택</h3>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"
+                      aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+              <!-- 부서(소속) 선택 -->
+              <div class="mb-3">
+                <label class="form-label">소속 선택</label>
+                <select class="form-select" id="participantDepartmentSelect" onchange="changeParticipantDepartment(this.value)">
+                  <option disabled selected>-- 소속 선택 --</option>
+                  <!-- 부서 목록은 fetch로 채워집니다 -->
+                </select>
+              </div>
+              <!-- 참가자 선택 -->
+              <div class="mb-3">
+                <label class="form-label">참가자 선택</label>
+                <div class="d-flex">
+                  <select id="participantEmployeeSelect" class="form-select me-2" style="flex:1;">
+                    <option disabled selected>-- 참가자 선택 --</option>
+                  </select>
+                  <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">추가</button>
+                </div>
+              </div>
+              <!-- 선택된 참가자 보여주기 -->
+              <div class="mb-3">
+                <label class="form-label">선택된 참가자</label>
+                <div id="selectedParticipants">
+                  <!-- 선택된 참가자들이 badge로 추가됩니다 -->
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+              <button type="button" class="btn btn-primary" onclick="confirmParticipantSelection()">선택</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        // 관리자 모달: 부서(소속) 목록을 fetch로 불러오기
+        document.getElementById('select_manager_modal').addEventListener('shown.bs.modal', function() {
+          fetch('/project/selectStructure')
+            .then(response => response.json())
+            .then(data => {
+              console.log("불러온 소속 목록:", data);
+              const deptSelect = document.getElementById('managerDepartmentSelect');
+              deptSelect.innerHTML = '<option disabled selected>-- 소속 선택 --</option>';
+              data.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept.separator_code;
+                option.text = dept.separator_name;
+                deptSelect.appendChild(option);
+              });
+            })
+            .catch(error => console.error('부서 목록 로딩 실패:', error));
+        });
+
+        // 관리자 모달: 부서 선택 시, 선택한 소속에 해당하는 직원(관리자) 목록 불러오기
+        function changeManagerDepartment(deptId) {
+          console.log("선택된 부서 (관리자) ID:", deptId);
+          fetch('/project/selectEmployees?separator_code=' + encodeURIComponent(deptId))
+            .then(response => response.json())
+            .then(data => {
+              console.log("불러온 관리자 목록:", data);
+              const select = document.getElementById('managerEmployeeSelect');
+              select.innerHTML = '<option disabled selected>-- 관리자 선택 --</option>';
+              data.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp.employee_no;
+                option.text = emp.employee_name;
+                select.appendChild(option);
+              });
+            })
+            .catch(error => console.error('직원 로딩 실패:', error));
+        }
+
+        // 관리자 모달: 선택된 관리자를 추가하는 함수
+        function addManager() {
+          const select = document.getElementById('managerEmployeeSelect');
+          if (!select.value) {
+            alert("관리자를 선택해주세요.");
+            return;
+          }
+          const managerId = select.value;
+          const managerName = select.options[select.selectedIndex].text;
+          if (document.getElementById('manager-' + managerId)) {
+            alert('이미 추가된 관리자입니다.');
+            return;
+          }
+          const badge = document.createElement('span');
+          badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
+          badge.id = 'manager-' + managerId;
+          badge.innerHTML = `${managerName}
+            <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeManager('${managerId}')"></button>
+            <input type="hidden" name="managerIds" value="${managerId}">`;
+          document.getElementById('selectedManagers').appendChild(badge);
+          select.selectedIndex = 0;
+        }
+
+        // 관리자 모달: 선택된 관리자를 제거하는 함수
+        function removeManager(managerId) {
+          const badge = document.getElementById('manager-' + managerId);
+          if (badge) badge.remove();
+        }
+
+        // 관리자 모달: 확인 버튼 클릭 시, 선택된 관리자들의 이름을 visible input에 표시하고, hidden 컨테이너를 업데이트 후 모달 닫기
+        function confirmManagerSelection() {
+          const selectedBadges = document.getElementById('selectedManagers').querySelectorAll('.badge');
+          let managerNames = [];
+          const container = document.getElementById('managerIdsContainer');
+          container.innerHTML = ""; // 기존 hidden 값 초기화
+          selectedBadges.forEach(badge => {
+            const managerId = badge.id.replace('manager-', '');
+            managerNames.push(badge.textContent.replace('×', '').trim());
+            // hidden input 생성
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = "hidden";
+            hiddenInput.name = "managerIds";
+            hiddenInput.value = managerId;
+            container.appendChild(hiddenInput);
+          });
+          document.getElementById('managers').value = managerNames.join(', ');
+          
+          // 모달 닫기
+          const modalElem = document.getElementById('select_manager_modal');
+          const modalInstance = bootstrap.Modal.getInstance(modalElem);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
+        }
+
+        // 참가자 모달: 부서(소속) 목록을 fetch로 불러오기
+        document.getElementById('select_participant_modal').addEventListener('shown.bs.modal', function() {
+          fetch('/project/selectStructure')
+            .then(response => response.json())
+            .then(data => {
+              console.log("불러온 소속 목록 (참가자):", data);
+              const deptSelect = document.getElementById('participantDepartmentSelect');
+              deptSelect.innerHTML = '<option disabled selected>-- 소속 선택 --</option>';
+              data.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept.separator_code;
+                option.text = dept.separator_name;
+                deptSelect.appendChild(option);
+              });
+            })
+            .catch(error => console.error('부서 목록 로딩 실패 (참가자):', error));
+        });
+
+        // 참가자 모달: 부서 선택 시, 선택한 소속에 해당하는 직원(참가자) 목록 불러오기
+        function changeParticipantDepartment(deptId) {
+          console.log("선택된 부서 (참가자) ID:", deptId);
+          fetch('/project/selectEmployees?separator_code=' + encodeURIComponent(deptId))
+            .then(response => response.json())
+            .then(data => {
+              console.log("불러온 참가자 목록:", data);
+              const select = document.getElementById('participantEmployeeSelect');
+              select.innerHTML = '<option disabled selected>-- 참가자 선택 --</option>';
+              data.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp.employee_no;
+                option.text = emp.employee_name;
+                select.appendChild(option);
+              });
+            })
+            .catch(error => console.error('직원 로딩 실패 (참가자):', error));
+        }
+
+        // 참가자 모달: 선택된 참가자를 추가하는 함수
+        function addParticipant() {
+          const select = document.getElementById('participantEmployeeSelect');
+          if (!select.value) {
+            alert("참가자를 선택해주세요.");
+            return;
+          }
+          const participantId = select.value;
+          const participantName = select.options[select.selectedIndex].text;
+          if (document.getElementById('participant-' + participantId)) {
+            alert('이미 추가된 참가자입니다.');
+            return;
+          }
+          const badge = document.createElement('span');
+          badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
+          badge.id = 'participant-' + participantId;
+          badge.innerHTML = `${participantName}
+            <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeParticipant('${participantId}')"></button>
+            <input type="hidden" name="participantIds" value="${participantId}">`;
+          document.getElementById('selectedParticipants').appendChild(badge);
+          select.selectedIndex = 0;
+        }
+
+        // 참가자 모달: 선택된 참가자를 제거하는 함수
+        function removeParticipant(participantId) {
+          const badge = document.getElementById('participant-' + participantId);
+          if (badge) badge.remove();
+        }
+
+        // 참가자 모달: 확인 버튼 클릭 시, 선택된 참가자들의 이름을 visible input에 표시하고, hidden 컨테이너 업데이트 후 모달 닫기
+        function confirmParticipantSelection() {
+          const selectedBadges = document.getElementById('selectedParticipants').querySelectorAll('.badge');
+          let participantNames = [];
+          const container = document.getElementById('participantIdsContainer');
+          container.innerHTML = "";
+          selectedBadges.forEach(badge => {
+            const participantId = badge.id.replace('participant-', '');
+            participantNames.push(badge.textContent.replace('×', '').trim());
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = "hidden";
+            hiddenInput.name = "participantIds";
+            hiddenInput.value = participantId;
+            container.appendChild(hiddenInput);
+          });
+          document.getElementById('participant').value = participantNames.join(', ');
+          
+          const modalElem = document.getElementById('select_participant_modal');
+          const modalInstance = bootstrap.Modal.getInstance(modalElem);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
+        }
+        
+        // 폼 제출 이벤트 처리 (유효성 검증 후)
+        const form = document.project_create_form;
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+
+          let vali_check = true;
+          let vali_text = "";
+
+          if (!form.project_name.value.trim()) {
+            vali_check = false;
+            vali_text = "프로젝트명을 입력해주세요.";
+            form.project_name.focus();
+          } else if (!form.project_github_url.value.trim()) {
+            vali_check = false;
+            vali_text = "github 주소를 입력해주세요.";
+            form.project_github_url.focus();
+          } else if (!form.project_github_token.value.trim()) {
+            vali_check = false;
+            vali_text = "github 토큰을 입력해주세요.";
+            form.project_github_token.focus();
+          } else if (!form.project_start.value.trim()) {
+            vali_check = false;
+            vali_text = "시작일을 입력해주세요.";
+            form.project_start.focus();
+          } else if (!form.project_end.value.trim()) {
+            vali_check = false;
+            vali_text = "종료일을 입력해주세요.";
+            form.project_end.focus();
+          } else if (!form.description.value.trim()) {
+            vali_check = false;
+            vali_text = "프로젝트 설명을 입력해주세요.";
+            form.description.focus();
+          }
+
+          if (vali_check === false) {
+            alert(vali_text);
+          } else {
+            const payload = new FormData(form);
+            fetch("/project/create", {
+              method: "post",
+              headers: {
+                [document.querySelector('meta[name="_csrf_header"]').content]:
+                  document.querySelector('meta[name="_csrf"]').content
+              },
+              body: payload
+            })
+              .then(response => response.json())
+              .then(data => {
+                alert(data.res_msg);
+                if (data.res_code === "200") {
+                  location.href = "/project/detail/" + data.res_project_no;
+                }
+              })
+              .catch(error => {
+                alert("프로젝트 생성 중 오류가 발생하였습니다.");
+              });
+          }
+        });
+      </script>
+    </main>
+  </body>
+</html>
