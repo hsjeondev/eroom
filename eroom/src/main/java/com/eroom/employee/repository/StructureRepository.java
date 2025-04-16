@@ -10,15 +10,15 @@ import com.eroom.employee.entity.Structure;
 public interface StructureRepository extends JpaRepository<Structure, Long>{
 
 	// 부서 하위의 모든 팀 조회
-		List<Structure> findBySeparatorCodeStartingWith(String prefix);
+	List<Structure> findBySeparatorCodeStartingWith(String prefix);
 
 		
-		// 부모 코드를 매개변수로 Structure 객체를 조회
-		Structure findBySeparatorCode(String separatorCode);
+	// 부모 코드를 매개변수로 Structure 객체를 조회
+	Structure findBySeparatorCode(String separatorCode);
 
 
-		List<Structure> findByParentCodeIsNull();
+	List<Structure> findByParentCodeIsNull();
 
 
-		List<Structure> findByParentCode(String parentCode);
+	List<Structure> findByParentCode(String parentCode);
 }
