@@ -45,6 +45,12 @@ public class Project {
 	@Column(name="proceed")
 	private String proceed;
 	
+	@Column(name="project_github_url")
+	private String projectGithubUrl;
+	
+	@Column(name="project_github_token")
+	private String projectGithubToken;
+	
 	@OneToMany(mappedBy="project")
 	private List<ProjectMember> projectMembers;
 	

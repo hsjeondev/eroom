@@ -13,17 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eroom.report.service.ReportService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/report")
+@RequiredArgsConstructor
 public class ReportController {
 
 	// ReportService를 의존성 주입해서 사용
 	private final ReportService reportService;
-	
-	// 생성자 기반 주입(Spring이 자동으로 주입해줌)
-	public ReportController(ReportService reportService) {
-		this.reportService = reportService;
-	}
 	
 	// GET 요청으로 sample pdf 리포트를 다운로드할 수 있게 하는 API
 	@GetMapping("/sample/pdf")
@@ -38,6 +36,17 @@ public class ReportController {
 		
 		// 실제 PDF 바이트 배열, 헤더, 상태코드를 함꼐 응답으로 보냄
 		return new ResponseEntity<>(baos.toByteArray(), headers, HttpStatus.OK);
+	}
+	
+	@GetMapping("/sample/excel")
+	public ResponseEntity<byte[]> downloadExcelSample() throws Exception {
+		ByteArrayOutputStream baos = reportService.generateStyledTableExcelReport();
+		
+		HttpHeaders headers = new HttpHeaders();
+		 headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+		    headers.setContentDisposition(ContentDisposition.attachment().filename("sample_report.xlsx").build());
+
+		    return new ResponseEntity<>(baos.toByteArray(), headers, HttpStatus.OK);
 	}
 	
 }
