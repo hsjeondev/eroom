@@ -46,42 +46,7 @@ public class ChatroomService {
 		List<Chatroom> list = repository.findAll(spec);
 		return list;
 	}
-	 // Repository에서 엔티티로 중복 제거된 부서(소속) 목록을 반환한 후, DTO로 변환
-	public List<SeparatorDto> findDistinctStructureNames() {
-	    List<Structure> structures = employeeRepository.findDistinctStructures();
-	    List<SeparatorDto> separatorDtos = new ArrayList<>();
-	    for(Structure entity : structures) {
-	    	SeparatorDto separatorDto = SeparatorDto.builder()
-	    	.separator_code(entity.getSeparatorCode())
-            .separator_name(entity.getCodeName())
-            .build();
-	    	separatorDtos.add(separatorDto);
-	    }
-	    return separatorDtos;
-	}
-	
-	public List<EmployeeDto> findEmployeesByStructureName(String separatorCode) {
-	    // 부서명으로 직원을 조회
-		System.out.println("현재 찾고 있는 부서 코드: " + separatorCode);
-		List<Employee> employes = employeeRepository.findByStructure_SeparatorCode(separatorCode);
-		List<EmployeeDto> employeeDtos = new ArrayList<>();
-		for(Employee emp : employes) {
-			EmployeeDto employeeDto = new EmployeeDto(emp.getEmployeeNo(), emp.getEmployeeName());
-			employeeDtos.add(employeeDto);
-		}
-		return employeeDtos;
-	}
 
-	public List<EmployeeDto> findEmployeesByParentCode(String parentCode) {
-	    // 부모 부서코드로 직원을 조회
-		List<Employee> employes = employeeRepository.findByStructureParentCode(parentCode);
-		List<EmployeeDto> employeeDtos = new ArrayList<>();
-		for(Employee emp : employes) {
-			EmployeeDto employeeDto = new EmployeeDto(emp.getEmployeeNo(), emp.getEmployeeName());
-			employeeDtos.add(employeeDto);
-		}
-		return employeeDtos;
-	}
 	public ChatroomDto createChatroom(ChatroomDto dto) {
 		Chatroom param = dto.toEntity();
 		Chatroom result = repository.save(param);
