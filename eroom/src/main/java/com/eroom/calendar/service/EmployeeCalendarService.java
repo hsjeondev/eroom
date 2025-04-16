@@ -23,7 +23,7 @@ public class EmployeeCalendarService {
 	}
 	
 	public List<EmployeeCalendarDto> getCalendarList(Long employeeNo) {
-	    List<EmployeeCalendar> list = repository.findByEmployeeNo(employeeNo);
+	    List<EmployeeCalendar> list = repository.findByEmployeeNoAndVisibleYn(employeeNo,"Y");
 	    return list.stream()
 	        .map(employeeCalendar -> {
 	            EmployeeCalendarDto dto = new EmployeeCalendarDto();
@@ -54,9 +54,44 @@ public class EmployeeCalendarService {
 		EmployeeCalendar target = repository.findById(param.getCalendar_no()).orElse(null);
 		//target -> calendarNo값이 있으면 이걸 저장해줘
 		if(target != null) {
+	        param.setCalendar_creator(target.getCalendarCreator());
 			result = repository.save(param.toEntity());
 		}
 		return result;
 	}
+	
+	public EmployeeCalendarDto deleteCalendar(Long id) {
+	    
+	    EmployeeCalendar target = repository.findById(id).orElse(null);
+	    if (target == null) {
+	        return null;
+	    }
+
+	    
+	    String changeYtoN = "Y".equals(target.getVisibleYn()) ? "N" : "Y";
+
+	    
+	    EmployeeCalendar updated = EmployeeCalendar.builder()
+	    	    .calendarNo(target.getCalendarNo())  
+	    	    .calendarTitle(target.getCalendarTitle())
+	    	    .calendarLocation(target.getCalendarLocation())
+	    	    .calendarStartTime(target.getCalendarStartTime())
+	    	    .calendarEndTime(target.getCalendarEndTime())
+	    	    .calendarContent(target.getCalendarContent())
+	    	    .calendarCreator(target.getCalendarCreator())
+	    	    .calendarEditor(target.getCalendarEditor())
+	    	    .employeeNo(target.getEmployeeNo())
+	    	    .separator(target.getSeparator())
+	    	    .calendarRegDate(target.getCalendarRegDate())
+	    	    .calendarModDate(target.getCalendarModDate())
+	    	    .visibleYn(changeYtoN)
+	    	    .build();
+
+	    EmployeeCalendar saved = repository.save(updated);
+	    return new EmployeeCalendarDto().toDto(saved);
+	}
+	
+	
+	
 
 }

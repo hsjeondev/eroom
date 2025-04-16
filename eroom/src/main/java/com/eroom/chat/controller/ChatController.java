@@ -19,6 +19,7 @@ import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
+import com.eroom.employee.service.EmployeeService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class ChatController {
 
 	private final ChatroomService chatroomService;
+	private final EmployeeService employeeService;
 	private final EmployeeRepository employeeRepository;
 	
 	@GetMapping("/list")
@@ -35,7 +37,7 @@ public class ChatController {
 		List<Chatroom> resultList = chatroomService.selectChatRoomAll();
 		model.addAttribute("chatroomList",resultList);
 		
-		List<SeparatorDto> structureList = chatroomService.findDistinctStructureNames();
+		List<SeparatorDto> structureList = employeeService.findDistinctStructureNames();
 		model.addAttribute("structureList", structureList);
 		
 		return "chat/list";
@@ -48,10 +50,10 @@ public class ChatController {
 	System.out.println(temp + " | substring 자르기 1글자 나와야해");
 	if ("T".equals(temp)) {
 		// 팀(소속) 선택한 경우: separatorCode 기준 조회
-		return chatroomService.findEmployeesByStructureName(separatorCode);
+		return employeeService.findEmployeesByStructureName(separatorCode);
 	} else {
 		// 부서를 선택한 경우: parentCode 기준 조회
-		return chatroomService.findEmployeesByParentCode(separatorCode);
+		return employeeService.findEmployeesByParentCode(separatorCode);
 	}
 }
 	@PostMapping("/create")
