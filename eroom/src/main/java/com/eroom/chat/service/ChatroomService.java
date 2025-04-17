@@ -17,6 +17,7 @@ import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.security.EmployeeDetails;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -76,7 +77,27 @@ public class ChatroomService {
 	    List<Long> existingRooms = chatroomAttendeeRepository.findOneToOneChatroomNos(myId, otherId);
 	    return !existingRooms.isEmpty();
 	}
-
 	
+	// 채팅방 참여자 추가
+	@Transactional
+	public void addParticipants(Long chatroomNo, List<Long> participantIds) {
+	    Chatroom chatroom = repository.findById(chatroomNo)
+	        .orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
+
+	    List<Employee> newParticipants = employeeRepository.findAllById(participantIds);
+	    // 참여자 정보 조회
+	    for (Employee participant : newParticipants) {
+	        boolean alreadyExists = chatroom.getChatroomMapping().stream()
+	            .anyMatch(mapping -> mapping.getAttendee().getEmployeeNo().equals(participant.getEmployeeNo()));
+	        // 참여자가 이미 존재하는지 확인
+	        if (!alreadyExists) {
+	            ChatroomAttendee newMapping = ChatroomAttendee.builder()
+	                .chatroomNo(chatroom)
+	                .attendee(participant)
+	                .build();
+	            chatroomAttendeeRepository.save(newMapping);
+	        }
+	    }
+	}
 
 }
