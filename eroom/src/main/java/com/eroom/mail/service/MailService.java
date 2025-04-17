@@ -3,8 +3,8 @@ package com.eroom.mail.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.mail.dto.MailDto;
@@ -36,6 +36,7 @@ public class MailService {
 	}
 	
 	// 메일 생성
+	@Transactional
 	public int createMail(MailDto mailDto) {
 		int result = 0;
 		try {

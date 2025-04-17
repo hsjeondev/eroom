@@ -8,9 +8,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.entity.Employee;
+import com.eroom.employee.service.EmployeeService;
 import com.eroom.mail.dto.MailDto;
 import com.eroom.mail.entity.Mail;
 import com.eroom.mail.service.MailService;
@@ -22,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class MailController {
 
 	private final MailService mailService;
+	private final EmployeeService employeeService;
 	/* 테스트로 만들어 놓은거
 	 * @GetMapping("/mail") public String selectMailAll(Model model) { // 조건 필요함
 	 * reveiver에 // to일때는 내가 보낸거 // 조건이 cc면 받은거
@@ -113,5 +117,14 @@ public class MailController {
 		return resultMap;
 	}
 	
+	@GetMapping("/search-employees")
+    @ResponseBody
+    public List<EmployeeDto> searchEmployees(@RequestParam("separator_code") String separatorCode) {
+        if (separatorCode.startsWith("T")) {
+            return employeeService.findEmployeesByStructureName(separatorCode); 
+        } else {
+            return employeeService.findEmployeesByParentCode(separatorCode);
+        }
+    }
 	
 }
