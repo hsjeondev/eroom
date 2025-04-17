@@ -50,17 +50,18 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                 <!-- 범용성 생각해서 일단 보류 -->
                 
                 <!-- 메일 목록 스타트부분 -->
-                <div th:if="${#lists.isEmpty(resultList)}">
+                <div th:if="${#lists.isEmpty(sentMailList)}">
                 	<input type="text" value="내용이 없습니다.">
                 </div>
                  <div class="border-top border-translucent hover-actions-trigger py-3"
-                 		th:if="${!#lists.isEmpty(resultList)}"
-                 		th:each="mail : ${resultList}">
+                 		th:if="${!#lists.isEmpty(sentMailList)}"
+                 		th:each="sentMail : ${sentMailList}">
                   <div class="row align-items-sm-center gx-2">
                     <div class="col-auto">
                       <div class="d-flex flex-column flex-sm-row">
                         <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" />
-                        <button class="btn p-0"><span class="fas text-warning fa-star"></span></button>
+                        <!-- 별 박스 -->
+                        <!-- <button class="btn p-0"><span class="fas text-warning fa-star"></span></button> -->
                       </div>
                     </div>
                     <div class="col-auto">
@@ -71,7 +72,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                     </div>
                     
                     
-                    <div class="col-auto"><a class="text-body-emphasis fw-bold inbox-link fs-9" href="../../apps/email/email-detail.html">보낸 사람</a></div>
+                    <div class="col-auto"><a class="text-body-emphasis fw-bold inbox-link fs-9" href="../../apps/email/email-detail.html" th:text="${sentMail.sender != null ? sentMail.sender.employeeName : '알 수 없음'}">보낸 사람</a></div>
                     <div class="col-auto ms-auto">
                       <div class="hover-actions end-0">
                         <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
@@ -80,20 +81,24 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                         <a class="dropdown-item" href="#!">🗑️휴지통</a>
                         <a class="dropdown-item text-danger" href="#!">삭제</a></div>
                       </div>
-                      <span class="fs-10 fw-bold" 
-                      		th:text="${mail.mailSentTime}">
-                      </span>
+                      
+                      
+                      <!-- 04/17 나중에 시간 남으면 좀 더 구성해보기 일단 전체 시간 다 보이게 설정함 -->
+                      <span class="fs-10 fw-bold"
+					      th:text="${#temporals.format(sentMail.mailSentTime, 'yyyy.MM.dd HH:mm:ss')}">
+					  </span>
+					
                     </div>
                   </div>
                   <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11">
                   	<a class="d-block inbox-link" th:href="@{/mail/detail}">
-                  		<span class="fs-9 line-clamp-1 text-body-emphasis" th:text="${mail.mailTitle}"></span>
-                  		<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2" th:text="${mail.mailContent}"></span>
+                  		<span class="fs-9 line-clamp-1 text-body-emphasis" th:text="${sentMail.mailTitle}"></span>
+                  		<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2" th:text="${sentMail.mailContent}"></span>
                     </a>
                     	<!-- <p class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2" th:text="${mail.mailContent}"></p> -->
                   </div>
                 </div>
-		 <h1>받은 메일</h1>
+		 <h1>보낸 메일</h1>
     </main>
   </body>
 </html>

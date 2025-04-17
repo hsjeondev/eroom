@@ -1,5 +1,6 @@
 package com.eroom.chat.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.chat.dto.ChatroomDto;
 import com.eroom.chat.entity.Chatroom;
+import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.chat.service.ChatroomService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
@@ -69,16 +72,16 @@ public class ChatController {
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "채팅방 생성을 실패하였습니다.");
 		
+		// 채팅방 생성 시 참여자에 본인 ID가 포함되어 있을 경우
+		if (dto.getParticipantIds().contains(dto.getCreater())) {
+			resultMap.put("res_msg", "본인은 참여자로 선택할 수 없습니다.");
+			return resultMap;
+		}
 		// 채팅방 생성 시 참여자 ID가 비어있을 경우
 		if ("N".equals(dto.getChatIsGroupYn())) {
 			// 1:1 채팅방 생성 시 참여자 ID가 비어있을 경우
 			if (dto.getParticipantIds() == null || dto.getParticipantIds().isEmpty()) {
 				resultMap.put("res_msg", "1:1 채팅방은 반드시 참여자를 선택해야 합니다.");
-				return resultMap;
-			}
-			// 1:1 채팅방 생성 시 본인 ID가 포함되어 있을 경우
-			if (dto.getParticipantIds().contains(dto.getCreater())) {
-				resultMap.put("res_msg", "본인은 참여자로 선택할 수 없습니다.");
 				return resultMap;
 			}
 			// 1:1 채팅방 생성시 이미 존재하는 채팅방인지 체크
@@ -139,5 +142,35 @@ public class ChatController {
 		}
 		return resultMap;
 	}
-		
+	// 그룹 채팅방 참여자 추가
+	@PostMapping("/addParticipants")
+	@ResponseBody
+	public Map<String, String> addParticipants(@ModelAttribute ChatroomDto param) {
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "채팅방 참여자 추가를 실패하였습니다.");
+
+	    chatroomService.addParticipants(param.getChatroomNo(), param.getParticipantIds());
+
+	    resultMap.put("res_code", "200");
+	    resultMap.put("res_msg", "참여자를 추가하였습니다!");
+	    return resultMap;
+	}
+	// 채팅방 참여자 조회
+	@GetMapping("/participants")
+	@ResponseBody
+	public List<String> getParticipants(@RequestParam("chatroomNo") Long chatroomNo) {
+	    Chatroom chatroom = chatroomService.selectChatroomOne(chatroomNo);
+	    if (chatroom == null) {
+	        throw new RuntimeException("채팅방 정보를 찾을 수 없습니다.");
+	    }
+	    // ChatroomAttendee에서 참여자 정보 가져오기
+	    List<String> participantNames = new ArrayList<String>();
+	    for (ChatroomAttendee mapping : chatroom.getChatroomMapping()) {
+	        participantNames.add(mapping.getAttendee().getEmployeeName());
+	    }
+	    
+	    return participantNames;
+	}
+
 }

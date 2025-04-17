@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,11 +13,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.employee.dto.EmployeeDto;
+import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.mail.dto.MailDto;
 import com.eroom.mail.entity.Mail;
 import com.eroom.mail.service.MailService;
+import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,20 +44,31 @@ public class MailController {
 		return "mail/mailReceiverTo";
 	}
 	
+	// 04/17 본인것만 조회되게 
+	@GetMapping("/mail/sent")
+	public String getSentMails(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
+
+	    List<Mail> sentMailList = mailService.findMailsBySender(myEmployeeNo);
+	    model.addAttribute("sentMailList", sentMailList);
+
+	    return "mail/mailSent"; // 뷰 파일 이름
+	}
+
 	// 보낸 메일
 	// 지금은 이게 받은걸로 되어 있음
-	@GetMapping("/mail/sent")
-	public String selectSentMailAll(Model model) {
-		
-		
-		
-		
-		// 04/11 지금은 전체 메일이 조회됨
-		List<Mail> resultList = mailService.selectMailAll();
-		model.addAttribute("resultList",resultList);
-		
-		return "mail/mailSent";
-	}
+//	@GetMapping("/mail/sent")
+//	public String selectSentMailAll(Model model) {
+//		
+//		
+//		
+//		
+//		// 04/11 지금은 전체 메일이 조회됨
+//		List<Mail> sentMailList = mailService.selectMailAll();
+//		model.addAttribute("sentMailList",sentMailList);
+//		
+//		return "mail/mailSent";
+//	}
 	
 	// 참조자 메일 < 이건 나중에 메일 기능을 만든다고 하면 쓸 예정
 	@GetMapping("/mail/receiverCc")
@@ -94,8 +108,10 @@ public class MailController {
 	@GetMapping("/mail/mailCreate")
 	public String createMailView(Model model) {
 		List<Employee> employeeList = mailService.selectEmployeeAll();
+		List<SeparatorDto> departments = employeeService.findDistinctStructureNames(); // 부서/팀 리스트 가져오기
 		model.addAttribute("employeeList",employeeList);
 		
+		model.addAttribute("departments", departments); // 부서 드롭다운용
 		return "mail/mailCreate";
 	}
 	// 메일 작성 로직
@@ -106,14 +122,11 @@ public class MailController {
 		Map<String, String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "메일 등록중 오류가 발생하였습니다.");
-		System.out.println(mailDto);
-		 
 		int result = mailService.createMail(mailDto);
 		if(result>0) {
 		resultMap.put("res_code", "200");
 		resultMap.put("res_msg", "메일이 발송되었습니다.");	
 		}
-		System.out.println(mailDto);
 		return resultMap;
 	}
 	

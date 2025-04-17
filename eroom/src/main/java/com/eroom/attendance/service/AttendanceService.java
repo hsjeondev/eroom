@@ -1,7 +1,10 @@
 package com.eroom.attendance.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,7 +54,7 @@ public class AttendanceService {
 			
 			// 지각 체크
 			if(now.getHour() > 9 || (now.getHour() == 9 && now.getMinute() > 0)) lateYn = "Y";
-			
+			// 출근 기록 저장
 			Attendance attendance = Attendance.builder()
 						.employee(Employee.builder().employeeNo(employeeNo).build())
 						.attendanceCheckInTime(now)
@@ -81,7 +84,49 @@ public class AttendanceService {
 		return null;
 	}
 	
+	// 홈에서 출퇴근 상태, 시간 반환
+	public Map<String,String> getTodayAttendanceStatusAndTime(Long employeeNo){
+		Map<String,String> resultMap = new HashMap<>();
+		
+		/*
+		 * // 현재 로그인한 정보 Authentication authentication =
+		 * SecurityContextHolder.getContext().getAuthentication(); EmployeeDetails
+		 * employeeDetail = (EmployeeDetails)authentication.getPrincipal();
+		 */
+		// 오늘 날짜
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime todayStart = now.toLocalDate().atStartOfDay();
+		LocalDateTime todayEnd = todayStart.plusDays(1);
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+		
+		// 출근 기록 전체 최신순 조회
+		List<Attendance> checkIns = attendanceRepository.findTodayAttendanceList(employeeNo, todayStart, todayEnd);
+		
+		if(checkIns.isEmpty()) {
+			resultMap.put("attendanceStatus", "notCheckedIn");
+			resultMap.put("attendanceTime", "");
+		}else {
+			Attendance recent = checkIns.get(0);
+			String attendanceStatus = "";
+			String attendanceTime = "";
+
+			if (recent.getAttendanceCheckOutTime() == null) {
+				attendanceStatus = "checkedIn";
+				attendanceTime = recent.getAttendanceCheckInTime().format(formatter);
+			} else {
+				attendanceStatus = "checkedOut";
+				attendanceTime = recent.getAttendanceCheckOutTime().format(formatter);
+			}
+
+			resultMap.put("attendanceStatus", attendanceStatus);
+			resultMap.put("attendanceTime", attendanceTime);
+		}
+		return resultMap;
+	}
 	
+	
+	// 근태 기록 전체 조회
 	public List<Attendance> selectAttendanceList(){
 		
 		// 현재 로그인한 정보
@@ -91,8 +136,7 @@ public class AttendanceService {
 		
 		Long employeeNo = employeeDetail.getEmployee().getEmployeeNo(); 
 		
-		return null;
-//		return attendanceRepository.findById(employeeNo);
+		return attendanceRepository.findByEmployee_EmployeeNo(employeeNo);
 		
 		
 	}
