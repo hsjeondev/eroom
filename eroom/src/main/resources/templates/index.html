@@ -1,12 +1,205 @@
 <!DOCTYPE html>
-<html 
-lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
-	  xmlns:th="http://www.thymeleaf.org"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{/include/layout}">
-  <body>
-    <main class="main" id="top" layout:fragment="content">
+<html lang="ko-KR" dir="ltr"
+  data-navigation-type="default"
+  data-navbar-horizontal-shape="default"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/include/layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>출퇴근 카드</title>
+  <style>
+    .attendance-card {
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    .attendance-card .card-body {
+      padding: 1.5rem;
+    }
+
+    .current-time {
+      font-size: 0.9rem;
+      color: #6c757d;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .profile-img {
+      width: 64px;
+      height: 64px;
+    }
+
+    .btn-wrap {
+      border-top: 1px dashed #dee2e6;
+      padding-top: 1rem;
+      margin-top: 1rem;
+    }
+
+    .btn-wrap .btn {
+      min-width: 120px;
+    }
+  </style>
+</head>
+<body>
+<main class="main" id="top" layout:fragment="content">
+
+  <div class="attendance-card">
+    <div class="card shadow-sm border-0">
+      <div class="card-body text-center">
+		<form id="attendanceForm" action="/attendance/log" method="post">
+			<!-- csrf 토큰 -->
+			<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf_token}">
+			<!-- 로그인한 사용자 -->
+			<input type="hidden" th:value="${#authentication.principal.employee.employeeNo}" name="employeeNo">
+			<!-- 출근 / 퇴근 type hidden -->
+			<input type="hidden" name="attendanceType" id="attendanceType">
+			
+			
+	        <!-- 현재 시간 -->
+	        <div class="current-time fw-semibold text-secondary fs-8 mb-0" id="currentTime"></div><br>
+	        <!-- 프로필 + 이름 / 부서 + 직급 -->
+	        <div class="d-flex justify-content-center mb-3">
+	          <div class="d-flex align-items-center">
+	            <img id="profileImage" class="rounded-circle me-3 profile-img" src="/assets/img/team/15.webp" alt="프로필">
+	            <div class="text-start">
+	              <p class="fw-semibold text-secondary fs-8 mb-0" th:text="${#authentication.principal.employee.employeeName}">이름</p>
+	              <small class="text-muted" th:text="|${#authentication.principal.employee.structure.codeName} / ${#authentication.principal.employee.employeePosition}|">부서 / 직급</small>
+	            </div>
+	          </div>
+	        </div>
+	        <!-- 출퇴근 버튼 -->
+	        <div class="btn-wrap d-flex justify-content-center gap-2">
+			  	        
+	          <button id="checkInBtn" class="btn btn-outline-primary btn-sm">출근하기</button>
+	          <button id="checkOutBtn" class="btn btn-primary btn-sm" disabled>퇴근하기</button>
+	        </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+      
+    // 현재 시간 표시
+    function updateCurrentTime() {
+      const now = new Date();
+      const year = now.getFullYear(); // 4자리 연도 -> 2025
+      const month = String(now.getMonth()+1).padStart(2,'0'); // 1월은 0부터 -> +1 해주기
+      const date = String(now.getDate()).padStart(2,'0'); // 일
+      
+      const hours = String(now.getHours()).padStart(2,'0'); // 시 (12시간 단위X 24시간단위)
+      const minutes = String(now.getMinutes()).padStart(2,'0'); // 7시 07
+      const seconds = String(now.getSeconds()).padStart(2,'0');
+      
+      const formattedDateTime = `${year}년${month}월${date}일 ${hours}:${minutes}:${seconds}`;
+      
+      document.getElementById('currentTime').innerText = formattedDateTime;
+    }
+    updateCurrentTime(); // 처음 호출
+    setInterval(updateCurrentTime, 1000); // 1초마다 호출
+	// form과 type    
+    const attendanceForm = document.getElementById('attendanceForm');
+    const attendanceType = document.getElementById('attendanceType');
+    // 출퇴근 버튼 
+   	const checkInBtn = document.getElementById('checkInBtn');
+   	const checkOutBtn = document.getElementById('checkOutBtn');
+   	
+   	// 버튼 상태 설정 함수
+   	function enableCheckInButton(){
+   		checkInBtn.disabled = false; // 출근 버튼 활성화
+   		checkOutBtn.disabled = true; // 퇴근 버튼 비활성화
+   	}
+   	// 출근을 눌렀을 때 퇴근 버튼이 활성화 되도록 한다.
+   	function enableCheckOutButton(){
+   		checkInBtn.disabled = true; // 출근 버튼 비활성화
+   		checkOutBtn.disabled = false; // 퇴근 버튼 활성화
+   	}
+   	// 출퇴근 버튼 모두 비활성화
+   	function disableAllButtons(){
+   		checkInBtn.disabled = true;
+   		checkOutBtn.disabled = true;
+   	}
+   	
+    // 출근 버튼 클릭
+   	checkInBtn.addEventListener('click',function(e){
+   		e.preventDefault(); // submit 막기
+    	attendanceType.value = 'checkIn'; // 서버에 checkIn으로 전달
+    	const now = new Date();
+    	const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    	
+    	const formData = new FormData(attendanceForm);
+    	
+    	fetch("/log",{
+    		method: 'post',
+    		headers: {
+				'header': document.querySelector('meta[name="_csrf_header"]').content,
+				'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content    			
+    		},
+    		body: formData
+    	})
+    	.then(response => response.json())
+    	.then(data => {
+    		alert(data.res_msg);
+    		if(data.res_code == 200){
+    			// 버튼 함수 불러오기
+    			enableCheckOutButton(); // 출근 버튼 비활성화, 퇴근 버튼 활성화
+    	    	checkInBtn.innerText = `${time}`; // 출근 버튼에 클릭 시간 표시
+    	    	
+    	    	// localStorage에 상태 저장
+    	    	localStorage.setItem("attendanceStatus","checkedIn");
+    	    	localStorage.setItem("attendanceDate",new Date().toISOString().split('T')[0]);
+    		}
+    	})
+    	.catch(error => {
+    		console.error('출근 오류:',error);
+    		alert('출근 실패');
+    	});
+    	
+    });
     
-    </main>
-  </body>
+    // 퇴근 버튼 클릭
+    checkOutBtn.addEventListener('click',function(e){
+    	e.preventDefault();
+    	if(!confirm("퇴근 하시겠습니까?")) return;
+    	attendanceType.value = 'checkOut'; // 퇴근 버튼을 클릭하면 타입이 checkOut
+    	
+    	const now = new Date();
+    	const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    	checkOutBtn.innerText = `${time}`;
+    	
+    	
+    	const formData = new FormData(attendanceForm);
+    	
+    	fetch("/log",{
+    		method:'post',
+    		headers:{
+				'header': document.querySelector('meta[name="_csrf_header"]').content,
+				'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content      			
+    		},
+    		body: formData
+    	})
+    	.then(response => response.json())
+    	.then(data => {
+    		alert(data.res_msg);
+    		if(data.res_code == 200){
+    			disableAllButtons();
+    			checkOutBtn.innerText = `${time}`;
+    			
+    			// localStorage 상태 저장(퇴근)
+    			localStorage.setItem("attendanceStatus","checkedOut");
+    			localStorage.setItem("attendanceDate",new Date().toISOString().split('T')[0]);
+    		}
+    	})
+    	.catch(error => {
+    		console.error('퇴근 오류',error);
+    		alert('퇴근 실패');
+    	});
+    });
+    
+  </script>
+
+</main>
+</body>
 </html>
