@@ -31,7 +31,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		        </div>
 		        <div class="mb-1">
 		          <label class="form-label" for="basic-form-dept">부서</label>
-		          <input class="form-control" id="basic-form-dept" type="text" placeholder="부서">
+		          <div id="basic-form-dept" class="form-control" th:text="${departmentName}"></div>
+		        </div>
+		        <div class="mb-1">
+		          <label class="form-label" for="basic-form-team">팀명</label>
+		          <div id="basic-form-team" class="form-control"  th:text="${employee.structure.codeName}"></div>
 		        </div>
 		        <div class="mb-1">
 		          <label class="form-label" for="basic-form-job">직급</label>

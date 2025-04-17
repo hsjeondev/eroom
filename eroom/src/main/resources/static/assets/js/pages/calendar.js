@@ -38,6 +38,7 @@
           center: 'title',
           right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
+		
         buttonText: {
           month: 'Month',
           week: 'Week',

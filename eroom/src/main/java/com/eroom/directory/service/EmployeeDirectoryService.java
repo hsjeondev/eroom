@@ -29,15 +29,15 @@ public class EmployeeDirectoryService {
 		return list;
 	}
 
-	public Structure selectStructureCodeNameByParentCodeEqualsSeparatorCode(String parentCode) {
-		return structureRepository.findBySeparatorCode(parentCode);
-	}
-	public List<Structure> selectDepartmentAll() {
-		return structureRepository.findByParentCodeIsNull();
-	}
-	public List<Structure> selectTeamAll(String parentCode) {
-		return structureRepository.findByParentCode(parentCode);
-	}
+//	public Structure selectStructureCodeNameByParentCodeEqualsSeparatorCode(String parentCode) {
+//		return structureRepository.findBySeparatorCode(parentCode);
+//	}
+//	public List<Structure> selectDepartmentAll() {
+//		return structureRepository.findByParentCodeIsNull();
+//	}
+//	public List<Structure> selectTeamAll(String parentCode) {
+//		return structureRepository.findByParentCode(parentCode);
+//	}
 
 	
 }
