@@ -51,7 +51,7 @@
 														<label class="col-sm-2 col-form-label text-end" for="inputItem">항목</label>
 														<div class="col-sm-8">
 															<div id="itemScrollBox" style="max-height: 400px; overflow-y: auto;">
-																<div id="itemContainer default">
+																<div id="itemContainer1">
 																	<input class="form-control mb-2" id="inputItem" name="items" type="text" style="width: 97.2%;">
 																</div>
 																<div id="itemContainer">
@@ -78,30 +78,22 @@
 													<div class="row mb-3">
 														<label class="col-sm-2 col-form-label text-end" for="basic-form-dob">참여자</label>
 														<div class="col-8">
-															<!-- 부서(소속) 선택 -->
-															<div class="mb-3">
-																<select class="form-select" id="departmentSelect" onchange="changeDepartment(this.value)" style="width: 97.2%;">
-																	<option disabled selected>-- 소속 선택 --</option>
-																	<!-- 부서 목록은 컨트롤러에서 structureList로 전달 -->
-																	<option th:each="dept : ${structureList}" th:value="${dept.separator_code}" th:text="${dept.separator_name}" th:selected="${dept.separator_name == param.department}"></option>
-																</select>
-															</div>
-
-															<!-- 참여자 선택 (부서 선택 후 해당 부서의 구성원 불러옴) -->
-															<div class="mb-3">
-																<div class="d-flex" style="width: 97.2%;">
-																	<select id="employeeSelect" class="form-select me-2" style="flex: 1;">
-																		<option disabled selected>-- 참여자 선택 --</option>
-																	</select>
-																	<button type="button" class="btn btn-outline-primary" onclick="addParticipant()">추가</button>
-																</div>
-															</div>
-
-															<!-- 선택된 참여자 보여주기 -->
-															<div class="mb-3">
-																<label class="form-label">선택된 참여자</label>
-																<div id="selectedParticipants">
-																	<!-- 여기에서 badge로 추가됨 -->
+															<!-- 팀 선택 -->
+															<div class="row mb-3">
+																<div class="col-sm-8">
+																	<div class="mb-3">
+																		<select class="form-select" id="selectTeam" onchange="changeTeamSelection(this.value)" style="width: 97.2%;">
+																			<option disabled selected>-- 팀 선택 --</option>
+																			<option th:each="team : ${structureList}" th:value="${team.structure_no}" th:text="${team.code_name}"></option>
+																		</select>
+																	</div>
+																	<!-- 선택된 팀 보여주기 -->
+																	<div class="mb-3">
+																		<label class="form-label" style="padding-left: 0;">선택된 팀</label>
+																		<div id="selectedTeam">
+																			<!-- 선택된 팀 정보가 배지로 표시됨 -->
+																		</div>
+																	</div>
 																</div>
 															</div>
 														</div>
@@ -136,7 +128,7 @@
 									<div class="border-bottom border-translucent">
 										<div class="d-flex align-items-start mb-1">
 											<div class="d-sm-flex align-items-center ps-2">
-												<button class="btn btn-link me-1 mb-1 fs-6 p-0" type="button" th:attr="data-survey-id=${survey.surveyNo}" data-bs-toggle="modal" data-bs-target="#survey-detail" th:text="${survey.surveyTitle}">설문 제목</button>
+												<button class="btn btn-link me-1 mb-1 fs-6 p-0" th:attr="data-survey-id=${survey.surveyNo}" data-bs-toggle="modal" data-bs-target="#survey-detail" th:text="${survey.surveyTitle}">설문 제목</button>
 												<div class="modal fade" id="survey-detail" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
 													<div class="modal-dialog modal-dialog-scrollable">
 														<div class="modal-content">
@@ -245,62 +237,41 @@
 			});
 		});
 		
-		// 설문 등록시 참여자 선택 스크립트
+		// 설문 등록시 참여자 팀 선택 스크립트
+		document.getElementById('selectTeam').addEventListener('change', function () {
+		    const selectedTeamContainer = document.getElementById('selectedTeam');
+		    const selected = Array.from(this.selectedOptions);
 		
-			// 부서(소속) 선택 시 해당 부서의 직원 목록을 불러오는 함수
-			function changeDepartment(deptId) {
-			  console.log("선택된 부서 ID:", deptId);
-			  fetch('/employes?separator_code=' + encodeURIComponent(deptId))
-			  .then(response => response.json())
-			  .then(data => {
-			    console.log(data);
-			    const select = document.getElementById('employeeSelect');
-			    select.innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
-			    data.forEach(emp => {
-			      const option = document.createElement('option');
-			      option.value = emp.employee_no;
-			      option.text = emp.employee_name;
-			      select.appendChild(option);
-			    });
-			    select.multiple = isGroupChat;
-			  })
-			  .catch(error => console.error('직원 로딩 실패:', error));
-			}
+		    selected.forEach(option => {
+		        const teamId = option.value;
+		        const teamName = option.text;
 		
-			// 선택된 참여자를 추가하는 함수
-			function addParticipant() {
-			  const select = document.getElementById('employeeSelect');
-			  const selectedOption = select.options[select.selectedIndex];
-			  if (!selectedOption || selectedOption.disabled) {
-			    alert('참여자를 선택해주세요.');
-			    return;
-			  }
-			  const participantId = selectedOption.value;
-			  const participantName = selectedOption.text;
-			  
-			  // 중복 추가 방지
-			  if (document.getElementById('participant-' + participantId)) {
-			    alert('이미 추가된 참여자입니다.');
-			    return;
-			  }
-			  const badge = document.createElement('span');
-			  badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
-			  badge.id = 'participant-' + participantId;
-			  badge.innerHTML = `
-			    ${participantName}
-			    <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeParticipant('${participantId}')"></button>
-			    <input type="hidden" name="participantIds" value="${participantId}">
-			  `;
-			  document.getElementById('selectedParticipants').appendChild(badge);
-			}
-			
-			function removeParticipant(id) {
-			  const badge = document.getElementById('participant-' + id);
-			  if (badge) badge.remove();
-			}
+		        if (!document.getElementById('selected-team-' + teamId)) {
+		            const badge = document.createElement('span');
+		            badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
+		            badge.id = 'selected-team-' + teamId;
+		            badge.innerHTML = `
+		                ${teamName}
+		                <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeTeam('${teamId}')"></button>
+		                <input type="hidden" name="selectedTeamIds" value="${teamId}">
+		            `;
+		            selectedTeamContainer.appendChild(badge);
+		        }
+		    });
+		
+		    // 선택된 항목 초기화 (선택 후 자동 해제)
+		    this.selectedIndex = 0;
+		});
+		
+		// 선택된 팀 삭제
+		function removeTeam(teamId) {
+		    const badge = document.getElementById('selected-team-' + teamId);
+		    if (badge) badge.remove();
+		}	
 		
 		
-		// 상세 조회
+		
+		// 설문 상세 조회
 		document.addEventListener('DOMContentLoaded', function () {
 		  const surveyModal = document.getElementById('survey-detail');
 		  const itemList = document.getElementById('surveyItemList');

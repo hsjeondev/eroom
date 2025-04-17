@@ -56,100 +56,26 @@ td.name p {
 							</button>
 						</div>
 						<ul class="mb-0 treeview" id="treeviewExample">
-							<li class="treeview-list-item"><a data-bs-toggle="collapse" href="#treeviewExample-1-1" role="button" aria-expanded="false">
+							<li class="treeview-list-item"><a data-bs-toggle="collapse" href="#treeviewExample-1-1" role="button" aria-expanded="true">
 									<p class="treeview-text text-nowrap">
-										<span class="fa-solid fa-folder treeview-icon"></span>이룸 컴퍼니
+										<span class="fa-solid fa-folder treeview-icon text-info-light"></span>이룸 컴퍼니
 									</p>
 							</a>
 								<ul class="collapse treeview-list" id="treeviewExample-1-1" data-show="true">
-									<li class="treeview-list-item"><a data-bs-toggle="collapse" href="#treeviewExample-2-1" role="button" aria-expanded="false">
+
+									<li th:each="dept, deptStatus : ${departmentList}" class="treeview-list-item"><a data-bs-toggle="collapse" th:href="'#treeview-dept-' + ${deptStatus.index}" role="button" aria-expanded="false">
 											<p class="treeview-text text-nowrap">
-												<span class="fa-solid fa-folder treeview-icon"></span>부서명1
+												<span class="fa-solid fa-folder treeview-icon"></span> <span th:text="${dept.codeName}">부서명</span>
+
 											</p>
 									</a>
 
-										<ul class="collapse treeview-list" id="treeviewExample-2-1" data-show="false">
-											<li class="treeview-list-item">
+										<ul class="collapse treeview-list" th:id="'treeview-dept-' + ${deptStatus.index}" data-show="false">
+											<li th:each="team, teamStatus : ${teamMap[dept.codeName]}" class="treeview-list-item">
 												<div class="treeview-item">
 													<a class="flex-1 ps-2 ms-2" href="#!">
 														<p class="treeview-text text-nowrap">
-															<span class="treeview-icon fa-solid fa-file-lines"></span>팀명1
-														</p>
-													</a>
-												</div>
-											</li>
-											<li class="treeview-list-item">
-												<div class="treeview-item">
-													<a class="flex-1 ps-2 ms-2" href="#!">
-														<p class="treeview-text text-nowrap">
-															<span class="treeview-icon fa-solid fa-image"></span>팀명2
-														</p>
-													</a>
-												</div>
-											</li>
-											<li class="treeview-list-item">
-												<div class="treeview-item">
-													<a class="flex-1 ps-2 ms-2" href="#!">
-														<p class="treeview-text text-nowrap">
-															<span class="treeview-icon fa-solid fa-file-zipper"></span>팀명3
-														</p>
-													</a>
-												</div>
-											</li>
-										</ul></li>
-
-									<li class="treeview-list-item"><a data-bs-toggle="collapse" href="#treeviewExample-2-3" role="button" aria-expanded="false">
-											<p class="treeview-text text-nowrap">
-												<span class="fa-solid fa-folder treeview-icon text-info-light"></span>부서명2
-											</p>
-									</a>
-										<ul class="collapse treeview-list" id="treeviewExample-2-3" data-show="false">
-											<li class="treeview-list-item">
-												<div class="treeview-item">
-													<a class="flex-1 ps-2 ms-2" href="#!">
-														<p class="treeview-text text-nowrap">
-															<span class="treeview-icon fa-solid fa-file-word"></span>팀명1
-														</p>
-													</a>
-												</div>
-											</li>
-										</ul></li>
-									<li class="treeview-list-item"><a data-bs-toggle="collapse" href="#treeviewExample-2-5" role="button" aria-expanded="false">
-											<p class="treeview-text text-nowrap">
-												<span class="fa-solid fa-folder treeview-icon"></span>부서명3
-											</p>
-									</a>
-										<ul class="collapse treeview-list" id="treeviewExample-2-5" data-show="true">
-											<li class="treeview-list-item"><a data-bs-toggle="collapse" href="#treeviewExample-3-1" role="button" aria-expanded="false">
-													<p class="treeview-text text-nowrap">
-														<span class="fa-solid fa-folder treeview-icon"></span>부서명4
-													</p>
-											</a>
-												<ul class="collapse treeview-list" id="treeviewExample-3-1" data-show="false">
-													<li class="treeview-list-item">
-														<div class="treeview-item">
-															<a class="flex-1 ps-2 ms-2" href="#!">
-																<p class="treeview-text text-nowrap">
-																	<span class="treeview-icon fa-solid fa-file-zipper"></span>팀명1
-																</p>
-															</a>
-														</div>
-													</li>
-												</ul></li>
-											<li class="treeview-list-item">
-												<div class="treeview-item">
-													<a class="flex-1 ps-2 ms-2" href="#!">
-														<p class="treeview-text text-nowrap">
-															<span class="treeview-icon fa-solid fa-file"></span>팀명1
-														</p>
-													</a>
-												</div>
-											</li>
-											<li class="treeview-list-item">
-												<div class="treeview-item">
-													<a class="flex-1 ps-2 ms-2" href="#!">
-														<p class="treeview-text text-nowrap">
-															<span class="treeview-icon fa-solid fa-file-zipper"></span>팀명2
+															<span class="treeview-icon fa-solid fa-file-lines"></span> <span th:text="${team.codeName}">팀명</span>
 														</p>
 													</a>
 												</div>
@@ -252,22 +178,22 @@ td.name p {
 									</tr>
 								</thead>
 								<tbody class="list align-middle" id="customers-table-body">
-									<tr>
-										<td class="no">1</td>
+									<tr th:each="member, memberStatus : ${employeeList}">
+										<td class="no" th:text="${memberStatus.count}">1</td>
 										<td class="name"><a class="d-flex align-items-center text-body-emphasis ps-5" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
 
 												<div class="avatar avatar-m me-2">
 													<img class="rounded-circle" src="../../../assets/img/team/23.webp" alt="">
 												</div>
-												<p class="mb-0 fw-bold text-truncate">강성관</p>
+												<p class="mb-0 fw-bold text-truncate" th:text="${member.employee_name}">이름없음</p>
 
 										</a></td>
-										<td class="mail"><a class="fw-semibold" href="mailto:annac34@gmail.com">devksk@gmail.com</a></td>
-										<td class="phone">01022239983</td>
-										<td class="job">부장</td>
-										<td class="dept">운영부</td>
-										<td class="team">인사팀</td>
-										<td class="date">2021.02.01</td>
+										<td class="mail"><a class="fw-semibold" href="/mail/mailCreate" th:text="${member.directory_email != null ? member.directory_email : '-'}"></a></td>
+										<td class="phone" th:text="${member.directory_phone}">-</td>
+										<td class="job" th:text="${member.employee_position}">-</td>
+										<td class="dept" th:text="${member.department_name != null ? member.department_name : '-'}">부서명</td>
+										<td class="team" th:text="${member.team_name != null ? member.team_name : '-'}">팀명</td>
+										<td class="date" th:if="${member.employee.employeeEmploymentYn == 'Y'}" th:text="${member.formatted_hire_date}">입사일</td>
 										<td class="text-end pe-0">
 											<div class="btn-reveal-trigger position-static">
 												<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
@@ -281,7 +207,9 @@ td.name p {
 											</div>
 										</td>
 									</tr>
-									<!-- 나머지 사원도 동일 형식으로 추가 -->
+
+									<!-- 
+									나머지 사원도 동일 형식으로 추가
 									<tr>
 										<td class="no">2</td>
 										<td class="name"><a class="d-flex align-items-center text-body-emphasis ps-5" href="#">
@@ -416,7 +344,7 @@ td.name p {
 												</div>
 											</div>
 										</td>
-									</tr>
+									</tr> -->
 								</tbody>
 							</table>
 						</div>
@@ -665,7 +593,51 @@ td.name p {
 										alertContainer.innerHTML = isSuccess ? '<div class="alert alert-subtle-primary" role="alert">등록이 완료되었습니다!</div>'
 												: '<div class="alert alert-subtle-danger" role="alert">등록에 실패했습니다. 다시 시도해주세요.</div>';
 									});
+					
 				</script>
+				<script>
+				  document.addEventListener('DOMContentLoaded', function () {
+				    const tree = document.querySelector('#treeviewExample');
+				
+				    tree.addEventListener('click', function (e) {
+				      // 클릭된 li.treeview-list-item을 찾음
+				      const clickedLi = e.target.closest('li.treeview-list-item');
+				      if (!clickedLi) return;
+				
+				      // 아이콘 요소 추출
+				      const clickedIcon = clickedLi.querySelector('.treeview-icon');
+				      if (!clickedIcon) return;
+				
+				      // 기존 모든 아이콘에서 파란색 제거
+				      document.querySelectorAll('.treeview-icon.text-info-light')
+				        .forEach(el => el.classList.remove('text-info-light'));
+				
+				      // 클릭된 아이콘에 파란색 추가
+				      clickedIcon.classList.add('text-info-light');
+				
+				      // 상위 폴더들도 파란색 적용
+				      let currentLi = clickedLi.parentElement;
+				      while (currentLi && currentLi.classList.contains('treeview-list')) {
+				        const parentLi = currentLi.closest('li.treeview-list-item');
+				        const parentIcon = parentLi?.querySelector('.treeview-icon');
+				        if (parentIcon) parentIcon.classList.add('text-info-light');
+				        currentLi = parentLi?.parentElement;
+				      }
+				    });
+				  });
+				</script>
+				<script>
+					$(function() {
+						// 트리뷰 아이콘 클릭 시
+						$('.li.treeview-list-item').on('click', function(e) {
+							
+						});
+					});
+				</script>
+
+
+
+
 
 
 			</div>
