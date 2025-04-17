@@ -67,10 +67,14 @@ public class ChatroomService {
 		Chatroom result = null;
 		Chatroom target = repository.findById(param.getChatroomNo()).orElse(null);
 		if(target != null) {
-			param.setChatroomName(param.getChatroomName());
-			result = repository.save(param.toEntity());
+			target.setChatroomName(param.getChatroomName());
+			result = repository.save(target);
 		}
 		return result;
+	}
+	public boolean existsOneToOneChatroom(Long myId, Long otherId) {
+	    List<Long> existingRooms = chatroomAttendeeRepository.findOneToOneChatroomNos(myId, otherId);
+	    return !existingRooms.isEmpty();
 	}
 
 	
