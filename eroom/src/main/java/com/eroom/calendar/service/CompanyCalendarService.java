@@ -28,7 +28,7 @@ public class CompanyCalendarService {
 	
 	//회사 목록 일정 조회
 	public List<CompanyCalendarDto> getCompanyList(String separator) {
-	    List<CompanyCalendar> list = companyRepository.findBySeparator(separator);
+	    List<CompanyCalendar> list = companyRepository.findBySeparatorAndVisibleYn(separator,"Y");
 	    List<CompanyCalendarDto> dtoList = new ArrayList<>();
 
 	    for (CompanyCalendar companyCalendar : list) {
@@ -67,5 +67,30 @@ public class CompanyCalendarService {
 		return result;
 	}
 	
-	
+	public CompanyCalendarDto deleteCompanyCalendar(Long id) {
+		CompanyCalendar target = companyRepository.findById(id).orElse(null);
+		if(target == null) {
+			return null;
+		}
+		
+		 String changeYtoN = "Y".equals(target.getVisibleYn()) ? "N" : "Y";
+	    
+	    CompanyCalendar updated = CompanyCalendar.builder()
+	    	    .calendarNo(target.getCalendarNo())  
+	    	    .companyTitle(target.getCompanyTitle())
+	    	    .companyLocation(target.getCompanyLocation())
+	    	    .calendarStartTime(target.getCalendarStartTime())
+	    	    .calendarEndTime(target.getCalendarEndTime())
+	    	    .companyContent(target.getCompanyContent())
+	    	    .companyCreator(target.getCompanyCreator())
+	    	    .companyEditor(target.getCompanyEditor())
+	    	    .employeeNo(target.getEmployeeNo())
+	    	    .separator(target.getSeparator())
+	    	    .calendarRegDate(target.getCalendarRegDate())
+	    	    .calendarModDate(target.getCalendarModDate())
+	    	    .visibleYn(changeYtoN)
+	    	    .build();
+	    CompanyCalendar saved = companyRepository.save(updated);
+	    return new CompanyCalendarDto().toDto(saved);
+	}
 }

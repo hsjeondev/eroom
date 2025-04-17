@@ -219,5 +219,25 @@ public class CalendarController {
 		
 		return result;
     }
+    
+    //회사 일정 삭제 --> calendar 테이블에 사용여부를 Y -> N으로 변경
+    @PostMapping("/companycalendar/delete/{calendarNo}")
+    @ResponseBody
+    public Map<String,String> deleteCompanyCalendar(@PathVariable("calendarNo") Long id){
+    	Map<String,String> result = new HashMap<String,String>();
+    	result.put("res_code", "500");
+		result.put("res_msg", "삭제를 실패했습니다");
+    	
+		CompanyCalendarDto deleteCompanyCalendar = companyService.deleteCompanyCalendar(id);
+    	
+		if(deleteCompanyCalendar != null) {
+			result.put("res_code", "200");
+			result.put("res_msg", "일정을 삭제하였습니다!");
+		}
+		
+		return result;
+    	
+    	
+    }
 
 }
