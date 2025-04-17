@@ -32,7 +32,7 @@ public class SurveyItemDto {
 				.collect(Collectors.toList());
 	}
 	
-	public static SurveyItemDto toDto(SurveyItem entity) {
+	public SurveyItemDto toDto(SurveyItem entity) {
 		return SurveyItemDto.builder()
 				.itemNo(entity.getItemNo())
 				.surveyNo(entity.getSurveyNo())

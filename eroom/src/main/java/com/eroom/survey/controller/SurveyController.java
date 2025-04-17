@@ -1,5 +1,6 @@
 package com.eroom.survey.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +18,6 @@ import com.eroom.employee.service.EmployeeService;
 import com.eroom.security.EmployeeDetails;
 import com.eroom.survey.dto.SurveyDto;
 import com.eroom.survey.dto.SurveyItemDto;
-import com.eroom.survey.dto.SurveyVoterDto;
 import com.eroom.survey.entity.Survey;
 import com.eroom.survey.service.SurveyItemService;
 import com.eroom.survey.service.SurveyService;
@@ -36,6 +36,11 @@ public class SurveyController {
 	public String surveyList(Model model, SurveyDto surveyDto, SurveyItemDto surveyItemDto) {
 		
 		List<Survey> surveyList = surveyService.findAllSurvey();
+		List<SurveyDto> surveyDtoList = new ArrayList<SurveyDto>();
+		for(Survey survey : surveyList) {
+			surveyDto  = new SurveyDto().toDto(survey);
+			surveyDtoList.add(surveyDto);
+		}
 		List<StructureDto> structureList = employeeService.findTeams();
 		
 		model.addAttribute("surveyList", surveyList);

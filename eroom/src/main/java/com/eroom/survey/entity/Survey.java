@@ -34,7 +34,7 @@ public class Survey {
 	private String surveyTitle;
 	
 	@Column(name="deadline")
-	private LocalDate deadline;
+	private LocalDateTime deadline;
 	
 	@Column(name="anonymous_vote")
 	private String anonymousVote;
@@ -42,7 +42,7 @@ public class Survey {
 	@Column(name="allow_multiple")
 	private String allowMultiple;
 	
-	
 	@Column(name="reg_date")
 	private LocalDateTime regDate;
+
 }
