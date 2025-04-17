@@ -46,7 +46,7 @@
             + 새 채팅방 만들기
           </button>
         </div>
-        <!-- 검색 입력란 (데스크탑) -->
+        <!-- 검색 입력란 -->
         <div class="form-icon-container mb-4 d-sm-none d-xl-block">
           <input class="form-control form-icon-input" type="text" placeholder="이름을 입력하세요" />
           <span class="fas fa-user text-body fs-9 form-icon"></span>
@@ -76,7 +76,7 @@
                 <div th:if="${#lists.isEmpty(chatroomList)}">
                   <p class="text-center text-muted mt-4">참여 중인 채팅방이 없습니다.</p>
                 </div>
-                <!-- 채팅방 목록 (반복 렌더링) -->
+                <!-- 채팅방 목록 -->
                 <li th:if="${!#lists.isEmpty(chatroomList)}"
                   th:each="chatroom : ${chatroomList}"
                   th:attr="data-room-no=${chatroom.chatroomNo}"
@@ -137,7 +137,7 @@
                   <input type="text" id="chatroomName" name="chatroomName" class="form-control"
                     placeholder="예: 개발팀 채팅방" readonly>
                 </div>
-                <!-- 부서(소속) 선택 -->
+                <!-- 소속 선택 -->
                 <div class="mb-3">
                   <label class="form-label">소속</label>
                   <select class="form-select" id="departmentSelect" onchange="changeDepartment(this.value)">
@@ -489,7 +489,7 @@
 			    const newName = prompt("새 채팅방 이름을 입력하세요:", currentName);
 
 			    if (newName && newName.trim() !== "" && newName !== currentName) {
-			      fetch('/chat/rename/' + chatroomNo, {
+			      fetch('/chat/rename', {
 			        method: 'POST',
 			        headers: {
 			          'Content-Type': 'application/json',
@@ -497,7 +497,8 @@
 		              'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
 			        },
 			        body: JSON.stringify({
-			          chatroomName: newName
+			          chatroomName: newName,
+			          chatroomNo : chatroomNo,
 			        })
 			      })
 			      .then(res => res.json())
