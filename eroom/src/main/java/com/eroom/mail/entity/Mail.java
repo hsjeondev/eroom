@@ -57,5 +57,5 @@ public class Mail {
 	@JoinColumn(name = "employee_no")  // mail 테이블에 외래키 컬럼 생성됨
 	private Employee sender;
 	
-	
+
 }

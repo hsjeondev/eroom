@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{/include/layout}">
+  <body>
+    <main class="main" id="top" layout:fragment="content">
+		<div class="d-flex align-items-center gap-2">
+		  	<a th:href="@{/project/all}" class="text-decoration-none text-dark me-2">
+		  		<i class="uil uil-angle-left-b fs-4"></i>
+			</a>
+		  	<h1 class="text-primary mb-0 fs-4" th:text="${project.project_name}">프로젝트 디테일</h1>
+		  	<span class="badge badge-phoenix fs-10 badge-phoenix-success" th:text="${project.proceed}">completed</span>
+		</div>
+    	<br>
+		<ul class="nav nav-phoenix-pills mt-3" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/project/detail/{id}/main(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/main')} ? ' active' : ''">메인</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/project/detail/{id}/developmentTab(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/developmentTab')} ? ' active' : ''">개발</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/project/detail/{id}/todo(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/todo')} ? ' active' : ''">할 일</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/project/detail/{id}/files(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/files')} ? ' active' : ''">파일</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/project/detail/{id}/minutes(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/minutes')} ? ' active' : ''">회의록</a>
+            </li>
+          </ul>
+		<br>
+
+		<div th:if="${pullRequests != null and !pullRequests.isEmpty()}">
+		    <table class="table">
+		        <thead>
+		            <tr>
+		                <th>#</th>
+		                <th>제목</th>
+		                <th>작성자</th>
+		                <th>브랜치</th>
+		                <th>상태</th>
+		                <th>링크</th>
+		            </tr>
+		        </thead>
+		        <tbody>
+		            <tr th:each="pr : ${pullRequests}">
+		                <td th:text="${pr.number}"></td>
+		                <td th:text="${pr.title}"></td>
+		                <td th:text="${pr.author}"></td>
+		                <td th:text="${pr.headBranch} + ' → ' + ${pr.baseBranch}"></td>
+		                <td th:text="${pr.state}"></td>
+		                <td><a th:href="${pr.htmlUrl}" target="_blank">보기</a></td>
+		            </tr>
+		        </tbody>
+		    </table>
+		</div>
+	        
+        
+
+    </main>
+  </body>
+</html>
