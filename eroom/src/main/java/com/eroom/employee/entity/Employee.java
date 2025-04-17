@@ -118,5 +118,5 @@ public class Employee {
 	// 근태 조건
 	@OneToMany(mappedBy="employee")
 	private List<Attendance> attendanceList;
-	
+
 }
