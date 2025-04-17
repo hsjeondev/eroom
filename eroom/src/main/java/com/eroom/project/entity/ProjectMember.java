@@ -21,7 +21,6 @@ import lombok.ToString;
 @Table(name="project_member")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
