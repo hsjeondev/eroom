@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Separator;
+import com.eroom.mail.entity.Mail;
+import com.eroom.mail.entity.MailReceiver;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -74,6 +76,5 @@ public class Directory {
 	
 	@OneToMany(mappedBy = "directory")
 	private List<DirectoryMemo> directoryMemos;
-
 
 }

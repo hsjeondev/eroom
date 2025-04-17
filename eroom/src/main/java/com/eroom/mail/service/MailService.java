@@ -5,10 +5,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eroom.directory.entity.Directory;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.mail.dto.MailDto;
-import com.eroom.mail.dto.MailReceiverDto;
 import com.eroom.mail.entity.Mail;
 import com.eroom.mail.entity.MailReceiver;
 import com.eroom.mail.repository.MailReceiverRepository;
@@ -45,14 +45,37 @@ public class MailService {
 			Mail mailSaver = repository.save(mailEntity);
 			
 			
-			// 전송 메일 저장
+			 List<Long> receiverNos = mailDto.getReceiverNos();
+		        for (Long receiverNo : receiverNos) {
+		            // FK 관계 맞춰줌
+		            Employee receiver = employeeRepository.findById(receiverNo).orElseThrow(() -> 
+		                new IllegalArgumentException("존재하지 않는 사원 번호: " + receiverNo));
+		            
+		            Directory receiverDirectory = receiver.getDirectory();
+		            
+		            MailReceiver mailReceiver = MailReceiver.builder()
+		                    .mail(mailSaver) // 발송된 메일
+		                    .receiver(receiver) // 수신자 (Employee)
+		                    .directory(receiverDirectory) // 수신자 Directory 정보
+		                    .build();
+
+		            mailRecevierRepository.save(mailReceiver);
+		        }
+			
+			
+			
+			
+			
+			
+			
+			/*// 전송 메일 저장
 			MailReceiverDto receiverDto=null;
 			MailReceiver mailReceiverEntity = receiverDto.toEntity();
 			MailReceiver mailReceiverSaver = MailReceiver.builder()
-//					.receiver(mailEntity.getReceivers())
+//					.receiver(mailDto.getReceiverNos())
 					.mail(mailSaver)
 					.build();
-			mailRecevierRepository.save(mailReceiverEntity);
+			mailRecevierRepository.save(mailReceiverEntity);*/
 			
 			//List<String> receiverList = Arrays.asList(mailDto.getReceiver().split(","));
 

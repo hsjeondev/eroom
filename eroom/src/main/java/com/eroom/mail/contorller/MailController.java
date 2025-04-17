@@ -105,11 +105,11 @@ public class MailController {
 	// mail DB에 데이터 넣는거만 가능
 	@PostMapping("/mail/create")
 	@ResponseBody
-	public Map<String, String> createMailApi(MailDto mailDto) {
+	public Map<String, String> createMailApi( MailDto mailDto) {
 		Map<String, String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "메일 등록중 오류가 발생하였습니다.");
-		
+		System.out.println(mailDto);
 		 
 		int result = mailService.createMail(mailDto);
 		if(result>0) {
