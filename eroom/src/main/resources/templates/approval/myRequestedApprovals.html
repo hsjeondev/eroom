@@ -224,60 +224,66 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						</div><!-- col-12 col-xl-6 -->
 						<!-- 카드1 끝 -->
 						
-						<!-- 카드2 -->
+						<!-- 카드2 thymeleaf 사용중 -->
 						<div class="col-12 col-xl-6" th:each="list, listStatus : ${resultList}">
 							<div class="card h-100">
 								<div class="card-body">
 									<!-- 결재문서 이름/ 진행상태 / 작성자 이름 칸 -->
 									<div class="border-bottom border-translucent">
 										<div class="d-flex align-items-start mb-1">
-											<div class="d-sm-flex align-items-center ps-2"><a class="fw-bold fs-7 lh-sm title line-clamp-1 me-sm-4" th:href="@{/approval/detail}">결재 제목</a>
+											<div class="d-sm-flex align-items-center ps-2"><a class="fw-bold fs-7 lh-sm title line-clamp-1 me-sm-4" th:text="${list.approval_title}" th:href="@{/approval/detail}">결재 제목</a>
 												<div class="d-flex align-items-center">
 												
 													<!-- 빨간색 -->
-													<span>
-													<svg class="svg-inline--fa fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
-														<g transform="translate(256 256)">
-															<g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
-																<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+													<span th:if="${list.approval_status == 'D'}">
+														<svg class="svg-inline--fa fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
+															<g transform="translate(256 256)">
+																<g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
+																	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+																</g>
 															</g>
-														</g>
-													</svg><span class="fw-bold fs-9 text-body lh-2">반려</span>
+														</svg><span class="fw-bold fs-9 text-body lh-2">반려</span>
 													</span>
 													
 													<!-- 초록색 -->
-													<svg class="svg-inline--fa fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
-													  <g transform="translate(256 256)">
-														  <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
-														  	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+													<span th:if="${list.approval_status == 'A'}">
+														<svg class="svg-inline--fa fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
+														  <g transform="translate(256 256)">
+															  <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
+															  	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+															  </g>
 														  </g>
-													  </g>
-												  	</svg><span class="fw-bold fs-9 text-body lh-2">승인</span>
+													  	</svg><span class="fw-bold fs-9 text-body lh-2">승인</span>
+													</span>
 													
 													<!-- 파란색 -->
-													<svg class="svg-inline--fa fa-circle me-1 text-info" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
-											            <g transform="translate(256 256)">
-												            <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
-												            	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+													<span th:if="${list.approval_status == 'S'}">
+														<svg class="svg-inline--fa fa-circle me-1 text-info" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
+												            <g transform="translate(256 256)">
+													            <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
+													            	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+													            </g>
 												            </g>
-											            </g>
-										            </svg><span class="fw-bold fs-9 text-body lh-2">진행</span>
+											            </svg><span class="fw-bold fs-9 text-body lh-2">진행</span>
+										            </span>
 													
 													<!-- 주황색 -->
-													<svg class="svg-inline--fa fa-circle me-1 text-warning" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
-											            <g transform="translate(256 256)">
-												            <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
-												            	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+													<span th:if="${list.approval_status == 'F'}">
+														<svg class="svg-inline--fa fa-circle me-1 text-warning" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
+												            <g transform="translate(256 256)">
+													            <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
+													            	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+													            </g>
 												            </g>
-											            </g>
-										            </svg>
-													<span class="fw-bold fs-9 text-body lh-2">대기</span>
+											            </svg>
+														<span class="fw-bold fs-9 text-body lh-2">대기</span>
+													</span>
 												</div>
 											</div>
 										</div>
 										<!-- 작성자 -->
 											<br>
-										<p class="fs-9 fw-semibold text-body ms-4 text mb-4 ps-2" th:text="|작성자 : ${employee.employeeName}|">
+										<p class="fs-9 fw-semibold text-body ms-4 text mb-4 ps-2" th:text="|작성자 : ${list.employee.employeeName}|">
 											작성자
 										</p>
 									</div>
@@ -307,7 +313,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 										  <div class="d-flex align-items-center">
 										  	<!-- 문서 아이콘 -> fs-20 숫자로 사이즈 조절 -->
 										    <span class="uil uil-clipboard-alt fs-20 text-body-secondary me-2" ></span>
-										    <p class="mb-0 fs-9 fw-semibold text-body-tertiary reports">[양식명]</p>
+										    <p class="mb-0 fs-9 fw-semibold text-body-tertiary reports" th:text="${list.approval_format.approvalFormatTitle}">[양식명]</p>
 										  </div>
 										</div>
 										<!-- 날짜 -->
@@ -315,7 +321,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 											<br>
 											<br>
 											<div class="d-flex align-items-center"><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock me-2" style="stroke-width:2;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-												<p class="mb-0 fs-9 fw-semibold text-body-tertiary date">2025.04.10</p>
+												<p class="mb-0 fs-9 fw-semibold text-body-tertiary date" th:text="${list.reg_date}">2025.04.10</p>
 											</div>
 										</div>
 									</div>

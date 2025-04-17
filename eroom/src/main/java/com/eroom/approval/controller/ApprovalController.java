@@ -1,5 +1,6 @@
 package com.eroom.approval.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.core.Authentication;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.eroom.approval.dto.ApprovalDto;
 import com.eroom.approval.entity.Approval;
 import com.eroom.approval.service.ApprovalService;
 import com.eroom.employee.entity.Employee;
@@ -27,10 +29,15 @@ public class ApprovalController {
 		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 		Employee employee = employeeDetails.getEmployee();
 		model.addAttribute("employee", employee);
-		// approval 리스트 조회
-		List<Approval> resultList = approvalService.getMyRequestedApprovals(employee.getEmployeeNo());
+		// 내가 올린 approval 리스트 조회
+		List<Approval> temp = approvalService.getMyRequestedApprovals(employee.getEmployeeNo());
+		List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
+		for (Approval approval : temp) {
+			ApprovalDto dto = new ApprovalDto();
+			dto = dto.toDto(approval);
+			resultList.add(dto);
+		}
 		model.addAttribute("resultList", resultList);
-		System.out.println("resultList : " + resultList);
 		
 		return "/approval/myRequestedApprovals";
 	}

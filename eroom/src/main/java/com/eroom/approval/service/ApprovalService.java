@@ -16,7 +16,7 @@ public class ApprovalService {
 	private final ApprovalRepository approvalRepository;
 
 	public List<Approval> getMyRequestedApprovals(Long employeeNo) {
-		List<Approval> resultList = approvalRepository.findByEmployee_EmployeeNo(employeeNo);
+		List<Approval> resultList = approvalRepository.findByEmployee_EmployeeNoOrderByApprovalRegDateDesc(employeeNo);
 		return resultList;
 	}
 
