@@ -58,6 +58,10 @@
 						    </div>
 						  </div>
 					</div> -->
+						<!-- 이메일 정보 서칭하는거 -->
+									<!-- <div th:each="employee : ${employeeList}">
+    <span th:text="${employee.directory != null && employee.directory.directoryEmail != null ? employee.directory.directoryEmail : '이메일 없음'}"></span>
+							</div> -->
 					<div class="modal fade" id="orgModal" tabindex="-1" aria-labelledby="orgModalLabel" aria-hidden="true">
 					  <div class="modal-dialog modal-md">
 					    <div class="modal-content">
@@ -98,6 +102,7 @@
 					    </div>
 					  </div>
 					</div>
+					<!-- 나중에 밑에 두기  -->
 					<script>
 					document.getElementById("deptSelect").addEventListener("change", function () {
 						  const separatorCode = this.value;
@@ -165,6 +170,7 @@
 						}
 					
 					
+					
 					/*function confirmManagerSelection() {
 				          const selectedBadges = document.getElementById('selectedManagers').querySelectorAll('.badge');
 				          let managerNames = [];
@@ -191,48 +197,7 @@
 				        }*/
 					
 					</script>
-					
-					
-					
-					
-					
-					
-                     <!-- test  -->  
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
+
                       <!-- <div class="col-4">
                         <input class="form-control" type="email" name="cc" placeholder="참조" />
                       </div>

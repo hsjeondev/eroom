@@ -20,13 +20,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MailService {
 
-	private final MailRepository repository;
+	private final MailRepository mailRepository;
 	private final MailReceiverRepository mailRecevierRepository;
 	private final EmployeeRepository employeeRepository;
 
     
+	public List<Mail> findMailsBySender(Long employeeNo) {
+	    return mailRepository.findBySenderEmployeeNo(employeeNo);
+	}
+
+	
 	public List<Mail> selectMailAll(){
-		List<Mail> list = repository.findAll();
+		List<Mail> list = mailRepository.findAll();
 		return list;
 	}
 	
@@ -42,7 +47,7 @@ public class MailService {
 		try {
 			// 보낸 메일 저장
 			Mail mailEntity = mailDto.toEntity();
-			Mail mailSaver = repository.save(mailEntity);
+			Mail mailSaver = mailRepository.save(mailEntity);
 			
 			
 			 List<Long> receiverNos = mailDto.getReceiverNos();
@@ -51,12 +56,12 @@ public class MailService {
 		            Employee receiver = employeeRepository.findById(receiverNo).orElseThrow(() -> 
 		                new IllegalArgumentException("존재하지 않는 사원 번호: " + receiverNo));
 		            
-		            Directory receiverDirectory = receiver.getDirectory();
+		            //Directory receiverDirectory = receiver.getDirectory();
 		            
 		            MailReceiver mailReceiver = MailReceiver.builder()
 		                    .mail(mailSaver) // 발송된 메일
 		                    .receiver(receiver) // 수신자 (Employee)
-		                    .directory(receiverDirectory) // 수신자 Directory 정보
+		                    //.directory(receiverDirectory) // 수신자 Directory 정보
 		                    .build();
 
 		            mailRecevierRepository.save(mailReceiver);

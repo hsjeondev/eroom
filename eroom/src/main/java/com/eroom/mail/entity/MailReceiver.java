@@ -50,7 +50,7 @@ public class MailReceiver {
 	@JoinColumn(name = "employee_no")  // 수신자 FK 컬럼
 	private Employee receiver;
 	
-    @ManyToOne
-    @JoinColumn(name = "directory_no")
-    private Directory directory; // Directory와 연결
+//    @ManyToOne
+//    @JoinColumn(name = "directory_no")
+//    private Directory directory; // Directory와 연결
 }
