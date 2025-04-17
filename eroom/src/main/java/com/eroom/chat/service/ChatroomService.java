@@ -72,6 +72,10 @@ public class ChatroomService {
 		}
 		return result;
 	}
+	public boolean existsOneToOneChatroom(Long myId, Long otherId) {
+	    List<Long> existingRooms = chatroomAttendeeRepository.findOneToOneChatroomNos(myId, otherId);
+	    return !existingRooms.isEmpty();
+	}
 
 	
 

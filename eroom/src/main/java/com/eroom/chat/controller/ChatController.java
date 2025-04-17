@@ -69,6 +69,24 @@ public class ChatController {
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "채팅방 생성을 실패하였습니다.");
 		
+		// 채팅방 생성 시 참여자 ID가 비어있을 경우
+		if ("N".equals(dto.getChatIsGroupYn())) {
+			// 1:1 채팅방 생성 시 참여자 ID가 비어있을 경우
+			if (dto.getParticipantIds() == null || dto.getParticipantIds().isEmpty()) {
+				resultMap.put("res_msg", "1:1 채팅방은 반드시 참여자를 선택해야 합니다.");
+				return resultMap;
+			}
+			// 1:1 채팅방 생성 시 본인 ID가 포함되어 있을 경우
+			if (dto.getParticipantIds().contains(dto.getCreater())) {
+				resultMap.put("res_msg", "본인은 참여자로 선택할 수 없습니다.");
+				return resultMap;
+			}
+			// 1:1 채팅방 생성시 이미 존재하는 채팅방인지 체크
+			if (chatroomService.existsOneToOneChatroom(dto.getCreater(), dto.getParticipantIds().get(0))) {
+	            resultMap.put("res_msg", "이미 존재하는 1:1 채팅방입니다.");
+	            return resultMap;
+	        }
+		}
 		 // 그룹 채팅인데 제목이 비어있을 경우
 	    if ("Y".equals(dto.getChatIsGroupYn()) &&
 	        (dto.getChatroomName() == null || dto.getChatroomName().trim().isEmpty())) {
