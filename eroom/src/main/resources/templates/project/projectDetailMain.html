@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{/include/layout}">
+  <body>
+    <main class="main" id="top" layout:fragment="content">
+		<div class="d-flex align-items-center gap-2">
+		  	<a th:href="@{/project/all}" class="text-decoration-none text-dark me-2">
+		  		<i class="uil uil-angle-left-b fs-4"></i>
+			</a>
+		  	<h1 class="text-primary mb-0 fs-4" th:text="${project.project_name}">프로젝트 디테일</h1>
+		  	<span class="badge badge-phoenix fs-10 badge-phoenix-success" th:text="${project.proceed}">completed</span>
+		</div>
+    	<br>
+		<ul class="nav nav-phoenix-pills mb-5 d-sm-none d-xl-flex" id="contactListTab" data-chat-thread-tab="data-chat-thread-tab" role="tablist">
+        	<li class="nav-item" role="presentation"><a class="nav-link cursor-pointer" data-bs-toggle="tab" data-chat-thread-list="all" role="tab" aria-selected="false" tabindex="-1">메인</a></li>
+            <li class="nav-item" role="presentation"><a class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab" data-chat-thread-list="read" aria-selected="false" tabindex="-1">개발</a></li>
+            <li class="nav-item" role="presentation"><a class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab" data-chat-thread-list="unread" aria-selected="false">할 일</a></li>
+            <li class="nav-item" role="presentation"><a class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab" data-chat-thread-list="unread" aria-selected="false">파일</a></li>
+            <li class="nav-item" role="presentation"><a class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab" data-chat-thread-list="unread" aria-selected="false">회의록</a></li>
+        </ul>
+        <div class="container">
+	        <div class="row" style="height: 100vh;">
+			  <div class="col-9 text-white d-flex align-items-center justify-content-center">
+			    왼쪽 9 (75%)
+			  </div>
+			  <div class="col-3 text-white d-flex align-items-center justify-content-center" style="background:#EFF2F6">
+			    오른쪽 3 (25%)
+			  </div>
+			</div>
+		</div>
+        
+
+    </main>
+  </body>
+</html>

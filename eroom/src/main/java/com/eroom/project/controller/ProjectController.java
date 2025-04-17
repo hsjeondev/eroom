@@ -66,18 +66,28 @@ public class ProjectController {
 		return "project/yetProject";
 	}
 	
+	// 이 컨트롤러 나중에 개발탭으로 사용
 	@GetMapping("/detail/{project_no}")
 	public String detailProjectView(@PathVariable("project_no") Long project_no, Model model) {
 		
 		ProjectDto project = projectService.findByProjectNo(project_no);
 		model.addAttribute("project", project);
 		
-		// 이 2줄은 나중에 프로젝트 디테일의 개발탭으로 이동
 	    List<GithubPullRequestDto> pullRequests = projectService.fetchPullRequests(project_no);
 	    model.addAttribute("pullRequests", pullRequests);
 		
 		model.addAttribute("project", project);
 		return "project/projectDetail";
+	}
+	
+	@GetMapping("/detail/{project_no}/main")
+	public String detailMainProjectView(@PathVariable("project_no") Long project_no, Model model) {
+		
+		ProjectDto project = projectService.findByProjectNo(project_no);
+		model.addAttribute("project", project);
+		
+		model.addAttribute("project", project);
+		return "project/projectDetailMain";
 	}
 	
 	@GetMapping("/create")

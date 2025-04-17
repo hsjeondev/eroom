@@ -29,7 +29,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                 </thead>
                 <tbody class="list" id="project-list-table-body">
                   <tr class="position-static" th:each="project : ${projectList}">
-                    <td class="align-middle time white-space-nowrap ps-0 projectName py-4"><a class="fw-bold fs-8" th:href="@{/project/detail/{id}(id=${project.project_no})}" 
+                    <td class="align-middle time white-space-nowrap ps-0 projectName py-4"><a class="fw-bold fs-8" th:href="@{/project/detail/{id}/main(id=${project.project_no})}" 
                     	th:text="${project.project_name}">프로젝트명</a></td>
                     <td class="align-middle white-space-nowrap start ps-3 py-4">
 					<th:block th:each="member : ${project.project_members}">
