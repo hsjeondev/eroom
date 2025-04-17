@@ -61,6 +61,8 @@ public class AttendanceController {
 	}
 	
 	// 출근 여부
+	@GetMapping("/status")
+	@ResponseBody
 	public Map<String, String> getTodayAttendanceStatus(){
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		EmployeeDetails employeeDetail = (EmployeeDetails) authentication.getPrincipal();
@@ -77,7 +79,7 @@ public class AttendanceController {
 		if(checkIn == null) {
 			result.put("status", "notCheckedIn");
 		}else if(checkIn.getAttendanceCheckOutTime() == null) {
-			result.put("status", "checkdIn");
+			result.put("status", "checkedIn");
 		}else {
 			result.put("status", "checkedOut");
 		}
