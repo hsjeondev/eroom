@@ -73,12 +73,6 @@ public class Employee {
 	@ToString.Exclude
 	private Structure structure;
 	
-//	@ManyToOne
-//	@JoinColumn(name="department_no")
-//	private Department department; // 부서번호
-//	@ManyToOne
-//	@JoinColumn(name="team_no")
-//	private Team team; // 팀번호
 	
 
 	// 채팅방 조인
