@@ -44,6 +44,7 @@ public class MailReceiver {
 	@JoinColumn(name = "mail_no")  // FK 컬럼명 명시
 	private Mail mail;
 	
+	// 부서 정보를 위해 서치 필요
 	@ManyToOne
 	@JoinColumn(name = "employee_no")  // 수신자 FK 컬럼
 	private Employee receiver;
