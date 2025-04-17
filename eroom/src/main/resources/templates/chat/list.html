@@ -489,7 +489,7 @@
 			    const newName = prompt("새 채팅방 이름을 입력하세요:", currentName);
 
 			    if (newName && newName.trim() !== "" && newName !== currentName) {
-			      fetch('/chat/rename/' + chatroomNo, {
+			      fetch('/chat/rename', {
 			        method: 'POST',
 			        headers: {
 			          'Content-Type': 'application/json',
@@ -497,7 +497,8 @@
 		              'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
 			        },
 			        body: JSON.stringify({
-			          chatroomName: newName
+			          chatroomName: newName,
+			          chatroomNo : chatroomNo,
 			        })
 			      })
 			      .then(res => res.json())
