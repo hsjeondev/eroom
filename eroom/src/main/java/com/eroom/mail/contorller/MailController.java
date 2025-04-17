@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.employee.dto.EmployeeDto;
+import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.mail.dto.MailDto;
@@ -94,8 +95,10 @@ public class MailController {
 	@GetMapping("/mail/mailCreate")
 	public String createMailView(Model model) {
 		List<Employee> employeeList = mailService.selectEmployeeAll();
+		List<SeparatorDto> departments = employeeService.findDistinctStructureNames(); // 부서/팀 리스트 가져오기
 		model.addAttribute("employeeList",employeeList);
 		
+		model.addAttribute("departments", departments); // 부서 드롭다운용
 		return "mail/mailCreate";
 	}
 	// 메일 작성 로직
@@ -106,7 +109,7 @@ public class MailController {
 		Map<String, String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "메일 등록중 오류가 발생하였습니다.");
-		System.out.println(mailDto);
+		
 		 
 		int result = mailService.createMail(mailDto);
 		if(result>0) {

@@ -69,9 +69,11 @@
 					        <!-- 소속 선택 -->
 					        <label for="deptSelect" class="form-label">소속</label>
 					        <select class="form-select" id="deptSelect">
-					          <option selected>-- 소속 선택 --</option>
-					          <option th:each="dept : ${departments}" th:value="${dept}" th:text="${dept}"></option>
-					        </select>
+							  <option selected disabled>-- 소속 선택 --</option>
+							  <option th:each="dept : ${departments}"
+							          th:value="${dept.separator_code}"
+							          th:text="${dept.separator_name}"></option>
+							</select>
 					
 					        <!-- 참여자 선택 -->
 					        <label for="employeeSelect" class="form-label mt-3">참여자 선택</label>
@@ -80,7 +82,7 @@
 					            <option selected>-- 참여자 선택 --</option>
 					            <!-- JS로 채워짐 -->
 					          </select>
-					          <button type="button" class="btn btn-primary" id="addEmployeeBtn">추가</button>
+					          <button type="button" class="btn btn-primary" id="addEmployeeBtn" onclick="addParticipant()">추가</button>
 					        </div>
 					
 					        <!-- 선택된 참여자 표시 -->
@@ -96,7 +98,74 @@
 					    </div>
 					  </div>
 					</div>
-					
+					<script>
+					document.getElementById("deptSelect").addEventListener("change", function () {
+						  const separatorCode = this.value;
+
+						  fetch("/search-employees?separator_code=" + separatorCode)
+						    .then(response => response.json())
+						    .then(data => {
+						      const employeeSelect = document.getElementById("employeeSelect");
+						      employeeSelect.innerHTML = '<option selected disabled>-- 참여자 선택 --</option>'; // 초기화
+
+						      data.forEach(emp => {
+						        const option = document.createElement("option");
+						        option.value = emp.employee_no;
+						        option.textContent = emp.employee_name;
+						        employeeSelect.appendChild(option);
+						      });
+						    })
+						    .catch(error => console.error("직원 불러오기 실패", error));
+						});
+					/* test */	
+					function addParticipant() {
+  const select = document.getElementById('employeeSelect');
+  const selectedOptions = Array.from(select.selectedOptions);
+
+  if (selectedOptions.length === 0) {
+    alert('참여자를 선택해주세요.');
+    return;
+  }
+
+  selectedOptions.forEach(option => {
+    const employeeNo = option.value;
+    const employeeName = option.text;
+
+    if (document.getElementById('receiver-' + employeeNo)) {
+      alert('이미 추가된 참여자입니다.');
+      return;
+    }
+
+    // 배지 생성
+    const badge = document.createElement('span');
+    badge.className = 'badge bg-secondary text-white me-2 mb-2';
+    badge.id = 'receiver-' + employeeNo;
+    badge.innerHTML = `
+      ${employeeName}
+      <button type="button" class="btn-close btn-close-white btn-sm ms-2" style="font-size: 0.6rem;" onclick="removeParticipant('${employeeNo}')"></button>
+      <input type="hidden" name="receiverNos" value="${employeeNo}">
+    `;
+
+    document.getElementById('selectedEmployeeList').appendChild(badge);
+  });
+
+  updateReceiverInput();
+}
+
+function removeParticipant(employeeNo) {
+  const badge = document.getElementById('receiver-' + employeeNo);
+  if (badge) {
+    badge.remove();
+    updateReceiverInput();
+  }
+}
+
+function updateReceiverInput() {
+  const badges = document.querySelectorAll('#selectedEmployeeList .badge');
+  const names = Array.from(badges).map(badge => badge.firstChild.textContent.trim());
+  document.getElementById('receiverInput').value = names.join(', ');
+}
+					</script>
 					
 					
 					
