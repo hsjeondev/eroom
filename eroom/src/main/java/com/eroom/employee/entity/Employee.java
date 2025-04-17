@@ -83,6 +83,7 @@ public class Employee {
 	private List<ChatroomAttendee> attendeeList;
 
 	@ManyToMany
+	@ToString.Exclude
 	@JoinTable(
 			name = "authority_mapping",
 			joinColumns = @JoinColumn(name="employee_no"),
@@ -90,6 +91,7 @@ public class Employee {
 	private List<Authority> authorities;
     
 	@OneToOne(mappedBy = "employee")
+	@ToString.Exclude
 	private Directory directory;
 	
 //	//개인 캘린더 조인
@@ -100,6 +102,7 @@ public class Employee {
 	private List<DirectoryMemo> directoryMemos;
 	
 	@OneToMany(mappedBy="employee")
+	@ToString.Exclude
 	private List<ProjectMember> projectMembers;
 
 	// 메일 조인

@@ -67,6 +67,7 @@ public class Directory {
 	private String directoryTeam; // 팀명
 	
 	@OneToOne
+	@ToString.Exclude
 	@JoinColumn(name = "employee_no")
 	private Employee employee; // 사번
 	
