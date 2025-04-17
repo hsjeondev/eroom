@@ -7,8 +7,8 @@ import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -104,14 +104,15 @@ public class ChatController {
 	}
 	
 	// 채팅방 업데이트
-	@PostMapping("/rename/{chatroomNo}")
+	@PostMapping("/rename")
 	@ResponseBody
-	public Map<String ,String> renameChatroom(ChatroomDto param ,@PathVariable("chatroomNo") Long chatroomNo){
+	public Map<String ,String> renameChatroom(@RequestBody ChatroomDto param){
+		
+		System.out.println(param);
+		
 		Map<String,String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "채팅방 이름변경을 실패하였습니다.");
-		
-		param.setChatroomNo(chatroomNo);
 		
 		Chatroom update = chatroomService.renameChatroom(param);
 		if(update != null) {
