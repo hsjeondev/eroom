@@ -45,8 +45,8 @@ public class ApprovalLine {
 	@Column(name="approval_line_step")
 	private int approvalLineStep; // 결재 라인 순서
 	
-	@Column(name="approval_line_yn")
-	private String approvalLineYn; // 결재 라인 사용 여부
+	@Column(name="approval_line_status")
+	private String approvalLineStatus; // 결재여부(A승인, S대기, D반려)
 	
 	@Column(name="approval_line_signed_date")
 	private LocalDateTime approvalLineSignedDate; // 결재 라인 결재일
