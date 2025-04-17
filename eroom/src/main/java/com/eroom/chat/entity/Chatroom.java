@@ -63,4 +63,6 @@ public class Chatroom {
 	
 	@Column(nullable=true, name="chatroom_read_yn")
 	private String chatroomReadYn;
+	
+	
 }
