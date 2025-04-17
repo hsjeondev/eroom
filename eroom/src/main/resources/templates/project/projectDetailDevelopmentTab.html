@@ -31,26 +31,34 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
               <a class="nav-link" th:href="@{/project/detail/{id}/minutes(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/minutes')} ? ' active' : ''">회의록</a>
             </li>
           </ul>
+		<br>
 
-			<br>
-			
-	        <div class="row g-5" style="height: 100vh; margin-left: 0.5px; margin-right: 0.5px;">
-			  <div class="col-xl-9">
-			    왼쪽 9
-			    <div class="row">
-			      <div class="col-xl-6" style="background-color:red; height: 200px;">
-			        왼쪽 내부 6 (빨강)
-			      </div>
-			      <div class="col-xl-6" style="background-color:blue; height: 200px;">
-			        왼쪽 내부 6 (파랑)
-			      </div>
-			    </div>
-			  </div>
-			  <div class="col-xl-3" style="background:#EFF2F6;">
-			    오른쪽 3
-			  </div>
-			</div>
-
+		<div th:if="${pullRequests != null and !pullRequests.isEmpty()}">
+		    <table class="table">
+		        <thead>
+		            <tr>
+		                <th>#</th>
+		                <th>제목</th>
+		                <th>작성자</th>
+		                <th>브랜치</th>
+		                <th>상태</th>
+		                <th>링크</th>
+		            </tr>
+		        </thead>
+		        <tbody>
+		            <tr th:each="pr : ${pullRequests}">
+		                <td th:text="${pr.number}"></td>
+		                <td th:text="${pr.title}"></td>
+		                <td th:text="${pr.author}"></td>
+		                <td th:text="${pr.headBranch} + ' → ' + ${pr.baseBranch}"></td>
+		                <td th:text="${pr.state}"></td>
+		                <td><a th:href="${pr.htmlUrl}" target="_blank">보기</a></td>
+		            </tr>
+		        </tbody>
+		    </table>
+		</div>
+	        
+        
 
     </main>
   </body>

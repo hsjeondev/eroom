@@ -86,8 +86,45 @@ public class ProjectController {
 		ProjectDto project = projectService.findByProjectNo(project_no);
 		model.addAttribute("project", project);
 		
-		model.addAttribute("project", project);
 		return "project/projectDetailMain";
+	}
+	
+	@GetMapping("/detail/{project_no}/developmentTab")
+	public String detailDevelopmentTabProjectView(@PathVariable("project_no") Long project_no, Model model) {
+		
+		ProjectDto project = projectService.findByProjectNo(project_no);
+		List<GithubPullRequestDto> pullRequests = projectService.fetchPullRequests(project_no);
+	    model.addAttribute("pullRequests", pullRequests);
+		model.addAttribute("project", project);
+		
+		return "project/projectDetailDevelopmentTab";
+	}
+	
+	@GetMapping("/detail/{project_no}/todo")
+	public String detailProjectTodoView(@PathVariable("project_no") Long project_no, Model model) {
+		
+		ProjectDto project = projectService.findByProjectNo(project_no);
+		model.addAttribute("project", project);
+		
+		return "project/projectDetailTodoTab";
+	}
+	
+	@GetMapping("/detail/{project_no}/files")
+	public String detailProjectFilesView(@PathVariable("project_no") Long project_no, Model model) {
+		
+		ProjectDto project = projectService.findByProjectNo(project_no);
+		model.addAttribute("project", project);
+		
+		return "project/projectDetailFilesTab";
+	}
+	
+	@GetMapping("/detail/{project_no}/minutes")
+	public String detailProjectMinutesView(@PathVariable("project_no") Long project_no, Model model) {
+		
+		ProjectDto project = projectService.findByProjectNo(project_no);
+		model.addAttribute("project", project);
+		
+		return "project/projectDetailMinutesTab";
 	}
 	
 	@GetMapping("/create")
