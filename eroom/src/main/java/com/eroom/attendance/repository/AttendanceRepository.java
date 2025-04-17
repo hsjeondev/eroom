@@ -21,5 +21,9 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
 	Attendance findLastCheckInToday(@Param("employeeNo") Long employeeNo,
 									@Param("start") LocalDateTime start,
 									@Param("end") LocalDateTime end);
+	
+	// 출근 기록 조회
+	@Query("SELECT a FROM Attendance a WHERE a.employee.employeeNo = :employeeNo AND a.attendanceCheckInTime BETWEEN :start AND :end ORDER BY a.attendanceNo DESC")
+	List<Attendance> findTodayAttendanceList(@Param("employeeNo") Long employeeNo, @Param("start") LocalDateTime start,@Param("end") LocalDateTime end);
 
 }

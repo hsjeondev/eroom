@@ -107,7 +107,7 @@
 				      <!-- 받은 메일함 -->
 				      <li class="nav-item">
 				        <a class="nav-link"
-				           th:href="@{/mail/sent}"
+				           th:href="@{/mail/receiverTo}"
 				           th:classappend="${(requestURI != null and requestURI.startsWith('/mail/receiverTo')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center">
 				            <span class="nav-link-text">받은 메일함</span>
@@ -118,8 +118,8 @@
 				      <!-- 보낸 메일함 -->
 				      <li class="nav-item">
 				        <a class="nav-link"
-				           th:href="@{/mail/receiverTo}"
-							th:classappend="${(requestURI != null and requestURI.startsWith('/mail/receiverCc')) ? 'active' : ''}">
+				           th:href="@{/mail/sent}"
+							th:classappend="${(requestURI != null and requestURI.startsWith('/mail/sent')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center">
 				            <span class="nav-link-text">보낸 메일함</span>
 				          </div>

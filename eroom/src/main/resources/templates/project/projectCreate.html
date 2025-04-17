@@ -166,6 +166,24 @@
           </div>
         </div>
       </div>
+      
+      <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered">
+	    <div class="modal-content border border-2 border-secondary-subtle shadow">
+	      <div class="modal-header">
+	        <h5 class="modal-title fw-semibold">등록 확인</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	        정말 등록하시겠습니까?
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
+	        <button type="button" class="btn btn-primary btn-sm" id="confirmSubmitBtn">확인</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
 
       <script>
         // 관리자 모달: 부서(소속) 목록을 fetch로 불러오기
@@ -350,64 +368,202 @@
           }
         }
         
+        document.getElementById('select_manager_modal').addEventListener('hidden.bs.modal', function () {
+        	  // 부서 드롭다운 초기화
+        	  const deptSelect = document.getElementById('managerDepartmentSelect');
+        	  deptSelect.innerHTML = '<option disabled selected>-- 소속 선택 --</option>';
+
+        	  // 직원 드롭다운 초기화
+        	  const empSelect = document.getElementById('managerEmployeeSelect');
+        	  empSelect.innerHTML = '<option disabled selected>-- 관리자 선택 --</option>';
+
+        	  // 선택된 관리자 뱃지 초기화
+        	  document.getElementById('selectedManagers').innerHTML = '';
+        	});
+        
+        document.getElementById('select_participant_modal').addEventListener('hidden.bs.modal', function () {
+        	  // 부서 드롭다운 초기화
+        	  const deptSelect = document.getElementById('participantDepartmentSelect');
+        	  deptSelect.innerHTML = '<option disabled selected>-- 소속 선택 --</option>';
+
+        	  // 직원 드롭다운 초기화
+        	  const empSelect = document.getElementById('participantEmployeeSelect');
+        	  empSelect.innerHTML = '<option disabled selected>-- 참가자 선택 --</option>';
+
+        	  // 선택된 참가자 뱃지 초기화
+        	  document.getElementById('selectedParticipants').innerHTML = '';
+        	});
+        
+        document.getElementById('select_manager_modal').addEventListener('shown.bs.modal', function () {
+        	  const deptSelect = document.getElementById('managerDepartmentSelect');
+        	  deptSelect.innerHTML = '<option disabled selected>-- 소속 선택 --</option>';
+        	  
+        	  // 부서 목록 불러오기
+        	  fetch('/project/selectStructure')
+        	    .then(response => response.json())
+        	    .then(data => {
+        	      data.forEach(dept => {
+        	        const option = document.createElement('option');
+        	        option.value = dept.separator_code;
+        	        option.text = dept.separator_name;
+        	        deptSelect.appendChild(option);
+        	      });
+        	    });
+
+        	  // 기존 선택된 관리자들 복원
+        	  const selectedContainer = document.getElementById('selectedManagers');
+        	  selectedContainer.innerHTML = ''; // 뱃지 영역 초기화
+        	  const managerInputs = document.querySelectorAll('#managerIdsContainer input[name="managerIds"]');
+
+        	  managerInputs.forEach(input => {
+        	    const id = input.value;
+        	    const name = findEmployeeNameById(id); // 아래에서 정의함
+        	    if (name) {
+        	      const badge = document.createElement('span');
+        	      badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
+        	      badge.id = 'manager-' + id;
+        	      badge.innerHTML = `${name}
+        	        <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeManager('${id}')"></button>
+        	        <input type="hidden" name="managerIds" value="${id}">`;
+        	      selectedContainer.appendChild(badge);
+        	    }
+        	  });
+        	});
+
+        
+        document.getElementById('select_participant_modal').addEventListener('shown.bs.modal', function () {
+        	  const deptSelect = document.getElementById('participantDepartmentSelect');
+        	  deptSelect.innerHTML = '<option disabled selected>-- 소속 선택 --</option>';
+
+        	  fetch('/project/selectStructure')
+        	    .then(response => response.json())
+        	    .then(data => {
+        	      data.forEach(dept => {
+        	        const option = document.createElement('option');
+        	        option.value = dept.separator_code;
+        	        option.text = dept.separator_name;
+        	        deptSelect.appendChild(option);
+        	      });
+        	    });
+
+        	  // 기존 선택된 참가자 복원
+        	  const selectedContainer = document.getElementById('selectedParticipants');
+        	  selectedContainer.innerHTML = '';
+        	  const participantInputs = document.querySelectorAll('#participantIdsContainer input[name="participantIds"]');
+
+        	  participantInputs.forEach(input => {
+        	    const id = input.value;
+        	    const name = findEmployeeNameById(id); // 아래에서 정의함
+        	    if (name) {
+        	      const badge = document.createElement('span');
+        	      badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
+        	      badge.id = 'participant-' + id;
+        	      badge.innerHTML = `${name}
+        	        <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeParticipant('${id}')"></button>
+        	        <input type="hidden" name="participantIds" value="${id}">`;
+        	      selectedContainer.appendChild(badge);
+        	    }
+        	  });
+        	});
+
+        
+        function findEmployeeNameById(id) {
+        	  // 본문 input에 보이는 이름 문자열을 참고해서 이름을 매칭하는 단순 전략
+        	  const managerMap = document.getElementById('managers').value.split(',').map(s => s.trim());
+        	  const managerInputs = Array.from(document.querySelectorAll('#managerIdsContainer input[name="managerIds"]'))
+        	    .map(input => input.value);
+
+        	  const participantMap = document.getElementById('participant').value.split(',').map(s => s.trim());
+        	  const participantInputs = Array.from(document.querySelectorAll('#participantIdsContainer input[name="participantIds"]'))
+        	    .map(input => input.value);
+
+        	  const idxInManager = managerInputs.indexOf(id);
+        	  if (idxInManager >= 0) return managerMap[idxInManager];
+
+        	  const idxInParticipant = participantInputs.indexOf(id);
+        	  if (idxInParticipant >= 0) return participantMap[idxInParticipant];
+
+        	  return null;
+        	}
+
+
+
+        
         // 폼 제출 이벤트 처리 (유효성 검증 후)
-        const form = document.project_create_form;
-        form.addEventListener("submit", (e) => {
-          e.preventDefault();
+        // 전역 변수로 선언해서 fetch 결과를 저장
+		let redirectUrlAfterConfirm = null;
+		
+		const form = document.project_create_form;
+		form.addEventListener("submit", (e) => {
+		  e.preventDefault();
+		
+		  let vali_check = true;
+		  let vali_text = "";
+		
+		  if (!form.project_name.value.trim()) {
+		    vali_check = false;
+		    vali_text = "프로젝트명을 입력해주세요.";
+		    form.project_name.focus();
+		  } else if (!form.project_github_url.value.trim()) {
+		    vali_check = false;
+		    vali_text = "github 주소를 입력해주세요.";
+		    form.project_github_url.focus();
+		  } else if (!form.project_github_token.value.trim()) {
+		    vali_check = false;
+		    vali_text = "github 토큰을 입력해주세요.";
+		    form.project_github_token.focus();
+		  } else if (!form.project_start.value.trim()) {
+		    vali_check = false;
+		    vali_text = "시작일을 입력해주세요.";
+		    form.project_start.focus();
+		  } else if (!form.project_end.value.trim()) {
+		    vali_check = false;
+		    vali_text = "종료일을 입력해주세요.";
+		    form.project_end.focus();
+		  } else if (!form.description.value.trim()) {
+		    vali_check = false;
+		    vali_text = "프로젝트 설명을 입력해주세요.";
+		    form.description.focus();
+		  }
+		
+		  if (!vali_check) {
+		    alert(vali_text);
+		    return;
+		  }
+		
+		  const payload = new FormData(form);
+		  fetch("/project/create", {
+		    method: "post",
+		    headers: {
+		      [document.querySelector('meta[name="_csrf_header"]').content]:
+		        document.querySelector('meta[name="_csrf"]').content
+		    },
+		    body: payload
+		  })
+		    .then(response => response.json())
+		    .then(data => {
+		      if (data.res_code === "200") {
+		        // 결과 저장하고 모달 띄우기
+		        redirectUrlAfterConfirm = "/project/detail/" + data.res_project_no + "/main";
+		        document.querySelector("#confirmModal .modal-body").textContent = data.res_msg;
+		        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+		        modal.show();
+		      } else {
+		        alert(data.res_msg); // 실패 메시지는 그대로 alert
+		      }
+		    })
+		    .catch(error => {
+		      alert("프로젝트 생성 중 오류가 발생하였습니다.");
+		    });
+		});
+		
+		// 모달 내 확인 버튼 클릭 시 이동
+		document.getElementById('confirmSubmitBtn').addEventListener('click', function () {
+		  if (redirectUrlAfterConfirm) {
+		    location.href = redirectUrlAfterConfirm;
+		  }
+		});
 
-          let vali_check = true;
-          let vali_text = "";
-
-          if (!form.project_name.value.trim()) {
-            vali_check = false;
-            vali_text = "프로젝트명을 입력해주세요.";
-            form.project_name.focus();
-          } else if (!form.project_github_url.value.trim()) {
-            vali_check = false;
-            vali_text = "github 주소를 입력해주세요.";
-            form.project_github_url.focus();
-          } else if (!form.project_github_token.value.trim()) {
-            vali_check = false;
-            vali_text = "github 토큰을 입력해주세요.";
-            form.project_github_token.focus();
-          } else if (!form.project_start.value.trim()) {
-            vali_check = false;
-            vali_text = "시작일을 입력해주세요.";
-            form.project_start.focus();
-          } else if (!form.project_end.value.trim()) {
-            vali_check = false;
-            vali_text = "종료일을 입력해주세요.";
-            form.project_end.focus();
-          } else if (!form.description.value.trim()) {
-            vali_check = false;
-            vali_text = "프로젝트 설명을 입력해주세요.";
-            form.description.focus();
-          }
-
-          if (vali_check === false) {
-            alert(vali_text);
-          } else {
-            const payload = new FormData(form);
-            fetch("/project/create", {
-              method: "post",
-              headers: {
-                [document.querySelector('meta[name="_csrf_header"]').content]:
-                  document.querySelector('meta[name="_csrf"]').content
-              },
-              body: payload
-            })
-              .then(response => response.json())
-              .then(data => {
-                alert(data.res_msg);
-                if (data.res_code === "200") {
-                  location.href = "/project/detail/" + data.res_project_no;
-                }
-              })
-              .catch(error => {
-                alert("프로젝트 생성 중 오류가 발생하였습니다.");
-              });
-          }
-        });
       </script>
     </main>
   </body>
