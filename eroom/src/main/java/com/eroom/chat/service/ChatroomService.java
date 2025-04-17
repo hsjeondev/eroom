@@ -1,8 +1,10 @@
 package com.eroom.chat.service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -12,7 +14,6 @@ import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.chat.repository.ChatroomAttendeeRepository;
 import com.eroom.chat.repository.ChatroomRepository;
-import com.eroom.chat.specification.ChatroomSpecification;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.security.EmployeeDetails;
@@ -28,22 +29,26 @@ public class ChatroomService {
 	private final EmployeeRepository employeeRepository;
 	private final ChatroomAttendeeRepository chatroomAttendeeRepository;
 	
-	public List<Chatroom> selectChatRoomAll(){
-		// 현재 로그인한 사람 설정해야됨
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		
-		EmployeeDetails employee = (EmployeeDetails)authentication.getPrincipal();
-		
-		// 채팅방 설정
-		Specification<Chatroom> spec = (root, query, criteriaBuilder) -> null;
-		// 생성자가 나인 경우
-		spec = spec.and(ChatroomSpecification.fromUserEquals(employee.getEmployee()));
-		// 생성자가 상대방인 경우
-		spec = spec.or(ChatroomSpecification.toUserEquals(employee.getEmployee()));
-		
-		List<Chatroom> list = repository.findAll(spec);
-		return list;
+	public List<Chatroom> selectChatRoomAll() {
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Employee employee = employeeDetails.getEmployee(); // employeeNo 말고 Employee 객체 통째로!
+
+	    // 1. 내가 만든 채팅방
+	    List<Chatroom> createdByMe = repository.findByCreater(employee);
+
+	    // 2. 내가 참여자로 들어간 채팅방
+	    List<Chatroom> participatedIn = repository.findByParticipant(employee.getEmployeeNo());
+
+	    // 3. 합치기 (중복제거)
+	    Set<Chatroom> allChatrooms = new HashSet<>();
+	    allChatrooms.addAll(createdByMe);
+	    allChatrooms.addAll(participatedIn);
+
+	    return new ArrayList<>(allChatrooms);
 	}
+
+
 
 	public ChatroomDto createChatroom(ChatroomDto dto) {
 		Chatroom param = dto.toEntity();
