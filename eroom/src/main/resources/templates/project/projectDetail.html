@@ -6,7 +6,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  layout:decorate="~{/include/layout}">
   <body>
     <main class="main" id="top" layout:fragment="content">
-    	<h1>프로젝트 디테일</h1>
+    	<h1 th:text="${project.project_name}">프로젝트 디테일</h1>
     	<br>
 		
 		<div th:if="${pullRequests != null and !pullRequests.isEmpty()}">
