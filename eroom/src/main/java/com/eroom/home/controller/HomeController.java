@@ -7,8 +7,8 @@ import java.util.Map;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -16,9 +16,9 @@ import com.eroom.attendance.dto.AttendanceDto;
 import com.eroom.attendance.entity.Attendance;
 import com.eroom.attendance.repository.AttendanceRepository;
 import com.eroom.attendance.service.AttendanceService;
+import com.eroom.employee.entity.Employee;
 import com.eroom.security.EmployeeDetails;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -29,7 +29,36 @@ public class HomeController {
 	private final AttendanceRepository attendanceRepository;
 
 	@GetMapping({"", "/"})
-	public String home() {
+	public String home(Model model, Authentication authentication) {
+		// 로그인한 사용자 정보 가져오기
+		EmployeeDetails employeeDetail = (EmployeeDetails) authentication.getPrincipal();
+		Employee employee = employeeDetail.getEmployee();
+		Long employeeNo = employee.getEmployeeNo();
+		model.addAttribute("employee", employee);
+		// html에서 #authentication.principal.employee.employeeName 대신
+		// ${employee.employeeName}으로 사용 가능
+		
+		// 오늘 날짜
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime todayStart = now.toLocalDate().atStartOfDay();
+		LocalDateTime todayEnd = todayStart.plusDays(1);
+		// 오늘 출근 기록
+		Attendance checkIn = attendanceRepository.findLastCheckInToday(employeeNo, todayStart, todayEnd);
+		
+		
+		if(checkIn == null) {
+			model.addAttribute("attendanceStatus", "notCheckedIn");
+			model.addAttribute("attendanceTime", null);
+		}else if(checkIn.getAttendanceCheckOutTime() == null) {
+			model.addAttribute("attendanceStatus", "checkedIn");
+			model.addAttribute("attendanceTime",checkIn.getAttendanceCheckInTime().toLocalTime().toString());
+		}else {
+			model.addAttribute("attendanceStatus", "checkedOut");
+			model.addAttribute("attendanceTime",checkIn.getAttendanceCheckOutTime().toLocalTime().toString());
+		}
+		
+		
+		
 		return "index";
 	}
 	
@@ -52,30 +81,29 @@ public class HomeController {
 	}
 	
 	// 출근 여부
-	@GetMapping("/status")
-	@ResponseBody
-	public Map<String, String> getTodayAttendanceStatus(){
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		EmployeeDetails employeeDetail = (EmployeeDetails) authentication.getPrincipal();
-		Long employeeNo = employeeDetail.getEmployee().getEmployeeNo();
-		
-		LocalDateTime now = LocalDateTime.now();
-		LocalDateTime todayStart = now.toLocalDate().atStartOfDay();
-		LocalDateTime todayEnd = todayStart.plusDays(1);
-		
-		Attendance checkIn = attendanceRepository.findLastCheckInToday(employeeNo, todayStart, todayEnd);
-		
-		Map<String,String> result = new HashMap<>();
-		
-		if(checkIn == null) {
-			result.put("status", "notCheckedIn");
-		}else if(checkIn.getAttendanceCheckOutTime() == null) {
-			result.put("status", "checkedIn");
-		}else {
-			result.put("status", "checkedOut");
-		}
-		
-		return result;
-	}
+	/*
+	 * @GetMapping("/status")
+	 * 
+	 * @ResponseBody public Map<String, String> getTodayAttendanceStatus(){
+	 * Authentication authentication =
+	 * SecurityContextHolder.getContext().getAuthentication(); EmployeeDetails
+	 * employeeDetail = (EmployeeDetails) authentication.getPrincipal(); Long
+	 * employeeNo = employeeDetail.getEmployee().getEmployeeNo();
+	 * 
+	 * LocalDateTime now = LocalDateTime.now(); LocalDateTime todayStart =
+	 * now.toLocalDate().atStartOfDay(); LocalDateTime todayEnd =
+	 * todayStart.plusDays(1);
+	 * 
+	 * Attendance checkIn = attendanceRepository.findLastCheckInToday(employeeNo,
+	 * todayStart, todayEnd);
+	 * 
+	 * Map<String,String> result = new HashMap<>();
+	 * 
+	 * if(checkIn == null) { result.put("status", "notCheckedIn"); }else
+	 * if(checkIn.getAttendanceCheckOutTime() == null) { result.put("status",
+	 * "checkedIn"); }else { result.put("status", "checkedOut"); }
+	 * 
+	 * return result; }
+	 */
 
 }
