@@ -26,8 +26,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
       <div class="row">
 	      <div class="col-5">
 		        <div class="mb-1">
-		          <label class="form-label" for="basic-form-date">신청일</label>
-		          <input class="form-control" id="basic-form-date" type="text" placeholder="신청일">
+		          <label class="form-label" for="basic-form-date" >신청일</label>
+		          <div id="basic-form-date" class="form-control" th:text="${now}"></div>
 		        </div>
 		        <div class="mb-1">
 		          <label class="form-label" for="basic-form-dept">부서</label>
@@ -39,15 +39,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		        </div>
 		        <div class="mb-1">
 		          <label class="form-label" for="basic-form-job">직급</label>
-		          <input class="form-control" id="basic-form-job" type="text" placeholder="직급">
+		          <div id="basic-form-job" class="form-control"  th:text="${employee.employeePosition}"></div>
 		        </div>
 		        <div class="mb-1">
 		          <label class="form-label" for="basic-form-name">신청자</label>
-		          <input class="form-control" id="basic-form-name" type="text" placeholder="신청자">
-		        </div>
-		        <div class="mb-1">
-		          <label class="form-label" for="basic-form-phone">전화번호</label>
-		          <input class="form-control" id="basic-form-phone" type="text" placeholder="전화번호">
+		          <div id="basic-form-name" class="form-control"  th:text="${employee.employeeName}"></div>
 		        </div>
 	        </div>
         	<div class="col-7">
@@ -95,59 +91,24 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
     	</div>
         
         
-        <!-- <div class="mb-3">
-          <label class="form-label" for="basic-form-dob">Date of Birth</label>
-          <input class="form-control" id="basic-form-dob" type="date">
-        </div> -->
         <div class="mb-3">
           <label class="form-label" for="basic-form-title">제목</label>
           <input class="form-control" id="basic-form-title" type="text" placeholder="제목">
           
-          <label class="form-label" for="basic-form-format">양식 선택</label>
-          <select class="form-select" id="basic-form-format" aria-label="Default select example">
-            <option selected="selected">양식을 선택해주세요.</option>
-            <option value="1">경조금</option>
-            <option value="2">법인카드</option>
-            <option value="3">시말서</option>
-            <option value="4">연장근무신청서</option>
-            <option value="5">재직증명서</option>
-            <option value="6">출장보고서</option>
-            <option value="7">휴가원</option>
+          <label class="form-label" for="basic-select-format">양식 선택</label>
+          <select class="form-select" id="basic-select-format" aria-label="Default select example">
+            <option selected="selected" disabled="disabled">양식을 선택해주세요.</option>
+            <option th:each="formList, formStatus : ${approvalFormatList}" th:value="${formList.approval_format_no}" th:text="${formList.approval_format_title}">경조금</option>
           </select>
         </div>
-        <!-- <div class="mb-3">
-
-          <div class="form-check">
-
-            <input class="form-check-input" id="flexRadioDefault1" type="radio" name="flexRadioDefault">
-
-            <label class="form-check-label mb-0" for="flexRadioDefault1">Personal Account</label>
-          </div>
-          <div class="form-check">
-
-            <input class="form-check-input" id="flexRadioDefault2" type="radio" name="flexRadioDefault" checked="checked">
-
-            <label class="form-check-label mb-0" for="flexRadioDefault2">Business Account</label>
-          </div>
-        </div> -->
         
         <div class="mb-3">
           <label class="form-label" for="basic-form-textarea">결재 작성</label>
           <div class="form-control" id="basic-form-edit">
 			
-			
-			
-			
-			
-			
-			
           </div>
         </div>
         
-        <!-- <div class="mb-3 form-check">
-          <input class="form-check-input" id="basic-form-checkbox" type="checkbox">
-          <label class="form-check-label" for="basic-form-checkbox">Remember me</label>
-        </div> -->
         <div class="mb-3">
           <label class="form-label">파일 업로드</label>
           <input class="form-control" type="file" multiple>
@@ -156,7 +117,6 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		<button type="button" class="btn btn-light" onclick="history.back()">취소</button>
       </form>
       </div>
-      <button type="button" id="testBtn">테스트</button>
       <script>
       	const testBtn = document.getElementById("testBtn");
       	const template = `
@@ -384,6 +344,31 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
       	    document.getElementById("basic-form-edit").innerHTML += template;
       	  });
       </script>
+		<script>
+		  document.getElementById("basic-select-format").addEventListener("change", function () {
+		    const selectedValue = this.value;
+		
+		    fetch("/approval/format", {
+		      method: 'POST',
+		      headers: {
+		        'Content-Type': 'application/json',
+		        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+		        'header': document.querySelector('meta[name="_csrf_header"]').content
+		      },
+		      body: JSON.stringify({ approval_format_no: selectedValue })
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		      if (data.res_code == "200") {
+		        document.getElementById("basic-form-edit").innerHTML = data.approvalFormatContent;
+		      } else {
+		        console.log(data.res_code);
+		        console.log(data.res_msg);
+		      }
+		    });
+		  });
+		</script>
+
 	</main>              
 </body>
 </html>

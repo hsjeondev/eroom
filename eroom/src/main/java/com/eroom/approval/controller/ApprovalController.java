@@ -1,5 +1,7 @@
 package com.eroom.approval.controller;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,8 +11,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.approval.dto.ApprovalDto;
+import com.eroom.approval.dto.ApprovalFormatDto;
 import com.eroom.approval.dto.ApprovalLineDto;
 import com.eroom.approval.entity.Approval;
 import com.eroom.approval.entity.ApprovalFormat;
@@ -91,15 +98,38 @@ public class ApprovalController {
 		model.addAttribute("employee", employee);
 //		System.out.println("employee : " + employee);
 		// 결재 양식 리스트 조회
-		List<ApprovalFormat> approvalFormatList = approvalFormatService.getApprovalFormatList();
+		List<ApprovalFormat> temp = approvalFormatService.getApprovalFormatList();
+		List<ApprovalFormatDto> approvalFormatList = new ArrayList<ApprovalFormatDto>();
+		for (ApprovalFormat format : temp) {
+			ApprovalFormatDto dto = new ApprovalFormatDto();
+			dto = dto.toDto(format);
+			approvalFormatList.add(dto);
+		}
 		model.addAttribute("approvalFormatList", approvalFormatList);
 		// 부서 정보 조회
 		Structure structure = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(employee.getStructure().getParentCode());
         String departmentName = structure != null ? structure.getCodeName() : "-";
         model.addAttribute("departmentName", departmentName);
-		
+        model.addAttribute("now", DateTimeFormatter.ofPattern("yyyy.MM.dd").format(LocalDateTime.now()));
 		return "/approval/create";
 	}
+	@PostMapping("/approval/format")
+	@ResponseBody
+	public Map<String, String> selectApprovalFormat(@RequestBody ApprovalFormatDto dto) {
+		// 결재 양식 조회
+		ApprovalFormat approvalFormat = approvalFormatService.getApprovalFormat(dto.getApproval_format_no());
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("res_code", "500");
+		map.put("res_msg", "양식 조회 실패");
+		if(approvalFormat != null) {
+			map.put("res_code", "200");
+			map.put("res_msg", "양식 조회 성공");
+			ApprovalFormatDto approvalFormatDto = new ApprovalFormatDto().toDto(approvalFormat);
+			map.put("approvalFormatContent", approvalFormatDto.getApproval_format_content());
+		}
+		return map;
+	}
+	
 	@GetMapping("/approval/detail")
 	public String selectApprovalDetail() {
 		

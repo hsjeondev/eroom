@@ -19,6 +19,11 @@ public class ApprovalFormatService {
 		List<ApprovalFormat> resultList = approvalFormatRepository.findAll();
 		return resultList;
 	}
+
+	public ApprovalFormat getApprovalFormat(Long id) {
+		ApprovalFormat result = approvalFormatRepository.findById(id).orElse(null);
+		return result;
+	}
 	
 	
 }
