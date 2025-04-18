@@ -94,5 +94,16 @@ public class TeamCalendarService {
 	    return new TeamCalendarDto().toDto(saved);
 	}
 	
+	public List<TeamCalendarDto> getTeamListByDepartmentCode(String departmentCode) {
+	    List<TeamCalendar> teamCalendars = teamRepository.findTeamSchedulesByDepartmentCode(departmentCode);
+	    List<TeamCalendarDto> result = new ArrayList<>();
+
+	    for (TeamCalendar entity : teamCalendars) {
+	    	TeamCalendarDto dto = new TeamCalendarDto().toDto(entity);
+	        result.add(dto);
+	    }
+
+	    return result;
+	}
 
 }

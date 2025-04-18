@@ -7,9 +7,11 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.calendar.dto.CompanyCalendarDto;
@@ -21,6 +23,8 @@ import com.eroom.calendar.entity.TeamCalendar;
 import com.eroom.calendar.service.CompanyCalendarService;
 import com.eroom.calendar.service.EmployeeCalendarService;
 import com.eroom.calendar.service.TeamCalendarService;
+import com.eroom.employee.dto.SeparatorDto;
+import com.eroom.employee.service.EmployeeService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +35,7 @@ public class CalendarController {
 	private final EmployeeCalendarService service;
 	private final CompanyCalendarService companyService;
 	private final TeamCalendarService teamService;
+	private final EmployeeService employeeService;
 
 	@GetMapping("/calendar")
 	public String calendarView() {
@@ -56,10 +61,17 @@ public class CalendarController {
 		return "calendar/companylist";
 	}
 	
+	//부서만 조회
 	@GetMapping("/calendar/department")
-	public String departMentCalendarView() {
+	public String departMentCalendarView(@RequestParam(value = "department", required = false) String department, Model model) {
+		List<SeparatorDto> structureList = employeeService.findOnlyDepartments();
+		
+		model.addAttribute("structureList", structureList);
+		model.addAttribute("selectedDepartment", department);
 		return "calendar/departlist";
 	}
+	
+
 	
 	
 	// =============================등록 =================================
@@ -165,7 +177,19 @@ public class CalendarController {
 	    
 	    return result;
 	}
+	
+	@GetMapping("/departmentcalendar/list/{departmentCode}")
+	@ResponseBody
+	public List<Map<String, Object>> getTeamListByDepartment(@PathVariable("departmentCode") String departmentCode) {
+	    List<Map<String, Object>> result = new ArrayList<>();
+	    List<TeamCalendarDto> teamList = teamService.getTeamListByDepartmentCode(departmentCode);
+	    System.out.println("💬 부서 코드로 일정 조회 요청 들어옴: " + teamList);
+	    for (TeamCalendarDto dto : teamList) {
+	        result.add(dto.toFullCalendarEvent()); // { title, start, end ... }
+	    }
 
+	    return result;
+	}
 	// ============================= 단일 조회 =================================
 	
 	//해당 직원 일정 단일 조회 (for 수정 모달)

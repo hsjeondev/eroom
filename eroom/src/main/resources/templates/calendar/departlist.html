@@ -1,161 +1,155 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{/include/layout}">
-
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
 <head>
-<title>부서 캘린더</title>
+  <title>부서 캘린더</title>
 </head>
 <body>
+  <main class="main" id="top" layout:fragment="content">
+    <div class="row g-0 mb-4 align-items-center">
+      <div class="col-5 col-md-6">
+        <h4 class="mb-0 text-body-emphasis fw-bold fs-md-6">부서일정</h4>
+      </div>
+    </div>
 
-	<main class="main" id="top" layout:fragment="content">
+    <div class="mb-3">
+      <select class="form-select form-select-sm" id="departmentSelect" onchange="changeDepartment(this.value)" style="width: 200px; font-size: 14px; padding: 6px 10px;">
+        <option disabled selected>-- 소속 선택 --</option>
+        <option th:each="dept : ${structureList}" th:value="${dept.separator_code}" th:text="${dept.separator_name}" th:selected="${dept.separator_code == selectedDepartment}"></option>
+      </select>
+    </div>
 
-		<div class="row g-0 mb-4 align-items-center">
-			<div class="col-5 col-md-6">
-				<h4 class="mb-0 text-body-emphasis fw-bold fs-md-6">
-					<span class="calendar-day d-block d-md-inline mb-1"></span> <span
-						class="px-3 fw-thin text-body-quaternary d-none d-md-inline">|</span>
-					<span class="calendar-date"></span>
-				</h4>
-			</div>
-			<div class="col-7 col-md-6 d-flex justify-content-end">
-				<button class="btn btn-primary btn-sm" type="button"
-					data-bs-toggle="modal" data-bs-target="#addEventModal">
-					<span class="fas fa-plus pe-2 fs-10"></span>일정 등록
-				</button>
-			</div>
-		</div>
+    <div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
 
+    <script th:inline="javascript">
+      let employeePosition = /*[[${#authentication.principal.employee.employeePosition}]]*/ "";
+    </script>
 
+    <script>
+      let calendar;
 
+      document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('appCalendar');
 
-		<div class="mx-n4 px-4 mx-lg-n6 px-lg-6 border-y border-translucent">
-			<div class="row py-3 gy-3 gx-0">
-				<div class="col-6 col-md-4 order-1 d-flex align-items-center">
-					<button class="btn btn-sm btn-phoenix-primary px-4"
-						data-event="today">Today</button>
-				</div>
-				<div
-					class="col-12 col-md-4 order-md-1 d-flex align-items-center justify-content-center">
-					<button
-						class="btn icon-item icon-item-sm shadow-none text-body-emphasis p-0"
-						type="button" data-event="prev" title="Previous">
-						<span class="fas fa-chevron-left"></span>
-					</button>
-					<h3 class="px-3 text-body-emphasis fw-semibold calendar-title mb-0"></h3>
-					<button
-						class="btn icon-item icon-item-sm shadow-none text-body-emphasis p-0"
-						type="button" data-event="next" title="Next">
-						<span class="fas fa-chevron-right"></span>
-					</button>
-				</div>
-				<div
-					class="col-6 col-md-4 ms-auto order-1 d-flex justify-content-end">
-					<div class="btn-group btn-group-sm" role="group">
-						<button class="btn btn-phoenix-secondary active-view"
-							data-fc-view="dayGridMonth">월별</button>
-						<button class="btn btn-phoenix-secondary"
-							data-fc-view="timeGridWeek">주별</button>
-					</div>
-				</div>
-			</div>
-		</div>
+        calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          locale: 'ko',
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: ''
+          },
+          buttonText: { today: '오늘' },
+          dayMaxEventRows: true,
+          views: {
+            dayGridMonth: { dayMaxEventRows: 3, moreLinkText: "더보기" }
+          },
+          eventDisplay: 'block',
+          dayCellContent: function (info) {
+            return info.date.getDate();
+          },
+          dateClick: function (info) {
+            if (employeePosition.trim() !== '관리자') return;
+            const dateStr = info.dateStr + "T09:00";
+            document.getElementById('calendarStartTime').value = dateStr;
+            document.getElementById('calendarEndTime').value = info.dateStr + "T18:00";
+            const addEventModal = new bootstrap.Modal(document.getElementById('addEventModal'));
+            addEventModal.show();
+          },
+          eventClick: function (info) {
+            document.getElementById('eventTitle').textContent = info.event.title || '';
+            document.getElementById('eventDate').textContent = info.event.start?.toLocaleString('ko-KR') || '';
+            document.getElementById('eventEndDate').textContent = info.event.end?.toLocaleString('ko-KR') || '';
+            document.getElementById('eventLocation').textContent = info.event.extendedProps.location || '';
+            document.getElementById('eventDescription').textContent = info.event.extendedProps.description || '';
+            document.getElementById('modalButton').click();
+          },
+          eventSources: [
+            {
+              events: function (fetchInfo, successCallback, failureCallback) {
+                const apiKey = 'AIzaSyCjXiu1ShbhE0XenBtciLx8ezU-mcZI0R0';
+                const calendarId = 'ko.south_korea%23holiday@group.v.calendar.google.com';
+                const timeMin = new Date(fetchInfo.start).toISOString();
+                const timeMax = new Date(fetchInfo.end).toISOString();
+                const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${timeMin}&timeMax=${timeMax}&orderBy=startTime&singleEvents=true`;
 
-		<!-- 일정 등록 모달 -->
-		<div class="modal fade" id="addEventModal" tabindex="-1">
-			<div class="modal-dialog">
-				<div class="modal-content border border-translucent">
-					<form id="addEventForm" autocomplete="off" name="addEventForm">
-						<div class="modal-header px-card border-0">
-							<div
-								class="w-100 d-flex justify-content-between align-items-start">
-								<h5 class="mb-0 lh-sm text-body-highlight">일정 등록</h5>
-								<button class="btn p-1 fs-10 text-body" type="button"
-									data-bs-dismiss="modal" aria-label="Close">닫기</button>
-							</div>
-						</div>
+                fetch(url)
+                  .then(response => response.json())
+                  .then(data => {
+                    if (!data.items) return successCallback([]);
+                    const holidays = data.items.map(item => ({
+                      title: item.summary,
+                      start: item.start.date,
+                      allDay: true,
+                      extendedProps: { type: 'holiday' }
+                    }));
+                    successCallback(holidays);
+                  })
+                  .catch(error => {
+                    console.error("공휴일 불러오기 실패", error);
+                    failureCallback(error);
+                  });
+              }
+            }
+          ]
+        });
 
+        calendar.render();
 
+        const selectedDepartment = document.getElementById('departmentSelect')?.value;
+        if (selectedDepartment) {
+          changeDepartment(selectedDepartment);
+        }
+      });
 
-						<div class="modal-body p-card py-0">
-							<input type="hidden" name="employee_no"
-								th:value="${#authentication.principal.employee.employeeNo}" />
+      window.changeDepartment = function (departmentCode) {
+        console.log("선택된 부서 코드: ", departmentCode);
+        calendar.removeAllEventSources();
 
-							<div class="form-floating mb-3">
-								<input class="form-control" id="eventTitle" type="text"
-									name="calendar_title" placeholder="일정 제목" /> <label
-									for="eventTitle">일정 제목</label>
-							</div>
-
-							<div class="form-floating mb-3">
-								<input class="form-control" id="eventLocation" type="text"
-									name="calendar_location" placeholder="일정 장소" /> <label
-									for="eventLocation">일정 장소</label>
-							</div>
-
-							<div class="form-floating mb-3">
-								<input class="form-control" id="startDatetime"
-									type="datetime-local" name="calendar_start" placeholder="시작 시간" />
-								<label for="startDatetime">시작 시간</label>
-							</div>
-
-							<div class="form-floating mb-3">
-								<input class="form-control" id="endDatetime"
-									type="datetime-local" name="calendar_end" placeholder="종료 시간" />
-								<label for="endDatetime">종료 시간</label>
-							</div>
-
-							<div class="form-floating mb-3">
-								<input class="form-control" id="eventDescription" type="text"
-									name="calendar_description" placeholder="일정 설명" /> <label
-									for="eventDescription">일정 설명</label>
-							</div>
-						</div>
-
-						<div
-							class="modal-footer d-flex justify-content-between align-items-center border-0">
-							<span></span>
-							<button class="btn btn-primary px-4" type="submit">일정 등록</button>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-
-
-		<!-- 캘린더 위치 -->
-		<div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
-
-
-		<!-- 일정 등록 처리 스크립트 -->
-		<script>
-    const form = document.addEventForm;
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      if (!form.calendar_location.value) {
-        alert("장소를 입력해주세요");
-        return;
-      }
-
-      const payload = new FormData(form);
-      fetch("/employeecalendar/add", {
-        method: "post",
-        headers: {
-          'header': document.querySelector('meta[name="_csrf_header"]').content,
-          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-        },
-        body: payload
-      })
-        .then(response => response.json())
-        .then(data => {
-          alert(data.res_msg);
-          if (data.res_code == 200) {
-            location.reload();
+        calendar.addEventSource({
+          events: function (fetchInfo, successCallback, failureCallback) {
+            fetch('/departmentcalendar/list/' + departmentCode)
+              .then(response => {
+                if (!response.ok) throw new Error("서버 응답 실패!");
+                return response.json();
+              })
+              .then(events => {
+                successCallback(events);
+              })
+              .catch(error => {
+                console.error("부서 일정 불러오기 실패 😢", error);
+                failureCallback(error);
+              });
           }
         });
-    });
-  </script>
 
-	</main>
+        calendar.addEventSource({
+          events: function (fetchInfo, successCallback, failureCallback) {
+            const apiKey = 'AIzaSyCjXiu1ShbhE0XenBtciLx8ezU-mcZI0R0';
+            const calendarId = 'ko.south_korea%23holiday@group.v.calendar.google.com';
+            const timeMin = new Date(fetchInfo.start).toISOString();
+            const timeMax = new Date(fetchInfo.end).toISOString();
+            const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${timeMin}&timeMax=${timeMax}&orderBy=startTime&singleEvents=true`;
+
+            fetch(url)
+              .then(response => response.json())
+              .then(data => {
+                if (!data.items) return successCallback([]);
+                const holidays = data.items.map(item => ({
+                  title: item.summary,
+                  start: item.start.date,
+                  allDay: true,
+                  extendedProps: { type: 'holiday' }
+                }));
+                successCallback(holidays);
+              })
+              .catch(error => {
+                console.error("공휴일 불러오기 실패", error);
+                failureCallback(error);
+              });
+          }
+        });
+      }
+    </script>
+  </main>
 </body>
+</html>

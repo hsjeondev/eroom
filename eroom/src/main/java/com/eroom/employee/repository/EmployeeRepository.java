@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
 
@@ -35,5 +36,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 	// 팀 번호로 소속 팀원 조회
 	@Query("SELECT e FROM Employee e WHERE e.structure.structureNo = :teamId")
 	List<Employee> findEmployeesByTeamId(@Param("teamId") String teamId);
+	
+	
 
 }
