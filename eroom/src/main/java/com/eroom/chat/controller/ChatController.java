@@ -172,5 +172,18 @@ public class ChatController {
 	    
 	    return participantNames;
 	}
+	@PostMapping("/delete")
+	@ResponseBody
+	public Map<String, String> deleteChatroom(@RequestBody ChatroomDto param) {
+		Map<String, String> resultMap = new HashMap<String, String>();
+		resultMap.put("res_code", "500");
+		resultMap.put("res_msg", "채팅방 삭제를 실패하였습니다.");
 
+		chatroomService.deleteChatroom(param.getChatroomNo());
+
+		resultMap.put("res_code", "200");
+		resultMap.put("res_msg", "채팅방을 삭제하였습니다!");
+
+		return resultMap;
+	}
 }
