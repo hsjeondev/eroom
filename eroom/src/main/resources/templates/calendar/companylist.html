@@ -24,6 +24,8 @@
 				</button>
 			</div>
 		</div>
+		
+
 
 
 		<!-- 일정 등록 모달 -->
@@ -124,8 +126,8 @@
 			<div class="modal-dialog modal-dialog-centered">
 				<div class="modal-content border border-translucent">
 					<div class="modal-header px-card border-0 position-relative">
-						<h5 class="mb-0 lh-sm text-body-highlight" id="tooltipModalLabel">내
-							일정 상세조회</h5>
+						<h5 class="mb-0 lh-sm text-body-highlight" id="tooltipModalLabel">회사 일정
+							상세조회</h5>
 						<button class="btn-close position-absolute top-0 end-0 mt-2 me-2"
 							type="button" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
@@ -243,17 +245,18 @@
 				</div>
 			</div>
 		</div>
+		
+		<!-- 회사 일정에서 캘린더를 클릭하면 누구나 일정을 등록할수 있기에, 관리자 라는 값을 넘겨줌 dateClick속성-->  
+		<script th:inline="javascript">
+  			let employeePosition = '[[${#authentication.principal.employee.employeePosition}]]';
+  			console.log(employeePosition)
+		</script>
 
 		<script>
 		document.addEventListener('DOMContentLoaded', function () {
 		    const calendarEl = document.getElementById('appCalendar');
-		    
-		    //form = addeventform의 정보를 가져옴
-		    const form = document.querySelector('form[name="addEventForm"]');
-		    //separator = form안에 있는 separator의 정보를 가져옴
-			const separator = form.querySelector('input[name="separator"]').value;
-			//console.log(separator);  
-			
+  			const separator = document.querySelector('input[name="separator"]').value;
+		  	const employeeNo = document.addEventForm.employee_no.value;
 		    let selectedCalendarNo = null;
 			
 		    
@@ -283,6 +286,10 @@
 		      
 		      //일정 등록이 안되어있는 날을 클릭하면 일정을 등록할수 있게 하는 event
 		      dateClick: function (info) {
+		    	  
+		    	  if (employeePosition.trim() !== '"관리자"') {
+		    		  return;
+		    		}
 		      
 		        const dateStr = info.dateStr + "T09:00";
 		        document.getElementById('calendarStartTime').value = dateStr;
@@ -292,7 +299,7 @@
 		        addEventModal.show();
 		      },
 		      
-		      eventSources: [ // ✅ 이 위치에 정확히 들어가야 해!
+		      eventSources: [ //구글 캘린더로 공휴일 불러오기, 그리고 해당 직원의 일정 불러오기
 		    	    {
 		    	      events: function (fetchInfo, successCallback, failureCallback) {
 		    	        fetch('/companycalendar/list/' + separator)
@@ -429,7 +436,7 @@
 		 	   const isHoliday = info.event.extendedProps?.type === 'holiday';
 			    if (isHoliday) {
 			        const el = info.el;
-			        el.style.setProperty("background-color", "#FFF8B3", "important"); // 💛 연노랑
+			        el.style.setProperty("background-color", "#FFF8B3", "important"); //  연노랑
 			        el.style.setProperty("border", "1px solid #F5E79E", "important");
 			        el.style.setProperty("color", "#4B4B4B", "important");
 			        el.style.setProperty("pointer-events", "none", "important"); // 클릭 막기
@@ -542,7 +549,7 @@
 			    const startEditInput = document.getElementById("editStartTime");
 			    const endEditInput = document.getElementById("editEndTime");
 			
-			    // ✅ 유효성 검사만 남기자!
+			    // 유효성 검사
 			    const startTime = new Date(startEditInput.value);
 			    const endTime = new Date(endEditInput.value);
 			
@@ -555,7 +562,7 @@
 			    }
 			
 			    // 서버로 전송
-			    fetch("/employeecalendar/update/" + selectedCalendarNo, {
+			    fetch("/companycalendar/update/" + selectedCalendarNo, {
 			        method: "POST",
 			        headers: {
 			            'header': document.querySelector('meta[name="_csrf_header"]').content,
@@ -614,56 +621,84 @@
 
 		<!-- 일정 등록 -->
 		<script>
-	  function setMinEndTime() {
+		  function format(date) {
+		    const pad = (n) => n.toString().padStart(2, '0');
+		    const yyyy = date.getFullYear();
+		    const MM = pad(date.getMonth() + 1);
+		    const dd = pad(date.getDate());
+		    const HH = pad(date.getHours());
+		    const mm = pad(date.getMinutes());
+		    return `${yyyy}-${MM}-${dd}T${HH}:${mm}`;
+		  }
+		
+		  function setDefaultTime() {
+		    const startInput = document.getElementById("calendarStartTime");
+		    const endInput = document.getElementById("calendarEndTime");
+		
+		    if (!startInput || !endInput) return;
+		
+		    const now = new Date();
+		    const startTime = new Date(now);
+		    const endTime = new Date(now);
+		    endTime.setHours(endTime.getHours() + 1);
+		
+		    startInput.value = format(startTime);
+		    endInput.value = format(endTime);
+		    endInput.min = startInput.value;
+		  }
+		
+		  function setMinEndTime() {
 		    const startInput = document.getElementById("calendarStartTime");
 		    const endInput = document.getElementById("calendarEndTime");
 		
 		    if (startInput && endInput) {
 		      endInput.min = startInput.value;
-		
 		      if (endInput.value < startInput.value) {
 		        endInput.value = startInput.value;
 		      }
 		    }
 		  }
-
+		
 		  document.addEventListener("DOMContentLoaded", function () {
 		    const startInput = document.getElementById("calendarStartTime");
 		    if (startInput) {
 		      startInput.addEventListener("change", setMinEndTime);
 		    }
-
+		
+		    // 🕒 페이지 로드될 때 기본 시간 설정 (현재 + 1시간)
+		    setDefaultTime();
+		
 		    const form = document.addEventForm;
 		    form.addEventListener("submit", function (e) {
 		      e.preventDefault();
-
-    
-	      const startTime = new Date(form.calendarStartTime.value);
-	      const endTime = new Date(form.calendarEndTime.value);
-
-	      if (!form.calendar_title.value) {
-	        alert("제목을 입력해주세요!");
-	        return;
-	      }
-	      const payload = new FormData(form);
-	      fetch("/employeecalendar/add", {
-	        method: "post",
-	        headers: {
-	          'header': document.querySelector('meta[name="_csrf_header"]').content,
-	          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-	        },
-	        body: payload
-	      })
-	        .then(response => response.json())
-	        .then(data => {
-	          alert(data.res_msg);
-	          if (data.res_code == 200) {
-	            location.reload();
-	          }
-	        });
-	    });
-	  });
-	</script>
+		
+		      const startTime = new Date(form.calendar_start_time.value);
+		      const endTime = new Date(form.calendar_end_time.value);
+		
+		      if (!form.company_title.value) {
+		        alert("제목을 입력해주세요!");
+		        return;
+		      }
+		
+		      const payload = new FormData(form);
+		      fetch("/companycalendar/add", {
+		        method: "post",
+		        headers: {
+		          'header': document.querySelector('meta[name="_csrf_header"]').content,
+		          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+		        },
+		        body: payload
+		      })
+		        .then(response => response.json())
+		        .then(data => {
+		          alert(data.res_msg);
+		          if (data.res_code == 200) {
+		            location.reload();
+		          }
+		        });
+		    });
+		  });
+		</script>
 
 
 
