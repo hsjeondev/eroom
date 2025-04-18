@@ -47,6 +47,7 @@ dependencies {
 	testImplementation'org.springframework.security:spring-security-test'
 	
 	// websocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	
 	// dynamic report 의존성
 	implementation 'net.sourceforge.dynamicreports:dynamicreports-core:6.20.0'

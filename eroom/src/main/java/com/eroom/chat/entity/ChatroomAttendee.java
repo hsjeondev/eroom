@@ -49,4 +49,6 @@ public class ChatroomAttendee {
 	@Builder.Default
 	@Column(name="visible_yn")
 	private String visibleYn = "Y"; // 사용여부
+	
+	
 }
