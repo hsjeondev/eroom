@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.eroom.attendance.entity.Attendance;
+import com.eroom.chat.entity.ChatMessage;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.directory.entity.Directory;
@@ -115,5 +116,9 @@ public class Employee {
 	// 근태 조건
 	@OneToMany(mappedBy="employee")
 	private List<Attendance> attendanceList;
+	
+	// 채팅 메시지
+	@OneToMany(mappedBy = "senderMember")
+	private List<ChatMessage> sentMessages;
 
 }
