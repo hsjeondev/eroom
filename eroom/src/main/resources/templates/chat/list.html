@@ -48,7 +48,7 @@
         </div>
         <!-- 검색 입력란 -->
         <div class="form-icon-container mb-4 d-sm-none d-xl-block">
-          <input class="form-control form-icon-input" type="text" placeholder="이름을 입력하세요" />
+          <input class="form-control form-icon-input search" type="text" placeholder="이름을 입력하세요" />
           <span class="fas fa-user text-body fs-9 form-icon"></span>
         </div>
         <!-- 탭 메뉴 (전체, 읽지않음, 읽음) -->
@@ -71,7 +71,8 @@
         <div class="scrollbar">
           <div class="tab-content" id="contactListTabContent">
             <div data-chat-thread-tab-content="data-chat-thread-tab-content">
-              <ul class="nav chat-thread-tab flex-column list chat_list">
+              <ul class="nav chat-thread-tab flex-column list chat_list"
+              data-list='{"valueNames":["name","message","date"],"page":10,"pagination":true}'>
                 <!-- 채팅방이 없을 경우 -->
                 <div th:if="${#lists.isEmpty(chatroomList)}">
                   <p class="text-center text-muted mt-4">참여 중인 채팅방이 없습니다.</p>
@@ -80,7 +81,7 @@
                 <li th:if="${!#lists.isEmpty(chatroomList)}"
                   th:each="chatroom : ${chatroomList}"
                   th:attr="data-room-no=${chatroom.chatroomNo}"
-                  class="nav-item read mb-1" role="presentation">
+                  class="nav-item read mb-1 item" role="presentation">
                   <a class="nav-link d-flex align-items-center justify-content-center p-2"
 					   th:href="'#chatroom-' + ${chatroom.chatroomNo}"
 					   th:attr="data-room-no=${chatroom.chatroomNo}, data-group=${chatroom.chatIsGroupYn}"
@@ -95,7 +96,8 @@
                       <div class="d-flex justify-content-between align-items-center">
                         <h5 th:text="${chatroom.chatroomName}"
                           class="text-body fw-normal name text-nowrap">채팅방 이름</h5>
-                        <p class="fs-10 text-body-tertiary text-opacity-85 mb-0 text-nowrap">시간은 일단 보류</p>
+                        <p th:text="${#temporals.format(chatroom.lastMessageRegDate, 'yy.MM.dd')}" 
+                        class="fs-10 text-body-tertiary text-opacity-85 mb-0 text-nowrap">마지막 메시지 시간</p>
                       </div>
                       <div class="d-flex justify-content-between">
                         <p th:text="${chatroom.chatLastMessage}"
@@ -299,14 +301,16 @@
 		let isCreateMode = true; // 기본은 생성 모드
 		
 		document.addEventListener("DOMContentLoaded", () => {
-		  bindModalReset();
-		  bindChatroomPanelEvents();
-		  bindChatroomRename();
-		  bindParticipantAddButton();
-		  bindChatroomCreate();
-		  bindDepartmentChange();
-		  bindParticipantAdd();
-		  bindChatTypeChange();
+		  bindModalReset(); // 모달 초기화
+		  bindChatroomPanelEvents(); // 채팅방 클릭 이벤트
+		  bindChatroomRename(); // 채팅방 이름 변경
+		  bindParticipantAddButton(); // 참여자 추가 버튼 클릭 이벤트
+		  bindChatroomCreate(); // 채팅방 생성 버튼 클릭 이벤트
+		  bindDepartmentChange(); // 소속 선택시 직원 목록 로딩
+		  bindParticipantAdd(); // 참여자 추가
+		  bindChatTypeChange(); // 채팅 종류 변경시
+		  bindChatroomDelete(); // 채팅방 삭제
+		  
 		});
 		
 		// 모달 초기화 (열릴 때 기본 리셋)
@@ -602,6 +606,43 @@
 		    }
 		  });
 		}
+		// 채팅방 삭제
+		function bindChatroomDelete() {
+          const detailModal = document.getElementById("chatroomDetailModal");
+          if (!detailModal) return;
+        
+          detailModal.addEventListener("click", function (e) {
+            const li = e.target.closest("li");
+            if (!li || !li.textContent.includes("채팅방 삭제")) return;
+        
+            const chatroomNo = document.getElementById("modalChatroomName").dataset.roomNo;
+            if (chatroomNo) {
+              if (confirm("정말로 채팅방을 삭제하시겠습니까?")) {
+                fetch('/chat/delete', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+                  },
+                  body: JSON.stringify({ chatroomNo })
+                })
+                .then(res => res.json())
+                .then(data => {
+                  if (data.res_code === "200") {
+                    alert(data.res_msg);
+                    location.href = "/chat/list";
+                  } else {
+                    alert("삭제 실패: " + data.res_msg);
+                  }
+                })
+                .catch(err => {
+                  console.error("요청 실패:", err);
+                  alert("서버 오류가 발생했습니다.");
+                });
+              }
+            }
+          });
+        }
 		
 		// 참여자 추가 모달 열기
 		function openParticipantAddModal(chatroomNo) {
@@ -630,8 +671,6 @@
 		  }, { once: true });
 		}
 		</script>
-	 
-	 
 	 
 	</main>
 	

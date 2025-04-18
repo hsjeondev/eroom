@@ -28,6 +28,7 @@ public class ChatroomDto {
     private LocalDateTime chatroomModDate;
     private String chatLastMessage;
     private String chatroomReadYn = "N";
+    
    
     // 참여자 ID 리스트
     private List<Long> participantIds;

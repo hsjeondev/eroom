@@ -32,7 +32,7 @@ public class ChatroomService {
 	public List<Chatroom> selectChatRoomAll() {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
-	    Employee employee = employeeDetails.getEmployee(); // employeeNo 말고 Employee 객체 통째로!
+	    Employee employee = employeeDetails.getEmployee(); // 현재 로그인한 직원 정보
 
 	    // 1. 내가 만든 채팅방
 	    List<Chatroom> createdByMe = repository.findByCreater(employee);
@@ -103,6 +103,15 @@ public class ChatroomService {
 	            chatroomAttendeeRepository.save(newMapping);
 	        }
 	    }
+	}
+	// 채팅방 삭제
+	@Transactional
+	public void deleteChatroom(Long chatroomNo) {
+		Chatroom chatroom = repository.findById(chatroomNo)
+				.orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
+		
+		chatroom.setVisibleYn("N"); // 채팅방 삭제
+		repository.save(chatroom);
 	}
 
 }

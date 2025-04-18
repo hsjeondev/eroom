@@ -45,4 +45,8 @@ public class ChatroomAttendee {
 	@ManyToOne
 	@JoinColumn(name="employee_no")
 	private Employee attendee; // 사번이랑 조인
+	
+	@Builder.Default
+	@Column(name="visible_yn")
+	private String visibleYn = "Y"; // 사용여부
 }
