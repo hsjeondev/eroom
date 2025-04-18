@@ -32,6 +32,8 @@ public class ChatroomDto {
    
     // 참여자 ID 리스트
     private List<Long> participantIds;
+    // 채팅 메시지 리스트
+    private List<ChatMessageDto> messageList;
     
     public Chatroom toEntity() {
         return Chatroom.builder()
@@ -52,6 +54,19 @@ public class ChatroomDto {
                 .chatroomModDate(entity.getChatroomModDate())
                 .chatLastMessage(entity.getChatLastMessage())
                 .chatroomReadYn(entity.getChatroomReadYn())
+                .build();
+    }
+    public static ChatroomDto toDto(Chatroom entity, List<ChatMessageDto> messages) {
+        return ChatroomDto.builder()
+                .chatroomNo(entity.getChatroomNo())
+                .chatroomName(entity.getChatroomName())
+                .chatIsGroupYn(entity.getChatIsGroupYn())
+                .creater(entity.getCreater().getEmployeeNo())
+                .chatroomRegDate(entity.getChatroomRegDate())
+                .chatroomModDate(entity.getChatroomModDate())
+                .chatLastMessage(entity.getChatLastMessage())
+                .chatroomReadYn(entity.getChatroomReadYn())
+                .messageList(messages)  // 메시지 리스트 추가
                 .build();
     }
 }

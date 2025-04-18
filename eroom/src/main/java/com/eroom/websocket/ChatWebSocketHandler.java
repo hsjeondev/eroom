@@ -35,7 +35,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler{
 		// WebSocket 연결시 세션을 저장
 		String senderNo = getQueryParam(session, "senderNo");
 		String roomNo = getQueryParam(session, "roomNo");
-		
+				
 		// 세션을 저장
 		userSessions.put(Long.parseLong(senderNo), session);
 		// 방 번호를 저장
@@ -66,8 +66,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler{
 		WebSocketSession receiverSession = userSessions.get(chatMessageDto.getReceiverMember());
 		// 받는 사람의 방 번호를 가져옴
 		Long receiverRoom = userRooms.get(chatMessageDto.getReceiverMember());
+		
+		System.out.println("### 수신자 세션 존재 여부: " + (receiverSession != null));
+		System.out.println("### 수신자 세션 오픈 여부: " + (receiverSession != null ? receiverSession.isOpen() : "세션없음"));
+		System.out.println("### 수신자 방번호: " + receiverRoom + ", 현재 메시지 방번호: " + chatMessageDto.getChatroomNo());
+
+		
 		// 메시지를 받는 사람의 세션이 열려있고, 방 번호가 같으면 메시지를 전송
-		if(receiverSession != null && receiverSession.isOpen() && receiverRoom == chatMessageDto.getChatroomNo()) {
+		if (receiverSession != null && receiverSession.isOpen() && receiverRoom != null && receiverRoom.equals(chatMessageDto.getChatroomNo())) {
 			receiverSession.sendMessage(new TextMessage(message.getPayload()));
 		}
 		// 메시지를 보내는 사람의 세션을 가져옴
@@ -75,7 +81,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler{
 		// 보내는 사람의 방 번호를 가져옴
 		Long senderRoom = userRooms.get(chatMessageDto.getSenderMember());
 		// 메시지를 보내는 사람의 세션이 열려있고, 방 번호가 같으면 메시지를 전송
-		if (senderSession != null && senderSession.isOpen() && senderRoom == chatMessageDto.getChatroomNo()) {
+		if (senderSession != null && senderSession.isOpen() && senderRoom.equals(chatMessageDto.getChatroomNo())) {
 			senderSession.sendMessage(new TextMessage(message.getPayload()));
 		}
 	}

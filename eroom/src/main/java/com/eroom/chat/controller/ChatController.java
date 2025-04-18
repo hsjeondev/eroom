@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,15 +17,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eroom.chat.dto.ChatMessageDto;
 import com.eroom.chat.dto.ChatroomDto;
+import com.eroom.chat.entity.ChatMessage;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
+import com.eroom.chat.service.ChatMessageService;
 import com.eroom.chat.service.ChatroomService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.employee.service.EmployeeService;
+import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +41,7 @@ public class ChatController {
 	private final ChatroomService chatroomService;
 	private final EmployeeService employeeService;
 	private final EmployeeRepository employeeRepository;
+	private final ChatMessageService chatMessageService;
 	
 	@GetMapping("/test")
 	public String test123() {
@@ -120,8 +127,15 @@ public class ChatController {
 	    if (chatroom == null) {
 	        throw new RuntimeException("채팅방 정보를 찾을 수 없습니다.");
 	    }
-	    // ChatroomDto의 toDto() 메서드를 통해 필요한 데이터를 DTO에 담아서 반환
-	    return ChatroomDto.toDto(chatroom);
+	    // 채팅 메시지 리스트 조회
+	    List<ChatMessage> messageList = chatMessageService.selectMessageByRoomNo(roomNo);
+	    
+	    List<ChatMessageDto> messageDtoList = new ArrayList<>();
+		for (ChatMessage message : messageList) {
+			ChatMessageDto messageDto = ChatMessageDto.toDto(message);
+			messageDtoList.add(messageDto);
+		}
+	    return ChatroomDto.toDto(chatroom, messageDtoList);
 	}
 	
 	// 채팅방 업데이트
@@ -186,4 +200,6 @@ public class ChatController {
 
 		return resultMap;
 	}
+
+
 }
