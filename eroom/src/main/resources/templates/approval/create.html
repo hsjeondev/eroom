@@ -1,389 +1,335 @@
 <!DOCTYPE html>
-<html 
-lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
-	  xmlns:th="http://www.thymeleaf.org"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{/include/layout}">
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
 <head>
 <style>
-  .custom-table td,
-  .custom-table th {
-    padding: 0.5rem !important;
-    min-width: 75px;
-  }
+.custom-table td, .custom-table th {
+	padding: 0.5rem !important;
+	min-width: 75px;
+}
 </style>
 <meta charset="UTF-8">
 <title>결재서 작성</title>
 </head>
 <body>
 	<main class="main" id="top" layout:fragment="content">
-	<div class="col-8 mx-auto">
-		<!-- <h2 class="mb-2 mx-auto">결재서 양식을 선택해주세요.</h2> -->
-		<div class="d-flex justify-content-start">
-			<span class="fw-bold fs-7">결재서 양식을 선택해주세요.</span>
+		<div class="col-8 mx-auto">
+			<!-- <h2 class="mb-2 mx-auto">결재서 양식을 선택해주세요.</h2> -->
+			<div class="d-flex justify-content-start">
+				<span class="fw-bold fs-7" id="approvalPageTitle">결재서 양식을 선택해주세요.</span>
+			</div>
+			<form>
+				<div class="row">
+					<div class="col-5">
+						<div class="mb-1">
+							<label class="form-label" for="basic-form-date">신청일</label>
+							<div id="basic-form-date" class="form-control" th:text="${now}"></div>
+						</div>
+						<div class="mb-1">
+							<label class="form-label" for="basic-form-dept">부서</label>
+							<div id="basic-form-dept" class="form-control" th:text="${departmentName}"></div>
+						</div>
+						<div class="mb-1">
+							<label class="form-label" for="basic-form-team">팀명</label>
+							<div id="basic-form-team" class="form-control" th:text="${employee.structure.codeName}"></div>
+						</div>
+						<div class="mb-1">
+							<label class="form-label" for="basic-form-job">직급</label>
+							<div id="basic-form-job" class="form-control" th:text="${employee.employeePosition}"></div>
+						</div>
+						<div class="mb-1">
+							<label class="form-label" for="basic-form-name">신청자</label>
+							<div id="basic-form-name" class="form-control" th:text="${employee.employeeName}"></div>
+						</div>
+					</div>
+					<div class="col-7">
+
+
+						<!-- 결재자 테이블 -->
+						<table class="table table-bordered text-center align-middle ms-auto custom-table" style="width: 45%;">
+							<thead class="table-light">
+								<tr>
+									<th>직급<br>결재자1
+									</th>
+									<th>직급<br>결재자2
+									</th>
+									<th>직급<br>결재자3
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td style="height: 80px;">(서명)</td>
+									<td>(서명)</td>
+									<td>(서명)</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<!-- 합의자 테이블 -->
+						<table class="table table-bordered text-center align-middle mt-3 ms-auto custom-table" style="width: 30%;">
+							<thead class="table-light">
+								<tr>
+									<th>직급<br>합의자1
+									</th>
+									<th>직급<br>합의자2
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td style="height: 80px;">(서명)</td>
+									<td>(서명)</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<!-- 참조자 -->
+						<div class="text-end text-body-secondary fs-8 mt-1">참조자 : 김대리, 이과장</div>
+						
+						<!-- 추가 버튼 -->
+						<div class="gap-2 mb-3 ms-right-2 d-flex justify-content-end" id="approveLineModalDiv">
+							<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#selectApproveLine1Modal">결재자 선택</button>
+							<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#selectApproveLine2Modal">합의자 선택</button>
+							<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#selectApproveLine3Modal">참조자 선택</button>
+						</div>
+
+					</div>
+
+
+				</div>
+
+
+				<div class="mb-3">
+					<label class="form-label" for="basic-form-title">제목</label> <input class="form-control" id="basic-form-title" type="text" placeholder="제목"> <label class="form-label" for="basic-select-format">양식 선택</label> <select class="form-select" id="basic-select-format" aria-label="Default select example">
+						<option selected="selected" disabled="disabled">양식을 선택해주세요.</option>
+						<option th:each="formList, formStatus : ${approvalFormatList}" th:value="${formList.approval_format_no}" th:text="${formList.approval_format_title}">경조금</option>
+					</select>
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label" for="basic-form-textarea">결재 작성</label>
+					<div class="form-control" id="basic-form-edit"></div>
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label">파일 업로드</label> <input class="form-control" type="file" multiple>
+				</div>
+				<button class="btn btn-primary" type="submit">등록</button>
+				<button type="button" class="btn btn-light" onclick="history.back()">취소</button>
+			</form>
 		</div>
-      <form>
-      <div class="row">
-	      <div class="col-5">
-		        <div class="mb-1">
-		          <label class="form-label" for="basic-form-date">신청일</label>
-		          <input class="form-control" id="basic-form-date" type="text" placeholder="신청일">
-		        </div>
-		        <div class="mb-1">
-		          <label class="form-label" for="basic-form-dept">부서</label>
-		          <div id="basic-form-dept" class="form-control" th:text="${departmentName}"></div>
-		        </div>
-		        <div class="mb-1">
-		          <label class="form-label" for="basic-form-team">팀명</label>
-		          <div id="basic-form-team" class="form-control"  th:text="${employee.structure.codeName}"></div>
-		        </div>
-		        <div class="mb-1">
-		          <label class="form-label" for="basic-form-job">직급</label>
-		          <input class="form-control" id="basic-form-job" type="text" placeholder="직급">
-		        </div>
-		        <div class="mb-1">
-		          <label class="form-label" for="basic-form-name">신청자</label>
-		          <input class="form-control" id="basic-form-name" type="text" placeholder="신청자">
-		        </div>
-		        <div class="mb-1">
-		          <label class="form-label" for="basic-form-phone">전화번호</label>
-		          <input class="form-control" id="basic-form-phone" type="text" placeholder="전화번호">
-		        </div>
-	        </div>
-        	<div class="col-7">
-
-			  <!-- 결재자 테이블 -->
-			  <table class="table table-bordered text-center align-middle ms-auto custom-table" style="width: 45%;">
-			    <thead class="table-light">
-			      <tr>
-			        <th>직급<br>결재자1</th>
-			        <th>직급<br>결재자2</th>
-			        <th>직급<br>결재자3</th>
-			      </tr>
-			    </thead>
-			    <tbody>
-			      <tr>
-			        <td style="height: 80px;">(서명)</td>
-			        <td>(서명)</td>
-			        <td>(서명)</td>
-			      </tr>
-			    </tbody>
-			  </table>
-			
-			  <!-- 합의자 테이블 -->
-			  <table class="table table-bordered text-center align-middle mt-3 ms-auto custom-table" style="width: 30%;">
-			    <thead class="table-light">
-			      <tr>
-			        <th>직급<br>합의자1</th>
-			        <th>직급<br>합의자2</th>
-			      </tr>
-			    </thead>
-			    <tbody>
-			      <tr>
-			        <td style="height: 80px;">(서명)</td>
-			        <td>(서명)</td>
-			      </tr>
-			    </tbody>
-			  </table>
-			<div class="text-end text-body-secondary fs-8 mt-1">
-			  참조자: 홍보팀 김대리, 회계팀 이과장
-			</div>
-				
-			</div>
-
-
-    	</div>
-        
-        
-        <!-- <div class="mb-3">
-          <label class="form-label" for="basic-form-dob">Date of Birth</label>
-          <input class="form-control" id="basic-form-dob" type="date">
-        </div> -->
-        <div class="mb-3">
-          <label class="form-label" for="basic-form-title">제목</label>
-          <input class="form-control" id="basic-form-title" type="text" placeholder="제목">
-          
-          <label class="form-label" for="basic-form-format">양식 선택</label>
-          <select class="form-select" id="basic-form-format" aria-label="Default select example">
-            <option selected="selected">양식을 선택해주세요.</option>
-            <option value="1">경조금</option>
-            <option value="2">법인카드</option>
-            <option value="3">시말서</option>
-            <option value="4">연장근무신청서</option>
-            <option value="5">재직증명서</option>
-            <option value="6">출장보고서</option>
-            <option value="7">휴가원</option>
-          </select>
-        </div>
-        <!-- <div class="mb-3">
-
-          <div class="form-check">
-
-            <input class="form-check-input" id="flexRadioDefault1" type="radio" name="flexRadioDefault">
-
-            <label class="form-check-label mb-0" for="flexRadioDefault1">Personal Account</label>
-          </div>
-          <div class="form-check">
-
-            <input class="form-check-input" id="flexRadioDefault2" type="radio" name="flexRadioDefault" checked="checked">
-
-            <label class="form-check-label mb-0" for="flexRadioDefault2">Business Account</label>
-          </div>
-        </div> -->
-        
-        <div class="mb-3">
-          <label class="form-label" for="basic-form-textarea">결재 작성</label>
-          <div class="form-control" id="basic-form-edit">
-			
-			
-			
-			
-			
-			
-			
+		
+		<!-- 결재자 생성 모달 -->
+      <div class="modal fade" id="selectApproveLine1Modal" tabindex="-1"
+        aria-labelledby="selectApproveLine1ModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>결재자 추가</h3>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="닫기"></button>
+            </div>
+            <form id="createApprovalLineForm">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <div class="modal-body">
+                <!-- 채팅 종류 선택 -->
+                <!-- <div class="mb-3">
+                  <label class="form-label">채팅 종류</label>
+                  <div id="chatTypeGroup">
+                    <input type="radio" name="chatIsGroupYn" value="N" checked> 1:1 채팅
+                    <input type="radio" name="chatIsGroupYn" value="Y"> 그룹 채팅
+                  </div>
+                </div> -->
+                <!-- <div class="mb-3" id="chatroomNameBox">
+                  <label class="form-label">채팅방 이름</label>
+                  <input type="text" id="chatroomName" name="chatroomName" class="form-control"
+                    placeholder="예: 개발팀 채팅방" readonly>
+                </div> -->
+                <!-- 소속 선택 -->
+                <div class="mb-3">
+                  <label class="form-label">소속</label>
+                  <select class="form-select" id="departmentSelect" onchange="changeDepartment(this.value)">
+                    <option disabled selected>-- 소속 선택 --</option>
+                    <option th:each="dept : ${structureList}" 
+                      th:value="${dept.separator_code}" 
+                      th:text="${dept.separator_name}" 
+                      th:selected="${dept.separator_name == param.department}">
+                    </option>
+                  </select>
+                </div>
+                <!-- 참여자 선택 -->
+                <div class="mb-3">
+                  <label class="form-label">참여자 선택</label>
+                  <div class="d-flex">
+                    <select id="employeeSelect" class="form-select me-2" style="flex:1;">
+                      <option disabled selected>-- 참여자 선택 --</option>
+                    </select>
+                    <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">추가</button>
+                  </div>
+                </div>
+                <!-- 선택된 참여자 표시 -->
+                <div class="mb-3">
+                  <label class="form-label">선택된 참여자</label>
+                  <div id="selectedParticipants">
+                    <!-- badge 형태로 추가 -->
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="submit" class="btn btn-primary">추가</button>
+              </div>
+              <div>
+                <input type="hidden" name="creater" th:value="${#authentication.principal.employee.employeeNo}">
+              </div>
+            </form>
           </div>
         </div>
-        
-        <!-- <div class="mb-3 form-check">
-          <input class="form-check-input" id="basic-form-checkbox" type="checkbox">
-          <label class="form-check-label" for="basic-form-checkbox">Remember me</label>
-        </div> -->
-        <div class="mb-3">
-          <label class="form-label">파일 업로드</label>
-          <input class="form-control" type="file" multiple>
-        </div>
-        <button class="btn btn-primary" type="submit">등록</button>
-		<button type="button" class="btn btn-light" onclick="history.back()">취소</button>
-      </form>
       </div>
-      <button type="button" id="testBtn">테스트</button>
-      <script>
-      	const testBtn = document.getElementById("testBtn");
-      	const template = `
+		
+		
+		
+		
+		
+		<script>
+	// 결재서 양식 선택 시, fetch로 결재서 양식 내용 가져오기
+ 	document.getElementById("basic-select-format").addEventListener("change", function () {
+    const selectedValue = this.value;
 
-      	  <table
-      	    style="width: 800px; color: rgb(0, 0, 0); background: rgb(255, 255, 255); border: 0px; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; margin-top: 10px; border-collapse: collapse !important;">
-      	    <colgroup>
-      	      <col width="120px">
-      	      <col width="680px">
-      	    </colgroup>
+    fetch("/approval/format", {
+      method: 'POST',
+      headers: {
+	        'Content-Type': 'application/json',
+	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+	        'header': document.querySelector('meta[name="_csrf_header"]').content
+	      },
+	      body: JSON.stringify({ approval_format_no: selectedValue })
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	      if (data.res_code == "200") {
+	        document.getElementById("basic-form-edit").innerHTML = data.approvalFormatContent;
+	        document.getElementById("approvalPageTitle").innerText = data.approvalFormatTitle + ' 결재서 작성';
+	      } else {
+	        console.log(data.res_code);
+	        console.log(data.res_msg);
+      	}
+    	});
+  	});
+	</script>
+	<script>
+	
+	let isCreateMode = true; // 기본은 생성 모드
+	
+	document.addEventListener("DOMContentLoaded", () => {
+	  bindModalReset();
+	  bindDepartmentChange();
+	  bindParticipantAdd();
+	  bindApprovalModal();
+	});
+	
+	// 모달 초기화 (열릴 때 기본 리셋)
+	function bindModalReset() {
+	  const modal = document.getElementById("selectApproveLine1Modal");
+	  if (!modal) return;
+	
+	  modal.addEventListener("shown.bs.modal", () => {
+	    document.getElementById("selectedParticipants").innerHTML = "";
+	    document.getElementById("departmentSelect").selectedIndex = 0;
+	    const empSelect = document.getElementById("employeeSelect");
+	    empSelect.innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
+	
+	
+	    [...document.querySelectorAll('input[name="participantIds"]')].forEach(el => el.remove());
+	  });
+	}
+	
+	// 소속 선택시 직원 목록 로딩
+	function bindDepartmentChange() {
+	  const departmentSelect = document.getElementById("departmentSelect");
+	  if (!departmentSelect) return;
+	
+	  departmentSelect.addEventListener("change", function () {
+	    const deptId = this.value;
+	    fetch('/approval/employes?separator_code=' + encodeURIComponent(deptId))
+	      .then(response => response.json())
+	      .then(data => {
+	        const select = document.getElementById('employeeSelect');
+	        select.innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
+	        data.forEach(emp => {
+	          const option = document.createElement('option');
+	          option.value = emp.employee_no;
+	          option.text = emp.employee_name;
+	          select.appendChild(option);
+	        });
+	      })
+	      .catch(error => console.error('직원 로딩 실패:', error));
+	  });
+	}
+	
+	// 참여자 추가
+	function bindParticipantAdd() {
+	  const btn = document.querySelector("button[onclick='addParticipant()']");
+	  if (!btn) return;
+	  btn.addEventListener("click", () => {
+	    const select = document.getElementById('employeeSelect');
+	    const selectedOptions = Array.from(select.selectedOptions);
+	
+	    if (selectedOptions.length === 0) {
+	      alert('참여자를 선택해주세요.');
+	      return;
+	    }
+	    const currentCount = document.querySelectorAll('#selectedParticipants .badge').length;
+	
+	    selectedOptions.forEach(option => {
+	      const participantId = option.value;
+	      const participantName = option.text;
+	      if (document.getElementById('participant-' + participantId)) {
+	        alert('이미 추가된 참여자입니다.');
+	        return;
+	      }
+	      const badge = document.createElement('span');
+	      badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
+	      badge.id = 'participant-' + participantId;
+	      badge.dataset.id = participantId;
+	      badge.innerHTML = `
+	        ${participantName}
+	        <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="this.parentElement.remove();"></button>
+	      `;
+	      document.getElementById('selectedParticipants').appendChild(badge);
+	
+	    });
+	    select.selectedIndex = -1;
+	  });
+	}
+	
+	// 모달 submit 시, 선택된 참여자 ID를 hidden input으로 추가
+	function bindApprovalModal() {
+	  const form = document.getElementById("createApprovalLineForm");
+	  if (!form) return;
+	
+	  form.addEventListener("submit", function (e) {
+	    e.preventDefault();
+	
+	
+	    [...form.querySelectorAll('input[name="participantIds"]')].forEach(el => el.remove());
+	    const selectedIds = [...document.querySelectorAll('#selectedParticipants span[data-id]')].map(span => span.dataset.id);
+	    if (selectedIds.length === 0) {
+	      alert("참여자를 선택해주세요.");
+	      return;
+	    }
+	    selectedIds.forEach(id => {
+	      const hidden = document.createElement('input');
+	      hidden.type = 'hidden';
+	      hidden.name = 'participantIds';
+	      hidden.value = id;
+	      form.appendChild(hidden);
+	    });
+	
+	  });
+	}
+	</script>
 
-      	    <tbody>
-      	      <tr>
-      	        <td
-      	          style="padding: 3px; height: 20px; border: 1px solid #000; vertical-align: middle; background: #ddd; text-align: center">
-      	          <span
-      	            style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;">
-      	            내용
-      	          </span>
-      	        </td>
-      	        <td style="padding: 3px; height: 20px; border: 1px solid #000; vertical-align: middle">
-      	          <span unselectable="on" contenteditable="false" class="comp_wrap" data-cid="5" data-dsl="{{textarea}}"
-      	            data-wrapper=""
-      	            style="width: 100%; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"
-      	            data-value=""><textarea class="txta_editor" style="font-size: 10pt;"></textarea><span
-      	              contenteditable="false" class="comp_active"
-      	              style="display: none; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;">
-      	              <span class="Active_dot1"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span><span
-      	                class="Active_dot2"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span>
-      	              <span class="Active_dot3"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span><span
-      	                class="Active_dot4"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span>
-      	            </span> <span contenteditable="false" class="comp_hover" data-content-protect-cover="true" data-origin="5"
-      	              style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;">
-      	              <a contenteditable="false" class="ic_prototype ic_prototype_trash" data-content-protect-cover="true"
-      	                data-component-delete-button="true"><span
-      	                  style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;"></span></a>
-      	            </span> </span><br>
-      	        </td>
-      	      </tr>
-      	      <tr>
-      	        <td
-      	          style="padding: 3px; height: 20px; border: 1px solid #000; vertical-align: middle; background: #ddd; text-align: center">
-      	          <span
-      	            style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;">
-      	            본인과의 관계
-      	          </span>
-      	        </td>
-      	        <td style="padding: 3px; height: 20px; border: 1px solid #000; vertical-align: middle">
-      	          <span unselectable="on" contenteditable="false" class="comp_wrap" data-cid="6" data-dsl="{{text}}"
-      	            data-wrapper=""
-      	            style="width: 100%; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"
-      	            data-value=""><input class="ipt_editor" type="text" style="font-size: 10pt;"><span contenteditable="false"
-      	              class="comp_active"
-      	              style="display: none; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;">
-      	              <span class="Active_dot1"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span><span
-      	                class="Active_dot2"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span>
-      	              <span class="Active_dot3"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span><span
-      	                class="Active_dot4"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span>
-      	            </span> <span contenteditable="false" class="comp_hover" data-content-protect-cover="true" data-origin="6"
-      	              style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;">
-      	              <a contenteditable="false" class="ic_prototype ic_prototype_trash" data-content-protect-cover="true"
-      	                data-component-delete-button="true"><span
-      	                  style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;"></span></a>
-      	            </span> </span><br>
-      	        </td>
-      	      </tr>
-      	      <tr>
-      	        <td
-      	          style="padding: 3px; height: 20px; border: 1px solid #000; vertical-align: middle; background: #ddd; text-align: center">
-      	          <span
-      	            style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;">
-      	            발생년월일
-      	          </span>
-      	        </td>
-      	        <td style="padding: 3px; height: 20px; border: 1px solid #000; vertical-align: middle">
-      	          <span unselectable="on" contenteditable="false" class="comp_wrap" data-cid="7" data-dsl="{{calendar}}"
-      	            data-wrapper=""
-      	            style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"
-      	            data-value=""><input class="ipt_editor ipt_editor_date" type="text" style="font-size: 10pt;"><span
-      	              contenteditable="false" class="comp_active"
-      	              style="display: none; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;">
-      	              <span class="Active_dot1"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span><span
-      	                class="Active_dot2"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span>
-      	              <span class="Active_dot3"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span><span
-      	                class="Active_dot4"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span>
-      	            </span> <span contenteditable="false" class="comp_hover" data-content-protect-cover="true" data-origin="7"
-      	              style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;">
-      	              <a contenteditable="false" class="ic_prototype ic_prototype_trash" data-content-protect-cover="true"
-      	                data-component-delete-button="true"><span
-      	                  style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;"></span></a>
-      	            </span> </span><br>
-      	        </td>
-      	      </tr>
-      	      <tr>
-      	        <td
-      	          style="padding: 3px; height: 20px; border: 1px solid #000; vertical-align: middle; background: #ddd; text-align: center">
-      	          <span
-      	            style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;">
-      	            장소
-      	          </span>
-      	        </td>
-      	        <td style="padding: 3px; height: 20px; border: 1px solid #000; vertical-align: middle">
-      	          <span unselectable="on" contenteditable="false" class="comp_wrap" data-cid="8" data-dsl="{{text}}"
-      	            data-wrapper=""
-      	            style="width: 100%; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"
-      	            data-value=""><input class="ipt_editor" type="text" style="font-size: 10pt;"><span contenteditable="false"
-      	              class="comp_active"
-      	              style="display: none; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;">
-      	              <span class="Active_dot1"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span><span
-      	                class="Active_dot2"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span>
-      	              <span class="Active_dot3"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span><span
-      	                class="Active_dot4"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span>
-      	            </span> <span contenteditable="false" class="comp_hover" data-content-protect-cover="true" data-origin="8"
-      	              style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;">
-      	              <a contenteditable="false" class="ic_prototype ic_prototype_trash" data-content-protect-cover="true"
-      	                data-component-delete-button="true"><span
-      	                  style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;"></span></a>
-      	            </span> </span><br>
-      	        </td>
-      	      </tr>
-      	      <tr>
-      	        <td
-      	          style="padding: 3px; height: 20px; border: 1px solid #000; vertical-align: middle; background: #ddd; text-align: center">
-      	          <span
-      	            style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;">
-      	            휴가기간
-      	          </span>
-      	        </td>
-      	        <td style="padding: 3px; height: 20px; border: 1px solid #000; vertical-align: middle">
-      	          <span unselectable="on" contenteditable="false" class="comp_wrap" data-cid="9" data-dsl="{{period}}"
-      	            data-wrapper=""
-      	            style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"
-      	            data-value=""><input class="ipt_editor ipt_editor_date" type="text" style="font-size: 10pt;"> ~ <input
-      	              class="ipt_editor ipt_editor_date" type="text" style="font-size: 10pt;"><span contenteditable="false"
-      	              class="comp_active"
-      	              style="display: none; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;">
-      	              <span class="Active_dot1"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span><span
-      	                class="Active_dot2"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span>
-      	              <span class="Active_dot3"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span><span
-      	                class="Active_dot4"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span>
-      	            </span> <span contenteditable="false" class="comp_hover" data-content-protect-cover="true" data-origin="9"
-      	              style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;">
-      	              <a contenteditable="false" class="ic_prototype ic_prototype_trash" data-content-protect-cover="true"
-      	                data-component-delete-button="true"><span
-      	                  style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;"></span></a>
-      	            </span> </span><br>
-      	        </td>
-      	      </tr>
-      	      <tr>
-      	        <td
-      	          style="padding: 3px; height: 20px; border: 1px solid #000; vertical-align: middle; background: #ddd; text-align: center">
-      	          <span
-      	            style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;">
-      	            금액
-      	          </span>
-      	        </td>
-      	        <td style="padding: 3px; height: 20px; border: 1px solid #000; vertical-align: middle">
-      	          <span unselectable="on" contenteditable="false" class="comp_wrap" data-cid="10" data-dsl="{{currency_0}}"
-      	            data-wrapper=""
-      	            style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"
-      	            data-value=""><input class="ipt_editor ipt_editor_currency" type="text" style="font-size: 10pt;"><span
-      	              contenteditable="false" class="comp_active"
-      	              style="display: none; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;">
-      	              <span class="Active_dot1"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span><span
-      	                class="Active_dot2"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span>
-      	              <span class="Active_dot3"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span><span
-      	                class="Active_dot4"
-      	                style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;"></span>
-      	            </span> <span contenteditable="false" class="comp_hover" data-content-protect-cover="true" data-origin="10"
-      	              style="font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px; font-size: 10pt;">
-      	              <a contenteditable="false" class="ic_prototype ic_prototype_trash" data-content-protect-cover="true"
-      	                data-component-delete-button="true"><span
-      	                  style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;"></span></a>
-      	            </span> </span><br>
-      	        </td>
-      	      </tr>
-      	      <tr>
-      	        <td colspan="2"
-      	          style="height: 20px; border: 1px solid #000; vertical-align: middle; text-align: center; padding: 10px;">
-      	          <span
-      	            style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;">
-      	            위와 같은 사유로 경조금을 신청합니다.
-      	          </span>
-      	        </td>
-      	      </tr><!-- 
-      			<tr>
-      				<td colspan="2" class="txt_right">
-      					
-      	년<span style="padding:20px"></span>월<span style="padding: 20px"></span>일<br/><br/>
-      	신청인 <span style="padding: 40px"></span>(서명)
-      				</td>
-      			</tr> --><span
-      	        style="font-size: 10pt; font-family: &quot;malgun gothic&quot;, dotum, arial, tahoma; line-height: normal; margin-top: 0px; margin-bottom: 0px;">
-
-      	      </span>
-      	    </tbody>
-      	  </table>
-      	  <br>
-      	</span>`;
-
-      	testBtn.addEventListener("click", function () {
-      	    document.getElementById("basic-form-edit").innerHTML += template;
-      	  });
-      </script>
-	</main>              
+	</main>
 </body>
 </html>
