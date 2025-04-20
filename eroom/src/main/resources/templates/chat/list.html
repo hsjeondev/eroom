@@ -462,6 +462,7 @@
 		    
 		    // 채팅방 클릭시 WebSocket 연결
 		    connectWebSocket(chatroomNo, isGroup);
+		    
 		    // 수신자 employeeNo 가져오기
 		    if (!isGroup) {
 			    fetch('/chat/receiver?chatroomNo=' + chatroomNo)
@@ -707,7 +708,10 @@
 		  const senderNo = document.getElementById("myEmployeeNo").value; 
 
 		  if (socket) {
-		    socket.close(); // 기존 연결 닫고
+		    socket.onmessage = null;   // 기존 소켓의 메시지 리스너를 끊는다
+		    socket.onclose = null;     // (선택) 기존 소켓의 종료 리스너도 끊는다
+		    socket.onerror = null;     // (선택) 기존 소켓의 에러 리스너도 끊는다
+		    socket.close();            // 기존 소켓 연결 닫는다
 		  }
 
 		  // socket = new WebSocket('ws://localhost:8080/ws/chat?senderNo=${senderNo}&roomNo=${chatroomNo}');
@@ -762,29 +766,37 @@
 		  };
 		}
 		// 메시지 보내기
-		function sendMessage(){
-			// 메시지 입력창
-			const messageInput = document.getElementById("messageInput");
-			// 메시지 입력값이 비어있지 않은지 확인
-			const message = messageInput.value.trim();
-			
-			if(!message){
-				alert("메시지를 입력해주세요.");
-                return;
-			}
-			const receiverValue = document.getElementById("receiverNo")?.value;
-			const receiverNo = receiverValue && receiverValue !== "undefined" ? Number(receiverValue) : null;
-			
-			const chatData = {
-			  chatMessageContent: message,
-			  senderMember: Number(document.getElementById("myEmployeeNo").value),
-			  chatroomNo: Number(document.querySelector(".chatroom-title").dataset.roomNo),
-			  receiverMember: receiverNo
-			};
-			console.log("보내는 데이터:", chatData);
-			socket.send(JSON.stringify(chatData));
-			messageInput.value = ""; // 메시지 전송 후 입력창 비우기
+		function sendMessage() {
+		    const messageInput = document.getElementById("messageInput");
+		    const message = messageInput.value.trim();
+		    
+		    if (!message) {
+		        alert("메시지를 입력해주세요.");
+		        return;
+		    }
+		    
+		    const isGroupChat = document.querySelector('.chatroom-title')?.dataset.group === 'Y';
+		    const receiverValue = document.getElementById("receiverNo")?.value;
+		    const receiverNo = receiverValue && receiverValue !== "undefined" && receiverValue !== "null" ? Number(receiverValue) : null;
+		
+		    if (!isGroupChat && (receiverNo === null || isNaN(receiverNo))) {
+		        alert("수신자 정보가 아직 설정되지 않았습니다. 잠시 후 다시 시도해주세요.");
+		        return;
+		    }
+		
+		    const chatData = {
+		        chatMessageContent: message,
+		        senderMember: Number(document.getElementById("myEmployeeNo").value),
+		        chatroomNo: Number(document.querySelector(".chatroom-title").dataset.roomNo),
+		        receiverMember: receiverNo // 그룹이면 null, 1:1이면 번호
+		    };
+		
+		    console.log("보내는 데이터:", chatData);
+		    socket.send(JSON.stringify(chatData));
+		    messageInput.value = ""; // 메시지 전송 후 입력창 비우기
 		}
+
+
 		
 		function loadChatroomDetail(chatroomNo) {
 			  fetch('/chat/roomDetail?roomNo=' + chatroomNo)

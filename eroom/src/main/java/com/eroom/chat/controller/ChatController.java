@@ -200,6 +200,34 @@ public class ChatController {
 
 		return resultMap;
 	}
+	// 채팅방 참여자 조회
+	@GetMapping("/receiver")
+	@ResponseBody
+	public Map<String, Object> getReceiver(@RequestParam("chatroomNo") Long chatroomNo) {
+	    Map<String, Object> resultMap = new HashMap<>();
+	    
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Employee loginUser = employeeDetails.getEmployee(); // 현재 로그인한 사람
+
+	    Chatroom chatroom = chatroomService.selectChatroomOne(chatroomNo);
+	    if (chatroom == null) {
+	        resultMap.put("receiverNo", null);
+	        return resultMap;
+	    }
+
+	    List<ChatroomAttendee> attendees = chatroom.getChatroomMapping(); // 채팅방 참여자 리스트
+
+	    for (ChatroomAttendee attendee : attendees) {
+	        if (!attendee.getAttendee().getEmployeeNo().equals(loginUser.getEmployeeNo())) {
+	            resultMap.put("receiverNo", attendee.getAttendee().getEmployeeNo());
+	            return resultMap;
+	        }
+	    }
+
+	    resultMap.put("receiverNo", null);
+	    return resultMap;
+	}
 
 
 }
