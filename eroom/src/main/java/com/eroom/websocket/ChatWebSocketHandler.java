@@ -35,7 +35,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler{
 		// WebSocket 연결시 세션을 저장
 		String senderNo = getQueryParam(session, "senderNo");
 		String roomNo = getQueryParam(session, "roomNo");
-		
+				
 		// 세션을 저장
 		userSessions.put(Long.parseLong(senderNo), session);
 		// 방 번호를 저장
@@ -43,42 +43,53 @@ public class ChatWebSocketHandler extends TextWebSocketHandler{
 	}
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-		// 메시지 처리 로직
-		ObjectMapper objectMapper = new ObjectMapper();
-		ChatMessageDto chatMessageDto = objectMapper.readValue(message.getPayload(), ChatMessageDto.class);
-		
-		// 메시지를 DB에 저장
-		if(userSessions.containsKey(chatMessageDto.getSenderMember())) {
-			// DB에 메시지 저장
-			Employee employee = Employee.builder().employeeNo(chatMessageDto.getSenderMember()).build();
-			// 채팅방 번호를 가져옴
-			Chatroom chatroom = Chatroom.builder().chatroomNo(chatMessageDto.getChatroomNo()).build();
-			// 메시지 저장
-			ChatMessage entity = ChatMessage.builder()
-						                    .senderMember(employee)
-						                    .chatroomNo(chatroom)
-						                    .chatMessageContent(chatMessageDto.getChatMessageContent())
-						                    .build();
-			// DB에 저장
-			ChatMessage saveMessage = chatMessageRepository.save(entity);
-		}
-		// 메시지를 받는 사람의 세션을 가져옴
-		WebSocketSession receiverSession = userSessions.get(chatMessageDto.getReceiverMember());
-		// 받는 사람의 방 번호를 가져옴
-		Long receiverRoom = userRooms.get(chatMessageDto.getReceiverMember());
-		// 메시지를 받는 사람의 세션이 열려있고, 방 번호가 같으면 메시지를 전송
-		if(receiverSession != null && receiverSession.isOpen() && receiverRoom == chatMessageDto.getChatroomNo()) {
-			receiverSession.sendMessage(new TextMessage(message.getPayload()));
-		}
-		// 메시지를 보내는 사람의 세션을 가져옴
-		WebSocketSession senderSession = userSessions.get(chatMessageDto.getSenderMember());
-		// 보내는 사람의 방 번호를 가져옴
-		Long senderRoom = userRooms.get(chatMessageDto.getSenderMember());
-		// 메시지를 보내는 사람의 세션이 열려있고, 방 번호가 같으면 메시지를 전송
-		if (senderSession != null && senderSession.isOpen() && senderRoom == chatMessageDto.getChatroomNo()) {
-			senderSession.sendMessage(new TextMessage(message.getPayload()));
-		}
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    ChatMessageDto chatMessageDto = objectMapper.readValue(message.getPayload(), ChatMessageDto.class);
+
+	    // (1) DB 저장
+	    if (userSessions.containsKey(chatMessageDto.getSenderMember())) {
+	        Employee employee = Employee.builder().employeeNo(chatMessageDto.getSenderMember()).build();
+	        Chatroom chatroom = Chatroom.builder().chatroomNo(chatMessageDto.getChatroomNo()).build();
+	        ChatMessage entity = ChatMessage.builder()
+	                                .senderMember(employee)
+	                                .chatroomNo(chatroom)
+	                                .chatMessageContent(chatMessageDto.getChatMessageContent())
+	                                .build();
+	        chatMessageRepository.save(entity);
+	    }
+
+	    // (2) 그룹 채팅 or 1:1 채팅 분기
+	    if (chatMessageDto.getReceiverMember() == null) {
+	        // 그룹 채팅 처리: 방번호 같은 모든 사람에게 보내기
+	        for (Map.Entry<Long, Long> entry : userRooms.entrySet()) {
+	            Long participantNo = entry.getKey();
+	            Long participantRoomNo = entry.getValue();
+
+	            if (participantRoomNo.equals(chatMessageDto.getChatroomNo())) {
+	                WebSocketSession participantSession = userSessions.get(participantNo);
+	                if (participantSession != null && participantSession.isOpen()) {
+	                    participantSession.sendMessage(new TextMessage(message.getPayload()));
+	                }
+	            }
+	        }
+	    } else {
+	        // 1:1 채팅 처리
+	        WebSocketSession receiverSession = userSessions.get(chatMessageDto.getReceiverMember());
+	        Long receiverRoom = userRooms.get(chatMessageDto.getReceiverMember());
+
+	        if (receiverSession != null && receiverSession.isOpen() && receiverRoom != null && receiverRoom.equals(chatMessageDto.getChatroomNo())) {
+	            receiverSession.sendMessage(new TextMessage(message.getPayload()));
+	        }
+	    }
+
+	    // (3) 내가 보낸 메시지도 화면에 보여야 하니까 나한테도 보내기
+	    WebSocketSession senderSession = userSessions.get(chatMessageDto.getSenderMember());
+	    Long senderRoom = userRooms.get(chatMessageDto.getSenderMember());
+	    if (senderSession != null && senderSession.isOpen() && senderRoom.equals(chatMessageDto.getChatroomNo())) {
+	        senderSession.sendMessage(new TextMessage(message.getPayload()));
+	    }
 	}
+
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
 		// WebSocket 연결 종료 시 세션 제거
