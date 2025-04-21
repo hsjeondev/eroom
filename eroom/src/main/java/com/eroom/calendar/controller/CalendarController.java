@@ -2,6 +2,7 @@ package com.eroom.calendar.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ public class CalendarController {
 	private final TeamCalendarService teamService;
 	private final EmployeeService employeeService;
 	private final DepartmentCalendarService departmentService;
+
 
 	@GetMapping("/calendar")
 	public String calendarView() {
@@ -185,7 +187,7 @@ public class CalendarController {
 	@ResponseBody
 	public List<Map<String, Object>> getDepartmentEvents(@PathVariable("departmentCode") String departmentCode) {
 	    List<DepartmentCalendarDto> deptList = departmentService.getDepartmentCalendar(departmentCode);
-	    System.out.println(departmentCode+"!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	    //System.out.println(departmentCode+"!!!!!!!!!!!!!!!!!!!!!!!!!!");
 	    List<Map<String, Object>> result = new ArrayList<>();
 
 	    for (DepartmentCalendarDto dto : deptList) {
@@ -368,6 +370,28 @@ public class CalendarController {
 		}
 		
 		return result;
+    }
+    
+    //====================================전체 조회=====================================
+    @GetMapping("/calendar/list/all")
+    @ResponseBody
+    public List<Map<String, Object>> getAllCalendars() {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        //  회사, 부서 일정만 추가
+        result.addAll(companyService.getAllVisibleCalendars());
+        result.addAll(departmentService.getAllVisibleCalendars());
+
+        //  calendar_no 기준 중복 제거
+        Map<String, Map<String, Object>> uniqueMap = new LinkedHashMap<>();
+        for (Map<String, Object> event : result) {
+            String calendarNo = String.valueOf(event.get("calendar_no")); // String 변환
+            if (!uniqueMap.containsKey(calendarNo)) {
+                uniqueMap.put(calendarNo, event);
+            }
+        }
+
+        return new ArrayList<>(uniqueMap.values());
     }
 
 }

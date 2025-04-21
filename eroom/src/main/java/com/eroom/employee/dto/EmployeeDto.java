@@ -30,6 +30,8 @@ public class EmployeeDto {
 	private String employee_position;
 	private Long department_no;
 	private Long team_no;
+	private String department_name;
+	private String team_name;
 	
 	public Employee toEntity() {
 		return Employee.builder()
