@@ -63,7 +63,7 @@ public class ApprovalService {
 						.approval(approval)
 						.approvalLineStatus("S")
 						.employee(Employee.builder().employeeNo(dto.getApproverIds().get(i)).build())
-						.approvalLineStep(dto.getApproverSteps().get(i))
+						.approvalLineStep(dto.getApproverSteps().get(i)) // 결재자 순서 step 1,2,3...
 						.build();
 					approvalLineRepository.save(approvalLine);
 			}
@@ -75,7 +75,7 @@ public class ApprovalService {
 						.approval(approval)
 						.approvalLineStatus("S")
 						.employee(Employee.builder().employeeNo(dto.getAgreerIds().get(i)).build())
-						.approvalLineStep(0) // 합의자 고정값
+						.approvalLineStep(0) // 합의자 고정값 0
 						.build();
 					approvalLineRepository.save(approvalLine);
 			}
@@ -87,7 +87,7 @@ public class ApprovalService {
 						.approval(approval)
 						.approvalLineStatus("A")
 						.employee(Employee.builder().employeeNo(dto.getRefererIds().get(i)).build())
-						.approvalLineStep(-1) // 참조자 고정값
+						.approvalLineStep(-1) // 참조자 고정값 -1
 						.build();
 					approvalLineRepository.save(approvalLine);
 			}
