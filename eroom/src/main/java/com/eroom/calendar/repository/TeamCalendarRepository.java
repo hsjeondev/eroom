@@ -12,6 +12,8 @@ import com.eroom.calendar.entity.TeamCalendar;
 public interface TeamCalendarRepository extends JpaRepository<TeamCalendar,Long>,JpaSpecificationExecutor<TeamCalendar> {
 	List<TeamCalendar> findBySeparatorAndVisibleYn(String separator,String visibleYn);
 	
+	List<TeamCalendar> findByVisibleYn(String visibleYn);
+	
 
 
 }
