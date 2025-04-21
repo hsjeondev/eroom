@@ -32,15 +32,23 @@ public class DepartmentCalendarDto {
 	private Long employee_no; // 사번
 	private String separator; // 구분자
 	private String visibleYn = "Y";
+	private String teamName;
 	private LocalDateTime calendar_reg_date;
 	private LocalDateTime calendar_mod_date;
 
 	public DepartmentCalendar toEntity() {
-		return DepartmentCalendar.builder().calendarNo(calendar_no).calendarTitle(calendar_title)
-				.calendarLocation(calendar_location).calendarStartTime(calendar_start_time)
-				.calendarEndTime(calendar_end_time).calendarContent(calendar_content).calendarCreator(calendar_creator)
-				.employeeNo(employee_no).separator(separator).visibleYn(visibleYn).calendarEditor(calendar_editor)
-
+		return DepartmentCalendar.builder()
+				.calendarNo(calendar_no)
+				.calendarTitle(calendar_title)
+				.calendarLocation(calendar_location)
+				.calendarStartTime(calendar_start_time)
+				.calendarEndTime(calendar_end_time)
+				.calendarContent(calendar_content).calendarCreator(calendar_creator)
+				.employeeNo(employee_no)
+				.separator(separator)
+				.visibleYn(visibleYn)
+				.calendarEditor(calendar_editor)
+			
 				.build();
 	}
 
@@ -54,8 +62,17 @@ public class DepartmentCalendarDto {
 				.calendar_creator(departmentCalendar.getCalendarCreator())
 				.calendar_editor(departmentCalendar.getCalendarEditor())
 				.employee_no(departmentCalendar.getEmployeeNo())
-				.separator(departmentCalendar.getSeparator()).calendar_reg_date(departmentCalendar.getCalendarRegDate())
-				.calendar_mod_date(departmentCalendar.getCalendarModDate()).build();
+				.separator(departmentCalendar.getSeparator())
+				.calendar_reg_date(departmentCalendar.getCalendarRegDate())
+				.calendar_mod_date(departmentCalendar.getCalendarModDate())
+				.teamName(
+					    departmentCalendar.getEmployee() != null &&
+					    departmentCalendar.getEmployee().getStructure() != null
+					        ? departmentCalendar.getEmployee().getStructure().getCodeName()
+					        : null
+					)
+				.build();
+			
 	}
 
 	
@@ -71,7 +88,8 @@ public class DepartmentCalendarDto {
 	    event.put("separator", this.separator != null ? this.separator : "");
 	    event.put("calendar_creator", this.calendar_creator != null ? this.calendar_creator : "");
 	    event.put("calendar_no", this.calendar_no);
-	    event.put("separator", this.separator);
+	    event.put("teamName", this.teamName != null ? this.teamName : "");
+	    
 	    
 
 	    

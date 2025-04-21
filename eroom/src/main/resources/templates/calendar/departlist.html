@@ -11,14 +11,31 @@
       </div>
     </div>
 
-    <div class="mb-3">
-      <select class="form-select form-select-sm" id="departmentSelect" onchange="changeDepartment(this.value)" style="width: 200px; font-size: 14px; padding: 6px 10px;">
-        <option disabled selected>-- 소속 선택 --</option>
-        <option th:each="dept : ${structureList}" th:value="${dept.separator_code}" th:text="${dept.separator_name}" th:selected="${dept.separator_code == selectedDepartment}"></option>
-      </select>
-    </div>
 
-    <div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
+		<!-- 소속 선태 셀렉트 창-->
+		<div class="mb-3">
+			<select class="form-select form-select-sm" id="departmentSelect"
+				onchange="changeDepartment(this.value)"
+				style="width: 200px; font-size: 14px; padding: 6px 10px;">
+				<option disabled selected>-- 소속 선택 --</option>
+				<option th:each="dept : ${structureList}"
+					th:value="${dept.separator_code}" th:text="${dept.separator_name}"
+					th:selected="${dept.separator_code == selectedDepartment}"></option>
+			</select>
+		</div>
+
+		<div class="mb-3 d-flex flex-wrap gap-2">
+			<div
+				style="background-color: #E0BBE4; padding: 5px 10px; border-radius: 5px; font-size: 13px;">기술부</div>
+			<div
+				style="background-color: #A2D2FF; padding: 5px 10px; border-radius: 5px; font-size: 13px;">운영부</div>
+			<div
+				style="background-color: #B5E48C; padding: 5px 10px; border-radius: 5px; font-size: 13px;">제품부</div>
+			<div
+				style="background-color: #FF8C94; padding: 5px 10px; border-radius: 5px; font-size: 13px;">영업부</div>
+		</div>
+
+		<div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
     
     <button class="btn btn-primary" type="button" data-bs-toggle="modal"
 			data-bs-target="#tooltipModal" style="display: none;"
@@ -37,6 +54,9 @@
 					</div>
 					<div class="modal-body p-card py-0">
 						<input type="hidden" name="calendar_no" value="">
+						<div class="mb-3">
+							<strong>팀:</strong> <span id="eventTeam"></span>
+						</div>
 						<div class="mb-3">
 							<strong>일정:</strong> <span id="eventTitle"></span>
 						</div>
@@ -76,162 +96,251 @@
     </script>
 
     <script>
-      let calendar;
+    let calendar;
+    let holidaySource = null;
+    let departmentSource = null;
 
-      document.addEventListener('DOMContentLoaded', function () {
-        const calendarEl = document.getElementById('appCalendar');
+    document.addEventListener('DOMContentLoaded', function () {
+      const calendarEl = document.getElementById('appCalendar');
 
-        calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'dayGridMonth',
-          locale: 'ko',
-          headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: ''
-          },
-          buttonText: { today: '오늘' },
-          dayMaxEventRows: true,
-          views: {
-            dayGridMonth: { dayMaxEventRows: 3, moreLinkText: "더보기" }
-          },
-          eventDisplay: 'block',
-          dayCellContent: function (info) {
-            return info.date.getDate();
-          },
-          dateClick: function (info) {
+      calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'ko',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: ''
+        },
+        buttonText: { today: '오늘' },
+        dayMaxEventRows: true,
+        views: {
+          dayGridMonth: { dayMaxEventRows: 3, moreLinkText: "더보기" }
+        },
+        eventDisplay: 'block',
+        dayCellContent: function (info) {
+          return info.date.getDate();
+        },
+        dateClick: function (info) {
+          const dateStr = info.dateStr + "T09:00";
+          document.getElementById('calendarStartTime').value = dateStr;
+          document.getElementById('calendarEndTime').value = info.dateStr + "T18:00";
+          const addEventModal = new bootstrap.Modal(document.getElementById('addEventModal'));
+          addEventModal.show();
+        },
+        eventClick: function (info) {
+			  const calendarNo = info.event.extendedProps.calendar_no;
+			  console.log("제발 가져와 !!!!!!!!! " + calendarNo);
+			
+			  // 날짜 포맷팅 옵션
+			  const options = {
+			    year: 'numeric',
+			    month: 'long',
+			    day: 'numeric',
+			    weekday: 'short',
+			    hour: '2-digit',
+			    minute: '2-digit',
+			    hour12: true
+			  };
+			  
+			  //관리자만 상세조회에서 수정/삭제 버튼이 보일 수 있게 설정
+			  if (employeePosition.trim() === '관리자') {
+				    document.getElementById('editEventBtn').style.display = 'inline-block';
+				    document.getElementById('deleteEventBtn').style.display = 'inline-block';
+				  } else {
+				    document.getElementById('editEventBtn').style.display = 'none';
+				    document.getElementById('deleteEventBtn').style.display = 'none';
+				  }
+			
+			  // 1. 일정, 시간, 장소, 설명을 가져옵니다
+			  const title = info.event.title || '';
+			  const start = info.event.start; // 한 번만 선언
+			  const end = info.event.end || '';
+			  const location = info.event.extendedProps.location || '';
+			  const description = info.event.extendedProps.description || '';
+			  document.getElementById('eventTeam').textContent = info.event.extendedProps.teamName || '';
+			
+			  // 날짜 포맷팅
+			  const date = start ? new Intl.DateTimeFormat('ko-KR', options).format(start) : '';
+			  const endDate = end ? new Intl.DateTimeFormat('ko-KR', options).format(end) : '';
+			
+			  // 2. 각각 항목을 채우고, 값이 없으면 해당 항목을 숨깁니다
+			  const eventTitleElement = document.getElementById('eventTitle');
+			  if (eventTitleElement) {
+			    if (title) {
+			      eventTitleElement.textContent = title;
+			    } else {
+			      eventTitleElement.parentElement.style.display = 'none'; // 제목 숨기기
+			    }
+			  }
+			
+			  const eventDateElement = document.getElementById('eventDate');
+			  if (eventDateElement) {
+			    if (date) {
+			      eventDateElement.textContent = date;
+			    } else {
+			      eventDateElement.parentElement.style.display = 'none'; // 시작 시간 숨기기
+			    }
+			  }
+			
+			  const eventEndDateElement = document.getElementById('eventEndDate');
+			  if (eventEndDateElement) {
+			    if (endDate) {
+			      eventEndDateElement.textContent = endDate;
+			    } else {
+			      eventEndDateElement.parentElement.style.display = 'none'; // 종료 시간 숨기기
+			    }
+			  }
+			
+			  const eventLocationElement = document.getElementById('eventLocation');
+			  if (eventLocationElement) {
+			    if (location) {
+			      eventLocationElement.textContent = location;
+			    } else {
+			      eventLocationElement.parentElement.style.display = 'none'; // 장소 숨기기
+			    }
+			  }
+			
+			  const eventDescriptionElement = document.getElementById('eventDescription');
+			  if (eventDescriptionElement) {
+			    if (description) {
+			      eventDescriptionElement.textContent = description;
+			    } else {
+			      eventDescriptionElement.parentElement.style.display = 'none'; // 설명 숨기기
+			    }
+			  }
+					
+		    selectedCalendarNo = calendarNo;
+		
+		    const modalButton = document.getElementById('modalButton');
+		    if (modalButton) {
+		        modalButton.click(); // 모달 버튼 클릭하여 모달 열기
+		    } else {
+		        console.error('modalButton not found');
+		    }
+		},
+        eventDidMount: function (info) {		 		
+		 		 const el = info.el;
+		 		  const separator = info.event.extendedProps.separator || "";
+		 		  const type = info.event.extendedProps.type;
 
-            const dateStr = info.dateStr + "T09:00";
-            document.getElementById('calendarStartTime').value = dateStr;
-            document.getElementById('calendarEndTime').value = info.dateStr + "T18:00";
-            const addEventModal = new bootstrap.Modal(document.getElementById('addEventModal'));
-            addEventModal.show();
-          },
-          eventClick: function (info) {
-        	if (info.event.extendedProps.type === 'holiday') {
-        		    return; // 공휴일은 상세조회 안되게
-        		}
-        	  
-            document.getElementById('eventTitle').textContent = info.event.title || '';
-            document.getElementById('eventDate').textContent = info.event.start?.toLocaleString('ko-KR') || '';
-            document.getElementById('eventEndDate').textContent = info.event.end?.toLocaleString('ko-KR') || '';
-            document.getElementById('eventLocation').textContent = info.event.extendedProps.location || '';
-            document.getElementById('eventDescription').textContent = info.event.extendedProps.description || '';
-            document.getElementById('modalButton').click();
-          },
-          eventDidMount: function (info) {
-        	  console.log("🎯 separator 확인:", info.event.extendedProps.separator);
-        	  const separator = info.event.extendedProps.separator;
-        	  const type = info.event.extendedProps.type;
+		 		  // 🌕 공휴일일 경우 스타일 적용
+		 		  if (type === "holiday") {
+		 		    el.style.setProperty("background-color", "#FFF8B3", "important"); // 연노랑
+		 		    el.style.setProperty("border", "1px solid #F5E79E", "important");
+		 		    el.style.setProperty("color", "#4B4B4B", "important");
+		 		    el.style.setProperty("pointer-events", "none", "important"); // 클릭 막기
+		 		    el.style.setProperty("opacity", "1", "important");
+		 		    return;
+		 		  }
 
-        	  if (!separator || type === 'holiday') return;
+		 		  // ✅ 팀/부서 색상 매핑
+		 		  const departmentColorMap = {
+		 				  "D001": "#E0BBE4", // 연보라
+		 				  "D002": "#A2D2FF", // 시원한 연하늘 파랑
+		 				  "D003": "#B5E48C", // 부드러운 연두
+		 				  "D004": "#FF8C94"  // 부드러운 로즈 핑크
+		 		  };
 
-        	  if (!separator) return;  // separator 없으면 아무것도 안 함 (공휴일은 제외)
+		 		  const teamToDepartmentMap = {
+		 		    "T001": "D001", "T002": "D002", "T003": "D002", "T004": "D002",
+		 		    "T005": "D003", "T006": "D003", "T007": "D004", "T008": "D004"
+		 		  };
 
-        	  const departmentColorMap = {
-        	    "D001": "#A3D8F4",
-        	    "D002": "#FFDD93",
-        	    "D003": "#B5EAD7",
-        	    "D004": "#FFB7B2"
-        	  };
+		 		  // 🟩 기존 switch-case 우선 적용
+		 		  let backgroundColor, borderColor, textColor;
 
-        	  const teamToDepartmentMap = {
-        	    "T001": "D001", "T002": "D002", "T003": "D002", "T004": "D002",
-        	    "T005": "D003", "T006": "D003", "T007": "D004", "T008": "D004"
-        	  };
+		 		  switch (separator) {
+		 		    case "E001":
+		 		      backgroundColor = "#C1F0E3";
+		 		      borderColor = "#A3E4A0";
+		 		      textColor = "#1A3C1A";
+		 		      break;
+		 		    case "A001":
+		 		      backgroundColor = "#F8D7DA";
+		 		      borderColor = "#F5C6CB";
+		 		      textColor = "#721C24";
+		 		      break;
+		 		    default:
+		 		      // 팀에 따른 부서 색상 적용
+		 		      const deptCode = teamToDepartmentMap[separator] || null;
+		 		      const deptColor = departmentColorMap[deptCode] || "#CCCCCC";
 
-        	  const deptCode = teamToDepartmentMap[separator] || "DEFAULT";
-        	  const color = departmentColorMap[deptCode] || "#CCCCCC";
+		 		      backgroundColor = deptColor;
+		 		      borderColor = deptColor;
+		 		      textColor = "#000000";
+		 		      break;
+		 		  }
 
-        	  info.el.style.backgroundColor = color;
-        	  info.el.style.borderColor = color;
-        	  info.el.style.color = "#000";
-        	  },
-          eventSources: [
-            {
-              events: function (fetchInfo, successCallback, failureCallback) {
-                const apiKey = 'AIzaSyCjXiu1ShbhE0XenBtciLx8ezU-mcZI0R0';
-                const calendarId = 'ko.south_korea%23holiday@group.v.calendar.google.com';
-                const timeMin = new Date(fetchInfo.start).toISOString();
-                const timeMax = new Date(fetchInfo.end).toISOString();
-                const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${timeMin}&timeMax=${timeMax}&orderBy=startTime&singleEvents=true`;
+		 		  el.style.setProperty("background-color", backgroundColor, "important");
+		 		  el.style.setProperty("border-color", borderColor, "important");
+		 		  el.style.setProperty("color", textColor, "important");
+		  }
+		 	
+      });
 
-                fetch(url)
-                  .then(response => response.json())
-                  .then(data => {
-                    if (!data.items) return successCallback([]);
-                    const holidays = data.items.map(item => ({
-                      title: item.summary,
-                      start: item.start.date,
-                      allDay: true,
-                      extendedProps: { type: 'holiday' }
-                    }));
-                    successCallback(holidays);
-                  })
-                  .catch(error => {
-                    console.error("공휴일 불러오기 실패", error);
-                    failureCallback(error);
-                  });
-              }
-            }
-          ]
-        });
+      // 공휴일 source는 처음에만 한 번 추가
+      holidaySource = calendar.addEventSource({
+        events: function (fetchInfo, successCallback, failureCallback) {
+          const apiKey = 'AIzaSyCjXiu1ShbhE0XenBtciLx8ezU-mcZI0R0';
+          const calendarId = 'ko.south_korea%23holiday@group.v.calendar.google.com';
+          const timeMin = new Date(fetchInfo.start).toISOString();
+          const timeMax = new Date(fetchInfo.end).toISOString();
+          const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${timeMin}&timeMax=${timeMax}&orderBy=startTime&singleEvents=true`;
 
-        calendar.render();
-
-        const selectedDepartment = document.getElementById('departmentSelect')?.value;
-        if (selectedDepartment) {
-          changeDepartment(selectedDepartment);
+          fetch(url)
+            .then(response => response.json())
+            .then(data => {
+              const holidays = data.items.map(item => ({
+                title: item.summary,
+                start: item.start.date,
+                allDay: true,
+                extendedProps: { type: 'holiday' }
+              }));
+              successCallback(holidays);
+            })
+            .catch(error => {
+              console.error("공휴일 불러오기 실패", error);
+              failureCallback(error);
+            });
         }
       });
 
-      window.changeDepartment = function (departmentCode) {
-        console.log("선택된 부서 코드: ", departmentCode);
-        calendar.removeAllEventSources();
+      calendar.render();
 
-        calendar.addEventSource({
-          events: function (fetchInfo, successCallback, failureCallback) {
-            fetch('/departmentcalendar/list/' + departmentCode)
-              .then(response => {
-                if (!response.ok) throw new Error("서버 응답 실패!");
-                return response.json();
-              })
-              .then(events => {
-                successCallback(events);
-              })
-              .catch(error => {
-                console.error("부서 일정 불러오기 실패 😢", error);
-                failureCallback(error);
-              });
-          }
-        });
-
-        calendar.addEventSource({
-          events: function (fetchInfo, successCallback, failureCallback) {
-            const apiKey = 'AIzaSyCjXiu1ShbhE0XenBtciLx8ezU-mcZI0R0';
-            const calendarId = 'ko.south_korea%23holiday@group.v.calendar.google.com';
-            const timeMin = new Date(fetchInfo.start).toISOString();
-            const timeMax = new Date(fetchInfo.end).toISOString();
-            const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${timeMin}&timeMax=${timeMax}&orderBy=startTime&singleEvents=true`;
-
-            fetch(url)
-              .then(response => response.json())
-              .then(data => {
-                if (!data.items) return successCallback([]);
-                const holidays = data.items.map(item => ({
-                  title: item.summary,
-                  start: item.start.date,
-                  allDay: true,
-                  extendedProps: { type: 'holiday' }
-                }));
-                successCallback(holidays);
-              })
-              .catch(error => {
-                console.error("공휴일 불러오기 실패", error);
-                failureCallback(error);
-              });
-          }
-        });
+      const selectedDepartment = document.getElementById('departmentSelect')?.value;
+      if (selectedDepartment) {
+        changeDepartment(selectedDepartment);
       }
+    });
+
+    window.changeDepartment = function (departmentCode) {
+      console.log("선택된 부서 코드: ", departmentCode);
+
+      // 기존 부서 일정만 제거
+      if (departmentSource) {
+        departmentSource.remove();
+      }
+
+      // 새로 선택된 부서 일정 추가
+      departmentSource = calendar.addEventSource({
+        events: function (fetchInfo, successCallback, failureCallback) {
+          fetch('/departmentcalendar/list/' + departmentCode)
+            .then(response => {
+              if (!response.ok) throw new Error("서버 응답 실패!");
+              return response.json();
+            })
+            .then(events => {
+              successCallback(events);
+            })
+            .catch(error => {
+              console.error("부서 일정 불러오기 실패 😢", error);
+              failureCallback(error);
+            });
+        }
+      });
+    };
+
+      
     </script>
   </main>
 </body>

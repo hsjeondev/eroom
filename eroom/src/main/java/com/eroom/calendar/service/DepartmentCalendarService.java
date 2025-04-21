@@ -34,6 +34,7 @@ public class DepartmentCalendarService {
         for (DepartmentCalendar cal : calendarList) {
             System.out.println("일정 제목: " + cal.getCalendarTitle());
             System.out.println("시작 시간: " + cal.getCalendarStartTime());
+            System.out.println("팀 이름: " + cal.getEmployee().getStructure().getCodeName());
         }
 
         List<DepartmentCalendarDto> result = new ArrayList<>();
