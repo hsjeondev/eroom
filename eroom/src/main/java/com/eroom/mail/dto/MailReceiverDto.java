@@ -39,17 +39,26 @@ public class MailReceiverDto {
 	private Long employee_no;
 	
 	
-	public MailReceiver toEntity() {
-		return MailReceiver.builder()
-				.mailReceiverNo(mail_receiver_no)
-				.mail(Mail.builder().mailNo(mail_no).build())
-				.receiver(Employee.builder().employeeNo(employee_no).build())
-				.mailReceiverReadYn(mail_receiver_read_yn)
-				.mailReceiverDeletedYn(mail_receiver_deleted_yn)
-				.mailReceiverImportantYn(mail_receiver_important_yn)
-				.build();
+//	public MailReceiver toEntity() {
+//		return MailReceiver.builder()
+//				.mailReceiverNo(mail_receiver_no)
+//				.mail(Mail.builder().mailNo(mail_no).build())
+//				.receiver(Employee.builder().employeeNo(employee_no).build())
+//				.mailReceiverReadYn(mail_receiver_read_yn)
+//				.mailReceiverDeletedYn(mail_receiver_deleted_yn)
+//				.mailReceiverImportantYn(mail_receiver_important_yn)
+//				.build();
+//	}
+	public MailReceiver toEntity(Mail mail, Employee receiver) {
+	    return MailReceiver.builder()
+	        .mail(mail)
+	        .receiver(receiver)
+	        .mailReceiverType(mail_recervier_type)
+	        .mailReceiverReadYn(mail_receiver_read_yn)
+	        .mailReceiverDeletedYn(mail_receiver_deleted_yn)
+	        .mailReceiverImportantYn(mail_receiver_important_yn)
+	        .build();
 	}
-	
 	
 	
 }

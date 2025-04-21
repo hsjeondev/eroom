@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.mail.dto.MailDto;
+import com.eroom.mail.dto.MailReceiverDto;
 import com.eroom.mail.entity.Mail;
 import com.eroom.mail.entity.MailReceiver;
 import com.eroom.mail.repository.MailReceiverRepository;
@@ -85,13 +86,24 @@ public class MailService {
 		            Employee receiver = employeeRepository.findById(receiverNo).orElseThrow(() -> 
 		                new IllegalArgumentException("존재하지 않는 사원 번호: " + receiverNo));
 		            
-
+		            MailReceiverDto mailReceiverDto = new MailReceiverDto();
 		            
-		            MailReceiver mailReceiver = MailReceiver.builder()
-		                    .mail(mailSaver) // 발송된 메일
-		                    .receiver(receiver) // 수신자 (Employee)
+		            mailReceiverDto = MailReceiverDto.builder()
+		                    .employee_no(receiverNo)
+		                    .mail(mailEntity)
 		                    .build();
-		            mailReceiverRepository.save(mailReceiver);
+
+		                MailReceiver mailReceiver = mailReceiverDto.toEntity(mailSaver, receiver);
+		                mailReceiverRepository.save(mailReceiver);
+		            
+		            
+		            
+		            
+//		            MailReceiver mailReceiver = MailReceiver.builder()
+//		                    .mail(mailSaver) // 발송된 메일
+//		                    .receiver(receiver) // 수신자 (Employee)
+//		                    .build();
+//		            mailReceiverRepository.save(mailReceiver);
 		        }
 			
 			
