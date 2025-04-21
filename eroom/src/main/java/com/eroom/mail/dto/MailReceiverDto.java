@@ -32,6 +32,7 @@ public class MailReceiverDto {
 	// 중요 여부
 	private String mail_receiver_important_yn="N";
 	
+	private Mail mail;
 	// 메일 번호
 	private Long mail_no;
 	// 사용자 정보

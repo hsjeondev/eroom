@@ -85,14 +85,12 @@ public class MailService {
 		            Employee receiver = employeeRepository.findById(receiverNo).orElseThrow(() -> 
 		                new IllegalArgumentException("존재하지 않는 사원 번호: " + receiverNo));
 		            
-		            //Directory receiverDirectory = receiver.getDirectory();
+
 		            
 		            MailReceiver mailReceiver = MailReceiver.builder()
 		                    .mail(mailSaver) // 발송된 메일
 		                    .receiver(receiver) // 수신자 (Employee)
-		                    //.directory(receiverDirectory) // 수신자 Directory 정보
 		                    .build();
-
 		            mailReceiverRepository.save(mailReceiver);
 		        }
 			
