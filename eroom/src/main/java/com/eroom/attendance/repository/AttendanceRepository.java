@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.eroom.attendance.entity.AnnualLeave;
 import com.eroom.attendance.entity.Attendance;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
@@ -25,5 +26,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
 	// 출근 기록 조회
 	@Query("SELECT a FROM Attendance a WHERE a.employee.employeeNo = :employeeNo AND a.attendanceCheckInTime BETWEEN :start AND :end ORDER BY a.attendanceNo DESC")
 	List<Attendance> findTodayAttendanceList(@Param("employeeNo") Long employeeNo, @Param("start") LocalDateTime start,@Param("end") LocalDateTime end);
+
 
 }

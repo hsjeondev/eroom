@@ -4,6 +4,7 @@ package com.eroom.employee.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.eroom.attendance.entity.AnnualLeave;
 import com.eroom.attendance.entity.Attendance;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
@@ -115,5 +116,9 @@ public class Employee {
 	// 근태 조건
 	@OneToMany(mappedBy="employee")
 	private List<Attendance> attendanceList;
+	
+	// 연차
+	@OneToOne(mappedBy="employee")
+	private AnnualLeave annualLeave;
 
 }

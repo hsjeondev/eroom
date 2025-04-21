@@ -10,5 +10,8 @@ import com.eroom.employee.entity.Separator;
 public interface EmployeeDirectoryRepository extends JpaRepository<Directory, Long>{
 
 	List<Directory> findBySeparator_SeparatorCode(String separatorCode);
+	
+	// 주소록 정보 조회
+	Directory findByEmployee_EmployeeNo(Long employeeNo);
 
 }
