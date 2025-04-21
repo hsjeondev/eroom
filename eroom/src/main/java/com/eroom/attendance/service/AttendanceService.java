@@ -3,6 +3,7 @@ package com.eroom.attendance.service;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,7 +141,7 @@ public class AttendanceService {
 		
 		Long employeeNo = employeeDetail.getEmployee().getEmployeeNo(); 
 		
-		return attendanceRepository.findByEmployee_EmployeeNo(employeeNo);
+		return attendanceRepository.findByEmployee_EmployeeNoOrderByAttendanceCheckInTimeDesc(employeeNo);
 		
 		
 	}
@@ -159,17 +160,27 @@ public class AttendanceService {
 	public List<AttendanceDto> selectAttendanceListByMonth(Long employeeNo, String month){
 		List<Attendance> attendanceList;
 		
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM");
 		// 현재 날짜 기준으로 현재 월 가져오기
-		String currentMonth = (month != null && !month.isEmpty()) ? month : LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM"));
+		String currentMonth = (month != null && !month.isEmpty()) ? month : LocalDateTime.now().format(formatter);
 		// YearMonth -> 연도와 월만 저장
-		YearMonth yearMonth = YearMonth.parse(currentMonth);
+		YearMonth yearMonth = YearMonth.parse(currentMonth,formatter);
 		
 		// 해당 월의 첫날, 마지막날 계산
 		LocalDateTime start = yearMonth.atDay(1).atStartOfDay();
 		LocalDateTime end = yearMonth.atEndOfMonth().atTime(23, 59, 59);
 		
-		// 기간 조건으로 조회
-		attendanceList = attendanceRepository.findByEmployee_EmployeeNoAndAttendanceCheckInTimeBetween(employeeNo, start, end);
+		// 월별 출근 기록 조회
+		attendanceList = attendanceRepository.findByEmployee_EmployeeNoAndAttendanceCheckInTimeBetweenOrderByAttendanceCheckInTimeDesc(employeeNo, start, end);
+		
+		// 조회된 결과를 DTO로 변환
+		List<AttendanceDto> attendanceDtoList = new ArrayList<>();
+		for(Attendance attendance : attendanceList) {
+			attendanceDtoList.add(new AttendanceDto().toDto(attendance));
+		}
+		
+		return attendanceDtoList;
 	}
 	
 

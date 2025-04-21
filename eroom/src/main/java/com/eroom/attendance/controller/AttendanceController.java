@@ -68,7 +68,7 @@ public class AttendanceController {
 		List<String> monthList = attendanceService.selectAttendanceMonthList(employeeNo);
 		
 		// 현재 년월 가져오기
-		String currentMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+		String currentMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM"));
 		
 		// 현재 월이 목록에 포함되어 있다면 맨 위로 정렬
 		if(monthList.contains(currentMonth)) {

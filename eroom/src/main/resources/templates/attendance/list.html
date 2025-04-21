@@ -186,7 +186,7 @@
 <hr><!-- 상단/하단 구분선 -->
 	
 <!-- 근태 현황 목록 테이블 -->     
-<div id="attendanceTable" data-list='{"valueNames":["no","date","checkin","checkout"],"page":5,"pagination":true}'>
+<div id="attendanceTable" data-list='{"valueNames":["no","date","checkin","checkout","late","early"],"page":10,"pagination":true}'>
   <!-- 상단: 날짜 선택 + 검색창 -->
   <div class="d-flex justify-content-between align-items-center mb-3 px-3 gap-2 flex-wrap">
      <div class="row g-2 mb-4">
@@ -208,12 +208,18 @@
     </div>
     <!-- 날짜 선택 -->
     <div>
-      <select class="form-select form-select-sm" data-list-filter="data-list-filter">
-        <option selected value="">날짜 선택</option>
+    <form th:action="@{/attendance/list}" method="get" id="monthSelectForm">
+      <select class="form-select form-select-sm" data-list-filter="data-list-filter" 
+      	name="month" id="month" onchange="this.form.submit()">
+        <option th:each="month : ${monthList}"
+            th:value="${month}" th:text="${month}" 
+        	th:selected="${month == selectedMonth}"></option>
+<!-- 
         <option value="2025.01">2025.01</option>
         <option value="2025.02">2025.02</option>
-        <option value="2025.03">2025.03</option>
+        <option value="2025.03">2025.03</option> -->
       </select>
+      </form>
     </div>
 
   </div>
@@ -224,85 +230,27 @@
 			<thead class="text-center align-middle">
 				<tr class="table-light">
 				<th class="sort" data-sort="no" style="width:5%;">번호</th>
-				<th class="sort" data-sort="date" style="width:30%;">근무일</th>
-				<th class="sort" data-sort="checkin" style="width:30%;">출근 시간</th>
-				<th class="sort" data-sort="checkout" style="width:30%;">퇴근 시간</th>
-				<th style="width:5%"></th>
+				<th class="sort" data-sort="date" style="width:25%;">근무일</th>
+				<th class="sort" data-sort="checkin" style="width:25%;">출근 시간</th>
+				<th class="sort" data-sort="checkout" style="width:25%;">퇴근 시간</th>
+				<th class ="sort" data-sort="late" style="width:10%">지각</th>
+				<th class ="sort" data-sort="early" style="width:10%">조퇴</th>
 				</tr>
 			</thead>
 			<tbody class="list align-middle">
-				<tr>
-				  <td class="no">1</td>
-				  <td class="date">2025.04.09</td>
-				  <td class="checkin">08:55:45</td>
-				  <td class="checkout">18:01:23</td>
-				  <td class="text-end pe-0">
-				      <div class="btn-reveal-trigger position-static">
-				        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-				          <i class="fas fa-ellipsis fs-10"></i>
-				        </button>
-				        <div class="dropdown-menu dropdown-menu-end py-2">
-				          <a class="dropdown-item" href="#!">수정</a>
-				          <div class="dropdown-divider"></div>
-				          <a class="dropdown-item text-danger" href="#!">삭제</a>
-				        </div>
-				      </div>
-				    </td>
+				<tr th:if ="${!#lists.isEmpty(attendanceList)}"
+					th:each="attendance, attendanceStatus : ${attendanceList}">
+				  <td class="no" th:text="${attendanceStatus.count}">1</td>
+				  <td class="date" th:text="${#temporals.format(attendance.attendance_check_in_time, 'yyyy.MM.dd')}">연도.월.일</td>
+				  <td class="checkin" th:text="${#temporals.format(attendance.attendance_check_in_time, 'HH:mm:ss')}">출근 시간</td>
+				  <td class="checkout" th:text="${#temporals.format(attendance.attendance_check_out_time, 'HH:mm:ss')}">퇴근 시간</td>
+				  <td class="late" th:text="${attendance.attendance_late_yn == 'Y' ? '지각' : '-'}">지각</td>
+				  <td class="early" th:text="${attendance.attendance_early_leave_yn == 'Y' ? '조퇴' : '-'}">조퇴</td>
 				</tr>
-				<tr>
-				  <td class="no">2</td>
-				  <td class="date">2025.04.08</td>
-				  <td class="checkin">08:49:27</td>
-				  <td class="checkout">18:00:30</td>
-				  <td class="text-end pe-0">
-				      <div class="btn-reveal-trigger position-static">
-				        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-				          <i class="fas fa-ellipsis fs-10"></i>
-				        </button>
-				        <div class="dropdown-menu dropdown-menu-end py-2">
-				          <a class="dropdown-item" href="#!">수정</a>
-				          <div class="dropdown-divider"></div>
-				          <a class="dropdown-item text-danger" href="#!">삭제</a>
-				        </div>
-				      </div>
-				    </td>
+				<tr th:if="${#lists.isEmpty(attendanceList)}">
+				    <td colspan="5" class="text-center"> 근태 정보가 없습니다.</td>
 				</tr>
-				<tr>
-				  <td class="no">3</td>
-				  <td class="date">2025.04.07</td>
-				  <td class="checkin">08:57:22</td>
-				  <td class="checkout">18:05:22</td>
-				  <td class="text-end pe-0">
-				      <div class="btn-reveal-trigger position-static">
-				        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-				          <i class="fas fa-ellipsis fs-10"></i>
-				        </button>
-				        <div class="dropdown-menu dropdown-menu-end py-2">
-				          <a class="dropdown-item" href="#!">수정</a>
-				          <div class="dropdown-divider"></div>
-				          <a class="dropdown-item text-danger" href="#!">삭제</a>
-				        </div>
-				      </div>
-				    </td>
-				</tr>
-				<tr>
-				  <td class="no">4</td>
-				  <td class="date">2025.04.06</td>
-				  <td class="checkin">08:54:33</td>
-				  <td class="checkout">18:03:47</td>
-				  <td class="text-end pe-0">
-				      <div class="btn-reveal-trigger position-static">
-				        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-				          <i class="fas fa-ellipsis fs-10"></i>
-				        </button>
-				        <div class="dropdown-menu dropdown-menu-end py-2">
-				          <a class="dropdown-item" href="#!">수정</a>
-				          <div class="dropdown-divider"></div>
-				          <a class="dropdown-item text-danger" href="#!">삭제</a>
-				        </div>
-				      </div>
-				    </td>
-				</tr>
+				
 			</tbody>
 	    </table>
 	</div>
