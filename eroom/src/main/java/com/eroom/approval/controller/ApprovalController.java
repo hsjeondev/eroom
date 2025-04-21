@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.eroom.approval.dto.ApprovalDto;
 import com.eroom.approval.dto.ApprovalFormatDto;
 import com.eroom.approval.dto.ApprovalLineDto;
+import com.eroom.approval.dto.ApprovalRequestDto;
 import com.eroom.approval.entity.Approval;
 import com.eroom.approval.entity.ApprovalFormat;
 import com.eroom.approval.entity.ApprovalLine;
@@ -46,6 +47,7 @@ public class ApprovalController {
 	private final StructureService structureService;
 	private final EmployeeService employeeService;
 	
+	// 내가 올린 결재 리스트 조회
 	@GetMapping("/approval/myRequestedApprovals")
 	public String selectMyRequestedApprovalsList(Model model, Authentication authentication) {
 		// 로그인한 사용자 정보 가져오기
@@ -94,6 +96,7 @@ public class ApprovalController {
 	public String selectWithdrawnApprovalsList() {
 		return "/approval/withdrawnApprovals";
 	}
+	// 결재 작성 페이지 진입
 	@GetMapping("/approval/create")
 	public String selectApprovalCreate(Model model, Authentication authentication) {
 		// 로그인한 사용자 정보 가져오기
@@ -122,6 +125,7 @@ public class ApprovalController {
 		return "/approval/create";
 	}
 	
+	// 결재 결재라인 추가를 위한 조회
 	@GetMapping("/approval/employes")
 	@ResponseBody
 	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam(name = "separator_code") String separatorCode) {
@@ -136,6 +140,7 @@ public class ApprovalController {
 		}
 	}
 	
+	// 결재 양식 리스트 조회
 	@PostMapping("/approval/format")
 	@ResponseBody
 	public Map<String, String> selectApprovalFormat(@RequestBody ApprovalFormatDto dto) {
@@ -153,6 +158,8 @@ public class ApprovalController {
 		}
 		return map;
 	}
+	
+	// 결재 라인 추가
 	@PostMapping("/approval/addApprovalLine")
 	@ResponseBody
 	public Map<String, String> addApprovalLine(@RequestBody ApprovalLineDto dto) {
@@ -166,6 +173,25 @@ public class ApprovalController {
 //		}
 		return map;
 		
+	}
+	
+	// 결재 생성 Create
+	@PostMapping("/approval/create")
+	@ResponseBody
+	public Map<String, String> createApproval(@RequestBody ApprovalRequestDto dto) {
+		Map<String, String> map = new HashMap<String, String>();
+
+		int result = approvalService.createApproval(dto);
+		
+		
+		map.put("res_code", "500");
+		map.put("res_msg", "결재 생성 실패");
+		if (result > 0) {
+			map.put("res_code", "200");
+			map.put("res_msg", "결재 생성 성공");
+		}
+		return map;
+
 	}
 	
 	@GetMapping("/approval/detail")

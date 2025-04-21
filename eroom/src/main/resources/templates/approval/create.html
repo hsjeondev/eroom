@@ -17,7 +17,8 @@
 			<div class="d-flex justify-content-start">
 				<span class="fw-bold fs-7" id="approvalPageTitle">결재서 양식을 선택해주세요.</span>
 			</div>
-			<form>
+			
+			<form id="approvalWriter">
 				<div class="row">
 					<div class="col-5">
 						<div class="mb-1">
@@ -25,21 +26,22 @@
 							<div id="basic-form-date" class="form-control" th:text="${now}"></div>
 						</div>
 						<div class="mb-1">
-							<label class="form-label" for="basic-form-dept">부서</label>
-							<div id="basic-form-dept" class="form-control" th:text="${departmentName}"></div>
+							<label class="form-label" for="basic-form-department_name">부서</label>
+							<div id="basic-form-department_name" class="form-control" th:text="${departmentName}"></div>
 						</div>
 						<div class="mb-1">
-							<label class="form-label" for="basic-form-team">팀명</label>
-							<div id="basic-form-team" class="form-control" th:text="${employee.structure.codeName}"></div>
+							<label class="form-label" for="basic-form-team_name">팀명</label>
+							<div id="basic-form-team_name" class="form-control" th:text="${employee.structure.codeName}"></div>
 						</div>
 						<div class="mb-1">
-							<label class="form-label" for="basic-form-job">직급</label>
-							<div id="basic-form-job" class="form-control" th:text="${employee.employeePosition}"></div>
+							<label class="form-label" for="basic-form-employee_position">직급</label>
+							<div id="basic-form-employee_position" class="form-control" th:text="${employee.employeePosition}"></div>
 						</div>
 						<div class="mb-1">
-							<label class="form-label" for="basic-form-name">신청자</label>
-							<div id="basic-form-name" class="form-control" th:text="${employee.employeeName}"></div>
+							<label class="form-label" for="basic-form-employee_name">신청자</label>
+							<div id="basic-form-employee_name" class="form-control" th:text="${employee.employeeName}"></div>
 						</div>
+						<input type="hidden" id="basic-form-employee_no" name="writer" th:value="${employee.employeeNo}">
 					</div>
 					<div class="col-7">
 
@@ -100,7 +102,8 @@
 
 
 				<div class="mb-3">
-					<label class="form-label" for="basic-form-title">제목</label> <input class="form-control" id="basic-form-title" type="text" placeholder="제목"> <label class="form-label" for="basic-select-format">양식 선택</label> <select class="form-select" id="basic-select-format" aria-label="Default select example">
+					<label class="form-label" for="basic-form-title">제목</label> <input class="form-control" id="basic-form-title" type="text" placeholder="제목"> <label class="form-label" for="basic-select-format">양식 선택</label>
+					<select class="form-select" id="basic-select-format" aria-label="Default select example">
 						<option selected="selected" disabled="disabled">양식을 선택해주세요.</option>
 						<option th:each="formList, formStatus : ${approvalFormatList}" th:value="${formList.approval_format_no}" th:text="${formList.approval_format_title}">경조금</option>
 					</select>
@@ -114,9 +117,11 @@
 				<div class="mb-3">
 					<label class="form-label">파일 업로드</label> <input class="form-control" type="file" multiple>
 				</div>
-				<button class="btn btn-primary" type="submit">등록</button>
 				<button type="button" class="btn btn-light" onclick="history.back()">취소</button>
+				<button id="approvalSubmitBtn" class="btn btn-primary" type="submit">등록</button>
 			</form>
+			
+			
 		</div>
 		
 		<!-- 결재자 생성 모달 -->
@@ -132,19 +137,6 @@
             <form id="createApprovalLineForm">
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
               <div class="modal-body">
-                <!-- 채팅 종류 선택 -->
-                <!-- <div class="mb-3">
-                  <label class="form-label">채팅 종류</label>
-                  <div id="chatTypeGroup">
-                    <input type="radio" name="chatIsGroupYn" value="N" checked> 1:1 채팅
-                    <input type="radio" name="chatIsGroupYn" value="Y"> 그룹 채팅
-                  </div>
-                </div> -->
-                <!-- <div class="mb-3" id="chatroomNameBox">
-                  <label class="form-label">채팅방 이름</label>
-                  <input type="text" id="chatroomName" name="chatroomName" class="form-control"
-                    placeholder="예: 개발팀 채팅방" readonly>
-                </div> -->
                 <!-- 소속 선택 -->
                 <div class="mb-3">
                   <label class="form-label">소속</label>
@@ -329,6 +321,80 @@
 	  });
 	}
 	</script>
+
+<script>
+  document.getElementById('approvalSubmitBtn').addEventListener('click', function (event) {
+    event.preventDefault(); // 기본 제출 방지
+
+    // [1] 제목 & 양식 번호 추출
+    const approvalTitle = document.getElementById("basic-form-title")?.value?.trim();
+    const approvalFormatNo = document.getElementById("basic-select-format")?.value;
+
+    // [2] 동적으로 삽입된 입력 필드 추출
+    const inputElements = document.querySelectorAll("#basic-form-title, #basic-form-edit input, #basic-form-edit textarea, #basic-form-edit select");
+    const approvalContent = {};
+    let hasEmpty = false;
+
+    inputElements.forEach(el => {
+      const name = el.name || el.getAttribute("th:field")?.replace("*{", "").replace("}", "");
+      const value = el.value?.trim();
+
+      if (!value) {
+        hasEmpty = true;
+        el.style.border = "1px solid red"; // 시각적 경고
+      } else {
+        el.style.border = ""; // 초기화
+        approvalContent[name] = value;
+      }
+    });
+
+    // [3] 작성자 기본 정보 추출
+    const writerFields = ["date", "department_name", "team_name", "employee_position", "employee_name", "employee_no"];
+    const writerData = {};
+    writerFields.forEach(field => {
+      const el = document.getElementById(`basic-form-${field}`);
+      writerData[field] = el ? (el.value ?? el.textContent.trim()) : null;
+    });
+
+    // [4] 유효성 검사
+    if (!approvalTitle || !approvalFormatNo || hasEmpty) {
+      alert("제목, 양식 및 모든 항목을 빠짐없이 입력해주세요.");
+      return;
+    }
+
+    // [5] 서버로 전송
+    fetch('/approval/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+        'header': document.querySelector('meta[name="_csrf_header"]').content
+      },
+      body: JSON.stringify({
+        writer: writerData,
+        title: approvalTitle,
+        format_no: approvalFormatNo,
+        content: approvalContent
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.res_code === "200") {
+        alert("결재서가 성공적으로 제출되었습니다.");
+        location.href = '/approval/myRequestedApprovals';
+      } else {
+        alert("결재서 제출에 실패했습니다. " + data.res_msg);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert("요청 중 오류가 발생했습니다.");
+    });
+  });
+</script>
+
+
+
 
 	</main>
 </body>
