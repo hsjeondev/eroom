@@ -29,7 +29,7 @@
 						<div class="d-md-flex justify-content-between">
 							<div class="mb-3">
 								<!-- 설문 생성 팝업창 -->
-								<form th:action="@{/survey/create}" method="post">
+								<form th:action="@{/survey/create}" method="post" id="surveyForm">
 									<div class="modal fade" id="create-survey" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
 										<div class="modal-dialog modal-dialog-scrollable">
 											<div class="modal-content">
@@ -105,12 +105,6 @@
 														</div>
 													</div>
 												</div>
-												<!-- 유효성 검사 alert(초기에 숨김상태) -->
-												<div id="alertBox" class="alert alert-outline-danger d-flex align-items-center d-none" role="alert">
-													<span class="fas fa-times-circle text-danger fs-5 me-3"></span>
-													<p class="mb-0 flex-1" id="alertMessage">유효성 검사 오류 메시지</p>
-													<button class="btn-close" type="button" onclick="hideAlert()" aria-label="Close"></button>
-												</div>
 												<div class="modal-footer">
 													<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">취소</button>
 													<button class="btn btn-primary" type="submit">등록</button>
@@ -139,15 +133,17 @@
 													<div class="modal-dialog modal-dialog-scrollable">
 														<div class="modal-content">
 															<div class="modal-header">
-																<h5 class="modal-title" id="scrollingLongModalLabel2">Modal title</h5>
+																<h5 class="modal-title" id="scrollingLongModalLabel2">투표</h5>
 																<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
 															</div>
+															<!-- 설문 항목 -->
 															<div class="modal-body">
-																<ul id="surveyItemList" class="list-group"></ul>
+																<!-- <ul id="surveyItemList" class="list-group"></ul> -->
+																<div id="surveyItemList" class="d-flex flex-column gap-2"></div>
 															</div>
 															<div class="modal-footer">
-																<button class="btn btn-primary" type="button">Okay</button>
-																<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancel</button>
+																<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">취소</button>
+																<button class="btn btn-primary" type="button" id="voteConfirmBtn">투표</button>
 															</div>
 														</div>
 													</div>
@@ -219,6 +215,7 @@
 				// input 생성
 				const input = document.createElement('input');
 				input.setAttribute('type', 'text');
+				input.setAttribute('id', 'inputItem');
 				input.setAttribute('name', 'items');
 				input.classList.add('form-control', 'me-2');
 
@@ -273,96 +270,154 @@
 		function removeTeam(teamId) {
 		    const badge = document.getElementById('selected-team-' + teamId);
 		    if (badge) badge.remove();
-		}	
+		}
 		
-		// 설문 등록 유효성 검사
+		// 설문 등록시 유효성 검사
 		document.addEventListener("DOMContentLoaded", function () {
-		  const form = document.querySelector('form[th\\:action="@{/survey/create}"]');
-		  form.addEventListener('submit', function (e) {
-		    // 제목 확인
-		    const titleInput = document.getElementById('surveyTitle');
-		    if (!titleInput.value.trim()) {
-		      e.preventDefault();
-		      showAlert('제목을 입력해주세요.');
+		  const surveyForm = document.getElementById("surveyForm");
+		
+		  surveyForm.addEventListener("submit", function (event) {
+		    const title = document.getElementById('surveyTitle').value.trim();
+		    if (title === "") {
+		      event.preventDefault();
+		      alert("설문 제목을 입력해주세요.");
 		      return;
 		    }
 		
-		    // 항목 확인
-		    const itemInputs = form.querySelectorAll('input[name="items"]');
-		    const validItems = Array.from(itemInputs).filter(input => input.value.trim());
-		    if (validItems.length === 0) {
-		      e.preventDefault();
-		      showAlert('최소 한 개 이상의 항목을 입력해주세요.');
+		    const itemInputs = document.querySelectorAll('input[name="items"]');
+		    const items = Array.from(itemInputs).map(input => input.value.trim()).filter(value => value !== "");
+		
+		    if (items.length < 2) {
+		      event.preventDefault();
+		      alert("설문 항목은 2개 이상 입력해주세요.");
 		      return;
 		    }
 		
-		    // 선택된 팀 확인
-		    const selectedTeamDiv = document.getElementById('selectedTeam');
-		    const hasTeam = selectedTeamDiv.querySelector('input[name="selectedTeamIds"]');
-		    if (!hasTeam) {
-		      e.preventDefault();
-		      showAlert('참여할 팀을 한 개 이상 선택해주세요.');
-		      return;
-		    }
-		
-		    // 마감일 유효성 검사
 		    const deadlineInput = document.getElementById('basic-form-dob');
-		    const selectedDate = new Date(deadlineInput.value);
-		    const now = new Date();
-		    if (!deadlineInput.value || selectedDate < now) {
-		      e.preventDefault();
-		      showAlert('마감일은 현재 시간 이후로 설정해야 합니다.');
+		    const deadlineValue = deadlineInput.value;
+		    if (!deadlineValue) {
+		      event.preventDefault();
+		      alert("마감일을 선택해주세요.");
 		      return;
 		    }
 		
-		    // 유효성 통과 시 알럿 숨기기
-		    hideAlert();
+		    const deadline = new Date(deadlineValue);
+		    const now = new Date();
+		    if (deadline <= now) {
+		      event.preventDefault();
+		      alert("마감일은 현재 시각보다 이후로 설정해야 합니다.");
+		      return;
+		    }
 		  });
 		});
 		
-		function showAlert(message) {
-		  const alertBox = document.getElementById('alertBox');
-		  const alertMessage = document.getElementById('alertMessage');
-		  alertMessage.textContent = message;
-		  alertBox.classList.remove('d-none');
-		}
-
-		function hideAlert() {
-		  const alertBox = document.getElementById('alertBox');
-		  alertBox.classList.add('d-none');
-		}
 		
 		// 설문 상세 조회
-		document.addEventListener('DOMContentLoaded', function () {
-		  const surveyModal = document.getElementById('survey-detail');
-		  const itemList = document.getElementById('surveyItemList');
-		
-		  document.querySelectorAll('button[data-survey-id]').forEach(button => {
-		    button.addEventListener('click', function () {
-		      const surveyId = this.getAttribute('data-survey-id');
-		      itemList.innerHTML = ''; // 기존 내용 초기화
-		
-		      fetch(`/survey/detail?id=${surveyId}`)
-		        .then(response => response.json())
-		        .then(items => {
-		          if (items.length === 0) {
-		            itemList.innerHTML = '<li class="list-group-item">항목이 없습니다.</li>';
-		          } else {
-		            items.forEach(item => {
-		              const li = document.createElement('li');
-		              li.className = 'list-group-item';
-		              li.textContent = item;
-		              itemList.appendChild(li);
-		            });
-		          }
-		        })
-		        .catch(err => {
-		          console.error('항목 불러오기 실패:', err);
-		          itemList.innerHTML = '<li class="list-group-item text-danger">불러오기 실패</li>';
-		        });
-		    });
-		  });
-		});
+document.addEventListener('DOMContentLoaded', function () {
+  const surveyModal = document.getElementById('survey-detail');
+  const itemList = document.getElementById('surveyItemList');
+  const voteConfirmBtn = document.getElementById('voteConfirmBtn');
+  let selectedItems = [];
+  let currentSurveyId = null;
+  let allowMultiple = false;
+
+  document.querySelectorAll('button[data-survey-id]').forEach(button => {
+    button.addEventListener('click', function () {
+      const surveyId = this.getAttribute('data-survey-id');
+      currentSurveyId = surveyId;
+      selectedItems = [];
+      itemList.innerHTML = '';
+
+      fetch('/survey/detail?id=' + surveyId)
+        .then(response => response.json())
+        .then(data => {
+          const items = data;  // 기존 항목 목록 받아오기
+          allowMultiple = data.allowMultiple;  // 다중 선택 여부 확인
+
+          if (!items || items.length === 0) {
+            itemList.innerHTML = '<div class="text-muted">항목이 없습니다.</div>';
+          } else {
+            items.forEach(item => {
+              const button = document.createElement('button');
+              button.className = 'btn btn-outline-primary d-flex justify-content-between align-items-center';
+              button.style.width = '100%';
+              button.style.height = '3rem';
+              button.setAttribute('data-item-id', item.itemNo);
+
+              button.innerHTML = `
+                <span>${item}</span>  <!-- 'item'으로 접근 -->
+                <span class="badge bg-secondary">${item.percentage || 0}%</span>
+              `;
+
+              button.addEventListener('click', function () {
+                const itemId = item.itemNo;
+                const index = selectedItems.indexOf(itemId);
+
+                if (index === -1) {
+                  // 항목이 선택되지 않은 경우
+                  if (!allowMultiple) {
+                    selectedItems = [itemId];
+                    document.querySelectorAll('#surveyItemList button').forEach(btn => {
+                      btn.classList.remove('btn-primary');
+                      btn.classList.add('btn-outline-primary');
+                    });
+                    this.classList.remove('btn-outline-primary');
+                    this.classList.add('btn-primary');
+                  } else {
+                    selectedItems.push(itemId);
+                    this.classList.remove('btn-outline-primary');
+                    this.classList.add('btn-primary');
+                  }
+                } else {
+                  // 항목이 이미 선택된 경우: 선택 해제
+                  selectedItems.splice(index, 1);
+                  this.classList.remove('btn-primary');
+                  this.classList.add('btn-outline-primary');
+                }
+              });
+
+              itemList.appendChild(button);
+            });
+          }
+        })
+        .catch(err => {
+          console.error('항목 불러오기 실패:', err);
+          itemList.innerHTML = '<div class="text-danger">불러오기 실패</div>';
+        });
+    });
+  });
+
+  voteConfirmBtn.addEventListener('click', function () {
+    if (selectedItems.length === 0) {
+      alert('투표할 항목을 선택해주세요.');
+      return;
+    }
+
+    fetch('/survey/vote', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        surveyId: currentSurveyId,
+        itemIds: selectedItems
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert('투표가 완료되었습니다.');
+        bootstrap.Modal.getInstance(surveyModal).hide();
+      } else {
+        alert('투표에 실패했습니다: ' + data.message);
+      }
+    })
+    .catch(err => {
+      console.error('투표 오류:', err);
+      alert('투표 처리 중 오류가 발생했습니다.');
+    });
+  });
+});
 	</script>
 </th:block>
 </html>
