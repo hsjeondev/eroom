@@ -378,11 +378,11 @@ public class CalendarController {
     public List<Map<String, Object>> getAllCalendars() {
         List<Map<String, Object>> result = new ArrayList<>();
 
-        // 💡 회사, 부서 일정만 추가
+        //  회사, 부서 일정만 추가
         result.addAll(companyService.getAllVisibleCalendars());
         result.addAll(departmentService.getAllVisibleCalendars());
 
-        // 💥 calendar_no 기준 중복 제거
+        //  calendar_no 기준 중복 제거
         Map<String, Map<String, Object>> uniqueMap = new LinkedHashMap<>();
         for (Map<String, Object> event : result) {
             String calendarNo = String.valueOf(event.get("calendar_no")); // String 변환

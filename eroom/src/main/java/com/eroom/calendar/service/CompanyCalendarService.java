@@ -101,7 +101,7 @@ public class CompanyCalendarService {
 	    for (CompanyCalendar entity : list) {
 	        Map<String, Object> map = new HashMap<>();
 	        map.put("calendar_no", entity.getCalendarNo());
-	        map.put("title", entity.getCompanyTitle());
+	        map.put("title", "[회사] " + entity.getCompanyTitle());
 	        map.put("start", entity.getCalendarStartTime().toString());
 	        map.put("end", entity.getCalendarEndTime().toString());
 	        map.put("location", entity.getCompanyLocation());

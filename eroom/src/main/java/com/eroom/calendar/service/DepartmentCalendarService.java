@@ -60,6 +60,12 @@ public class DepartmentCalendarService {
             map.put("location", entity.getCalendarLocation());
             map.put("description", entity.getCalendarContent());
             map.put("separator", entity.getSeparator());
+            map.put("teamName", 
+            	    entity.getEmployee() != null && entity.getEmployee().getStructure() != null 
+            	    ? entity.getEmployee().getStructure().getCodeName()
+            	    : null
+            	);
+
             result.add(map);
         }
         return result;
