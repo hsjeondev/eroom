@@ -29,7 +29,7 @@
 						<div class="d-md-flex justify-content-between">
 							<div class="mb-3">
 								<!-- 설문 생성 팝업창 -->
-								<form th:action="@{/survey/create}" method="post" id="surveyForm">
+								<form th:action="@{/survey/create}" method="post">
 									<div class="modal fade" id="create-survey" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
 										<div class="modal-dialog modal-dialog-scrollable">
 											<div class="modal-content">
@@ -43,7 +43,7 @@
 													<div class="row mb-3">
 														<label class="col-sm-2 col-form-label text-end" for="surveyTitle">제목</label>
 														<div class="col-sm-8">
-															<input class="form-control" id="surveyTitle" name="surveyTitle" type="text" style="width: 97.2%;">
+															<input class="form-control" id="surveyTitle" name="surveyTitle" type="text" required style="width: 97.2%;">
 														</div>
 													</div>
 													<!-- 항목 div -->
@@ -52,10 +52,10 @@
 														<div class="col-sm-8">
 															<div id="itemScrollBox" style="max-height: 400px; overflow-y: auto;">
 																<div id="itemContainer1">
-																	<input class="form-control mb-2" id="inputItem" name="items" type="text" style="width: 97.2%;">
+																	<input class="form-control mb-2" id="inputItem" name="items" type="text" required style="width: 97.2%;">
 																</div>
 																<div id="itemContainer">
-																	<input class="form-control mb-2" name="items" type="text" style="width: 97.2%;">
+																	<input class="form-control mb-2" name="items" type="text" required style="width: 97.2%;">
 																</div>
 															</div>
 															<!-- 항목 추가 버튼 -->
@@ -101,7 +101,7 @@
 													<div class="row mb-3">
 														<label class="col-sm-2 col-form-label text-end" for="basic-form-dob">마감일</label>
 														<div class="col-sm-8">
-															<input class="form-control" id="basic-form-dob" name="deadline" type="datetime-local" style="width: 97.2%;">
+															<input class="form-control" id="basic-form-dob" name="deadline" type="datetime-local" required style="width: 97.2%;">
 														</div>
 													</div>
 												</div>
@@ -113,8 +113,6 @@
 										</div>
 									</div>
 								</form>
-								<!-- 문서화 버튼? -->
-								<!-- <button class="btn btn-link text-body px-0"><span class="fa-solid fa-file-export fs-9 me-2"></span>Export </button> -->
 							</div>
 						</div>
 					</div>
@@ -133,17 +131,15 @@
 													<div class="modal-dialog modal-dialog-scrollable">
 														<div class="modal-content">
 															<div class="modal-header">
-																<h5 class="modal-title" id="scrollingLongModalLabel2">투표</h5>
+																<h5 class="modal-title" id="scrollingLongModalLabel2">Modal title</h5>
 																<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
 															</div>
-															<!-- 설문 항목 -->
 															<div class="modal-body">
-																<!-- <ul id="surveyItemList" class="list-group"></ul> -->
-																<div id="surveyItemList" class="d-flex flex-column gap-2"></div>
+																<ul id="surveyItemList" class="list-group"></ul>
 															</div>
 															<div class="modal-footer">
 																<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">취소</button>
-																<button class="btn btn-primary" type="button" id="voteConfirmBtn">투표</button>
+																<button class="btn btn-primary" type="button">투표</button>
 															</div>
 														</div>
 													</div>
@@ -215,7 +211,6 @@
 				// input 생성
 				const input = document.createElement('input');
 				input.setAttribute('type', 'text');
-				input.setAttribute('id', 'inputItem');
 				input.setAttribute('name', 'items');
 				input.classList.add('form-control', 'me-2');
 
@@ -270,154 +265,41 @@
 		function removeTeam(teamId) {
 		    const badge = document.getElementById('selected-team-' + teamId);
 		    if (badge) badge.remove();
-		}
+		}	
 		
-		// 설문 등록시 유효성 검사
-		document.addEventListener("DOMContentLoaded", function () {
-		  const surveyForm = document.getElementById("surveyForm");
-		
-		  surveyForm.addEventListener("submit", function (event) {
-		    const title = document.getElementById('surveyTitle').value.trim();
-		    if (title === "") {
-		      event.preventDefault();
-		      alert("설문 제목을 입력해주세요.");
-		      return;
-		    }
-		
-		    const itemInputs = document.querySelectorAll('input[name="items"]');
-		    const items = Array.from(itemInputs).map(input => input.value.trim()).filter(value => value !== "");
-		
-		    if (items.length < 2) {
-		      event.preventDefault();
-		      alert("설문 항목은 2개 이상 입력해주세요.");
-		      return;
-		    }
-		
-		    const deadlineInput = document.getElementById('basic-form-dob');
-		    const deadlineValue = deadlineInput.value;
-		    if (!deadlineValue) {
-		      event.preventDefault();
-		      alert("마감일을 선택해주세요.");
-		      return;
-		    }
-		
-		    const deadline = new Date(deadlineValue);
-		    const now = new Date();
-		    if (deadline <= now) {
-		      event.preventDefault();
-		      alert("마감일은 현재 시각보다 이후로 설정해야 합니다.");
-		      return;
-		    }
-		  });
-		});
 		
 		
 		// 설문 상세 조회
-document.addEventListener('DOMContentLoaded', function () {
-  const surveyModal = document.getElementById('survey-detail');
-  const itemList = document.getElementById('surveyItemList');
-  const voteConfirmBtn = document.getElementById('voteConfirmBtn');
-  let selectedItems = [];
-  let currentSurveyId = null;
-  let allowMultiple = false;
-
-  document.querySelectorAll('button[data-survey-id]').forEach(button => {
-    button.addEventListener('click', function () {
-      const surveyId = this.getAttribute('data-survey-id');
-      currentSurveyId = surveyId;
-      selectedItems = [];
-      itemList.innerHTML = '';
-
-      fetch('/survey/detail?id=' + surveyId)
-        .then(response => response.json())
-        .then(data => {
-          const items = data;  // 기존 항목 목록 받아오기
-          allowMultiple = data.allowMultiple;  // 다중 선택 여부 확인
-
-          if (!items || items.length === 0) {
-            itemList.innerHTML = '<div class="text-muted">항목이 없습니다.</div>';
-          } else {
-            items.forEach(item => {
-              const button = document.createElement('button');
-              button.className = 'btn btn-outline-primary d-flex justify-content-between align-items-center';
-              button.style.width = '100%';
-              button.style.height = '3rem';
-              button.setAttribute('data-item-id', item.itemNo);
-
-              button.innerHTML = `
-                <span>${item}</span>  <!-- 'item'으로 접근 -->
-                <span class="badge bg-secondary">${item.percentage || 0}%</span>
-              `;
-
-              button.addEventListener('click', function () {
-                const itemId = item.itemNo;
-                const index = selectedItems.indexOf(itemId);
-
-                if (index === -1) {
-                  // 항목이 선택되지 않은 경우
-                  if (!allowMultiple) {
-                    selectedItems = [itemId];
-                    document.querySelectorAll('#surveyItemList button').forEach(btn => {
-                      btn.classList.remove('btn-primary');
-                      btn.classList.add('btn-outline-primary');
-                    });
-                    this.classList.remove('btn-outline-primary');
-                    this.classList.add('btn-primary');
-                  } else {
-                    selectedItems.push(itemId);
-                    this.classList.remove('btn-outline-primary');
-                    this.classList.add('btn-primary');
-                  }
-                } else {
-                  // 항목이 이미 선택된 경우: 선택 해제
-                  selectedItems.splice(index, 1);
-                  this.classList.remove('btn-primary');
-                  this.classList.add('btn-outline-primary');
-                }
-              });
-
-              itemList.appendChild(button);
-            });
-          }
-        })
-        .catch(err => {
-          console.error('항목 불러오기 실패:', err);
-          itemList.innerHTML = '<div class="text-danger">불러오기 실패</div>';
-        });
-    });
-  });
-
-  voteConfirmBtn.addEventListener('click', function () {
-    if (selectedItems.length === 0) {
-      alert('투표할 항목을 선택해주세요.');
-      return;
-    }
-
-    fetch('/survey/vote', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        surveyId: currentSurveyId,
-        itemIds: selectedItems
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        alert('투표가 완료되었습니다.');
-        bootstrap.Modal.getInstance(surveyModal).hide();
-      } else {
-        alert('투표에 실패했습니다: ' + data.message);
-      }
-    })
-    .catch(err => {
-      console.error('투표 오류:', err);
-      alert('투표 처리 중 오류가 발생했습니다.');
-    });
-  });
-});
+		document.addEventListener('DOMContentLoaded', function () {
+		  const surveyModal = document.getElementById('survey-detail');
+		  const itemList = document.getElementById('surveyItemList');
+		
+		  document.querySelectorAll('button[data-survey-id]').forEach(button => {
+		    button.addEventListener('click', function () {
+		      const surveyId = this.getAttribute('data-survey-id');
+		      itemList.innerHTML = ''; // 기존 내용 초기화
+		
+		      fetch(`/survey/detail?id=${surveyId}`)
+		        .then(response => response.json())
+		        .then(items => {
+		          if (items.length === 0) {
+		            itemList.innerHTML = '<li class="list-group-item">항목이 없습니다.</li>';
+		          } else {
+		            items.forEach(item => {
+		              const li = document.createElement('li');
+		              li.className = 'list-group-item';
+		              li.textContent = item;
+		              itemList.appendChild(li);
+		            });
+		          }
+		        })
+		        .catch(err => {
+		          console.error('항목 불러오기 실패:', err);
+		          itemList.innerHTML = '<li class="list-group-item text-danger">불러오기 실패</li>';
+		        });
+		    });
+		  });
+		});
 	</script>
 </th:block>
 </html>
