@@ -8,6 +8,9 @@ import com.eroom.mail.entity.Mail;
 
 public interface MailRepository extends JpaRepository<Mail, Long>{
 
-	List<Mail> findBySenderEmployeeNo(Long employeeNo);
-
+//	List<Mail> findBySenderEmployeeNo(Long employeeNo);
+	// 최신순
+	List<Mail> findBySenderEmployeeNoOrderByMailSentTimeDesc(Long employeeNo);
+	// 오래된 순
+	List<Mail> findBySenderEmployeeNoOrderByMailSentTimeAsc(Long employeeNo);
 }

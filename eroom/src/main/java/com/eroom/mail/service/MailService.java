@@ -25,14 +25,37 @@ public class MailService {
 
 	
 	
-	
-	public List<MailReceiver> getReceivedMailsByEmployee(Long employeeNo) {
+	// 받은 메일 조회
+	/*public List<MailReceiver> getReceivedMailsByEmployee(Long employeeNo) {
         return mailReceiverRepository.findByEmployeeNo(employeeNo);
-    }
+    }*/
+	public List<MailReceiver> getReceivedMailsByEmployee(Long employeeNo, String sortOrder) {
+			List<MailReceiver> resultList = null;
+		
+		if(sortOrder.equals("latest")) {
+	     resultList= mailReceiverRepository.findByEmployeeNoOrderByLatest(employeeNo);
+		}else if(sortOrder.equals("oldest")) {
+			 resultList= mailReceiverRepository.findByEmployeeNoOrderByOldest(employeeNo);
+		}
+		return resultList;
+	}
 	
     // 본인 메일 조회
-	public List<Mail> findMailsBySender(Long employeeNo) {
-	    return mailRepository.findBySenderEmployeeNo(employeeNo);
+//	public List<Mail> findMailsBySender(Long employeeNo) {
+//	    return mailRepository.findBySenderEmployeeNo(employeeNo);
+//	}
+	
+	// 지금은 최신순
+	// 조건줘서 최신 > 오래된 변환하게 
+	public List<Mail> findMailsBySender(Long employeeNo,String sortOrder) {
+		List<Mail> resultList = null;
+		
+		if(sortOrder.equals("latest")) {
+	     resultList= mailRepository.findBySenderEmployeeNoOrderByMailSentTimeDesc(employeeNo);
+		}else if(sortOrder.equals("oldest")) {
+			 resultList= mailRepository.findBySenderEmployeeNoOrderByMailSentTimeAsc(employeeNo);
+		}
+		return resultList;
 	}
 
 	// 지금 쓰는곳 없음 삭제 해도 될듯

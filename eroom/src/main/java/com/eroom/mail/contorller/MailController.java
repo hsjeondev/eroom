@@ -45,9 +45,12 @@ public class MailController {
 	
 	// 받은 메일
 	@GetMapping("/mail/receiverTo")
-	public String selectReceiverToAll(Model model, @AuthenticationPrincipal EmployeeDetails user) {
-	    Long empNo = user.getEmployee().getEmployeeNo(); // 로그인된 사용자
-	    List<MailReceiver> received = mailService.getReceivedMailsByEmployee(empNo); // 💡 서비스로 위임
+	public String selectReceiverToAll(Model model, @AuthenticationPrincipal EmployeeDetails user,
+			@RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder) {
+	    Long employeeNo = user.getEmployee().getEmployeeNo();
+	    
+	    
+	    List<MailReceiver> received = mailService.getReceivedMailsByEmployee(employeeNo, sortOrder); 
 	    model.addAttribute("receivedMails", received);
 	    return "mail/mailReceiverTo";
 	}
@@ -55,10 +58,15 @@ public class MailController {
 	// 04/17 본인것만 조회되게 
 	
 	  @GetMapping("/mail/sent") public String getSentMails(Model
-	  model, @AuthenticationPrincipal EmployeeDetails user) { Long myEmployeeNo =
-	  user.getEmployee().getEmployeeNo();
+	  model, @AuthenticationPrincipal EmployeeDetails user,
+	  @RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder
+			  ) { 
+	  Long employeeNo =user.getEmployee().getEmployeeNo();
 	  
-	  List<Mail> sentMailList = mailService.findMailsBySender(myEmployeeNo);
+	  // 조건 받아와서 여기서 적용하기 ( 최신순, 오래된 순 ) 
+	  
+	  List<Mail> sentMailList = mailService.findMailsBySender(employeeNo,sortOrder);
+	  //List<Mail> sentMailList = mailService.findMailsBySender(myEmployeeNo);
 	  model.addAttribute("sentMailList", sentMailList);
 	  
 	  return "mail/mailSent"; // 뷰 파일 이름 
