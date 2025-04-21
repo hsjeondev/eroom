@@ -11,5 +11,8 @@ public interface EmployeeDirectoryRepository extends JpaRepository<Directory, Lo
 
 	// separator_code로 주소록 리스트 조회(service 에서 separatorCode를 구분해서 사용)
 	List<Directory> findBySeparator_SeparatorCode(String separatorCode);
+	
+	// 주소록 정보 조회
+	Directory findByEmployee_EmployeeNo(Long employeeNo);
 
 }
