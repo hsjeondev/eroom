@@ -2,6 +2,7 @@ package com.eroom.websocket;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -14,6 +15,7 @@ import com.eroom.chat.entity.ChatMessage;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.repository.ChatMessageRepository;
 import com.eroom.employee.entity.Employee;
+import com.eroom.employee.repository.EmployeeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -23,11 +25,12 @@ import lombok.RequiredArgsConstructor;
 public class ChatWebSocketHandler extends TextWebSocketHandler{
 
 	private final ChatMessageRepository chatMessageRepository;
-	
-	// WebSocketSession을 저장할 Map
-	private static final Map<Long,WebSocketSession> userSessions = new HashMap<Long,WebSocketSession>();
-	// 방 번호를 저장할 Map
-	private static final Map<Long,Long> userRooms = new HashMap<Long,Long>();
+	private final EmployeeRepository employeeRepository;
+	// 사용자 세션을 저장할 Map
+	private static final Map<Long, WebSocketSession> userSessions = new ConcurrentHashMap<>();
+	// 사용자 방 번호를 저장할 Map
+	// ConcurrentHashMap 을 사용하여 멀티스레드 환경에서도 안전하게 사용할 수 있도록 함
+	private static final Map<Long, Long> userRooms = new ConcurrentHashMap<>();
 	
 	// WebSocket 연결 시 호출되는 메서드
 	@Override
@@ -57,8 +60,19 @@ public class ChatWebSocketHandler extends TextWebSocketHandler{
 	                                .build();
 	        chatMessageRepository.save(entity);
 	    }
+	    // (2) DB에서 저장된 메시지 조회
+	    Employee sender = employeeRepository.findById(chatMessageDto.getSenderMember())
+                .orElseThrow(() -> new IllegalArgumentException("직원이 존재하지 않습니다."));
+	    Map<String, Object> sendData = new HashMap<>();
+	    sendData.put("chatMessageContent", chatMessageDto.getChatMessageContent());
+	    sendData.put("senderMember", chatMessageDto.getSenderMember());
+	    sendData.put("senderName", sender.getEmployeeName()); // ⭐ 추가
+	    sendData.put("chatroomNo", chatMessageDto.getChatroomNo());
+	    sendData.put("receiverMember", chatMessageDto.getReceiverMember());
 
-	    // (2) 그룹 채팅 or 1:1 채팅 분기
+	    String sendPayload = objectMapper.writeValueAsString(sendData);
+
+	    // 그룹 채팅 or 1:1 채팅 분기
 	    if (chatMessageDto.getReceiverMember() == null) {
 	        // 그룹 채팅 처리: 방번호 같은 모든 사람에게 보내기
 	        for (Map.Entry<Long, Long> entry : userRooms.entrySet()) {
@@ -68,7 +82,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler{
 	            if (participantRoomNo.equals(chatMessageDto.getChatroomNo())) {
 	                WebSocketSession participantSession = userSessions.get(participantNo);
 	                if (participantSession != null && participantSession.isOpen()) {
-	                    participantSession.sendMessage(new TextMessage(message.getPayload()));
+	                    participantSession.sendMessage(new TextMessage(sendPayload));
 	                }
 	            }
 	        }
@@ -78,16 +92,16 @@ public class ChatWebSocketHandler extends TextWebSocketHandler{
 	        Long receiverRoom = userRooms.get(chatMessageDto.getReceiverMember());
 
 	        if (receiverSession != null && receiverSession.isOpen() && receiverRoom != null && receiverRoom.equals(chatMessageDto.getChatroomNo())) {
-	            receiverSession.sendMessage(new TextMessage(message.getPayload()));
+	            receiverSession.sendMessage(new TextMessage(sendPayload));
 	        }
+	     // 내가 보낸 메시지도 화면에 보여야 하니까 나한테도 보내기
+		    WebSocketSession senderSession = userSessions.get(chatMessageDto.getSenderMember());
+		    Long senderRoom = userRooms.get(chatMessageDto.getSenderMember());
+		    if (senderSession != null && senderSession.isOpen() && senderRoom.equals(chatMessageDto.getChatroomNo())) {
+		        senderSession.sendMessage(new TextMessage(sendPayload));
+		    }
 	    }
-
-	    // (3) 내가 보낸 메시지도 화면에 보여야 하니까 나한테도 보내기
-	    WebSocketSession senderSession = userSessions.get(chatMessageDto.getSenderMember());
-	    Long senderRoom = userRooms.get(chatMessageDto.getSenderMember());
-	    if (senderSession != null && senderSession.isOpen() && senderRoom.equals(chatMessageDto.getChatroomNo())) {
-	        senderSession.sendMessage(new TextMessage(message.getPayload()));
-	    }
+	    
 	}
 
 	@Override

@@ -21,8 +21,11 @@ public class ChatMessageService {
 	private final ChatMessageRepository chatMessageRepository;
 	
 	public List<ChatMessage> selectMessageByRoomNo(Long roomNo) {
+		// 채팅방 번호로 채팅 메시지 조회
 		Chatroom chatroom = repository.findById(roomNo).orElse(null);
+		// 채팅방이 존재하지 않으면 null 반환
 		Specification<ChatMessage> spec = (root, query, CriteriaBuilder) -> null;
+		// 채팅방이 존재하면 조건 추가
 		spec = spec.and(ChatMessageSpecification.roomNoEquals(chatroom));
 		return chatMessageRepository.findAll(spec);
 	}

@@ -73,4 +73,17 @@ public class EmployeeService {
 	public List<Employee> findEmployeesByTeamId(String teamId) {
 		return employeeRepository.findEmployeesByTeamId(teamId);
 	}
+	
+	//부서만 조회
+	public List<SeparatorDto> findOnlyDepartments() {
+	    List<Structure> departments = structureRepository.findOnlyDepartments();
+
+	    return departments.stream()
+	        .map(entity -> SeparatorDto.builder()
+	                .separator_code(entity.getSeparatorCode())
+	                .separator_name(entity.getCodeName())
+	                .build())
+	        .collect(Collectors.toList());
+	}
+	
 }
