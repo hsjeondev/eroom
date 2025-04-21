@@ -62,7 +62,6 @@ public class CompanyCalendarDto {
 				.separator(companyCalendar.getSeparator())
 				.calendar_reg_date(companyCalendar.getCalendarRegDate())
 				.calendar_mod_date(companyCalendar.getCalendarModDate())
-				.employee_no(companyCalendar.getEmployeeNo())
 				.build();
 	}
 	

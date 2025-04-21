@@ -37,54 +37,5 @@ public class AttendanceController {
 		return "attendance/list";
 	}
 	
-	// 출근 페이지
-	@GetMapping("/checkinout")
-	public String checkInOut() {
-		return "checkinout";
-	}
-
-	// 출퇴근 기록
-	@PostMapping("/log")
-	@ResponseBody
-	public Map<String,String> recordAttendance(AttendanceDto dto){
-		Map<String,String> resultMap = new HashMap<String,String>();
-		resultMap.put("res_code", "500");
-		resultMap.put("res_msg", "처리에 실패했습니다.");
-		
-		Attendance result = attendanceService.recordAttendance(dto);
-		if(result != null) {
-			resultMap.put("res_code", "200");
-			resultMap.put("res_msg", "checkIn".equals(dto.getAttendanceType()) ? "출근 완료! 오늘도 힘내세요~" : "퇴근 완료! 수고하셨습니다");
-		}
-		
-		return resultMap;
-	}
-	
-	// 출근 여부
-	@GetMapping("/status")
-	@ResponseBody
-	public Map<String, String> getTodayAttendanceStatus(){
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		EmployeeDetails employeeDetail = (EmployeeDetails) authentication.getPrincipal();
-		Long employeeNo = employeeDetail.getEmployee().getEmployeeNo();
-		
-		LocalDateTime now = LocalDateTime.now();
-		LocalDateTime todayStart = now.toLocalDate().atStartOfDay();
-		LocalDateTime todayEnd = todayStart.plusDays(1);
-		
-		Attendance checkIn = attendanceRepository.findLastCheckInToday(employeeNo, todayStart, todayEnd);
-		
-		Map<String,String> result = new HashMap<>();
-		
-		if(checkIn == null) {
-			result.put("status", "notCheckedIn");
-		}else if(checkIn.getAttendanceCheckOutTime() == null) {
-			result.put("status", "checkedIn");
-		}else {
-			result.put("status", "checkedOut");
-		}
-		
-		return result;
-	}
 	
 }

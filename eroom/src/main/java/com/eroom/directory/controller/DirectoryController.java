@@ -13,6 +13,7 @@ import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.EmployeeDirectoryService;
 import com.eroom.employee.entity.Structure;
+import com.eroom.employee.service.StructureService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class DirectoryController {
 	
 	private final EmployeeDirectoryService employeeDirectoryService;
+	private final StructureService structureService;
 	
 
 	@GetMapping("/directory/employee")
@@ -37,7 +39,7 @@ public class DirectoryController {
 			    	// 팀이라는 뜻이니까 code_name을 가져오면 팀명
 			        dto.setTeam_name(structure.getCodeName());
 			        // 부서 있다는 뜻이니까 부서 parent_code=separator_code 조회해서 code_name을 가져오면 부서명
-			        Structure parent = employeeDirectoryService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(structure.getParentCode());
+			        Structure parent = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(structure.getParentCode());
 			        dto.setDepartment_name(parent != null ? parent.getCodeName() : "-");
 			    } else {
 			    	// 부서라는 뜻이니까 code_name을 바로 가져오면 부서명
@@ -57,12 +59,12 @@ public class DirectoryController {
 		// 부서 리스트와 팀 리스트를 가져와서 Map에 저장
 		List<Structure> departmentList = new ArrayList<Structure>();
 		Map<String, List<Structure>> teamMap = new HashMap<String, List<Structure>>();
-		departmentList = employeeDirectoryService.selectDepartmentAll();
+		departmentList = structureService.selectDepartmentAll();
 		for (Structure s : departmentList) {
 			// 부서명으로 팀 리스트를 가져와서 Map에 저장
 			List<Structure> teamList = new ArrayList<Structure>();
 			// separator_code로 팀 리스트를 조회 후 <부서명, 팀리스트> 형태로 Map에 저장
-			teamList = employeeDirectoryService.selectTeamAll(s.getSeparatorCode());
+			teamList = structureService.selectTeamAll(s.getSeparatorCode());
 			teamMap.put(s.getCodeName(), teamList);
 		}
 		

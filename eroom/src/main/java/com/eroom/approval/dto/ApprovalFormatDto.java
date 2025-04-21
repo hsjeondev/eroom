@@ -19,11 +19,13 @@ import lombok.ToString;
 public class ApprovalFormatDto {
 	private Long approval_format_no;
 	private String approval_format_content;
+	private String approval_format_title;
 	
 	public ApprovalFormat toEntity() {
 		return ApprovalFormat.builder()
 				.approvalFormatNo(approval_format_no)
 				.approvalFormatContent(approval_format_content)
+				.approvalFormatTitle(approval_format_title)
 				.build();
 	}
 	
@@ -31,6 +33,7 @@ public class ApprovalFormatDto {
 		return ApprovalFormatDto.builder()
 				.approval_format_no(entity.getApprovalFormatNo())
 				.approval_format_content(entity.getApprovalFormatContent())
+				.approval_format_title(entity.getApprovalFormatTitle())
 				.build();
 	}
 }

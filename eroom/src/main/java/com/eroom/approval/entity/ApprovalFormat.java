@@ -31,4 +31,7 @@ public class ApprovalFormat {
 	
 	@Column(name="approval_format_content")
 	private String approvalFormatContent;
+	
+	@Column(name="approval_format_title")
+	private String approvalFormatTitle;
 }

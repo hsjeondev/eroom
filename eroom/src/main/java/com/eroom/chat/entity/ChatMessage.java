@@ -4,11 +4,15 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.eroom.employee.entity.Employee;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +35,13 @@ public class ChatMessage {
 	@Column(name="chat_message_no")
 	private Long chatMessageNo; // 메시지번호
 	
-	// 챗룸번호 FK
+	@ManyToOne
+	@JoinColumn(name="chatroom_no")
+	private Chatroom chatroomNo; // 챗룸번호
+	
+	@ManyToOne
+	@JoinColumn(name="sender_member")
+	private Employee senderMember; // 보낸 사람
 	
 	@Column(name="chat_message_content")
 	private String chatMessageContent; // 메시지 내용
@@ -40,10 +50,11 @@ public class ChatMessage {
 	@Column(updatable=false, name="message_reg_date")
 	private LocalDateTime messageRegDate; // 보낸시간
 	
+	@Builder.Default
 	@Column(nullable=false, name="message_is_deleted_yn")
-	private String messageIsDeletedYn; // 삭제여부
+	private String messageIsDeletedYn = "N"; // 삭제여부
 	
-	// 사번 FK
+	
 	
 	
 	

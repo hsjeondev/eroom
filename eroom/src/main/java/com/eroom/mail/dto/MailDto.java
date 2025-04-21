@@ -1,6 +1,7 @@
 package com.eroom.mail.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.eroom.employee.entity.Employee;
 import com.eroom.mail.entity.Mail;
@@ -28,7 +29,9 @@ public class MailDto {
 	// directory 데이터로 바꿀 예정
 	private Long employee_no;
 	// 받는 사람 나중에 List로 바꿀 예정
-	private Employee receiver;
+	//private Employee receiver;
+	
+	private List<Long> receiverNos;
 	
 	public Mail toEntity() {
 		return Mail.builder()
