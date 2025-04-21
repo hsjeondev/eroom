@@ -126,7 +126,7 @@
         <div class="card p-3 shadow-sm">
           <div class="card-title d-flex justify-content-between align-items-center mb-3">
             <span class="fw-bold fs-8 text-secondary">근무시간 통합 차트</span>
-            <p class="text-muted mb-0">이번달 총 근무시간: <strong class="text-primary">165시간 25분</strong></p>
+            <p class="text-muted mb-0">이번달 총 근무시간: <strong class="text-primary" th:text="${totalWorkTime}">165시간 25분</strong></p>
           </div>
           <canvas id="workTimeMixedChart" height="260"></canvas>
         </div>
@@ -218,97 +218,142 @@
 </div><!-- 근태현황 목록 테이블 끝 -->
 
 <script>
-	/* 상단에 현재 시간 보여주기 */
-	function updateCurrentTime(){
+	// 상단에 현재 날짜 표시
+	function updateCurrentTime() {
 		const now = new Date();
-		
 		const year = now.getFullYear();
-		const month = String(now.getMonth()+1).padStart(2,'0');
-		const date = String(now.getDate()).padStart(2,'0');
-		
-		const formattedDate = `${year}.${month}.${date}`;
-		
-		document.getElementById('currentTime').innerText = formattedDate;
+		const month = String(now.getMonth() + 1).padStart(2, '0');
+		const date = String(now.getDate()).padStart(2, '0');
+		document.getElementById('currentTime').innerText = `${year}.${month}.${date}`;
 	}
 	updateCurrentTime();
-   
-   /* 근태 요약 차트 */
-	const ctx1 = document.getElementById('miniAttendanceChart').getContext('2d');
-	new Chart(ctx1, {
-		type: 'bar',
-		data: {
-			labels: ['출근일수', '지각', '조퇴'],
-			datasets: [{
-				label: '횟수',
-				data: [15, 2, 1],
-				backgroundColor: ['rgba(13, 110, 253, 0.7)', 'rgba(220, 53, 69, 0.7)', 'rgba(255, 193, 7, 0.7)']
-			}]
-		},
-		options: {
-			plugins: { legend: { display: false } },
-			scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-		}
-	});
-/* 근무시간 통합 차트 */
-	const ctx2 = document.getElementById('workTimeMixedChart').getContext('2d');
-	new Chart(ctx2, {
-	  type: 'bar',
-	  data: {
-		labels: ['4/1', '4/2', '4/3', '4/4', '4/5', '월', '화', '수', '목', '금'],
-		datasets: [
-			{
-			  type: 'line',
-			  label: '일별 근무시간',
-			  data: [8.1, 7.6, 8.3, 6.9, 7.5, null, null, null, null, null],
-			  borderColor: '#0d6efd',
-			  backgroundColor: '#0d6efd55',
-			  yAxisID: 'y',
-			  tension: 0.3,
-			  spanGaps: true
+
+	// 차트 데이터를 받아서 각 차트를 렌더링하는 함수
+	async function renderCharts() {
+		// 1. API 호출
+		const response = await fetch('/attendance/chartData');
+		const data = await response.json();
+		console.log(data); // 디버깅용 콘솔 출력
+		console.log(data.checkinDays,data.lateCount,data.earlyLeaveCount); // 디버깅용 콘솔 출력
+
+		/* --------------- 근태 요약 차트 (Bar Chart) ----------------- */
+		const miniCtx = document.getElementById('miniAttendanceChart').getContext('2d');
+		console.log(miniCtx); // 디버깅용 콘솔 출력
+		new Chart(miniCtx, {
+			type: 'bar',
+			data: {
+				labels: ['출근일수', '지각', '조퇴'],
+				datasets: [{
+					label: '횟수',
+					data: [
+						data.checkinDays || 0,
+						data.lateCount || 0,
+						data.earlyLeaveCount || 0
+					],
+					backgroundColor: [
+						'rgba(13, 110, 253, 0.7)',   // 출근: 파랑
+						'rgba(220, 53, 69, 0.7)',    // 지각: 빨강
+						'rgba(255, 193, 7, 0.7)'     // 조퇴: 노랑
+					]
+				}]
 			},
-			{
-			  type: 'bar',
-			  label: '요일별 평균 근무시간',
-			  data: [null, null, null, null, null, 8.2, 7.5, 7.9, 8.0, 6.8],
-			  backgroundColor: 'rgba(255, 99, 132, 0.6)',
-			  yAxisID: 'y1'
-			}
-		]
-	  },
-	  options: {
-		responsive: true,
-		plugins: {
-			tooltip: {
-				callbacks: {
-					label: function(context) {
-					  const label = context.dataset.label;
-					  const val = context.raw;
-					  return label + ': ' + (val !== null ? val.toFixed(2) + '시간' : '');
+			options: {
+				plugins: {
+					legend: { display: false }
+				},
+				scales: {
+					y: {
+						beginAtZero: true,
+						ticks: { stepSize: 1 }
 					}
 				}
-			},
-			legend: { position: 'top' }
-		},
-		scales: {
-			y: {
-				type: 'linear',
-				position: 'left',
-				title: { display: true, text: '일별 근무시간' },
-				beginAtZero: true,
-				suggestedMax: 10
-			},
-			y1: {
-				type: 'linear',
-				position: 'right',
-				title: { display: true, text: '요일별 평균' },
-				grid: { drawOnChartArea: false },
-				beginAtZero: true,
-				suggestedMax: 10
 			}
-		}
-	  }
-	});
-</script>                           
+		});
+
+		/* --------------- 근무시간 통합 차트 (Mixed: Line + Bar) ----------------- */
+		const mixedCtx = document.getElementById('workTimeMixedChart').getContext('2d');
+		const workTimePerDay = data.workTimePerDay || {};
+		const weekdayAvg = data.weekdayAvg || {};
+
+		// (1) 날짜별 근무시간 차트용 데이터 변환
+		const dailyLabels = Object.keys(workTimePerDay).map(dateStr => {
+			const [year, month, day] = dateStr.split('-');
+			return `${month}/${day}`;
+		});
+		const dailyData = Object.values(workTimePerDay);
+
+		// (2) 요일별 평균 근무시간 변환 및 정렬
+		const dayMap = {
+			'MONDAY': '월', 'TUESDAY': '화', 'WEDNESDAY': '수',
+			'THURSDAY': '목', 'FRIDAY': '금', 'SATURDAY': '토', 'SUNDAY': '일'
+		};
+		const weekdayOrder = ['월', '화', '수', '목', '금', '토', '일'];
+		const weekdayData = weekdayOrder.map(kor => {
+			const eng = Object.keys(dayMap).find(key => dayMap[key] === kor);
+			return weekdayAvg[eng] ?? null;
+		});
+
+		// (3) 차트 생성
+		new Chart(mixedCtx, {
+			type: 'bar',
+			data: {
+				labels: [...dailyLabels, ...weekdayOrder],
+				datasets: [
+					{
+						type: 'line',
+						label: '일별 근무시간',
+						data: [...dailyData, ...new Array(weekdayOrder.length).fill(null)],
+						borderColor: '#0d6efd',
+						backgroundColor: '#0d6efd55',
+						yAxisID: 'y',
+						tension: 0.3,
+						spanGaps: true
+					},
+					{
+						type: 'bar',
+						label: '요일별 평균 근무시간',
+						data: [...new Array(dailyLabels.length).fill(null), ...weekdayData],
+						backgroundColor: 'rgba(255, 99, 132, 0.6)',
+						yAxisID: 'y1'
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				plugins: {
+					tooltip: {
+						callbacks: {
+							label: function (context) {
+								const label = context.dataset.label;
+								const val = context.raw;
+								return label + ': ' + (val !== null ? val.toFixed(2) + '시간' : '');
+							}
+						}
+					},
+					legend: { position: 'top' }
+				},
+				scales: {
+					y: {
+						type: 'linear',
+						position: 'left',
+						title: { display: true, text: '일별 근무시간' },
+						beginAtZero: true,
+						suggestedMax: 10
+					},
+					y1: {
+						type: 'linear',
+						position: 'right',
+						title: { display: true, text: '요일별 평균' },
+						grid: { drawOnChartArea: false },
+						beginAtZero: true,
+						suggestedMax: 10
+					}
+				}
+			}
+		});
+	}
+	renderCharts();
+</script>                         
 
 </main>
 </body>

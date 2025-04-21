@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.attendance.dto.AnnualLeaveDto;
 import com.eroom.attendance.dto.AttendanceDto;
@@ -85,11 +87,27 @@ public class AttendanceController {
 		// 해당 월의 근태 기록 조회
 		List<AttendanceDto> attendanceList = attendanceService.selectAttendanceListByMonth(employeeNo, selectedMonth);
 		model.addAttribute("attendanceList",attendanceList);
+		
+		// 근태 차트 요약 데이터
+		Map<String, Object> chartData = attendanceService.getAttendanceChartData(employeeDetail);
+		// 근무시간 문자열만 가져오기
+		String totalWorkTime = (String) chartData.get("totalWorkTime");
+		model.addAttribute("totalWorkTime", totalWorkTime);
+		
+		
+		
 		return "attendance/list";
 	}
 	
 	@GetMapping("/chartData")
+	@ResponseBody
 	public Map<String,Object> getChartData(){
+		// 현재 로그인 정보
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		EmployeeDetails employeeDetail = (EmployeeDetails)authentication.getPrincipal();
+		
+		// 차트 데이터
+		return attendanceService.getAttendanceChartData(employeeDetail);
 		
 	}
 	

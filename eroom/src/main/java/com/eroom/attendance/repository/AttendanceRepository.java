@@ -1,5 +1,6 @@
-package com.eroom.attendance.repository;
+	package com.eroom.attendance.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -8,7 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.eroom.attendance.entity.AnnualLeave;
 import com.eroom.attendance.entity.Attendance;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
@@ -35,4 +35,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
 	@Query("SELECT DISTINCT DATE_FORMAT(a.attendanceCheckInTime, '%Y.%m') AS formattedMonth FROM Attendance a WHERE a.employee.employeeNo = :employeeNo ORDER BY formattedMonth DESC")
     List<String> findDistinctAttendanceMonth(@Param("employeeNo") Long employeeNo);
 
+	
+	// 
+	@Query("SELECT a FROM Attendance a WHERE a.employee.employeeNo = :employeeNo AND a.attendanceCheckInTime BETWEEN :start AND :end")
+	List<Attendance> findByEmployeeAndDateRange(@Param("employeeNo") Long employeeNo,@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }
