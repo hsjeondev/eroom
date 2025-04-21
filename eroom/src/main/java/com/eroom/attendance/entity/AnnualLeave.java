@@ -1,5 +1,7 @@
 package com.eroom.attendance.entity;
 
+import com.eroom.employee.entity.Employee;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,17 +28,17 @@ public class AnnualLeave {
 	@Column(name="annual_leave_no")
 	private Long annualLeaveNo; // 연차 번호
 	
+	@Column(name="year")
+	private Long year; // 연차 년도
+	
 	@Column(name="annual_leave_total")
-	private Long annualLeaveTotal; // 총 연차
+	private Double annualLeaveTotal; // 총 연차
 	
 	@Column(name="annual_leave_used")
-	private Long annualLeaveUsed; // 사용 연차
+	private Double annualLeaveUsed; // 사용 연차
 	
-	@Column(name="annual_leave_half_used")
-	private Long annualLeaveHalfUsed; // 사용 반차
-	
-//	@OneToOne
-//	@JoinColumn(name="employee_no")
-//	private Employee employee; // 사번
+	@OneToOne
+	@JoinColumn(name="employee_no")
+	private Employee employee; // 사번
 	
 }
