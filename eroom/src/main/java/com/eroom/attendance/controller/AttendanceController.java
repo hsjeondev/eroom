@@ -3,6 +3,7 @@ package com.eroom.attendance.controller;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -85,6 +86,11 @@ public class AttendanceController {
 		List<AttendanceDto> attendanceList = attendanceService.selectAttendanceListByMonth(employeeNo, selectedMonth);
 		model.addAttribute("attendanceList",attendanceList);
 		return "attendance/list";
+	}
+	
+	@GetMapping("/chartData")
+	public Map<String,Object> getChartData(){
+		
 	}
 	
 	
