@@ -150,10 +150,10 @@
 						</div>
 					</div>
 					<div
-						class="modal-footer d-flex justify-content-between align-items-center border-0">
+						class="modal-footer d-flex justify-content-between align-items-center border-0" >
 						<div class="d-flex">
 							<button class="btn btn-subtle-secondary me-1 mb-1" type="button"
-								id="editEventBtn">수정</button>
+								id="editEventBtn" >수정</button>
 							<button class="btn btn-outline-info me-1 mb-1" type="button"
 								id="deleteEventBtn">삭제</button>
 						</div>
@@ -248,7 +248,7 @@
 		
 		<!-- 회사 일정에서 캘린더를 클릭하면 누구나 일정을 등록할수 있기에, 관리자 라는 값을 넘겨줌 dateClick속성-->  
 		<script th:inline="javascript">
-  			let employeePosition = '[[${#authentication.principal.employee.employeePosition}]]';
+			let employeePosition = /*[[${#authentication.principal.employee.employeePosition}]]*/ "";
   			console.log(employeePosition)
 		</script>
 
@@ -287,7 +287,7 @@
 		      //일정 등록이 안되어있는 날을 클릭하면 일정을 등록할수 있게 하는 event
 		      dateClick: function (info) {
 		    	  
-		    	  if (employeePosition.trim() !== '"관리자"') {
+		    	  if (employeePosition.trim() !== '관리자') {
 		    		  return;
 		    		}
 		      
@@ -361,6 +361,15 @@
 			    minute: '2-digit',
 			    hour12: true
 			  };
+			  
+			  //관리자만 상세조회에서 수정/삭제 버튼이 보일 수 있게 설정
+			  if (employeePosition.trim() === '관리자') {
+				    document.getElementById('editEventBtn').style.display = 'inline-block';
+				    document.getElementById('deleteEventBtn').style.display = 'inline-block';
+				  } else {
+				    document.getElementById('editEventBtn').style.display = 'none';
+				    document.getElementById('deleteEventBtn').style.display = 'none';
+				  }
 			
 			  // 1. 일정, 시간, 장소, 설명을 가져옵니다
 			  const title = info.event.title || '';
