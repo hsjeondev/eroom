@@ -26,11 +26,11 @@ public class ApprovalService {
 		return resultList;
 	}
 
-	public int createApproval(ApprovalRequestDto dto) {
+	public int createApproval(ApprovalRequestDto dto, Long employeeNo) {
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
 			String json = objectMapper .writeValueAsString(dto.getContent());
-			Employee emp = employeeRepository.findById(dto.getWriter().getEmployee_no()).orElse(null);
+			Employee emp = employeeRepository.findById(employeeNo).orElse(null);
 			
 			Approval approval = Approval.builder()
 					.employee(emp)

@@ -96,7 +96,7 @@ public class ApprovalController {
 	public String selectWithdrawnApprovalsList() {
 		return "/approval/withdrawnApprovals";
 	}
-	// 결재 작성 페이지 진입
+	// 결재 생성 페이지 진입
 	@GetMapping("/approval/create")
 	public String selectApprovalCreate(Model model, Authentication authentication) {
 		// 로그인한 사용자 정보 가져오기
@@ -125,7 +125,7 @@ public class ApprovalController {
 		return "/approval/create";
 	}
 	
-	// 결재 결재라인 추가를 위한 조회
+	// 결재 생성 결재라인 추가를 위한 조회
 	@GetMapping("/approval/employes")
 	@ResponseBody
 	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam(name = "separator_code") String separatorCode) {
@@ -140,7 +140,7 @@ public class ApprovalController {
 		}
 	}
 	
-	// 결재 양식 리스트 조회
+	// 결재 생성 양식 리스트 조회
 	@PostMapping("/approval/format")
 	@ResponseBody
 	public Map<String, String> selectApprovalFormat(@RequestBody ApprovalFormatDto dto) {
@@ -159,7 +159,7 @@ public class ApprovalController {
 		return map;
 	}
 	
-	// 결재 라인 추가
+	// 결재 생성 라인 추가
 	@PostMapping("/approval/addApprovalLine")
 	@ResponseBody
 	public Map<String, String> addApprovalLine(@RequestBody ApprovalLineDto dto) {
@@ -178,10 +178,15 @@ public class ApprovalController {
 	// 결재 생성 Create
 	@PostMapping("/approval/create")
 	@ResponseBody
-	public Map<String, String> createApproval(@RequestBody ApprovalRequestDto dto) {
+	public Map<String, String> createApproval(@RequestBody ApprovalRequestDto dto, Authentication authentication) {
 		Map<String, String> map = new HashMap<String, String>();
 
-		int result = approvalService.createApproval(dto);
+		// 로그인한 사용자 정보 가져오기
+		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+		Employee employee = employeeDetails.getEmployee();
+		Long employeeNo = employee.getEmployeeNo();
+		
+		int result = approvalService.createApproval(dto, employeeNo);
 		
 		
 		map.put("res_code", "500");
