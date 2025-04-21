@@ -1,14 +1,14 @@
 package com.eroom.calendar.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
 import com.eroom.calendar.dto.CompanyCalendarDto;
-
 import com.eroom.calendar.entity.CompanyCalendar;
-
 import com.eroom.calendar.repository.CompanyCalendarRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -92,5 +92,24 @@ public class CompanyCalendarService {
 	    	    .build();
 	    CompanyCalendar saved = companyRepository.save(updated);
 	    return new CompanyCalendarDto().toDto(saved);
+	}
+	
+	public List<Map<String, Object>> getAllVisibleCalendars() {
+	    List<CompanyCalendar> list = companyRepository.findBySeparatorStartingWithAndVisibleYn("A", "Y");
+
+	    List<Map<String, Object>> result = new ArrayList<>();
+	    for (CompanyCalendar entity : list) {
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("calendar_no", entity.getCalendarNo());
+	        map.put("title", entity.getCompanyTitle());
+	        map.put("start", entity.getCalendarStartTime().toString());
+	        map.put("end", entity.getCalendarEndTime().toString());
+	        map.put("location", entity.getCompanyLocation());
+	        map.put("description", entity.getCompanyContent());
+	        map.put("separator", entity.getSeparator());
+
+	        result.add(map); // ✅ 올바른 리스트 추가!
+	    }
+	    return result;
 	}
 }
