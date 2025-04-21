@@ -223,7 +223,7 @@
 		 		  const separator = info.event.extendedProps.separator || "";
 		 		  const type = info.event.extendedProps.type;
 
-		 		  // 🌕 공휴일일 경우 스타일 적용
+		 		  // 공휴일일 경우 스타일 적용
 		 		  if (type === "holiday") {
 		 		    el.style.setProperty("background-color", "#FFF8B3", "important"); // 연노랑
 		 		    el.style.setProperty("border", "1px solid #F5E79E", "important");
@@ -246,7 +246,7 @@
 		 		    "T005": "D003", "T006": "D003", "T007": "D004", "T008": "D004"
 		 		  };
 
-		 		  // 🟩 기존 switch-case 우선 적용
+		 		  // 기존 switch-case 우선 적용
 		 		  let backgroundColor, borderColor, textColor;
 
 		 		  switch (separator) {
@@ -323,21 +323,27 @@
 
       // 새로 선택된 부서 일정 추가
       departmentSource = calendar.addEventSource({
-        events: function (fetchInfo, successCallback, failureCallback) {
-          fetch('/departmentcalendar/list/' + departmentCode)
-            .then(response => {
-              if (!response.ok) throw new Error("서버 응답 실패!");
-              return response.json();
-            })
-            .then(events => {
-              successCallback(events);
-            })
-            .catch(error => {
-              console.error("부서 일정 불러오기 실패 😢", error);
-              failureCallback(error);
-            });
-        }
-      });
+    	  events: function (fetchInfo, successCallback, failureCallback) {
+    	    fetch('/departmentcalendar/list/' + departmentCode)
+    	      .then(response => {
+    	        if (!response.ok) throw new Error("서버 응답 실패!");
+    	        return response.json();
+    	      })
+    	      .then(events => {
+    	        const updatedEvents = events.map(event => {
+    	          return {
+    	            ...event,
+    	            title: (event.teamName ? `[${event.teamName}] ` : '') + (event.title || '')
+    	          };
+    	        });
+    	        successCallback(updatedEvents);
+    	      })
+    	      .catch(error => {
+    	        console.error("부서 일정 불러오기 실패 😢", error);
+    	        failureCallback(error);
+    	      });
+    	  }
+    	});
     };
 
       
