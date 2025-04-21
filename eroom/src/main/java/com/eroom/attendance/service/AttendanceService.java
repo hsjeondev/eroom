@@ -1,7 +1,9 @@
 package com.eroom.attendance.service;
 
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +13,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.eroom.attendance.dto.AttendanceDto;
+import com.eroom.attendance.entity.AnnualLeave;
 import com.eroom.attendance.entity.Attendance;
+import com.eroom.attendance.repository.AnnualLeaveRepository;
 import com.eroom.attendance.repository.AttendanceRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.security.EmployeeDetails;
@@ -25,6 +29,7 @@ import lombok.Setter;
 public class AttendanceService {
 	
 	private final AttendanceRepository attendanceRepository;
+	private final AnnualLeaveRepository annualLeaveRepository;
 	
 	// 출퇴근 기록
 	public Attendance recordAttendance(AttendanceDto dto){
@@ -136,12 +141,47 @@ public class AttendanceService {
 		
 		Long employeeNo = employeeDetail.getEmployee().getEmployeeNo(); 
 		
-		return attendanceRepository.findByEmployee_EmployeeNo(employeeNo);
+		return attendanceRepository.findByEmployee_EmployeeNoOrderByAttendanceCheckInTimeDesc(employeeNo);
 		
 		
 	}
+	// 연차 정보 조회
+	public AnnualLeave selectAnnualLeaveByEmployeeNo(Long employeeNo) {
+		
+		return annualLeaveRepository.findByEmployee_EmployeeNo(employeeNo);
+	}
 	
+	// 근무 기록이 있는 월 조회
+	public List<String> selectAttendanceMonthList(Long employeeNo){
+		return attendanceRepository.findDistinctAttendanceMonth(employeeNo);
+	}
 	
+	// 해당 월의 근태 기록 조회
+	public List<AttendanceDto> selectAttendanceListByMonth(Long employeeNo, String month){
+		List<Attendance> attendanceList;
+		
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM");
+		// 현재 날짜 기준으로 현재 월 가져오기
+		String currentMonth = (month != null && !month.isEmpty()) ? month : LocalDateTime.now().format(formatter);
+		// YearMonth -> 연도와 월만 저장
+		YearMonth yearMonth = YearMonth.parse(currentMonth,formatter);
+		
+		// 해당 월의 첫날, 마지막날 계산
+		LocalDateTime start = yearMonth.atDay(1).atStartOfDay();
+		LocalDateTime end = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+		
+		// 월별 출근 기록 조회
+		attendanceList = attendanceRepository.findByEmployee_EmployeeNoAndAttendanceCheckInTimeBetweenOrderByAttendanceCheckInTimeDesc(employeeNo, start, end);
+		
+		// 조회된 결과를 DTO로 변환
+		List<AttendanceDto> attendanceDtoList = new ArrayList<>();
+		for(Attendance attendance : attendanceList) {
+			attendanceDtoList.add(new AttendanceDto().toDto(attendance));
+		}
+		
+		return attendanceDtoList;
+	}
 	
 
 }

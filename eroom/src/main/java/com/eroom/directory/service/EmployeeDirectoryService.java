@@ -39,6 +39,10 @@ public class EmployeeDirectoryService {
 //	public List<Structure> selectTeamAll(String parentCode) {
 //		return structureRepository.findByParentCode(parentCode);
 //	}
+	
+	public Directory selectDirectoryByEmployeeNo(Long employeeNo) {
+		return employeeDirectoryRepository.findByEmployee_EmployeeNo(employeeNo);
+	}
 
 	
 }
