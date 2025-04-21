@@ -15,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.calendar.dto.CompanyCalendarDto;
+import com.eroom.calendar.dto.DepartmentCalendarDto;
 import com.eroom.calendar.dto.EmployeeCalendarDto;
 import com.eroom.calendar.dto.TeamCalendarDto;
 import com.eroom.calendar.entity.CompanyCalendar;
 import com.eroom.calendar.entity.EmployeeCalendar;
 import com.eroom.calendar.entity.TeamCalendar;
 import com.eroom.calendar.service.CompanyCalendarService;
+import com.eroom.calendar.service.DepartmentCalendarService;
 import com.eroom.calendar.service.EmployeeCalendarService;
 import com.eroom.calendar.service.TeamCalendarService;
 import com.eroom.employee.dto.SeparatorDto;
@@ -36,6 +38,7 @@ public class CalendarController {
 	private final CompanyCalendarService companyService;
 	private final TeamCalendarService teamService;
 	private final EmployeeService employeeService;
+	private final DepartmentCalendarService departmentService;
 
 	@GetMapping("/calendar")
 	public String calendarView() {
@@ -180,12 +183,13 @@ public class CalendarController {
 	
 	@GetMapping("/departmentcalendar/list/{departmentCode}")
 	@ResponseBody
-	public List<Map<String, Object>> getTeamListByDepartment(@PathVariable("departmentCode") String departmentCode) {
+	public List<Map<String, Object>> getDepartmentEvents(@PathVariable("departmentCode") String departmentCode) {
+	    List<DepartmentCalendarDto> deptList = departmentService.getDepartmentCalendar(departmentCode);
+	    System.out.println(departmentCode+"!!!!!!!!!!!!!!!!!!!!!!!!!!");
 	    List<Map<String, Object>> result = new ArrayList<>();
-	    List<TeamCalendarDto> teamList = teamService.getTeamListByDepartmentCode(departmentCode);
-	    System.out.println("💬 부서 코드로 일정 조회 요청 들어옴: " + teamList);
-	    for (TeamCalendarDto dto : teamList) {
-	        result.add(dto.toFullCalendarEvent()); // { title, start, end ... }
+
+	    for (DepartmentCalendarDto dto : deptList) {
+	        result.add(dto.toFullCalendarEvent());  // FullCalendar 형식 맞춤 변환
 	    }
 
 	    return result;
