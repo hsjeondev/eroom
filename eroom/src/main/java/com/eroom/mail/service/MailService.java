@@ -21,15 +21,19 @@ import lombok.RequiredArgsConstructor;
 public class MailService {
 
 	private final MailRepository mailRepository;
-	private final MailReceiverRepository mailRecevierRepository;
+	private final MailReceiverRepository mailReceiverRepository;
 	private final EmployeeRepository employeeRepository;
 
-    
+	public List<MailReceiver> getReceivedMailsByEmployee(Long employeeNo) {
+        return mailReceiverRepository.findByEmployeeNo(employeeNo);
+    }
+	
+    // 본인 메일 조회
 	public List<Mail> findMailsBySender(Long employeeNo) {
 	    return mailRepository.findBySenderEmployeeNo(employeeNo);
 	}
 
-	
+	// 지금 쓰는곳 없음 삭제 해도 될듯
 	public List<Mail> selectMailAll(){
 		List<Mail> list = mailRepository.findAll();
 		return list;
@@ -64,7 +68,7 @@ public class MailService {
 		                    //.directory(receiverDirectory) // 수신자 Directory 정보
 		                    .build();
 
-		            mailRecevierRepository.save(mailReceiver);
+		            mailReceiverRepository.save(mailReceiver);
 		        }
 			
 			

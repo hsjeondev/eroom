@@ -18,6 +18,7 @@ import com.eroom.employee.entity.Employee;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.mail.dto.MailDto;
 import com.eroom.mail.entity.Mail;
+import com.eroom.mail.entity.MailReceiver;
 import com.eroom.mail.service.MailService;
 import com.eroom.security.EmployeeDetails;
 
@@ -29,6 +30,7 @@ public class MailController {
 
 	private final MailService mailService;
 	private final EmployeeService employeeService;
+	
 	/* 테스트로 만들어 놓은거
 	 * @GetMapping("/mail") public String selectMailAll(Model model) { // 조건 필요함
 	 * reveiver에 // to일때는 내가 보낸거 // 조건이 cc면 받은거
@@ -40,14 +42,17 @@ public class MailController {
 	
 	// 받은 메일
 	@GetMapping("/mail/receiverTo")
-	public String selectReceiverToAll() {
-		return "mail/mailReceiverTo";
+	public String selectReceiverToAll(Model model, @AuthenticationPrincipal EmployeeDetails user) {
+	    Long empNo = user.getEmployee().getEmployeeNo(); // 로그인된 사용자
+	    List<MailReceiver> received = mailService.getReceivedMailsByEmployee(empNo); // 💡 서비스로 위임
+	    model.addAttribute("receivedMails", received);
+	    return "mail/mailReceiverTo";
 	}
 	
 	// 04/17 본인것만 조회되게 
 	@GetMapping("/mail/sent")
-	public String getSentMails(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
-	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	public String getSentMails(Model model, @AuthenticationPrincipal EmployeeDetails user) {
+	    Long myEmployeeNo = user.getEmployee().getEmployeeNo();
 
 	    List<Mail> sentMailList = mailService.findMailsBySender(myEmployeeNo);
 	    model.addAttribute("sentMailList", sentMailList);
