@@ -11,4 +11,5 @@ public interface EmployeeCalendarRepository extends JpaRepository<EmployeeCalend
 	List<EmployeeCalendar> findByEmployeeNoAndVisibleYnAndSeparator(Long employeeNo, String visibleYn, String separator);
 	
 	
+	
 }

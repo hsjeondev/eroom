@@ -2,25 +2,32 @@ package com.eroom.calendar.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.calendar.dto.CompanyCalendarDto;
+import com.eroom.calendar.dto.DepartmentCalendarDto;
 import com.eroom.calendar.dto.EmployeeCalendarDto;
 import com.eroom.calendar.dto.TeamCalendarDto;
 import com.eroom.calendar.entity.CompanyCalendar;
 import com.eroom.calendar.entity.EmployeeCalendar;
 import com.eroom.calendar.entity.TeamCalendar;
 import com.eroom.calendar.service.CompanyCalendarService;
+import com.eroom.calendar.service.DepartmentCalendarService;
 import com.eroom.calendar.service.EmployeeCalendarService;
 import com.eroom.calendar.service.TeamCalendarService;
+import com.eroom.employee.dto.SeparatorDto;
+import com.eroom.employee.service.EmployeeService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +38,9 @@ public class CalendarController {
 	private final EmployeeCalendarService service;
 	private final CompanyCalendarService companyService;
 	private final TeamCalendarService teamService;
+	private final EmployeeService employeeService;
+	private final DepartmentCalendarService departmentService;
+
 
 	@GetMapping("/calendar")
 	public String calendarView() {
@@ -56,10 +66,17 @@ public class CalendarController {
 		return "calendar/companylist";
 	}
 	
+	//부서만 조회
 	@GetMapping("/calendar/department")
-	public String departMentCalendarView() {
+	public String departMentCalendarView(@RequestParam(value = "department", required = false) String department, Model model) {
+		List<SeparatorDto> structureList = employeeService.findOnlyDepartments();
+		
+		model.addAttribute("structureList", structureList);
+		model.addAttribute("selectedDepartment", department);
 		return "calendar/departlist";
 	}
+	
+
 	
 	
 	// =============================등록 =================================
@@ -165,7 +182,20 @@ public class CalendarController {
 	    
 	    return result;
 	}
+	
+	@GetMapping("/departmentcalendar/list/{departmentCode}")
+	@ResponseBody
+	public List<Map<String, Object>> getDepartmentEvents(@PathVariable("departmentCode") String departmentCode) {
+	    List<DepartmentCalendarDto> deptList = departmentService.getDepartmentCalendar(departmentCode);
+	    //System.out.println(departmentCode+"!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	    List<Map<String, Object>> result = new ArrayList<>();
 
+	    for (DepartmentCalendarDto dto : deptList) {
+	        result.add(dto.toFullCalendarEvent());  // FullCalendar 형식 맞춤 변환
+	    }
+
+	    return result;
+	}
 	// ============================= 단일 조회 =================================
 	
 	//해당 직원 일정 단일 조회 (for 수정 모달)
@@ -340,6 +370,28 @@ public class CalendarController {
 		}
 		
 		return result;
+    }
+    
+    //====================================전체 조회=====================================
+    @GetMapping("/calendar/list/all")
+    @ResponseBody
+    public List<Map<String, Object>> getAllCalendars() {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        //  회사, 부서 일정만 추가
+        result.addAll(companyService.getAllVisibleCalendars());
+        result.addAll(departmentService.getAllVisibleCalendars());
+
+        //  calendar_no 기준 중복 제거
+        Map<String, Map<String, Object>> uniqueMap = new LinkedHashMap<>();
+        for (Map<String, Object> event : result) {
+            String calendarNo = String.valueOf(event.get("calendar_no")); // String 변환
+            if (!uniqueMap.containsKey(calendarNo)) {
+                uniqueMap.put(calendarNo, event);
+            }
+        }
+
+        return new ArrayList<>(uniqueMap.values());
     }
 
 }
