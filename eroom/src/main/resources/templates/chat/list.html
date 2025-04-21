@@ -722,40 +722,53 @@
 		  };
 		  // 메시지 수신
 		  socket.onmessage = function(event) {
-		    console.log('수신한 메시지:', event.data);
-		    
-		    const data = JSON.parse(event.data);
-		    const chatHistory = document.querySelector(".chat-history");
-		    if (!chatHistory) {
-		      console.error("chat-history 영역이 없습니다.");
-		      return;
-		    }
+		  console.log('수신한 메시지:', event.data);
+		  
+		  const data = JSON.parse(event.data);
+		  const chatHistory = document.querySelector(".chat-history");
+		  const currentChatroomNo = document.querySelector(".chatroom-title")?.dataset.roomNo;
+		
+		  // 수신한 메시지 방번호와 현재 열려있는 방번호가 다르면 무시
+		  if (data.chatroomNo != currentChatroomNo) {
+		    console.log("현재 방 아님, 무시함");
+		    return;
+		  }
+		  // 수신한 메시지 내용이 없으면 무시
+		  if (!chatHistory) {
+		    console.error("chat-history 영역이 없습니다.");
+		    return;
+		  }
+		
+		  const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+		  const isMyMessage = data.senderMember == myEmployeeNo;
+		
+		  const wrapperDiv = document.createElement("div");
+		  wrapperDiv.className = "mb-3";
+		
+		  const nameDiv = document.createElement("div");
+		  nameDiv.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-1`;
+		  nameDiv.innerHTML = `<div class="small text-muted">${isMyMessage ? '나' : data.senderName}</div>`;
+		
+		  const messageOuterDiv = document.createElement("div");
+		  messageOuterDiv.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
+		
+		  const messageInnerDiv = document.createElement("div");
+		  messageInnerDiv.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
+		  messageInnerDiv.style.maxWidth = "70%";
+		  messageInnerDiv.innerText = data.chatMessageContent;
+		
+		  messageOuterDiv.appendChild(messageInnerDiv);
+		  wrapperDiv.appendChild(nameDiv);
+		  wrapperDiv.appendChild(messageOuterDiv);
+		  chatHistory.appendChild(wrapperDiv);
+		
+		  const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
+		  if (chatArea) {
+		    chatArea.scrollTop = chatArea.scrollHeight;
+		  }
+		};
 
-		    // 내 메시지인지 상대방 메시지인지 구분
-		    const myEmployeeNo = document.getElementById("myEmployeeNo").value;
-		    const isMyMessage = data.senderMember == myEmployeeNo;
 
-		    // 메시지 요소 만들기
-		    const messageDiv = document.createElement("div");
-		    messageDiv.className = "mb-2";
-
-		    messageDiv.innerHTML = `
-		      <div class="d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'}">
-		        <div class="p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}" style="max-width: 70%;">
-		          ${data.chatMessageContent}
-		        </div>
-		      </div>
-		    `;
-
-		    chatHistory.appendChild(messageDiv);
-
-		    // 스크롤 맨 아래로 내리기
-		    const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
-		    if (chatArea) {
-		      chatArea.scrollTop = chatArea.scrollHeight;
-		    }  
-		    
-		  };
 
 		  socket.onclose = function(event) {
 		    console.log('❌ WebSocket 연결 종료:', event);
