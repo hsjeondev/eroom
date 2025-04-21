@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -50,16 +53,20 @@ public class MailController {
 	}
 	
 	// 04/17 본인것만 조회되게 
-	@GetMapping("/mail/sent")
-	public String getSentMails(Model model, @AuthenticationPrincipal EmployeeDetails user) {
-	    Long myEmployeeNo = user.getEmployee().getEmployeeNo();
-
-	    List<Mail> sentMailList = mailService.findMailsBySender(myEmployeeNo);
-	    model.addAttribute("sentMailList", sentMailList);
-
-	    return "mail/mailSent"; // 뷰 파일 이름
-	}
-
+	
+	  @GetMapping("/mail/sent") public String getSentMails(Model
+	  model, @AuthenticationPrincipal EmployeeDetails user) { Long myEmployeeNo =
+	  user.getEmployee().getEmployeeNo();
+	  
+	  List<Mail> sentMailList = mailService.findMailsBySender(myEmployeeNo);
+	  model.addAttribute("sentMailList", sentMailList);
+	  
+	  return "mail/mailSent"; // 뷰 파일 이름 
+	  }
+	 
+	
+	
+	
 	// 보낸 메일
 	// 지금은 이게 받은걸로 되어 있음
 //	@GetMapping("/mail/sent")

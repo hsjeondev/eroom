@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eroom.directory.entity.Directory;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.mail.dto.MailDto;
@@ -24,6 +23,9 @@ public class MailService {
 	private final MailReceiverRepository mailReceiverRepository;
 	private final EmployeeRepository employeeRepository;
 
+	
+	
+	
 	public List<MailReceiver> getReceivedMailsByEmployee(Long employeeNo) {
         return mailReceiverRepository.findByEmployeeNo(employeeNo);
     }
