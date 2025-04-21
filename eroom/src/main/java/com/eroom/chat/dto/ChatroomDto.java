@@ -27,7 +27,6 @@ public class ChatroomDto {
     private LocalDateTime chatroomRegDate;
     private LocalDateTime chatroomModDate;
     private String chatLastMessage;
-    private String chatroomReadYn = "N";
     
    
     // 참여자 ID 리스트
@@ -53,7 +52,6 @@ public class ChatroomDto {
                 .chatroomRegDate(entity.getChatroomRegDate())
                 .chatroomModDate(entity.getChatroomModDate())
                 .chatLastMessage(entity.getChatLastMessage())
-                .chatroomReadYn(entity.getChatroomReadYn())
                 .build();
     }
     public static ChatroomDto toDto(Chatroom entity, List<ChatMessageDto> messages) {
@@ -65,7 +63,6 @@ public class ChatroomDto {
                 .chatroomRegDate(entity.getChatroomRegDate())
                 .chatroomModDate(entity.getChatroomModDate())
                 .chatLastMessage(entity.getChatLastMessage())
-                .chatroomReadYn(entity.getChatroomReadYn())
                 .messageList(messages)  // 메시지 리스트 추가
                 .build();
     }
