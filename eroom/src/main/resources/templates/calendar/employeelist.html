@@ -279,6 +279,7 @@
 
 			
 		    const calendarEl = document.getElementById('appCalendar');
+		    
 		    const employeeNo = document.addEventForm.employee_no.value;
 		    let selectedCalendarNo = null;
 			
@@ -321,7 +322,7 @@
 		        addEventModal.show();
 		      },
 		      
-		      eventSources: [ // ✅ 이 위치에 정확히 들어가야 해!
+		      eventSources: [ //구글 캘린더로 공휴일 불러오기, 그리고 해당 직원의 일정 불러오기
 		    	    {
 		    	      events: function (fetchInfo, successCallback, failureCallback) {
 		    	        fetch('/employeecalendar/list/' + employeeNo)
@@ -562,7 +563,7 @@
 			    const startEditInput = document.getElementById("editStartTime");
 			    const endEditInput = document.getElementById("editEndTime");
 			
-			    // ✅ 유효성 검사만 남기자!
+			    // 유효성 검사만 남기자!
 			    const startTime = new Date(startEditInput.value);
 			    const endTime = new Date(endEditInput.value);
 			
@@ -642,25 +643,34 @@
 		
 		    //  현재 시간 기준으로 시작/종료 시간 자동 설정
 		    function setDefaultTimeValuesNow() {
-		        if (!startInput || !endInput) return;
-		
-		        const now = new Date();
-		
-		        // 시작: 현재 시간
-		        const startTime = new Date(now);
-		
-		        // 종료: 현재 시간 + 1시간
-		        const endTime = new Date(now);
-		        endTime.setHours(endTime.getHours() + 1);
-		
-		        // yyyy-MM-ddTHH:mm 포맷 (datetime-local용)
-		        const format = (date) => date.toISOString().slice(0, 16);
-		
-		        startInput.value = format(startTime);
-		        endInput.value = format(endTime);
-		
-		        // 종료시간 최소값도 시작시간으로 설정
-		        endInput.min = startInput.value;
+		    	if (!startInput || !endInput) return;
+
+		    	const now = new Date();
+
+		    	// 시간 보정 (한국 시간 = UTC + 9)
+		    	const pad = (n) => n.toString().padStart(2, '0');
+
+		    	const format = (date) => {
+		    	    const yyyy = date.getFullYear();
+		    	    const MM = pad(date.getMonth() + 1);
+		    	    const dd = pad(date.getDate());
+		    	    const HH = pad(date.getHours());
+		    	    const mm = pad(date.getMinutes());
+		    	    return `${yyyy}-${MM}-${dd}T${HH}:${mm}`;
+		    	};
+
+		    	// 시작: 현재 시간
+		    	const startTime = new Date(now);
+
+		    	// 종료: 현재 시간 + 1시간
+		    	const endTime = new Date(now);
+		    	endTime.setHours(endTime.getHours() + 1);
+
+		    	startInput.value = format(startTime);
+		    	endInput.value = format(endTime);
+
+		    	// 종료시간 최소값도 시작시간으로 설정
+		    	endInput.min = startInput.value;
 		    }
 		
 		    // 시작시간 바뀔 때 종료시간 제한 다시 걸기

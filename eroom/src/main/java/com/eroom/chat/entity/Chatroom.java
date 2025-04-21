@@ -64,5 +64,13 @@ public class Chatroom {
 	@Column(nullable=true, name="chatroom_read_yn")
 	private String chatroomReadYn;
 	
+	@Column(name="last_message_reg_date")
+	private LocalDateTime lastMessageRegDate; // 마지막 메시지 등록일
 	
+	@Builder.Default
+	@Column(name="visible_yn")
+	private String visibleYn = "Y"; // 사용여부
+	
+	@OneToMany(mappedBy = "chatroomNo")
+	private List<ChatMessage> chatMessages; // 메시지랑 조인됨
 }
