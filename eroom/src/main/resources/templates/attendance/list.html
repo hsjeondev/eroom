@@ -76,26 +76,26 @@
             <div class="row text-center">
               <div class="col text-center d-flex flex-column align-items-center">
                 <div class="fw-semibold mb-2">출근일수</div>
-                <div class="text-primary fw-bold">18일</div>
+                <div class="text-primary fw-bold" th:text="${summaryData.checkinDays} + '일'">O일</div>
               </div>
               <div class="col text-center d-flex flex-column align-items-center">
                 <div class="fw-semibold">지각</div>
-                <div class="text-danger fw-bold">2회</div>
+                <div class="text-danger fw-bold" th:text="${summaryData.lateCount} + '회'">OO회</div>
               </div>
               <div class="col text-center d-flex flex-column align-items-center">
                 <div class="fw-semibold">조퇴</div>
-                <div class="text-warning fw-bold">1회</div>
+                <div class="text-warning fw-bold" th:text="${summaryData.earlyLeaveCount} + '회'">OO회</div>
               </div>
               <div class="col text-center d-flex flex-column align-items-center">
                 <div class="fw-semibold">평균 출근</div>
-                <div class="text-success fw-bold">09:12</div>
+                <div class="text-success fw-bold" th:text=${summaryData.averageCheckInTime}>00:00</div>
               </div>
               <div class="col text-center d-flex flex-column align-items-center">
                 <div class="fw-semibold">출근률</div>
-                <div class="text-info fw-bold">90%</div>
+                <div class="text-info fw-bold" th:text=${summaryData.attendanceRate}>00%</div>
               </div>
             </div>
-            <div class="mt-4">
+            <div class="mini-chart-wrapper mt-4">
               <canvas id="miniAttendanceChart" height="47"></canvas>
             </div>
           </div>
@@ -107,11 +107,11 @@
         <div class="card">
           <div class="card-body fs-9">
             <h5 class="text-body-secondary">사번</h5>
-            <p class="text-body-secondary" th:text="${employee.employeeId}">123456</p>
+            <p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
             <h5 class="text-body-secondary">직급</h5>
-            <p class="text-body-secondary" th:text="${employee.employeePosition}">팀장</p>
+            <p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p>
             <h5 class="text-body-secondary">부서</h5>
-            <p class="text-body-secondary" th:text="${departmentName}">개발팀</p>
+            <p class="text-body-secondary" th:text="${departmentName}">부서</p>
             <div class="mb-3">
               <h5 class="text-body-secondary">Email</h5>
               <a href="mailto:email@email.com" id="emailValue" th:text="${directory.directory_email}">email@email.com</a>
@@ -285,9 +285,9 @@
 		// (2) 요일별 평균 근무시간 변환 및 정렬
 		const dayMap = {
 			'MONDAY': '월', 'TUESDAY': '화', 'WEDNESDAY': '수',
-			'THURSDAY': '목', 'FRIDAY': '금', 'SATURDAY': '토', 'SUNDAY': '일'
+			'THURSDAY': '목', 'FRIDAY': '금'
 		};
-		const weekdayOrder = ['월', '화', '수', '목', '금', '토', '일'];
+		const weekdayOrder = ['월', '화', '수', '목', '금'];
 		const weekdayData = weekdayOrder.map(kor => {
 			const eng = Object.keys(dayMap).find(key => dayMap[key] === kor);
 			return weekdayAvg[eng] ?? null;

@@ -3,6 +3,7 @@ package com.eroom.attendance.service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -190,6 +191,9 @@ public class AttendanceService {
 	public Map<String,Object> getAttendanceChartData(EmployeeDetails employeeDetail){
 		Long employeeNo = employeeDetail.getEmployee().getEmployeeNo();
 		
+		// 평균 출근 시간 계산 리스트
+		List<LocalTime> checkInTimes = new ArrayList<>();
+		
 		// 이번 달 시작일, 마지막일
 		YearMonth currentMonth = YearMonth.now();
 		LocalDateTime start = currentMonth.atDay(1).atStartOfDay();
@@ -222,15 +226,14 @@ public class AttendanceService {
 			if("Y".equals(a.getAttendanceLateYn())) lateCount++; // 지각 횟수 증가
 			if("Y".equals(a.getAttendanceEarlyLeaveYn())) earlyLeaveCount++; // 조퇴 횟수 증가
 			
-			// 근무시간 계산
+			// 일별 근무시간 계산
 			LocalDateTime checkIn = a.getAttendanceCheckInTime();
 			LocalDateTime checkOut = a.getAttendanceCheckOutTime();
 			double workTime = Duration.between(checkIn, checkOut).toMinutes() / 60.0; // 초단위로 계산 후 시 단위로 변환
 //					(checkOut.getHour() - checkIn.getHour()) + ((checkOut.getMinute() - checkIn.getMinute()) / 60.0);
 			
-			// 날짜별 근무시간 저장
-			String dateStr = checkIn.toLocalDate().toString();
-			workTimePerDay.put(dateStr, workTime);
+			workTimePerDay.put(checkIn.toLocalDate().toString(), workTime); // 날짜별 근무시간 저장
+
 			
 			// 요일별 근무시간 분류
 			// getDayOfWeek() -> 요일을 반환 -> toString() -> 요일을 문자열로 변환
@@ -239,6 +242,8 @@ public class AttendanceService {
 			workTimePerWeekday.putIfAbsent(weekday, new ArrayList<>());
 			// 해당 요일 리스트에 근무시간 추가
 			workTimePerWeekday.get(weekday).add(workTime);
+			
+			checkInTimes.add(checkIn.toLocalTime()); // 출근 시간 리스트에 추가
 			
 		}
 		
@@ -263,6 +268,37 @@ public class AttendanceService {
 			weekdayAvg.put(day, avg);
 		}
 		
+		// 평균 출근 시간 계산
+		String averageCheckInTime = "";
+		if(!checkInTimes.isEmpty()) {
+			int totalCheckInMinutes = 0;
+			for (LocalTime time : checkInTimes) {
+				totalCheckInMinutes += time.getHour() * 60 + time.getMinute(); // 시 * 60 + 분
+			}
+			int avgMinutes = totalCheckInMinutes / checkInTimes.size(); // 평균 시
+			int avgHours = avgMinutes / 60; // 평균 시
+			int avgMinutesRemain = avgMinutes % 60; // 평균 분
+			averageCheckInTime = String.format("%02d:%02d", avgHours, avgMinutesRemain); // 시:분 형식으로 변환
+		}
+		
+		// 출근률 계산
+		int weekdayCount = 0; // 주말 제외 출근일 수
+		LocalDate startDate = currentMonth.atDay(1); // 이번 달 첫날
+		LocalDate endDate = currentMonth.atEndOfMonth(); // 이번 달 마지막 날
+		for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) { // 이번 달 날짜 반복
+			// 토요일, 일요일 제외
+			if (date.getDayOfWeek().getValue() < 6) { // 월~금
+				weekdayCount++;
+			}	
+		}
+		
+		String attendanceRate = "";
+		if(weekdayCount > 0 ) {
+			double rate = (checkinDays * 100.0) / weekdayCount; // 출근일 수 / 주말 제외 출근일 수
+			attendanceRate = String.format("%.0f", rate) + "%"; // 소수점 0자리까지
+			
+		}
+		
 		// 결과 Map 생성
 		Map<String,Object> result = new HashMap<>();
 		result.put("checkinDays", checkinDays); // 출근일 수
@@ -271,6 +307,8 @@ public class AttendanceService {
 		result.put("workTimePerDay", workTimePerDay); // 일별 근무시간
 		result.put("weekdayAvg", weekdayAvg); // 요일별 평균 근무시간
 		result.put("totalWorkTime", totalWorkTime); // 총 근무시간
+		result.put("averageCheckInTime", averageCheckInTime); // 평균 출근시간
+		result.put("attendanceRate", attendanceRate); // 출근률
 		
 		return result;
 		

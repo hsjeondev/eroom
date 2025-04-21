@@ -94,7 +94,9 @@ public class AttendanceController {
 		String totalWorkTime = (String) chartData.get("totalWorkTime");
 		model.addAttribute("totalWorkTime", totalWorkTime);
 		
-		
+		// 근태요약 정보 가져오기
+		Map<String,Object> summaryData = attendanceService.getAttendanceChartData(employeeDetail);
+		model.addAttribute("summaryData", summaryData);
 		
 		return "attendance/list";
 	}
