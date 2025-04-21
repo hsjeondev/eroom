@@ -118,6 +118,34 @@
             document.getElementById('eventDescription').textContent = info.event.extendedProps.description || '';
             document.getElementById('modalButton').click();
           },
+          eventDidMount: function (info) {
+        	  console.log("🎯 separator 확인:", info.event.extendedProps.separator);
+        	  const separator = info.event.extendedProps.separator;
+        	  const type = info.event.extendedProps.type;
+
+        	  if (!separator || type === 'holiday') return;
+
+        	  if (!separator) return;  // separator 없으면 아무것도 안 함 (공휴일은 제외)
+
+        	  const departmentColorMap = {
+        	    "D001": "#A3D8F4",
+        	    "D002": "#FFDD93",
+        	    "D003": "#B5EAD7",
+        	    "D004": "#FFB7B2"
+        	  };
+
+        	  const teamToDepartmentMap = {
+        	    "T001": "D001", "T002": "D002", "T003": "D002", "T004": "D002",
+        	    "T005": "D003", "T006": "D003", "T007": "D004", "T008": "D004"
+        	  };
+
+        	  const deptCode = teamToDepartmentMap[separator] || "DEFAULT";
+        	  const color = departmentColorMap[deptCode] || "#CCCCCC";
+
+        	  info.el.style.backgroundColor = color;
+        	  info.el.style.borderColor = color;
+        	  info.el.style.color = "#000";
+        	  },
           eventSources: [
             {
               events: function (fetchInfo, successCallback, failureCallback) {

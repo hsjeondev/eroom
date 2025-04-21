@@ -71,6 +71,7 @@ public class DepartmentCalendarDto {
 	    event.put("separator", this.separator != null ? this.separator : "");
 	    event.put("calendar_creator", this.calendar_creator != null ? this.calendar_creator : "");
 	    event.put("calendar_no", this.calendar_no);
+	    event.put("separator", this.separator);
 	    
 
 	    
