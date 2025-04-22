@@ -39,17 +39,23 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        String senderNo = getQueryParam(session, "senderNo");
-        String roomNo = getQueryParam(session, "roomNo");
-        userSessions.put(Long.parseLong(senderNo), session);
-        userRooms.put(Long.parseLong(senderNo), Long.parseLong(roomNo));
+        Object senderNoObj = session.getAttributes().get("senderNo");
+        if (senderNoObj != null) {
+            Long senderNo = Long.parseLong(senderNoObj.toString());
+            System.out.println("연결된 senderNo: " + senderNo);
+            userSessions.put(senderNo, session);
+        } else {
+            System.out.println("senderNo를 찾을 수 없습니다!");
+        }
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         ChatMessageDto chatMessageDto = objectMapper.readValue(message.getPayload(), ChatMessageDto.class);
-
+        System.out.println("📦 수신된 메시지 DTO: " + chatMessageDto);
+        System.out.println("📦 DTO senderMember=" + chatMessageDto.getSenderMember() + ", chatroomNo=" + chatMessageDto.getChatroomNo());
+        // userRooms.put(chatMessageDto.getSenderMember(), chatMessageDto.getChatroomNo());
         // 1. DB 저장
         ChatMessage savedMessage = null;
         if (userSessions.containsKey(chatMessageDto.getSenderMember())) {
@@ -84,8 +90,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                                 .build();
                         chatAlarmRepository.save(alarm);
                     }
+
                 }
             }
+            System.out.println("🔵 현재 userSessions: " + userSessions.keySet());
+            System.out.println("🟣 현재 userRooms: " + userRooms);
+            System.out.println("🟡 메시지 보낼 방 번호: " + chatMessageDto.getChatroomNo());
+
         }
 
         // 2. WebSocket 브로드캐스트
@@ -100,15 +111,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         sendData.put("receiverMember", chatMessageDto.getReceiverMember());
 
         String sendPayload = objectMapper.writeValueAsString(sendData);
-
         if (chatMessageDto.getReceiverMember() == null) {
-            // 그룹 채팅: 참가자 모두에게 (나 포함)
-            for (Map.Entry<Long, Long> entry : userRooms.entrySet()) {
-                if (entry.getValue().equals(chatMessageDto.getChatroomNo())) {
-                    WebSocketSession participantSession = userSessions.get(entry.getKey());
-                    if (participantSession != null && participantSession.isOpen()) {
-                        participantSession.sendMessage(new TextMessage(sendPayload));
-                    }
+            // 그룹 채팅
+            List<Employee> participants = getParticipants(chatMessageDto.getChatroomNo());
+            for (Employee participant : participants) {
+                WebSocketSession participantSession = userSessions.get(participant.getEmployeeNo());
+                if (participantSession != null && participantSession.isOpen()) {
+                    participantSession.sendMessage(new TextMessage(sendPayload));
                 }
             }
         } else {
@@ -144,7 +153,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         }
         return null;
     }
-
+ // WebSocket 외부에서도 방 등록할 수 있도록 static 메서드 추가
+    public static void registerUserRoom(Long senderNo, Long chatroomNo) {
+        userRooms.put(senderNo, chatroomNo);
+        System.out.println("ChatWebSocketHandler.registerUserRoom: senderNo=" + senderNo + ", chatroomNo=" + chatroomNo);
+    }
     private List<Employee> getParticipants(Long chatroomNo) {
         Chatroom chatroom = chatroomRepository.findByIdWithAttendees(chatroomNo);
         if (chatroom == null) {

@@ -32,6 +32,7 @@ import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.security.EmployeeDetails;
+import com.eroom.websocket.ChatWebSocketHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -281,7 +282,42 @@ public class ChatController {
 
 	    return resultMap;
 	}
+	// 채팅방 입장 등록
+	@PostMapping("/joinRoom")
+	@ResponseBody
+	public Map<String, String> joinRoom(@RequestBody Map<String, Object> payload) {
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "방 입장 등록 실패했습니다.");
 
+	    try {
+	        Long senderNo = Long.valueOf(payload.get("senderNo").toString());
+	        Long chatroomNo = Long.valueOf(payload.get("chatroomNo").toString());
+
+	        // WebSocket Handler의 static 맵에 등록
+	        ChatWebSocketHandler.registerUserRoom(senderNo, chatroomNo);
+
+	        resultMap.put("res_code", "200");
+	        resultMap.put("res_msg", "방 입장 등록 완료되었습니다!");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return resultMap;
+	}
+	// 채팅방 알림 개수 조회
+	@GetMapping("/unreadCount")
+	@ResponseBody
+	public Map<String, Integer> getUnreadCount(@RequestParam("chatroomNo") Long chatroomNo) {
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	    
+	    int count = chatAlarmRepository.countUnreadAlarms(myEmployeeNo, chatroomNo);
+	    Map<String, Integer> result = new HashMap<>();
+	    result.put("count", count);
+	    return result;
+	}
 
 
 }
