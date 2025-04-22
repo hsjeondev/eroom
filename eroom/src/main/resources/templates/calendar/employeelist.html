@@ -24,41 +24,6 @@
 			</div>
 		</div>
 
-
-
-<!-- 
-	 	<div class="mx-n4 px-4 mx-lg-n6 px-lg-6 border-y border-translucent">
-			<div class="row py-3 gy-3 gx-0">
-				<div class="col-6 col-md-4 order-1 d-flex align-items-center">
-					<button class="btn btn-sm btn-phoenix-primary px-4"
-						data-event="today">Today</button>
-				</div>
-				<div
-					class="col-12 col-md-4 order-md-1 d-flex align-items-center justify-content-center">
-					<button
-						class="btn icon-item icon-item-sm shadow-none text-body-emphasis p-0"
-						type="button" data-event="prev" title="Previous">
-						<span class="fas fa-chevron-left"></span>
-					</button>
-					<h3 class="px-3 text-body-emphasis fw-semibold calendar-title mb-0"></h3>
-					<button
-						class="btn icon-item icon-item-sm shadow-none text-body-emphasis p-0"
-						type="button" data-event="next" title="Next">
-						<span class="fas fa-chevron-right"></span>
-					</button>
-				</div>
-				<div
-					class="col-6 col-md-4 ms-auto order-1 d-flex justify-content-end">
-					<div class="btn-group btn-group-sm" role="group">
-						<button class="btn btn-phoenix-secondary active-view"
-							data-fc-view="dayGridMonth">월별</button>
-						<button class="btn btn-phoenix-secondary"
-							data-fc-view="timeGridWeek">주별</button>
-					</div>
-				</div>
-			</div>
-		</div>  -->
-
 		<!-- 일정 등록 모달 -->
 		<div class="modal fade" id="addEventModal" tabindex="-1">
 			<div class="modal-dialog modal-dialog-centered" >
@@ -111,7 +76,7 @@
 								<div class="col-6">
 									<div class="mb-3">
 										<label class="form-label" for="calendarEndTime">종료시간</label> <input class="form-control" id="calendarEndTime"
-											type="datetime-local" name="calendar_end_time" />
+											type="datetime-local" name="calendar_end_time" required />
 									</div>
 								</div>
 							</div>
@@ -386,7 +351,7 @@
 			    hour12: true
 			  };
 			
-			  // 1. 일정, 시간, 장소, 설명을 가져옵니다
+			  // 1. 일정, 시간, 장소, 설명을 가져옴
 			  const title = info.event.title || '';
 			  const start = info.event.start; // 한 번만 선언
 			  const end = info.event.end || '';
@@ -453,7 +418,7 @@
 		    }
 		},
 				
-		      //일정의 색상을 정해주는 event, E001 -> 개인 캘린더는 연한 연두색으로 지정
+		  //일정의 색상을 정해주는 event, E001 -> 개인 캘린더는 연한 연두색으로 지정
 		  eventDidMount: function (info) {
 			    const isHoliday = info.event.extendedProps?.type === 'holiday';
 			    if (isHoliday) {
@@ -640,6 +605,7 @@
 		    const endInput = document.getElementById("calendarEndTime");
 		    const titleInput = document.getElementById("calendarTitle");
 		    const form = document.addEventForm;
+	
 		
 		    //  현재 시간 기준으로 시작/종료 시간 자동 설정
 		    function setDefaultTimeValuesNow() {
@@ -695,6 +661,7 @@
 		
 		        const startTime = Date.parse(startInput.value);
 		        const endTime = Date.parse(endInput.value);
+	
 		
 		        if (!titleInput.value.trim()) {
 		            alert("제목을 입력해주세요!");
@@ -702,8 +669,9 @@
 		        }
 		
 		        if (startTime > endTime) {
+		        	
 		            endInput.setCustomValidity("종료시간은 시작시간 이후여야 합니다!");
-		
+		            endInput.reportValidity(); 
 		            return;
 		        } else {
 		            endInput.setCustomValidity("");
