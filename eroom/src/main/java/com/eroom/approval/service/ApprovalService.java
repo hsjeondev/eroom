@@ -13,7 +13,6 @@ import com.eroom.approval.repository.ApprovalLineRepository;
 import com.eroom.approval.repository.ApprovalRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,23 +24,23 @@ public class ApprovalService {
 	private final EmployeeRepository employeeRepository;
 	private final ApprovalLineRepository approvalLineRepository;
 
-	public List<Approval> getMyRequestedApprovals(Long employeeNo) {
-		List<Approval> resultList = approvalRepository.findByEmployee_EmployeeNoOrderByApprovalRegDateDesc(employeeNo);
+	public List<Approval> getMyRequestedApprovals(Long employeeNo, String visible) {
+		List<Approval> resultList = approvalRepository.findByEmployee_EmployeeNoAndApprovalVisibleYnOrderByApprovalRegDateDesc(employeeNo, visible);
 		return resultList;
 	}
 
 	@Transactional
 	public int createApproval(ApprovalRequestDto dto, Long employeeNo) {
 		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			String json = objectMapper .writeValueAsString(dto.getContent());
+//			ObjectMapper objectMapper = new ObjectMapper();
+//			String json = objectMapper .writeValueAsString(dto.getContent());
 			Employee emp = employeeRepository.findById(employeeNo).orElse(null);
 			
 			Approval approval = Approval.builder()
 					.employee(emp)
 					.approvalTitle(dto.getTitle())
 					.approvalFormat(ApprovalFormat.builder().approvalFormatNo(Long.valueOf(dto.getFormat_no())).build())
-					.approvalContent(json)
+					.approvalContent(dto.getContent())
 					.approvalStatus("S")
 					.build();
 			
@@ -63,7 +62,7 @@ public class ApprovalService {
 						.approval(approval)
 						.approvalLineStatus("S")
 						.employee(Employee.builder().employeeNo(dto.getApproverIds().get(i)).build())
-						.approvalLineStep(dto.getApproverSteps().get(i))
+						.approvalLineStep(dto.getApproverSteps().get(i)) // 결재자 순서 step 1,2,3...
 						.build();
 					approvalLineRepository.save(approvalLine);
 			}
@@ -75,7 +74,7 @@ public class ApprovalService {
 						.approval(approval)
 						.approvalLineStatus("S")
 						.employee(Employee.builder().employeeNo(dto.getAgreerIds().get(i)).build())
-						.approvalLineStep(0) // 합의자 고정값
+						.approvalLineStep(0) // 합의자 고정값 0
 						.build();
 					approvalLineRepository.save(approvalLine);
 			}
@@ -87,7 +86,7 @@ public class ApprovalService {
 						.approval(approval)
 						.approvalLineStatus("A")
 						.employee(Employee.builder().employeeNo(dto.getRefererIds().get(i)).build())
-						.approvalLineStep(-1) // 참조자 고정값
+						.approvalLineStep(-1) // 참조자 고정값 -1
 						.build();
 					approvalLineRepository.save(approvalLine);
 			}
@@ -99,6 +98,30 @@ public class ApprovalService {
 			e.printStackTrace();
 			return 0;
 		}
+	}
+
+	public Approval selecApprovalByApprovalNo(Long approvalNo) {
+		Approval approval = approvalRepository.findById(approvalNo).orElse(null);
+		return approval;
+	}
+
+
+	public int updateVisibleYn(Long approvalNo) {
+		int result = 0;
+		try {
+			Approval approval = approvalRepository.findById(approvalNo).orElse(null);
+			if (approval != null) {
+				if (!approval.getApprovalVisibleYn().equals("N")) {
+					approval.setApprovalVisibleYn("N");
+					approvalRepository.save(approval);
+				}
+				result = 1;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = 0;
+		}
+		return result;
 	}
 
 

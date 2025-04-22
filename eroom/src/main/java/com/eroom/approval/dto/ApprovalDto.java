@@ -2,7 +2,7 @@ package com.eroom.approval.dto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Map;
 
 import com.eroom.approval.entity.Approval;
 import com.eroom.approval.entity.ApprovalFormat;
@@ -27,7 +27,7 @@ public class ApprovalDto {
     
     private String approval_status; // 결재 상태 (A, S, D, F, 등)
     private String approval_title; // 결재 제목
-    private String approval_content; // 결재 내용
+    private Map<String, String> approval_content; // 결재 내용
     private String approval_deny_reason; // 반려 사유
 
     private LocalDateTime approval_reg_date; // 등록일
@@ -37,6 +37,7 @@ public class ApprovalDto {
     
     private Employee employee; // 기안자
     private ApprovalFormat approval_format; // 결재 양식
+    private String approval_visible_yn; // 결재 사용여부
     
 	public Approval toEntity() {
 		return Approval.builder()
@@ -50,6 +51,7 @@ public class ApprovalDto {
 				.approvalCompletedDate(approval_completed_date)
 				.employee(employee)
 				.approvalFormat(approval_format)
+				.approvalVisibleYn(approval_visible_yn)
 				.build();
 	}
 	
@@ -65,6 +67,7 @@ public class ApprovalDto {
 				.completed_date(entity.getApprovalCompletedDate() != null ? entity.getApprovalCompletedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
 				.employee(entity.getEmployee())
 				.approval_format(entity.getApprovalFormat())
+				.approval_visible_yn(entity.getApprovalVisibleYn())
 				.build();
 	}
 }

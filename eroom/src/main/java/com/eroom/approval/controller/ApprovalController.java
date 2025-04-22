@@ -4,13 +4,17 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,7 +59,7 @@ public class ApprovalController {
 		Employee employee = employeeDetails.getEmployee();
 		model.addAttribute("employee", employee);
 		// 내가 올린 approval 리스트 조회
-		List<Approval> temp = approvalService.getMyRequestedApprovals(employee.getEmployeeNo());
+		List<Approval> temp = approvalService.getMyRequestedApprovals(employee.getEmployeeNo(), "Y");
 		List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
 		Map<Long, List<ApprovalLineDto>> approvalLineMap = new HashMap<Long, List<ApprovalLineDto>>();
 		for (Approval approval : temp) {
@@ -199,10 +203,91 @@ public class ApprovalController {
 
 	}
 	
-	@GetMapping("/approval/detail")
-	public String selectApprovalDetail() {
+	@GetMapping("/approval/detail/{approvalNo}")
+	public String selectApprovalDetail(@PathVariable("approvalNo") Long approvalNo, Model model, Authentication authentication) {
+		
+		
+		
+		// 선택한 결재 번호로 결재 정보 조회
+		Approval approval = approvalService.selecApprovalByApprovalNo(approvalNo);
+		// 결재 정보가 없으면 404 에러 페이지로 이동
+		if (approval == null) {
+		    return "redirect:/error/404";
+		}
+		ApprovalDto approvalDto = new ApprovalDto().toDto(approval);
+		model.addAttribute("approval", approvalDto);
+		
+		// 로그인한 사용자 정보 조회
+		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+		Employee employee = employeeDetails.getEmployee();
+		model.addAttribute("employee", employee);
+		
+		// 결재 라인 정보 조회
+		List<ApprovalLine> temp = approvalLineService.getApprovalLineByApprovalNo(approvalNo);
+		List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
+		for (ApprovalLine approvalLine : temp) {
+			ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
+			approvalLineDtoList.add(approvalLineDto);
+		}
+		model.addAttribute("approvalLineList", approvalLineDtoList);
+		
+		// 권한 리스트 조회
+		Set<Long> authorityList = new HashSet<Long>();
+		for(ApprovalLine t : temp) {
+			// 결재자, 합의자, 참조자 중 결재라인에 있는 사람들
+			authorityList.add(t.getEmployee().getEmployeeNo());
+		}
+		// 기안자
+		authorityList.add(approval.getEmployee().getEmployeeNo());
+		
+		// 결재 관련 인원 + 관리자만 접근 가능
+		if (!authorityList.contains(employee.getEmployeeNo()) && !employee.getEmployeeName().contains("admin")) {
+	        return "redirect:/error/403";
+	    }
 		
 		return "/approval/detail";
+	}
+	
+	@PostMapping("/approval/{approvalNo}/delete")
+	@ResponseBody
+	public Map<String, String> deleteApproval(@PathVariable("approvalNo") Long approvalNo, Model model,
+			Authentication authentication) {
+		
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("res_code", "500");
+		map.put("res_msg", "결재 삭제 실패");
+		
+		// 로그인한 사용자 정보 가져오기
+		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+		Employee employee = employeeDetails.getEmployee();
+		Long employeeNo = employee.getEmployeeNo();
+		
+		// 내가 올린 결재인지 확인
+		List<Approval> temp = approvalService.getMyRequestedApprovals(employeeNo, "Y");
+		Boolean isMyApproval = false;
+		for (Approval t : temp) {
+			if (t.getApprovalNo() == approvalNo) {
+				isMyApproval = true;
+				break;
+			}
+		}
+		if(isMyApproval == false) {
+			map.put("res_code", "403");
+			map.put("res_msg", "결재 삭제 권한 없음");
+			return map;
+		}
+		
+		
+
+		// 결재 삭제
+		int result = approvalService.updateVisibleYn(approvalNo);
+		
+		if (result > 0) {
+			map.put("res_code", "200");
+			map.put("res_msg", "결재 삭제 성공");
+			return map;
+		}
+		return map;
 	}
 	
 	
