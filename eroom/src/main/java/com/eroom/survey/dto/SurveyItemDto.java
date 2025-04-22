@@ -12,17 +12,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 @Builder
 public class SurveyItemDto {
 	private Long itemNo;
 	private Long surveyNo;
+	private String item;
 	private List<String> items;
-	
+	private int count;
+	private String voted = "N";
+
 	public List<SurveyItem> toEntityList() {
 		return items.stream()
 				.map(itemStr -> SurveyItem.builder()
@@ -31,12 +34,24 @@ public class SurveyItemDto {
 						.build())
 				.collect(Collectors.toList());
 	}
-	
+
 	public static SurveyItemDto toDto(SurveyItem entity) {
 		return SurveyItemDto.builder()
 				.itemNo(entity.getItemNo())
 				.surveyNo(entity.getSurveyNo())
-				.items(List.of(entity.getItem()))
+				.item(entity.getItem())
 				.build();
 	}
+
+	public static SurveyItemDto toDto(SurveyItem entity, int count, boolean voted) {
+		return SurveyItemDto.builder()
+			.itemNo(entity.getItemNo())
+			.surveyNo(entity.getSurveyNo())
+			.item(entity.getItem())
+			.count(count)
+			.voted(voted ? "Y" : "N")
+			.build();
+	}
+
 }
+
