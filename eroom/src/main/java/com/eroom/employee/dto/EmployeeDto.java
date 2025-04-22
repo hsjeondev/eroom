@@ -26,7 +26,7 @@ public class EmployeeDto {
 	private String employee_name;
 	private LocalDateTime employee_hire_date;
 	private LocalDateTime employee_end_date;
-	private String employee_end_yn;
+	private String employee_employment_yn;
 	private String employee_position;
 	private Long department_no;
 	private Long team_no;
@@ -41,19 +41,20 @@ public class EmployeeDto {
 				.employeeName(employee_name)
 				.employeeHireDate(employee_hire_date)
 				.employeeEndDate(employee_end_date)
-				.employeeEmploymentYn(employee_end_yn)
+				.employeeEmploymentYn(employee_employment_yn)
 				.employeePosition(employee_position)
 				.build();
 	}
 	
 	public EmployeeDto toDto(Employee emp) {
 		return EmployeeDto.builder()
+				.employee_name(emp.getEmployeeName())
 				.employee_no(emp.getEmployeeNo())
 				.employee_id(emp.getEmployeeId())
 				.employee_pw(emp.getEmployeePw())
 				.employee_hire_date(emp.getEmployeeHireDate())
 				.employee_end_date(emp.getEmployeeEndDate())
-				.employee_end_yn(emp.getEmployeeEmploymentYn())
+				.employee_employment_yn(emp.getEmployeeEmploymentYn())
 				.employee_position(emp.getEmployeePosition())
 				.build();
 	}
