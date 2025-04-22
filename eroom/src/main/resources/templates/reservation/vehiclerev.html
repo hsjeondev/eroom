@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-US" dir="ltr" data-navigation-type="default"
-	data-navbar-horizontal-shape="default"
-	xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{/include/layout}">
 <head>
@@ -14,7 +12,7 @@
 		
 
 		<div class="row">
-			<!-- 🚗 차량 예약 목록 (왼쪽) -->
+			<!--  차량 예약 목록 (왼쪽) -->
 			<div class="col-md-6">
 				<div class="mb-3">
 					<div class="d-flex align-items-center mb-2">
@@ -40,18 +38,107 @@
 									<tr th:if="${#lists.isEmpty(list)}">
 										<td colspan="4">등록된 차량이 없습니다 😓</td>
 									</tr>
-									<tr class="align-middle" th:if="${!#lists.isEmpty(list)}"
+									<tr class="align-middle vehicle-row" th:if="${!#lists.isEmpty(list)}"
 										th:each="result, resultstatus : ${list}">
 										<td class="no" th:text="${resultstatus.count}"></td>
 										<td class="vehicle" th:text="${result.facilityName}"></td>
 										<td class="passengers" th:text="${result.facilityCapacity}"></td>
 										<td class="date"
 											th:text="${#temporals.format(result.facilityRegDate, 'yy-MM-dd')}"></td>
-										<td class="text-end pe-0"></td>
+										<td class="text-end pe-0"><button
+												class="btn btn-sm btn-outline-primary"
+												data-bs-toggle="modal" data-bs-target="#addEventModal">
+												예약하기</button></td>
 									</tr>
 								</tbody>
 							</table>
+							</div>
+						<!-- 예약 모달 창 -->
+						<div class="modal fade" id="addEventModal" tabindex="-1">
+							<div class="modal-dialog modal-dialog-centered">
+								<div class="modal-content border border-translucent">
+									<form id="addEventForm" autocomplete="off" name="addEventForm">
+										<div class="modal-header px-card border-0">
+											<div
+												class="w-100 d-flex justify-content-between align-items-start">
+												<h5 class="mb-0 lh-sm text-body-highlight">일정 등록</h5>
+												<button class="btn p-1 fs-10 text-body" type="button"
+													data-bs-dismiss="modal" aria-label="Close">닫기</button>
+											</div>
+										</div>
+										<div class="mb-4"></div>
+										<div class="modal-body p-card py-0">
+											<!-- 숨겨진 값들 -->
+											<input type="hidden" name="employee_no"
+												th:value="${#authentication.principal.employee.employeeNo}" />
+											<input type="hidden" name="facility_no" value="F002" /> <input
+												type="hidden" name="reservation_creator"
+												th:value="${#authentication.principal.employee.employeeId}" />
+
+											<!-- 제목 / 장소 가로 배치 -->
+											<div class="row mb-2">
+												<div class="col-6">
+													<label class="form-label" for="calendarTitle">제목</label> <input
+														type="text" class="form-control form-control-sm"
+														id="calendarTitle" name="company_title"
+														placeholder="일정 제목" aria-label="일정 제목" />
+												</div>
+												<div class="col-6">
+													<label class="form-label" for="calendarLocation">장소</label>
+													<input type="text" class="form-control form-control-sm"
+														id="calendarLocation" name="company_location"
+														placeholder="일정 장소" aria-label="일정 장소" />
+												</div>
+											</div>
+
+											<div class="mb-4"></div>
+
+											<!-- 시작 시간 / 종료 시간 가로 배치 -->
+											<div class="row mb-3">
+												<div class="col-6">
+													<div class="mb-3">
+														<label class="form-label" for="calendarStartTime">시작시간</label>
+														<input class="form-control" id="calendarStartTime"
+															type="datetime-local" name="calendar_start_time" />
+													</div>
+												</div>
+												<div class="col-6">
+													<div class="mb-3">
+														<label class="form-label" for="calendarEndTime">종료시간</label>
+														<input class="form-control" id="calendarEndTime"
+															type="datetime-local" name="calendar_end_time" />
+													</div>
+												</div>
+											</div>
+
+											<!-- 설명 -->
+											<div class="input-group input-group-sm mb-3">
+												<span class="input-group-text">설명</span> <input type="text"
+													class="form-control" id="calendarContent"
+													name="company_content" placeholder="일정 설명"
+													aria-label="일정 설명" />
+											</div>
+
+											<!-- 버튼 -->
+											<div
+												class="modal-footer d-flex justify-content-between align-items-center border-0">
+												<span></span>
+												<button class="btn btn-primary px-4" type="submit">일정
+													등록</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
 						</div>
+
+
+
+
+
+
+
+
 
 						<!-- 페이징 -->
 						<div class="d-flex justify-content-center mt-3">
@@ -74,8 +161,12 @@
 					</div>
 				</div>
 			</div>
+
+		
 			
 			
+
+
 
 			<!-- 캘린더 (오른쪽) -->
 			<div class="col-md-6">
@@ -85,25 +176,44 @@
 			</div>
 
 
+
+
+
 		<script>
-			document.addEventListener('DOMContentLoaded', function() {
-				const calendarEl = document.getElementById('appCalendar'); 
-				const calendar = new FullCalendar.Calendar(calendarEl, {
-					initialView : 'dayGridMonth',
-					locale : 'ko',
-					headerToolbar : {
-						left : 'prev,next today',
-						center : 'title',
-						right : ''
-					}
-				});
-				calendar.render();
+		document.addEventListener('DOMContentLoaded', function () {
+			  const calendarEl = document.getElementById('appCalendar');
+			  const calendar = new FullCalendar.Calendar(calendarEl, {
+			      initialView: 'dayGridMonth',
+			      locale: 'ko',
+			      headerToolbar: {
+			        left: 'prev,next today',
+			        center: 'title',
+			        right: ''
+			      },
+			      buttonText: {
+			    	    today: '오늘' 
+			    	  },
+			      dayMaxEventRows: true,
+			      views: {
+			        dayGridMonth: {
+			          dayMaxEventRows: 3,
+			          moreLinkText: "더보기"		       
+			          }
+			      },
+			      eventDisplay: 'block',
+			      dayCellContent: function (info) {
+			        return info.date.getDate();
+			      }
+			  });
+
+			  // setTimeout으로 약간 늦게 실행해주면 스타일 로딩 이후 안전하게 그려짐
+				/* <head>에 있는 FullCalendar CSS 파일이 아직 로드 중이라
+				캘린더는 그려졌지만 스타일이 적용되지 않은 상태로 나와버림. */
+			  setTimeout(() => {
+			    calendar.render();
+			  }, 0); 
 			});
 		</script>
-
-
-
-
 	</main>
 </body>
 </html>
