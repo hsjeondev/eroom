@@ -89,7 +89,7 @@ public class CalendarController {
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "일정 등록을 실패하였습니다");
 		
-		System.out.println(param);
+		//System.out.println(param);
 		
 		EmployeeCalendarDto edto = service.addEmployeeCalendar(param);
 		if(edto != null) {
@@ -365,6 +365,23 @@ public class CalendarController {
 		TeamCalendarDto deleteCompanyCalendar = teamService.deleteTeamCalendar(id);
     	
 		if(deleteCompanyCalendar != null) {
+			result.put("res_code", "200");
+			result.put("res_msg", "일정을 삭제하였습니다!");
+		}
+		
+		return result;
+    }
+    
+    @PostMapping("/departmentcalendar/delete/{calendarNo}")
+    @ResponseBody
+    public Map<String,String> deleteDepartCalendar(@PathVariable("calendarNo") Long id){
+    	Map<String,String> result = new HashMap<String,String>();
+    	result.put("res_code", "500");
+		result.put("res_msg", "삭제를 실패했습니다");
+    	
+		DepartmentCalendarDto deleteDepartCalendar = departmentService.deleteDepartCalendar(id);
+    	
+		if(deleteDepartCalendar != null) {
 			result.put("res_code", "200");
 			result.put("res_msg", "일정을 삭제하였습니다!");
 		}
