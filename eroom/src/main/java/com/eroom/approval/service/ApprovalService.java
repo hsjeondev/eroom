@@ -33,15 +33,15 @@ public class ApprovalService {
 	@Transactional
 	public int createApproval(ApprovalRequestDto dto, Long employeeNo) {
 		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			String json = objectMapper .writeValueAsString(dto.getContent());
+//			ObjectMapper objectMapper = new ObjectMapper();
+//			String json = objectMapper .writeValueAsString(dto.getContent());
 			Employee emp = employeeRepository.findById(employeeNo).orElse(null);
 			
 			Approval approval = Approval.builder()
 					.employee(emp)
 					.approvalTitle(dto.getTitle())
 					.approvalFormat(ApprovalFormat.builder().approvalFormatNo(Long.valueOf(dto.getFormat_no())).build())
-					.approvalContent(json)
+					.approvalContent(dto.getContent())
 					.approvalStatus("S")
 					.build();
 			
@@ -99,6 +99,11 @@ public class ApprovalService {
 			e.printStackTrace();
 			return 0;
 		}
+	}
+
+	public Approval selecApprovalByApprovalNo(Long approvalNo) {
+		Approval approval = approvalRepository.findById(approvalNo).orElse(null);
+		return approval;
 	}
 
 

@@ -26,23 +26,27 @@
             <tbody>
               <tr>
                 <th class="table-light text-center" style="width: 150px;">신청일</th>
-                <td th:text="${approval.approval_reg_date}">신청일</td>
+                <td>2025-04-13</td>
                 <th class="table-light text-center">신청자</th>
-                <td th:text="${approval.employee.employeeName}">신청자</td>
+                <td>홍길동</td>
               </tr>
               <tr>
                 <th class="table-light text-center">부서</th>
-                <td th:text="${approval.employee.structure.codeName}">부서명</td>
+                <td>개발팀</td>
                 <th class="table-light text-center">직급</th>
-                <td th:text="${approval.employee.employeePosition}">직급</td>
+                <td>대리</td>
+              </tr>
+              <tr>
+                <th class="table-light text-center">전화번호</th>
+                <td colspan="3">010-1234-5678</td>
               </tr>
               <tr>
                 <th class="table-light text-center">제목</th>
-                <td colspan="3" th:text="${approval.approval_title}">제목</td>
+                <td colspan="3">경조금 신청</td>
               </tr>
               <tr>
                 <th class="table-light text-center">양식 종류</th>
-                <td colspan="3" th:text="${approval.approval_format.approvalFormatTitle}">양식 종류</td>
+                <td colspan="3">경조금</td>
               </tr>
             </tbody>
           </table>
@@ -53,55 +57,51 @@
           <table class="table table-bordered text-center align-middle mb-3">
             <thead class="table-light">
               <tr>
-                <th th:each="line : ${approvalLineList}"
-                 th:if="${line.approval_line_step >= 1}"
-                  th:utext="|${line.employee.employeePosition}<br>${line.employee.employeeName}|"
-                  >
-                  직급<br>결재자1
-                  </th>
+                <th>직급<br>결재자1</th>
+                <th>직급<br>결재자2</th>
+                <th>직급<br>결재자3</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td  th:if="${line.approval_line_step >= 1}" th:each="line : ${approvalLineList}">
-                	<span th:if="${line.approval_line_status == 'A'}" th:text="서명넣기">서명</span>
-                	<span th:if="${line.approval_line_status == 'S'}" th:text="대기중">대기</span>
-                	<span th:if="${line.approval_line_status == 'D'}" th:text="반려">반려</span>
-                </td>
+                <td>서명 완료</td>
+                <td>대기중</td>
+                <td>대기중</td>
               </tr>
             </tbody>
           </table>
-          
           <table class="table table-bordered text-center align-middle">
             <thead class="table-light">
               <tr>
-                <th th:each="line : ${approvalLineList}" th:if="${line.approval_line_step == 0}" th:utext="|${line.employee.employeePosition}<br${line.employee.employeeName}|">직급<br>합의자1</th>
+                <th>직급<br>합의자1</th>
+                <th>직급<br>합의자2</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td  th:if="${line.approval_line_step == 0}" th:each="line : ${approvalLineList}">
-                	<span th:if="${line.approval_line_status == 'A'}" th:text="|합의|">서명!</span>
-                	<span th:if="${line.approval_line_status == 'S'}" th:text="|대기중|">대기!</span>
-                	<span th:if="${line.approval_line_status == 'D'}" th:text="|합의x|">반려!</span>
-                </td>
+                <td>서명 완료</td>
+                <td>서명 완료</td>
               </tr>
             </tbody>
           </table>
-          
 		<!-- 참조자 텍스트 -->
-		<div class="text-end text-body-secondary fs-8 mt-1" th:if="${line.approval_line_step == -1}" th:each="line : ${approvalLineList}">
-			<span>참조자: </span>
-			<span th:text="${line.employee.employeeName}">참조자!</span>
+		<div class="text-end text-body-secondary fs-8 mt-1">
+			참조자: 홍보팀 김대리, 회계팀 이과장
 		</div>
 
         </div>
-        
-        
       </div>
 
       <!-- 결재 내용 -->
-      <div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/congratulatory_payment :: congratulatory_payment}"></div>
+      <div class="bg-light rounded p-4 mt-4">
+        <h5 class="mb-3 text-dark">결재 내용</h5>
+        <p><strong>1. 내용:</strong> 부친상으로 인한 경조금 신청</p>
+        <p><strong>2. 본인과의 관계:</strong> 부</p>
+        <p><strong>3. 발생년월일:</strong> 2025-04-10</p>
+        <p><strong>4. 장소:</strong> 서울아산병원 장례식장</p>
+        <p><strong>5. 휴가기간:</strong> 2025-04-11 ~ 2025-04-13</p>
+        <p><strong>6. 금액:</strong> 300,000원</p>
+      </div>
 
       <!-- 첨부 파일 -->
       <div class="mt-4">

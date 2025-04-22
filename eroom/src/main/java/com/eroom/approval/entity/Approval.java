@@ -1,12 +1,16 @@
 package com.eroom.approval.entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.eroom.employee.entity.Employee;
+import com.eroom.approval.JsonToMapConverter;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,6 +18,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,8 +45,9 @@ public class Approval {
 	private String approvalStatus; // 결재 상태(A, S, D, F)
 	@Column(name="approval_title")
 	private String approvalTitle; // 결재 제목
-	@Column(name="approval_content")
-	private String approvalContent; // 결재 내용
+	@Convert(converter = JsonToMapConverter.class)
+	@Column(name = "approval_content", columnDefinition = "TEXT")
+	private Map<String, String> approvalContent; // 결재 내용
 	@Column(name="approval_deny_reason")
 	private String approvalDenyReason; // 결재 반려 사유
 	@Column(name="approval_reg_date", insertable = false, updatable = false)
@@ -56,8 +62,11 @@ public class Approval {
 	@JoinColumn(name="approval_format_no")
 	private ApprovalFormat approvalFormat; // 결재 양식
 	
-	@OneToMany(mappedBy = "approval")
-	private List<ApprovalLine> approvalLines;
+	@OneToMany(mappedBy = "approval", fetch = FetchType.LAZY)
+	@OrderBy("approvalLineNo ASC")
+	private Set<ApprovalLine> approvalLines;
+
+
 
 	
 }

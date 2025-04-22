@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -199,8 +200,27 @@ public class ApprovalController {
 
 	}
 	
-	@GetMapping("/approval/detail")
-	public String selectApprovalDetail() {
+	@GetMapping("/approval/myRequestedApprovals/detail/{approvalNo}")
+	public String selectApprovalDetail(@PathVariable("approvalNo") Long approvalNo, Model model, Authentication authentication) {
+		
+		// 선택한 결재 번호로 결재 정보 조회
+		Approval approval = approvalService.selecApprovalByApprovalNo(approvalNo);
+		ApprovalDto approvalDto = new ApprovalDto().toDto(approval);
+		model.addAttribute("approval", approvalDto);
+		
+		// 로그인한 사용자 정보 조회
+		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+		Employee employee = employeeDetails.getEmployee();
+		model.addAttribute("employee", employee);
+		
+		// 결재 라인 정보 조회
+		List<ApprovalLine> temp = approvalLineService.getApprovalLineByApprovalNo(approvalNo);
+		List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
+		for (ApprovalLine approvalLine : temp) {
+			ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
+			approvalLineDtoList.add(approvalLineDto);
+		}
+		model.addAttribute("approvalLineList", approvalLineDtoList);
 		
 		return "/approval/detail";
 	}

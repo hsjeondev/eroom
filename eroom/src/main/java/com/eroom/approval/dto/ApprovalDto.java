@@ -2,7 +2,7 @@ package com.eroom.approval.dto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Map;
 
 import com.eroom.approval.entity.Approval;
 import com.eroom.approval.entity.ApprovalFormat;
@@ -27,7 +27,7 @@ public class ApprovalDto {
     
     private String approval_status; // 결재 상태 (A, S, D, F, 등)
     private String approval_title; // 결재 제목
-    private String approval_content; // 결재 내용
+    private Map<String, String> approval_content; // 결재 내용
     private String approval_deny_reason; // 반려 사유
 
     private LocalDateTime approval_reg_date; // 등록일
