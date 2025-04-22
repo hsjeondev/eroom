@@ -7,14 +7,9 @@
   <main class="main" id="top" layout:fragment="content">
     <div class="row g-0 mb-4 align-items-center">
       <div class="col-5 col-md-6">
-        <h4 class="mb-0 text-body-emphasis fw-bold fs-md-6">회사일정</h4>
+        <h4 class="mb-0 text-body-emphasis fw-bold fs-md-6">전체일정</h4>
       </div>
     </div>
-
-
-		
-
-
 
 		<div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
     
@@ -293,6 +288,8 @@
 		});
 
 		    
+		    //부서와 회사 캘린더의 정보를 가져옴
+		    //공휴일도 추가
 		    calendar.addEventSource({
 		    	  url: '/calendar/list/all',
 		    	  method: 'GET',
@@ -311,7 +308,7 @@
 		    		    fetch(url)
 		    		      .then(response => response.json())
 		    		      .then(data => {
-		    		        console.log("📅 공휴일 API 응답 확인:", data); // ✅ 이거 추가!
+		    		        //console.log("공휴일 API 응답 확인:", data); 
 		    		        const holidays = data.items.map(item => ({
 		    		          title: item.summary,
 		    		          start: item.start.date,
@@ -321,7 +318,7 @@
 		    		        successCallback(holidays);
 		    		      })
 		    		      .catch(error => {
-		    		        console.error("🛑 공휴일 불러오기 실패 😢", error);
+		    		        //console.error("공휴일 불러오기 실패 😢", error);
 		    		        failureCallback(error);
 		    		      });
 		    		  }
