@@ -9,5 +9,7 @@ import com.eroom.calendar.entity.CompanyCalendar;
 
 
 public interface CompanyCalendarRepository extends JpaRepository<CompanyCalendar,Long>,JpaSpecificationExecutor<CompanyCalendar> {
-	List<CompanyCalendar> findBySeparator(String separator);
+	List<CompanyCalendar> findBySeparatorAndVisibleYn(String separator,String visibleYn);
+	
+	 List<CompanyCalendar> findBySeparatorStartingWithAndVisibleYn(String prefix, String visibleYn);
 }

@@ -19,10 +19,18 @@
 	  transform: translateX(0);
 	  pointer-events: auto;
 	}
-	
+	.unread .name {
+	  font-weight: bold;
+	  color: #007bff; /* 읽지 않은 채팅방은 파란색 */
+	}
+	.read .name {
+	  color: #6c757d; /* 읽은 채팅방은 회색 */
+	}
 	</style>
 <body>
   <main class="main" id="top" layout:fragment="content">
+  
+   <input type="hidden" id="myEmployeeNo" th:value="${#authentication.principal.employee.employeeNo}">
     <div class="chat d-flex phoenix-offcanvas-container pt-1 mt-n1 mb-9">
       <!-- 왼쪽 채팅 목록 영역 -->
       <div class="card p-3 p-xl-1 mt-xl-n1 chat-sidebar me-3 phoenix-offcanvas phoenix-offcanvas-start" id="chat-sidebar">
@@ -48,7 +56,7 @@
         </div>
         <!-- 검색 입력란 -->
         <div class="form-icon-container mb-4 d-sm-none d-xl-block">
-          <input class="form-control form-icon-input" type="text" placeholder="이름을 입력하세요" />
+          <input class="form-control form-icon-input search" type="text" placeholder="이름을 입력하세요" />
           <span class="fas fa-user text-body fs-9 form-icon"></span>
         </div>
         <!-- 탭 메뉴 (전체, 읽지않음, 읽음) -->
@@ -80,7 +88,8 @@
                 <li th:if="${!#lists.isEmpty(chatroomList)}"
                   th:each="chatroom : ${chatroomList}"
                   th:attr="data-room-no=${chatroom.chatroomNo}"
-                  class="nav-item read mb-1" role="presentation">
+                  th:classappend="${chatroom.unreadCount > 0} ? 'unread' : 'read'"
+                  class="nav-item read mb-1 item" role="presentation">
                   <a class="nav-link d-flex align-items-center justify-content-center p-2"
 					   th:href="'#chatroom-' + ${chatroom.chatroomNo}"
 					   th:attr="data-room-no=${chatroom.chatroomNo}, data-group=${chatroom.chatIsGroupYn}"
@@ -95,7 +104,12 @@
                       <div class="d-flex justify-content-between align-items-center">
                         <h5 th:text="${chatroom.chatroomName}"
                           class="text-body fw-normal name text-nowrap">채팅방 이름</h5>
-                        <p class="fs-10 text-body-tertiary text-opacity-85 mb-0 text-nowrap">시간은 일단 보류</p>
+                          <div th:if="${chatroom.unreadCount > 0}" 
+					         class="badge bg-danger text-white ms-2" 
+					         th:text="${chatroom.unreadCount}">
+					      </div>
+                        <p th:text="${#temporals.format(chatroom.lastMessageRegDate, 'yy.MM.dd')}" 
+                        class="fs-10 text-body-tertiary text-opacity-85 mb-0 text-nowrap">마지막 메시지 시간</p>
                       </div>
                       <div class="d-flex justify-content-between">
                         <p th:text="${chatroom.chatLastMessage}"
@@ -296,17 +310,21 @@
       
     </div>
 	 <script>
+	 	let socket = null; 
+		let currentReceiverNo = null;
 		let isCreateMode = true; // 기본은 생성 모드
 		
 		document.addEventListener("DOMContentLoaded", () => {
-		  bindModalReset();
-		  bindChatroomPanelEvents();
-		  bindChatroomRename();
-		  bindParticipantAddButton();
-		  bindChatroomCreate();
-		  bindDepartmentChange();
-		  bindParticipantAdd();
-		  bindChatTypeChange();
+		  bindModalReset(); // 모달 초기화
+		  bindChatroomPanelEvents(); // 채팅방 클릭 이벤트
+		  bindChatroomRename(); // 채팅방 이름 변경
+		  bindParticipantAddButton(); // 참여자 추가 버튼 클릭 이벤트
+		  bindChatroomCreate(); // 채팅방 생성 버튼 클릭 이벤트
+		  bindDepartmentChange(); // 소속 선택시 직원 목록 로딩
+		  bindParticipantAdd(); // 참여자 추가
+		  bindChatTypeChange(); // 채팅 종류 변경시
+		  bindChatroomDelete(); // 채팅방 삭제
+		  
 		});
 		
 		// 모달 초기화 (열릴 때 기본 리셋)
@@ -452,8 +470,37 @@
 		        </div>
 		      </div>
 		    `;
+		    
+		    // 채팅방 클릭시 WebSocket 연결
+		    connectWebSocket(chatroomNo, isGroup);
+		    
+		    // 수신자 employeeNo 가져오기
+		    if (!isGroup) {
+			    fetch('/chat/receiver?chatroomNo=' + chatroomNo)
+			    .then(response => response.json())
+			    .then(data => {
+			        console.log("받아온 수신자 번호 : ", data.receiverNo);
+			
+			        // hidden input 생성 또는 업데이트
+			        let receiverInput = document.getElementById("receiverNo");
+			        if (!receiverInput) {
+			            receiverInput = document.createElement("input");
+			            receiverInput.type = "hidden";
+			            receiverInput.id = "receiverNo";
+			            document.body.appendChild(receiverInput);
+			        }
+			        receiverInput.value = data.receiverNo;
+			    })
+			    .catch(error => {
+			        console.error('수신자 불러오기 실패:', error);
+			    });
+		    }
+		    
+		    
+		    // 채팅 이력 불러오기
+		    loadChatroomDetail(chatroomNo);
 		  });
-		
+
 		  document.addEventListener("click", function (e) {
 		    const target = e.target.closest(".chatroom-title");
 		    if (!target) return;
@@ -602,6 +649,43 @@
 		    }
 		  });
 		}
+		// 채팅방 삭제
+		function bindChatroomDelete() {
+          const detailModal = document.getElementById("chatroomDetailModal");
+          if (!detailModal) return;
+        
+          detailModal.addEventListener("click", function (e) {
+            const li = e.target.closest("li");
+            if (!li || !li.textContent.includes("채팅방 삭제")) return;
+        
+            const chatroomNo = document.getElementById("modalChatroomName").dataset.roomNo;
+            if (chatroomNo) {
+              if (confirm("정말로 채팅방을 삭제하시겠습니까?")) {
+                fetch('/chat/delete', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+                  },
+                  body: JSON.stringify({ chatroomNo })
+                })
+                .then(res => res.json())
+                .then(data => {
+                  if (data.res_code === "200") {
+                    alert(data.res_msg);
+                    location.href = "/chat/list";
+                  } else {
+                    alert("삭제 실패: " + data.res_msg);
+                  }
+                })
+                .catch(err => {
+                  console.error("요청 실패:", err);
+                  alert("서버 오류가 발생했습니다.");
+                });
+              }
+            }
+          });
+        }
 		
 		// 참여자 추가 모달 열기
 		function openParticipantAddModal(chatroomNo) {
@@ -629,9 +713,221 @@
 		    document.getElementById("chatTypeGroup").style.display = "block";
 		  }, { once: true });
 		}
+		
+		
+		function connectWebSocket(chatroomNo, isGroup) {
+		  const senderNo = document.getElementById("myEmployeeNo").value; 
+
+		  if (socket) {
+		    socket.onmessage = null;   // 기존 소켓의 메시지 리스너를 끊는다
+		    socket.onclose = null;     // (선택) 기존 소켓의 종료 리스너도 끊는다
+		    socket.onerror = null;     // (선택) 기존 소켓의 에러 리스너도 끊는다
+		    socket.close();            // 기존 소켓 연결 닫는다
+		  }
+
+		  // socket = new WebSocket('ws://localhost:8080/ws/chat?senderNo=${senderNo}&roomNo=${chatroomNo}');
+		  socket = new WebSocket("ws://localhost:8080/ws/chat?senderNo=" + senderNo + "&roomNo=" + chatroomNo);
+		  
+		  socket.onopen = function() {
+			  if (chatroomNo) {  
+			    fetch('/chat/read', {
+			      method: 'POST',
+			      headers: {
+			        'Content-Type': 'application/json',
+			        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			      },
+			      body: JSON.stringify({
+			        chatroomNo: chatroomNo,
+			        senderNo: senderNo
+			      })
+			    }).then(res => res.json())
+			      .then(result => {
+			        console.log('채팅방 입장 - 읽음 처리 완료:', result);
+			        const sidebarItem = document.querySelector(`[data-room-no="${chatroomNo}"]`);
+			        if (sidebarItem) {
+			            sidebarItem.classList.remove('unread');
+			            sidebarItem.classList.add('read');
+
+			            const badge = sidebarItem.querySelector('.badge');
+			            if (badge) {
+			              badge.remove(); // 읽음 뱃지 삭제
+			            }
+			          }
+			      })
+			      .catch(err => {
+			        console.error('채팅방 입장 - 읽음 처리 실패:', err);
+			      });
+			  }
+		    };
+		  // 메시지 수신
+		  socket.onmessage = function(event) {
+  console.log('수신한 메시지:', event.data);
+
+  const data = JSON.parse(event.data);
+  const chatHistory = document.querySelector(".chat-history");
+  const currentChatroomNo = document.querySelector(".chatroom-title")?.dataset.roomNo;
+  const sidebarItem = document.querySelector(`[data-room-no="${data.chatroomNo}"]`);
+
+  if (!sidebarItem) {
+    console.warn("사이드바에 채팅방이 없음:", data.chatroomNo);
+    return;
+  }
+
+  // 현재 열린 방이 없거나, 다른 방이면 읽지 않음 처리
+  if (!currentChatroomNo || Number(data.chatroomNo) !== Number(currentChatroomNo)) {
+    console.log("💬 다른 방에서 메시지 수신: 읽지 않음 뱃지 올림");
+
+    sidebarItem.classList.add('unread');
+    sidebarItem.classList.remove('read');
+
+    let badge = sidebarItem.querySelector('.badge');
+    if (badge) {
+      let count = parseInt(badge.innerText) || 0;
+      badge.innerText = count + 1;
+    } else {
+      badge = document.createElement('div');
+      badge.className = 'badge bg-danger text-white ms-2';
+      badge.innerText = 1;
+      const flexBox = sidebarItem.querySelector('.d-flex.justify-content-between');
+      if (flexBox) {
+        flexBox.appendChild(badge);
+      }
+    }
+
+    const messagePreview = sidebarItem.querySelector('.message');
+    if (messagePreview) {
+      messagePreview.innerText = data.chatMessageContent;
+    }
+
+    const timePreview = sidebarItem.querySelector('.text-body-tertiary');
+    if (timePreview) {
+      const now = new Date();
+      const formatted = now.getFullYear().toString().slice(2) + '.' +
+                        String(now.getMonth() + 1).padStart(2, '0') + '.' +
+                        String(now.getDate()).padStart(2, '0');
+      timePreview.innerText = formatted;
+    }
+
+    return; // 다른 방이면 여기서 끝
+  }
+
+  // 같은 방이면 채팅 추가
+  if (!chatHistory) {
+    console.error("❌ chat-history 없음");
+    return;
+  }
+
+  const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+  const isMyMessage = data.senderMember == myEmployeeNo;
+
+  const wrapperDiv = document.createElement("div");
+  wrapperDiv.className = "mb-3";
+
+  const nameDiv = document.createElement("div");
+  nameDiv.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-1`;
+  nameDiv.innerHTML = `<div class="small text-muted">${isMyMessage ? '나' : data.senderName}</div>`;
+
+  const messageOuterDiv = document.createElement("div");
+  messageOuterDiv.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
+
+  const messageInnerDiv = document.createElement("div");
+  messageInnerDiv.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
+  messageInnerDiv.style.maxWidth = "70%";
+  messageInnerDiv.innerText = data.chatMessageContent;
+
+  messageOuterDiv.appendChild(messageInnerDiv);
+  wrapperDiv.appendChild(nameDiv);
+  wrapperDiv.appendChild(messageOuterDiv);
+  chatHistory.appendChild(wrapperDiv);
+
+  const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
+  if (chatArea) {
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+};
+
+
+
+
+		  socket.onclose = function(event) {
+		    console.log('❌ WebSocket 연결 종료:', event);
+		  };
+
+		  socket.onerror = function(error) {
+		    console.error('🚨 WebSocket 오류 발생:', error);
+		  };
+		}
+		// 메시지 보내기
+		function sendMessage() {
+		    const messageInput = document.getElementById("messageInput");
+		    const message = messageInput.value.trim();
+		    
+		    if (!message) {
+		        alert("메시지를 입력해주세요.");
+		        return;
+		    }
+		    
+		    const isGroupChat = document.querySelector('.chatroom-title')?.dataset.group === 'Y';
+		    const receiverValue = document.getElementById("receiverNo")?.value;
+		    const receiverNo = receiverValue && receiverValue !== "undefined" && receiverValue !== "null" ? Number(receiverValue) : null;
+		
+		    if (!isGroupChat && (receiverNo === null || isNaN(receiverNo))) {
+		        alert("수신자 정보가 아직 설정되지 않았습니다. 잠시 후 다시 시도해주세요.");
+		        return;
+		    }
+		
+		    const chatData = {
+		        chatMessageContent: message,
+		        senderMember: Number(document.getElementById("myEmployeeNo").value),
+		        chatroomNo: Number(document.querySelector(".chatroom-title").dataset.roomNo),
+		        receiverMember: receiverNo // 그룹이면 null, 1:1이면 번호
+		    };
+		
+		    console.log("보내는 데이터:", chatData);
+		    socket.send(JSON.stringify(chatData));
+		    messageInput.value = ""; // 메시지 전송 후 입력창 비우기
+		}
+
+
+		
+		function loadChatroomDetail(chatroomNo) {
+			  fetch('/chat/roomDetail?roomNo=' + chatroomNo)
+			    .then(response => response.json())
+			    .then(data => {
+			      const chatHistory = document.querySelector(".chat-history");
+			      if (!chatHistory) return;
+			      
+			      chatHistory.innerHTML = "<hr>"; // 초기화
+
+			      if (data.messageList && data.messageList.length > 0) {
+			        const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+					
+			        data.messageList.forEach(msg => {
+			          const isMyMessage = (msg.senderMember == myEmployeeNo);
+			          const messageDiv = document.createElement("div");
+			          messageDiv.className = "mb-2";
+			          messageDiv.innerHTML = `
+			            <div class="d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'}">
+			              <div class="p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}" style="max-width: 70%;">
+			                ${msg.chatMessageContent}
+			              </div>
+			            </div>
+			          `;
+			          chatHistory.appendChild(messageDiv);
+			        });
+
+			        // 스크롤 맨 밑으로
+			        const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
+			        if (chatArea) {
+			          chatArea.scrollTop = chatArea.scrollHeight;
+			        }
+			      }
+			    })
+			    .catch(error => {
+			      console.error("채팅방 상세 조회 실패:", error);
+			    });
+			}
 		</script>
-	 
-	 
 	 
 	</main>
 	

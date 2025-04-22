@@ -18,25 +18,30 @@ import lombok.RequiredArgsConstructor;
 public class EmployeeDirectoryService {
 
 	private final EmployeeDirectoryRepository employeeDirectoryRepository;
-	private final StructureRepository structureRepository;
 
+	// 직원 주소록 리스트 조회
 	public List<Directory> selectDirectoryEmployeeAllBySeparatorCode() {
 		List<Directory> list = employeeDirectoryRepository.findBySeparator_SeparatorCode("A001");
 		return list;
 	}
+	// 협력업체 주소록 리스트 조회
 	public List<Directory> selectDirectoryPartnerAllBySeparatorCode() {
-		List<Directory> list = employeeDirectoryRepository.findBySeparator_SeparatorCode("A001");
+		List<Directory> list = employeeDirectoryRepository.findBySeparator_SeparatorCode("A002");
 		return list;
 	}
 
-	public Structure selectStructureCodeNameByParentCodeEqualsSeparatorCode(String parentCode) {
-		return structureRepository.findBySeparatorCode(parentCode);
-	}
-	public List<Structure> selectDepartmentAll() {
-		return structureRepository.findByParentCodeIsNull();
-	}
-	public List<Structure> selectTeamAll(String parentCode) {
-		return structureRepository.findByParentCode(parentCode);
+//	public Structure selectStructureCodeNameByParentCodeEqualsSeparatorCode(String parentCode) {
+//		return structureRepository.findBySeparatorCode(parentCode);
+//	}
+//	public List<Structure> selectDepartmentAll() {
+//		return structureRepository.findByParentCodeIsNull();
+//	}
+//	public List<Structure> selectTeamAll(String parentCode) {
+//		return structureRepository.findByParentCode(parentCode);
+//	}
+	
+	public Directory selectDirectoryByEmployeeNo(Long employeeNo) {
+		return employeeDirectoryRepository.findByEmployee_EmployeeNo(employeeNo);
 	}
 
 	

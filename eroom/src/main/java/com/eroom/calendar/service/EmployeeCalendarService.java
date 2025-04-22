@@ -2,12 +2,12 @@ package com.eroom.calendar.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
 import com.eroom.calendar.dto.EmployeeCalendarDto;
 import com.eroom.calendar.entity.EmployeeCalendar;
-import com.eroom.calendar.repository.CompanyCalendarRepository;
 import com.eroom.calendar.repository.EmployeeCalendarRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -40,23 +40,20 @@ public class EmployeeCalendarService {
 	
 	//해당 직원 일정 단일 조회
 	public EmployeeCalendarDto findByCalendarNo(Long id) {
-        // 데이터베이스에서 일정 가져오기
-        EmployeeCalendar calendar = repository.findById(id).orElse(null);
         
-        // 데이터가 없으면 null 반환
+        EmployeeCalendar calendar = repository.findById(id).orElse(null);
+          
         if (calendar == null) {
             return null;
-        }
-
-        // EmployeeCalendarDto 객체 생성
+        }      
         EmployeeCalendarDto dto = new EmployeeCalendarDto();
         
-        // toDto 호출
+       
         return dto.toDto(calendar);
     }
 	
 	
-	
+	//해당 직원 일정 수정
 	public EmployeeCalendar updateCalendar(EmployeeCalendarDto param) {
 		EmployeeCalendar result = null;
 		EmployeeCalendar target = repository.findById(param.getCalendar_no()).orElse(null);
@@ -67,6 +64,7 @@ public class EmployeeCalendarService {
 		}
 		return result;
 	}
+	
 	
 	public EmployeeCalendarDto deleteCalendar(Long id) {
 	    
@@ -98,6 +96,8 @@ public class EmployeeCalendarService {
 	    EmployeeCalendar saved = repository.save(updated);
 	    return new EmployeeCalendarDto().toDto(saved);
 	}
+	
+	
 	
 	
 	

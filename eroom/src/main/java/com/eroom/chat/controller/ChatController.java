@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,15 +17,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eroom.chat.dto.ChatMessageDto;
 import com.eroom.chat.dto.ChatroomDto;
+import com.eroom.chat.entity.ChatAlarm;
+import com.eroom.chat.entity.ChatMessage;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
+import com.eroom.chat.repository.ChatAlarmRepository;
+import com.eroom.chat.service.ChatMessageService;
 import com.eroom.chat.service.ChatroomService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.employee.service.EmployeeService;
+import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +43,8 @@ public class ChatController {
 	private final ChatroomService chatroomService;
 	private final EmployeeService employeeService;
 	private final EmployeeRepository employeeRepository;
+	private final ChatMessageService chatMessageService;
+	private final ChatAlarmRepository chatAlarmRepository;
 	
 	@GetMapping("/test")
 	public String test123() {
@@ -43,8 +53,21 @@ public class ChatController {
 	
 	@GetMapping("/list")
 	public String selectChatRoomAll(@RequestParam(name = "department" ,required = false) String department, Model model) {
+		// 현재 로그인한 사용자 정보 가져오기
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+		Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
+		// 채팅방 리스트 조회
 		List<Chatroom> resultList = chatroomService.selectChatRoomAll();
-		model.addAttribute("chatroomList",resultList);
+		List<ChatroomDto> chatroomDtos = new ArrayList<>();
+		// 채팅방 알림을 읽지 않은 알림 리스트 조회
+		for(Chatroom chatroom : resultList) {
+			int unreadCount = chatAlarmRepository.countUnreadAlarms(myEmployeeNo, chatroom.getChatroomNo());
+			ChatroomDto dto = ChatroomDto.toDto(chatroom);
+			dto.setUnreadCount(unreadCount);
+			chatroomDtos.add(dto);
+		}
+		model.addAttribute("chatroomList",chatroomDtos);
 		
 		List<SeparatorDto> structureList = employeeService.findDistinctStructureNames();
 		model.addAttribute("structureList", structureList);
@@ -116,12 +139,35 @@ public class ChatController {
 	@GetMapping("/roomDetail")
 	@ResponseBody
 	public ChatroomDto roomDetail(@RequestParam("roomNo") Long roomNo) {
+		// 채팅방 정보 조회
+		// 현재 로그인한 사용자 정보 가져오기
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	    
+	    // (1) 채팅방 알림을 읽지 않은 알림 리스트 조회
+	    List<ChatAlarm> urreadAlarms = chatAlarmRepository.findUnreadAlarms(myEmployeeNo, roomNo);
+	    
+	    // (2) 채팅방 알림을 읽지 않은 알림 리스트를 읽음 처리
+	    for(ChatAlarm alarm : urreadAlarms) {
+	    	alarm.setChatAlarmReadYn("Y");
+	    }
+	    // 읽음 처리된 알림 리스트를 DB에 저장
+	    chatAlarmRepository.saveAll(urreadAlarms);
+	    // (3) 채팅방 정보 + 메시지 리스트 조회
 	    Chatroom chatroom = chatroomService.selectChatroomOne(roomNo);
 	    if (chatroom == null) {
 	        throw new RuntimeException("채팅방 정보를 찾을 수 없습니다.");
 	    }
-	    // ChatroomDto의 toDto() 메서드를 통해 필요한 데이터를 DTO에 담아서 반환
-	    return ChatroomDto.toDto(chatroom);
+	    // 채팅 메시지 리스트 조회
+	    List<ChatMessage> messageList = chatMessageService.selectMessageByRoomNo(roomNo);
+	    
+	    List<ChatMessageDto> messageDtoList = new ArrayList<>();
+		for (ChatMessage message : messageList) {
+			ChatMessageDto messageDto = ChatMessageDto.toDto(message);
+			messageDtoList.add(messageDto);
+		}
+	    return ChatroomDto.toDto(chatroom, messageDtoList);
 	}
 	
 	// 채팅방 업데이트
@@ -172,5 +218,70 @@ public class ChatController {
 	    
 	    return participantNames;
 	}
+	@PostMapping("/delete")
+	@ResponseBody
+	public Map<String, String> deleteChatroom(@RequestBody ChatroomDto param) {
+		Map<String, String> resultMap = new HashMap<String, String>();
+		resultMap.put("res_code", "500");
+		resultMap.put("res_msg", "채팅방 삭제를 실패하였습니다.");
+
+		chatroomService.deleteChatroom(param.getChatroomNo());
+
+		resultMap.put("res_code", "200");
+		resultMap.put("res_msg", "채팅방을 삭제하였습니다!");
+
+		return resultMap;
+	}
+	// 채팅방 참여자 조회
+	@GetMapping("/receiver")
+	@ResponseBody
+	public Map<String, Object> getReceiver(@RequestParam("chatroomNo") Long chatroomNo) {
+	    Map<String, Object> resultMap = new HashMap<>();
+	    
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Employee loginUser = employeeDetails.getEmployee(); // 현재 로그인한 사람
+
+	    Chatroom chatroom = chatroomService.selectChatroomOne(chatroomNo);
+	    if (chatroom == null) {
+	        resultMap.put("receiverNo", null);
+	        return resultMap;
+	    }
+
+	    List<ChatroomAttendee> attendees = chatroom.getChatroomMapping(); // 채팅방 참여자 리스트
+
+	    for (ChatroomAttendee attendee : attendees) {
+	        if (!attendee.getAttendee().getEmployeeNo().equals(loginUser.getEmployeeNo())) {
+	            resultMap.put("receiverNo", attendee.getAttendee().getEmployeeNo());
+	            return resultMap;
+	        }
+	    }
+
+	    resultMap.put("receiverNo", null);
+	    return resultMap;
+	}
+	@PostMapping("/read")
+	@ResponseBody
+	public Map<String, String> readChat(@RequestBody Map<String, Long> payload) {
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "읽음 처리를 실패했습니다.");
+
+	    try {
+	        Long chatroomNo = payload.get("chatroomNo");
+	        Long senderNo = payload.get("senderNo");
+
+	        chatroomService.updateReadStatus(chatroomNo, senderNo);
+
+	        resultMap.put("res_code", "200");
+	        resultMap.put("res_msg", "읽음 처리가 완료되었습니다!");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return resultMap;
+	}
+
+
 
 }

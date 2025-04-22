@@ -1,189 +1,143 @@
 <!DOCTYPE html>
-<html lang="ko-KR" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+<html lang="ko-KR" dir="ltr"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{/include/layout}">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<meta charset="UTF-8">
-<title>근태 상세</title>
-<style>
-   .profile-wrapper {
-     position: relative;
-     width: 120px;
-     height: 120px;
-   }
-   .profile-wrapper img {
-     width: 100%;
-     height: 100%;
-     object-fit: cover;
-
-   }
-</style>
+  <meta charset="UTF-8">
+  <title>근태 상세</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .profile-wrapper {
+      position: relative;
+      width: 120px;
+      height: 120px;
+    }
+    .profile-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .row > [class^="col"] {
+      display: flex;
+    }
+    .card {
+      flex: 1 1 auto;
+    }
+  </style>
 </head>
 <body>
- <main class="main" id="top" layout:fragment="content">
-	<div class="mb-9">
-		<div class="d-flex justify-content-between align-items-center mb-2 position-relative">
-		  <span class="fw-bold fs-7">근태</span>
-		  <div class="position-absolute start-50 translate-middle-x">
-		  	<span class="current-time fw-bold text-secondary fs-6 mb-0" id="currentTime"></span>
-		  </div>
-		 <a class="d-flex justify-content-end align-items-end" th:href="@{/attendance/checkinout}">출근</a>
-		</div>
-		<div class="row g-5">
-			<div class="col-12 col-md-4 col-xxl-4">
-				<div class="row g-3">
-					<div class="col-12">
-						<div class="card h-100">
-							<div class="card-body">
-								<!-- 프로필 상단 -->
-								<div class="row align-items-center g-5 mb-3 text-center text-sm-start">
-									<div class="col-12 col-sm-auto mb-sm-2">
-										<div class="profile-wrapper mx-auto mb-3">
-											<img class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
-										</div>
-									</div>
-									
-									<div class="col-12 col-sm-auto flex-1">
-										<!-- 이름 -->
-										<div class="d-flex">
-											<span class="fw-bold fs-7">강성관</span>
-										</div>
-										<!-- 직급 -->
-										<p class="text-body-secondary">CEO</p>
-									</div>
-								</div><!-- 프로필 상단 끝  -->
-								<!-- 하단 정보 -->
-								<div class="d-flex flex-between-center border-top border-dashed pt-4">
-									<div>
-										<div class="d-flex">
-											<span class="fw-bold fs-8">총 연차</span>
-										</div>
-										<p class="fs-7 text-body-secondary mb-0 text-center">12</p>
-									</div>
-									<div>
-										<div class="d-flex">
-											<span class="fw-bold fs-8">사용 연차</span>
-										</div>
-										<p class="fs-7 text-body-secondary mb-0 text-center">5</p>
-									</div>
-									<div>
-										<div class="d-flex">
-											<span class="fw-bold fs-8">잔여 연차</span>
-										</div>
-										<p class="fs-7 text-body-primary mb-0 text-center">7</p>
-									</div>
-								</div><!-- 하단 정보 끝 -->
-							</div><!-- card-body -->
-						</div><!-- card h-100 -->
-					</div><!-- col-12 -->
-					<!-- 주소록 정보 -->
-					<div class="col-12">
-						<div class="card h-100 position-relative">
-							<div class="card-body fs-9">
-								<div class="d-flex align-items-center mb-2">
-								    <span class="fw-bold text-dark fs-8 me-1 mb-0">00000001</span>
-								
-									<!--  수정 버튼
-									<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
-									        data-bs-toggle="modal" data-bs-target="#editInfoModal">
-									  <svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
-									       focusable="false" data-prefix="fas" data-icon="pen" role="img"
-									       xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-									    <path fill="currentColor"
-									          d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
-									  </svg>
-									</button> -->
-								</div>
-							
-								<!-- 기본 정보 -->
-								<h5 class="text-body-secondary">직급</h5>
-								<p class="text-body-secondary">CEO</p>
-								
-								<h5 class="text-body-secondary">부서</h5>
-								<p class="text-body-secondary">운영부</p>
-								
-								<div class="mb-3">
-								  <h5 class="text-body-secondary">Email</h5>
-								  <a href="mailto:shatinon@jeemail.com" id="emailValue">shatinon@jeemail.com</a>
-								</div>
-								
-								<h5 class="text-body-secondary">Phone</h5>
-								<p class="text-body-secondary" id="phoneValue">01011112222</p>
-								
-								<h5 class="text-body-secondary">주소</h5>
-								<p class="text-body-secondary" id="addressValue">서울특별시 금천구 가산디지털2로 95</p>
-							</div>
-						</div>
-					</div>
-					<!-- 주소록 끝 -->
-				</div><!-- row g-3 -->
-			</div><!-- col-12 col-md-4 col-xxl-4 --> <!-- 프로필 상단+주소 (왼쪽 상단)-->
-			
-			<div class="col-12 col-md-8 col-xxl-8">
-				<div class="row g-4">
-					<!-- 근태 요약 -->
-					<div class="card mb-4 shadow-sm p-3">
-        
-						<div class="card-title d-flex">
-							<span class="fw-bold fs-8 mb-3 text-secondary">근태 요약</span>
-						</div>
-						
-						<div class="row text-center">
-							<div class="col">
-							  <p class="mb-1 fw-semibold">출근일수</p>
-							  <h6 class="text-primary">18일</h6>
-							</div>
-							
-							
-							<div class="col">
-							  <p class="mb-1 fw-semibold">지각</p>
-							  <h6 class="text-danger">2회</h6>
-							</div>
-							
-							<div class="col">
-							  <p class="mb-1 fw-semibold">조퇴</p>
-							  <h6 class="text-warning">1회</h6>
-							</div>
-							
-							<div class="col">
-							  <p class="mb-1 fw-semibold">평균 출근</p>
-							  <h6 class="text-success">09:12</h6>
-							</div>
-							
-							<div class="col">
-							  <p class="mb-1 fw-semibold">출근률</p>
-							  <h6 class="text-info">90%</h6>
-							</div>
-						</div>
+<main class="main" id="top" layout:fragment="content">
+  <div class="mb-9">
+    <div class="d-flex justify-content-between align-items-center mb-2 position-relative">
+      <span class="fw-bold fs-7">근태</span>
+      <div class="position-absolute start-50 translate-middle-x">
+        <span class="current-time fw-bold text-secondary fs-6 mb-0" id="currentTime"></span>
+      </div>
+    </div>
 
-						<div class="mt-4">
-						  <canvas id="miniAttendanceChart" height="47 !important"></canvas>
-						</div>
-					</div>
-					
-					<!-- 근무시간 통합 차트 -->
-					<div class="card p-3 shadow-sm mb-4">
-						<div class="card-title d-flex justify-content-between align-items-center mb-3">
-						  <span class="fw-bold fs-8 text-secondary">근무시간 통합 차트</span>
-						  <p class="text-muted mb-0">이번달 총 근무시간: <strong class="text-primary">165시간 25분</strong></p>
-						</div>
-						<canvas id="workTimeMixedChart" height="260"></canvas>
-					</div>
+    <!-- 카드 그룹: 프로필 + 근태요약 / 주소록 + 근무시간 -->
+    <div class="row g-3">
+      <!-- 1행: 프로필 + 근태 요약 -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body d-flex align-items-center">
+            <div class="profile-wrapper me-3">
+              <img class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
+            </div>
+            <div class="text-start">
+              <div class="fw-bold fs-7" th:text="${employee.employeeName}">이름</div>
+              <div class="text-body-secondary" th:text="${employee.employeePosition}">직급</div>
+            </div>
+          </div>
+          <div class="card-footer border-top border-dashed pt-3">
+            <div class="d-flex justify-content-around">
+              <div>
+                <div class="fw-bold fs-8 text-center">총 연차</div>
+                <div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annualLeaveTotal}">12</div>
+              </div>
+              <div>
+                <div class="fw-bold fs-8 text-center">사용 연차</div>
+                <div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annualLeaveUsed}">2</div>
+              </div>
+              <div>
+                <div class="fw-bold fs-8 text-center">잔여 연차</div>
+                <div class="fs-7 text-body-primary text-center" th:text="${annualLeave.annualLeaveRemain}">10</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-				</div> <!-- row g-4 끝 -->
-		
-			</div> <!-- col-12 col-md-8 col-xxl-8 -->	<!-- 근태요약 + 근무시간 통합차트 끝(우측 상단) -->
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-body">
+            <div class="fw-bold fs-8 mb-3 text-secondary">근태 요약</div>
+            <div class="row text-center">
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold mb-2">출근일수</div>
+                <div class="text-primary fw-bold" th:text="${summaryData.checkinDays} + '일'">O일</div>
+              </div>
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold">지각</div>
+                <div class="text-danger fw-bold" th:text="${summaryData.lateCount} + '회'">OO회</div>
+              </div>
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold">조퇴</div>
+                <div class="text-warning fw-bold" th:text="${summaryData.earlyLeaveCount} + '회'">OO회</div>
+              </div>
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold">평균 출근</div>
+                <div class="text-success fw-bold" th:text=${summaryData.averageCheckInTime}>00:00</div>
+              </div>
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold">출근률</div>
+                <div class="text-info fw-bold" th:text=${summaryData.attendanceRate}>00%</div>
+              </div>
+            </div>
+            <div class="mini-chart-wrapper mt-4">
+              <canvas id="miniAttendanceChart" height="47"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
 
-		</div>	<!-- row g-5 -->         
-            
-	</div> <!-- mb-9 테이블 상단 부분 -->           
+      <!-- 2행: 주소록 + 근무시간 차트 -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body fs-9">
+            <h5 class="text-body-secondary">사번</h5>
+            <p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
+            <h5 class="text-body-secondary">직급</h5>
+            <p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p>
+            <h5 class="text-body-secondary">부서</h5>
+            <p class="text-body-secondary" th:text="${departmentName != null ? departmentName : '-'}">부서</p>
+            <div class="mb-3">
+              <h5 class="text-body-secondary">Email</h5>
+              <a href="mailto:email@email.com" id="emailValue" th:text="${directory != null and directory.directory_email != null ? directory.directory_email : '-'}">email@email.com</a>
+            </div>
+            <h5 class="text-body-secondary">Phone</h5>
+            <p class="text-body-secondary" id="phoneValue" th:text="${directory != null and directory.directory_phone != null ? directory.directory_phone : '-'}">010-0000-0000</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card p-3 shadow-sm">
+          <div class="card-title d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold fs-8 text-secondary">근무시간 통합 차트</span>
+            <p class="text-muted mb-0">이번달 총 근무시간: <strong class="text-primary" th:text="${totalWorkTime}">000시간 00분</strong></p>
+          </div>
+          <canvas id="workTimeMixedChart" height="260"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>       
 
 <hr><!-- 상단/하단 구분선 -->
 	
 <!-- 근태 현황 목록 테이블 -->     
-<div id="attendanceTable" data-list='{"valueNames":["no","date","checkin","checkout"],"page":5,"pagination":true}'>
+<div id="attendanceTable" data-list='{"valueNames":["no","date","checkin","checkout","late","early"],"page":10,"pagination":true}'>
   <!-- 상단: 날짜 선택 + 검색창 -->
   <div class="d-flex justify-content-between align-items-center mb-3 px-3 gap-2 flex-wrap">
      <div class="row g-2 mb-4">
@@ -205,12 +159,14 @@
     </div>
     <!-- 날짜 선택 -->
     <div>
-      <select class="form-select form-select-sm" data-list-filter="data-list-filter">
-        <option selected value="">날짜 선택</option>
-        <option value="2025.01">2025.01</option>
-        <option value="2025.02">2025.02</option>
-        <option value="2025.03">2025.03</option>
-      </select>
+    <form th:action="@{/attendance/list}" method="get" id="monthSelectForm">
+	      <select class="form-select form-select-sm" data-list-filter="data-list-filter" 
+	      	name="month" id="month" onchange="this.form.submit()">
+	        <option th:each="month : ${monthList}"
+	            th:value="${month}" th:text="${month}" 
+	        	th:selected="${month == selectedMonth}"></option>
+	      </select>
+      </form>
     </div>
 
   </div>
@@ -221,84 +177,25 @@
 			<thead class="text-center align-middle">
 				<tr class="table-light">
 				<th class="sort" data-sort="no" style="width:5%;">번호</th>
-				<th class="sort" data-sort="date" style="width:30%;">근무일</th>
-				<th class="sort" data-sort="checkin" style="width:30%;">출근 시간</th>
-				<th class="sort" data-sort="checkout" style="width:30%;">퇴근 시간</th>
-				<th style="width:5%"></th>
+				<th class="sort" data-sort="date" style="width:25%;">근무일</th>
+				<th class="sort" data-sort="checkin" style="width:25%;">출근 시간</th>
+				<th class="sort" data-sort="checkout" style="width:25%;">퇴근 시간</th>
+				<th class ="sort" data-sort="late" style="width:10%">지각</th>
+				<th class ="sort" data-sort="early" style="width:10%">조퇴</th>
 				</tr>
 			</thead>
 			<tbody class="list align-middle">
-				<tr>
-				  <td class="no">1</td>
-				  <td class="date">2025.04.09</td>
-				  <td class="checkin">08:55:45</td>
-				  <td class="checkout">18:01:23</td>
-				  <td class="text-end pe-0">
-				      <div class="btn-reveal-trigger position-static">
-				        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-				          <i class="fas fa-ellipsis fs-10"></i>
-				        </button>
-				        <div class="dropdown-menu dropdown-menu-end py-2">
-				          <a class="dropdown-item" href="#!">수정</a>
-				          <div class="dropdown-divider"></div>
-				          <a class="dropdown-item text-danger" href="#!">삭제</a>
-				        </div>
-				      </div>
-				    </td>
+				<tr th:if ="${!#lists.isEmpty(attendanceList)}"
+					th:each="attendance, attendanceStatus : ${attendanceList}">
+				  <td class="no" th:text="${attendanceStatus.count}">1</td>
+				  <td class="date" th:text="${#temporals.format(attendance.attendance_check_in_time, 'yyyy.MM.dd')}">연도.월.일</td>
+				  <td class="checkin" th:text="${#temporals.format(attendance.attendance_check_in_time, 'HH:mm:ss')}">출근 시간</td>
+				  <td class="checkout" th:text="${#temporals.format(attendance.attendance_check_out_time, 'HH:mm:ss')}">퇴근 시간</td>
+				  <td class="late" th:text="${attendance.attendance_late_yn == 'Y' ? '지각' : '-'}">지각</td>
+				  <td class="early" th:text="${attendance.attendance_early_leave_yn == 'Y' ? '조퇴' : '-'}">조퇴</td>
 				</tr>
-				<tr>
-				  <td class="no">2</td>
-				  <td class="date">2025.04.08</td>
-				  <td class="checkin">08:49:27</td>
-				  <td class="checkout">18:00:30</td>
-				  <td class="text-end pe-0">
-				      <div class="btn-reveal-trigger position-static">
-				        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-				          <i class="fas fa-ellipsis fs-10"></i>
-				        </button>
-				        <div class="dropdown-menu dropdown-menu-end py-2">
-				          <a class="dropdown-item" href="#!">수정</a>
-				          <div class="dropdown-divider"></div>
-				          <a class="dropdown-item text-danger" href="#!">삭제</a>
-				        </div>
-				      </div>
-				    </td>
-				</tr>
-				<tr>
-				  <td class="no">3</td>
-				  <td class="date">2025.04.07</td>
-				  <td class="checkin">08:57:22</td>
-				  <td class="checkout">18:05:22</td>
-				  <td class="text-end pe-0">
-				      <div class="btn-reveal-trigger position-static">
-				        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-				          <i class="fas fa-ellipsis fs-10"></i>
-				        </button>
-				        <div class="dropdown-menu dropdown-menu-end py-2">
-				          <a class="dropdown-item" href="#!">수정</a>
-				          <div class="dropdown-divider"></div>
-				          <a class="dropdown-item text-danger" href="#!">삭제</a>
-				        </div>
-				      </div>
-				    </td>
-				</tr>
-				<tr>
-				  <td class="no">4</td>
-				  <td class="date">2025.04.06</td>
-				  <td class="checkin">08:54:33</td>
-				  <td class="checkout">18:03:47</td>
-				  <td class="text-end pe-0">
-				      <div class="btn-reveal-trigger position-static">
-				        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-				          <i class="fas fa-ellipsis fs-10"></i>
-				        </button>
-				        <div class="dropdown-menu dropdown-menu-end py-2">
-				          <a class="dropdown-item" href="#!">수정</a>
-				          <div class="dropdown-divider"></div>
-				          <a class="dropdown-item text-danger" href="#!">삭제</a>
-				        </div>
-				      </div>
-				    </td>
+				<tr th:if="${#lists.isEmpty(attendanceList)}">
+				    <td colspan="5" class="text-center"> 근태 정보가 없습니다.</td>
 				</tr>
 			</tbody>
 	    </table>
@@ -321,97 +218,142 @@
 </div><!-- 근태현황 목록 테이블 끝 -->
 
 <script>
-	/* 상단에 현재 시간 보여주기 */
-	function updateCurrentTime(){
+	// 상단에 현재 날짜 표시
+	function updateCurrentTime() {
 		const now = new Date();
-		
 		const year = now.getFullYear();
-		const month = String(now.getMonth()+1).padStart(2,'0');
-		const date = String(now.getDate()).padStart(2,'0');
-		
-		const formattedDate = `${year}.${month}.${date}`;
-		
-		document.getElementById('currentTime').innerText = formattedDate;
+		const month = String(now.getMonth() + 1).padStart(2, '0');
+		const date = String(now.getDate()).padStart(2, '0');
+		document.getElementById('currentTime').innerText = `${year}.${month}.${date}`;
 	}
 	updateCurrentTime();
-   
-   /* 근태 요약 차트 */
-	const ctx1 = document.getElementById('miniAttendanceChart').getContext('2d');
-	new Chart(ctx1, {
-		type: 'bar',
-		data: {
-			labels: ['출근일수', '지각', '조퇴'],
-			datasets: [{
-				label: '횟수',
-				data: [15, 2, 1],
-				backgroundColor: ['rgba(13, 110, 253, 0.7)', 'rgba(220, 53, 69, 0.7)', 'rgba(255, 193, 7, 0.7)']
-			}]
-		},
-		options: {
-			plugins: { legend: { display: false } },
-			scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-		}
-	});
-/* 근무시간 통합 차트 */
-	const ctx2 = document.getElementById('workTimeMixedChart').getContext('2d');
-	new Chart(ctx2, {
-	  type: 'bar',
-	  data: {
-		labels: ['4/1', '4/2', '4/3', '4/4', '4/5', '월', '화', '수', '목', '금'],
-		datasets: [
-			{
-			  type: 'line',
-			  label: '일별 근무시간',
-			  data: [8.1, 7.6, 8.3, 6.9, 7.5, null, null, null, null, null],
-			  borderColor: '#0d6efd',
-			  backgroundColor: '#0d6efd55',
-			  yAxisID: 'y',
-			  tension: 0.3,
-			  spanGaps: true
+
+	// 차트 데이터를 받아서 각 차트를 렌더링하는 함수
+	async function renderCharts() {
+		// 1. API 호출
+		const response = await fetch('/attendance/chartData');
+		const data = await response.json();
+		console.log(data); // 디버깅용 콘솔 출력
+		console.log(data.checkinDays,data.lateCount,data.earlyLeaveCount); // 디버깅용 콘솔 출력
+
+		/* --------------- 근태 요약 차트 (Bar Chart) ----------------- */
+		const miniCtx = document.getElementById('miniAttendanceChart').getContext('2d');
+		console.log(miniCtx); // 디버깅용 콘솔 출력
+		new Chart(miniCtx, {
+			type: 'bar',
+			data: {
+				labels: ['출근일수', '지각', '조퇴'],
+				datasets: [{
+					label: '횟수',
+					data: [
+						data.checkinDays || 0,
+						data.lateCount || 0,
+						data.earlyLeaveCount || 0
+					],
+					backgroundColor: [
+						'rgba(13, 110, 253, 0.7)',   // 출근: 파랑
+						'rgba(220, 53, 69, 0.7)',    // 지각: 빨강
+						'rgba(255, 193, 7, 0.7)'     // 조퇴: 노랑
+					]
+				}]
 			},
-			{
-			  type: 'bar',
-			  label: '요일별 평균 근무시간',
-			  data: [null, null, null, null, null, 8.2, 7.5, 7.9, 8.0, 6.8],
-			  backgroundColor: 'rgba(255, 99, 132, 0.6)',
-			  yAxisID: 'y1'
-			}
-		]
-	  },
-	  options: {
-		responsive: true,
-		plugins: {
-			tooltip: {
-				callbacks: {
-					label: function(context) {
-					  const label = context.dataset.label;
-					  const val = context.raw;
-					  return label + ': ' + (val !== null ? val.toFixed(2) + '시간' : '');
+			options: {
+				plugins: {
+					legend: { display: false }
+				},
+				scales: {
+					y: {
+						beginAtZero: true,
+						ticks: { stepSize: 1 }
 					}
 				}
-			},
-			legend: { position: 'top' }
-		},
-		scales: {
-			y: {
-				type: 'linear',
-				position: 'left',
-				title: { display: true, text: '일별 근무시간' },
-				beginAtZero: true,
-				suggestedMax: 10
-			},
-			y1: {
-				type: 'linear',
-				position: 'right',
-				title: { display: true, text: '요일별 평균' },
-				grid: { drawOnChartArea: false },
-				beginAtZero: true,
-				suggestedMax: 10
 			}
-		}
-	  }
-	});
-</script>                           
+		});
+
+		/* --------------- 근무시간 통합 차트 (Mixed: Line + Bar) ----------------- */
+		const mixedCtx = document.getElementById('workTimeMixedChart').getContext('2d');
+		const workTimePerDay = data.workTimePerDay || {};
+		const weekdayAvg = data.weekdayAvg || {};
+
+		// (1) 날짜별 근무시간 차트용 데이터 변환
+		const dailyLabels = Object.keys(workTimePerDay).map(dateStr => {
+			const [year, month, day] = dateStr.split('-');
+			return `${month}/${day}`;
+		});
+		const dailyData = Object.values(workTimePerDay);
+
+		// (2) 요일별 평균 근무시간 변환 및 정렬
+		const dayMap = {
+			'MONDAY': '월', 'TUESDAY': '화', 'WEDNESDAY': '수',
+			'THURSDAY': '목', 'FRIDAY': '금'
+		};
+		const weekdayOrder = ['월', '화', '수', '목', '금'];
+		const weekdayData = weekdayOrder.map(kor => {
+			const eng = Object.keys(dayMap).find(key => dayMap[key] === kor);
+			return weekdayAvg[eng] ?? null;
+		});
+
+		// (3) 차트 생성
+		new Chart(mixedCtx, {
+			type: 'bar',
+			data: {
+				labels: [...dailyLabels, ...weekdayOrder],
+				datasets: [
+					{
+						type: 'line',
+						label: '일별 근무시간',
+						data: [...dailyData, ...new Array(weekdayOrder.length).fill(null)],
+						borderColor: '#0d6efd',
+						backgroundColor: '#0d6efd55',
+						yAxisID: 'y',
+						tension: 0.3,
+						spanGaps: true
+					},
+					{
+						type: 'bar',
+						label: '요일별 평균 근무시간',
+						data: [...new Array(dailyLabels.length).fill(null), ...weekdayData],
+						backgroundColor: 'rgba(255, 99, 132, 0.6)',
+						yAxisID: 'y1'
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				plugins: {
+					tooltip: {
+						callbacks: {
+							label: function (context) {
+								const label = context.dataset.label;
+								const val = context.raw;
+								return label + ': ' + (val !== null ? val.toFixed(2) + '시간' : '');
+							}
+						}
+					},
+					legend: { position: 'top' }
+				},
+				scales: {
+					y: {
+						type: 'linear',
+						position: 'left',
+						title: { display: true, text: '일별 근무시간' },
+						beginAtZero: true,
+						suggestedMax: 10
+					},
+					y1: {
+						type: 'linear',
+						position: 'right',
+						title: { display: true, text: '요일별 평균' },
+						grid: { drawOnChartArea: false },
+						beginAtZero: true,
+						suggestedMax: 10
+					}
+				}
+			}
+		});
+	}
+	renderCharts();
+</script>                         
 
 </main>
 </body>

@@ -27,10 +27,14 @@ public class ChatroomDto {
     private LocalDateTime chatroomRegDate;
     private LocalDateTime chatroomModDate;
     private String chatLastMessage;
-    private String chatroomReadYn = "N";
+    private Integer unreadCount; // 읽지 않은 메시지 수
+    private LocalDateTime lastMessageRegDate;
+    
    
     // 참여자 ID 리스트
     private List<Long> participantIds;
+    // 채팅 메시지 리스트
+    private List<ChatMessageDto> messageList;
     
     public Chatroom toEntity() {
         return Chatroom.builder()
@@ -50,7 +54,20 @@ public class ChatroomDto {
                 .chatroomRegDate(entity.getChatroomRegDate())
                 .chatroomModDate(entity.getChatroomModDate())
                 .chatLastMessage(entity.getChatLastMessage())
-                .chatroomReadYn(entity.getChatroomReadYn())
+                .lastMessageRegDate(entity.getChatroomModDate())
+                .build();
+    }
+    public static ChatroomDto toDto(Chatroom entity, List<ChatMessageDto> messages) {
+        return ChatroomDto.builder()
+                .chatroomNo(entity.getChatroomNo())
+                .chatroomName(entity.getChatroomName())
+                .chatIsGroupYn(entity.getChatIsGroupYn())
+                .creater(entity.getCreater().getEmployeeNo())
+                .chatroomRegDate(entity.getChatroomRegDate())
+                .chatroomModDate(entity.getChatroomModDate())
+                .chatLastMessage(entity.getChatLastMessage())
+                .lastMessageRegDate(entity.getChatroomModDate())
+                .messageList(messages)  // 메시지 리스트 추가
                 .build();
     }
 }

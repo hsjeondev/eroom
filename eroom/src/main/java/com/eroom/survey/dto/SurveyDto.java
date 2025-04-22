@@ -1,9 +1,9 @@
 package com.eroom.survey.dto;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.eroom.survey.entity.Survey;
 
@@ -24,7 +24,7 @@ public class SurveyDto {
 	private Long surveyNo;
 	private String writer;
 	private String surveyTitle;
-	private LocalDate deadline;
+	private LocalDateTime deadline;
     private String anonymousVote = "off";
     private String allowMultiple = "off";
 	@CreationTimestamp

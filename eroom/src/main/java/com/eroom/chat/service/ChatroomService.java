@@ -1,5 +1,6 @@
 package com.eroom.chat.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,8 +11,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.eroom.chat.dto.ChatroomDto;
+import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
+import com.eroom.chat.repository.ChatAlarmRepository;
 import com.eroom.chat.repository.ChatroomAttendeeRepository;
 import com.eroom.chat.repository.ChatroomRepository;
 import com.eroom.employee.entity.Employee;
@@ -28,19 +31,20 @@ public class ChatroomService {
 	private final ChatroomRepository repository;
 	private final EmployeeRepository employeeRepository;
 	private final ChatroomAttendeeRepository chatroomAttendeeRepository;
+	private final ChatAlarmRepository chatAlarmRepository;
 	
 	public List<Chatroom> selectChatRoomAll() {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
-	    Employee employee = employeeDetails.getEmployee(); // employeeNo 말고 Employee 객체 통째로!
+	    Employee employee = employeeDetails.getEmployee(); // 현재 로그인한 직원 정보
 
-	    // 1. 내가 만든 채팅방
+	    // 1. 만든 채팅방
 	    List<Chatroom> createdByMe = repository.findByCreater(employee);
 
-	    // 2. 내가 참여자로 들어간 채팅방
+	    // 2. 참여한 채팅방
 	    List<Chatroom> participatedIn = repository.findByParticipant(employee.getEmployeeNo());
 
-	    // 3. 합치기 (중복제거)
+	    // 3. 합치기 (자바 Set으로 중복 제거)
 	    Set<Chatroom> allChatrooms = new HashSet<>();
 	    allChatrooms.addAll(createdByMe);
 	    allChatrooms.addAll(participatedIn);
@@ -51,19 +55,35 @@ public class ChatroomService {
 
 
 	public ChatroomDto createChatroom(ChatroomDto dto) {
-		Chatroom param = dto.toEntity();
-		Chatroom result = repository.save(param);
-		
-		if(dto.getParticipantIds() != null && !dto.getParticipantIds().isEmpty()) {
-			for(Long participantid : dto.getParticipantIds()) {
-				Employee participant = employeeRepository.findById(participantid).orElse(null);
-				ChatroomAttendee attendeeMapping = ChatroomAttendee.builder().chatroomNo(result).attendee(participant).build();
-				
-				chatroomAttendeeRepository.save(attendeeMapping);
-			}
-		}
-		return ChatroomDto.toDto(result);
+	    Chatroom param = dto.toEntity();
+	    Chatroom result = repository.save(param);
+
+	    // 생성자 본인을 참여자에 추가
+	    Employee creater = employeeRepository.findById(dto.getCreater())
+	        .orElseThrow(() -> new RuntimeException("생성자 정보를 찾을 수 없습니다."));
+	    ChatroomAttendee creatorMapping = ChatroomAttendee.builder()
+	        .chatroomNo(result)
+	        .attendee(creater)
+	        .build();
+	    chatroomAttendeeRepository.save(creatorMapping);
+
+	    // 나머지 참여자 추가
+	    if (dto.getParticipantIds() != null && !dto.getParticipantIds().isEmpty()) {
+	        for (Long participantId : dto.getParticipantIds()) {
+	            Employee participant = employeeRepository.findById(participantId).orElse(null);
+	            if (participant != null) {
+	                ChatroomAttendee attendeeMapping = ChatroomAttendee.builder()
+	                    .chatroomNo(result)
+	                    .attendee(participant)
+	                    .build();
+	                chatroomAttendeeRepository.save(attendeeMapping);
+	            }
+	        }
+	    }
+
+	    return ChatroomDto.toDto(result);
 	}
+
 
 	public Chatroom selectChatroomOne(Long id) {
 		return repository.findById(id).orElse(null);
@@ -104,5 +124,25 @@ public class ChatroomService {
 	        }
 	    }
 	}
+	// 채팅방 삭제
+	@Transactional
+	public void deleteChatroom(Long chatroomNo) {
+		Chatroom chatroom = repository.findById(chatroomNo)
+				.orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
+		
+		chatroom.setVisibleYn("N"); // 채팅방 삭제
+		repository.save(chatroom);
+	}
+	public void updateReadStatus(Long chatroomNo, Long senderNo) {
+		List<ChatAlarm> alarms = chatAlarmRepository.findUnreadAlarms(senderNo, chatroomNo);
+
+		for (ChatAlarm alarm : alarms) {
+		    alarm.setChatAlarmReadYn("Y");
+		    alarm.setChatAlarmReadDate(LocalDateTime.now());
+		}
+
+		chatAlarmRepository.saveAll(alarms);
+	}
+
 
 }
