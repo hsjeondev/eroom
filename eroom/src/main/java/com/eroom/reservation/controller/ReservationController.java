@@ -1,26 +1,36 @@
 package com.eroom.reservation.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.facility.entity.Facility;
+import com.eroom.reservation.dto.VehicleDto;
 import com.eroom.reservation.service.VehicleService;
-
+import com.eroom.survey.repository.SurveyRepository;
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
 public class ReservationController {
 
+ 
+
    
 	
 	private final VehicleService vehicleService;
 
+
+ 
+
   
-	
+	//========================화면 전환 =============================
 	@GetMapping("/reservation/sleep")
 	public String sleepReservationView() {
 		return "reservation/sleeprev";
@@ -38,5 +48,19 @@ public class ReservationController {
 	@GetMapping("/reservation/meetingroom")
 	public String meetingroomReservationView() {
 		return "reservation/meetingroomrev";
+	}
+	
+	
+	//========================등록 =============================
+	@PostMapping("/resvehicle/reservation")
+	@ResponseBody
+	public Map<String,String> vehicleReservation(VehicleDto param){
+		Map<String,String> resultMap = new HashMap<String,String>();
+		resultMap.put("res_code", "500");
+		resultMap.put("res_msg", "예약이 성공적으로 완료되었습니다");
+		
+		System.out.println(param);
+		
+		return resultMap;
 	}
 }
