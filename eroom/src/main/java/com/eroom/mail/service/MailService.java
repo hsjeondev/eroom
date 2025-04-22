@@ -5,14 +5,15 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eroom.directory.entity.Directory;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.mail.dto.MailDto;
+import com.eroom.mail.dto.MailReceiverDto;
 import com.eroom.mail.entity.Mail;
 import com.eroom.mail.entity.MailReceiver;
 import com.eroom.mail.repository.MailReceiverRepository;
 import com.eroom.mail.repository.MailRepository;
+import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,15 +22,51 @@ import lombok.RequiredArgsConstructor;
 public class MailService {
 
 	private final MailRepository mailRepository;
-	private final MailReceiverRepository mailRecevierRepository;
+	private final MailReceiverRepository mailReceiverRepository;
 	private final EmployeeRepository employeeRepository;
 
-    
-	public List<Mail> findMailsBySender(Long employeeNo) {
-	    return mailRepository.findBySenderEmployeeNo(employeeNo);
+	@Transactional
+	public Mail selectMailOne(Long employeeNo,Long id) {
+		
+	    mailReceiverRepository.updateReadYn(employeeNo,id); // 읽음 처리
+		return mailRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("메일을 찾을 수 없습니다."));
+	}
+	
+	
+	// 받은 메일 조회
+	/*public List<MailReceiver> getReceivedMailsByEmployee(Long employeeNo) {
+        return mailReceiverRepository.findByEmployeeNo(employeeNo);
+    }*/
+	public List<MailReceiver> getReceivedMailsByEmployee(Long employeeNo, String sortOrder) {
+			List<MailReceiver> resultList = null;
+		
+		if(sortOrder.equals("latest")) {
+	     resultList= mailReceiverRepository.findByEmployeeNoOrderByLatest(employeeNo);
+		}else if(sortOrder.equals("oldest")) {
+			 resultList= mailReceiverRepository.findByEmployeeNoOrderByOldest(employeeNo);
+		}
+		return resultList;
+	}
+	
+    // 본인 메일 조회
+//	public List<Mail> findMailsBySender(Long employeeNo) {
+//	    return mailRepository.findBySenderEmployeeNo(employeeNo);
+//	}
+	
+	// 지금은 최신순
+	// 조건줘서 최신 > 오래된 변환하게 
+	public List<Mail> findMailsBySender(Long employeeNo,String sortOrder) {
+		List<Mail> resultList = null;
+		
+		if(sortOrder.equals("latest")) {
+	     resultList= mailRepository.findBySenderEmployeeNoOrderByMailSentTimeDesc(employeeNo);
+		}else if(sortOrder.equals("oldest")) {
+			 resultList= mailRepository.findBySenderEmployeeNoOrderByMailSentTimeAsc(employeeNo);
+		}
+		return resultList;
 	}
 
-	
+	// 지금 쓰는곳 없음 삭제 해도 될듯
 	public List<Mail> selectMailAll(){
 		List<Mail> list = mailRepository.findAll();
 		return list;
@@ -56,15 +93,28 @@ public class MailService {
 		            Employee receiver = employeeRepository.findById(receiverNo).orElseThrow(() -> 
 		                new IllegalArgumentException("존재하지 않는 사원 번호: " + receiverNo));
 		            
-		            //Directory receiverDirectory = receiver.getDirectory();
+//		            MailReceiverDto mailReceiverDto = MailReceiverDto.builder()
+//		                    .employee_no(receiverNo)
+//		                    .mail(mailEntity)
+//		                    .build();
+		            MailReceiverDto mailReceiverDto = new MailReceiverDto();
+		            mailReceiverDto.setEmployee_no(receiverNo);
+		            mailReceiverDto.setMail_no(mailSaver.getMailNo());
 		            
-		            MailReceiver mailReceiver = MailReceiver.builder()
-		                    .mail(mailSaver) // 발송된 메일
-		                    .receiver(receiver) // 수신자 (Employee)
-		                    //.directory(receiverDirectory) // 수신자 Directory 정보
-		                    .build();
-
-		            mailRecevierRepository.save(mailReceiver);
+		            
+		            
+		            ;
+		            MailReceiver mailReceiver = mailReceiverDto.toEntity(mailSaver, receiver);
+		            mailReceiverRepository.save(mailReceiver);
+		            
+		            
+		            
+		            
+//		            MailReceiver mailReceiver = MailReceiver.builder()
+//		                    .mail(mailSaver) // 발송된 메일
+//		                    .receiver(receiver) // 수신자 (Employee)
+//		                    .build();
+//		            mailReceiverRepository.save(mailReceiver);
 		        }
 			
 			
