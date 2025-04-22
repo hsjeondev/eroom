@@ -1,5 +1,6 @@
 package com.eroom.chat.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,8 +11,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.eroom.chat.dto.ChatroomDto;
+import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
+import com.eroom.chat.repository.ChatAlarmRepository;
 import com.eroom.chat.repository.ChatroomAttendeeRepository;
 import com.eroom.chat.repository.ChatroomRepository;
 import com.eroom.employee.entity.Employee;
@@ -28,6 +31,7 @@ public class ChatroomService {
 	private final ChatroomRepository repository;
 	private final EmployeeRepository employeeRepository;
 	private final ChatroomAttendeeRepository chatroomAttendeeRepository;
+	private final ChatAlarmRepository chatAlarmRepository;
 	
 	public List<Chatroom> selectChatRoomAll() {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -129,5 +133,16 @@ public class ChatroomService {
 		chatroom.setVisibleYn("N"); // 채팅방 삭제
 		repository.save(chatroom);
 	}
+	public void updateReadStatus(Long chatroomNo, Long senderNo) {
+		List<ChatAlarm> alarms = chatAlarmRepository.findUnreadAlarms(senderNo, chatroomNo);
+
+		for (ChatAlarm alarm : alarms) {
+		    alarm.setChatAlarmReadYn("Y");
+		    alarm.setChatAlarmReadDate(LocalDateTime.now());
+		}
+
+		chatAlarmRepository.saveAll(alarms);
+	}
+
 
 }
