@@ -10,7 +10,6 @@ import com.eroom.approval.JsonToMapConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -54,6 +53,8 @@ public class Approval {
 	private LocalDateTime approvalRegDate; // 결재 등록일
 	@Column(name="approval_completed_date")
 	private LocalDateTime approvalCompletedDate; // 결재 수정일
+	@Column(name="approval_visible_yn")
+	private String approvalVisibleYn; // 결재 사용여부
 	
 	@ManyToOne
 	@JoinColumn(name = "employee_no")
@@ -62,7 +63,7 @@ public class Approval {
 	@JoinColumn(name="approval_format_no")
 	private ApprovalFormat approvalFormat; // 결재 양식
 	
-	@OneToMany(mappedBy = "approval", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "approval")
 	@OrderBy("approvalLineNo ASC")
 	private Set<ApprovalLine> approvalLines;
 

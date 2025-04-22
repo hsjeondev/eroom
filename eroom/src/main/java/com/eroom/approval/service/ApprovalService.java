@@ -13,7 +13,6 @@ import com.eroom.approval.repository.ApprovalLineRepository;
 import com.eroom.approval.repository.ApprovalRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,8 +24,8 @@ public class ApprovalService {
 	private final EmployeeRepository employeeRepository;
 	private final ApprovalLineRepository approvalLineRepository;
 
-	public List<Approval> getMyRequestedApprovals(Long employeeNo) {
-		List<Approval> resultList = approvalRepository.findByEmployee_EmployeeNoOrderByApprovalRegDateDesc(employeeNo);
+	public List<Approval> getMyRequestedApprovals(Long employeeNo, String visible) {
+		List<Approval> resultList = approvalRepository.findByEmployee_EmployeeNoAndApprovalVisibleYnOrderByApprovalRegDateDesc(employeeNo, visible);
 		return resultList;
 	}
 
@@ -104,6 +103,25 @@ public class ApprovalService {
 	public Approval selecApprovalByApprovalNo(Long approvalNo) {
 		Approval approval = approvalRepository.findById(approvalNo).orElse(null);
 		return approval;
+	}
+
+
+	public int updateVisibleYn(Long approvalNo) {
+		int result = 0;
+		try {
+			Approval approval = approvalRepository.findById(approvalNo).orElse(null);
+			if (approval != null) {
+				if (!approval.getApprovalVisibleYn().equals("N")) {
+					approval.setApprovalVisibleYn("N");
+					approvalRepository.save(approval);
+				}
+				result = 1;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = 0;
+		}
+		return result;
 	}
 
 

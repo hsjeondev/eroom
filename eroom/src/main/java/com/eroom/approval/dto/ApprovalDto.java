@@ -37,6 +37,7 @@ public class ApprovalDto {
     
     private Employee employee; // 기안자
     private ApprovalFormat approval_format; // 결재 양식
+    private String approval_visible_yn; // 결재 사용여부
     
 	public Approval toEntity() {
 		return Approval.builder()
@@ -50,6 +51,7 @@ public class ApprovalDto {
 				.approvalCompletedDate(approval_completed_date)
 				.employee(employee)
 				.approvalFormat(approval_format)
+				.approvalVisibleYn(approval_visible_yn)
 				.build();
 	}
 	
@@ -65,6 +67,7 @@ public class ApprovalDto {
 				.completed_date(entity.getApprovalCompletedDate() != null ? entity.getApprovalCompletedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
 				.employee(entity.getEmployee())
 				.approval_format(entity.getApprovalFormat())
+				.approval_visible_yn(entity.getApprovalVisibleYn())
 				.build();
 	}
 }
