@@ -104,22 +104,23 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						</tr>
 					</thead>
 					<tbody class="list align-middle" id="customers-table-body">
-						<tr>
-							<td class="no">1</td>
+						<tr th:each="employeeManage, employeeStatus : ${employeeList}">
+							<td class="no" th:text="${employeeStatus.count}">1</td>
 							<td class="name">
 								<a class="d-flex align-items-center text-body-emphasis ps-5" th:href="@{/admin/employeeInfoView}">
 									<div class="avatar avatar-m me-2">
 										<img class="rounded-circle" src="../../../assets/img/team/23.webp" alt="">
 									</div>
-									<p class="mb-0 fw-bold text-truncate">강성관</p>
+									<p class="mb-0 fw-bold text-truncate" th:text="${employeeManage.employee.employee_name}">강성관</p>
 								</a>
 							</td>
-							<td class="mail"><a class="fw-semibold" href="mailto:annac34@gmail.com">devksk@gmail.com</a></td>
-							<td class="phone">01022239983</td>
-							<td class="job">부장</td>
-							<td class="dept">운영부</td>
-							<td class="team">인사팀</td>
-							<td class="date">2021.02.01</td>
+							<td class="mail"><a class="fw-semibold" href="mailto:annac34@gmail.com" 
+							th:text="${employeeManage.directory != null? employeeManage.directory.directory_email : '-'}">devksk@gmail.com</a></td>
+							<td class="phone" th:text="${employeeManage.directory != null? employeeManage.directory.directory_phone : '-'}">01022239983</td>
+							<td class="job" th:text="${employeeManage.employee.employee_position}">부장</td>
+							<td class="dept" th:text="${employeeManage.department_name}">운영부</td>
+							<td class="team" th:text="${employeeManage.team_name}">인사팀</td>
+							<td class="date" th:text="${employeeManage.formatted_hire_date}">2021.02.01</td>
 							 <td class="text-end pe-0">
 								<div class="btn-reveal-trigger position-static">
 									<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
@@ -134,7 +135,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 							 </td>
 						</tr>
 						<!-- 나머지 사원도 동일 형식으로 추가 -->
-						<tr>
+<!-- 						<tr>
 							<td class="no">2</td>
 							<td class="name">
 								<a class="d-flex align-items-center text-body-emphasis ps-5" th:href="@{/admin/employeeInfoView}">
@@ -278,7 +279,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 									</div>
 								</div>
 						     </td>
-						</tr>
+						</tr> -->
 					</tbody>
 				</table>
 			</div><!-- table-responsive -->

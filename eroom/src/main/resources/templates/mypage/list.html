@@ -153,15 +153,15 @@
 							<p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p>
 							
 							<h5 class="text-body-secondary">부서</h5>
-							<p class="text-body-secondary" th:text="${departmentName}">부서</p>
+							<p class="text-body-secondary" th:text="${departmentName != null ? departmentName : '-'}">부서</p>
 							
 							<div class="mb-3">
 							  <h5 class="text-body-secondary">Email</h5>
-							  <a href="mailto:shatinon@jeemail.com" id="emailValue" th:text="${directory.directoryEmail}">Email</a>
+							  <a href="mailto:shatinon@jeemail.com" id="emailValue" th:text="${directory != null and directory.directory_email != null ? directory.directory_email : '-'}">Email</a>
 							</div>
 							
 							<h5 class="text-body-secondary">Phone</h5>
-							<p class="text-body-secondary" id="phoneValue" th:text="${directory.directoryPhone}">01000000000</p>
+							<p class="text-body-secondary" id="phoneValue" th:text="${directory != null and directory.directory_phone != null ? directory.directory_phone : '-'}">01000000000</p>
 							
 							<!-- <h5 class="text-body-secondary">주소</h5>
 							<p class="text-body-secondary" id="addressValue">서울특별시 금천구 가산디지털2로 95</p> -->
