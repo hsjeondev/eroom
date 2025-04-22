@@ -7,9 +7,9 @@ import com.eroom.chat.entity.Chatroom;
 
 public class ChatMessageSpecification {
 
-	public static Specification<ChatMessage> roomNoEquals(Chatroom chatroom){
-		return (root,query, CriteriaBuilder) ->
-		CriteriaBuilder.equal(root.get("chatroomNo"),chatroom);
-	}
+	public static Specification<ChatMessage> roomNoEquals(Chatroom chatroom) {
+        return (root, query, cb) -> 
+            cb.equal(root.get("chatroom").get("chatroomNo"), chatroom.getChatroomNo());
+    }
 	
 }

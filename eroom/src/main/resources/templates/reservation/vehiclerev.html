@@ -1,184 +1,219 @@
 <!DOCTYPE html>
-<html 
-lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
-	  xmlns:th="http://www.thymeleaf.org"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{/include/layout}">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/include/layout}">
 <head>
 <meta charset="UTF-8">
 <title>차량 목록</title>
-</head> 
+</head>
 
-  <body>
-    <main class="main" id="top" layout:fragment="content">
-    
-  <div class="mb-3">
-	    <div class="d-flex justify-content-start align-items-center mb-2">
-	    <i class="fas fa-car me-2"></i>
-	    <span class="fw-bold fs-7"> 차량 예약</span>
-	  </div>
+<body>
+	<main class="main" id="top" layout:fragment="content">
+		
 
+		<div class="row">
+			<!--  차량 예약 목록 (왼쪽) -->
+			<div class="col-md-6">
+				<div class="mb-3">
+					<div class="d-flex align-items-center mb-2">
+						<i class="fas fa-car me-2"></i> <span class="fw-bold fs-7">
+							차량 예약</span>
+					</div>
 
+					<div id="vehicleTable"
+						data-list='{"valueNames":["no","vehicle","passengers","date"], "page": 5, "pagination": true}'>
+						<div class="table-responsive">
+							<table class="table table-striped table-sm fs-9 mb-0 text-center">
+								<thead class="text-center align-middle">
+									<tr>
+										<th class="sort" data-sort="no" style="width: 5%;">번호</th>
+										<th class="sort" data-sort="vehicle" style="width: 25%;">차량</th>
+										<th class="sort" data-sort="passengers" style="width: 20%;">탑승
+											인원</th>
+										<th class="sort" data-sort="date" style="width: 20%;">등록일</th>
+										<th style="width: 10%;"></th>
+									</tr>
+								</thead>
+								<tbody class="list align-middle">
+									<tr th:if="${#lists.isEmpty(list)}">
+										<td colspan="4">등록된 차량이 없습니다 😓</td>
+									</tr>
+									<tr class="align-middle vehicle-row" th:if="${!#lists.isEmpty(list)}"
+										th:each="result, resultstatus : ${list}">
+										<td class="no" th:text="${resultstatus.count}"></td>
+										<td class="vehicle" th:text="${result.facilityName}"></td>
+										<td class="passengers" th:text="${result.facilityCapacity}"></td>
+										<td class="date"
+											th:text="${#temporals.format(result.facilityRegDate, 'yy-MM-dd')}"></td>
+										<td class="text-end pe-0"><button
+												class="btn btn-sm btn-outline-primary"
+												data-bs-toggle="modal" data-bs-target="#addEventModal">
+												예약하기</button></td>
+									</tr>
+								</tbody>
+							</table>
+							</div>
+						<!-- 예약 모달 창 -->
+						<div class="modal fade" id="addEventModal" tabindex="-1">
+							<div class="modal-dialog modal-dialog-centered">
+								<div class="modal-content border border-translucent">
+									<form id="addEventForm" autocomplete="off" name="addEventForm">
+										<div class="modal-header px-card border-0">
+											<div
+												class="w-100 d-flex justify-content-between align-items-start">
+												<h5 class="mb-0 lh-sm text-body-highlight">일정 등록</h5>
+												<button class="btn p-1 fs-10 text-body" type="button"
+													data-bs-dismiss="modal" aria-label="Close">닫기</button>
+											</div>
+										</div>
+										<div class="mb-4"></div>
+										<div class="modal-body p-card py-0">
+											<!-- 숨겨진 값들 -->
+											<input type="hidden" name="employee_no"
+												th:value="${#authentication.principal.employee.employeeNo}" />
+											<input type="hidden" name="facility_no" value="F002" /> <input
+												type="hidden" name="reservation_creator"
+												th:value="${#authentication.principal.employee.employeeId}" />
 
-  <div id="vehicleTable" data-list='{"valueNames":["no","vehicle","passengers","date"], "page": 5, "pagination": true}'>
-    
-<!-- 검색창 + 추가 버튼 영역 -->
-<div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
-  <!-- 검색창 (가운데 정렬) -->
-  <div class="d-flex justify-content-center">
-    <form class="position-relative" style="width: 300px;">
-      <input class="form-control search-input search form-control-sm" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
-      <svg class="svg-inline--fa fa-magnifying-glass search-box-icon position-absolute top-50 end-0 translate-middle-y me-2"
-        aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img"
-        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="pointer-events: none;">
-        <path fill="currentColor"
-          d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z">
-        </path>
-      </svg>
-    </form>
-  </div>
+											<!-- 제목 / 장소 가로 배치 -->
+											<div class="row mb-2">
+												<div class="col-6">
+													<label class="form-label" for="calendarTitle">제목</label> <input
+														type="text" class="form-control form-control-sm"
+														id="calendarTitle" name="company_title"
+														placeholder="일정 제목" aria-label="일정 제목" />
+												</div>
+												<div class="col-6">
+													<label class="form-label" for="calendarLocation">장소</label>
+													<input type="text" class="form-control form-control-sm"
+														id="calendarLocation" name="company_location"
+														placeholder="일정 장소" aria-label="일정 장소" />
+												</div>
+											</div>
 
-  <!-- 추가 버튼 (오른쪽 고정) -->
-  <button class="btn btn-sm btn-primary position-absolute top-0 end-0" type="button"
-  	data-bs-toggle="modal" data-bs-target="#addVehicleModal">
-   	차량 등록
-  </button>
-</div>
+											<div class="mb-4"></div>
 
-    <!-- 테이블 본문 -->
-    <div class="table-responsive">
-      <table class="table table-striped table-sm fs-9 mb-0 text-center">
-        <thead class="text-center align-middle">
-          <tr>
-            <th class="sort" data-sort="no" style="width: 5%;">번호</th>
-            <th class="sort" data-sort="vehicle" style="width: 25%;">차량</th>
-            <th class="sort" data-sort="passengers" style="width: 20%;">탑승 인원</th>
-            <th class="sort" data-sort="date" style="width: 20%;">등록일</th>
-            <th style="width: 10%;"></th>
-          </tr>
-        </thead>
-        <tbody class="list align-middle">
+											<!-- 시작 시간 / 종료 시간 가로 배치 -->
+											<div class="row mb-3">
+												<div class="col-6">
+													<div class="mb-3">
+														<label class="form-label" for="calendarStartTime">시작시간</label>
+														<input class="form-control" id="calendarStartTime"
+															type="datetime-local" name="calendar_start_time" />
+													</div>
+												</div>
+												<div class="col-6">
+													<div class="mb-3">
+														<label class="form-label" for="calendarEndTime">종료시간</label>
+														<input class="form-control" id="calendarEndTime"
+															type="datetime-local" name="calendar_end_time" />
+													</div>
+												</div>
+											</div>
 
-          <!-- 차량 1 -->
-          <tr class="align-middle">
-            <td class="no">1</td>
-            <td class="vehicle">제네시스 G80[37주 2800]</td>
-            <td class="passengers">4명</td>
-            <td class="date">2025-04-10</td>
-            <td class="text-end pe-0">
-              <div class="btn-reveal-trigger position-static">
-                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-                  <i class="fas fa-ellipsis fs-10"></i>
-                </button>
-                <div class="dropdown-menu dropdown-menu-end py-2">
-                  <a class="dropdown-item" href="#!">수정</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item text-danger" href="#!">삭제</a>
-                </div>
-              </div>
-            </td>
-          </tr>
+											<!-- 설명 -->
+											<div class="input-group input-group-sm mb-3">
+												<span class="input-group-text">설명</span> <input type="text"
+													class="form-control" id="calendarContent"
+													name="company_content" placeholder="일정 설명"
+													aria-label="일정 설명" />
+											</div>
 
-          <!-- 차량 2 -->
-          <tr class="align-middle">
-            <td class="no">2</td>
-            <td class="vehicle">아반떼[40마 4144]</td>
-            <td class="passengers">4명</td>
-            <td class="date">2025-04-10</td>
-            <td class="text-end pe-0">
-              <div class="btn-reveal-trigger position-static">
-                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-                  <i class="fas fa-ellipsis fs-10"></i>
-                </button>
-                <div class="dropdown-menu dropdown-menu-end py-2">
-                  <a class="dropdown-item" href="#!">수정</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item text-danger" href="#!">삭제</a>
-                </div>
-              </div>
-            </td>
-          </tr>
-
-          <!-- 차량 3 -->
-          <tr class="align-middle">
-            <td class="no">3</td>
-            <td class="vehicle">아이오닉[30다 5512]</td>
-            <td class="passengers">4명</td>
-            <td class="date">2025-04-10</td>
-            <td class="text-end pe-0">
-              <div class="btn-reveal-trigger position-static">
-                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-                  <i class="fas fa-ellipsis fs-10"></i>
-                </button>
-                <div class="dropdown-menu dropdown-menu-end py-2">
-                  <a class="dropdown-item" href="#!">수정</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item text-danger" href="#!">삭제</a>
-                </div>
-              </div>
-            </td>
-          </tr>
-
-
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 페이징? -->
-    <div class="d-flex justify-content-center mt-3">
-     <!--  <span class="d-none d-sm-inline-block" data-list-info="data-list-info">1 to 4 <span class="text-body-tertiary"> Items of </span>4</span> -->
-      <div class="d-flex">
-        <button class="page-link disabled" data-list-pagination="prev" disabled><i class="fas fa-chevron-left"></i></button>
-        <ul class="mb-0 pagination">
-          <li class="active"><button class="page" type="button" data-i="1" data-page="5">1</button></li>
-        </ul>
-        <button class="page-link pe-0" data-list-pagination="next" disabled><i class="fas fa-chevron-right"></i></button>
-      </div>
-    </div>
-  </div>    
-</div>    
-    
-    <hr>
-  <!-- 차량 예약 목록 -->  
-      
+											<!-- 버튼 -->
+											<div
+												class="modal-footer d-flex justify-content-between align-items-center border-0">
+												<span></span>
+												<button class="btn btn-primary px-4" type="submit">일정
+													등록</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
 
 
-<!-- 차량 추가 모달 -->
-<div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-
-      <!-- 헤더 -->
-      <div class="modal-header">
-        <h5 class="modal-title" id="addVehicleModalLabel">차량 등록</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-
-      <!-- 바디 -->
-      <div class="modal-body">
-        <form id="addVehicleForm">
-          <div class="mb-3">
-            <label for="vehicleName" class="form-label">차량[번호]</label>
-            <input type="text" class="form-control form-control-sm" id="vehicleName" placeholder="예: k9[20마 9330]">
-          </div>
-         
-          <div class="mb-3">
-            <label for="vehicleCapacity" class="form-label">탑승 인원</label>
-            <input type="number" class="form-control form-control-sm" id="vehicleCapacity" placeholder="예: 10">
-          </div>
-        </form>
-      </div>
-
-      <!-- 푸터 -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">닫기</button>
-        <button type="submit" class="btn btn-primary btn-sm" form="addVehicleForm">등록</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 
-    </main>
-  </body>
+
+
+
+
+
+						<!-- 페이징 -->
+						<div class="d-flex justify-content-center mt-3">
+							<div class="d-flex">
+								<button class="page-link disabled" data-list-pagination="prev"
+									disabled>
+									<i class="fas fa-chevron-left"></i>
+								</button>
+								<ul class="mb-0 pagination">
+									<li class="active">
+										<button class="page" type="button" data-i="1" data-page="5">1</button>
+									</li>
+								</ul>
+								<button class="page-link pe-0" data-list-pagination="next"
+									disabled>
+									<i class="fas fa-chevron-right"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		
+			
+			
+
+
+
+			<!-- 캘린더 (오른쪽) -->
+			<div class="col-md-6">
+				<div class="calendar-outline" id="appCalendar"
+					style="height: 400px;"></div>
+				</div>
+			</div>
+
+
+
+
+
+		<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			  const calendarEl = document.getElementById('appCalendar');
+			  const calendar = new FullCalendar.Calendar(calendarEl, {
+			      initialView: 'dayGridMonth',
+			      locale: 'ko',
+			      headerToolbar: {
+			        left: 'prev,next today',
+			        center: 'title',
+			        right: ''
+			      },
+			      buttonText: {
+			    	    today: '오늘' 
+			    	  },
+			      dayMaxEventRows: true,
+			      views: {
+			        dayGridMonth: {
+			          dayMaxEventRows: 3,
+			          moreLinkText: "더보기"		       
+			          }
+			      },
+			      eventDisplay: 'block',
+			      dayCellContent: function (info) {
+			        return info.date.getDate();
+			      }
+			  });
+
+			  // setTimeout으로 약간 늦게 실행해주면 스타일 로딩 이후 안전하게 그려짐
+				/* <head>에 있는 FullCalendar CSS 파일이 아직 로드 중이라
+				캘린더는 그려졌지만 스타일이 적용되지 않은 상태로 나와버림. */
+			  setTimeout(() => {
+			    calendar.render();
+			  }, 0); 
+			});
+		</script>
+	</main>
+</body>
 </html>

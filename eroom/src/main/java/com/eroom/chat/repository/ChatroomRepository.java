@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.eroom.chat.entity.Chatroom;
+import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.employee.entity.Employee;
 
 public interface ChatroomRepository extends JpaRepository<Chatroom, Long>{
@@ -20,5 +21,7 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long>{
     // 내가 참여한 채팅방 조회 (visibleYn = 'Y'만)
     @Query("SELECT ca.chatroomNo FROM ChatroomAttendee ca WHERE ca.attendee.employeeNo = :employeeNo AND ca.chatroomNo.visibleYn = 'Y'")
     List<Chatroom> findByParticipant(@Param("employeeNo") Long employeeNo);
-    
+ 
+    @Query("SELECT c FROM Chatroom c JOIN FETCH c.chatroomMapping ca WHERE c.chatroomNo = :chatroomNo")
+    Chatroom findByIdWithAttendees(@Param("chatroomNo") Long chatroomNo);
 }

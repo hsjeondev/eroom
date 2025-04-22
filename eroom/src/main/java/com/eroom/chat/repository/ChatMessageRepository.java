@@ -21,7 +21,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long>{
     ChatMessage findByChatMessageNo(Long chatMessageNo);
 
     // 채팅방으로 여러 메시지 조회
-    List<ChatMessage> findByChatroomNo(Chatroom chatroom);
+    List<ChatMessage> findByChatroom(Chatroom chatroom);
 
     // 보낸 사람으로 여러 메시지 조회
     List<ChatMessage> findBySenderMember(Employee senderMember);
@@ -29,6 +29,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long>{
     // 메시지 내용으로 메시지 검색 (1개)
     ChatMessage findByChatMessageContent(String chatMessageContent);
 	// 메시지 내용으로 여러 메시지 검색
-    @Query("SELECT m FROM ChatMessage m WHERE m.chatroomNo.chatroomNo = :roomNo ORDER BY m.messageRegDate ASC")
-    List<ChatMessage> findByChatroomNo(@Param("roomNo") Long roomNo);
+    @Query("SELECT m FROM ChatMessage m WHERE m.chatroom.chatroomNo = :roomNo ORDER BY m.messageRegDate ASC")
+    List<ChatMessage> findByRoomNo(@Param("roomNo") Long roomNo);
+
 }

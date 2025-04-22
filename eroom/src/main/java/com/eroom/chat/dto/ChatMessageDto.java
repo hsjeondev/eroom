@@ -32,7 +32,7 @@ public class ChatMessageDto {
 	public ChatMessage toEntity() {
 		return ChatMessage.builder()
 				.chatMessageNo(chatMessageNo)
-				.chatroomNo(Chatroom.builder().chatroomNo(chatroomNo).build())
+				.chatroom(Chatroom.builder().chatroomNo(chatroomNo).build())
 				.senderMember(Employee.builder().employeeNo(senderMember).build())
 				.chatMessageContent(chatMessageContent)
 				.messageRegDate(messageRegDate)
@@ -41,7 +41,7 @@ public class ChatMessageDto {
     // Entity -> DTO
 	public static ChatMessageDto toDto(ChatMessage entity) {
 		return ChatMessageDto.builder().chatMessageNo(entity.getChatMessageNo())
-				.chatroomNo(entity.getChatroomNo().getChatroomNo())
+				.chatroomNo(entity.getChatroom().getChatroomNo())
 				.senderMember(entity.getSenderMember().getEmployeeNo())
 				.chatMessageContent(entity.getChatMessageContent())
 				.messageRegDate(entity.getMessageRegDate())
