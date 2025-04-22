@@ -111,13 +111,13 @@
             <h5 class="text-body-secondary">직급</h5>
             <p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p>
             <h5 class="text-body-secondary">부서</h5>
-            <p class="text-body-secondary" th:text="${departmentName}">부서</p>
+            <p class="text-body-secondary" th:text="${departmentName != null ? departmentName : '-'}">부서</p>
             <div class="mb-3">
               <h5 class="text-body-secondary">Email</h5>
-              <a href="mailto:email@email.com" id="emailValue" th:text="${directory.directory_email}">email@email.com</a>
+              <a href="mailto:email@email.com" id="emailValue" th:text="${directory != null and directory.directory_email != null ? directory.directory_email : '-'}">email@email.com</a>
             </div>
             <h5 class="text-body-secondary">Phone</h5>
-            <p class="text-body-secondary" id="phoneValue" th:text="${directory.directory_phone}">010-0000-0000</p>
+            <p class="text-body-secondary" id="phoneValue" th:text="${directory != null and directory.directory_phone != null ? directory.directory_phone : '-'}">010-0000-0000</p>
           </div>
         </div>
       </div>
@@ -126,7 +126,7 @@
         <div class="card p-3 shadow-sm">
           <div class="card-title d-flex justify-content-between align-items-center mb-3">
             <span class="fw-bold fs-8 text-secondary">근무시간 통합 차트</span>
-            <p class="text-muted mb-0">이번달 총 근무시간: <strong class="text-primary" th:text="${totalWorkTime}">165시간 25분</strong></p>
+            <p class="text-muted mb-0">이번달 총 근무시간: <strong class="text-primary" th:text="${totalWorkTime}">000시간 00분</strong></p>
           </div>
           <canvas id="workTimeMixedChart" height="260"></canvas>
         </div>
