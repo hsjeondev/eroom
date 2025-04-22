@@ -70,6 +70,33 @@ public class DepartmentCalendarService {
         }
         return result;
     }
+    
+    public DepartmentCalendarDto deleteDepartCalendar(Long id) {
+    	DepartmentCalendar target = calendarRepository.findById(id).orElse(null);
+    	if(target == null) {
+    		return null;
+    	}
+    	
+    	String changeYtoN = "Y".equals(target.getVisibleYn()) ? "N" : "Y";
+    	
+    	DepartmentCalendar updated = DepartmentCalendar.builder()
+    			.calendarNo(target.getCalendarNo())
+    			.calendarTitle(target.getCalendarTitle())
+				.calendarLocation(target.getCalendarLocation())
+				.calendarStartTime(target.getCalendarStartTime())
+				.calendarEndTime(target.getCalendarEndTime())
+				.calendarContent(target.getCalendarContent())
+				.calendarCreator(target.getCalendarCreator())
+				.calendarEditor(target.getCalendarEditor())
+				.employeeNo(target.getEmployeeNo())
+				.separator(target.getSeparator())
+				.calendarRegDate(target.getCalendarRegDate())
+				.calendarModDate(target.getCalendarModDate())
+				.visibleYn(changeYtoN)
+				.build();
+    	DepartmentCalendar saved = calendarRepository.save(updated);
+    	return new DepartmentCalendarDto().toDto(saved);
+    }
 }
 
 	
