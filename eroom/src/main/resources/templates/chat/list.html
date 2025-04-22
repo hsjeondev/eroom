@@ -761,59 +761,59 @@
 		    };
 		  // 메시지 수신
 		  socket.onmessage = function(event) {
-  console.log('수신한 메시지:', event.data);
-
-  const data = JSON.parse(event.data);
-  const chatHistory = document.querySelector(".chat-history");
-  const currentChatroomNo = document.querySelector(".chatroom-title")?.dataset.roomNo;
-  const sidebarItem = document.querySelector(`[data-room-no="${data.chatroomNo}"]`);
-
-  if (!sidebarItem) {
-    console.warn("사이드바에 채팅방이 없음:", data.chatroomNo);
-    return;
-  }
-
-  // 현재 열린 방이 없거나, 다른 방이면 읽지 않음 처리
-  if (!currentChatroomNo || Number(data.chatroomNo) !== Number(currentChatroomNo)) {
-    console.log("💬 다른 방에서 메시지 수신: 읽지 않음 뱃지 올림");
-
-    sidebarItem.classList.add('unread');
-    sidebarItem.classList.remove('read');
-
-    let badge = sidebarItem.querySelector('.badge');
-    if (badge) {
-      let count = parseInt(badge.innerText) || 0;
-      badge.innerText = count + 1;
-    } else {
-      badge = document.createElement('div');
-      badge.className = 'badge bg-danger text-white ms-2';
-      badge.innerText = 1;
-      const flexBox = sidebarItem.querySelector('.d-flex.justify-content-between');
-      if (flexBox) {
-        flexBox.appendChild(badge);
-      }
-    }
-
-    const messagePreview = sidebarItem.querySelector('.message');
-    if (messagePreview) {
-      messagePreview.innerText = data.chatMessageContent;
-    }
-
-    const timePreview = sidebarItem.querySelector('.text-body-tertiary');
-    if (timePreview) {
-      const now = new Date();
-      const formatted = now.getFullYear().toString().slice(2) + '.' +
-                        String(now.getMonth() + 1).padStart(2, '0') + '.' +
-                        String(now.getDate()).padStart(2, '0');
-      timePreview.innerText = formatted;
-    }
-
-    return; // 다른 방이면 여기서 끝
-  }
+		  console.log('수신한 메시지:', event.data);
+		
+		  const data = JSON.parse(event.data);
+		  const chatHistory = document.querySelector(".chat-history");
+		  const currentChatroomNo = document.querySelector(".chatroom-title")?.dataset.roomNo;
+		  const sidebarItem = document.querySelector(`[data-room-no="${data.chatroomNo}"]`);
+		
+		  if (!sidebarItem) {
+		    console.warn("사이드바에 채팅방이 없음:", data.chatroomNo);
+		    return;
+		  }
+		
+		  // 현재 열린 방이 없거나, 다른 방이면 읽지 않음 처리
+		  if (!currentChatroomNo || Number(data.chatroomNo) !== Number(currentChatroomNo)) {
+		    console.log("다른 방에서 메시지 수신: 읽지 않음 뱃지 올림");
+		
+		    sidebarItem.classList.add('unread');
+		    sidebarItem.classList.remove('read');
+		
+		    let badge = sidebarItem.querySelector('.badge');
+		    if (badge) {
+		      let count = parseInt(badge.innerText) || 0;
+		      badge.innerText = count + 1;
+		    } else {
+		      badge = document.createElement('div');
+		      badge.className = 'badge bg-danger text-white ms-2';
+		      badge.innerText = 1;
+		      const flexBox = sidebarItem.querySelector('.d-flex.justify-content-between');
+		      if (flexBox) {
+		        flexBox.appendChild(badge);
+		      }
+		    }
+		
+		    const messagePreview = sidebarItem.querySelector('.message');
+		    if (messagePreview) {
+		      messagePreview.innerText = data.chatMessageContent;
+		    }
+		
+		    const timePreview = sidebarItem.querySelector('.text-body-tertiary');
+		    if (timePreview) {
+		      const now = new Date();
+		      const formatted = now.getFullYear().toString().slice(2) + '.' +
+		                        String(now.getMonth() + 1).padStart(2, '0') + '.' +
+		                        String(now.getDate()).padStart(2, '0');
+		      timePreview.innerText = formatted;
+		    }
+		
+		    return; // 다른 방이면 여기서 끝
+		  }
 
   // 같은 방이면 채팅 추가
   if (!chatHistory) {
-    console.error("❌ chat-history 없음");
+    console.error("chat-history 없음");
     return;
   }
 
@@ -850,11 +850,11 @@
 
 
 		  socket.onclose = function(event) {
-		    console.log('❌ WebSocket 연결 종료:', event);
+		    console.log('WebSocket 연결 종료:', event);
 		  };
 
 		  socket.onerror = function(error) {
-		    console.error('🚨 WebSocket 오류 발생:', error);
+		    console.error('WebSocket 오류 발생:', error);
 		  };
 		}
 		// 메시지 보내기
