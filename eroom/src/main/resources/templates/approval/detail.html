@@ -164,6 +164,32 @@
 		});
 	
 	</script>
+	<!-- 회수 버튼 -->
+	<script th:inline="javascript">
+		document.getElementById("fallBackBtn").addEventListener("click", function(){
+			const fallBackNo = [[${approval.approval_no}]];
+			if(confirm('결재를 회수하시겠습니까?')){
+				fetch('/approval/' + fallBackNo + '/fallBack',{
+					method : 'POST',
+					headers : {
+				      'Content-Type': 'application/json',
+				      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+				      'header': document.querySelector('meta[name="_csrf_header"]').content
+					}
+				})
+				.then(response => response.json())
+				.then(data =>{
+					alert(data.res_msg)
+					if(data.res_code == 200){
+						location.href='/approval/myRequestedApprovals';
+					}
+				})
+			} else{
+				
+			}
+		});
+	
+	</script>
     
   </main>
 </body>

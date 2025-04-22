@@ -102,6 +102,7 @@ public class ApprovalService {
 		return approval;
 	}
 
+	// 결재 삭제
 	public int updateVisibleYn(Long approvalNo) {
 		int result = 0;
 		try {
@@ -124,6 +125,25 @@ public class ApprovalService {
 	public List<Approval> getApprovalListByApprovalNo(Long approvalNo, String visible) {
 		List<Approval> resultList = approvalRepository.findByApprovalNoAndApprovalVisibleYnOrderByApprovalRegDateDesc(approvalNo, visible);
 		return resultList;
+	}
+
+	// 결재 회수
+	public int updateApprovalStatus(Long approvalNo) {
+		int result = 0;
+		try {
+			Approval approval = approvalRepository.findById(approvalNo).orElse(null);
+			if (approval != null) {
+				if (!approval.getApprovalStatus().equals("F")) {
+					approval.setApprovalStatus("F");
+					approvalRepository.save(approval);
+				}
+				result = 1;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = 0;
+		}
+		return result;
 	}
 
 

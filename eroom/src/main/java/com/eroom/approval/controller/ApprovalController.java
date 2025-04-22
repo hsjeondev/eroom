@@ -248,17 +248,12 @@ public class ApprovalController {
 		Long employeeNo = employee.getEmployeeNo();
 		
 		// 내가 올린 결재인지 확인
-		List<Approval> temp = approvalService.getMyRequestedApprovals(employeeNo, "Y");
-		Approval approval = null;
+		Approval approval = approvalService.selectApprovalByApprovalNo(approvalNo);
 		Boolean isMyApproval = false;
-		for (Approval t : temp) {
-			if (t.getApprovalNo() == approvalNo) {
-				isMyApproval = true;
-				approval = t;
-				break;
-			}
+		if (approval.getEmployee().getEmployeeNo() == employeeNo) {
+			isMyApproval = true;
 		}
-		if(isMyApproval == false || employee.getEmployeeName().contains("admin") == false) {
+		if(isMyApproval == false && employee.getEmployeeName().contains("admin") == false) {
 			map.put("res_code", "403");
 			map.put("res_msg", "결재 삭제 실패(권한 없음)");
 			return map;
@@ -291,6 +286,63 @@ public class ApprovalController {
 		} else {
 			map.put("res_code", "500");
 			map.put("res_msg", "결재 삭제 실패(결재가 진행중입니다.)");
+		}
+		return map;
+	}
+	
+	@PostMapping("/approval/{fallBackNo}/fallBack")
+	@ResponseBody
+	public Map<String, String> fallBackApproval(@PathVariable("fallBackNo") Long approvalNo, Model model,
+			Authentication authentication) {
+		
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("res_code", "500");
+		map.put("res_msg", "결재 회수 실패");
+		
+		// 로그인한 사용자 정보 가져오기
+		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+		Employee employee = employeeDetails.getEmployee();
+		Long employeeNo = employee.getEmployeeNo();
+		
+		// 내가 올린 결재인지 확인
+		Approval approval = approvalService.selectApprovalByApprovalNo(approvalNo);
+		Boolean isMyApproval = false;
+		if (approval.getEmployee().getEmployeeNo() == employeeNo) {
+			isMyApproval = true;
+		}
+		if(isMyApproval == false && employee.getEmployeeName().contains("admin") == false) {
+			map.put("res_code", "403");
+			map.put("res_msg", "결재 회수 실패(권한 없음)");
+			return map;
+		}
+		
+		// 결재 라인들의 상태 조회 -> 결재자가 아무도 결재 승인을 안 했다면 삭제 프로세스 진행
+		List<ApprovalLine> approvalLineList = approval.getApprovalLines();
+		Map<Integer, String> approvalLineStatusMap = new HashMap<Integer, String>();
+		Boolean isApproval = false;
+		for(ApprovalLine app : approvalLineList) {
+			approvalLineStatusMap.put(app.getApprovalLineStep(), app.getApprovalLineStatus());
+		}
+		if(approvalLineStatusMap.containsKey(1) && approvalLineStatusMap.get(1).equals("S")) {
+			isApproval = true;
+		} else if(!approvalLineStatusMap.containsKey(1)) {
+			isApproval = true;
+		}
+		
+		if(isApproval) {
+			// 결재 회수
+			int result = approvalService.updateApprovalStatus(approvalNo);
+			
+			if (result > 0) {
+				map.put("res_code", "200");
+				map.put("res_msg", "결재 회수 성공");
+			} else {
+				map.put("res_code", "500");
+				map.put("res_msg", "결재 회수 실패(서버 오류)");
+			}
+		} else {
+			map.put("res_code", "500");
+			map.put("res_msg", "결재 회수 실패(결재가 진행중입니다.)");
 		}
 		return map;
 	}
