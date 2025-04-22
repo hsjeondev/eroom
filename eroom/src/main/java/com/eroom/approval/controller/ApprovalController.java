@@ -249,28 +249,48 @@ public class ApprovalController {
 		
 		// 내가 올린 결재인지 확인
 		List<Approval> temp = approvalService.getMyRequestedApprovals(employeeNo, "Y");
+		Approval approval = null;
 		Boolean isMyApproval = false;
 		for (Approval t : temp) {
 			if (t.getApprovalNo() == approvalNo) {
 				isMyApproval = true;
+				approval = t;
 				break;
 			}
 		}
-		if(isMyApproval == false) {
+		if(isMyApproval == false || employee.getEmployeeName().contains("admin") == false) {
 			map.put("res_code", "403");
-			map.put("res_msg", "결재 삭제 권한 없음");
+			map.put("res_msg", "결재 삭제 실패(권한 없음)");
 			return map;
 		}
 		
+		// 결재 라인들의 상태 조회 -> 결재자가 아무도 결재 승인을 안 했다면 삭제 프로세스 진행
+		List<ApprovalLine> approvalLineList = approval.getApprovalLines();
+		Map<Integer, String> approvalLineStatusMap = new HashMap<Integer, String>();
+		Boolean isApproval = false;
+		for(ApprovalLine app : approvalLineList) {
+			approvalLineStatusMap.put(app.getApprovalLineStep(), app.getApprovalLineStatus());
+		}
+		if(approvalLineStatusMap.containsKey(1) && approvalLineStatusMap.get(1).equals("S")) {
+			isApproval = true;
+		} else if(!approvalLineStatusMap.containsKey(1)) {
+			isApproval = true;
+		}
 		
-
-		// 결재 삭제
-		int result = approvalService.updateVisibleYn(approvalNo);
-		
-		if (result > 0) {
-			map.put("res_code", "200");
-			map.put("res_msg", "결재 삭제 성공");
-			return map;
+		if(isApproval) {
+			// 결재 삭제
+			int result = approvalService.updateVisibleYn(approvalNo);
+			
+			if (result > 0) {
+				map.put("res_code", "200");
+				map.put("res_msg", "결재 삭제 성공");
+			} else {
+				map.put("res_code", "500");
+				map.put("res_msg", "결재 삭제 실패(서버 오류)");
+			}
+		} else {
+			map.put("res_code", "500");
+			map.put("res_msg", "결재 삭제 실패(결재가 진행중입니다.)");
 		}
 		return map;
 	}
