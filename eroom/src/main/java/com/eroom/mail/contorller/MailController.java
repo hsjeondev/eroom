@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -45,9 +46,9 @@ public class MailController {
 	
 	// 받은 메일
 	@GetMapping("/mail/receiverTo")
-	public String selectReceiverToAll(Model model, @AuthenticationPrincipal EmployeeDetails user,
+	public String selectReceiverToAll(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails,
 			@RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder) {
-	    Long employeeNo = user.getEmployee().getEmployeeNo();
+	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
 	    
 	    
 	    List<MailReceiver> received = mailService.getReceivedMailsByEmployee(employeeNo, sortOrder); 
@@ -58,10 +59,10 @@ public class MailController {
 	// 04/17 본인것만 조회되게 
 	
 	  @GetMapping("/mail/sent") public String getSentMails(Model
-	  model, @AuthenticationPrincipal EmployeeDetails user,
+	  model, @AuthenticationPrincipal EmployeeDetails employeeDetails,
 	  @RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder
 			  ) { 
-	  Long employeeNo =user.getEmployee().getEmployeeNo();
+	  Long employeeNo =employeeDetails.getEmployee().getEmployeeNo();
 	  
 	  // 조건 받아와서 여기서 적용하기 ( 최신순, 오래된 순 ) 
 	  
@@ -119,8 +120,13 @@ public class MailController {
 	}
 	
 	// 디테일
-	@GetMapping("/mail/detail")
-	public String selectMailOne() { 
+	@GetMapping("/mail/detail/{id}")
+	public String selectMailOne(@PathVariable("id") Long id,
+								Model model,
+								 @AuthenticationPrincipal EmployeeDetails employeeDetails) { 
+		Long employeeNo = employeeDetails.getEmployee().getEmployeeNo(); // employeeNo값 
+		Mail mail = mailService.selectMailOne(employeeNo,id);
+		model.addAttribute("mail",mail);
 		return "mail/mailDetail";
 	}
 	

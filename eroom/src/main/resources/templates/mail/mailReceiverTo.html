@@ -4,7 +4,9 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{/include/layout}">
+	  
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+
   <body>
     <main class="main" id="top" layout:fragment="content">
       <!-- 여기에 요소 넣으면 됩니다. -->
@@ -58,7 +60,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                 <div class="list">
                  <div class="border-top border-translucent hover-actions-trigger py-3"
                  		th:if="${!#lists.isEmpty(receivedMails)}"
-                 		th:each="receiverMail : ${receivedMails}">
+                 		th:each="receiverMail : ${receivedMails}"
+                 		th:classappend="${receiverMail.mailReceiverReadYn == 'N'} ? 'bg-primary-subtle text-primary-emphasis' : ''">
                   <div class="row align-items-sm-center gx-2">
                     <div class="col-auto">
                       <div class="d-flex flex-column flex-sm-row">
@@ -75,9 +78,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
                       </div>
                     </div>
-                    
-                    
-                    <div class="col-auto"><a class="text-body-emphasis fw-bold inbox-link fs-9 senderName" href="../../apps/email/email-detail.html" th:text="${receiverMail.mail != null and receiverMail.mail.sender != null ? receiverMail.mail.sender.employeeName : '알 수 없음'}">보낸 사람</a></div>
+                    <div class="col-auto">
+					  <a class="inbox-link fs-9 senderName"
+					     th:href="@{/mail/detail/{id}(id=${receiverMail.mail.mailNo})}"
+					     th:classappend="${receiverMail.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
+					     th:text="${receiverMail.mail != null and receiverMail.mail.sender != null ? receiverMail.mail.sender.employeeName : '알 수 없음'}">
+					     보낸 사람
+					  </a>
+					</div>
                     <div class="col-auto ms-auto">
                       <div class="hover-actions end-0">
                         <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
@@ -96,11 +104,20 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                     </div>
                   </div>
                   <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11">
-                  	<a class="d-block inbox-link" th:href="@{/mail/detail}">
-                  		<span class="fs-9 line-clamp-1 text-body-emphasis mailTitle" th:text="${receiverMail.mail.mailTitle}"></span> 
-                  		<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent" th:utext="${receiverMail.mail.mailContent}"></span> 
-                    </a>
-                  </div>
+					  <a class="d-block inbox-link"
+					     th:href="@{/mail/detail/{id}(id=${receiverMail.mail.mailNo})}"
+					     th:data-receiver-id="${#authentication.principal.employee.employeeNo}">
+					     
+					     <span class="fs-9 line-clamp-1 mailTitle"
+					           th:classappend="${receiverMail.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
+					           th:text="${receiverMail.mail.mailTitle}">
+					     </span>
+					
+					     <span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"
+					           th:utext="${receiverMail.mail.mailContent}">
+					     </span>
+					  </a>
+					</div>
                 </div>
                 </div>
                 <div class="d-flex flex-wrap align-items-center justify-content-between py-3 pe-0 fs-9 border-bottom border-translucent">
@@ -115,6 +132,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             		</div>
                 </div>
                 </div>
+                
 	     <h1>받은 메일</h1>
     </main>
   </body>

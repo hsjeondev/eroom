@@ -11,7 +11,8 @@
 <main class="main" id="top" layout:fragment="content">
 	<div class="card-body overflow-hidden">
                   <div class="d-flex flex-between-center pb-3 border-bottom border-translucent mb-4"><a class="btn btn-link p-0 text-body-secondary me-3" th:href="@{/mail}"><span class="fa-solid fa-angle-left fw-bolder fs-8"></span></a>
-                    <h3 class="flex-1 mb-0 lh-sm line-clamp-1">메일 제목</h3>
+                    <h3 class="flex-1 mb-0 lh-sm line-clamp-1"
+                    	th:text="${mail.mailTitle}">메일 제목</h3>
                     <div class="btn-reveal-trigger">
                       <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none d-flex btn-reveal" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fas fa-ellipsis-h"></span></button>
                       <div class="dropdown-menu dropdown-menu-end py-2">
@@ -33,23 +34,24 @@
                       <div class="col-auto"><img class="me-2 rounded-circle" src="../../assets/img/team/60.webp" alt="..." width="48" height="48" /></div>
                       <div class="col-auto flex-1">
                         <div class="d-flex mb-1">
-                          <h5 class="mb-0 text-body-highlight me-2">작성자</h5>
-                          <p class="mb-0 lh-sm text-body-tertiary fs-9 d-none d-md-block text-nowrap">&#60; 작성자 이메일 &#62;</p>
+                          <h5 class="mb-0 text-body-highlight me-2" th:text="${mail.sender.employeeName}">작성자</h5>
+                          <p class="mb-0 lh-sm text-body-tertiary fs-9 d-none d-md-block text-nowrap" th:text="${mail.sender.directory.directoryEmail}">&#60; 작성자 이메일 &#62;</p>
                         </div>
-                        <p class="mb-0 fs-9"><span class="text-body-tertiary">to</span><span class="fw-bold text-body-secondary"> Me </span><span class="text-body-highlight fw-semibold fs-10">년도 </span><span class="fw-semibold text-body fs-10 me-1"> 시간</span><span class="fa-regular fa-star text-body-quaternary"></span></p>
+                        <p class="mb-0 fs-9"><span class="text-body-tertiary">to</span><span class="fw-bold text-body-secondary"> Me </span><span class="text-body-highlight fw-semibold fs-10" th:text="${#temporals.format(mail.mailSentTime, 'yyyy.MM.dd HH:mm:ss')}">년도 </span>
+                        <!-- 별 표시  -->
+                        <!-- <span class="fa-regular fa-star text-body-quaternary"></span> -->
+                        
+                        </p>
                       </div>
                     </div>
                     <div class="text-body-highlight fs-9 w-100 w-md-75 mb-8">
                     <!-- 내용 -->
-                      <p>Dear Simp sons, </p>
-                      <p>Something in a thirty-acre thermal thicket of thorns and thistles thumped and thundered threatening the three-D thoughts of Matthew the thug - although, theatrically, it was only the thirteen-thousand thistles and thorns through the underneath of his thigh that the thirty year old thug thought of that morning.</p>
-                      <p>How much caramel can a canny canonball cram in a camel if a canny canonball can cram caramel in a camel? If practice makes perfect and perfect needs practice, I’m perfectly practiced and practically perfect.</p>
-                      <p class="mb-0">Best regards,</p>
-                      <p>Jess</p>
+                      <p th:utext="${mail.mailContent}"></p>
+                      
                     <!-- 내용 -->
                     </div>
                     <div class="d-flex align-items-center mb-5">
-                      <button class="btn btn-link text-body-highlight fs-8 text-decoration-none p-0" type="button"><span class="fa-solid fa-paperclip me-2"></span>2 Attachments</button>
+                      <button class="btn btn-link text-body-highlight fs-8 text-decoration-none p-0" type="button"><span class="fa-solid fa-paperclip me-2"></span>2 첨부 파일 (하드코딩)</button>
                     </div>
                     <div class="row pb-11 border-bottom mb-4 gx-0 gy-2 border-translucent">
                       <div class="col-auto me-3"><a class="text-decoration-none d-flex align-items-center" href="#!">
@@ -59,22 +61,22 @@
                           </div>
                            
                           <div>
-                            <h6 class="text-body-highlight">workflow-data.pdf</h6>
-                            <p class="fs-9 mb-0 text-body-tertiary lh-1">53.34 KB</p>
+                            <h6 class="text-body-highlight">workflow-data.pdf(하드코딩)</h6>
+                            <p class="fs-9 mb-0 text-body-tertiary lh-1">53.34 KB (하드코딩)</p>
                           </div>
                         </a></div>
                       <div class="col-auto"><a class="text-decoration-none d-flex align-items-center" href="#!"><img class="rounded" src="../../assets/img/generic/41.png" alt="..." />
                           <div class="ms-2">
-                            <h6 class="text-body-highlight">forest.jpg</h6>
-                            <p class="fs-9 mb-0 text-body-tertiary">53.34 KB</p>
+                            <h6 class="text-body-highlight">forest.jpg (하드코딩)</h6>
+                            <p class="fs-9 mb-0 text-body-tertiary">53.34 KB (하드코딩)</p>
                           </div>
                         </a></div>
                         <!-- 파일 -->
                     </div>
                     <div class="d-flex justify-content-between">
-                      <button class="btn btn-phoenix-secondary me-1 text-nowrap px-2 px-sm-4">Reply<span class="fa-solid fa-reply ms-2 fs-10"></span></button>
+                      <button class="btn btn-phoenix-secondary me-1 text-nowrap px-2 px-sm-4">전달<span class="fa-solid fa-reply ms-2 fs-10"></span></button>
                       <button class="btn btn-phoenix-secondary me-1 text-nowrap px-2 px-sm-4">Reply All<span class="fa-solid fa-reply-all ms-2 fs-10"></span></button>
-                      <button class="btn btn-phoenix-secondary ms-auto text-nowrap px-2 px-sm-4">Forward<span class="fa-solid fa-share ms-2 fs-10"></span></button>
+                      <button class="btn btn-phoenix-secondary ms-auto text-nowrap px-2 px-sm-4">답장<span class="fa-solid fa-share ms-2 fs-10"></span></button>
                     </div>
                   </div>
                 </div>

@@ -13,6 +13,7 @@ import com.eroom.mail.entity.Mail;
 import com.eroom.mail.entity.MailReceiver;
 import com.eroom.mail.repository.MailReceiverRepository;
 import com.eroom.mail.repository.MailRepository;
+import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +25,12 @@ public class MailService {
 	private final MailReceiverRepository mailReceiverRepository;
 	private final EmployeeRepository employeeRepository;
 
+	@Transactional
+	public Mail selectMailOne(Long employeeNo,Long id) {
+		
+	    mailReceiverRepository.updateReadYn(employeeNo,id); // 읽음 처리
+		return mailRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("메일을 찾을 수 없습니다."));
+	}
 	
 	
 	// 받은 메일 조회
@@ -86,15 +93,19 @@ public class MailService {
 		            Employee receiver = employeeRepository.findById(receiverNo).orElseThrow(() -> 
 		                new IllegalArgumentException("존재하지 않는 사원 번호: " + receiverNo));
 		            
+//		            MailReceiverDto mailReceiverDto = MailReceiverDto.builder()
+//		                    .employee_no(receiverNo)
+//		                    .mail(mailEntity)
+//		                    .build();
 		            MailReceiverDto mailReceiverDto = new MailReceiverDto();
+		            mailReceiverDto.setEmployee_no(receiverNo);
+		            mailReceiverDto.setMail_no(mailSaver.getMailNo());
 		            
-		            mailReceiverDto = MailReceiverDto.builder()
-		                    .employee_no(receiverNo)
-		                    .mail(mailEntity)
-		                    .build();
-
-		                MailReceiver mailReceiver = mailReceiverDto.toEntity(mailSaver, receiver);
-		                mailReceiverRepository.save(mailReceiver);
+		            
+		            
+		            ;
+		            MailReceiver mailReceiver = mailReceiverDto.toEntity(mailSaver, receiver);
+		            mailReceiverRepository.save(mailReceiver);
 		            
 		            
 		            

@@ -75,7 +75,17 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                     </div>
                     
                     
-                    <div class="col-auto"><a class="text-body-emphasis fw-bold inbox-link fs-9 senderName"  href="../../apps/email/email-detail.html" th:text="${sentMail.sender != null ? sentMail.sender.employeeName : '알 수 없음'}">보낸 사람</a></div>
+                    <div class="col-auto">
+                    	<a class="text-body-emphasis fw-bold inbox-link fs-9 senderName"  href="../../apps/email/email-detail.html"
+                    	 th:text="${sentMail.sender != null ? sentMail.sender.employeeName : '알 수 없음'}"
+                    	>
+                    	 보낸 사람
+                    	 받은 사람 : (OOO) 으로 바꿀 예정
+                    	 </a>
+                    </div>
+                    <!-- 이메일 잘 나옴 -->
+                    <!-- <p th:text="${sentMail.sender.directory.directoryEmail}"></p> -->
+                    
                     <div class="col-auto ms-auto">
                       <div class="hover-actions end-0">
                         <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
@@ -94,11 +104,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                     </div>
                   </div>
                   <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11">
-                  	<a class="d-block inbox-link" th:href="@{/mail/detail}">
+                  	<!-- <a class="d-block inbox-link" th:href="@{/mail/detail}"> -->
+                  	<a class="d-block inbox-link" th:href="@{/mail/detail/{id}(id=${sentMail.mailNo})}">
                   		<span class="fs-9 line-clamp-1 text-body-emphasis mailTitle"  th:text="${sentMail.mailTitle}"></span>
                   		<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"  th:utext="${sentMail.mailContent}"></span>
                     </a>
-                    	<!-- <p class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2" th:text="${mail.mailContent}"></p> -->
                   </div>
                 </div>
                 <!-- 페이징 -->
