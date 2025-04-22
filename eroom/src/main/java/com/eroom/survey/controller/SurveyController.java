@@ -94,20 +94,12 @@ public class SurveyController {
 		Long surveyNo = surveyService.saveSurvey(surveyDto, surveyItemDto);
 
 		// 선택된 팀에 투표권한 부여
-		int resultSaveVoters = 0;
 		for (String teamId : selectedTeamIds) {
-			System.out.println("선택된 팀 ID: " + teamId);
-
-			// 팀원 조회
-			List<Employee> members = employeeService.findEmployeesByTeamId(teamId);
-			for (Employee member : members) {
-				System.out.println(member.getEmployeeNo());
-				// survey_voter에 저장
-				resultSaveVoters = surveyVoterService.saveSurveyVoters(surveyNo, member.getEmployeeNo());
-			}
-
+		    List<Employee> members = employeeService.findEmployeesByTeamId(teamId);
+		    for (Employee member : members) {
+		        surveyVoterService.saveSurveyVoters(surveyNo, member.getEmployeeNo());
+		    }
 		}
-
 		return "redirect:/survey/list";
 	}
 
@@ -125,7 +117,7 @@ public class SurveyController {
 		try {
 			// 요청 데이터 추출
 			Long surveyId = Long.valueOf(payload.get("surveyId").toString());
-			List<Integer> itemNos = (List<Integer>) payload.get("selectedItemNos");
+			List<Integer> itemNos = (List<Integer>) payload.get("selectedItems");
 
 			// 로그인한 사용자 정보 (voter)
 			EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -143,7 +135,6 @@ public class SurveyController {
 			e.printStackTrace();
 			response.put("success", false);
 		}
-
 		return response;
 	}
 }

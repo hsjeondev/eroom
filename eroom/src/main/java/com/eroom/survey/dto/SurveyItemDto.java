@@ -23,6 +23,7 @@ public class SurveyItemDto {
 	private Long surveyNo;
 	private List<String> items;
 	
+	
 	public List<SurveyItem> toEntityList() {
 		return items.stream()
 				.map(itemStr -> SurveyItem.builder()
@@ -31,8 +32,16 @@ public class SurveyItemDto {
 						.build())
 				.collect(Collectors.toList());
 	}
-	
+
 	public SurveyItemDto toDto(SurveyItem entity) {
+		return SurveyItemDto.builder()
+				.itemNo(entity.getItemNo())
+				.surveyNo(entity.getSurveyNo())
+				.items(List.of(entity.getItem())) // 단건이지만 구조에 맞추기 위해 list로 감쌈
+				.build();
+	}
+	
+	public SurveyItemDto toDtoList(SurveyItem entity) {
 		return SurveyItemDto.builder()
 				.itemNo(entity.getItemNo())
 				.surveyNo(entity.getSurveyNo())
