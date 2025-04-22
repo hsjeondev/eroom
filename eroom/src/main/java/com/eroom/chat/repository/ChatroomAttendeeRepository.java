@@ -18,7 +18,6 @@ public interface ChatroomAttendeeRepository extends JpaRepository<ChatroomAttend
 	List<Long> findOneToOneChatroomNos(@Param("myId") Long myId, @Param("otherId") Long otherId);
 
 
-	    
 
 
 }

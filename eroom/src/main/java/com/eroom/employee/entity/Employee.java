@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.eroom.attendance.entity.Attendance;
+import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.chat.entity.ChatMessage;
 import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
@@ -121,4 +122,6 @@ public class Employee {
 	@OneToMany(mappedBy = "senderMember")
 	private List<ChatMessage> sentMessages;
 
+	@OneToMany(mappedBy = "employee")
+	private List<ChatAlarm> chatAlarms; // 채팅 알림 목록
 }
