@@ -9,7 +9,12 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
   <body>
     <main class="main" id="top" layout:fragment="content">
-      <!-- 여기에 요소 넣으면 됩니다. -->
+      <div class="row align-items-center justify-content-between g-3 mb-4">
+		<!-- 상단 제목 -->
+		<div class="d-flex justify-content-start">
+			<span class="fw-bold fs-6">받은 메일함</span>
+		</div>
+	</div>
    <div id="mailSummary" data-list='{"valueNames":["senderName", "mailTitle", "mailContent", "sendTime"], "page":6, "pagination":true}'>   
       <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
             <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mailCreate}">메일 쓰기</a>
@@ -132,8 +137,6 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             		</div>
                 </div>
                 </div>
-                
-	     <h1>받은 메일</h1>
     </main>
   </body>
 </html>
