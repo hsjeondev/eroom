@@ -53,7 +53,7 @@ public class Approval {
 	private LocalDateTime approvalRegDate; // 결재 등록일
 	@Column(name="approval_completed_date")
 	private LocalDateTime approvalCompletedDate; // 결재 수정일
-	@Column(name="approval_visible_yn")
+	@Column(name="approval_visible_yn", insertable = false)
 	private String approvalVisibleYn; // 결재 사용여부
 	
 	@ManyToOne
