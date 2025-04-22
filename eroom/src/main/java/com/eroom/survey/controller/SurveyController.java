@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,8 +23,9 @@ import com.eroom.security.EmployeeDetails;
 import com.eroom.survey.dto.SurveyDto;
 import com.eroom.survey.dto.SurveyItemDto;
 import com.eroom.survey.dto.SurveyVoteDto;
+import com.eroom.survey.dto.VoteRequest;
+import com.eroom.survey.dto.VoteResultDto;
 import com.eroom.survey.entity.Survey;
-import com.eroom.survey.entity.SurveyItem;
 import com.eroom.survey.service.SurveyItemService;
 import com.eroom.survey.service.SurveyService;
 import com.eroom.survey.service.SurveyVoteService;
@@ -105,36 +107,48 @@ public class SurveyController {
 
 	@GetMapping("/detail")
 	@ResponseBody
-	public List<SurveyItem> surveyDetail(@RequestParam("id") Long surveyNo) {
-		return surveyItemService.findItemsBySurveyNo(surveyNo);
+	public List<SurveyItemDto> surveyDetail(@RequestParam("id") Long surveyNo,
+	                                        @AuthenticationPrincipal EmployeeDetails userDetails) {
+	    Long voterId = userDetails.getEmployee().getEmployeeNo();
+	    return surveyItemService.findVotedItem(surveyNo, voterId);
 	}
 
 	@PostMapping("/vote")
 	@ResponseBody
-	public Map<String, Object> submitVote(@RequestBody Map<String, Object> payload) {
-		Map<String, Object> response = new HashMap<>();
+	public Map<String, Object> submitVote(@RequestBody VoteRequest voteRequest) {
+	    Map<String, Object> response = new HashMap<>();
 
-		try {
-			// 요청 데이터 추출
-			Long surveyId = Long.valueOf(payload.get("surveyId").toString());
-			List<Integer> itemNos = (List<Integer>) payload.get("selectedItems");
+	    try {
+	        Long surveyId = voteRequest.getSurveyId();
+	        List<Long> items = voteRequest.getVotedItems();
 
-			// 로그인한 사용자 정보 (voter)
-			EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			Long voterId = userDetails.getEmployee().getEmployeeNo();
+	        EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	        Long voterId = userDetails.getEmployee().getEmployeeNo();
 
-			// 각 itemNo에 대해 투표 저장
-			for (Integer itemNo : itemNos) {
-				SurveyVoteDto dto = SurveyVoteDto.builder().surveyNo(surveyId).itemNo(Long.valueOf(itemNo)).voter(voterId).build();
+	        for (Long itemNo : items) {
+	            SurveyVoteDto dto = SurveyVoteDto.builder()
+	                .surveyNo(surveyId)
+	                .itemNo(itemNo)
+	                .voter(voterId)
+	                .build();
 
-				surveyVoteService.saveVote(dto); // 서비스에서 save 처리
-			}
+	            surveyVoteService.saveVote(dto);
+	        }
 
-			response.put("success", true);
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.put("success", false);
-		}
-		return response;
+	        response.put("success", true);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        response.put("success", false);
+	    }
+
+	    return response;
 	}
+	
+	@GetMapping("/vote-result")
+	@ResponseBody
+	public List<VoteResultDto> getVoteResult(@RequestParam("id") Long surveyId) {
+	    return surveyVoteService.findVoteResults(surveyId);
+	}
+
+
 }

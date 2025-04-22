@@ -12,18 +12,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 @Builder
 public class SurveyItemDto {
 	private Long itemNo;
 	private Long surveyNo;
+	private String item;
 	private List<String> items;
-	
-	
+	private int count;
+	private String voted = "N";
+
 	public List<SurveyItem> toEntityList() {
 		return items.stream()
 				.map(itemStr -> SurveyItem.builder()
@@ -33,19 +35,23 @@ public class SurveyItemDto {
 				.collect(Collectors.toList());
 	}
 
-	public SurveyItemDto toDto(SurveyItem entity) {
+	public static SurveyItemDto toDto(SurveyItem entity) {
 		return SurveyItemDto.builder()
 				.itemNo(entity.getItemNo())
 				.surveyNo(entity.getSurveyNo())
-				.items(List.of(entity.getItem())) // 단건이지만 구조에 맞추기 위해 list로 감쌈
+				.item(entity.getItem())
 				.build();
 	}
-	
-	public SurveyItemDto toDtoList(SurveyItem entity) {
+
+	public static SurveyItemDto toDto(SurveyItem entity, int count, boolean voted) {
 		return SurveyItemDto.builder()
-				.itemNo(entity.getItemNo())
-				.surveyNo(entity.getSurveyNo())
-				.items(List.of(entity.getItem()))
-				.build();
+			.itemNo(entity.getItemNo())
+			.surveyNo(entity.getSurveyNo())
+			.item(entity.getItem())
+			.count(count)
+			.voted(voted ? "Y" : "N")
+			.build();
 	}
+
 }
+
