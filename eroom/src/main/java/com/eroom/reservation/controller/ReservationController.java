@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.facility.entity.Facility;
+import com.eroom.facility.service.FacilityService;
 import com.eroom.reservation.dto.VehicleDto;
 import com.eroom.reservation.service.VehicleService;
-import com.eroom.survey.repository.SurveyRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -23,7 +24,7 @@ public class ReservationController {
  
 
    
-	
+	private final FacilityService facilityService;
 	private final VehicleService vehicleService;
 
 
@@ -36,9 +37,10 @@ public class ReservationController {
 		return "reservation/sleeprev";
 	}
 	
+	//facility 에서 F002 차량만 목록조회
 	@GetMapping("/reservation/vehicle")
 	public String vehicleReservationView(Model model) {
-		List<Facility>result = vehicleService.selectVehicleAll();
+		List<Facility>result = facilityService.selectVehicleAll();
 		//목록이 정상적으로 출력
 		//System.out.println(result);
 		model.addAttribute("list",result);		
@@ -57,9 +59,16 @@ public class ReservationController {
 	public Map<String,String> vehicleReservation(VehicleDto param){
 		Map<String,String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
-		resultMap.put("res_msg", "예약이 성공적으로 완료되었습니다");
+		resultMap.put("res_msg", "예약을 실패하였습니다");
 		
-		System.out.println(param);
+		//System.out.println(param);
+		
+		VehicleDto dto = vehicleService.vehicleReservation(param);
+		
+		if(dto != null) {
+			resultMap.put("res_code", "200");
+			resultMap.put("res_msg", "예약을 성공적으로 완료했습니다");
+		}
 		
 		return resultMap;
 	}
