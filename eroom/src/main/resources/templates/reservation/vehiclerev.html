@@ -87,6 +87,7 @@
 											<input type="hidden" name="employee_no"
 												th:value="${#authentication.principal.employee.employeeNo}" />
 											<input type="hidden" name="facility_no" id="modalFacilityNo" value="" /> 
+											<input type="hidden" name="separator_code" value="F002" id="separator">
 											<input type="hidden" name="reservation_creator"
 												th:value="${#authentication.principal.employee.employeeId}" />
 
@@ -205,6 +206,8 @@
 		<script>
 		document.addEventListener('DOMContentLoaded', function () {
 			  const calendarEl = document.getElementById('appCalendar');
+			  const separator = document.getElementById('separator').value;
+			  //console.log(separator+"!!!!!!!!!!!!!!!");
 			  const calendar = new FullCalendar.Calendar(calendarEl, {
 			      initialView: 'dayGridMonth',
 			      locale: 'ko',
@@ -223,6 +226,51 @@
 			          moreLinkText: "더보기"		       
 			          }
 			      },
+			      eventSources: [ //구글 캘린더로 공휴일 불러오기, 예약 현황 불러오기
+			    	    {
+			    	      events: function (fetchInfo, successCallback, failureCallback) {
+			    	        fetch('/resvehicle/list' + separator)
+			    	          .then(response => response.json())
+			    	          .then(events => successCallback(events))
+			    	          .catch(error => {
+			    	            console.error("내 일정 불러오기 실패", error);
+			    	            failureCallback(error);
+			    	          });
+			    	      }
+			    	    },
+			    	    {
+			    	      events: function (fetchInfo, successCallback, failureCallback) {
+			    	        const apiKey = 'AIzaSyCjXiu1ShbhE0XenBtciLx8ezU-mcZI0R0';
+			    	        const calendarId = 'ko.south_korea%23holiday@group.v.calendar.google.com';
+			    	        const timeMin = new Date(fetchInfo.start).toISOString();
+			    	        const timeMax = new Date(fetchInfo.end).toISOString();
+			    	        const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${timeMin}&timeMax=${timeMax}&orderBy=startTime&singleEvents=true`;
+
+			    	        fetch(url)
+			    	          .then(response => response.json())
+			    	          .then(data => {
+			    	            if (!data.items) {
+			    	              console.warn("공휴일 데이터 없음", data);
+			    	              return successCallback([]);
+			    	            }
+			    	            const holidays = data.items.map(item => ({
+			    	              title: item.summary,
+			    	              start: item.start.date,
+			    	              allDay: true,
+			    	              extendedProps: {
+			    	            	    type: 'holiday'
+			    	            	  }
+			    	              
+			    	            }));
+			    	            successCallback(holidays);
+			    	          })
+			    	          .catch(error => {
+			    	            console.error("공휴일 불러오기 실패", error);
+			    	            failureCallback(error);
+			    	          });
+			    	      }
+			    	    }
+			    	  ],
 			      eventDisplay: 'block',
 			      dayCellContent: function (info) {
 			        return info.date.getDate();

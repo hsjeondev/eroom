@@ -1,5 +1,6 @@
 package com.eroom.reservation.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,9 +8,11 @@ import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eroom.calendar.dto.CompanyCalendarDto;
 import com.eroom.facility.entity.Facility;
 import com.eroom.facility.service.FacilityService;
 import com.eroom.reservation.dto.VehicleDto;
@@ -71,5 +74,20 @@ public class ReservationController {
 		}
 		
 		return resultMap;
+	}
+	
+	//====================목록 조회 =========================
+	@GetMapping("/resvehicle/list/{separator}")
+	@ResponseBody
+	public List<Map<String, Object>> getVehicleList(@PathVariable("separator") String separator){
+		   List<Map<String, Object>> result = new ArrayList<>();
+		    List<VehicleDto> list = vehicleService.getVehicleList(separator);
+		    
+		    for (VehicleDto dto : list) {
+		        result.add(dto.toFullCalendarEvent());
+		    }
+		    
+		    return result;
+		
 	}
 }
