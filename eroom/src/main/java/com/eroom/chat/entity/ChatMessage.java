@@ -1,6 +1,7 @@
 package com.eroom.chat.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -13,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +39,7 @@ public class ChatMessage {
 	
 	@ManyToOne
 	@JoinColumn(name="chatroom_no")
-	private Chatroom chatroomNo; // 챗룸번호
+	private Chatroom chatroom; // 챗룸번호
 	
 	@ManyToOne
 	@JoinColumn(name="sender_member")
@@ -54,8 +56,8 @@ public class ChatMessage {
 	@Column(nullable=false, name="message_is_deleted_yn")
 	private String messageIsDeletedYn = "N"; // 삭제여부
 	
-	
-	
+	@OneToMany(mappedBy = "chatMessage")
+	private List<ChatAlarm> chatAlarmList; // 채팅 알림 리스트
 	
 	
 }
