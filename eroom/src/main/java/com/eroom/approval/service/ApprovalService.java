@@ -24,11 +24,13 @@ public class ApprovalService {
 	private final EmployeeRepository employeeRepository;
 	private final ApprovalLineRepository approvalLineRepository;
 
+	// 내가 올린 결재 리스트 조회 + 신청일 기준으로 최신순 정렬
 	public List<Approval> getMyRequestedApprovals(Long employeeNo, String visible) {
 		List<Approval> resultList = approvalRepository.findByEmployee_EmployeeNoAndApprovalVisibleYnOrderByApprovalRegDateDesc(employeeNo, visible);
 		return resultList;
 	}
 
+	// 결재 생성
 	@Transactional
 	public int createApproval(ApprovalRequestDto dto, Long employeeNo) {
 		try {
@@ -50,12 +52,6 @@ public class ApprovalService {
 			
 			// 1. 결재자 저장
 			ApprovalLine approvalLine = null;
-//			System.out.println(dto.getApproverIds() + " : 결재자들id");
-//			System.out.println(dto.getApproverSteps() + " : 결재자들step");
-//			System.out.println(dto.getAgreerIds() + " : 합의자들id");
-//			System.out.println(dto.getAgreerSteps() + " : 합의자들step");
-//			System.out.println(dto.getRefererIds() + " : 참조자들id");
-//			System.out.println(dto.getRefererSteps() + " : 참조자들step");
 			for (int i = 0; i < dto.getApproverIds().size(); i++) {
 				
 				approvalLine = ApprovalLine.builder()
@@ -100,11 +96,11 @@ public class ApprovalService {
 		}
 	}
 
-	public Approval selecApprovalByApprovalNo(Long approvalNo) {
+	// 결재 번호로 결재 조회
+	public Approval selectApprovalByApprovalNo(Long approvalNo) {
 		Approval approval = approvalRepository.findById(approvalNo).orElse(null);
 		return approval;
 	}
-
 
 	public int updateVisibleYn(Long approvalNo) {
 		int result = 0;
@@ -122,6 +118,12 @@ public class ApprovalService {
 			result = 0;
 		}
 		return result;
+	}
+
+	// 결재 번호로 결재 리스트 조회
+	public List<Approval> getApprovalListByApprovalNo(Long approvalNo, String visible) {
+		List<Approval> resultList = approvalRepository.findByApprovalNoAndApprovalVisibleYnOrderByApprovalRegDateDesc(approvalNo, visible);
+		return resultList;
 	}
 
 

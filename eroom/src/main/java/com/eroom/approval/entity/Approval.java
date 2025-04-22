@@ -1,11 +1,11 @@
 package com.eroom.approval.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import com.eroom.employee.entity.Employee;
 import com.eroom.approval.JsonToMapConverter;
+import com.eroom.employee.entity.Employee;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -65,7 +65,7 @@ public class Approval {
 	
 	@OneToMany(mappedBy = "approval")
 	@OrderBy("approvalLineNo ASC")
-	private Set<ApprovalLine> approvalLines;
+	private List<ApprovalLine> approvalLines;
 
 
 
