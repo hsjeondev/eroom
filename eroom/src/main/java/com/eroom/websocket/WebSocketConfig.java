@@ -18,9 +18,11 @@ public class WebSocketConfig implements WebSocketConfigurer{
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 		registry.addHandler(basicWebSocketHandler, "/ws/basic")
+		        .addInterceptors(new CustomHandshakeInterceptor()) // 핸드쉐이크 인터셉터 추가
 				.setAllowedOrigins("http://localhost:8080");
 		
 		registry.addHandler(chatWebSocketHandler, "/ws/chat")
+				.addInterceptors(new CustomHandshakeInterceptor())
 				.setAllowedOrigins("http://localhost:8080");
 	}
 }
