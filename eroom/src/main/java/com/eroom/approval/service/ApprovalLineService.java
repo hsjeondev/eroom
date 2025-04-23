@@ -33,18 +33,6 @@ public class ApprovalLineService {
 	}
 
 
-	public Boolean isMyReceivedApproval(Long approval_no, Long employee_no) {
-		Boolean isMyReceived = false;
-		List<ApprovalLine> approvalLines = approvalLineRepository.findApprovalLines(approval_no);
-		for (ApprovalLine app : approvalLines) {
-			if (app.getEmployee().getEmployeeNo() == employee_no) {
-				isMyReceived = true;
-				break;
-			}
-		}
-		return isMyReceived;
-	}
-
 	@Transactional
 	public int approvalLineApproveDeny(ApprovalLine approvalLine) {
 		int result = 0;
@@ -63,6 +51,19 @@ public class ApprovalLineService {
 		}
 		return result;
 	}
+
+	public Boolean isMyLineApproval(Long approval_no, Long employee_no) {
+		Boolean isMyLineApproval = false;
+		List<ApprovalLine> approvalLines = approvalLineRepository.findApprovalLines(approval_no);
+		for (ApprovalLine app : approvalLines) {
+			if (app.getEmployee().getEmployeeNo() == employee_no) {
+				isMyLineApproval = true;
+				break;
+			}
+		}
+		return isMyLineApproval;
+	}
+
 	
 	
 }

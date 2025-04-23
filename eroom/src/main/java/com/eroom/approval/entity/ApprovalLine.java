@@ -48,7 +48,7 @@ public class ApprovalLine {
 	@Column(name="approval_line_status")
 	private String approvalLineStatus; // 결재여부(A승인, S대기, D반려)
 	
-	@Column(name="approval_line_signed_date")
+	@Column(name="approval_line_signed_date", insertable = false)
 	private LocalDateTime approvalLineSignedDate; // 결재 라인 결재일
 	
 	@Column(name = "approval_line_deny_reason")
