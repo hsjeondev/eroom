@@ -20,4 +20,13 @@ public class ApprovalLineService {
 		List<ApprovalLine> resultList = approvalLineRepository.findApprovalLines(approvalNo);
 		return resultList;
 	}
+
+	
+	// 회원 번호로 결재 라인 조회
+	public List<ApprovalLine> getApprovalLineByEmployeeNo(Long employeeNo) {
+		List<ApprovalLine> resultList = approvalLineRepository.findApprovalLinesByEmployee_EmployeeNo(employeeNo);
+		return resultList;
+	}
+	
+	
 }
