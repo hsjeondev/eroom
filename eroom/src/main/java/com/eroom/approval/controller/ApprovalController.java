@@ -413,17 +413,22 @@ public class ApprovalController {
 					List<ApprovalLine> temp = approval.getApprovalLines();
 					Boolean bool = false;
 					Boolean stackBool = false;
+					int count = 0;
 					// step이 0인 사람(합의자) 중 결재 상태가 A인 사람이 한명이라도 있으면 stackBool = false처리
 					for(int i = 0; i < temp.size(); i++) {
 						if(temp.get(i).getApprovalLineStep() != 0) {
 							continue;
 						}
-						if(temp.get(i).getApprovalLineStep() == 0 && !temp.get(i).getApprovalLineStatus().equals("A")) {
-							stackBool = false;
-							break;
-						} else if(temp.get(i).getApprovalLineStep() == 0 && temp.get(i).getApprovalLineStatus().equals("A")) {
-							stackBool = true;
+						if(temp.get(i).getApprovalLineStep() == 0) {
+							count++;
+							if(!temp.get(i).getApprovalLineStatus().equals("A")) {
+								stackBool = false;
+								break;
+							} else if(temp.get(i).getApprovalLineStatus().equals("A")) {
+								stackBool = true;
+							}
 						}
+						
 						
 				    }
 					// 결재 라인에 있는 사람들 중~
@@ -443,9 +448,16 @@ public class ApprovalController {
 							}
 						}
 						// 모든 합의자가 status = A, 나의 결재 차례인 경우에만 approval을 담아서 보내기
-						if(bool && stackBool && !approval.getApprovalStatus().equals("F")) {
-							temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
-							resultApprovalList.add(temp2);
+						if(count == 0) {
+							if(bool && !approval.getApprovalStatus().equals("F")) {
+								temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
+								resultApprovalList.add(temp2);
+							}
+						} else {
+							if(bool && stackBool && !approval.getApprovalStatus().equals("F")) {
+								temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
+								resultApprovalList.add(temp2);
+							}
 						}
 					}
 				}
