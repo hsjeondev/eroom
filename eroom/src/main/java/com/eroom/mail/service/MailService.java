@@ -1,5 +1,6 @@
 package com.eroom.mail.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -13,7 +14,6 @@ import com.eroom.mail.entity.Mail;
 import com.eroom.mail.entity.MailReceiver;
 import com.eroom.mail.repository.MailReceiverRepository;
 import com.eroom.mail.repository.MailRepository;
-import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +25,16 @@ public class MailService {
 	private final MailReceiverRepository mailReceiverRepository;
 	private final EmployeeRepository employeeRepository;
 
+	public void moveToTrash(Long employeeNo, Long id) {
+	    mailReceiverRepository.updateDeletedYn(employeeNo, id);
+	}
+	
+	@Transactional
+	public void deleteReceivedMailById(Long employeeNo,Long mailReceiverNo) {
+	    mailReceiverRepository.deleteByIdAndEmployeeNo(employeeNo, mailReceiverNo);
+	}
+	
+	// 디테일 조회할때 읽음 컬럼 N => Y로 업데이트
 	@Transactional
 	public Mail selectMailOne(Long employeeNo,Long id) {
 		
@@ -32,6 +42,39 @@ public class MailService {
 		return mailRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("메일을 찾을 수 없습니다."));
 	}
 	
+	public List<MailReceiver> getTrashMailsByEmployee(Long employeeNo, String sortOrder) {
+	    List<MailReceiver> resultList;
+
+	    if ("latest".equals(sortOrder)) {
+	        resultList = mailReceiverRepository.findByEmployeeNoOrderByLatest(employeeNo);
+	    } else if ("oldest".equals(sortOrder)) {
+	        resultList = mailReceiverRepository.findByEmployeeNoOrderByOldest(employeeNo);
+	    } else {
+	        throw new IllegalArgumentException("유효하지 않은 정렬 조건: " + sortOrder);
+	    }
+
+	    return filterOnlyDeletedMails(resultList);
+	}
+	
+	// 휴지통 여부 로직 메소드
+	public List<MailReceiver> filterNotDeletedMails(List<MailReceiver> mails) {
+	    List<MailReceiver> result = new ArrayList<>();
+	    for (MailReceiver mail : mails) {
+	        if (!"Y".equals(mail.getMailReceiverDeletedYn())) {
+	            result.add(mail);
+	        }
+	    }
+	    return result;
+	}
+	private List<MailReceiver> filterOnlyDeletedMails(List<MailReceiver> mails) {
+	    List<MailReceiver> result = new ArrayList<>();
+	    for (MailReceiver mail : mails) {
+	        if ("Y".equals(mail.getMailReceiverDeletedYn())) {
+	            result.add(mail);
+	        }
+	    }
+	    return result;
+	}
 	
 	// 받은 메일 조회
 	/*public List<MailReceiver> getReceivedMailsByEmployee(Long employeeNo) {
@@ -45,7 +88,8 @@ public class MailService {
 		}else if(sortOrder.equals("oldest")) {
 			 resultList= mailReceiverRepository.findByEmployeeNoOrderByOldest(employeeNo);
 		}
-		return resultList;
+		// 휴지통 Y여부 확인해서 걸러줌
+		return filterNotDeletedMails(resultList);
 	}
 	
     // 본인 메일 조회
