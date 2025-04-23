@@ -74,14 +74,21 @@ public class VehicleDto {
 	    event.put("title", "[" + this.vehicleName + "] " + this.reserverName);
 	    event.put("start", this.reservation_start != null ? this.reservation_start.toString() : "");
 	    event.put("end", this.reservation_end != null ? this.reservation_end.toString() : "");
-	    event.put("location", this.reservation_location != null ? this.reservation_location : "");
+
+
+	    // FullCalendar에서 사용할 정보들 추가
+	    event.put("reservation_no", this.reservation_no);  
+	    event.put("vehicleName", this.vehicleName);        
+	    event.put("reserverName", this.reserverName);    
+	    event.put("reservationLocation", this.reservation_location); 
+
 	    event.put("separator", this.separator_code != null ? this.separator_code : "");
-	    event.put("calendar_creator", this.reservation_creator != null ? this.reservation_creator : "");
-	    event.put("calendar_no", this.reservation_no);  // FullCalendar에서 id 대신 사용할 수도 있음
-	    event.put("type", "vehicle"); // 일정 타입을 명시해줄 수도 있어요
+	    event.put("reservationCreator", this.reservation_creator != null ? this.reservation_creator : "");
+	    event.put("type", "vehicle");
 
 	    return event;
 	}
+
 	
 	
 }

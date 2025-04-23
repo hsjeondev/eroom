@@ -2,7 +2,7 @@ package com.eroom.reservation.repository;
 
 
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,8 +15,13 @@ import com.eroom.reservation.entity.Vehicle;
 public interface VehicleRepository extends JpaRepository<Vehicle,Long>,JpaSpecificationExecutor<Vehicle> {
 	List<Vehicle> findBySeparatorCodeAndVisibleYn(String separatorCode, String visibleYn);
 	
-	 @Query("SELECT v FROM Vehicle v WHERE v.facilityNo = :facilityNo AND FUNCTION('DATE', v.reservationStart) = :date")
-	    List<Vehicle> findByFacilityNoAndReservationDate(@Param("facilityNo") String facilityNo,
-	                                                     @Param("date") LocalDate date);
+	@Query("SELECT v FROM Vehicle v WHERE v.facilityNo = :facilityNo AND v.reservationStart >= :startOfDay AND v.reservationStart < :endOfDay")
+	List<Vehicle> findByFacilityNoAndReservationDate(
+	    @Param("facilityNo") Long facilityNo,
+	    @Param("startOfDay") LocalDateTime startOfDay,
+	    @Param("endOfDay") LocalDateTime endOfDay
+	);
+	 
+	 List<Vehicle> findByFacilityNo(Long facilityNo);
 	
 }
