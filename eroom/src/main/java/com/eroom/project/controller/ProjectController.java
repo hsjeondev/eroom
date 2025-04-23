@@ -85,6 +85,7 @@ public class ProjectController {
 		
 		ProjectDto project = projectService.findByProjectNo(project_no);
 		model.addAttribute("project", project);
+		model.addAttribute("description", project.getDescription().replace("\n", "<br>"));
 		
 		return "project/projectDetailMain";
 	}
@@ -208,6 +209,54 @@ public class ProjectController {
 		return employeeService.findEmployeesByParentCode(separatorCode);
 	}
 }
+	
+	@GetMapping("/{project_no}/update")
+	public String updateProjectView(@PathVariable("project_no") Long projectNo, Model model) {
+	    
+	    ProjectDto project = projectService.findByProjectNo(projectNo);
+
+	    List<Long> pmIds = new ArrayList<>();
+	    List<String> pmNames = new ArrayList<>();
+	    List<Long> managerIds = new ArrayList<>();
+	    List<String> managerNames = new ArrayList<>();
+	    List<Long> participantIds = new ArrayList<>();
+	    List<String> participantNames = new ArrayList<>();
+
+	    for (ProjectMemberDto dto : project.getProject_members()) {
+	        if ("Y".equals(dto.getProject_manager())) {
+	            pmIds.add(dto.getProject_member().getEmployeeNo());
+	            pmNames.add(dto.getProject_member().getEmployeeName());
+	        }
+	        
+	        if ("Y".equals(dto.getIs_manager())) {
+	            managerIds.add(dto.getProject_member().getEmployeeNo());
+	            managerNames.add(dto.getProject_member().getEmployeeName());
+	        } else if ("N".equals(dto.getIs_manager())) {
+	            participantIds.add(dto.getProject_member().getEmployeeNo());
+	            participantNames.add(dto.getProject_member().getEmployeeName());
+	        }
+	    }
+
+	    model.addAttribute("pmIds", pmIds);
+	    model.addAttribute("pmNames", String.join(", ", pmNames));
+	    model.addAttribute("managerIds", managerIds);
+	    model.addAttribute("managerNames", String.join(", ", managerNames));
+	    model.addAttribute("participantIds", participantIds);
+	    model.addAttribute("participantNames", String.join(", ", participantNames));
+	    model.addAttribute("project", project);
+
+	    return "project/projectUpdate";
+	}
+
+	
+	@PostMapping("/{project_no}/update")
+	@ResponseBody
+	public Map<String, String> updateProjectApi(@PathVariable("project_no") Long projectNo) {
+		
+		Map<String, String> map = new HashMap<String, String>();
+		
+		return map;
+	}
 
 	
 }
