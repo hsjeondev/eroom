@@ -110,7 +110,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				<div class="mb-3">
 				  <strong>개발 :</strong>
 				  <span th:each="member : ${project.project_members}"
-				        th:if="${member.project_member.structure.codeName == '영업지원팀' and member.is_manager == 'N'}"
+				        th:if="${member.project_member.structure.codeName == '개발팀' and member.is_manager == 'N'}"
 				        class="me-2 d-inline-block text-muted"
 				        th:text="|${member.project_member.employeeName}(${member.project_member.employeePosition}/${member.project_member.structure.codeName})|">
 				    이름(직급/개발)
