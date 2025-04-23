@@ -16,48 +16,13 @@
                 <div class="card-body">
                   <form method="post" class="d-flex flex-column h-100"
                   action="/mail/create" name="mail_create_form" enctype="multipart/form-data">
-                  
                   <!-- 본인 히든 처리 -->
                   <input type="hidden" name="employee_no"
 								th:value="${#authentication.principal.employee.employeeNo}" />
-								
                     <div class="row g-3 mb-2">
-                      <!-- <div class="col-4">
-                        <input class="form-control" type="text" name="receiver" placeholder="받는 사람" />
-                      </div> -->
-                      
-                      
-                      
-                      
-                      <!-- test  -->
-                    <div class="col-4">
-                   		<input class="form-control" type="text" name="receiver" placeholder="받는 사람" id="receiverInput" readonly data-bs-toggle="modal" data-bs-target="#orgModal" />
-                   </div>
-                     <!-- <div class="modal fade" id="orgModal" tabindex="-1" aria-labelledby="orgModalLabel" aria-hidden="true">
-						  <div class="modal-dialog modal-lg">
-						    <div class="modal-content">
-						      <div class="modal-header">
-						        <h5 class="modal-title" id="orgModalLabel">조직도에서 직원 선택</h5>
-						        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-						      </div>
-						      <div class="modal-body">
-						        Thymeleaf로 구성된 조직도 or 사원 리스트
-						        <div class="row">
-						          <div class="col">
-						            <ul>
-						              <li th:each="emp : ${employeeList}">
-						                <button type="button" class="btn btn-light mb-1 select-employee-btn"
-						                  th:text="${emp.employeeName}"
-						                  >
-						                </button>
-						              </li>
-						            </ul>
-						          </div>
-						        </div>
-						      </div>
-						    </div>
-						  </div>
-					</div> -->
+	                    <div class="col-4">
+	                   		<input class="form-control" type="text" name="receiver" placeholder="받는 사람" id="receiverInput" readonly data-bs-toggle="modal" data-bs-target="#orgModal" />
+	                   </div>
 						<!-- 이메일 정보 서칭하는거 -->
 									<!-- <div th:each="employee : ${employeeList}">
     <span th:text="${employee.directory != null && employee.directory.directoryEmail != null ? employee.directory.directoryEmail : '이메일 없음'}"></span>
