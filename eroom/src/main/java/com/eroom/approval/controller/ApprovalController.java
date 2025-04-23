@@ -631,7 +631,7 @@ public class ApprovalController {
 		
 		return "/approval/referencedApprovals";
 	}
-	@GetMapping("/approval/withdrawnApprovals")
+	@GetMapping("/approval/fallBackApprovals")
 	public String selectWithdrawnApprovalsList(Model model, Authentication authentication) {
 		// 로그인한 사용자 정보 가져오기
 		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
@@ -662,7 +662,7 @@ public class ApprovalController {
 		model.addAttribute("resultList", resultList);
 		
 		
-		return "/approval/withdrawnApprovals";
+		return "/approval/fallBackApprovals";
 	}
 	
 	
