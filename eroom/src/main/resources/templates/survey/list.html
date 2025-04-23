@@ -428,16 +428,18 @@
 		
 		// 득표수 표시
 		function showVoteResult(surveyId) {
-		  fetch(`/survey/vote-result?id=${surveyId}`)
-		    .then(res => res.json())
-		    .then(data => {
+		  fetch('/survey/vote-result?id=' + surveyId)
+		    .then(function(res) {
+		      return res.json();
+		    })
+		    .then(function(data) {
 		      const itemList = document.getElementById('surveyItemList-' + surveyId);
 		      itemList.innerHTML = '';
-		      
+		
 		      const allowAnonymous = document.getElementById('survey-detail-' + surveyId)
-              .getAttribute('data-anonymous') === 'on';
-		      
-		      data.forEach((item, index) => {
+		        .getAttribute('data-anonymous') === 'on';
+		
+		      data.forEach(function(item, index) {
 		        const wrapper = document.createElement('div');
 		        wrapper.className = 'd-flex justify-content-between align-items-center rounded p-2 mb-2 bg-light text-dark border';
 		
@@ -446,39 +448,55 @@
 		        label.textContent = item.name;
 		
 		        const voteCount = document.createElement('span');
-		        voteCount.textContent = `${item.count}표`;
+		        voteCount.textContent = item.count + '표';
 		        voteCount.setAttribute('data-bs-toggle', 'tooltip');
-		        voteCount.setAttribute('title', item.voters.join(', '));
-		        
 		        voteCount.setAttribute('title', allowAnonymous ? '익명 투표' : item.voters.join(', '));
+		
+		        if (item.voted === "Y") {
+		          label.innerHTML += ' <span class="badge bg-success ms-2">내 투표</span>';
+		          wrapper.classList.add('border-success', 'border-2');
+		        }
 		
 		        wrapper.appendChild(label);
 		        wrapper.appendChild(voteCount);
 		        itemList.appendChild(wrapper);
 		      });
 		
-		      // Bootstrap Tooltip 활성화
-		      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-		      tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+		      // 툴팁 활성화
+		      const tooltipTriggerList = [].slice.call(itemList.querySelectorAll('[data-bs-toggle="tooltip"]'));
+		      tooltipTriggerList.forEach(function (el) {
+		        const existing = bootstrap.Tooltip.getInstance(el);
+		        if (existing) existing.dispose();
+		        new bootstrap.Tooltip(el);
+		      });
 		    });
 		}
+		
+		// 모달 열릴 때 투표 결과 + 툴팁 다시 적용
+		document.addEventListener('shown.bs.modal', function (event) {
+		  const modal = event.target;
+		  if (modal.id && modal.id.startsWith('survey-detail-')) {
+		    const surveyId = modal.id.replace('survey-detail-', '');
+		    showVoteResult(surveyId);
+		  }
+		});
 	</script>
 	<!-- 모달 닫기 확인창 -->
 	<div class="modal fade" id="confirmCloseModal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-sm">
-			<div class="modal-content bg-dark text-white rounded-3 shadow-lg border border-white">
+			<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
 				<div class="modal-header border-0">
-					<h5 class="modal-title text-light">정말 닫을까요?</h5>
-					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="닫기"></button>
+					<h5 class="modal-title text-dark">정말 닫을까요?</h5>
+					<button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="닫기"></button>
 				</div>
 				<div class="modal-body text-center">
-					<p class="mb-0">
+					<p class="mb-0 text-body">
 						작성 중인 내용이 사라집니다.<br>정말 닫으시겠습니까?
 					</p>
 				</div>
 				<div class="modal-footer justify-content-center border-0">
-					<button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">취소</button>
-					<button type="button" class="btn btn-danger btn-sm" id="confirmCloseBtn">확인</button>
+					<button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+					<button type="button" class="btn btn-danger" id="confirmCloseBtn">확인</button>
 				</div>
 			</div>
 		</div>
