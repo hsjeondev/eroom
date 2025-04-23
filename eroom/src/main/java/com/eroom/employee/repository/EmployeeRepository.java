@@ -37,6 +37,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 	@Query("SELECT e FROM Employee e WHERE e.structure.structureNo = :teamId")
 	List<Employee> findEmployeesByTeamId(@Param("teamId") String teamId);
 	
+	//Vehicle Reservation에서 예약자 이름을 가져옴
+	Employee findByEmployeeNo(Long long1);
+	
 	
 
 }
