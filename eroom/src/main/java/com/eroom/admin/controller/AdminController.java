@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -219,6 +220,23 @@ public class AdminController {
 	@ResponseBody
 	public Map<String,Object> getEmployeeChartData(@RequestParam("employeeNo") Long employeeNo) {
 		return attendanceService.getAttendanceChartDataByEmployeeNo(employeeNo);
+	}
+	
+	// 회원의 근태 기록 상세
+	@GetMapping("/attendanceDetail")
+	@ResponseBody
+	public AttendanceDto getAttendanceDetail(@RequestParam("attendanceNo") Long attendanceNo){
+		return attendanceService.findAttendanceByNo(attendanceNo);
+	}
+	
+	@PostMapping("attendanceUpdate")
+	@ResponseBody
+	public Map<String, Object> updateAttendance(@RequestParam("attendanceNo") Long attendanceNo,
+			@RequestParam("attendanceCheckInTime") String attendanceCheckInTime,
+			@RequestParam("attendanceCheckOutTime") String attendanceCheckOutTime) {
+		// 출근시간, 퇴근시간 수정
+		// return attendanceService.updateAttendance(attendanceNo, attendanceCheckInTime, attendanceCheckOutTime);
+		return null;
 	}
 	
 	

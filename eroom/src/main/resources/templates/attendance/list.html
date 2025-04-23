@@ -42,17 +42,8 @@
 <body>
 <main class="main" id="top" layout:fragment="content">
   <div class="mb-9">
-    <div class="d-flex justify-content-between align-items-center mb-2 position-relative"
-    	th:if="${employee.employeeId != 'admin'}">
+    <div class="d-flex justify-content-between align-items-center mb-2 position-relative">
       <span class="fw-bold fs-7">근태</span>
-      <div class="position-absolute start-50 translate-middle-x">
-        <span class="current-time fw-bold text-secondary fs-6 mb-0" id="currentTime"></span>
-      </div>
-    </div>
-    
-    <div class="d-flex justify-content-between align-items-center mb-2 position-relative"
-        th:if="${employee.employeeId == 'admin'}">
-      <span class="fw-bold fs-7">근태 / 회원 정보 수정</span>
       <div class="position-absolute start-50 translate-middle-x">
         <span class="current-time fw-bold text-secondary fs-6 mb-0" id="currentTime"></span>
       </div>
@@ -64,28 +55,7 @@
       <div class="col-md-4">
         <div class="card">
           <div class="card-body d-flex align-items-center">
-			<!-- 관리자일 때 -->
-			<div class="profile-wrapper me-3" th:if="${employee.employeeId == 'admin'}"
-			     data-bs-toggle="modal" data-bs-target="#profileUploadModal" style="position: relative; cursor: pointer;">
-			  <img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
-			  <div class="camera-overlay" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0;
-			                                     background-color: rgba(0, 0, 0, 0.4); border-radius: 50%;
-			                                     display: flex; align-items: center; justify-content: center;">
-			    <svg class="svg-inline--fa fa-camera fs-4 text-white" aria-hidden="true" focusable="false"
-			         data-prefix="fas" data-icon="camera" role="img"
-			         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 24px; height: 24px;">
-			      <path fill="currentColor"
-			            d="M149.1 64.3c7.8-14.3 22.9-23.1 39.4-23.1h134.9c16.5 0 31.6 8.9 39.4 23.1l14.9 27.4H464
-			             c26.5 0 48 21.5 48 48v272c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V139.7c0-26.5
-			             21.5-48 48-48h86.1l14.9-27.4zM256 408c66.3 0 120-53.7 120-120s-53.7-120-120-120
-			             s-120 53.7-120 120s53.7 120 120 120zm0-48a72 72 0 1 0 0-144 72 72 0 1 0 0 144z">
-			      </path>
-			    </svg>
-			  </div>
-			</div>
-			
-			<!-- 관리자 아닐 때 -->
-			<div class="profile-wrapper me-3" th:if="${employee.employeeId != 'admin'}">
+			<div class="profile-wrapper me-3">
 			  <img class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
 			</div>
             <div class="text-start">
@@ -94,20 +64,6 @@
             </div>
           </div>
           <div class="card-footer border-top border-dashed pt-3">
-   			<div class="d-flex align-items-center mb-2" th:if="${employee.employeeId == 'admin'}">
-				<!-- <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span> -->
-				
-				<!--  수정 버튼 -->
-				<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0" id="editAnnualLeaveBtn"
-				        data-bs-toggle="modal" data-bs-target="#editInfoModal">
-					<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
-					     focusable="false" data-prefix="fas" data-icon="pen" role="img"
-					     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-						<path fill="currentColor"
-					        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
-					</svg>
-				</button>
-			</div> 
             <div class="d-flex justify-content-around">
               <div>
                 <div class="fw-bold fs-8 text-center">총 연차</div>
@@ -163,20 +119,6 @@
       <div class="col-md-4">
         <div class="card">
           <div class="card-body fs-9">
-			<div class="d-flex align-items-center mb-2" th:if="${employee.employeeId == 'admin'}">
-				<!-- <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span> -->
-				
-				<!--  수정 버튼 -->
-				<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0" id="editDirectoryBtn"
-				        data-bs-toggle="modal" data-bs-target="#editInfoModal">
-					<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
-					     focusable="false" data-prefix="fas" data-icon="pen" role="img"
-					     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-						<path fill="currentColor"
-					        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
-					</svg>
-				</button>
-			</div>          
             <h5 class="text-body-secondary">사번</h5>
             <p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
             <h5 class="text-body-secondary">직급</h5>
@@ -230,7 +172,7 @@
     </div>
     <!-- 날짜 선택 -->
     <div>
-    <form th:action="@{/attendance/list}" method="get" id="monthSelectForm">
+    <form th:action="@{/attendance/list}" method="get" id="monthSelectForm" th:if="${monthList != null}">
 	      <select class="form-select form-select-sm" data-list-filter="data-list-filter" 
 	      	name="month" id="month" onchange="this.form.submit()">
 	        <option th:each="month : ${monthList}"
@@ -253,7 +195,6 @@
 					<th class="sort" data-sort="checkout" style="width:25%;">퇴근 시간</th>
 					<th class ="sort" data-sort="late" style="width:10%">지각</th>
 					<th class ="sort" data-sort="early" style="width:10%">조퇴</th>
-					<th class="text-end-pe-0" th:if="${employee.employeeId == 'admin'}"></th>
 				</tr>
 			</thead>
 			<tbody class="list align-middle">
@@ -265,19 +206,6 @@
 				  <td class="checkout" th:text="${#temporals.format(attendance.attendance_check_out_time, 'HH:mm:ss')}">퇴근 시간</td>
 				  <td class="late" th:text="${attendance.attendance_late_yn == 'Y' ? '지각' : '-'}">지각</td>
 				  <td class="early" th:text="${attendance.attendance_early_leave_yn == 'Y' ? '조퇴' : '-'}">조퇴</td>
-				  <td class="text-end pe-0" th:if="${employee.employeeId == 'admin'}">
-					<div class="btn-reveal-trigger position-static">
-						<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-						  <i class="fas fa-ellipsis fs-10"></i>
-						</button>
-						<div class="dropdown-menu dropdown-menu-end py-2">
-						  <a class="dropdown-item" href="#!" data-bs-toggle="modal" data-bs-target="#editAttendanceModal">수정</a>
-						  <div class="dropdown-divider"></div>
-						  <a class="dropdown-item text-danger" href="#!">삭제</a>
-						</div>
-					</div>
-				 </td>
-				  
 				</tr>
 				<tr th:if="${#lists.isEmpty(attendanceList)}">
 				    <td colspan="5" class="text-center"> 근태 정보가 없습니다.</td>

@@ -439,5 +439,11 @@ public class AttendanceService {
 		return result;
 	}
 	
+	// 근태기록 상세 조회
+	public AttendanceDto findAttendanceByNo(Long attendanceNo) {
+		Attendance attendance = attendanceRepository.findById(attendanceNo).orElse(null);
+		return new AttendanceDto().toDto(attendance);
+	}
+	
 
 }

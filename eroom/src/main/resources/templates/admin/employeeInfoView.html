@@ -264,7 +264,9 @@
 						  <i class="fas fa-ellipsis fs-10"></i>
 						</button>
 						<div class="dropdown-menu dropdown-menu-end py-2">
-						  <a class="dropdown-item" href="#!" data-bs-toggle="modal" data-bs-target="#editAttendanceModal">수정</a>
+						  <a class="dropdown-item open-edit-modal"  href="#!"
+						  	data-bs-toggle="modal" data-bs-target="#editAttendanceModal"
+						   th:attr="data-attendance-no=${attendance.attendance_no}">수정</a>
 						  <div class="dropdown-divider"></div>
 						  <a class="dropdown-item text-danger" href="#!">삭제</a>
 						</div>
@@ -311,45 +313,102 @@
 	      <!-- 바디 -->
 	      <div class="modal-body px-4 py-2">
 	
-<!-- 출근일시 + 지각 -->
-<div class="mb-3">
-  <label for="editCheckInTime" class="form-label fw-semibold">출근일시</label>
-  <div class="d-flex align-items-center justify-content-between">
-    <input type="datetime-local" class="form-control" id="editCheckInTime"
-           name="attendance_check_in_time" style="width: 70%;">
-    
-    <!-- 체크박스와 라벨을 따로 정렬 -->
-    <div class="d-flex align-items-center ms-2" style="width: 30%; justify-content: flex-start;">
-      <input class="form-check-input mt-0 me-2" type="checkbox" id="lateCheckbox" name="attendance_late_yn">
-      <label for="lateCheckbox" class="form-label mb-0">지각</label>
-    </div>
-  </div>
-</div>
-
-<!-- 퇴근일시 + 조퇴 -->
-<div class="mb-3">
-  <label for="editCheckOutTime" class="form-label fw-semibold">퇴근일시</label>
-  <div class="d-flex align-items-center justify-content-between">
-    <input type="datetime-local" class="form-control" id="editCheckOutTime"
-           name="attendance_check_out_time" style="width: 70%;">
-    
-    <div class="d-flex align-items-center ms-2" style="width: 30%; justify-content: flex-start;">
-      <input class="form-check-input mt-0 me-2" type="checkbox" id="earlyLeaveCheckbox" name="attendance_early_leave_yn">
-      <label for="earlyLeaveCheckbox" class="form-label mb-0">조퇴</label>
-    </div>
-  </div>
-</div>
+			<!-- 출근일시 + 지각 -->
+			<div class="mb-3">
+			  <label for="editCheckInTime" class="form-label fw-semibold">출근일시</label>
+			  <div class="d-flex align-items-center justify-content-between">
+			    <input type="datetime-local" class="form-control" id="editCheckInTime"
+			           name="attendance_check_in_time" style="width: 70%;">
+			    
+			    <!-- 체크박스와 라벨을 따로 정렬 -->
+			<!--     <div class="d-flex align-items-center ms-2" style="width: 30%; justify-content: flex-start;">
+			      <input class="form-check-input mt-0 me-2" type="checkbox" id="lateCheckbox" name="attendance_late_yn">
+			      <label for="lateCheckbox" class="form-label mb-0">지각</label>
+			    </div> -->
+			    <span id="lateStatus" class="ms-2 text-danger fw-semi-bold" style="width: 20%; text-align: right">지각여부</span>
+			  </div>
+			</div>
+			
+			<!-- 퇴근일시 + 조퇴 -->
+			<div class="mb-3">
+			  <label for="editCheckOutTime" class="form-label fw-semibold">퇴근일시</label>
+			  <div class="d-flex align-items-center justify-content-between">
+			    <input type="datetime-local" class="form-control" id="editCheckOutTime"
+			           name="attendance_check_out_time" style="width: 70%;">
+			    
+			<!--     <div class="d-flex align-items-center ms-2" style="width: 30%; justify-content: flex-start;">
+			      <input class="form-check-input mt-0 me-2" type="checkbox" id="earlyLeaveCheckbox" name="attendance_early_leave_yn">
+			      <label for="earlyLeaveCheckbox" class="form-label mb-0">조퇴</label>
+			    </div> -->
+			    <span id="earlyLeaveStatus" class="ms-2 text-danger fw-semi-bold" style="width: 20%; text-align: right">조퇴여부</span>
+			  </div>
+			</div>
 	
 	      </div>
 	
 	      <!-- 푸터 -->
 	      <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
 	        <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">취소</button>
-	        <button type="submit" class="btn btn-primary">일정 등록</button>
+	        <button type="submit" class="btn btn-primary">수정하기</button>
 	      </div>
 	    </form>
 	  </div>
 	</div>
+</div>
+
+<!-- confirm Modal -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmSaveModalLabel">수정 확인</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        정말 수정하시겠습니까?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="cancelSaveBtn">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alert Modal (닫기 경고용) -->
+<div class="modal fade" id="unsavedAlertModal" tabindex="-1" aria-labelledby="unsavedAlertModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="unsavedAlertModalLabel">수정 이력 감지됨</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        수정된 이력이 존재합니다. 창을 닫으면 입력한 정보는 사라집니다.<br>계속 닫으시겠습니까?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="stayModalBtn">아니오</button>
+        <button type="button" class="btn btn-danger" id="confirmCloseBtn">예</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 수정 이력 없음 안내 모달 -->
+<div class="modal fade" id="noChangeModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">알림</h5>
+        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        수정된 이력이 없습니다.
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
 </div>
 <script>
 	// 상단에 현재 날짜 표시
@@ -490,6 +549,326 @@
 		});
 	}
 	renderCharts();
+	
+	// ✅ 출퇴근 수정 모달에 필요한 변수 초기화
+	let originalData = {
+	  checkInTime: '',
+	  checkOutTime: '',
+	  attendanceNo: null
+	};
+
+	let hideTriggered = false; // 모달 강제 닫기 여부
+
+	// ✅ 모달 객체 생성 또는 가져오기
+	const editModal = document.getElementById('editAttendanceModal');
+	const bsEditModal = bootstrap.Modal.getInstance(editModal) || new bootstrap.Modal(editModal);
+
+	// ✅ DOMContentLoaded 이후 실행 보장
+	// 모달을 자동 열고, fetch로 데이터 채우고, originalData 저장
+document.addEventListener('DOMContentLoaded', function () {
+  const editButtons = document.querySelectorAll('[data-bs-target="#editAttendanceModal"]');
+
+  editButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      const attendanceNo = this.getAttribute('data-attendance-no');
+      fetch(`/admin/attendanceDetail?attendanceNo=${attendanceNo}`)
+        .then(response => response.json())
+        .then(data => {
+          console.log('받아온 데이터:', data); // 콘솔 확인
+
+          // datetime-local input 형식으로 바꾸기
+          const checkIn = data.attendance_check_in_time?.replace(' ', 'T') || '';
+          const checkOut = data.attendance_check_out_time?.replace(' ', 'T') || '';
+
+          // input에 값 세팅
+          document.getElementById('editCheckInTime').value = checkIn;
+          document.getElementById('editCheckOutTime').value = checkOut;
+          document.getElementById('lateStatus').textContent = data.attendance_late_yn === 'Y' ? '지각' : '-';
+          document.getElementById('earlyLeaveStatus').textContent = data.attendance_early_leave_yn === 'Y' ? '조퇴' : '-';
+        })
+        .catch(err => {
+          console.error('서버 요청 실패:', err);
+        });
+    });
+  });
+});
+
+
+	// ✅ 모달 닫힐 때 수정 여부 체크
+	editModal.addEventListener('hide.bs.modal', function (e) {
+	  if (hideTriggered) {
+	    hideTriggered = false;
+	    return;
+	  }
+
+	  const currentCheckIn = document.getElementById('editCheckInTime').value;
+	  const currentCheckOut = document.getElementById('editCheckOutTime').value;
+
+	  const isModified = (
+	    currentCheckIn !== originalData.checkInTime ||
+	    currentCheckOut !== originalData.checkOutTime
+	  );
+
+	  if (isModified) {
+	    e.preventDefault(); // 자동 닫힘 막고 경고 띄움
+	    const alertModal = new bootstrap.Modal(document.getElementById('unsavedAlertModal'));
+	    alertModal.show();
+	  }
+	});
+
+	// ✅ 모달 닫기 확인
+	const confirmCloseBtn = document.getElementById('confirmCloseBtn');
+	confirmCloseBtn.addEventListener('click', function () {
+	  hideTriggered = true;
+	  bootstrap.Modal.getInstance(document.getElementById('unsavedAlertModal')).hide();
+	  bsEditModal.hide();
+	});
+
+	// ✅ 모달 닫기 취소
+	const stayModalBtn = document.getElementById('stayModalBtn');
+	stayModalBtn.addEventListener('click', function () {
+	  bootstrap.Modal.getInstance(document.getElementById('unsavedAlertModal')).hide();
+	});
+
+	// ✅ 수정하기 버튼 클릭 시 확인 모달 띄우기
+	const form = document.getElementById('editAttendanceForm');
+	form.addEventListener('submit', function (e) {
+	  e.preventDefault();
+
+	  const checkInStr = document.getElementById('editCheckInTime').value;
+	  const checkOutStr = document.getElementById('editCheckOutTime').value;
+
+	  if (checkInStr && checkOutStr && new Date(checkOutStr) <= new Date(checkInStr)) {
+	    alert('퇴근시간은 출근시간보다 늦어야 합니다.');
+	    return;
+	  }
+
+	  const isModified = (
+	    checkInStr !== originalData.checkInTime ||
+	    checkOutStr !== originalData.checkOutTime
+	  );
+
+	  if (!isModified) {
+	    new bootstrap.Modal(document.getElementById('noChangeModal')).show();
+	    return;
+	  }
+
+	  new bootstrap.Modal(document.getElementById('confirmSaveModal')).show();
+	});
+
+	// ✅ 저장 확인 → 서버로 수정 요청 전송
+	const confirmSaveBtn = document.getElementById('confirmSaveBtn');
+	confirmSaveBtn.addEventListener('click', function () {
+	  const form = document.getElementById('editAttendanceForm');
+	  const payload = new FormData(form);
+
+	  fetch('/admin/attendanceUpdate', {
+	    method: 'POST',
+	    headers: {
+	      'header': document.querySelector('meta[name="_csrf_header"]').content,
+	      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+	    },
+	    body: payload
+	  })
+	    .then(response => response.json())
+	    .then(data => {
+	      bootstrap.Modal.getInstance(document.getElementById('confirmSaveModal')).hide();
+
+	      if (data.result === 'success') {
+	        bsEditModal.hide();
+	        location.reload();
+	      } else {
+	        alert('수정 실패');
+	      }
+	    })
+	    .catch(error => {
+	      console.error('Error:', error);
+	    });
+	});
+
+	// ✅ 수정 확인 취소
+	const cancelSaveBtn = document.getElementById('cancelSaveBtn');
+	cancelSaveBtn.addEventListener('click', function () {
+	  bootstrap.Modal.getInstance(document.getElementById('confirmSaveModal')).hide();
+	});
+	
+	
+	
+	
+/* 	// 출.퇴근 시간, 근태 번호를 기억하는 객체(모달 열릴 때 상태 저장)
+	let originalData = {
+			checkInTime: '',
+			checkOutTime: '',
+			attendanceNo: null
+		};
+	// 모달 닫기 플래그(확인 클릭시 강제 닫기)
+	let hideTriggered = false;
+
+	
+	
+	// 모달 객체 (있으면 getInstance, 없으면 create)
+	const editModal = document.getElementById('editAttendanceModal');
+	const bsEditModal = bootstrap.Modal.getInstance(editModal) || new bootstrap.Modal(editModal);
+	
+	// 수정 버튼 클릭시 해당 attendancNo로 데이터 받아와서 input에 보여주기, originalData에 저장
+ 	const editButtons = document.querySelectorAll('[data-bs-target="#editAttendanceModal"]');
+
+	editButtons.forEach(button =>{
+		button.addEventListener('click',function(){
+			const attendanceNo = this.getAttribute('data-attendance-no');
+			originalData.attendanceNo = attendanceNo;
+			// 해당 근태기록 번호로 fetch 요청
+			fetch(`/admin/attendanceDetail?attendanceNo=${attendanceNo}`)
+				.then(response => response.json())
+				.then(data => {
+					const checkIn = data.attendance_check_in_time.replace(' ','T');
+					const checkOut = data.attendance_check_out_time ? data.attendance_check_out_time.replace(' ', 'T') : '';
+					// 모달에 데이터 세팅
+					document.getElementById('editCheckInTime').value = checkIn;
+					document.getElementById('editCheckOutTime').value = checkOut;
+					// 지각/조퇴 여부 표시
+					document.getElementById('lateStatus').textContent = data.attendance_late_yn === 'Y' ? '지각' : '';
+					document.getElementById('earlyLeaveStatus').textContent = data.attendance_early_leave_yn === 'Y' ? '조퇴' : '';
+					
+					// 원래 값 저장
+					originalData.checkInTime = checkIn;
+					originalData.checkOutTime = checkOut;
+					
+					// 모달 열기
+					bsEditModal.show();
+				});
+		});
+	}); 
+	
+	
+	// 모달 닫을때 현재 입력값과 originalData 비교, 수정 된 경우 확인 모달 띄우기
+	editModal.addEventListener('hide.bs.modal', function (e) {
+		if(hideTriggered) {
+			hideTriggered = false; // 모달이 닫히면 hideTriggered 초기화
+			return; // 모달 닫기
+		}
+		
+		const currentCheckIn = document.getElementById('editCheckInTime').value;
+		const currentCheckOut = document.getElementById('editCheckOutTime').value;
+		const isModified = (currentCheckIn !== originalData.checkInTime || currentCheckOut !== originalData.checkOutTime);
+		
+		if(isModified){
+			e.preventDefault(); // 모달 닫기 막기
+			const alertModal = new bootstrap.Modal(document.getElementById('unsavedAlertModal'));
+			alertModal.show();
+		}
+	});
+	
+	// 모달 닫기 확인
+	const confirmCloseBtn = document.getElementById('confirmCloseBtn');
+	confirmCloseBtn.addEventListener('click',function(){
+		hideTriggered = true; // 모달 닫기
+		const alertModal = bootstrap.Modal.getInstance(document.getElementById('unsavedAlertModal'));
+		alertModal.hide();
+		bsEditModal.hide();
+	});
+	
+	// 모달 닫기 취소
+	const stayModalBtn = document.getElementById('stayModalBtn');
+	stayModalBtn.addEventListener('click',function(){
+		const alertModal = bootstrap.Modal.getInstance(document.getElementById('unsavedAlertModal'));
+		alertModal.hide();
+	});
+	
+	// 수정하기 버튼 클릭 시 확인 모달 띄우기
+	const form = document.getElementById('editAttendanceForm');
+	form.addEventListener('submit', function(e) {
+		e.preventDefault(); // 기본 제출 방지
+		
+		const checkInStr = document.getElementById('editCheckInTime').value;
+		const checkOutStr = document.getElementById('editCheckOutTime').value;
+		
+		// 유효성 검사
+		if(checkInStr && checkOutStr && new Date(checkOutStr) <= new Date(checkInStr)){
+			alert('퇴근시간은 출근시간보다 늦어야 합니다.');
+			return;
+		}
+		
+		// 수정 내역 없음 체크
+		const isModified = (checkInStr !== originalData.checkInTime || checkOutStr !== originalData.checkOutTime);
+		if(!isModified){
+			const noChangeModal = new bootstrap.Modal(document.getElementById('noChangeModal'));
+			noChangeModal.show();
+			return;
+		}
+		
+		// 수정 확인 모달 열기
+		const confirmModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+		confirmModal.show();
+	});
+	
+	// 저장 확인 모달
+	const confirmSaveBtn = document.getElementById('confirmSaveBtn');
+	confirmSaveBtn.addEventListener('click',function(){
+    	// const checkInStr = document.getElementById('editCheckInTime').value;
+		// const checkOutStr = document.getElementById('editCheckOutTime').value; 
+		const form = document.getElementById('editAttendanceForm');
+		const payload = new FormData(form);
+		
+		fetch('/admin/attendanceUpdate',{
+			method:'POST',
+			headers:{
+				'header': document.querySelector('meta[name="_csrf_header"]').content,
+                'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			},
+			body : payload
+		})
+			.then(response => response.json())
+			.then(data => {
+					// 모달 닫기
+					const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmSaveModal'));
+					confirmModal.hide();
+				if (data.result === 'success') {
+					bsEditModal.hide();
+
+					// 페이지 새로고침
+					location.reload();
+				} else {
+					alert('수정 실패');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+	});
+	
+	// 저장 확인 모달 취소시
+	const cancelSaveBtn = document.getElementById('cancelSaveBtn');
+	cancelSaveBtn.addEventListener('click',function(){
+		const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmSaveModal'));
+		confirmModal.hide();
+	});
+		// 모달 열릴 때 input에 기존 정보 세팅
+ 	document.querySelectorAll('[data-bs-target="#editAttendanceModal"]').forEach(button => {
+		button.addEventListener('click',function(){
+ 			// 버튼이 포함된 행<tr> 찾기
+			// const tr = this.closest('tr');
+			// 해당 행에서 attendanceNo 가져오기
+			// const attendanceNo = tr.querySelector('.no').textContent; 
+			
+			const attendanceNo = this.getAttribute('data-attendance-no');
+			// 해당 근태기록 번호로 fetch 요청
+			fetch(`/admin/attendanceDetail?attendanceNo=${attendanceNo}`)
+			    .then(response => response.json())
+				.then(data => {
+					// 모달에 데이터 세팅
+					// input[type="datetime-local"]에 맞게 '2025-04-23 09:00:00' -> '2025-04-23T09:00'
+					document.getElementById('editCheckInTime').value = data.attendance_check_in_time.replace(' ','T');
+					// 퇴근 기록이 있을 경우에만 값 세팅
+					document.getElementById('editCheckOutTime').value = data.attendance_check_out_time ? 
+						data.attendance_check_out_time.replace(' ', 'T') : '';
+
+					// 지각/조퇴 여부 표시
+					document.getElementById('lateStatus').textContent = data.attendance_late_yn === 'Y' ? '지각' : '';
+					document.getElementById('earlyLeaveStatus').textContent = data.attendance_early_leave_yn === 'Y' ? '조퇴' : '';
+				});
+		});
+	});  */
 </script>                         
 
 </main>
