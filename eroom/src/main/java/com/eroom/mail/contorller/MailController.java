@@ -4,9 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,22 +43,26 @@ public class MailController {
 	
 	// 받은 메일
 	@GetMapping("/mail/receiverTo")
-	public String selectReceiverToAll(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails,
-			@RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder) {
+	public String selectReceiverToAll(Model model, 
+									@AuthenticationPrincipal EmployeeDetails employeeDetails,
+									@RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder) {
 	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
 	    
 	    
 	    List<MailReceiver> received = mailService.getReceivedMailsByEmployee(employeeNo, sortOrder); 
+	    
+	    
 	    model.addAttribute("receivedMails", received);
 	    return "mail/mailReceiverTo";
 	}
 	
 	// 04/17 본인것만 조회되게 
 	
-	  @GetMapping("/mail/sent") public String getSentMails(Model
-	  model, @AuthenticationPrincipal EmployeeDetails employeeDetails,
-	  @RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder
-			  ) { 
+	  @GetMapping("/mail/sent") 
+	  public String getSentMails(Model model, 
+			  					@AuthenticationPrincipal EmployeeDetails employeeDetails,
+			  					@RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder) { 
+	  
 	  Long employeeNo =employeeDetails.getEmployee().getEmployeeNo();
 	  
 	  // 조건 받아와서 여기서 적용하기 ( 최신순, 오래된 순 ) 
@@ -112,11 +113,40 @@ public class MailController {
 		return "mail/mailImportant";
 	}
 	
+	// 휴지통에서 삭제하는 로직
+	@PostMapping("/mail/delete/{id}")
+	public String deleteMail(@PathVariable("id") Long id,
+	                         @RequestParam("redirectUrl") String redirectUrl,
+	                         @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+	   Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	    
+	   //System.out.println(id+" : "+redirectUrl+" : "+employeeNo);
+	   mailService.deleteReceivedMailById(id, employeeNo);  // 서비스에서 삭제 처리
+
+	    return "redirect:" + redirectUrl;
+	}
+	// 휴지통으로 옮기는 로직 ( N => Y )
+	@PostMapping("/mail/trash/{id}")
+	public String moveToTrash(@PathVariable("id") Long id,
+							  @RequestParam("redirectUrl") String redirectUrl,
+							  @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+		Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+		mailService.moveToTrash(employeeNo,id);
+		return "redirect:" + redirectUrl;
+	}
+	
 	// 휴지통 조회할곳
 	@GetMapping("/mail/trash")
-	public String selectTrashMailAll() {
-		
-		return "mail/mailTrash";
+	public String selectTrashMailAll(Model model, 
+	    @AuthenticationPrincipal EmployeeDetails employeeDetails,
+	    @RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder) {
+
+	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+
+	    List<MailReceiver> trashMailList = mailService.getTrashMailsByEmployee(employeeNo, sortOrder);
+
+	    model.addAttribute("trashMailList", trashMailList);
+	    return "mail/mailTrash";
 	}
 	
 	// 디테일

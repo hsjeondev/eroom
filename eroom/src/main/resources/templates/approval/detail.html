@@ -81,7 +81,7 @@
             </thead>
             <tbody>
               <tr>
-                <td  th:if="${line.approval_line_step == 0}" th:each="line : ${approvalLineList}">
+                <td th:if="${line.approval_line_step == 0}" th:each="line : ${approvalLineList}">
                 	<span th:if="${line.approval_line_status == 'A'}" th:text="|합의|">서명!</span>
                 	<span th:if="${line.approval_line_status == 'S'}" th:text="|대기중|">대기!</span>
                 	<span th:if="${line.approval_line_status == 'D'}" th:text="|합의x|">반려!</span>
@@ -90,11 +90,24 @@
             </tbody>
           </table>
           
-		<!-- 참조자 텍스트 -->
-		<div class="text-end text-body-secondary fs-8 mt-1" th:if="${line.approval_line_step == -1}" th:each="line : ${approvalLineList}">
-			<span>참조자: </span>
-			<span th:text="${line.employee.employeeName}">참조자!</span>
+        <!-- 참조자 -->
+		<!-- Step 1: 참조자 리스트를 전부 숨겨서 HTML에 숨겨둠 -->
+		<span id="referenceList" style="display:none;"><span th:each="line : ${approvalLineList}" th:if="${line.approval_line_step == -1}" th:text="${line.employee.employeeName + ', '}">홍길동,</span></span>
+		
+		<!-- Step 2: 보여줄 영역 -->
+		<div class="text-end text-body-secondary fs-8 mt-1">
+		  <span>참조자: </span><span id="referenceDisplay"></span>
 		</div>
+		
+		<!-- Step 3: JS로 콤마 제거하고 보여주기 -->
+		<script>
+		  const refList = document.getElementById("referenceList").innerText;
+		  const trimmed = refList.replace(/,\s*$/, ''); // 마지막 콤마 제거
+		  document.getElementById("referenceDisplay").innerText = trimmed;
+		</script>
+
+
+
 
         </div>
         
@@ -114,14 +127,14 @@
       </div>
 
       <!-- 승인/반려 버튼 -->
-      <div class="mt-4 text-end">
-        <button type="button" class="btn btn-primary me-2">결재 승인</button>
-        <button type="button" class="btn btn-outline-danger">반려</button>
+      <div class="mt-4 text-end"  th:if="${line.approval_line_step >= 1 and line.employee.employeeNo == employee.employeeNo and line.approval_line_status == 'S'}" th:each="line : ${approvalLineList}">
+        <button data-status="A" id="approvalApproveBtn" type="button" class="btn btn-primary me-2 approveDenyBtn">승인</button>
+        <button data-status="D" id="approvalDenyBtn" type="button" class="btn btn-outline-danger approveDenyBtn">반려</button>
       </div>
       <!-- 결재 삭제 버튼 -->
-      <div class="mt-4 text-end" th:if="${approval.employee.employeeNo} == ${employee.employeeNo}">
-        <button id="deleteBtn" type="button" class="btn btn-outline-danger">삭제</button>
-        <button id="fallBackBtn" type="button" class="btn btn-outline-danger">회수</button>
+      <div class="mt-4 text-end">
+        <button  th:if="${approval.employee.employeeNo == employee.employeeNo or employee.employeeName.contains('admin')}" id="deleteBtn" type="button" class="btn btn-outline-danger">삭제</button>
+        <button  th:if="${approval.employee.employeeNo == employee.employeeNo}" id="fallBackBtn" type="button" class="btn btn-outline-danger">회수</button>
       </div>
     </div>
     
@@ -141,7 +154,7 @@
 	<!-- 삭제 버튼 -->
 	<script th:inline="javascript">
 		document.getElementById("deleteBtn").addEventListener("click", function(){
-			const deleteNo = [[${approval.approval_no}]];
+			const deleteNo = /*[[${approval.approval_no}]]*/ 0;
 			if(confirm('결재를 삭제하시겠습니까?')){
 				fetch('/approval/' + deleteNo + '/delete',{
 					method : 'POST',
@@ -166,8 +179,9 @@
 	</script>
 	<!-- 회수 버튼 -->
 	<script th:inline="javascript">
+	
 		document.getElementById("fallBackBtn").addEventListener("click", function(){
-			const fallBackNo = [[${approval.approval_no}]];
+			const fallBackNo = /*[[${approval.approval_no}]]*/ 0;
 			if(confirm('결재를 회수하시겠습니까?')){
 				fetch('/approval/' + fallBackNo + '/fallBack',{
 					method : 'POST',
@@ -190,7 +204,43 @@
 		});
 	
 	</script>
-    
-  </main>
+	
+	<!-- 승인,반려 버튼 -->
+	<script th:inline="javascript">
+		document.querySelectorAll(".approveDenyBtn").forEach(function(btn) {
+			btn.addEventListener("click", function () {
+				const approvalNo = /*[[${approval.approval_no}]]*/ 0;
+				const employeeNo = /*[[${employee.employeeNo}]]*/ 0;
+				const status = this.dataset.status;
+				const actionText = status === 'A' ? '승인' : (status === 'D' ? '반려' : '처리');
+				if (confirm(`결재를 ${actionText}하시겠습니까?`)) {
+					fetch('/approvalLine/approveDeny', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+							'header': document.querySelector('meta[name="_csrf_header"]').content
+						},
+						body: JSON.stringify({
+							approval_no : approvalNo,
+							approval_line_status : status,
+							employee_no : employeeNo
+						})
+					})
+					.then(response => response.json())
+					.then(data => {
+						alert(data.res_msg)
+						if (data.res_code == 200) {
+							location.reload();
+						}
+					})
+				} else {
+
+				}
+			});
+		})
+	</script>
+
+	</main>
 </body>
 </html>

@@ -7,6 +7,12 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
   <body>
     <main class="main" id="top" layout:fragment="content">
+    <div class="row align-items-center justify-content-between g-3 mb-4">
+		<!-- 상단 제목 -->
+		<div class="d-flex justify-content-start">
+			<span class="fw-bold fs-6"  >보낸 메일함</span>
+		</div>
+	</div>
    <div id="mailSummary" data-list='{"valueNames":["senderName", "mailTitle", "mailContent", "sendTime"], "page":6, "pagination":true}'>
       <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
             <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mailCreate}">메일 쓰기</a>
@@ -76,12 +82,24 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                     
                     
                     <div class="col-auto">
-                    	<a class="text-body-emphasis fw-bold inbox-link fs-9 senderName"  href="../../apps/email/email-detail.html"
+                    	 <!-- <a class="text-body-emphasis fw-bold inbox-link fs-9 senderName"  href="../../apps/email/email-detail.html"
                     	 th:text="${sentMail.sender != null ? sentMail.sender.employeeName : '알 수 없음'}"
-                    	>
+                    	> 
+                    	
                     	 보낸 사람
                     	 받은 사람 : (OOO) 으로 바꿀 예정
-                    	 </a>
+                    	 </a> -->
+                    	 <div class="text-body-emphasis fw-bold inbox-link fs-9 senderName">받는 사람:
+					        <!-- <span th:each="receiver : ${sentMail.receivers}" 
+					              th:text="${receiver.receiver.employeeName}"
+					              th:append="' '" /></span> --> 
+					              <!-- 이쪽 코드오류남 -->
+					              <!-- <span th:each="receiver : ${sentMail.receivers}" 
+								      class="badge bg-secondary me-1">
+								  <span th:text="${receiver.receiver.employeeName}"></span>
+								</span> -->
+								<!-- 이쪽 코드오류남 -->
+					    </div>
                     </div>
                     <!-- 이메일 잘 나옴 -->
                     <!-- <p th:text="${sentMail.sender.directory.directoryEmail}"></p> -->
@@ -114,7 +132,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                 <!-- 페이징 -->
 					</div>
                      
-					<div class="d-flex flex-wrap align-items-center justify-content-between py-3 pe-0 fs-9 border-bottom border-translucent">
+					<!-- <div class="d-flex flex-wrap align-items-center justify-content-between py-3 pe-0 fs-9 border-bottom border-translucent">
 		              <div class="d-flex">
 		                <p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info"></p><a class="fw-semibold" href="#!" data-list-view="*">전체 보기<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a><a class="fw-semibold d-none" href="#!" data-list-view="less">접기<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a>
 		              </div>
@@ -123,12 +141,24 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		                <ul class="mb-0 pagination"></ul>
 		                <button class="page-link pe-0" data-list-pagination="next"><span class="fas fa-chevron-right"></span></button>
 		              </div>
-            		</div>
+            		</div> -->
+            		<!-- <nav aria-label="Page navigation example">
+					  <ul class="pagination justify-content-center">
+					    <li class="page-item"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
+					    <li class="page-item"><a class="page-link" href="#">1</a></li>
+					    <li class="page-item"><a class="page-link" href="#">2</a></li>
+					    <li class="page-item"><a class="page-link" href="#">3</a></li>
+					    <li class="page-item active" aria-current="page"><a class="page-link" href="#">4</a></li>
+					    <li class="page-item"><a class="page-link" href="#">5</a></li>
+					    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+					  </ul>
+					</nav> -->
+					<!-- 페이징 손봐야함 -->
+					<div class="d-flex justify-content-center mt-4">
+					    <ul class="pagination mb-0"></ul>
+					</div>
                 </div>
                 </div>
-                
-                    
-		 <h1>보낸 메일</h1>
     </main>
    
   </body>

@@ -28,7 +28,6 @@ public class ApprovalDto {
     private String approval_status; // 결재 상태 (A, S, D, F, 등)
     private String approval_title; // 결재 제목
     private Map<String, String> approval_content; // 결재 내용
-    private String approval_deny_reason; // 반려 사유
 
     private LocalDateTime approval_reg_date; // 등록일
     private String reg_date; // 등록일 (String)
@@ -46,7 +45,6 @@ public class ApprovalDto {
 				.approvalStatus(approval_status)
 				.approvalTitle(approval_title)
 				.approvalContent(approval_content)
-				.approvalDenyReason(approval_deny_reason)
 				.approvalRegDate(approval_reg_date)
 				.approvalCompletedDate(approval_completed_date)
 				.employee(employee)
@@ -62,7 +60,6 @@ public class ApprovalDto {
 				.approval_status(entity.getApprovalStatus())
 				.approval_title(entity.getApprovalTitle())
 				.approval_content(entity.getApprovalContent())
-				.approval_deny_reason(entity.getApprovalDenyReason())
 				.reg_date(entity.getApprovalRegDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")))
 				.completed_date(entity.getApprovalCompletedDate() != null ? entity.getApprovalCompletedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
 				.employee(entity.getEmployee())

@@ -243,10 +243,9 @@
 								<input type="hidden" th:name="${_csrf.parameterName}"
 									th:value="${_csrf.token}" />
 								<ul class="list-unstyled mb-4">
-									<li><font style="vertical-align: inherit;">채팅방 이름
-											변경</font></li>
-									<li><font style="vertical-align: inherit;">참여자 추가하기</font></li>
-									<li><font style="vertical-align: inherit;">채팅방 삭제</font></li>
+								  <li data-action="rename" class="cursor-pointer">채팅방 이름 변경</li>
+								  <li data-action="add" class="cursor-pointer">참여자 추가하기</li>
+								  <li data-action="delete" class="cursor-pointer">채팅방 삭제</li>
 								</ul>
 
 							</div>
@@ -560,7 +559,8 @@
 	 	let socket = null; 
 		let currentReceiverNo = null;
 		let isCreateMode = true; // 기본은 생성 모드
-		
+		let lastSelectedChatroomName = null;
+
 		document.addEventListener("DOMContentLoaded", () => {
 		  bindModalReset(); // 모달 초기화
 		  bindChatroomPanelEvents(); // 채팅방 클릭 이벤트
@@ -692,7 +692,9 @@
 		
 		    const chatroomNo = target.dataset.roomNo;
 		    const isGroup = target.dataset.group === "Y";
-		    const chatroomName = target.querySelector(".name")?.innerText || "알 수 없음";
+		    const chatroomNameEl = target.querySelector('.name');
+		    const chatroomName = chatroomNameEl ? chatroomNameEl.innerText.trim() : "채팅방";
+		    lastSelectedChatroomName = chatroomName;
 			// 기본 채팅 영역 숨기기
 		    const defaultArea = document.getElementById("default-chat-area");
 		    if (defaultArea) defaultArea.style.display = "none";
@@ -703,7 +705,7 @@
 		    chatContent.innerHTML = `
 		      <div class="tab-pane h-100 fade show active d-flex flex-column">
 		        <div class="d-flex align-items-center justify-content-between px-4 pt-3">
-		          <h4 class="mb-0 chatroom-title cursor-pointer text-primary" data-group="${isGroup ? 'Y' : 'N'}" data-room-no="${chatroomNo}">${chatroomName}</h4>
+		          <h4 class="mb-0 chatroom-title cursor-pointer text-primary" data-group="${isGroup ? 'Y' : 'N'}" data-room-no="${chatroomNo}">${lastSelectedChatroomName || "채팅방"}</h4>
 		        </div>
 		        <div class="flex-grow-1 overflow-auto p-4">
 		          <div class="chat-history">
@@ -818,41 +820,44 @@
 		  if (!detailModal) return;
 		
 		  detailModal.addEventListener("click", function (e) {
-		    const li = e.target.closest("li");
-		    if (!li || !li.textContent.includes("채팅방 이름 변경")) return;
-		
-		    const nameEl = document.getElementById("modalChatroomName");
-		    const chatroomNo = nameEl.dataset.roomNo;
-		    const currentName = nameEl.innerText;
-		    const newName = prompt("새 채팅방 이름을 입력하세요:", currentName);
-		    if (!newName || newName.trim() === "" || newName === currentName) return;
-		
-		    fetch('/chat/rename', {
-		      method: 'POST',
-		      headers: {
-		        'Content-Type': 'application/json',
-		        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-		      },
-		      body: JSON.stringify({ chatroomNo, chatroomName: newName })
-		    })
-		    .then(res => res.json())
-		    .then(data => {
-		      if (data.res_code === "200") {
-		        alert("채팅방 이름이 변경되었습니다.");
-		        nameEl.innerText = newName;
-		        const titleEl = document.querySelector(".chatroom-title");
-		        if (titleEl) titleEl.innerText = newName;
-		        const sideNameEl = document.querySelector(`[data-room-no="${chatroomNo}"] .name`);
-		        if (sideNameEl) sideNameEl.innerText = newName;
-		      } else {
-		        alert("변경 실패: " + data.res_msg);
-		      }
-		    })
-		    .catch(err => {
-		      console.error("요청 실패:", err);
-		      alert("서버 오류가 발생했습니다.");
-		    });
-		  });
+			  const li = e.target.closest("li");
+			  if (!li || li.dataset.action !== "rename") return;
+
+			  const nameEl = document.getElementById("modalChatroomName");
+			  const chatroomNo = nameEl.dataset.roomNo;
+			  const currentName = nameEl.innerText;
+			  const newName = prompt("새 채팅방 이름을 입력하세요:", currentName);
+			  if (!newName || newName.trim() === "" || newName === currentName) return;
+
+			  fetch('/chat/rename', {
+			    method: 'POST',
+			    headers: {
+			      'Content-Type': 'application/json',
+			      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			    },
+			    body: JSON.stringify({ chatroomNo, chatroomName: newName })
+			  })
+			  .then(res => res.json())
+			  .then(data => {
+			    if (data.res_code === "200") {
+			      alert("채팅방 이름이 변경되었습니다.");
+			      nameEl.innerText = newName;
+			      const titleEl = document.querySelector(".chatroom-title");
+			      if (titleEl) titleEl.innerText = newName;
+			      const sideNameEl = document.querySelector(`[data-room-no="${chatroomNo}"] .name`);
+			      if (sideNameEl) sideNameEl.innerText = newName;
+			      lastSelectedChatroomName = newName;
+			    } else {
+			      alert("변경 실패: " + data.res_msg);
+			    }
+			  })
+			  .catch(err => {
+			    console.error("요청 실패:", err);
+			    alert("서버 오류가 발생했습니다.");
+			  });
+			});
+
+
 		}
 		
 		// 채팅방 생성/참여자 추가 submit
@@ -1011,68 +1016,68 @@
 		  };
 		  // 메시지 수신
 		 socket.onmessage = function(event) {
-  const data = JSON.parse(event.data);
+		  const data = JSON.parse(event.data);
+		  const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+		  const currentChatroomNo = document.querySelector(".chatroom-title")?.dataset.roomNo;
+		  const chatHistory = document.querySelector(".chat-history");
+		  const sidebarItem = document.querySelector(`[data-room-no="${data.chatroomNo}"]`);
+		
+		  const isMyMessage = data.senderMember == myEmployeeNo;
+		
+		  if (!sidebarItem) return;
+		
+		  // 다른 채팅방일 경우 사이드바에 알림 뱃지 갱신
+		  if (!currentChatroomNo || Number(currentChatroomNo) !== Number(data.chatroomNo)) {
+		    sidebarItem.classList.add('unread');
+		    sidebarItem.classList.remove('read');
+		
+		    const badge = sidebarItem.querySelector('.badge');
+		    if (badge) {
+		      badge.innerText = (parseInt(badge.innerText) || 0) + 1;
+		    } else {
+		      const newBadge = document.createElement("div");
+		      newBadge.className = "badge bg-danger text-white ms-2";
+		      newBadge.innerText = "1";
+		      const container = sidebarItem.querySelector('.d-flex.justify-content-between');
+		      if (container) container.appendChild(newBadge);
+		    }
+		
+		    const messagePreview = sidebarItem.querySelector('.message');
+		    if (messagePreview) messagePreview.innerText = data.chatMessageContent;
+		
+		    const timePreview = sidebarItem.querySelector('.text-body-tertiary');
+		    if (timePreview) timePreview.innerText = getFormattedDate();
+		
+		    return;
+		  }
+		
+		  // 현재 열린 채팅방일 경우 채팅 내용 렌더링
+		  if (!chatHistory) return;
+		
+		  const wrapper = document.createElement("div");
+		  wrapper.className = "mb-3";
+		
+		  const nameLine = document.createElement("div");
+		  nameLine.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-1`;
+		  nameLine.innerHTML = `<div class="small text-muted">${isMyMessage ? '나' : data.senderName}</div>`;
+		
+		  const messageLine = document.createElement("div");
+		  messageLine.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
+		
+		  const messageBubble = document.createElement("div");
+		  messageBubble.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
+		  messageBubble.style.maxWidth = "70%";
+		  messageBubble.innerText = data.chatMessageContent;
+		
+		  messageLine.appendChild(messageBubble);
+		  wrapper.appendChild(nameLine);
+		  wrapper.appendChild(messageLine);
+		  chatHistory.appendChild(wrapper);
+		
+		  const scrollArea = document.querySelector(".flex-grow-1.overflow-auto");
+		  if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
+		};
 
-  const myEmployeeNo = document.getElementById("myEmployeeNo").value;
-  const currentChatroomNo = document.querySelector(".chatroom-title")?.dataset.roomNo;
-  const sidebarItem = document.querySelector(`[data-room-no="${data.chatroomNo}"]`);
-  const chatHistory = document.querySelector(".chat-history");
-
-  // 메시지 보내는 사람이 나면 그냥 무시
-  // if (data.senderMember == myEmployeeNo) return;
-
-  // 현재 열려있는 방과 메시지 방 번호 비교
-  if (Number(data.chatroomNo) === Number(currentChatroomNo)) {
-    // 같은 방이면 채팅 내용만 추가하고 뱃지 갱신 안함
-    if (chatHistory) {
-      const messageDiv = document.createElement("div");
-      messageDiv.className = "mb-2";
-      messageDiv.innerHTML = `
-        <div class="d-flex ${data.senderMember == myEmployeeNo ? 'justify-content-end' : 'justify-content-start'}">
-          <div class="p-2 rounded-2 ${data.senderMember == myEmployeeNo ? 'bg-primary text-white' : 'bg-light'}" style="max-width: 70%;">
-            ${data.chatMessageContent}
-          </div>
-        </div>
-      `;
-      chatHistory.appendChild(messageDiv);
-      chatHistory.scrollTop = chatHistory.scrollHeight;
-    }
-  } else {
-    // 다른 방이면 알림 카운트 업데이트
-    if (sidebarItem) {
-      sidebarItem.classList.add('unread');
-      sidebarItem.classList.remove('read');
-
-      let badge = sidebarItem.querySelector('.badge');
-      if (badge) {
-        badge.innerText = (parseInt(badge.innerText) || 0) + 1;
-      } else {
-        badge = document.createElement('div');
-        badge.className = 'badge bg-danger text-white ms-2';
-        badge.innerText = '1';
-        const flexBox = sidebarItem.querySelector('.d-flex.justify-content-between');
-        if (flexBox) {
-          flexBox.appendChild(badge);
-        }
-      }
-    }
-  }
-
-  // 미리보기 텍스트 업데이트
-  const messagePreview = sidebarItem.querySelector('.message');
-  if (messagePreview) {
-    messagePreview.innerText = data.chatMessageContent;
-  }
-  
-  const timePreview = sidebarItem.querySelector('.text-body-tertiary');
-  if (timePreview) {
-    const now = new Date();
-    const formatted = now.getFullYear().toString().slice(2) + '.' +
-                      String(now.getMonth() + 1).padStart(2, '0') + '.' +
-                      String(now.getDate()).padStart(2, '0');
-    timePreview.innerText = formatted;
-  }
-};
 
 
 

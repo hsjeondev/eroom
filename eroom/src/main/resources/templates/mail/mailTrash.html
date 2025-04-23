@@ -6,8 +6,165 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  layout:decorate="~{/include/layout}">
   <body>
     <main class="main" id="top" layout:fragment="content">
-      <!-- 여기에 요소 넣으면 됩니다. -->
-	     <h1>휴지통</h1>
+      <div class="row align-items-center justify-content-between g-3 mb-4">
+		<!-- 상단 제목 -->
+		<div class="d-flex justify-content-start">
+			<span class="fw-bold fs-6">휴지통</span>
+		</div>
+	</div>
+	<div id="mailSummary" data-list='{"valueNames":["senderName", "mailTitle", "mailContent", "sendTime"], "page":6, "pagination":true}'>   
+      <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
+            <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mailCreate}">메일 쓰기</a>
+              <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button>
+            </div>
+            <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" th:href="@{mailCreate}"> <span class="d-none d-sm-inline-block">메일 쓰기</span><span class="d-sm-none fas fa-plus"></span></a></div>
+            <div class="col-auto flex-1">
+              <div class="search-box w-100">
+                <form class="position-relative">
+                  <input class="form-control search-input search" type="search" placeholder="검색" aria-label="Search" />
+                  <span class="fas fa-search search-box-icon"></span>
+                </form>
+              </div>
+            </div>
+       </div>
+       <div class="px-lg-1">
+                <div class="d-flex align-items-center flex-wrap position-sticky pb-2 bg-body z-2 email-toolbar inbox-toolbar">
+                  <div class="d-flex align-items-center flex-1 me-2">
+                    <button class="btn btn-sm p-0 me-2" type="button" onclick="location.reload()"><span class="text-primary fas fa-redo fs-10"></span></button>
+                    <p class="fw-semibold fs-10 text-body-tertiary text-opacity-85 mb-0 lh-sm text-nowrap">새로 고침</p>
+                  </div>
+                  <div class="d-flex">
+                  	<select class="form-control search-input search" onchange="location = this.value;">
+                  		<option disabled selected>정렬 선택</option>
+					    <option value="?sortOrder=latest" th:selected="${sortOrder == 'latest'}">최신순</option>
+					    <option value="?sortOrder=oldest" th:selected="${sortOrder == 'oldest'}">오래된순</option>
+					</select>
+                  </div>
+                </div>
+                <!-- 범용성 생각해서 일단 보류 -->
+                <div class="border-top border-translucent py-2 d-flex justify-content-between">
+                  <div class="form-check mb-0 fs-8">
+                    <input class="form-check-input" type="checkbox" data-bulk-select-row="data-bulk-select-row" />
+                  </div>
+                  <div>
+                    <button class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Archive"><span class="fas fa-archive fs-10"></span></button>
+                    <button class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete"><span class="fas fa-trash fs-10"></span></button>
+                    <button class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Star"><span class="fas fa-star fs-10"></span></button>
+                    <button class="btn p-0 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tags"><span class="fas fa-tag fs-10"></span></button>
+                  </div>
+                </div>
+                <!-- 범용성 생각해서 일단 보류 -->
+                
+                <!-- 메일 목록 스타트부분 -->
+                <div th:if="${#lists.isEmpty(trashMailList)}">
+                	<input type="text" value="내용이 없습니다.">
+                </div>
+                <div class="list">
+                 <div class="border-top border-translucent hover-actions-trigger py-3"
+                 		th:if="${!#lists.isEmpty(trashMailList)}"
+                 		th:each="trashMailList : ${trashMailList}"
+                 		th:classappend="${trashMailList.mailReceiverReadYn == 'N'} ? 'bg-primary-subtle text-primary-emphasis' : ''">
+                  <div class="row align-items-sm-center gx-2">
+                    <div class="col-auto">
+                      <div class="d-flex flex-column flex-sm-row">
+                        <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" />
+                        <!-- 별 박스 -->
+                        <!-- <button class="btn p-0"><span class="fas text-warning fa-star"></span></button> -->
+                      </div>
+                    </div>
+                    
+                    <!-- 프로필 사진 이미지 부분  -->
+                    <div class="col-auto">
+                      <div class="avatar avatar-s  rounded-circle">
+                        <img class="rounded-circle " src="../../assets/img/team/60.webp" alt="" />
+
+                      </div>
+                    </div>
+                    <div class="col-auto">
+					  <a class="inbox-link fs-9 senderName"
+					     th:href="@{/mail/detail/{id}(id=${trashMailList.mail.mailNo})}"
+					     th:classappend="${trashMailList.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
+					     th:text="${trashMailList.mail != null and trashMailList.mail.sender != null ? trashMailList.mail.sender.employeeName : '알 수 없음'}">
+					     보낸 사람
+					  </a>
+					</div>
+                    <div class="col-auto ms-auto">
+                      <div class="hover-actions end-0">
+                        <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
+                        <div class="dropdown-menu dropdown-menu-end py-2">
+                        <a class="dropdown-item" href="#!">중요 표시 여기서도 이거 처리해야 되나</a>
+                        
+                        <form th:action="@{/mail/trash/{id}(id=${trashMailList.mail.mailNo})}" method="post">
+                        	<input type="hidden" name="redirectUrl" value="/mail/trash"/>
+						  <button type="submit" class="dropdown-item">받은 메일로 이동하는걸로 바꿀 예정</button>
+						</form>
+						
+                        <form th:action="@{/mail/delete/{id}(id=${trashMailList.mailReceiverNo})}" method="post" th:id="'deleteForm-' + ${trashMailList.mailReceiverNo}">
+						  <input type="hidden" name="redirectUrl" value="/mail/trash"/>
+						  <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" 
+						          th:data-bs-target="'#confirmDeleteModal-' + ${trashMailList.mailReceiverNo}">🗑️ 삭제</button>
+						</form>
+                        </div>
+                      </div>
+                      
+                      
+                      <!-- 04/17 나중에 시간 남으면 좀 더 구성해보기 일단 전체 시간 다 보이게 설정함 -->
+                       <span class="fs-10 fw-bold sendTime"
+					      th:text="${#temporals.format(trashMailList.mail.mailSentTime, 'yyyy.MM.dd HH:mm:ss')}">
+					  </span> 
+					
+                    </div>
+                  </div>
+                  <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11">
+					  <a class="d-block inbox-link"
+					     th:href="@{/mail/detail/{id}(id=${trashMailList.mail.mailNo})}"
+					     th:data-receiver-id="${#authentication.principal.employee.employeeNo}">
+					     
+					     <span class="fs-9 line-clamp-1 mailTitle"
+					           th:classappend="${trashMailList.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
+					           th:text="${trashMailList.mail.mailTitle}">
+					     </span>
+					
+					     <span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"
+					           th:utext="${trashMailList.mail.mailContent}">
+					     </span>
+					  </a>
+					</div>
+					<!-- 삭제 여부 모달 -->
+					<div class="modal fade" th:id="'confirmDeleteModal-' + ${trashMailList.mailReceiverNo}" tabindex="-1" aria-hidden="true">
+						  <div class="modal-dialog modal-dialog-centered modal-sm">
+						    <div class="modal-content bg-dark text-white rounded-3 shadow-lg border border-white">
+						      <div class="modal-header border-0">
+						        <h5 class="modal-title text-light">정말 삭제할까요?</h5>
+						        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="닫기"></button>
+						      </div>
+						      <div class="modal-body text-center">
+						        <p class="mb-0">삭제한 메일은 복구할 수 없습니다.<br>정말 삭제하시겠습니까?</p>
+						      </div>
+						      <div class="modal-footer justify-content-center border-0">
+						        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">취소</button>
+						        <button type="button" class="btn btn-danger btn-sm"
+						                th:onclick="'document.getElementById(\'deleteForm-' + ${trashMailList.mailReceiverNo} + '\').submit();'">삭제</button>
+						      </div>
+						    </div>
+						  </div>
+					</div>
+                </div>
+                </div>
+            	<nav aria-label="Page navigation example">
+					  <ul class="pagination justify-content-center">
+					    <li class="page-item"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
+					    <li class="page-item"><a class="page-link" href="#">1</a></li>
+					    <li class="page-item"><a class="page-link" href="#">2</a></li>
+					    <li class="page-item"><a class="page-link" href="#">3</a></li>
+					    <li class="page-item active" aria-current="page"><a class="page-link" href="#">4</a></li>
+					    <li class="page-item"><a class="page-link" href="#">5</a></li>
+					    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+					  </ul>
+					</nav>
+           
+           </div>
+         </div>
     </main>
   </body>
 </html>
