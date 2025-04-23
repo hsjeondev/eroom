@@ -47,8 +47,6 @@ public class Approval {
 	@Convert(converter = JsonToMapConverter.class)
 	@Column(name = "approval_content", columnDefinition = "TEXT")
 	private Map<String, String> approvalContent; // 결재 내용
-	@Column(name="approval_deny_reason")
-	private String approvalDenyReason; // 결재 반려 사유
 	@Column(name="approval_reg_date", insertable = false, updatable = false)
 	private LocalDateTime approvalRegDate; // 결재 등록일
 	@Column(name="approval_completed_date")
