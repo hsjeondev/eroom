@@ -4,11 +4,248 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{/include/layout}">
-<head>
-<meta charset="UTF-8">
-<title>회수한 결재</title>
-</head>
-<body>
-
+ <body>
+	<main class="main" id="top" layout:fragment="content">
+	<!-- 여기에 요소 넣으면 됩니다. -->
+		<div class="content">
+		<!-- <nav class="mb-3" aria-label="breadcrumb">
+			<ol class="breadcrumb mb-0">
+				<li class="breadcrumb-item"><a href="#!">Page 1</a></li>
+				<li class="breadcrumb-item"><a href="#!">Page 2</a></li>
+				<li class="breadcrumb-item active">Default</li>
+			</ol>
+		</nav> -->
+			<div class="pb-8">
+				<h4 class="mb-4">회수한 결재</h4>
+				<div id="reports" data-list="{&quot;valueNames&quot;:[&quot;title&quot;,&quot;text&quot;,&quot;priority&quot;,&quot;reportsby&quot;,&quot;reports&quot;,&quot;date&quot;],&quot;page&quot;:10,&quot;pagination&quot;:true}">
+					<div class="row g-3 justify-content-between mb-2">
+						<div class="col-12">
+							<div class="d-md-flex justify-content-between">
+							
+								<!-- 결재서 작성 버튼 부분 -->
+								<div class="mb-3">
+									<a href="/approval/create"><button class="btn btn-primary me-4">
+										<!-- <svg class="svg-inline--fa fa-plus me-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+											<path fill="currentColor" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"></path>
+										</svg> -->
+										<!-- <span class="fas fa-plus me-2"></span> Font Awesome fontawesome.com -->
+										결재서 작성
+										
+									</button></a>
+									<!-- <button class="btn btn-link text-body px-0">
+										<svg class="svg-inline--fa fa-file-export fs-9 me-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="file-export" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg="">
+											<path fill="currentColor" d="M0 64C0 28.7 28.7 0 64 0H224V128c0 17.7 14.3 32 32 32H384V288H216c-13.3 0-24 10.7-24 24s10.7 24 24 24H384V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64zM384 336V288H494.1l-39-39c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l39-39H384zm0-208H256V0L384 128z"></path>
+										</svg><span class="fa-solid fa-file-export fs-9 me-2"></span> Font Awesome fontawesome.com
+									Export 
+									</button> -->
+								</div>
+								
+								<div class="d-flex mb-3">
+									<!-- 검색창 -->
+									<div class="search-box me-2">
+										<form class="position-relative">
+										  <input class="form-control search-input search" type="search" placeholder="Search by name" aria-label="Search">
+										  <svg class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+										  	<path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+										  </svg><!-- <span class="fas fa-search search-box-icon"></span> Font Awesome fontawesome.com -->
+										</form>
+									</div>
+									<!-- 필터 버튼  -->
+									<button class="btn px-3 btn-phoenix-secondary" type="button" data-bs-toggle="modal" data-bs-target="#reportsFilterModal" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+										<svg class="svg-inline--fa fa-filter text-primary" data-fa-transform="down-3" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="filter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.6875em;">
+											<g transform="translate(256 256)">
+												<g transform="translate(0, 96)  scale(1, 1)  rotate(0 0 0)">
+													<path fill="currentColor" d="M3.9 54.9C10.5 40.9 24.5 32 40 32H472c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9V448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6V320.9L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z" transform="translate(-256 -256)"></path>
+												</g>
+											</g>
+										</svg><!-- <span class="fa-solid fa-filter text-primary" data-fa-transform="down-3"></span> Font Awesome fontawesome.com -->
+									</button>
+									<!-- 필터 모달 -->
+									<div class="modal fade" id="reportsFilterModal" tabindex="-1">
+										<div class="modal-dialog modal-dialog-centered">
+											<div class="modal-content border border-translucent">
+												<form id="addEventForm" autocomplete="off">
+													<div class="modal-header justify-content-between border-translucent p-4">
+														<h5 class="modal-title text-body-highlight fs-6 lh-sm">Filter</h5>
+														<button class="btn p-1 text-danger" type="button" data-bs-dismiss="modal" aria-label="Close"><svg class="svg-inline--fa fa-xmark fs-9" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"></path></svg><!-- <span class="fas fa-times fs-9"> 				</span> Font Awesome fontawesome.com --></button>
+													</div>
+													<div class="modal-body pt-4 pb-2 px-4">
+														<div class="mb-3">
+															<label class="fw-bold mb-2 text-body-highlight" for="priority">결재양식</label>
+															<select class="form-select" id="priority">
+																<option value="urgent" selected="selected">경조금</option>
+																<option value="medium">휴가원 </option>
+																<option value="high">사직서</option>
+																<option value="low">....</option>
+															</select>
+														</div>
+														<div class="mb-3">
+															<label class="fw-bold mb-2 text-body-highlight" for="createDate">날짜</label>
+															<select class="form-select" id="createDate">
+																<option value="today" selected="selected">Today</option>
+																<option value="last7Days">Last 7 Days</option>
+																<option value="last30Days">Last 30 Days</option>
+																<option value="chooseATimePeriod">Choose a time period</option>
+															</select>
+														</div>
+														<div class="mb-3">
+															<label class="fw-bold mb-2 text-body-highlight" for="category">진행여부</label>
+															<select class="form-select" id="category">
+																<option value="salesReports" selected="selected">대기중</option>
+																<option value="hrReports">진행중</option>
+																<option value="marketingReports">승인 완료</option>
+																<option value="administrativeReports">반려</option>
+															</select>
+														</div>
+													</div>
+												<div class="modal-footer d-flex justify-content-end align-items-center px-4 pb-4 border-0 pt-3">
+												  <!-- <button class="btn btn-sm btn-phoenix-primary px-4 fs-10 my-0" type="submit"> 
+													  <svg class="svg-inline--fa fa-arrows-rotate me-2 fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrows-rotate" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+													  	<path fill="currentColor" d="M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160H352c-17.7 0-32 14.3-32 32s14.3 32 32 32H463.5c0 0 0 0 0 0h.4c17.7 0 32-14.3 32-32V80c0-17.7-14.3-32-32-32s-32 14.3-32 32v35.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1V432c0 17.7 14.3 32 32 32s32-14.3 32-32V396.9l17.6 17.5 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.7c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352H160c17.7 0 32-14.3 32-32s-14.3-32-32-32H48.4c-1.6 0-3.2 .1-4.8 .3s-3.1 .5-4.6 1z"></path>
+													  </svg><span class="fas fa-arrows-rotate me-2 fs-10"></span> Font Awesome fontawesome.com
+													  Reset
+												  </button> -->
+												  <button class="btn btn-sm btn-primary px-9 fs-10 my-0" type="submit">확인</button>
+												  </div>
+												</form>
+											</div>
+										</div>
+									</div>
+									
+									
+								</div> <!-- d-flex mb-3 끝  -->
+							</div> <!-- d-md-flex justify-content-between 끝 -->
+						</div> <!-- col-12 끝 -->
+					</div><!-- row g-3 justify-content-between mb-2 끝 -->
+					
+					
+					<div class="row g-3 list" id="reportsList">
+						
+						
+						<!-- 카드1 thymeleaf 사용중 -->
+						<div class="col-12 col-xl-6" th:each="list, listStatus : ${resultList}">
+							<div class="card h-100">
+								<div class="card-body">
+									<!-- 결재문서 이름/ 진행상태 / 작성자 이름 칸 -->
+									<div class="border-bottom border-translucent">
+										<div class="d-flex align-items-start mb-1">
+											<div class="d-sm-flex align-items-center ps-2"><a class="fw-bold fs-7 lh-sm title line-clamp-1 me-sm-4" th:text="${list.approval_title}" th:href="@{/approval/detail/{no}(no=${list.approval_no})}">결재 제목</a>
+												<div class="d-flex align-items-center">
+												
+													<!-- 빨간색 -->
+													<span th:if="${list.approval_status == 'D'}">
+														<svg class="svg-inline--fa fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
+															<g transform="translate(256 256)">
+																<g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
+																	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+																</g>
+															</g>
+														</svg><span class="fw-bold fs-9 text-body lh-2">반려</span>
+													</span>
+													
+													<!-- 초록색 -->
+													<span th:if="${list.approval_status == 'A'}">
+														<svg class="svg-inline--fa fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
+														  <g transform="translate(256 256)">
+															  <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
+															  	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+															  </g>
+														  </g>
+													  	</svg><span class="fw-bold fs-9 text-body lh-2">승인</span>
+													</span>
+													
+													<!-- 파란색 -->
+													<span th:if="${list.approval_status == 'S'}">
+														<svg class="svg-inline--fa fa-circle me-1 text-info" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
+												            <g transform="translate(256 256)">
+													            <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
+													            	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+													            </g>
+												            </g>
+											            </svg><span class="fw-bold fs-9 text-body lh-2">진행</span>
+										            </span>
+													
+													<!-- 주황색 -->
+													<span th:if="${list.approval_status == 'F'}">
+														<svg class="svg-inline--fa fa-circle me-1 text-warning" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
+												            <g transform="translate(256 256)">
+													            <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
+													            	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+													            </g>
+												            </g>
+											            </svg>
+														<span class="fw-bold fs-9 text-body lh-2">회수</span>
+													</span>
+												</div>
+											</div>
+										</div>
+										<!-- 작성자 -->
+											<br>
+										<p class="fs-9 fw-semibold text-body ms-4 text mb-4 ps-2" th:text="|작성자 : ${list.employee.employeeName}|">
+											작성자
+										</p>
+									</div>
+									<!-- 결재자, 참조자, 합의자 + 날짜 칸 -->
+									<div class="row g-1 g-sm-3 mt-2 lh-1">
+										<div class="col-12 col-sm-auto flex-1 text-truncate">
+											<a class="fw-semibold fs-9">
+												결재자 : 
+											</a>
+											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step >= 1}"  th:text="|${member.employee.employeeName} |">결재자목록</span>
+											<br>
+											<a class="fw-semibold fs-9">
+												합의자 : 
+											</a>
+											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == 0}"  th:text="|${member.employee.employeeName} |">합의자목록</span>
+											<br>
+											<a class="fw-semibold fs-9">
+												참조자 : 
+											</a>
+											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == -1}"  th:text="|${member.employee.employeeName} |">참조자목록</span>
+										</div>
+										
+										<!-- 결재양식  -->
+										<div class="col-12 col-sm-auto">
+											<br>
+											<br>
+										  <div class="d-flex align-items-center">
+										  	<!-- 문서 아이콘 -> fs-20 숫자로 사이즈 조절 -->
+										    <span class="uil uil-clipboard-alt fs-20 text-body-secondary me-2" ></span>
+										    <p class="mb-0 fs-9 fw-semibold text-body-tertiary reports" th:text="${list.approval_format.approvalFormatTitle}">[양식명]</p>
+										  </div>
+										</div>
+										<!-- 날짜 -->
+										<div class="col-12 col-sm-auto">
+											<br>
+											<br>
+											<div class="d-flex align-items-center"><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock me-2" style="stroke-width:2;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+												<p class="mb-0 fs-9 fw-semibold text-body-tertiary date" th:text="${list.reg_date}">2025.04.10</p>
+											</div>
+										</div>
+									</div>
+								</div> <!-- card-body -->
+							</div><!-- card h-100 끝 -->
+						</div><!-- col-12 col-xl-6 -->
+						<!-- 카드1 끝 -->
+					
+					
+					
+					</div><!-- row g-3 list -->
+				
+				<!-- 페이징 -->
+				<div class="row align-items-center justify-content-center py-2 pe-0 fs-9 mt-2">
+					<div class="col-auto d-flex">
+						<button class="page-link disabled" data-list-pagination="prev" disabled=""><svg class="svg-inline--fa fa-chevron-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"></path></svg><!-- <span class="fas fa-chevron-left"></span> Font Awesome fontawesome.com --></button>
+							<ul class="mb-0 pagination"><li class="active"><button class="page" type="button" data-i="1" data-page="10">1</button></li><li><button class="page" type="button" data-i="2" data-page="10">2</button></li></ul>
+						<button class="page-link pe-0" data-list-pagination="next"><svg class="svg-inline--fa fa-chevron-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"></path></svg><!-- <span class="fas fa-chevron-right"></span> Font Awesome fontawesome.com --></button>
+					</div>
+				  </div>
+				
+				</div> <!-- reports 끝 -->
+			
+			</div><!-- pb-8 끝 -->
+			
+		</div> <!-- content 끝 -->
+	</main>
 </body>
 </html>
