@@ -48,12 +48,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			    왼쪽 9
 			    <div class="row">
 			      <div class="col-xl-4" style="background-color:red; height: 200px;">
-  <ul class="list-unstyled mb-0">
-    <li th:each="member : ${project.project_members}" th:text="${member.employee.employeeName}">
-      직원 이름
-    </li>
-  </ul>
-</div>
+					<!--   <ul class="list-unstyled mb-0">
+					    <li th:each="member : ${project.project_members}" th:text="${member.employee.employeeName}">
+					      직원 이름
+					    </li>
+					  </ul> -->
+					  <span>PM : </span>
+					  <span th:text="${}">PM : </span>
+				</div>
 
 			      <div class="col-xl-8" style="background-color:blue; height: 200px;">
 			        왼쪽 내부 6 (파랑)
