@@ -238,10 +238,10 @@ public class ChatController {
 	@ResponseBody
 	public Map<String, Object> getReceiver(@RequestParam("chatroomNo") Long chatroomNo) {
 	    Map<String, Object> resultMap = new HashMap<>();
-	    
+
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
-	    Employee loginUser = employeeDetails.getEmployee(); // 현재 로그인한 사람
+	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
 
 	    Chatroom chatroom = chatroomService.selectChatroomOne(chatroomNo);
 	    if (chatroom == null) {
@@ -249,18 +249,20 @@ public class ChatController {
 	        return resultMap;
 	    }
 
-	    List<ChatroomAttendee> attendees = chatroom.getChatroomMapping(); // 채팅방 참여자 리스트
-
-	    for (ChatroomAttendee attendee : attendees) {
-	        if (!attendee.getAttendee().getEmployeeNo().equals(loginUser.getEmployeeNo())) {
-	            resultMap.put("receiverNo", attendee.getAttendee().getEmployeeNo());
-	            return resultMap;
+	    // 1:1 채팅방인지 확인
+	    if ("N".equals(chatroom.getChatIsGroupYn())) {
+	        for (ChatroomAttendee attendee : chatroom.getChatroomMapping()) {
+	            if (!attendee.getAttendee().getEmployeeNo().equals(myEmployeeNo)) {
+	                resultMap.put("receiverNo", attendee.getAttendee().getEmployeeNo());
+	                return resultMap;
+	            }
 	        }
 	    }
 
-	    resultMap.put("receiverNo", null);
+	    resultMap.put("receiverNo", null); // 그룹 채팅은 receiverNo 없음
 	    return resultMap;
 	}
+
 	@PostMapping("/read")
 	@ResponseBody
 	public Map<String, String> readChat(@RequestBody Map<String, Long> payload) {
@@ -282,29 +284,7 @@ public class ChatController {
 
 	    return resultMap;
 	}
-	// 채팅방 입장 등록
-	@PostMapping("/joinRoom")
-	@ResponseBody
-	public Map<String, String> joinRoom(@RequestBody Map<String, Object> payload) {
-	    Map<String, String> resultMap = new HashMap<>();
-	    resultMap.put("res_code", "500");
-	    resultMap.put("res_msg", "방 입장 등록 실패했습니다.");
-
-	    try {
-	        Long senderNo = Long.valueOf(payload.get("senderNo").toString());
-	        Long chatroomNo = Long.valueOf(payload.get("chatroomNo").toString());
-
-	        // WebSocket Handler의 static 맵에 등록
-	        ChatWebSocketHandler.registerUserRoom(senderNo, chatroomNo);
-
-	        resultMap.put("res_code", "200");
-	        resultMap.put("res_msg", "방 입장 등록 완료되었습니다!");
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-
-	    return resultMap;
-	}
+	
 	// 채팅방 알림 개수 조회
 	@GetMapping("/unreadCount")
 	@ResponseBody
