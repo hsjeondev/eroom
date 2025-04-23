@@ -120,6 +120,13 @@
 				</div>
 				<div class="row g-3 list" id="reportsList">
 					<!-- 설문 상세 -->
+					<th:block th:if="${#lists.isEmpty(surveyList)}">
+						<div class="col-12">
+							<div class="alert alert-light text-center border border-secondary-light rounded py-4 fs-6 fw-semibold text-body-secondary">
+								<i class="fa-solid fa-circle-info me-2 text-secondary"></i>등록된 설문이 없습니다.
+							</div>
+						</div>
+					</th:block>
 					<th:block th:each="survey : ${surveyList}">
 						<div class="col-12 col-xl-4">
 							<div class="card h-100">
@@ -350,8 +357,8 @@
 		          countSpan.textContent = item.count + '표';
 
 		          if (item.voted === "Y") {
-	        	    wrapper.classList.add('border', 'border-success', 'bg-light');
-	        	    label.innerHTML += ' <span class="badge bg-success ms-2">내 투표</span>';
+	        	    wrapper.classList.add('border', 'border-primary', 'bg-light');
+	        	    label.innerHTML += ' <span class="badge bg-primary ms-2">내 투표</span>';
 	        	  }
 
 		          wrapper.appendChild(label);
@@ -453,8 +460,8 @@
 		        voteCount.setAttribute('title', allowAnonymous ? '익명 투표' : item.voters.join(', '));
 		
 		        if (item.voted === "Y") {
-		          label.innerHTML += ' <span class="badge bg-success ms-2">내 투표</span>';
-		          wrapper.classList.add('border-success', 'border-2');
+		          label.innerHTML += ' <span class="badge bg-primary ms-2">내 투표</span>';
+		          wrapper.classList.add('border-primary', 'border-2');
 		        }
 		
 		        wrapper.appendChild(label);
