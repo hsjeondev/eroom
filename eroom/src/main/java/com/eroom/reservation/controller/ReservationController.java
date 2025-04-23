@@ -10,8 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 
 import com.eroom.facility.entity.Facility;
 import com.eroom.facility.service.FacilityService;
@@ -81,7 +81,7 @@ public class ReservationController {
 	@ResponseBody
 	public List<Map<String, Object>> getVehicleList(@PathVariable("separator") String separator){
 		   List<Map<String, Object>> result = new ArrayList<>();
-		   System.out.println(separator);
+		   //System.out.println(separator);
 		    List<VehicleDto> list = vehicleService.getVehicleList(separator);
 		    
 		    for (VehicleDto dto : list) {
@@ -91,4 +91,15 @@ public class ReservationController {
 		    return result;
 		
 	}
+	
+	  @GetMapping("/resvehicle/booked-times")
+	    @ResponseBody
+	    public List<String> getBookedTimes(
+	            @RequestParam String date,
+	            @RequestParam String facilityNo
+	    ) {
+	        return vehicleService.getBookedTimes(date, facilityNo);
+	    }
+	
+	
 }

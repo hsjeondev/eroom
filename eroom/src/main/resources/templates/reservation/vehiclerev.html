@@ -7,9 +7,9 @@
 <title>차량 목록</title>
 </head>
 
+
 <body>
 	<main class="main" id="top" layout:fragment="content">
-		
 
 		<div class="row">
 			<!--  차량 예약 목록 (왼쪽) -->
@@ -103,8 +103,62 @@
 											</div>
 
 											<!-- 시간 -->
-											<div class="row g-2 mb-3">
-												<div class="col">
+											<div class="row g-2 mb-3">											
+												<!-- 날짜 선택 -->
+												<div class="row g-2">
+													<div class="col">
+														<label class="form-label">시작 날짜</label> <input type="date"
+															id="startDate" class="form-control"   name="reservation_start_date">
+													</div>
+													<div class="col">
+														<label class="form-label">종료 날짜</label> <input type="date"
+															id="endDate" class="form-control"   name="reservation_end_date" >
+													</div>
+												</div>
+
+												<!-- 시간 선택 -->
+												<div class="row g-2 mt-2">
+													<div class="col">
+														<label class="form-label">시작 시간</label> <select
+															id="startTime" class="form-select">
+															<option value="09:00">09:00</option>
+															<option value="10:00">10:00</option>
+															<option value="11:00">11:00</option>
+															<option value="12:00">12:00</option>
+															<option value="13:00">13:00</option>
+															<option value="14:00">14:00</option>
+															<option value="15:00">15:00</option>
+															<option value="16:00">16:00</option>
+															<option value="17:00">17:00</option>
+														</select>
+													</div>
+													<div class="col">
+														<label class="form-label">종료 시간</label> <select
+															id="endTime" class="form-select">
+															<option value="10:00">10:00</option>
+															<option value="11:00">11:00</option>
+															<option value="12:00">12:00</option>
+															<option value="13:00">13:00</option>
+															<option value="14:00">14:00</option>
+															<option value="15:00">15:00</option>
+															<option value="16:00">16:00</option>
+															<option value="17:00">17:00</option>
+															<option value="18:00">18:00</option>
+															<option value="19:00">19:00</option>
+															<option value="20:00">20:00</option>
+															<option value="21:00">21:00</option>
+															<option value="22:00">22:00</option>
+															<option value="23:00">23:00</option>														
+														</select>
+													</div>
+												</div>
+
+												<!-- 숨겨서 서버로 보낼 datetime-local 값 -->
+												<input type="hidden" name="reservation_start"
+													id="calendarStartTime"> <input type="hidden"
+													name="reservation_end" id="calendarEndTime">
+
+												<!-- 	<div class="col">
 													<label for="calendarStartTime" class="form-label">
 														시작시간</label> <input type="datetime-local"
 														class="form-control form-control-sm"
@@ -115,7 +169,7 @@
 														종료시간</label> <input type="datetime-local"
 														class="form-control form-control-sm" id="calendarEndTime"
 														name="reservation_end" />
-												</div>
+												</div> -->
 											</div>
 										</div>
 										<div class="modal-footer border-0 px-4 pb-3">
@@ -129,31 +183,114 @@
 						
 						<!-- 등록을 위한 fetch -->
 						<script>
-							const form = document.addEventForm;
-							form.addEventListener('submit',function(e){
-								e.preventDefault();
-								if(!form.reservation_location.value){
-									alert('목적지를 입력해주세요!');
-									return;
-								}
-								
-								const payload = new FormData(form);
-								fetch('/resvehicle/reservation',{
-									method: 'post',
-									headers: {
-								        'header': document.querySelector('meta[name="_csrf_header"]').content,
-								        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-								     },
-								    body: payload
-								 })
-								 .then(response => response.json())
-								 .then(data => {
-									 alert(data.res_msg);
-									 if(data.res_code == 200){
-										 location.reload();
-									 }
-								 })								
-							})													
+						  const form = document.addEventForm;
+						
+						  // 오늘 날짜 자동 설정
+						  const today = new Date().toISOString().split("T")[0];
+						  form.reservation_start_date.value = today;
+						  form.reservation_end_date.value = today;
+						  form.reservation_start_date.min = today;
+						  form.reservation_end_date.min = today;
+						
+						  // 시작 날짜 변경 시, 종료 날짜 제한
+						  form.reservation_start_date.addEventListener("change", function () {
+						    const start = form.reservation_start_date.value;
+						    form.reservation_end_date.min = start;
+						
+						    if (form.reservation_end_date.value < start) {
+						      form.reservation_end_date.value = start;
+						    }
+						  });
+						
+						  // 예약 등록!
+						  form.addEventListener('submit', function(e) {
+						    e.preventDefault();
+						
+						    if (!form.reservation_location.value) {
+						      alert('목적지를 입력해주세요!');
+						      return;
+						    }
+						
+						    const startDate = form.reservation_start_date.value;
+						    const endDate = form.reservation_end_date.value;
+						    const startTime = form.startTime.value;
+						    const endTime = form.endTime.value;
+						
+						    if (!startDate || !endDate || !startTime || !endTime) {
+						      alert("날짜와 시간을 모두 선택해주세요!");
+						      return;
+						    }
+						
+						    const fullStart = `${startDate}T${startTime}`;
+						    const fullEnd = `${endDate}T${endTime}`;
+						
+						    if (fullStart >= fullEnd) {
+						      alert("종료일시는 시작일시보다 늦어야 합니다!");
+						      return;
+						    }
+						
+						    form.calendarStartTime.value = fullStart;
+						    form.calendarEndTime.value = fullEnd;
+						
+						    const payload = new FormData(form);
+						    fetch('/resvehicle/reservation', {
+						      method: 'post',
+						      headers: {
+						        'header': document.querySelector('meta[name="_csrf_header"]').content,
+						        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+						      },
+						      body: payload
+						    })
+						    .then(response => response.json())
+						    .then(data => {
+						      alert(data.res_msg);
+						      if (data.res_code == 200) {
+						        location.reload();
+						      }
+						    });
+						  });
+						  
+						  form.reservation_start_date.addEventListener("change", function () {
+							  const start = form.reservation_start_date.value;
+							  const facilityNo = document.getElementById("modalFacilityNo").value;
+
+							  form.reservation_end_date.min = start;
+							  if (form.reservation_end_date.value < start) {
+							    form.reservation_end_date.value = start;
+							  }
+
+							  // 🚀 예약된 시간 조회
+							  fetch(`/resvehicle/booked-times?date=${start}&facilityNo=${facilityNo}`)
+							    .then(response => response.json())
+							    .then(bookedTimes => {
+							      disableReservedTimes(bookedTimes);
+							    });
+							});
+
+							// ✅ 예약 시간 비활성화 함수
+							function disableReservedTimes(bookedTimes) {
+							  const startSelect = form.startTime;
+							  const endSelect = form.endTime;
+
+							  [...startSelect.options, ...endSelect.options].forEach(opt => {
+							    opt.disabled = false;
+							    opt.textContent = opt.value;
+							  });
+
+							  bookedTimes.forEach(time => {
+							    const sOpt = [...startSelect.options].find(o => o.value === time);
+							    const eOpt = [...endSelect.options].find(o => o.value === time);
+
+							    if (sOpt) {
+							      sOpt.disabled = true;
+							      sOpt.textContent += " (예약됨)";
+							    }
+							    if (eOpt) {
+							      eOpt.disabled = true;
+							      eOpt.textContent += " (예약됨)";
+							    }
+							  });
+							}
 						</script>
 
 
@@ -195,7 +332,7 @@
 			  //console.log(separator+"!!!!!!!!!!!!!!!");
 			  const calendar = new FullCalendar.Calendar(calendarEl, {
 			      initialView: 'dayGridMonth',
-			      locale: 'ko',
+			      locale: 'ko',		      
 			      headerToolbar: {
 			        left: 'prev,next today',
 			        center: 'title',
@@ -259,7 +396,34 @@
 			      eventDisplay: 'block',
 			      dayCellContent: function (info) {
 			        return info.date.getDate();
-			      }
+			      },
+			      eventDidMount: function(info) {
+			    	  const eventEl = info.el;
+
+			    	 
+
+			    	  // 초슬림 스타일 적용
+			    	  eventEl.style.setProperty("font-size", "9px", "important");
+			    	  eventEl.style.setProperty("font-weight", "400", "important");
+			    	  eventEl.style.setProperty("padding", "0 2px", "important");
+			    	  eventEl.style.setProperty("margin", "1px 0", "important");
+			    	  eventEl.style.setProperty("border-radius", "2px", "important");
+			    	  eventEl.style.setProperty("height", "auto", "important");
+
+			    	
+			    	  eventEl.style.setProperty("white-space", "nowrap", "important");
+			    	  eventEl.style.setProperty("overflow", "hidden", "important");
+			    	  eventEl.style.setProperty("text-overflow", "ellipsis", "important");
+
+			    	  
+			    	  const eventMain = eventEl.querySelector(".fc-event-main");
+			    	  if (eventMain) {
+			    	    eventMain.style.setProperty("white-space", "nowrap", "important");
+			    	    eventMain.style.setProperty("overflow", "hidden", "important");
+			    	    eventMain.style.setProperty("text-overflow", "ellipsis", "important");
+			    	    eventMain.style.setProperty("font-size", "9px", "important");
+			    	  }
+			    }
 			  });
 
 			  	// setTimeout 사용
