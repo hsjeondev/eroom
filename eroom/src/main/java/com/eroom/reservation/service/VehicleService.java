@@ -112,4 +112,31 @@ public class VehicleService {
 		}
 		return result;
 	}
+	
+	//해당 예약 삭제
+	public VehicleDto deleteCalendar(Long id) {
+		Vehicle target = repository.findById(id).orElse(null);
+		if(target == null) {
+			return null;
+		}
+		
+		String changeYtoN = "Y".equals(target.getVisibleYn()) ? "N" : "Y";
+		
+		Vehicle updated = Vehicle.builder()
+			    .reservationNo(target.getReservationNo())
+	            .facilityNo(target.getFacilityNo())
+	            .employeeNo(target.getEmployeeNo())
+	            .separatorCode(target.getSeparatorCode())
+	            .reservationStart(target.getReservationStart())
+	            .reservationEnd(target.getReservationEnd())
+	            .visibleYn(changeYtoN) 
+	            .reservationCreator(target.getReservationCreator())
+	            .reservationEditor(target.getReservationEditor())
+	            .reservationRegDate(target.getReservationRegDate())
+	            .reservationModDate(target.getReservationModDate())
+	            .reservationLocation(target.getReservationLocation())
+	            .build();
+		Vehicle saved = repository.save(updated);
+		return new VehicleDto().toDto(saved);
+	}
 }

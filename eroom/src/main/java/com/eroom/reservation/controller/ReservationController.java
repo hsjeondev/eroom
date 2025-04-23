@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eroom.calendar.dto.EmployeeCalendarDto;
 import com.eroom.facility.entity.Facility;
 import com.eroom.facility.service.FacilityService;
 import com.eroom.reservation.dto.VehicleDto;
@@ -50,7 +51,7 @@ public class ReservationController {
 		return "reservation/meetingroomrev";
 	}
 
-	// ========================등록 =============================
+	// ========================차량 등록 =============================
 	@PostMapping("/resvehicle/reservation")
 	@ResponseBody
 	public Map<String, String> vehicleReservation(VehicleDto param) {
@@ -70,7 +71,7 @@ public class ReservationController {
 		return resultMap;
 	}
 
-	// ====================목록 조회 =========================
+	// ====================차량 목록 조회 =========================
 	@GetMapping("/resvehicle/list/{separator}")
 	@ResponseBody
 	public List<Map<String, Object>> getVehicleList(@PathVariable("separator") String separator) {
@@ -86,7 +87,7 @@ public class ReservationController {
 
 	}
 	
-	//======================예약 수정 모달에 값 넣기 ===========================
+	//======================차량 예약 수정 모달에 값 넣기 ===========================
 	@GetMapping("/resvehicle/detail/{reservationNo}")
 	@ResponseBody
 	public ResponseEntity<VehicleDto> selectVehicleOne(@PathVariable("reservationNo") Long reservationNo){
@@ -101,7 +102,7 @@ public class ReservationController {
 		}
 	}
 	
-	//========================예약 수정 ==========================
+	//========================차량 예약 수정 ==========================
 	@PostMapping("/resvehicle/update/{reservationNo}")
 	@ResponseBody
 	public Map<String,String> updateVehicle(VehicleDto param, @PathVariable("reservationNo") Long id){
@@ -122,8 +123,28 @@ public class ReservationController {
     	
     	return resultMap;
 	}
+	
+	//====================차량 예약 삭제 ================================
+	@PostMapping("/resvehicle/delete/{reservationNo}")
+	@ResponseBody
+	public Map<String,String> deleteVehicle(@PathVariable("reservationNo") Long id){
+		Map<String,String> result = new HashMap<String,String>();
+		result.put("res_code", "500");
+		result.put("res_msg", "삭제를 실패했습니다");
+		
+		//System.out.println("==================="+ id + "===================");
+		
+		VehicleDto deleteVehicle = vehicleService.deleteCalendar(id);
+		
+		if(deleteVehicle != null) {
+			result.put("res_code", "200");
+			result.put("res_msg", "예약을 삭제하였습니다!");
+		}
+		
+		return result;
+	}
 
-	// =================예약 시간 막기==============================
+	// =================차량 예약 시간 막기==============================
 	// 예약 시간 막기
 	@GetMapping("/resvehicle/booked-times")
 	@ResponseBody

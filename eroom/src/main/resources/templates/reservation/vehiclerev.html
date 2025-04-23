@@ -588,6 +588,10 @@
 
 			    	  document.getElementById("detailEndTime").textContent = 
 			    	    new Intl.DateTimeFormat('ko-KR', options).format(new Date(event.end));
+			    	  
+			    	  
+			    	  
+
 
 			    	  // 모달 열기
 			    	  const modalElement = document.getElementById('vehicleDetailModal');
@@ -654,26 +658,41 @@
 			  });
 			  
 			  //수정 모달에 값 채워넣기 + resvationNo 기준
-			  document.getElementById("editVehicleBtn").addEventListener("click", function () {
-				  const reservationNo = document.getElementById("detailReservationNo").value;
-				  console.log(reservationNo);
-				  fetch('/resvehicle/detail/' + reservationNo)
-				    .then(response => response.json())
-				    .then(data => {
-				      //모달 input 값 채우기
-				      document.getElementById("editReservationNo").value = data.reservation_no;
-				      document.getElementById("editFacilityNo").value = data.facility_no;
-				      document.getElementById("editLocation").value = data.reservation_location;
-				      document.getElementById("editStartDate").value = data.reservation_start.split("T")[0];
-				      document.getElementById("editEndDate").value = data.reservation_end.split("T")[0];
-				      document.getElementById("editStartTime").value = data.reservation_start.split("T")[1].substring(0,5);
-				      document.getElementById("editEndTime").value = data.reservation_end.split("T")[1].substring(0,5);
+			document.getElementById("editVehicleBtn").addEventListener("click", function () {
+			  const reservationNo = document.getElementById("detailReservationNo").value;
+			
+			  // 상세 모달 닫기
+			  const detailModalEl = document.getElementById("vehicleDetailModal");
+			  const detailModal = bootstrap.Modal.getInstance(detailModalEl);
+			  if (detailModal) {
+			    detailModal.hide();
+			  }
+			
+			  // 서버에서 수정할 데이터 가져오기
+			  fetch('/resvehicle/detail/' + reservationNo)
+			    .then(response => response.json())
+			    .then(data => {
+			      // 수정 모달 데이터 채우기
+			      document.getElementById("editReservationNo").value = data.reservation_no;
+			      document.getElementById("editFacilityNo").value = data.facility_no;
+			      document.getElementById("editLocation").value = data.reservation_location;
+			
+			      const startDate = data.reservation_start.split("T")[0];
+			      const endDate = data.reservation_end.split("T")[0];
+			
+			      document.getElementById("editStartDate").value = startDate;
+			      document.getElementById("editEndDate").value = endDate;
+			      document.getElementById("editEndDate").min = startDate; 
+			      const today = new Date().toISOString().split("T")[0];
+			      document.getElementById("editStartDate").min = today;
+			      document.getElementById("editStartTime").value = data.reservation_start.split("T")[1].substring(0, 5);
+			      document.getElementById("editEndTime").value = data.reservation_end.split("T")[1].substring(0, 5);
 
-				      // 모달 열기
-				      const editModal = new bootstrap.Modal(document.getElementById("editVehicleModal"));
-				      editModal.show();
-				    });
-				});
+			      //수정 모달 열기
+			      const editModal = new bootstrap.Modal(document.getElementById("editVehicleModal"));
+			      editModal.show();
+			    });
+			});
 			  
 			  //수정용 모달에서 수정완료 버튼을 눌러 UPDATE
 			  document.getElementById("editVehicleForm").addEventListener("submit", function (e) {
@@ -685,7 +704,7 @@
 				  const startTime = document.getElementById("editStartTime").value;
 				  const endDate = document.getElementById("editEndDate").value;
 				  const endTime = document.getElementById("editEndTime").value;
-				  const location = document.getElementById("editLocation").value.trim();
+				  const locationValue = document.getElementById("editLocation").value.trim();
 
 				  const startDateTime = `${startDate}T${startTime}`;
 				  const endDateTime = `${endDate}T${endTime}`;
@@ -693,9 +712,19 @@
 				  //console.log(reservationNo+"!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
 				  //목적지 유효성 검사
-				  if (!location) {
+				  if (!locationValue) {
 				    alert("목적지를 입력해주세요!");
 				    return;
+				  }
+
+				  const now = new Date();
+				  const today = now.toISOString().split("T")[0];
+				  if (startDate === today) {
+				    const startDateTimeObj = new Date(startDateTime);
+				    if (startDateTimeObj < now) {
+				      alert("지나간 시간으로는 예약할 수 없습니다!");
+				      return;
+				    }
 				  }
 
 				  //시간 유효성 검사
@@ -722,16 +751,43 @@
 				  })
 				    .then(response => response.json())
 				    .then(data => {
+					   alert(data.res_msg); 
+					  if (data.res_code == 200) {
+					    location.reload();   
+					  } 
+					})
+
+				    .catch(error => {
+				      console.error("수정 중 오류:", error);
+				      alert("수정에 실패했습니다.");
+				    });
+				});
+			  	//예약 삭제
+			  	document.getElementById("deleteVehicleBtn").addEventListener("click", function () {
+				    const reservationNo = document.getElementById("detailReservationNo").value;
+
+				    const confirmDelete = confirm("정말 이 차량 예약을 삭제하시겠습니까?");
+				    if (!confirmDelete) return;
+
+				    fetch('/resvehicle/delete/'+reservationNo, {
+				      method: "post",
+				      headers: {
+				        'header': document.querySelector('meta[name="_csrf_header"]').content,
+				        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+				      }
+				    })
+				    .then(response => response.json())
+				    .then(data => {
 				      alert(data.res_msg);
 				      if (data.res_code == 200) {
 				        location.reload();
 				      }
 				    })
 				    .catch(error => {
-				      console.error("수정 중 오류:", error);
-				      alert("수정에 실패했습니다.");
+				      console.error("삭제 중 오류:", error);
+				      alert("삭제에 실패했습니다.");
 				    });
-				});
+				  });
 			  	// setTimeout 사용
 				/* <head>에 있는 FullCalendar CSS 파일이 아직 로드 중이라
 				캘린더는 그려졌지만 스타일이 적용되지 않은 상태로 나와버림. */
