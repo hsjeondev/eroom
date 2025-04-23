@@ -54,7 +54,9 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					    </li>
 					  </ul> -->
 					  <span>PM : </span>
-					  <span th:text="${}">PM : </span>
+					  <span th:each="projectMember : ${project.project_members}"
+					  		th:if="${projectMember.project_manager == 'Y'}"
+					  		th:text="${projectMember.project_member.employeeName}">PM 이름</span>
 				</div>
 
 			      <div class="col-xl-8" style="background-color:blue; height: 200px;">
