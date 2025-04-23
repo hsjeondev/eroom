@@ -146,6 +146,11 @@ public class ApprovalService {
 		return result;
 	}
 
+	public List<Approval> findAllApprovalsVisibleY(String visible) {
+		List<Approval> approvals = approvalRepository.findAllByApprovalVisibleYn(visible);
+		return approvals;
+	}
+
 
 
 }
