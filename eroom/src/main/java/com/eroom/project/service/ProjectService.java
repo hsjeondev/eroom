@@ -88,6 +88,9 @@ public class ProjectService {
     	
     	if(project != null) {
     		projectdto = new ProjectDto().toDto(project);
+    		String encryptedToken = projectdto.getProject_github_token();
+            String decryptedToken = rsaCryptor.decrypt(encryptedToken);
+            projectdto.setProject_github_token(decryptedToken);
     	}
     	
     	return projectdto;
