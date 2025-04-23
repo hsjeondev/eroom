@@ -10,14 +10,11 @@ import com.eroom.approval.entity.ApprovalLine;
 
 public interface ApprovalLineRepository extends JpaRepository<ApprovalLine, Long> {
 
-//	@Query("SELECT DISTINCT a FROM ApprovalLine a WHERE a.approval.approvalNo = :approvalNo ORDER BY a.approvalLineNo")
-//	List<ApprovalLine> findByApproval_ApprovalNoOrderByApprovalLineNoAsc(@Param("approvalNo") Long approvalNo);
+	// 결재 번호로 결재 라인 조회
 	@Query("SELECT DISTINCT a FROM ApprovalLine a JOIN FETCH a.employee WHERE a.approval.approvalNo = :approvalNo")
 	List<ApprovalLine> findApprovalLines(@Param("approvalNo") Long approvalNo);
 
-
-	
-//	List<ApprovalLine> findByApproval_ApprovalNoOrderByApprovalLineNoAsc(Long approvalNo);
-
+	// 회원 번호로 결재 라인 조회
+	List<ApprovalLine> findApprovalLinesByEmployee_EmployeeNo(Long employeeNo);
 
 }
