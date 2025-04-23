@@ -112,6 +112,13 @@ public class MailController {
 		return "mail/mailImportant";
 	}
 	
+	@PostMapping("/mail/trash/{id}")
+	public String moveToTrash(@PathVariable("id") Long id,
+							  @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+		System.out.println(id+":"+employeeDetails);
+		return null;
+	}
+	
 	// 휴지통 조회할곳
 	@GetMapping("/mail/trash")
 	public String selectTrashMailAll() {
