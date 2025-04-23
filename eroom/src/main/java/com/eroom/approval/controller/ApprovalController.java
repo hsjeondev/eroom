@@ -454,7 +454,7 @@ public class ApprovalController {
 								bool = true;
 							}
 						}
-						if(bool) {
+						if(bool && !approval.getApprovalStatus().equals("F")) {
 							temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
 							resultApprovalList.add(temp2);
 						}
@@ -554,7 +554,7 @@ public class ApprovalController {
 						if (temp.get(i).getApprovalLineStep() == 0 && temp.get(i).getEmployee().getEmployeeNo() == employeeNo) {
 							bool = true;
 						}
-						if(bool) {
+						if(bool && !approval.getApprovalStatus().equals("F")) {
 							temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
 							resultApprovalList.add(temp2);
 						}
@@ -611,7 +611,7 @@ public class ApprovalController {
 						if (temp.get(i).getApprovalLineStep() == -1 && temp.get(i).getEmployee().getEmployeeNo() == employeeNo) {
 							bool = true;
 						}
-						if(bool) {
+						if(bool && !approval.getApprovalStatus().equals("F")) {
 							temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
 							resultApprovalList.add(temp2);
 						}
