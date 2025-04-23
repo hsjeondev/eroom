@@ -81,7 +81,7 @@
             </thead>
             <tbody>
               <tr>
-                <td  th:if="${line.approval_line_step == 0}" th:each="line : ${approvalLineList}">
+                <td th:if="${line.approval_line_step == 0}" th:each="line : ${approvalLineList}">
                 	<span th:if="${line.approval_line_status == 'A'}" th:text="|합의|">서명!</span>
                 	<span th:if="${line.approval_line_status == 'S'}" th:text="|대기중|">대기!</span>
                 	<span th:if="${line.approval_line_status == 'D'}" th:text="|합의x|">반려!</span>
@@ -127,7 +127,7 @@
       </div>
 
       <!-- 승인/반려 버튼 -->
-      <div class="mt-4 text-end">
+      <div class="mt-4 text-end"  th:if="${line.approval_line_step >= 1 and line.employee.employeeNo == employee.employeeNo and line.approval_line_status == 'S'}" th:each="line : ${approvalLineList}">
         <button type="button" class="btn btn-primary me-2">결재 승인</button>
         <button type="button" class="btn btn-outline-danger">반려</button>
       </div>
@@ -154,7 +154,7 @@
 	<!-- 삭제 버튼 -->
 	<script th:inline="javascript">
 		document.getElementById("deleteBtn").addEventListener("click", function(){
-			const deleteNo = [[${approval.approval_no}]];
+			const deleteNo = /*[[${approval.approval_no}]]*/ 0;
 			if(confirm('결재를 삭제하시겠습니까?')){
 				fetch('/approval/' + deleteNo + '/delete',{
 					method : 'POST',
@@ -180,7 +180,7 @@
 	<!-- 회수 버튼 -->
 	<script th:inline="javascript">
 		document.getElementById("fallBackBtn").addEventListener("click", function(){
-			const fallBackNo = [[${approval.approval_no}]];
+			const fallBackNo = /*[[${approval.approval_no}]]*/ 0;
 			if(confirm('결재를 회수하시겠습니까?')){
 				fetch('/approval/' + fallBackNo + '/fallBack',{
 					method : 'POST',
