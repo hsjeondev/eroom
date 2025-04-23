@@ -128,8 +128,8 @@
 
       <!-- 승인/반려 버튼 -->
       <div class="mt-4 text-end"  th:if="${line.approval_line_step >= 1 and line.employee.employeeNo == employee.employeeNo and line.approval_line_status == 'S'}" th:each="line : ${approvalLineList}">
-        <button id="approvalApproveBtn" type="button" class="btn btn-primary me-2">승인</button>
-        <button id="approvalDenyBtn" type="button" class="btn btn-outline-danger">반려</button>
+        <button data-status="A" id="approvalApproveBtn" type="button" class="btn btn-primary me-2 approveDenyBtn">승인</button>
+        <button data-status="D" id="approvalDenyBtn" type="button" class="btn btn-outline-danger approveDenyBtn">반려</button>
       </div>
       <!-- 결재 삭제 버튼 -->
       <div class="mt-4 text-end">
@@ -179,7 +179,8 @@
 	</script>
 	<!-- 회수 버튼 -->
 	<script th:inline="javascript">
-		document.getElementById("fallBackBtn").addEventListener("click", function(){
+	
+		document.getElementByClassName("fallBackBtn").addEventListener("click", function(){
 			const fallBackNo = /*[[${approval.approval_no}]]*/ 0;
 			if(confirm('결재를 회수하시겠습니까?')){
 				fetch('/approval/' + fallBackNo + '/fallBack',{
@@ -203,32 +204,43 @@
 		});
 	
 	</script>
-	<!-- 승인 버튼 -->
+	
+	<!-- 승인,반려 버튼 -->
 	<script th:inline="javascript">
-		document.getElementById("approvalApproveBtn").addEventListener("click", function () {
+		document.querySelectorAll(".approveDenyBtn").forEach(function(btn) {
+			btn.addEventListener("click", function () {
 				const approvalNo = /*[[${approval.approval_no}]]*/ 0;
-				if (confirm('결재를 승인하시겠습니까?')) {
-					fetch('/approval/' + approvalNo + '/approve', {
+				const employeeNo = /*[[${employee.employeeNo}]]*/ 0;
+				const status = this.dataset.status;
+				const actionText = status === 'A' ? '승인' : (status === 'D' ? '반려' : '처리');
+				if (confirm(`결재를 ${actionText}하시겠습니까?`)) {
+					fetch('/approvalLine/approveDeny', {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
 							'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
 							'header': document.querySelector('meta[name="_csrf_header"]').content
+						},
+						body: JSON.stringify({
+							approval_no : approvalNo,
+							approval_line_status : status,
+							employee_no : employeeNo
+						})
+					})
+					.then(response => response.json())
+					.then(data => {
+						alert(data.res_msg)
+						if (data.res_code == 200) {
+							location.reload();
 						}
 					})
-						.then(response => response.json())
-						.then(data => {
-							alert(data.res_msg)
-							if (data.res_code == 200) {
-								location.href = '/approval/myRequestedApprovals';
-							}
-						})
 				} else {
 
 				}
 			});
+		})
 	</script>
-    
-  </main>
+
+	</main>
 </body>
 </html>
