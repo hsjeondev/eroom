@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
 <th:block layout:fragment="content">
-	<style>
+<style>
 /* 삭제 버튼 css */
 .item-wrapper {
 	position: relative;
@@ -23,7 +23,7 @@
 	<main class="main" id="top">
 		<div class="pb-8">
 			<h2 class="mb-4">설문</h2>
-			<div id="reports" data-list='{"valueNames":["title","text","priority","reportsby","reports","date"],"page":2,"pagination":true}'>
+			<div id="reports" data-list='{"valueNames":["title","text","priority","reportsby","reports","date"],"page":9,"pagination":true}'>
 				<div class="row g-3 justify-content-between mb-2">
 					<div class="col-12">
 						<div class="d-md-flex justify-content-between">
@@ -416,20 +416,20 @@
 	    // 복수 선택 가능 → 토글
 	    const isSelected = selected.classList.contains('bg-primary');
 	    if (isSelected) {
-	      selected.classList.remove('bg-primary', 'border-2');
+	      selected.classList.remove('bg-primary', 'border-2', 'text-white');
 	      selected.classList.add('bg-light');
 	    } else {
 	      selected.classList.remove('bg-light');
-	      selected.classList.add('bg-primary', 'border-2');
+	      selected.classList.add('bg-primary', 'border-2', 'text-white');
 	    }
 	  } else {
 	    // 단일 선택 → 기존 선택 해제 후 하나만 선택
 	    allOptions.forEach(el => {
-	      el.classList.remove('bg-primary', 'border-2');
+	      el.classList.remove('bg-primary', 'border-2', 'text-white');
 	      el.classList.add('bg-light');
 	    });
 	    selected.classList.remove('bg-light');
-	    selected.classList.add('bg-primary', 'border-2');
+	    selected.classList.add('bg-primary', 'border-2', 'text-white');
 	  }
 	}
 	
@@ -458,12 +458,14 @@
 	  })
 	  .then(res => res.json())
 	  .then(result => {
-	    if (result.success) {
-	      showVoteResult(surveyId); // 투표 결과 조회 후 표시
-	    } else {
-	      alert('투표에 실패했습니다.');
-	    }
-	  });
+		  if (result.success) {
+		    showVoteResult(surveyId);
+		    const voteBtn = document.querySelector(`#survey-detail-${surveyId} .modal-footer .btn-primary`);
+		    if (voteBtn) voteBtn.textContent = '다시 투표';
+		  } else {
+		    alert('투표에 실패했습니다.');
+		  }
+		});
 	}
 	
 	// 득표수 표시
@@ -489,8 +491,11 @@
 	
 	        const voteCount = document.createElement('span');
 	        voteCount.textContent = item.count + '표';
+	        const voterList = allowAnonymous ? '익명 투표' : item.voters.join('<br>');
+	        voteCount.setAttribute('title', voterList);
 	        voteCount.setAttribute('data-bs-toggle', 'tooltip');
-	        voteCount.setAttribute('title', allowAnonymous ? '익명 투표' : item.voters.join(', '));
+	        voteCount.setAttribute('data-bs-placement', 'right');
+	        voteCount.setAttribute('data-bs-html', 'true');
 	
 	        if (item.voted === "Y") {
 	          label.innerHTML += ' <span class="badge bg-primary ms-2">내 투표</span>';
@@ -501,15 +506,54 @@
 	        wrapper.appendChild(voteCount);
 	        itemList.appendChild(wrapper);
 	      });
+	      
+	    // showVoteResult 마지막에 추가
+	    const voteBtn = document.querySelector(`#survey-detail-${surveyId} .modal-footer .btn-primary`);
+	    if (voteBtn && voteBtn.textContent === '다시 투표') {
+	      voteBtn.onclick = () => enableRevote(surveyId);
+	    }
+	      
+	    // 이미 투표한 항목이 있다면 → 버튼을 '다시 투표'로 바꿔줌
+		const hasVoted = data.some(item => item.voted === "Y");
+		
+		if (voteBtn) {
+		  voteBtn.textContent = hasVoted ? '다시 투표' : '투표';
+		  voteBtn.onclick = hasVoted
+		    ? () => enableRevote(surveyId)
+		    : () => submitVote(surveyId);
+		}
 	
-	      // 툴팁 활성화
-	      const tooltipTriggerList = [].slice.call(itemList.querySelectorAll('[data-bs-toggle="tooltip"]'));
-	      tooltipTriggerList.forEach(function (el) {
-	        const existing = bootstrap.Tooltip.getInstance(el);
-	        if (existing) existing.dispose();
-	        new bootstrap.Tooltip(el);
-	      });
-	    });
+		// 툴팁 활성화
+		const tooltipTriggerList = [].slice.call(itemList.querySelectorAll('[data-bs-toggle="tooltip"]'));
+		  tooltipTriggerList.forEach(function (el) {
+		    const existing = bootstrap.Tooltip.getInstance(el);
+		    if (existing) existing.dispose();
+		    new bootstrap.Tooltip(el);
+		  });
+		});
+	}
+	
+	function enableRevote(surveyId) {
+	  const itemList = document.getElementById('surveyItemList-' + surveyId);
+	  if (!itemList) return;
+
+	  // 항목 초기화
+	  itemList.querySelectorAll('.vote-option').forEach(el => {
+	    el.classList.remove('bg-primary', 'border-2', 'text-white', 'border-primary');
+	    el.classList.add('bg-light', 'text-dark');
+
+	    const label = el.querySelector('span.fw-semibold');
+	    if (label && label.innerHTML.includes('내 투표')) {
+	      label.innerHTML = label.innerHTML.replace(/<span.*<\/span>/, '');
+	    }
+	  });
+
+	  // 버튼 텍스트 복원
+	  const voteBtn = document.querySelector(`#survey-detail-${surveyId} .modal-footer .btn-primary`);
+	  if (voteBtn) voteBtn.textContent = '투표';
+
+	  // 버튼 동작 복원
+	  voteBtn.onclick = () => submitVote(surveyId);
 	}
 	
 	// 모달 열릴 때 투표 결과 + 툴팁 다시 적용

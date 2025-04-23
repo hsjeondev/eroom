@@ -119,22 +119,7 @@ public class SurveyController {
 	    Map<String, Object> response = new HashMap<>();
 
 	    try {
-	        Long surveyId = voteRequest.getSurveyId();
-	        List<Long> items = voteRequest.getVotedItems();
-
-	        EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	        Long voterId = userDetails.getEmployee().getEmployeeNo();
-
-	        for (Long itemNo : items) {
-	            SurveyVoteDto dto = SurveyVoteDto.builder()
-	                .surveyNo(surveyId)
-	                .itemNo(itemNo)
-	                .voter(voterId)
-	                .build();
-
-	            surveyVoteService.saveVote(dto);
-	        }
-
+	        surveyVoteService.saveVote(voteRequest);
 	        response.put("success", true);
 	    } catch (Exception e) {
 	        e.printStackTrace();
