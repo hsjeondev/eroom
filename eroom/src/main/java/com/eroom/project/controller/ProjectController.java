@@ -85,6 +85,7 @@ public class ProjectController {
 		
 		ProjectDto project = projectService.findByProjectNo(project_no);
 		model.addAttribute("project", project);
+		model.addAttribute("description", project.getDescription().replace("\n", "<br>"));
 		
 		return "project/projectDetailMain";
 	}

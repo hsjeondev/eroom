@@ -45,31 +45,85 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			
 	        <div class="row g-5" style="height: 100vh; margin-left: 0.5px; margin-right: 0.5px;">
 			  <div class="col-xl-9">
-			    왼쪽 9
+			  <br>
 			    <div class="row">
-			      <div class="col-xl-4" style="background-color:red; height: 200px;">
-					<!--   <ul class="list-unstyled mb-0">
-					    <li th:each="member : ${project.project_members}" th:text="${member.employee.employeeName}">
-					      직원 이름
-					    </li>
-					  </ul> -->
-					  <span>PM : </span>
-					  <span th:each="projectMember : ${project.project_members}"
-					  		th:if="${projectMember.project_manager == 'Y'}"
-					  		th:text="${projectMember.project_member.employeeName}">PM 이름</span>
+				  <div class="col-xl-4">
+					  <div class="d-flex mb-1">
+					    <span class="fw-bold me-1" style="min-width: 70px;">PM :</span>
+					    <span class="fw-semibold text-muted"
+						      th:each="projectMember : ${project.project_members}"
+						      th:if="${projectMember.project_manager == 'Y'}"
+						      th:text="|${projectMember.project_member.employeeName}(${projectMember.project_member.employeePosition}/${projectMember.project_member.structure.codeName})|">
+						  PM 이름 (직급/부서명)
+						</span>
+
+					  </div>
+					  <div class="d-flex mb-1">
+					    <span class="fw-bold me-1" style="min-width: 70px;">시작일 :</span>
+					    <span class="fw-semibold text-muted"
+					          th:text="${#temporals.format(project.project_start, 'yyyy.MM.dd')}">2025.04.17</span>
+					  </div>
+					  <div class="d-flex">
+					    <span class="fw-bold me-1" style="min-width: 70px;">종료일 :</span>
+					    <span class="fw-semibold text-muted"
+					          th:text="${#temporals.format(project.project_end, 'yyyy.MM.dd')}">2025.04.30</span>
+					  </div>
+					</div>
+				  <div class="col-xl-8">
+				    <div class="d-flex align-items-center gap-2 mb-3">
+				      <span class="fs-7 fw-bold">진행도</span>
+				      <span class="fs-7 fw-bold">33%</span>
+				    </div>
+				    <div class="progress" style="height:20px; border-radius: 10px;">
+				      <div class="progress-bar bg-success" role="progressbar"
+				           style="width: 33%; background-color: limegreen; border-radius: 10px;">
+				      </div>
+				    </div>
+				  </div>
+				  
+				  
+				</div>
+				<h4 class="fw-bold mt-15 mb-5">참여 인원</h4>
+				<div class="mb-3">
+				  <strong>기획 :</strong>
+				  <span th:each="member : ${project.project_members}"
+				        th:if="${member.project_member.structure.codeName == '기획팀' and member.is_manager == 'N'}"
+				        class="me-2 d-inline-block text-muted"
+				        th:text="|${member.project_member.employeeName}(${member.project_member.employeePosition}/${member.project_member.structure.codeName})|">
+				    이름(직급/기획)
+				  </span>
+				</div>
+				
+				<div class="mb-3">
+				  <strong>디자인 :</strong>
+				  <span th:each="member : ${project.project_members}"
+				        th:if="${member.project_member.structure.codeName == '디자인팀' and member.is_manager == 'N'}"
+				        class="me-2 d-inline-block text-muted"
+				        th:text="|${member.project_member.employeeName}(${member.project_member.employeePosition}/${member.project_member.structure.codeName})|">
+				    이름(직급/디자인)
+				  </span>
+				</div>
+				
+				<div class="mb-3">
+				  <strong>개발 :</strong>
+				  <span th:each="member : ${project.project_members}"
+				        th:if="${member.project_member.structure.codeName == '영업지원팀' and member.is_manager == 'N'}"
+				        class="me-2 d-inline-block text-muted"
+				        th:text="|${member.project_member.employeeName}(${member.project_member.employeePosition}/${member.project_member.structure.codeName})|">
+				    이름(직급/개발)
+				  </span>
 				</div>
 
-			      <div class="col-xl-8" style="background-color:blue; height: 200px;">
-			        왼쪽 내부 6 (파랑)
-			      </div>
-			    </div>
+				<div class="mt-15">
+				  <h4 class="fw-bold mb-5">설명</h4>
+				  <p class="text-muted lh-lg" style="white-space: pre-line;" th:text="${project.description}">프로젝트 설명</p>
+				</div>
+				
 			  </div>
 			  <div class="col-xl-3" style="background:#EFF2F6;">
-			    오른쪽 3
+			    최근 파일, 회의록 자리
 			  </div>
 			</div>
-
-
     </main>
   </body>
 </html>
