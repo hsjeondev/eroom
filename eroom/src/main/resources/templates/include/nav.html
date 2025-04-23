@@ -242,8 +242,8 @@
 				      <!-- 회수한 결재 -->
 				      <li class="nav-item">
 				        <a class="nav-link"
-				           th:href="@{/approval/withdrawnApprovals}"
-					        th:classappend="${(requestURI != null and requestURI.startsWith('/approval/withdrawnApprovals')) ? 'active' : ''}">
+				           th:href="@{/approval/fallBackApprovals}"
+					        th:classappend="${(requestURI != null and requestURI.startsWith('/approval/fallBackApprovals')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">회수한 결재</span></div>
 				        </a>
 				      </li>
