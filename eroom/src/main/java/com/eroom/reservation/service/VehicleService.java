@@ -5,9 +5,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.eroom.calendar.dto.EmployeeCalendarDto;
-import com.eroom.calendar.entity.EmployeeCalendar;
+import com.eroom.employee.entity.Employee;
+import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.facility.entity.Facility;
+import com.eroom.facility.repository.FacilityRepository;
 import com.eroom.reservation.dto.VehicleDto;
 import com.eroom.reservation.entity.Vehicle;
 import com.eroom.reservation.repository.VehicleRepository;
@@ -19,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 public class VehicleService {
 	
 	private final VehicleRepository repository;
+	private final FacilityRepository facilityRepositroy;
+	private final EmployeeRepository employeeRepository;
 	
 	//예약 등록
 	public VehicleDto vehicleReservation(VehicleDto dto) {
@@ -33,7 +36,20 @@ public class VehicleService {
 
 		    for (Vehicle vehicle : list) {
 		        VehicleDto dto = new VehicleDto();
+		        
+		        Facility facility = facilityRepositroy.findByFacilityNo(vehicle.getFacilityNo());
+		        if (facility != null) {
+		            dto.setVehicleName(facility.getFacilityName()); // 차량 이름
+		        }
+
+		        // employee_name 가져오기
+		        Employee employee = employeeRepository.findByEmployeeNo(vehicle.getEmployeeNo());
+		        if (employee != null) {
+		            dto.setReserverName(employee.getEmployeeName()); // 예약자 이름
+		        }
+
 		        dtoList.add(dto.toDto(vehicle));
+		        
 		    }
 
 		    return dtoList;

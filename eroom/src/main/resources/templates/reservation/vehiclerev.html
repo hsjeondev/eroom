@@ -214,7 +214,7 @@
 			      eventSources: [ //구글 캘린더로 공휴일 불러오기, 예약 현황 불러오기
 			    	    {
 			    	      events: function (fetchInfo, successCallback, failureCallback) {
-			    	        fetch('/resvehicle/list' + separator)
+			    	        fetch('/resvehicle/list/' + separator)
 			    	          .then(response => response.json())
 			    	          .then(events => successCallback(events))
 			    	          .catch(error => {

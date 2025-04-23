@@ -27,6 +27,8 @@ public class VehicleDto {
 	private LocalDateTime reservation_start;
 	private LocalDateTime reservation_end;
 	private String visible_yn="Y";
+	private String vehicleName;
+	private String reserverName;
 	private String reservation_creator;
 	private String reservation_editor;
 	private LocalDateTime reservation_reg_date;
@@ -69,7 +71,7 @@ public class VehicleDto {
 	
 	public Map<String, Object> toFullCalendarEvent() {
 	    Map<String, Object> event = new HashMap<>();
-	    event.put("title", this.reservation_location != null ? this.reservation_location : "차량 예약");
+	    event.put("title", "[" + this.vehicleName + "] " + this.reserverName);
 	    event.put("start", this.reservation_start != null ? this.reservation_start.toString() : "");
 	    event.put("end", this.reservation_end != null ? this.reservation_end.toString() : "");
 	    event.put("location", this.reservation_location != null ? this.reservation_location : "");

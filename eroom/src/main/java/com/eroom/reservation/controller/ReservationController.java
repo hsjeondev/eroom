@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.eroom.calendar.dto.CompanyCalendarDto;
+
 import com.eroom.facility.entity.Facility;
 import com.eroom.facility.service.FacilityService;
 import com.eroom.reservation.dto.VehicleDto;
