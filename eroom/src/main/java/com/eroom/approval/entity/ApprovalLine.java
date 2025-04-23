@@ -51,6 +51,8 @@ public class ApprovalLine {
 	@Column(name="approval_line_signed_date")
 	private LocalDateTime approvalLineSignedDate; // 결재 라인 결재일
 	
+	@Column(name = "approval_line_deny_reason")
+	private String approvalLineDenyReason; // 결재 반려 사유
 
 
 }

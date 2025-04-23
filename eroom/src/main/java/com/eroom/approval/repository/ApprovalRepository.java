@@ -13,6 +13,8 @@ public interface ApprovalRepository extends JpaRepository<Approval, Long> {
 
 	List<Approval> findByApprovalNoAndApprovalVisibleYnOrderByApprovalRegDateDesc(Long approvalNo, String visible);
 
+	List<Approval> findAllByApprovalVisibleYn(String string);
+
 
 	
 }

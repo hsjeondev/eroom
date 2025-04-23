@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eroom.approval.dto.ApprovalDto;
 import com.eroom.approval.dto.ApprovalRequestDto;
 import com.eroom.approval.entity.Approval;
 import com.eroom.approval.entity.ApprovalFormat;
@@ -50,15 +51,16 @@ public class ApprovalService {
 			
 			
 			
-			// 1. 결재자 저장
 			ApprovalLine approvalLine = null;
-			for (int i = 0; i < dto.getApproverIds().size(); i++) {
+
+			// 3. 참조자 저장
+			for (int i = 0; i < dto.getRefererIds().size(); i++) {
 				
-				approvalLine = ApprovalLine.builder()
+						approvalLine = ApprovalLine.builder()
 						.approval(approval)
-						.approvalLineStatus("S")
-						.employee(Employee.builder().employeeNo(dto.getApproverIds().get(i)).build())
-						.approvalLineStep(dto.getApproverSteps().get(i)) // 결재자 순서 step 1,2,3...
+						.approvalLineStatus("A")
+						.employee(Employee.builder().employeeNo(dto.getRefererIds().get(i)).build())
+						.approvalLineStep(-1) // 참조자 고정값 -1
 						.build();
 					approvalLineRepository.save(approvalLine);
 			}
@@ -74,15 +76,14 @@ public class ApprovalService {
 						.build();
 					approvalLineRepository.save(approvalLine);
 			}
-
-			// 3. 참조자 저장
-			for (int i = 0; i < dto.getRefererIds().size(); i++) {
+			// 1. 결재자 저장
+			for (int i = 0; i < dto.getApproverIds().size(); i++) {
 				
-						approvalLine = ApprovalLine.builder()
+				approvalLine = ApprovalLine.builder()
 						.approval(approval)
-						.approvalLineStatus("A")
-						.employee(Employee.builder().employeeNo(dto.getRefererIds().get(i)).build())
-						.approvalLineStep(-1) // 참조자 고정값 -1
+						.approvalLineStatus("S")
+						.employee(Employee.builder().employeeNo(dto.getApproverIds().get(i)).build())
+						.approvalLineStep(dto.getApproverSteps().get(i)) // 결재자 순서 step 1,2,3...
 						.build();
 					approvalLineRepository.save(approvalLine);
 			}
@@ -145,6 +146,39 @@ public class ApprovalService {
 		}
 		return result;
 	}
+
+	public List<Approval> findAllApprovalsVisibleY(String visible) {
+		List<Approval> approvals = approvalRepository.findAllByApprovalVisibleYn(visible);
+		return approvals;
+	}
+
+	// 결재 승인,반려 처리 결재에반영할지말지 가르는 델리미터필요
+	public int approvalApproveDeny(ApprovalLine approvalLine, Boolean isFinalApprovalLineisMe) {
+		int result = 0;
+		try {
+			Approval approval = approvalRepository.findById(approvalLine.getApproval().getApprovalNo()).orElse(null);
+			
+			if (approval != null) {
+				ApprovalDto approvalDto = new ApprovalDto().toDto(approval);
+//				if(approvalLine.equals("D")) {
+//					approvalDto.setApproval_status("D");
+//				} else  {
+//					approvalDto.setApproval_status("A");
+//				}
+				approvalDto.setApproval_status(approvalLine.getApprovalLineStatus());
+				approval = approvalDto.toEntity();
+				if(isFinalApprovalLineisMe || approvalDto.getApproval_status().equals("D")) {
+					approvalRepository.save(approval);
+                }
+				result = 1;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = 0;
+		}
+		return result;
+	}
+	
 
 
 
