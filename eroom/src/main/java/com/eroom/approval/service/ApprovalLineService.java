@@ -1,10 +1,12 @@
 package com.eroom.approval.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eroom.approval.dto.ApprovalLineDto;
 import com.eroom.approval.entity.ApprovalLine;
 import com.eroom.approval.repository.ApprovalLineRepository;
 
@@ -40,6 +42,9 @@ public class ApprovalLineService {
 			Long approvalNo = approvalLine.getApproval().getApprovalNo();
 			Long employeeNo = approvalLine.getEmployee().getEmployeeNo();
 			ApprovalLine appLine = approvalLineRepository.findByApproval_ApprovalNoAndEmployee_EmployeeNo(approvalNo, employeeNo);
+			ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(appLine);
+			approvalLineDto.setApproval_line_signed_date(LocalDateTime.now());
+			appLine = approvalLineDto.toEntity();
 			if (appLine != null) {
 				appLine.setApprovalLineStatus(approvalLine.getApprovalLineStatus());
 				approvalLineRepository.save(appLine);

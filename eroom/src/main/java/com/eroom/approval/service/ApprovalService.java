@@ -1,5 +1,6 @@
 package com.eroom.approval.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -152,7 +153,7 @@ public class ApprovalService {
 		return approvals;
 	}
 
-	// 결재 승인,반려 처리 결재에반영할지말지 가르는 델리미터필요
+	// 결재와 합의 승인,반려 처리
 	public int approvalApproveDeny(ApprovalLine approvalLine, Boolean isFinalApprovalLineisMe) {
 		int result = 0;
 		try {
@@ -160,12 +161,8 @@ public class ApprovalService {
 			
 			if (approval != null) {
 				ApprovalDto approvalDto = new ApprovalDto().toDto(approval);
-//				if(approvalLine.equals("D")) {
-//					approvalDto.setApproval_status("D");
-//				} else  {
-//					approvalDto.setApproval_status("A");
-//				}
 				approvalDto.setApproval_status(approvalLine.getApprovalLineStatus());
+				approvalDto.setApproval_completed_date(LocalDateTime.now());
 				approval = approvalDto.toEntity();
 				if(isFinalApprovalLineisMe || approvalDto.getApproval_status().equals("D")) {
 					approvalRepository.save(approval);

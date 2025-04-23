@@ -134,7 +134,7 @@
       <!-- 합의/거절 버튼 -->
       <div class="mt-4 text-end"  th:if="${line.approval_line_step == 0 and line.employee.employeeNo == employee.employeeNo and line.approval_line_status == 'S'}" th:each="line : ${approvalLineList}">
         <button data-approval-status="A" id="agreementApproveBtn" type="button" class="btn btn-primary me-2 approveDenyBtn">합의</button>
-        <button data-approval-status="D" id="agreementDenyBtn" type="button" class="btn btn-outline-danger approveDenyBtn">거절</button>
+        <button data-approval-status="D" id="agreementDenyBtn" type="button" class="btn btn-outline-danger approveDenyBtn">반려</button>
       </div>
       <!-- 결재 삭제 버튼 -->
       <div class="mt-4 text-end">
@@ -225,7 +225,7 @@
 					const actionText1 = status === 'A' ? '승인' : (status === 'D' ? '반려' : '처리');
 					con1 = confirm(`결재를 ${actionText1}하시겠습니까?`);
 				} else if (this.id === 'agreementApproveBtn' || this.id === 'agreementDenyBtn') {
-					const actionText2 = status === 'A' ? '합의' : (status === 'D' ? '거절' : '처리');
+					const actionText2 = status === 'A' ? '합의' : (status === 'D' ? '반려' : '처리');
 					con1 = confirm(`결재를 ${actionText2}하시겠습니까?`);
 				}
 	

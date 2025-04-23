@@ -45,20 +45,27 @@ public class ApprovalLineController {
 		Employee employee = employeeDetails.getEmployee();
 		Long employeeNo = employee.getEmployeeNo();
 		
-		int delimeter = dto.getDelimeter();
+		Map<String, String> map = new HashMap<String, String>();
+		if (dto == null || dto.getApproval_no() == null || dto.getEmployee_no() == null) {
+			map.put("res_code", "500");
+			map.put("res_msg", "페이지오류. 관리자에게 문의하세요.");
+			return map;
+		}
+		
 		Map<Integer, String> delimeterMap = new HashMap<Integer, String>();
+		int delimeter = dto.getDelimeter();
 		delimeterMap.put(0, "합의");
 		delimeterMap.put(1, "결재");
-		Map<String, String> map = new HashMap<String, String>();
 		map.put("res_code", "500");
 		map.put("res_msg", delimeterMap.get(delimeter)+ " 승인 실패");
 		
 		Boolean isMyReceived = approvalLineService.isMyLineApproval(dto.getApproval_no(), dto.getEmployee_no());
 		if (!isMyReceived) {
 			map.put("res_code", "500");
-			map.put("res_msg", delimeterMap.get(delimeter)+ " 승인 실패(권한 없음)");
+			map.put("res_msg", delimeterMap.get(delimeter)+ " 실패(권한 없음)");
 		} else {
 			ApprovalLine approvalLine = dto.toEntity();
+			// 결재 라인에서 나의 승인/반려 반영
 			int result = approvalLineService.approvalLineApproveDeny(approvalLine);
 			String res_msg_success = "";
 			String res_msg_fail = "";
@@ -87,11 +94,11 @@ public class ApprovalLineController {
 			if(dto.getApproval_line_status().equals("A")) {
 				approveResult = approvalService.approvalApproveDeny(approvalLine, isFinalApprovalLineisMe);
 				res_msg_success = delimeterMap.get(delimeter)+ " 승인 성공";
-				res_msg_fail = delimeterMap.get(delimeter)+ " 승인 실패(서버1 오류)";
+				res_msg_fail = delimeterMap.get(delimeter)+ " 승인 실패(서버 오류)";
 			} else if(dto.getApproval_line_status().equals("D")) {
 				denyResult = approvalService.approvalApproveDeny(approvalLine, isFinalApprovalLineisMe);
 				res_msg_success = delimeterMap.get(delimeter)+ " 반려 성공";
-				res_msg_fail = delimeterMap.get(delimeter)+ " 반려 실패(서버2 오류)";
+				res_msg_fail = delimeterMap.get(delimeter)+ " 반려 실패(서버 오류)";
 			}
 			
 			cnt = 0;
