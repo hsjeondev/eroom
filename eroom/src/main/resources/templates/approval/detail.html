@@ -180,7 +180,7 @@
 	<!-- 회수 버튼 -->
 	<script th:inline="javascript">
 	
-		document.getElementByClassName("fallBackBtn").addEventListener("click", function(){
+		document.getElementById("fallBackBtn").addEventListener("click", function(){
 			const fallBackNo = /*[[${approval.approval_no}]]*/ 0;
 			if(confirm('결재를 회수하시겠습니까?')){
 				fetch('/approval/' + fallBackNo + '/fallBack',{
