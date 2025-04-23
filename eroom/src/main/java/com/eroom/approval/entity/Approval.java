@@ -1,11 +1,11 @@
 package com.eroom.approval.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import com.eroom.employee.entity.Employee;
 import com.eroom.approval.JsonToMapConverter;
+import com.eroom.employee.entity.Employee;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -53,7 +53,7 @@ public class Approval {
 	private LocalDateTime approvalRegDate; // 결재 등록일
 	@Column(name="approval_completed_date")
 	private LocalDateTime approvalCompletedDate; // 결재 수정일
-	@Column(name="approval_visible_yn")
+	@Column(name="approval_visible_yn", insertable = false)
 	private String approvalVisibleYn; // 결재 사용여부
 	
 	@ManyToOne
@@ -65,7 +65,7 @@ public class Approval {
 	
 	@OneToMany(mappedBy = "approval")
 	@OrderBy("approvalLineNo ASC")
-	private Set<ApprovalLine> approvalLines;
+	private List<ApprovalLine> approvalLines;
 
 
 
