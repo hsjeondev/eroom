@@ -21,7 +21,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @Builder
 @Entity
 @Table(name="project")
@@ -52,6 +51,9 @@ public class Project {
 	
 	@Column(name="project_github_token")
 	private String projectGithubToken;
+	
+	@Column(name="progress")
+	private int progress;
 	
 	@OneToMany(mappedBy="project")
 	private List<ProjectMember> projectMembers;

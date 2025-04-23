@@ -34,6 +34,7 @@ public class ProjectDto {
 	private String project_github_url;
 	private String project_github_token;
 	private String proceed;
+	private int progress;
 	private List<ProjectMemberDto> project_members;
 
 	public Project toEntity() {
@@ -46,6 +47,7 @@ public class ProjectDto {
 				.projectGithubUrl(project_github_url)
 				.projectGithubToken(project_github_token)
 				.proceed(proceed)
+				.progress(progress)
 				.build();
 
 
@@ -70,6 +72,7 @@ public class ProjectDto {
 				.proceed(project.getProceed())
 				.project_github_url(project.getProjectGithubUrl())
 				.project_github_token(project.getProjectGithubToken())
+				.progress(project.getProgress())
 				.project_members(dtoList)
 				.build();
 	}
