@@ -27,16 +27,18 @@ public class ApprovalLineDto {
 	private String approval_line_status; // 결재여부(A승인, S대기, D반려)
 	private LocalDateTime approval_line_signed_date; // 결재 라인 결재일
 	private Employee employee; // 결재자
+	private String approval_line_deny_reason; // 결재 반려 사유
 	
 	public ApprovalLine toEntity() {
 		return ApprovalLine.builder()
 				.approvalLineNo(approval_line_no)
 				.approval(Approval.builder().approvalNo(approval_no).build())
+				.employee(employee)
 				.employee(Employee.builder().employeeNo(employee_no).build())
 				.approvalLineStep(approval_line_step)
 				.approvalLineStatus(approval_line_status)
 				.approvalLineSignedDate(approval_line_signed_date)
-				.employee(employee)
+				.approvalLineDenyReason(approval_line_deny_reason)
 				.build();
 	}
 	
@@ -44,11 +46,12 @@ public class ApprovalLineDto {
         return ApprovalLineDto.builder()
                 .approval_line_no(entity.getApprovalLineNo())
                 .approval_no(entity.getApproval().getApprovalNo())
+                .employee(entity.getEmployee())
                 .employee_no(entity.getEmployee().getEmployeeNo())
                 .approval_line_step(entity.getApprovalLineStep())
                 .approval_line_status(entity.getApprovalLineStatus())
                 .approval_line_signed_date(entity.getApprovalLineSignedDate())
-                .employee(entity.getEmployee())
+                .approval_line_deny_reason(entity.getApprovalLineDenyReason())
                 .build();
 	}
 }
