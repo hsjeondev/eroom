@@ -1,502 +1,502 @@
 <!DOCTYPE html>
-<html 
-lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
-	  xmlns:th="http://www.thymeleaf.org"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{/include/layout}">
+<html lang="ko-KR" dir="ltr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/include/layout}">
 <head>
   <meta charset="UTF-8">
-  <title>회원 상세 정보</title>
- <style>
+  <title>근태 상세</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
     .profile-wrapper {
       position: relative;
-      width: 128px;
-      height: 128px;
+      width: 120px;
+      height: 120px;
     }
-
     .profile-wrapper img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-
-    .camera-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      color: white;
+    .row > [class^="col"] {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 50%;
-      opacity: 0;
-      transition: 0.3s;
-      cursor: pointer;
     }
+    .card {
+      flex: 1 1 auto;
+    }
+  
+  .profile-wrapper .camera-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
 
-    .profile-wrapper:hover .camera-overlay {
-      opacity: 1;
-    }
-  </style> 
+  .profile-wrapper:hover .camera-overlay {
+    opacity: 1;
+  }    
+  </style>
 </head>
 <body>
 <main class="main" id="top" layout:fragment="content">
-  	
-<div class="mb-9">
-	<div class="row align-items-center justify-content-between g-3 mb-4">
-		<!-- 상단 제목 -->
-		<div class="row g-2 mb-4">
-			<div class="d-flex justify-content-start align-items-center mb-2">
-				<i class="fas fa-user-tie text-secondary me-2"></i>
-				<span class="fw-bold fs-7">회원 상세 정보</span>
+  <div class="mb-9">
+  	<!-- 현재 페이지의 회원 정보 -->
+  	<input type="hidden" id="employeeNo" th:value="${employee.employeeNo}"/>
+    
+    <div class="d-flex justify-content-between align-items-center mb-2 position-relative"
+        th:if="${isAdmin}">
+      <span class="fw-bold fs-7">근태 / 회원 정보 수정</span>
+      <div class="position-absolute start-50 translate-middle-x">
+        <span class="current-time fw-bold text-secondary fs-6 mb-0" id="currentTime"></span>
+      </div>
+    </div>
+
+    <!-- 카드 그룹: 프로필 + 근태요약 / 주소록 + 근무시간 -->
+    <div class="row g-3">
+      <!-- 1행: 프로필 + 근태 요약 -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body d-flex align-items-center">
+			<!-- 관리자일 때 -->
+			<div class="profile-wrapper me-3" th:if="${isAdmin}"
+			     data-bs-toggle="modal" data-bs-target="#profileUploadModal" style="position: relative; cursor: pointer;">
+			  <img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
+			  <div class="camera-overlay" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+			                                     background-color: rgba(0, 0, 0, 0.4); border-radius: 50%;
+			                                     display: flex; align-items: center; justify-content: center;">
+			    <svg class="svg-inline--fa fa-camera fs-4 text-white" aria-hidden="true" focusable="false"
+			         data-prefix="fas" data-icon="camera" role="img"
+			         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 24px; height: 24px;">
+			      <path fill="currentColor"
+			            d="M149.1 64.3c7.8-14.3 22.9-23.1 39.4-23.1h134.9c16.5 0 31.6 8.9 39.4 23.1l14.9 27.4H464
+			             c26.5 0 48 21.5 48 48v272c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V139.7c0-26.5
+			             21.5-48 48-48h86.1l14.9-27.4zM256 408c66.3 0 120-53.7 120-120s-53.7-120-120-120
+			             s-120 53.7-120 120s53.7 120 120 120zm0-48a72 72 0 1 0 0-144 72 72 0 1 0 0 144z">
+			      </path>
+			    </svg>
+			  </div>
 			</div>
-		</div> 
-	<!-- 삭제. 수정 버튼 col-auto로 하면 왼쪽 col-auto ms-auto 는 오른쪽 -->
-		<div class="col-auto ms-auto">
-			<div class="row g-3">
-				<!-- 삭제버튼 필요없을듯? -->
-				<!-- <div class="col-auto">
-					<button class="btn btn-phoenix-danger">
-						<svg class="svg-inline--fa fa-trash-can me-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-can" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
-							<path fill="currentColor" d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z"></path>
-						</svg><span class="fa-solid fa-trash-can me-2"></span>
-						Delete customer
-					</button>
-				</div> -->
-				<div class="col-auto">
-					<button class="btn btn-primary">
-						연차 등록
-					</button>
-				</div>
-			</div>
-		</div> 
+			
+
+            <div class="text-start">
+              <div class="fw-bold fs-7" th:text="${employee.employeeName}">이름</div>
+              <div class="text-body-secondary" th:text="${employee.employeePosition}">직급</div>
+            </div>
+          </div>
+          <div class="card-footer border-top border-dashed pt-3">
+   			<div class="d-flex align-items-center mb-2" th:if="${isAdmin}">
+				<!-- <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span> -->
+				
+				<!--  수정 버튼 -->
+				<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0" id="editAnnualLeaveBtn"
+				        data-bs-toggle="modal" data-bs-target="#editInfoModal">
+					<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
+					     focusable="false" data-prefix="fas" data-icon="pen" role="img"
+					     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+						<path fill="currentColor"
+					        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
+					</svg>
+				</button>
+			</div> 
+            <div class="d-flex justify-content-around">
+              <div>
+                <div class="fw-bold fs-8 text-center">총 연차</div>
+                <div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annualLeaveTotal}">12</div>
+              </div>
+              <div>
+                <div class="fw-bold fs-8 text-center">사용 연차</div>
+                <div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annualLeaveUsed}">2</div>
+              </div>
+              <div>
+                <div class="fw-bold fs-8 text-center">잔여 연차</div>
+                <div class="fs-7 text-body-primary text-center" th:text="${annualLeave.annualLeaveRemain}">10</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-body">
+            <div class="fw-bold fs-8 mb-3 text-secondary">근태 요약</div>
+            <div class="row text-center">
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold mb-2">출근일수</div>
+                <div class="text-primary fw-bold" th:text="${summaryData.checkinDays} + '일'">O일</div>
+              </div>
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold">지각</div>
+                <div class="text-danger fw-bold" th:text="${summaryData.lateCount} + '회'">OO회</div>
+              </div>
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold">조퇴</div>
+                <div class="text-warning fw-bold" th:text="${summaryData.earlyLeaveCount} + '회'">OO회</div>
+              </div>
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold">평균 출근</div>
+                <div class="text-success fw-bold" th:text="${summaryData.averageCheckInTime}">00:00</div>
+              </div>
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold">출근률</div>
+                <div class="text-info fw-bold" th:text="${summaryData.attendanceRate}">00%</div>
+              </div>
+            </div>
+            <div class="mini-chart-wrapper mt-4">
+              <canvas id="miniAttendanceChart" height="47"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2행: 주소록 + 근무시간 차트 -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body fs-9">
+			<div class="d-flex align-items-center mb-2" th:if="${isAdmin}">
+				<!-- <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span> -->
+				
+				<!--  수정 버튼 -->
+				<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0" id="editDirectoryBtn"
+				        data-bs-toggle="modal" data-bs-target="#editInfoModal">
+					<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
+					     focusable="false" data-prefix="fas" data-icon="pen" role="img"
+					     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+						<path fill="currentColor"
+					        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
+					</svg>
+				</button>
+			</div>          
+            <h5 class="text-body-secondary">사번</h5>
+            <p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
+            <h5 class="text-body-secondary">직급</h5>
+            <p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p>
+            <h5 class="text-body-secondary">부서</h5>
+            <p class="text-body-secondary" th:text="${departmentName != null ? departmentName : '-'}">부서</p>
+            <div class="mb-3">
+              <h5 class="text-body-secondary">Email</h5>
+              <a href="mailto:email@email.com" id="emailValue" th:text="${directory != null and directory.directory_email != null ? directory.directory_email : '-'}">email@email.com</a>
+            </div>
+            <h5 class="text-body-secondary">Phone</h5>
+            <p class="text-body-secondary" id="phoneValue" th:text="${directory != null and directory.directory_phone != null ? directory.directory_phone : '-'}">010-0000-0000</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card p-3 shadow-sm">
+          <div class="card-title d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold fs-8 text-secondary">근무시간 통합 차트</span>
+            <p class="text-muted mb-0">이번달 총 근무시간: <strong class="text-primary" th:text="${totalWorkTime}">000시간 00분</strong></p>
+          </div>
+          <canvas id="workTimeMixedChart" height="260"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>       
+
+<hr><!-- 상단/하단 구분선 -->
+	
+<!-- 근태 현황 목록 테이블 -->     
+<div id="attendanceTable" data-list='{"valueNames":["no","date","checkin","checkout","late","early"],"page":10,"pagination":true}'>
+  <!-- 상단: 날짜 선택 + 검색창 -->
+  <div class="d-flex justify-content-between align-items-center mb-3 px-3 gap-2 flex-wrap">
+     <div class="row g-2 mb-4">
+		<div class="d-flex justify-content-start align-items-center mb-2">
+			<!-- <i class="fas fa-user-tie text-secondary me-2"></i> -->
+			<span class="fw-bold fs-7">근태 현황</span>
+		</div>
+	</div>
+        <!-- 검색창 -->
+    <div class="flex-grow-1 d-flex justify-content-center">
+      <div class="search-box w-50">
+        <form class="position-relative">
+          <input class="form-control form-control-sm search-input search" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
+          <svg style="height:40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+          </svg>
+        </form>
+      </div>
+    </div>
+    <!-- 날짜 선택 -->
+    <div>
+    <form th:action="@{/admin/employeeInfoView}" method="get" id="monthSelectForm" th:if="${monthList.size() > 0}">
+          <input type="hidden" name="employeeNo" th:value="${employee.employeeNo}"/>
+	      <select class="form-select form-select-sm" data-list-filter="data-list-filter" 
+	      	name="month" id="month" onchange="this.form.submit()">
+	        <option th:each="month : ${monthList}"
+	            th:value="${month}" th:text="${month}" 
+	        	th:selected="${month == selectedMonth}"></option>
+	      </select>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- 테이블 -->
+	<div class="table-responsive">
+	    <table class="table table-striped table-sm fs-9 mb-0 text-center">
+			<thead class="text-center align-middle">
+				<tr class="table-light">
+					<th class="sort" data-sort="no" style="width:5%;">번호</th>
+					<th class="sort" data-sort="date" style="width:25%;">근무일</th>
+					<th class="sort" data-sort="checkin" style="width:25%;">출근 시간</th>
+					<th class="sort" data-sort="checkout" style="width:25%;">퇴근 시간</th>
+					<th class ="sort" data-sort="late" style="width:10%">지각</th>
+					<th class ="sort" data-sort="early" style="width:10%">조퇴</th>
+					<th class="text-end-pe-0" th:if="${isAdmin}"></th>
+				</tr>
+			</thead>
+			<tbody class="list align-middle">
+				<tr th:if ="${!#lists.isEmpty(attendanceList)}"
+					th:each="attendance, attendanceStatus : ${attendanceList}">
+				  <td class="no" th:text="${attendanceStatus.count}">1</td>
+				  <td class="date" th:text="${#temporals.format(attendance.attendance_check_in_time, 'yyyy.MM.dd')}">연도.월.일</td>
+				  <td class="checkin" th:text="${#temporals.format(attendance.attendance_check_in_time, 'HH:mm:ss')}">출근 시간</td>
+				  <td class="checkout" th:text="${#temporals.format(attendance.attendance_check_out_time, 'HH:mm:ss')}">퇴근 시간</td>
+				  <td class="late" th:text="${attendance.attendance_late_yn == 'Y' ? '지각' : '-'}">지각</td>
+				  <td class="early" th:text="${attendance.attendance_early_leave_yn == 'Y' ? '조퇴' : '-'}">조퇴</td>
+				  <td class="text-end pe-0" th:if="${isAdmin}">
+					<div class="btn-reveal-trigger position-static">
+						<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+						  <i class="fas fa-ellipsis fs-10"></i>
+						</button>
+						<div class="dropdown-menu dropdown-menu-end py-2">
+						  <a class="dropdown-item" href="#!" data-bs-toggle="modal" data-bs-target="#editAttendanceModal">수정</a>
+						  <div class="dropdown-divider"></div>
+						  <a class="dropdown-item text-danger" href="#!">삭제</a>
+						</div>
+					</div>
+				 </td>
+				  
+				</tr>
+				<tr th:if="${#lists.isEmpty(attendanceList)}">
+				    <td colspan="5" class="text-center"> 근태 정보가 없습니다.</td>
+				</tr>
+			</tbody>
+	    </table>
 	</div>
 
-	<div class="row g-5">
-		<div class="col-12 col-md-4 col-xxl-4">
-			<div class="row g-3">
-				<div class="col-12">
-					<div class="card h-100">
-						<div class="card-body">
-							<div class="row align-items-center g-5 mb-3 text-center text-sm-start">
-								<div class="col-12 col-sm-auto mb-sm-2">
-								
-								  <div class="profile-wrapper" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
-								    <img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
-								    <div class="camera-overlay">
-								      <svg class="svg-inline--fa fa-camera fs-4" aria-hidden="true" focusable="false"
-								        data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg"
-								        viewBox="0 0 512 512" style="width: 24px; height: 24px;">
-								        <path fill="currentColor"
-								          d="M149.1 64.3c7.8-14.3 22.9-23.1 39.4-23.1h134.9c16.5 0 31.6 8.9 39.4 23.1l14.9 27.4H464c26.5 0 48 21.5 48 48v272c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V139.7c0-26.5 21.5-48 48-48h86.1l14.9-27.4zM256 408c66.3 0 120-53.7 120-120s-53.7-120-120-120s-120 53.7-120 120s53.7 120 120 120zm0-48a72 72 0 1 0 0-144 72 72 0 1 0 0 144z">
-								        </path>
-								      </svg>
-								    </div>
-								  </div>
-								</div>
-
-								 <!-- 프로필 상단 -->
-								<div class="col-12 col-sm-auto flex-1">
-									<!-- 이름 -->
-									<div class="d-flex">
-										<span class="fw-bold fs-7">강성관</span>
-									</div>
-									<!-- 직급 -->
-									<p class="text-body-secondary">CEO</p>
-								</div>
-							</div>
-							<!-- 하단 정보 -->
-							<div class="d-flex flex-between-center border-top border-dashed pt-4">
-								<div>
-									<h6>Following</h6>
-									<p class="fs-7 text-body-secondary mb-0">297</p>
-								</div>
-								<div>
-									<h6>Projects</h6>
-									<p class="fs-7 text-body-secondary mb-0">56</p>
-								</div>
-								<div>
-									<h6>Completion</h6>
-									<p class="fs-7 text-body-secondary mb-0">97</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- 주소록 정보 -->
-				<div class="col-12">
-					<div class="card h-100 position-relative">
-						<div class="card-body fs-9">
-							<div class="d-flex align-items-center mb-2">
-								<span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span>
-								
-								<!--  수정 버튼 -->
-								<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
-								        data-bs-toggle="modal" data-bs-target="#editInfoModal">
-									<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
-									     focusable="false" data-prefix="fas" data-icon="pen" role="img"
-									     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-									  <path fill="currentColor"
-									        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
-									</svg>
-								</button>
-							</div>
-						
-							<!-- 기본 정보 -->
-							<h5 class="text-body-secondary">직급</h5>
-							<p class="text-body-secondary">CEO</p>
-							
-							<h5 class="text-body-secondary">부서</h5>
-							<p class="text-body-secondary">운영부</p>
-							
-							<div class="mb-3">
-							  <h5 class="text-body-secondary">Email</h5>
-							  <a href="mailto:shatinon@jeemail.com" id="emailValue">shatinon@jeemail.com</a>
-							</div>
-							
-							<h5 class="text-body-secondary">Phone</h5>
-							<p class="text-body-secondary" id="phoneValue">01011112222</p>
-							
-							<h5 class="text-body-secondary">주소</h5>
-							<p class="text-body-secondary" id="addressValue">서울특별시 금천구 가산디지털2로 95</p>
-						</div>
-					</div>
-				</div>
-				<!-- 주소록 끝 -->
-							
-			</div> <!-- 프로필 & 주소록 끝 -->
-		</div> <!-- col-12 col-md-4 col-xxl-4 -->
-		
-		<!-- 근태 카드 -->
-		<div class="col-12 col-md-8 col-xxl-8">
-			<div class="row g-4">			
-				<!-- 카드1 START -->
-				<div class="col-md-6">
-					<div class="deals-col me-4">
-						<div class="w-100 h-50" data-sortable="data-sortable">
-							<div class="card mb-3">
-								<div class="card-body">
-									<table class="w-100 text-center mx-auto w-auto text-center">
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">총 연차</span>
-													</div>
-												</div>		
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">  
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">사용 연차</span>
-													</div>
-												</div>
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">잔여 연차</span>
-													</div>
-												</div>
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-									</table>
-								</div> <!-- card-body 끝 -->
-							</div> <!-- card mb-3 끝 -->
-						</div> <!-- w-100 min-vh-50 끝  -->
-					</div><!-- deals-col me-4 끝 -->
-				</div><!-- col-md-6 -->
-	            <!-- 카드1 END -->		
-				
-				<div class="col-md-6">
-					<div class="deals-col me-4">
-						<div class="w-100 h-50" data-sortable="data-sortable">
-							<div class="card mb-3">
-								<div class="card-body">
-									<table class="w-100 text-center mx-auto w-auto text-center">
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">지각</span>
-													</div>
-												</div>		
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">  
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">조퇴</span>
-													</div>
-												</div>
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">결근</span>
-													</div>
-												</div>
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-									</table>
-								</div> <!-- card-body 끝 -->
-							</div> <!-- card mb-3 끝 -->
-						</div> <!-- w-100 min-vh-50 끝  -->
-					</div><!-- deals-col me-4 끝 -->              
-				</div><!-- col-md-6 -->
+  <!-- 페이징 -->
+	<div class="row justify-content-center py-2 fs-9">
+	    <div class="col-auto d-flex">
+	      <button class="page-link disabled" data-list-pagination="prev" disabled>
+	        <i class="fas fa-chevron-left"></i>
+	      </button>
+	      <ul class="mb-0 pagination">
+	        <li class="active"><button class="page" type="button" data-i="1">1</button></li>
+	      </ul>
+	      <button class="page-link disabled" data-list-pagination="next" disabled>
+	        <i class="fas fa-chevron-right"></i>
+	      </button>
+	    </div>
+	</div>
+</div><!-- 근태현황 목록 테이블 끝 -->
 
 
-				<!-- attendanceTable -->    
-     
-				<div id="attendanceTable" data-list='{"valueNames":["no","date","checkin","checkout"],"page":5,"pagination":true}'>
-				  <!-- 상단: 날짜 선택 + 검색창 -->
-						<div class="d-flex justify-content-between align-items-center mb-3 px-3 gap-2 flex-wrap">
-							<div class="row g-2 mb-4">
-								<div class="d-flex justify-content-start align-items-center mb-2">
-									<!-- <i class="fas fa-user-tie text-secondary me-2"></i> -->
-									<span class="fw-bold fs-7">근태 현황</span>
-								</div>
-							</div>
-							       <!-- 검색창 -->
-							<div class="flex-grow-1 d-flex justify-content-center">
-								<div class="search-box w-50">
-								  <form class="position-relative">
-								    <input class="form-control form-control-sm search-input search" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
-								    <svg style="height:40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-								      <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
-								    </svg>
-								  </form>
-								</div>
-							</div>
-							<!-- 날짜 선택 -->
-							<div>
-								<select class="form-select form-select-sm" data-list-filter="data-list-filter">
-								  <option selected value="">날짜 선택</option>
-								  <option value="2025.01">2025.01</option>
-								  <option value="2025.02">2025.02</option>
-								  <option value="2025.03">2025.03</option>
-								</select>
-							</div>
-					
-						</div><!-- 검색 + select 끝 -->
-				
-					  <!-- 테이블 -->
-					  <div class="table-responsive">
-						<table class="table table-striped table-sm fs-9 mb-0 text-center">
-							<thead class="text-center align-middle">
-								<tr>
-									<th class="sort" data-sort="no" style="width:5%;">번호</th>
-									<th class="sort" data-sort="date" style="width:30%;">근무일</th>
-									<th class="sort" data-sort="checkin" style="width:30%;">출근 시간</th>
-									<th class="sort" data-sort="checkout" style="width:30%;">퇴근 시간</th>
-									<th style="width:5%"></th>
-								</tr>
-							</thead>
-							<tbody class="list align-middle">
-								<tr>
-								  <td class="no">1</td>
-								  <td class="date">2025.04.09</td>
-								  <td class="checkin">08:55:45</td>
-								  <td class="checkout">18:01:23</td>
-								  <td class="text-end pe-0">
-								      <div class="btn-reveal-trigger position-static">
-								        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-								          <i class="fas fa-ellipsis fs-10"></i>
-								        </button>
-								        <div class="dropdown-menu dropdown-menu-end py-2">
-								          <a class="dropdown-item" href="#!">수정</a>
-								          <div class="dropdown-divider"></div>
-								          <a class="dropdown-item text-danger" href="#!">삭제</a>
-								        </div>
-								      </div>
-								    </td>
-								</tr>
-								<tr>
-								  <td class="no">2</td>
-								  <td class="date">2025.04.08</td>
-								  <td class="checkin">08:49:27</td>
-								  <td class="checkout">18:00:30</td>
-								  <td class="text-end pe-0">
-								      <div class="btn-reveal-trigger position-static">
-								        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-								          <i class="fas fa-ellipsis fs-10"></i>
-								        </button>
-								        <div class="dropdown-menu dropdown-menu-end py-2">
-								          <a class="dropdown-item" href="#!">수정</a>
-								          <div class="dropdown-divider"></div>
-								          <a class="dropdown-item text-danger" href="#!">삭제</a>
-								        </div>
-								      </div>
-								    </td>
-								</tr>
-								<tr>
-								  <td class="no">3</td>
-								  <td class="date">2025.04.07</td>
-								  <td class="checkin">08:57:22</td>
-								  <td class="checkout">18:05:22</td>
-								  <td class="text-end pe-0">
-								      <div class="btn-reveal-trigger position-static">
-								        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-								          <i class="fas fa-ellipsis fs-10"></i>
-								        </button>
-								        <div class="dropdown-menu dropdown-menu-end py-2">
-								          <a class="dropdown-item" href="#!">수정</a>
-								          <div class="dropdown-divider"></div>
-								          <a class="dropdown-item text-danger" href="#!">삭제</a>
-								        </div>
-								      </div>
-								    </td>
-								</tr>
-								<tr>
-								  <td class="no">4</td>
-								  <td class="date">2025.04.06</td>
-								  <td class="checkin">08:54:33</td>
-								  <td class="checkout">18:03:47</td>
-								  <td class="text-end pe-0">
-								      <div class="btn-reveal-trigger position-static">
-								        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-								          <i class="fas fa-ellipsis fs-10"></i>
-								        </button>
-								        <div class="dropdown-menu dropdown-menu-end py-2">
-								          <a class="dropdown-item" href="#!">수정</a>
-								          <div class="dropdown-divider"></div>
-								          <a class="dropdown-item text-danger" href="#!">삭제</a>
-								        </div>
-								      </div>
-								    </td>
-								</tr>
-							</tbody>
-						</table>
-					</div><!-- 테이블 끝 -->
-				
-					  <!-- 페이징 -->
-					 <div class="row justify-content-center py-2 fs-9">
-						<div class="col-auto d-flex">
-							<button class="page-link disabled" data-list-pagination="prev" disabled>
-							  <i class="fas fa-chevron-left"></i>
-							</button>
-							<ul class="mb-0 pagination">
-							  <li class="active"><button class="page" type="button" data-i="1">1</button></li>
-							</ul>
-							<button class="page-link disabled" data-list-pagination="next" disabled>
-							  <i class="fas fa-chevron-right"></i>
-							</button>
-						</div>
-					 </div><!-- 페이징 끝 -->
-				</div><!-- attendanceTable -->
-
-			</div> <!-- row g-4 끝 -->
-		
-		</div> <!-- col-12 col-md-8 col-xxl-8 -->	<!-- 우측 근태카드 + 차트 부분 끝 -->
-	</div>	<!-- row g-5 --> 
-</div><!-- mb-9 -->   <!-- 프로필, 근태, 차트 위치된 상단 부분. -->
-
-<!-- 모달 -->
-<div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="profileUploadModalLabel">프로필 사진 변경</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-      </div>
-      <div class="modal-body text-center">
-        <button class="btn btn-outline-primary mb-3" onclick="setDefaultProfile()">
-          기본 프로필 적용하기
-        </button>
-        <br>
-        <!-- <label class="btn btn-primary" for="profileUploadInput">
-          프로필 사진 업로드하기
-        </label>
-        <input type="file" id="profileUploadInput" class="d-none" accept="image/*" onchange="previewProfileImage(event)"> -->
-      </div>
+<!-- 근태 정보 수정 모달 -->
+<div class="modal fade" id="editAttendanceModal" tabindex="-1">
+	<div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+	  <div class="modal-content border border-translucent rounded-3 shadow-sm">
+	    <form id="editAttendanceForm" autocomplete="off" name="editAttendanceForm">
+	
+	      <!-- 헤더 -->
+	      <div class="modal-header px-4 py-3 border-0">
+	        <h5 class="modal-title fw-bold">근태 정보 수정</h5>
+	        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	
+	      <!-- 바디 -->
+	      <div class="modal-body px-4 py-2">
+	
+<!-- 출근일시 + 지각 -->
+<div class="mb-3">
+  <label for="editCheckInTime" class="form-label fw-semibold">출근일시</label>
+  <div class="d-flex align-items-center justify-content-between">
+    <input type="datetime-local" class="form-control" id="editCheckInTime"
+           name="attendance_check_in_time" style="width: 70%;">
+    
+    <!-- 체크박스와 라벨을 따로 정렬 -->
+    <div class="d-flex align-items-center ms-2" style="width: 30%; justify-content: flex-start;">
+      <input class="form-check-input mt-0 me-2" type="checkbox" id="lateCheckbox" name="attendance_late_yn">
+      <label for="lateCheckbox" class="form-label mb-0">지각</label>
     </div>
   </div>
 </div>
 
-<!-- 정보 수정 모달 -->
-<div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editInfoModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
-			<div class="modal-header">
-			  <h5 class="modal-title" id="editInfoModalLabel">정보 수정</h5>
-			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-			</div>
-			
-			<div class="modal-body">
-				<form id="editInfoForm">
-					<div class="mb-3">
-					  <label for="emailInput" class="form-label">이메일</label>
-					  <input type="email" class="form-control" id="emailInput" required>
-					</div>
-					<div class="mb-3">
-					  <label for="phoneInput" class="form-label">전화번호</label>
-					  <input type="text" class="form-control" id="phoneInput" required>
-					</div>
-					<div class="mb-3">
-					  <label for="addressInput" class="form-label">주소</label>
-					  <input type="text" class="form-control" id="addressInput" required>
-					</div>
-				</form>
-			</div>
-			
-			<div class="modal-footer">
-			  <button class="btn btn-light" data-bs-dismiss="modal">취소</button>
-			  <button class="btn btn-primary" onclick="saveInfo()">저장</button>
-			</div>
-		</div>
+<!-- 퇴근일시 + 조퇴 -->
+<div class="mb-3">
+  <label for="editCheckOutTime" class="form-label fw-semibold">퇴근일시</label>
+  <div class="d-flex align-items-center justify-content-between">
+    <input type="datetime-local" class="form-control" id="editCheckOutTime"
+           name="attendance_check_out_time" style="width: 70%;">
+    
+    <div class="d-flex align-items-center ms-2" style="width: 30%; justify-content: flex-start;">
+      <input class="form-check-input mt-0 me-2" type="checkbox" id="earlyLeaveCheckbox" name="attendance_early_leave_yn">
+      <label for="earlyLeaveCheckbox" class="form-label mb-0">조퇴</label>
+    </div>
+  </div>
+</div>
+	
+	      </div>
+	
+	      <!-- 푸터 -->
+	      <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+	        <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">취소</button>
+	        <button type="submit" class="btn btn-primary">일정 등록</button>
+	      </div>
+	    </form>
+	  </div>
 	</div>
 </div>
-
 <script>
+	// 상단에 현재 날짜 표시
+	function updateCurrentTime() {
+		const now = new Date();
+		const year = now.getFullYear();
+		const month = String(now.getMonth() + 1).padStart(2, '0');
+		const date = String(now.getDate()).padStart(2, '0');
+		document.getElementById('currentTime').innerText = `${year}.${month}.${date}`;
+	}
+	updateCurrentTime();
+
+	// 차트 데이터를 받아서 각 차트를 렌더링하는 함수
+	async function renderCharts() {
+		
+		const employeeNo = document.getElementById('employeeNo').value;
+		console.log(employeeNo); // 디버깅용 콘솔 출력
+		// 1. API 호출
+		const response = await fetch(`/admin/employeeChartData?employeeNo=${employeeNo}`);
+		const data = await response.json();
+		console.log(data); // 디버깅용 콘솔 출력
+		console.log(data.checkinDays,data.lateCount,data.earlyLeaveCount); // 디버깅용 콘솔 출력
+
+		/* --------------- 근태 요약 차트 (Bar Chart) ----------------- */
+		const miniCtx = document.getElementById('miniAttendanceChart').getContext('2d');
+		console.log(miniCtx); // 디버깅용 콘솔 출력
+		new Chart(miniCtx, {
+			type: 'bar',
+			data: {
+				labels: ['출근일수', '지각', '조퇴'],
+				datasets: [{
+					label: '횟수',
+					data: [
+						data.checkinDays || 0,
+						data.lateCount || 0,
+						data.earlyLeaveCount || 0
+					],
+					backgroundColor: [
+						'rgba(13, 110, 253, 0.7)',   // 출근: 파랑
+						'rgba(220, 53, 69, 0.7)',    // 지각: 빨강
+						'rgba(255, 193, 7, 0.7)'     // 조퇴: 노랑
+					]
+				}]
+			},
+			options: {
+				plugins: {
+					legend: { display: false }
+				},
+				scales: {
+					y: {
+						beginAtZero: true,
+						ticks: { stepSize: 1 }
+					}
+				}
+			}
+		});
+
+		/* --------------- 근무시간 통합 차트 (Mixed: Line + Bar) ----------------- */
+		const mixedCtx = document.getElementById('workTimeMixedChart').getContext('2d');
+		const workTimePerDay = data.workTimePerDay || {};
+		const weekdayAvg = data.weekdayAvg || {};
+
+		// (1) 날짜별 근무시간 차트용 데이터 변환
+		const dailyLabels = Object.keys(workTimePerDay).map(dateStr => {
+			const [year, month, day] = dateStr.split('-');
+			return `${month}/${day}`;
+		});
+		const dailyData = Object.values(workTimePerDay);
+
+		// (2) 요일별 평균 근무시간 변환 및 정렬
+		const dayMap = {
+			'MONDAY': '월', 'TUESDAY': '화', 'WEDNESDAY': '수',
+			'THURSDAY': '목', 'FRIDAY': '금'
+		};
+		const weekdayOrder = ['월', '화', '수', '목', '금'];
+		const weekdayData = weekdayOrder.map(kor => {
+			const eng = Object.keys(dayMap).find(key => dayMap[key] === kor);
+			return weekdayAvg[eng] ?? null;
+		});
+
+		// (3) 차트 생성
+		new Chart(mixedCtx, {
+			type: 'bar',
+			data: {
+				labels: [...dailyLabels, ...weekdayOrder],
+				datasets: [
+					{
+						type: 'line',
+						label: '일별 근무시간',
+						data: [...dailyData, ...new Array(weekdayOrder.length).fill(null)],
+						borderColor: '#0d6efd',
+						backgroundColor: '#0d6efd55',
+						yAxisID: 'y',
+						tension: 0.3,
+						spanGaps: true
+					},
+					{
+						type: 'bar',
+						label: '요일별 평균 근무시간',
+						data: [...new Array(dailyLabels.length).fill(null), ...weekdayData],
+						backgroundColor: 'rgba(255, 99, 132, 0.6)',
+						yAxisID: 'y1'
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				plugins: {
+					tooltip: {
+						callbacks: {
+							label: function (context) {
+								const label = context.dataset.label;
+								const val = context.raw;
+								return label + ': ' + (val !== null ? val.toFixed(2) + '시간' : '');
+							}
+						}
+					},
+					legend: { position: 'top' }
+				},
+				scales: {
+					y: {
+						type: 'linear',
+						position: 'left',
+						title: { display: true, text: '일별 근무시간' },
+						beginAtZero: true,
+						suggestedMax: 10
+					},
+					y1: {
+						type: 'linear',
+						position: 'right',
+						title: { display: true, text: '요일별 평균' },
+						grid: { drawOnChartArea: false },
+						beginAtZero: true,
+						suggestedMax: 10
+					}
+				}
+			}
+		});
+	}
+	renderCharts();
+</script>                         
+
+</main>
+</body>
+</html>
+
+<!-- <script>
 	// 모달 열릴 때 input에 기존 정보 세팅
 	const editInfoModal = document.getElementById('editInfoModal');
 	editInfoModal.addEventListener('show.bs.modal', function () {
@@ -532,8 +532,5 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	   const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
 	   modal.hide();
 	 }	
-</script>			
+</script>	 -->		
                
-    </main>
-  </body>
-</html>

@@ -107,7 +107,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						<tr th:each="employeeManage, employeeStatus : ${employeeList}">
 							<td class="no" th:text="${employeeStatus.count}">1</td>
 							<td class="name">
-								<a class="d-flex align-items-center text-body-emphasis ps-5" th:href="@{/attendance/list(employeeNo=${employeeManage.employee.employee_no})}">
+								<a class="d-flex align-items-center text-body-emphasis ps-5" th:href="@{/admin/employeeInfoView(employeeNo=${employeeManage.employee.employee_no})}">
 									<div class="avatar avatar-m me-2">
 										<img class="rounded-circle" src="../../../assets/img/team/23.webp" alt="">
 									</div>
