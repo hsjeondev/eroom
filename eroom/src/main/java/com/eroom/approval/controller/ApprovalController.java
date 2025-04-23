@@ -454,7 +454,7 @@ public class ApprovalController {
 								bool = true;
 							}
 						}
-						if(bool) {
+						if(bool && !approval.getApprovalStatus().equals("F")) {
 							temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
 							resultApprovalList.add(temp2);
 						}
@@ -554,7 +554,7 @@ public class ApprovalController {
 						if (temp.get(i).getApprovalLineStep() == 0 && temp.get(i).getEmployee().getEmployeeNo() == employeeNo) {
 							bool = true;
 						}
-						if(bool) {
+						if(bool && !approval.getApprovalStatus().equals("F")) {
 							temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
 							resultApprovalList.add(temp2);
 						}
@@ -611,7 +611,7 @@ public class ApprovalController {
 						if (temp.get(i).getApprovalLineStep() == -1 && temp.get(i).getEmployee().getEmployeeNo() == employeeNo) {
 							bool = true;
 						}
-						if(bool) {
+						if(bool && !approval.getApprovalStatus().equals("F")) {
 							temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
 							resultApprovalList.add(temp2);
 						}
@@ -631,9 +631,38 @@ public class ApprovalController {
 		
 		return "/approval/referencedApprovals";
 	}
-	@GetMapping("/approval/withdrawnApprovals")
-	public String selectWithdrawnApprovalsList() {
-		return "/approval/withdrawnApprovals";
+	@GetMapping("/approval/fallBackApprovals")
+	public String selectWithdrawnApprovalsList(Model model, Authentication authentication) {
+		// 로그인한 사용자 정보 가져오기
+		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+		Employee employee = employeeDetails.getEmployee();
+		model.addAttribute("employee", employee);
+		// 내가 올린 approval 리스트 조회
+		List<Approval> temp = approvalService.getMyRequestedApprovals(employee.getEmployeeNo(), "Y");
+		List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
+		Map<Long, List<ApprovalLineDto>> approvalLineMap = new HashMap<Long, List<ApprovalLineDto>>();
+		for (Approval approval : temp) {
+			// approval 리스트의 approval_no를 사용해서 approval_line 리스트 조회
+			List<ApprovalLine> temp2 = approvalLineService.getApprovalLineByApprovalNo(approval.getApprovalNo());
+			List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
+			for (ApprovalLine approvalLine : temp2) {
+				ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
+				approvalLineDtoList.add(approvalLineDto);
+			}
+			// approval_line 리스트를 approval_no를 키로 하는 맵에 저장
+			approvalLineMap.put(approval.getApprovalNo(), approvalLineDtoList);
+			
+			if (approval.getApprovalStatus().equals("F")) {
+				ApprovalDto dto = new ApprovalDto();
+				dto = dto.toDto(approval);
+				resultList.add(dto);
+			}
+		}
+		model.addAttribute("approvalLineMap", approvalLineMap);
+		model.addAttribute("resultList", resultList);
+		
+		
+		return "/approval/fallBackApprovals";
 	}
 	
 	
