@@ -26,27 +26,23 @@
             <tbody>
               <tr>
                 <th class="table-light text-center" style="width: 150px;">신청일</th>
-                <td>2025-04-13</td>
+                <td th:text="${approval.reg_date}">신청일</td>
                 <th class="table-light text-center">신청자</th>
-                <td>홍길동</td>
+                <td th:text="${approval.employee.employeeName}">신청자</td>
               </tr>
               <tr>
                 <th class="table-light text-center">부서</th>
-                <td>개발팀</td>
+                <td th:text="${approval.employee.structure.codeName}">부서명</td>
                 <th class="table-light text-center">직급</th>
-                <td>대리</td>
-              </tr>
-              <tr>
-                <th class="table-light text-center">전화번호</th>
-                <td colspan="3">010-1234-5678</td>
+                <td th:text="${approval.employee.employeePosition}">직급</td>
               </tr>
               <tr>
                 <th class="table-light text-center">제목</th>
-                <td colspan="3">경조금 신청</td>
+                <td colspan="3" th:text="${approval.approval_title}">제목</td>
               </tr>
               <tr>
                 <th class="table-light text-center">양식 종류</th>
-                <td colspan="3">경조금</td>
+                <td colspan="3" th:text="${approval.approval_format.approvalFormatTitle}">양식 종류</td>
               </tr>
             </tbody>
           </table>
@@ -57,51 +53,56 @@
           <table class="table table-bordered text-center align-middle mb-3">
             <thead class="table-light">
               <tr>
-                <th>직급<br>결재자1</th>
-                <th>직급<br>결재자2</th>
-                <th>직급<br>결재자3</th>
+                <th th:each="line : ${approvalLineList}"
+                 th:if="${line.approval_line_step >= 1}"
+                  th:utext="|${line.employee.employeePosition}<br>${line.employee.employeeName}|"
+                  >
+                  직급<br>결재자1
+                  </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>서명 완료</td>
-                <td>대기중</td>
-                <td>대기중</td>
+                <td th:if="${line.approval_line_step >= 1}" th:each="line : ${approvalLineList}">
+                	<span th:if="${line.approval_line_status == 'A'}" th:text="서명넣기">서명</span>
+                	<span th:if="${line.approval_line_status == 'S'}" th:text="대기중">대기</span>
+                	<span th:if="${line.approval_line_status == 'D'}" th:text="반려">반려</span>
+                </td>
               </tr>
             </tbody>
           </table>
+          
           <table class="table table-bordered text-center align-middle">
             <thead class="table-light">
               <tr>
-                <th>직급<br>합의자1</th>
-                <th>직급<br>합의자2</th>
+                <th th:each="line : ${approvalLineList}" th:if="${line.approval_line_step == 0}" 
+                th:utext="|${line.employee.employeePosition}<br>${line.employee.employeeName}|">직급<br>합의자1</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>서명 완료</td>
-                <td>서명 완료</td>
+                <td  th:if="${line.approval_line_step == 0}" th:each="line : ${approvalLineList}">
+                	<span th:if="${line.approval_line_status == 'A'}" th:text="|합의|">서명!</span>
+                	<span th:if="${line.approval_line_status == 'S'}" th:text="|대기중|">대기!</span>
+                	<span th:if="${line.approval_line_status == 'D'}" th:text="|합의x|">반려!</span>
+                </td>
               </tr>
             </tbody>
           </table>
+          
 		<!-- 참조자 텍스트 -->
-		<div class="text-end text-body-secondary fs-8 mt-1">
-			참조자: 홍보팀 김대리, 회계팀 이과장
+		<div class="text-end text-body-secondary fs-8 mt-1" th:if="${line.approval_line_step == -1}" th:each="line : ${approvalLineList}">
+			<span>참조자: </span>
+			<span th:text="${line.employee.employeeName}">참조자!</span>
 		</div>
 
         </div>
+        
+        
       </div>
 
       <!-- 결재 내용 -->
-      <div class="bg-light rounded p-4 mt-4">
-        <h5 class="mb-3 text-dark">결재 내용</h5>
-        <p><strong>1. 내용:</strong> 부친상으로 인한 경조금 신청</p>
-        <p><strong>2. 본인과의 관계:</strong> 부</p>
-        <p><strong>3. 발생년월일:</strong> 2025-04-10</p>
-        <p><strong>4. 장소:</strong> 서울아산병원 장례식장</p>
-        <p><strong>5. 휴가기간:</strong> 2025-04-11 ~ 2025-04-13</p>
-        <p><strong>6. 금액:</strong> 300,000원</p>
-      </div>
+      <div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/congratulatory_payment :: congratulatory_payment}"></div>
 
       <!-- 첨부 파일 -->
       <div class="mt-4">
@@ -117,20 +118,78 @@
         <button type="button" class="btn btn-primary me-2">결재 승인</button>
         <button type="button" class="btn btn-outline-danger">반려</button>
       </div>
+      <!-- 결재 삭제 버튼 -->
+      <div class="mt-4 text-end" th:if="${approval.employee.employeeNo} == ${employee.employeeNo}">
+        <button id="deleteBtn" type="button" class="btn btn-outline-danger">삭제</button>
+        <button id="fallBackBtn" type="button" class="btn btn-outline-danger">회수</button>
+      </div>
     </div>
     
-<script>
-  document.getElementById("topdf").addEventListener("click", function() {
-    // meta 태그에서 CSRF 토큰과 헤더명 읽기
-    var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
-    var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
-
-    // GET 요청일 경우, 쿼리 파라미터로 CSRF 토큰 전달 (예: headerName=token)
-    // CSRF 토큰이 필요 없다면 Spring Security 설정에서 GET은 제외할 수도 있습니다.
-    window.location.href = "/approval/detail/pdf?" 
-        + encodeURIComponent(csrfHeader) + "=" + encodeURIComponent(csrfToken);
-  });
-</script>
+    <!-- pdf 생성 버튼 -->
+	<script>
+	  document.getElementById("topdf").addEventListener("click", function() {
+	    // meta 태그에서 CSRF 토큰과 헤더명 읽기
+	    var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+	    var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+	
+	    // GET 요청일 경우, 쿼리 파라미터로 CSRF 토큰 전달 (예: headerName=token)
+	    // CSRF 토큰이 필요 없다면 Spring Security 설정에서 GET은 제외할 수도 있습니다.
+	    window.location.href = "/approval/detail/pdf?" 
+	        + encodeURIComponent(csrfHeader) + "=" + encodeURIComponent(csrfToken);
+	  });
+	</script>
+	<!-- 삭제 버튼 -->
+	<script th:inline="javascript">
+		document.getElementById("deleteBtn").addEventListener("click", function(){
+			const deleteNo = [[${approval.approval_no}]];
+			if(confirm('결재를 삭제하시겠습니까?')){
+				fetch('/approval/' + deleteNo + '/delete',{
+					method : 'POST',
+					headers : {
+				      'Content-Type': 'application/json',
+				      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+				      'header': document.querySelector('meta[name="_csrf_header"]').content
+					}
+				})
+				.then(response => response.json())
+				.then(data =>{
+					alert(data.res_msg)
+					if(data.res_code == 200){
+						location.href='/approval/myRequestedApprovals';
+					}
+				})
+			} else{
+				
+			}
+		});
+	
+	</script>
+	<!-- 회수 버튼 -->
+	<script th:inline="javascript">
+		document.getElementById("fallBackBtn").addEventListener("click", function(){
+			const fallBackNo = [[${approval.approval_no}]];
+			if(confirm('결재를 회수하시겠습니까?')){
+				fetch('/approval/' + fallBackNo + '/fallBack',{
+					method : 'POST',
+					headers : {
+				      'Content-Type': 'application/json',
+				      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+				      'header': document.querySelector('meta[name="_csrf_header"]').content
+					}
+				})
+				.then(response => response.json())
+				.then(data =>{
+					alert(data.res_msg)
+					if(data.res_code == 200){
+						location.href='/approval/myRequestedApprovals';
+					}
+				})
+			} else{
+				
+			}
+		});
+	
+	</script>
     
   </main>
 </body>

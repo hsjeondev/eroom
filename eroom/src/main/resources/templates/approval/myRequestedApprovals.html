@@ -129,7 +129,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 									<!-- 결재문서 이름/ 진행상태 / 작성자 이름 칸 -->
 									<div class="border-bottom border-translucent">
 										<div class="d-flex align-items-start mb-1">
-											<div class="d-sm-flex align-items-center ps-2"><a class="fw-bold fs-7 lh-sm title line-clamp-1 me-sm-4" th:text="${list.approval_title}" th:href="@{/approval/detail}">결재 제목</a>
+											<div class="d-sm-flex align-items-center ps-2"><a class="fw-bold fs-7 lh-sm title line-clamp-1 me-sm-4" th:text="${list.approval_title}" th:href="@{/approval/detail/{no}(no=${list.approval_no})}">결재 제목</a>
 												<div class="d-flex align-items-center">
 												
 													<!-- 빨간색 -->
@@ -174,7 +174,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 													            </g>
 												            </g>
 											            </svg>
-														<span class="fw-bold fs-9 text-body lh-2">대기</span>
+														<span class="fw-bold fs-9 text-body lh-2">회수</span>
 													</span>
 												</div>
 											</div>

@@ -9,7 +9,10 @@ import com.eroom.approval.entity.ApprovalLine;
 
 public interface ApprovalRepository extends JpaRepository<Approval, Long> {
 
-	List<Approval> findByEmployee_EmployeeNoOrderByApprovalRegDateDesc(Long employeeNo);
+	List<Approval> findByEmployee_EmployeeNoAndApprovalVisibleYnOrderByApprovalRegDateDesc(Long employeeNo, String visible);
+
+	List<Approval> findByApprovalNoAndApprovalVisibleYnOrderByApprovalRegDateDesc(Long approvalNo, String visible);
+
 
 	
 }

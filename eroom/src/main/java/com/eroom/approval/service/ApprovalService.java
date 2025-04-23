@@ -13,7 +13,6 @@ import com.eroom.approval.repository.ApprovalLineRepository;
 import com.eroom.approval.repository.ApprovalRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,23 +24,25 @@ public class ApprovalService {
 	private final EmployeeRepository employeeRepository;
 	private final ApprovalLineRepository approvalLineRepository;
 
-	public List<Approval> getMyRequestedApprovals(Long employeeNo) {
-		List<Approval> resultList = approvalRepository.findByEmployee_EmployeeNoOrderByApprovalRegDateDesc(employeeNo);
+	// 내가 올린 결재 리스트 조회 + 신청일 기준으로 최신순 정렬
+	public List<Approval> getMyRequestedApprovals(Long employeeNo, String visible) {
+		List<Approval> resultList = approvalRepository.findByEmployee_EmployeeNoAndApprovalVisibleYnOrderByApprovalRegDateDesc(employeeNo, visible);
 		return resultList;
 	}
 
+	// 결재 생성
 	@Transactional
 	public int createApproval(ApprovalRequestDto dto, Long employeeNo) {
 		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			String json = objectMapper .writeValueAsString(dto.getContent());
+//			ObjectMapper objectMapper = new ObjectMapper();
+//			String json = objectMapper .writeValueAsString(dto.getContent());
 			Employee emp = employeeRepository.findById(employeeNo).orElse(null);
 			
 			Approval approval = Approval.builder()
 					.employee(emp)
 					.approvalTitle(dto.getTitle())
 					.approvalFormat(ApprovalFormat.builder().approvalFormatNo(Long.valueOf(dto.getFormat_no())).build())
-					.approvalContent(json)
+					.approvalContent(dto.getContent())
 					.approvalStatus("S")
 					.build();
 			
@@ -51,19 +52,13 @@ public class ApprovalService {
 			
 			// 1. 결재자 저장
 			ApprovalLine approvalLine = null;
-//			System.out.println(dto.getApproverIds() + " : 결재자들id");
-//			System.out.println(dto.getApproverSteps() + " : 결재자들step");
-//			System.out.println(dto.getAgreerIds() + " : 합의자들id");
-//			System.out.println(dto.getAgreerSteps() + " : 합의자들step");
-//			System.out.println(dto.getRefererIds() + " : 참조자들id");
-//			System.out.println(dto.getRefererSteps() + " : 참조자들step");
 			for (int i = 0; i < dto.getApproverIds().size(); i++) {
 				
 				approvalLine = ApprovalLine.builder()
 						.approval(approval)
 						.approvalLineStatus("S")
 						.employee(Employee.builder().employeeNo(dto.getApproverIds().get(i)).build())
-						.approvalLineStep(dto.getApproverSteps().get(i))
+						.approvalLineStep(dto.getApproverSteps().get(i)) // 결재자 순서 step 1,2,3...
 						.build();
 					approvalLineRepository.save(approvalLine);
 			}
@@ -75,7 +70,7 @@ public class ApprovalService {
 						.approval(approval)
 						.approvalLineStatus("S")
 						.employee(Employee.builder().employeeNo(dto.getAgreerIds().get(i)).build())
-						.approvalLineStep(0) // 합의자 고정값
+						.approvalLineStep(0) // 합의자 고정값 0
 						.build();
 					approvalLineRepository.save(approvalLine);
 			}
@@ -87,7 +82,7 @@ public class ApprovalService {
 						.approval(approval)
 						.approvalLineStatus("A")
 						.employee(Employee.builder().employeeNo(dto.getRefererIds().get(i)).build())
-						.approvalLineStep(-1) // 참조자 고정값
+						.approvalLineStep(-1) // 참조자 고정값 -1
 						.build();
 					approvalLineRepository.save(approvalLine);
 			}
@@ -99,6 +94,56 @@ public class ApprovalService {
 			e.printStackTrace();
 			return 0;
 		}
+	}
+
+	// 결재 번호로 결재 조회
+	public Approval selectApprovalByApprovalNo(Long approvalNo) {
+		Approval approval = approvalRepository.findById(approvalNo).orElse(null);
+		return approval;
+	}
+
+	// 결재 삭제
+	public int updateVisibleYn(Long approvalNo) {
+		int result = 0;
+		try {
+			Approval approval = approvalRepository.findById(approvalNo).orElse(null);
+			if (approval != null) {
+				if (!approval.getApprovalVisibleYn().equals("N")) {
+					approval.setApprovalVisibleYn("N");
+					approvalRepository.save(approval);
+				}
+				result = 1;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = 0;
+		}
+		return result;
+	}
+
+	// 결재 번호로 결재 리스트 조회
+	public List<Approval> getApprovalListByApprovalNo(Long approvalNo, String visible) {
+		List<Approval> resultList = approvalRepository.findByApprovalNoAndApprovalVisibleYnOrderByApprovalRegDateDesc(approvalNo, visible);
+		return resultList;
+	}
+
+	// 결재 회수
+	public int updateApprovalStatus(Long approvalNo) {
+		int result = 0;
+		try {
+			Approval approval = approvalRepository.findById(approvalNo).orElse(null);
+			if (approval != null) {
+				if (!approval.getApprovalStatus().equals("F")) {
+					approval.setApprovalStatus("F");
+					approvalRepository.save(approval);
+				}
+				result = 1;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = 0;
+		}
+		return result;
 	}
 
 

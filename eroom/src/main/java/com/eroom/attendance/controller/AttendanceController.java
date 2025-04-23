@@ -46,9 +46,20 @@ public class AttendanceController {
 		Long employeeNo = employee.getEmployeeNo();
 		model.addAttribute("employee", employee);
 		
+		Structure employeeStructure = employee.getStructure();  
+		String departmentName = "-"; // 기본값
 		// 부서 정보 조회
-		Structure structure = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(employee.getStructure().getParentCode());
-        String departmentName = structure != null ? structure.getCodeName() : "-";
+		if(employeeStructure != null) {
+			// 부서 정보가 있을 경우에만 parentCode를 사용하여 부서명 조회
+			String parentCode = employeeStructure.getParentCode();
+			Structure structure = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(parentCode);
+			if(structure != null) {
+				departmentName = structure.getCodeName();
+			} else {
+				// 부서 정보가 없을 경우 기본값 사용
+				departmentName = "-";
+			}
+		}
         model.addAttribute("departmentName", departmentName);
         
         // 주소록 정보 조회

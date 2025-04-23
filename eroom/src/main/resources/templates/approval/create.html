@@ -417,96 +417,129 @@
 
 	</script>
 
+	<script>
+		document.getElementById('approvalSubmitBtn').addEventListener('click', function (event) {
+		  event.preventDefault(); // 기본 제출 방지
+		
+		  // [1] 제목 & 양식 유효성 검사
+		  const approvalTitle = document.getElementById("basic-form-title")?.value?.trim();
+		  const formatSelect = document.getElementById("basic-select-format");
+		  const approvalFormatNo = formatSelect?.value;
+		  let isValid = true;
+		
+		  if (!approvalTitle) {
+		    document.getElementById("basic-form-title").style.border = "1px solid red";
+		    isValid = false;
+		  } else {
+		    document.getElementById("basic-form-title").style.border = "";
+		  }
+		
+		  if (!approvalFormatNo || formatSelect.selectedIndex === 0) {
+		    formatSelect.style.border = "1px solid red";
+		    isValid = false;
+		  } else {
+		    formatSelect.style.border = "";
+		  }
+		
+		  if (!isValid) {
+		    alert("제목과 양식을 모두 입력해주세요.");
+		    return;
+		  }
+		
+		  // [2] 양식 입력 필드 유효성 검사 및 데이터 수집
+		  const inputElements = document.querySelectorAll("#basic-form-edit [name]");
+		  const approvalContent = {};
+		  let hasEmpty = false;
+		
+		  inputElements.forEach(el => {
+		    const name = el.name?.trim();
+		    const value = el.value?.trim();
+		
+		    if (!name) return;
+		
+		    if (!value) {
+		      hasEmpty = true;
+		      el.classList.add("is-invalid");
+		      el.style.border = "1px solid red";
+		    } else {
+		      el.classList.remove("is-invalid");
+		      el.style.border = "";
+		      approvalContent[name] = value;
+		    }
+		  });
+		
+		  if (hasEmpty) {
+		    alert("결재서 내용을 모두 입력해주세요.");
+		    return;
+		  }
+		
+		  // [3] 결재선 유효성 검사
+		  const approverIds = Array.from(document.querySelectorAll('input[name="approverIds"]')).map(el => el.value);
+		  const approverSteps = Array.from(document.querySelectorAll('input[name="approverSteps"]')).map(el => parseInt(el.value));
+		  const agreerIds = Array.from(document.querySelectorAll('input[name="agreerIds"]')).map(el => el.value);
+		  const agreerSteps = Array.from(document.querySelectorAll('input[name="agreerSteps"]')).map(el => parseInt(el.value));
+		  const refererIds = Array.from(document.querySelectorAll('input[name="refererIds"]')).map(el => el.value);
+		  const refererSteps = Array.from(document.querySelectorAll('input[name="refererSteps"]')).map(el => parseInt(el.value));
+		
+		  if (approverSteps.length === 0 && agreerSteps.length === 0 && refererSteps.length === 0) {
+		    alert("결재자, 합의자, 참조자를 한 명 이상 선택해주세요.");
+		    return;
+		  }
+		
+		  if (
+		    approverIds.length !== approverSteps.length ||
+		    agreerIds.length !== agreerSteps.length ||
+		    refererIds.length !== refererSteps.length
+		  ) {
+		    alert("결재자 정보가 올바르지 않습니다. 다시 선택해주세요.");
+		    return;
+		  }
+		
+		  // [4] 작성자 정보 수집
+		  const writerFields = ["date", "department_name", "team_name", "employee_position", "employee_name"];
+		  const writerData = {};
+		  writerFields.forEach(field => {
+		    const el = document.getElementById(`basic-form-${field}`);
+		    writerData[field] = el ? (el.value ?? el.textContent.trim()) : null;
+		  });
+		
+		  // [5] 서버 전송
+		  fetch('/approval/create', {
+		    method: 'POST',
+		    headers: {
+		      'Content-Type': 'application/json',
+		      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+		      'header': document.querySelector('meta[name="_csrf_header"]').content
+		    },
+		    body: JSON.stringify({
+		      writer: writerData,
+		      title: approvalTitle,
+		      format_no: approvalFormatNo,
+		      content: approvalContent,
+		      approverIds,
+		      approverSteps,
+		      agreerIds,
+		      agreerSteps,
+		      refererIds,
+		      refererSteps
+		    })
+		  })
+		  .then(res => res.json())
+		  .then(data => {
+		    if (data.res_code === "200") {
+		      alert("결재서가 성공적으로 제출되었습니다.");
+		      location.href = '/approval/myRequestedApprovals';
+		    } else {
+		      alert("결재서 제출에 실패했습니다: " + data.res_msg);
+		    }
+		  })
+		  .catch(err => {
+		    console.error(err);
+		    alert("요청 중 오류가 발생했습니다.");
+		  });
+		});
+	</script>
 
-<!-- 결재 생성 submit -->
-<script>
-  document.getElementById('approvalSubmitBtn').addEventListener('click', function (event) {
-    event.preventDefault(); // 기본 제출 방지
-
-    // [1-1] 제목 & 양식 번호 추출
-    const approvalTitle = document.getElementById("basic-form-title")?.value?.trim();
-    const approvalFormatNo = document.getElementById("basic-select-format")?.value;
-    
- 	// [1-2] // 모달에서 수집된 ID와 순서 값 추출
-	const approverIds = Array.from(document.querySelectorAll('input[name="approverIds"]')).map(el => el.value);
-	const approverSteps = Array.from(document.querySelectorAll('input[name="approverSteps"]')).map(el => parseInt(el.value));
-	
-	const agreerIds = Array.from(document.querySelectorAll('input[name="agreerIds"]')).map(el => el.value);
-	const agreerSteps = Array.from(document.querySelectorAll('input[name="agreerSteps"]')).map(el => parseInt(el.value));
-	
-	const refererIds = Array.from(document.querySelectorAll('input[name="refererIds"]')).map(el => el.value);
-	const refererSteps = Array.from(document.querySelectorAll('input[name="refererSteps"]')).map(el => parseInt(el.value));
-
-
-
-    // [2] 동적으로 삽입된 입력 필드 추출
-    const inputElements = document.querySelectorAll("#basic-form-title, #basic-form-edit input, #basic-form-edit textarea, #basic-form-edit select");
-    const approvalContent = {};
-    let hasEmpty = false;
-
-    inputElements.forEach(el => {
-      const name = el.name || el.getAttribute("th:field")?.replace("*{", "").replace("}", "");
-      const value = el.value?.trim();
-
-      if (!value) {
-        hasEmpty = true;
-        el.style.border = "1px solid red"; // 시각적 경고
-      } else {
-        el.style.border = ""; // 초기화
-        approvalContent[name] = value;
-      }
-    });
-
-    // [3] 작성자 기본 정보 추출
-    const writerFields = ["date", "department_name", "team_name", "employee_position", "employee_name"];
-    const writerData = {};
-    writerFields.forEach(field => {
-      const el = document.getElementById(`basic-form-${field}`);
-      writerData[field] = el ? (el.value ?? el.textContent.trim()) : null;
-    });
-
-    // [4] 유효성 검사
-    if (!approvalTitle || !approvalFormatNo || hasEmpty) {
-      alert("제목, 양식 및 모든 항목을 빠짐없이 입력해주세요.");
-      return;
-    }
-
-    // [5] 서버로 전송
-    fetch('/approval/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
-        'header': document.querySelector('meta[name="_csrf_header"]').content
-      },
-      body: JSON.stringify({
-        writer: writerData,
-        title: approvalTitle,
-        format_no: approvalFormatNo,
-        content: approvalContent,
-        approverIds: approverIds,
-        agreerIds: agreerIds,
-        refererIds: refererIds,
-        approverSteps : approverSteps,
-        agreerSteps : agreerSteps,
-        refererSteps : refererSteps
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.res_code === "200") {
-        alert("결재서가 성공적으로 제출되었습니다.");
-        location.href = '/approval/myRequestedApprovals';
-      } else {
-        alert("결재서 제출에 실패했습니다. " + data.res_msg);
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert("요청 중 오류가 발생했습니다.");
-    });
-  });
-</script>
 
 
 

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <th:block th:fragment="congratulatory_payment">
+    <form th:id="congratsForm" th:object="${approval}">
+      <table class="table table-bordered text-dark align-middle">
+        <colgroup>
+          <col style="width: 150px;" />
+          <col />
+        </colgroup>
+        <tbody>
+          <tr>
+            <th class="table-light text-center">내용</th>
+            <td th:text="*{approval_content['content']}"  style="white-space: pre-wrap;">
+            </td>
+          </tr>
+          <tr>
+            <th class="table-light text-center">본인과의 관계</th>
+            <td th:text="*{approval_content['relation']}"  style="white-space: pre-wrap;">
+            </td>
+          </tr>
+          <tr>
+            <th class="table-light text-center">발생년월일</th>
+            <td th:text="*{approval_content['eventDate']}"  style="white-space: pre-wrap;">
+            </td>
+          </tr>
+          <tr>
+            <th class="table-light text-center">장소</th>
+            <td th:text="*{approval_content['location']}"  style="white-space: pre-wrap;">
+            </td>
+          </tr>
+          <tr>
+            <th class="table-light text-center">휴가기간</th>
+            <td th:text="|*{approval_content['vacationStart']} ~ *{approval_content['vacationEnd']}|"  style="white-space: pre-wrap;">
+            </td>
+          </tr>
+          <tr>
+            <th class="table-light text-center">금액</th>
+            <td th:text="|*{approval_content['amount']} 원|"  style="white-space: pre-wrap;">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" class="text-center text-secondary">
+              위와 같은 사유로 경조금을 신청합니다.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  </th:block>
+</html>
