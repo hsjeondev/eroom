@@ -67,22 +67,25 @@
 												data-bs-dismiss="modal" aria-label="Close">×</button>
 										</div>
 										
+										
+										<!-- 모달창 안에 facilityNo값을 넣어주는 script -->
 										<script>
 										  document.addEventListener("DOMContentLoaded", function () {
 										    const modal = document.getElementById("addEventModal");
 										    const facilityInput = document.getElementById("modalFacilityNo");
-										
+											
 										    modal.addEventListener("show.bs.modal", function (event) {
 										      const button = event.relatedTarget;
 										      const facilityNo = button.getAttribute("data-facility-no");
-										      console.log("facilityNo:", facilityNo); //  여기!
+										     // console.log("facilityNo:", facilityNo); 
 										      facilityInput.value = facilityNo;
 										    });
 										  });
 										</script>
-
-										<div class="modal-body p-4">
-
+										
+										
+										<!-- 등록 모달창 -->
+										<div class="modal-body p-4">												
 											<!-- 숨겨진 값들 -->
 											<input type="hidden" name="employee_no"
 												th:value="${#authentication.principal.employee.employeeNo}" />
@@ -114,9 +117,7 @@
 														name="reservation_end" />
 												</div>
 											</div>
-
 										</div>
-
 										<div class="modal-footer border-0 px-4 pb-3">
 											<button class="btn btn-primary w-100" type="submit">🚘
 												예약하기</button>
@@ -126,6 +127,7 @@
 							</div>
 						</div>
 						
+						<!-- 등록을 위한 fetch -->
 						<script>
 							const form = document.addEventForm;
 							form.addEventListener('submit',function(e){
@@ -151,17 +153,8 @@
 										 location.reload();
 									 }
 								 })								
-							})
-							
-						
+							})													
 						</script>
-
-
-
-
-
-
-
 
 
 						<!-- 페이징 -->
@@ -187,10 +180,6 @@
 			</div>
 
 		
-			
-			
-
-
 
 			<!-- 캘린더 (오른쪽) -->
 			<div class="col-md-6">
@@ -198,11 +187,7 @@
 					style="height: 400px;"></div>
 				</div>
 			</div>
-
-
-
-
-
+		<!-- 캘린더 script -->
 		<script>
 		document.addEventListener('DOMContentLoaded', function () {
 			  const calendarEl = document.getElementById('appCalendar');
@@ -233,7 +218,7 @@
 			    	          .then(response => response.json())
 			    	          .then(events => successCallback(events))
 			    	          .catch(error => {
-			    	            console.error("내 일정 불러오기 실패", error);
+			    	            console.error("차량 예약 불러오기 싪패", error);
 			    	            failureCallback(error);
 			    	          });
 			    	      }
@@ -277,7 +262,7 @@
 			      }
 			  });
 
-			  // setTimeout으로 약간 늦게 실행해주면 스타일 로딩 이후 안전하게 그려짐
+			  	// setTimeout 사용
 				/* <head>에 있는 FullCalendar CSS 파일이 아직 로드 중이라
 				캘린더는 그려졌지만 스타일이 적용되지 않은 상태로 나와버림. */
 			  setTimeout(() => {

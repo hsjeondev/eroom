@@ -81,6 +81,7 @@ public class ReservationController {
 	@ResponseBody
 	public List<Map<String, Object>> getVehicleList(@PathVariable("separator") String separator){
 		   List<Map<String, Object>> result = new ArrayList<>();
+		   System.out.println(separator);
 		    List<VehicleDto> list = vehicleService.getVehicleList(separator);
 		    
 		    for (VehicleDto dto : list) {
