@@ -138,8 +138,9 @@
       </div>
       <!-- 결재 삭제 버튼 -->
       <div class="mt-4 text-end">
-        <button  th:if="${approval.employee.employeeNo == employee.employeeNo or employee.employeeName.contains('admin')}" id="deleteBtn" type="button" class="btn btn-outline-danger">삭제</button>
-        <button  th:if="${approval.employee.employeeNo == employee.employeeNo and approval.approval_status == 'S'}" id="fallBackBtn" type="button" class="btn btn-outline-danger">회수</button>
+        <button th:if="${approval.employee.employeeNo == employee.employeeNo or employee.employeeName.contains('admin')}" id="deleteBtn" type="button" class="btn btn-outline-danger">삭제</button>
+        <button th:if="${approval.employee.employeeNo == employee.employeeNo and approval.approval_status == 'S'}" id="fallBackBtn" type="button" class="btn btn-outline-danger">회수</button>
+        <button th:if="${approval.employee.employeeNo == employee.employeeNo and approval.approval_status == 'F'}" id="rewriteBtn" type="button" class="btn btn-primary me-2 approveDenyBtn">재기안</button>
       </div>
     </div>
     
@@ -265,42 +266,13 @@
 		});
 
 	</script>
-	<!-- 합의,거절 버튼 -->
-	<!-- <script th:inline="javascript">
-		document.querySelectorAll(".approveDenyBtn").forEach(function(btn) {
-			btn.addEventListener("click", function () {
-				const approvalNo2 = /*[[${approval.approval_no}]]*/ 0;
-				const employeeNo2 = /*[[${employee.employeeNo}]]*/ 0;
-				const agreementStatus = this.dataset.agreementStatus;
-				const actionText = status === 'A' ? '합의' : (status === 'D' ? '거절' : '처리');
-				if (confirm(`결재를 ${actionText}하시겠습니까?`)) {
-					fetch('/approvalLine/agreement', {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
-							'header': document.querySelector('meta[name="_csrf_header"]').content
-						},
-						body: JSON.stringify({
-							approval_no : approvalNo2,
-							approval_line_status : agreementStatus,
-							employee_no : employeeNo2
-						})
-					})
-					.then(response => response.json())
-					.then(data => {
-						alert(data.res_msg)
-						if (data.res_code == 200) {
-							location.reload();
-						}
-					})
-				} else {
-
-				}
-			});
-		})
-	</script> -->
-
+    <!-- 재기안 버튼 -->
+    <script th:inline="javascript">
+    	document.getElementById("rewriteBtn").addEventListener("click", function(){
+    		const editNo = /*[[${approval.approval_no}]]*/ null;
+    		location.href = '/approval/' + editNo + '/edit';
+    	});
+    </script>
 	</main>
 </body>
 </html>

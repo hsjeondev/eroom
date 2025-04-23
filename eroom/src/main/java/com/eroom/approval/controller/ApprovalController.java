@@ -116,8 +116,33 @@ public class ApprovalController {
 		return "/approval/myRequestedApprovals";
 	}
 	// 결재 생성 페이지 진입
-	@GetMapping("/approval/create")
-	public String selectApprovalCreate(Model model, Authentication authentication) {
+	@GetMapping({"/approval/create", "/approval/{approvalNo}/edit"})
+	public String selectApprovalCreate(Model model, Authentication authentication, @PathVariable(value = "approvalNo", required = false) Long approvalNo) {
+		// 새로운 결재인지 수정하는 결재인지 확인
+		if(approvalNo != null) {
+			// 수정하는 결재인 경우
+			model.addAttribute("mode", "edit");
+			// 결재 번호로 결재 정보 조회
+			Approval approval = approvalService.selectApprovalByApprovalNo(approvalNo);
+			// 결재 정보가 없으면 404 에러 페이지로 이동
+			if (approval == null) {
+				return "redirect:/error/404";
+			}
+			ApprovalDto approvalDto = new ApprovalDto().toDto(approval);
+			model.addAttribute("approval", approvalDto);
+			// 결재 라인 정보 조회
+			List<ApprovalLine> temp = approvalLineService.getApprovalLineByApprovalNo(approvalNo);
+			List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
+			for (ApprovalLine approvalLine : temp) {
+				ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
+				approvalLineDtoList.add(approvalLineDto);
+			}
+			model.addAttribute("approvalLineList", approvalLineDtoList);
+		} else {
+			// 새로운 결재인 경우
+			model.addAttribute("mode", "create");
+		}
+		
 		// 로그인한 사용자 정보 가져오기
 		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 		Employee employee = employeeDetails.getEmployee();
