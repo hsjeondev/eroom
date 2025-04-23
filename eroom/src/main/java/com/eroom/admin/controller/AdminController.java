@@ -226,7 +226,10 @@ public class AdminController {
 	@GetMapping("/attendanceDetail")
 	@ResponseBody
 	public AttendanceDto getAttendanceDetail(@RequestParam("attendanceNo") Long attendanceNo){
-		return attendanceService.findAttendanceByNo(attendanceNo);
+	    System.out.println("받은 attendanceNo: " + attendanceNo);
+	    AttendanceDto dto = attendanceService.findAttendanceByNo(attendanceNo);
+	    System.out.println("반환할 DTO: " + dto);
+	    return dto;
 	}
 	
 	@PostMapping("attendanceUpdate")

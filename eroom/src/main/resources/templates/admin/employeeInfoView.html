@@ -550,7 +550,7 @@
 	}
 	renderCharts();
 	
-	// ✅ 출퇴근 수정 모달에 필요한 변수 초기화
+	//  출퇴근 수정 모달에 필요한 변수 초기화
 	let originalData = {
 	  checkInTime: '',
 	  checkOutTime: '',
@@ -559,42 +559,53 @@
 
 	let hideTriggered = false; // 모달 강제 닫기 여부
 
-	// ✅ 모달 객체 생성 또는 가져오기
+	//  모달 객체 생성 또는 가져오기
 	const editModal = document.getElementById('editAttendanceModal');
 	const bsEditModal = bootstrap.Modal.getInstance(editModal) || new bootstrap.Modal(editModal);
 
-	// ✅ DOMContentLoaded 이후 실행 보장
+	//  DOMContentLoaded 이후 실행 보장
 	// 모달을 자동 열고, fetch로 데이터 채우고, originalData 저장
-document.addEventListener('DOMContentLoaded', function () {
+window.onload = function () {
   const editButtons = document.querySelectorAll('[data-bs-target="#editAttendanceModal"]');
+  console.log('버튼 개수:', editButtons.length); // 👈 콘솔에 몇 개 있는지 찍어봐
 
   editButtons.forEach(button => {
     button.addEventListener('click', function () {
       const attendanceNo = this.getAttribute('data-attendance-no');
-      fetch(`/admin/attendanceDetail?attendanceNo=${attendanceNo}`)
-        .then(response => response.json())
-        .then(data => {
-          console.log('받아온 데이터:', data); // 콘솔 확인
+      console.log('클릭한 attendanceNo:', attendanceNo); // 👈 클릭 확인용
 
-          // datetime-local input 형식으로 바꾸기
+      fetch(`/admin/attendanceDetail?attendanceNo=${attendanceNo}`)
+        .then(response => {
+          if (!response.ok) throw new Error('서버 응답 오류');
+          return response.json();
+        })
+        .then(data => {
+          console.log('받아온 데이터:', data);
+
           const checkIn = data.attendance_check_in_time?.replace(' ', 'T') || '';
           const checkOut = data.attendance_check_out_time?.replace(' ', 'T') || '';
 
-          // input에 값 세팅
           document.getElementById('editCheckInTime').value = checkIn;
           document.getElementById('editCheckOutTime').value = checkOut;
           document.getElementById('lateStatus').textContent = data.attendance_late_yn === 'Y' ? '지각' : '-';
           document.getElementById('earlyLeaveStatus').textContent = data.attendance_early_leave_yn === 'Y' ? '조퇴' : '-';
+
+          // ✅ 원래 값도 저장 (수정 여부 비교용)
+          originalData = {
+            checkInTime: checkIn,
+            checkOutTime: checkOut,
+            attendanceNo: attendanceNo
+          };
         })
         .catch(err => {
           console.error('서버 요청 실패:', err);
         });
     });
   });
-});
+};
 
 
-	// ✅ 모달 닫힐 때 수정 여부 체크
+	//  모달 닫힐 때 수정 여부 체크
 	editModal.addEventListener('hide.bs.modal', function (e) {
 	  if (hideTriggered) {
 	    hideTriggered = false;
@@ -616,7 +627,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	  }
 	});
 
-	// ✅ 모달 닫기 확인
+	//  모달 닫기 확인
 	const confirmCloseBtn = document.getElementById('confirmCloseBtn');
 	confirmCloseBtn.addEventListener('click', function () {
 	  hideTriggered = true;
@@ -624,13 +635,13 @@ document.addEventListener('DOMContentLoaded', function () {
 	  bsEditModal.hide();
 	});
 
-	// ✅ 모달 닫기 취소
+	//  모달 닫기 취소
 	const stayModalBtn = document.getElementById('stayModalBtn');
 	stayModalBtn.addEventListener('click', function () {
 	  bootstrap.Modal.getInstance(document.getElementById('unsavedAlertModal')).hide();
 	});
 
-	// ✅ 수정하기 버튼 클릭 시 확인 모달 띄우기
+	//  수정하기 버튼 클릭 시 확인 모달 띄우기
 	const form = document.getElementById('editAttendanceForm');
 	form.addEventListener('submit', function (e) {
 	  e.preventDefault();
@@ -656,7 +667,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	  new bootstrap.Modal(document.getElementById('confirmSaveModal')).show();
 	});
 
-	// ✅ 저장 확인 → 서버로 수정 요청 전송
+	// 저장 확인 → 서버로 수정 요청 전송
 	const confirmSaveBtn = document.getElementById('confirmSaveBtn');
 	confirmSaveBtn.addEventListener('click', function () {
 	  const form = document.getElementById('editAttendanceForm');
@@ -686,7 +697,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	    });
 	});
 
-	// ✅ 수정 확인 취소
+	// 수정 확인 취소
 	const cancelSaveBtn = document.getElementById('cancelSaveBtn');
 	cancelSaveBtn.addEventListener('click', function () {
 	  bootstrap.Modal.getInstance(document.getElementById('confirmSaveModal')).hide();
