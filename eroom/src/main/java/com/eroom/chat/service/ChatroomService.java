@@ -33,24 +33,41 @@ public class ChatroomService {
 	private final ChatroomAttendeeRepository chatroomAttendeeRepository;
 	private final ChatAlarmRepository chatAlarmRepository;
 	
-	public List<Chatroom> selectChatRoomAll() {
+	public List<ChatroomDto> selectChatRoomAll() {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
-	    Employee employee = employeeDetails.getEmployee(); // 현재 로그인한 직원 정보
+	    Employee me = employeeDetails.getEmployee(); // 현재 로그인한 직원
 
-	    // 1. 만든 채팅방
-	    List<Chatroom> createdByMe = repository.findByCreater(employee);
+	    // 1. 내가 만든 채팅방
+	    List<Chatroom> createdByMe = repository.findByCreater(me);
 
-	    // 2. 참여한 채팅방
-	    List<Chatroom> participatedIn = repository.findByParticipant(employee.getEmployeeNo());
+	    // 2. 내가 참여자로 들어간 채팅방 (ChatroomAttendee 기준)
+	    List<Chatroom> participatedIn = repository.findByParticipant(me.getEmployeeNo());
 
-	    // 3. 합치기 (자바 Set으로 중복 제거)
+	    // 3. 중복 제거
 	    Set<Chatroom> allChatrooms = new HashSet<>();
 	    allChatrooms.addAll(createdByMe);
 	    allChatrooms.addAll(participatedIn);
 
-	    return new ArrayList<>(allChatrooms);
+	    // 4. DTO로 변환 + 1:1 채팅방이면 상대방 이름으로 변경
+	    List<ChatroomDto> result = new ArrayList<>();
+	    for (Chatroom chatroom : allChatrooms) {
+	        ChatroomDto dto = ChatroomDto.toDto(chatroom);
+	        if ("N".equals(chatroom.getChatIsGroupYn())) {
+	            String opponentName = chatroom.getChatroomMapping().stream()
+	                .map(ChatroomAttendee::getAttendee)
+	                .filter(e -> !e.getEmployeeNo().equals(me.getEmployeeNo()))
+	                .map(Employee::getEmployeeName)
+	                .findFirst()
+	                .orElse("알 수 없음");
+	            dto.setChatroomName(opponentName);
+	        }
+	        result.add(dto);
+	    }
+
+	    return result;
 	}
+
 
 
 

@@ -54,27 +54,22 @@ public class ChatController {
 	
 	@GetMapping("/list")
 	public String selectChatRoomAll(@RequestParam(name = "department" ,required = false) String department, Model model) {
-		// 현재 로그인한 사용자 정보 가져오기
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
-		Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
-		// 채팅방 리스트 조회
-		List<Chatroom> resultList = chatroomService.selectChatRoomAll();
-		List<ChatroomDto> chatroomDtos = new ArrayList<>();
-		// 채팅방 알림을 읽지 않은 알림 리스트 조회
-		for(Chatroom chatroom : resultList) {
-			int unreadCount = chatAlarmRepository.countUnreadAlarms(myEmployeeNo, chatroom.getChatroomNo());
-			ChatroomDto dto = ChatroomDto.toDto(chatroom);
-			dto.setUnreadCount(unreadCount);
-			chatroomDtos.add(dto);
-		}
-		model.addAttribute("chatroomList",chatroomDtos);
-		
-		List<SeparatorDto> structureList = employeeService.findDistinctStructureNames();
-		model.addAttribute("structureList", structureList);
-		
-		return "chat/list";
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
+
+	    List<ChatroomDto> chatroomDtos = chatroomService.selectChatRoomAll();
+	    for (ChatroomDto dto : chatroomDtos) {
+	        int unreadCount = chatAlarmRepository.countUnreadAlarms(myEmployeeNo, dto.getChatroomNo());
+	        dto.setUnreadCount(unreadCount);
+	    }
+
+	    model.addAttribute("chatroomList", chatroomDtos);
+	    model.addAttribute("structureList", employeeService.findDistinctStructureNames());
+
+	    return "chat/list";
 	}
+
 	
 	@GetMapping("/employes")
 	@ResponseBody
@@ -140,36 +135,48 @@ public class ChatController {
 	@GetMapping("/roomDetail")
 	@ResponseBody
 	public ChatroomDto roomDetail(@RequestParam("roomNo") Long roomNo) {
-		// 채팅방 정보 조회
-		// 현재 로그인한 사용자 정보 가져오기
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    // 현재 로그인한 사용자 정보 가져오기
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
-	    
-	    // (1) 채팅방 알림을 읽지 않은 알림 리스트 조회
-	    List<ChatAlarm> urreadAlarms = chatAlarmRepository.findUnreadAlarms(myEmployeeNo, roomNo);
-	    
-	    // (2) 채팅방 알림을 읽지 않은 알림 리스트를 읽음 처리
-	    for(ChatAlarm alarm : urreadAlarms) {
-	    	alarm.setChatAlarmReadYn("Y");
+
+	    // 1. 안 읽은 알림 조회 및 읽음 처리
+	    List<ChatAlarm> unreadAlarms = chatAlarmRepository.findUnreadAlarms(myEmployeeNo, roomNo);
+	    for (ChatAlarm alarm : unreadAlarms) {
+	        alarm.setChatAlarmReadYn("Y");
 	    }
-	    // 읽음 처리된 알림 리스트를 DB에 저장
-	    chatAlarmRepository.saveAll(urreadAlarms);
-	    // (3) 채팅방 정보 + 메시지 리스트 조회
+	    chatAlarmRepository.saveAll(unreadAlarms);
+
+	    // 2. 채팅방 조회
 	    Chatroom chatroom = chatroomService.selectChatroomOne(roomNo);
 	    if (chatroom == null) {
 	        throw new RuntimeException("채팅방 정보를 찾을 수 없습니다.");
 	    }
-	    // 채팅 메시지 리스트 조회
+
+	    // 3. 메시지 리스트 DTO 변환
 	    List<ChatMessage> messageList = chatMessageService.selectMessageByRoomNo(roomNo);
-	    
 	    List<ChatMessageDto> messageDtoList = new ArrayList<>();
-		for (ChatMessage message : messageList) {
-			ChatMessageDto messageDto = ChatMessageDto.toDto(message);
-			messageDtoList.add(messageDto);
-		}
-	    return ChatroomDto.toDto(chatroom, messageDtoList);
+	    for (ChatMessage message : messageList) {
+	        messageDtoList.add(ChatMessageDto.toDto(message));
+	    }
+
+	    // 4. 채팅방 DTO 생성
+	    ChatroomDto chatroomDto = ChatroomDto.toDto(chatroom, messageDtoList);
+
+	    // 5. 1:1 채팅일 경우 상대방 이름으로 덮어쓰기
+	    if ("N".equals(chatroom.getChatIsGroupYn())) {
+	        String opponentName = chatroom.getChatroomMapping().stream()
+	            .map(ChatroomAttendee::getAttendee)
+	            .filter(e -> !e.getEmployeeNo().equals(myEmployeeNo))
+	            .map(Employee::getEmployeeName)
+	            .findFirst()
+	            .orElse("알 수 없음");
+	        chatroomDto.setChatroomName(opponentName);
+	    }
+
+	    return chatroomDto;
 	}
+
 	
 	// 채팅방 업데이트
 	@PostMapping("/rename")
