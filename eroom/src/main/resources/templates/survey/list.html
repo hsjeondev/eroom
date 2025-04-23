@@ -23,7 +23,7 @@
 	<main class="main" id="top">
 		<div class="pb-8">
 			<h2 class="mb-4">설문</h2>
-			<div id="reports" data-list='{"valueNames":["title","text","priority","reportsby","reports","date"],"page":9,"pagination":true}'>
+			<div id="reports" data-list='{"valueNames":["title","text","priority","reportsby","reports","date"],"page":2,"pagination":true}'>
 				<div class="row g-3 justify-content-between mb-2">
 					<div class="col-12">
 						<div class="d-md-flex justify-content-between">
@@ -120,6 +120,13 @@
 				</div>
 				<div class="row g-3 list" id="reportsList">
 					<!-- 설문 상세 -->
+					<th:block th:if="${#lists.isEmpty(surveyList)}">
+						<div class="col-12">
+							<div class="alert alert-light text-center border border-secondary-light rounded py-4 fs-6 fw-semibold text-body-secondary">
+								<i class="fa-solid fa-circle-info me-2 text-secondary"></i>등록된 설문이 없습니다.
+							</div>
+						</div>
+					</th:block>
 					<th:block th:each="survey : ${surveyList}">
 						<div class="col-12 col-xl-4">
 							<div class="card h-100">
@@ -200,285 +207,347 @@
 		</div>
 	</main>
 	<script>
-		// 설문 등록시 항목 추가 스크립트
-		document.addEventListener("DOMContentLoaded", function() {
-			const addItemButton = document.getElementById('addItemBtn');
-			const itemContainer = document.getElementById('itemContainer');
-
-			addItemButton.addEventListener('click', function() {
-				// wrapper div 생성
-				const wrapper = document.createElement('div');
-				wrapper.classList.add('d-flex', 'align-items-center', 'mb-2', 'item-wrapper');
-
-				// input 생성
-				const input = document.createElement('input');
-				input.setAttribute('type', 'text');
-				input.setAttribute('name', 'items');
-				input.classList.add('form-control', 'me-2');
-
-				// 삭제 버튼 생성
-				const removeBtn = document.createElement('button');
-				removeBtn.setAttribute('type', 'button');
-				removeBtn.classList.add('btn', 'btn-close', 'btn-sm');
-
-				// 삭제 버튼 클릭 이벤트
-				removeBtn.addEventListener('click', function() {
-					wrapper.remove();
-				});
-
-				// 요소 조립
-				wrapper.appendChild(input);
-				wrapper.appendChild(removeBtn);
-				itemContainer.appendChild(wrapper);
-
-				// 설문 등록 항목 추가시 스크롤 맨 아래로 자동 이동
-				const scrollTarget = itemContainer.parentElement;
-				scrollTarget.scrollTop = scrollTarget.scrollHeight;
-			});
-		});
-		
-		// 설문 등록시 참여자 팀 선택 스크립트
-		document.getElementById('selectTeam').addEventListener('change', function () {
-		    const selectedTeamContainer = document.getElementById('selectedTeam');
-		    const selected = Array.from(this.selectedOptions);
-		
-		    selected.forEach(option => {
-		        const teamId = option.value;
-		        const teamName = option.text;
-		
-		        if (!document.getElementById('selected-team-' + teamId)) {
-		            const badge = document.createElement('span');
-		            badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
-		            badge.id = 'selected-team-' + teamId;
-		            badge.innerHTML = `
-		                ${teamName}
-		                <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeTeam('${teamId}')"></button>
-		                <input type="hidden" name="selectedTeamIds" value="${teamId}">
-		            `;
-		            selectedTeamContainer.appendChild(badge);
-		        }
-		    });
-		
-		    // 선택된 항목 초기화 (선택 후 자동 해제)
-		    this.selectedIndex = 0;
-		});
-		
-		// 선택된 팀 삭제
-		function removeTeam(teamId) {
-		    const badge = document.getElementById('selected-team-' + teamId);
-		    if (badge) badge.remove();
-		}
-		
-		// 모달창 닫기 초기화
-		document.addEventListener('DOMContentLoaded', () => {
-		  const form = document.getElementById('create-survey-form');
-		  const modalEl = document.getElementById('create-survey');
-		  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-		
-		  const confirmModalEl = document.getElementById('confirmCloseModal');
-		  const confirmModal = bootstrap.Modal.getOrCreateInstance(confirmModalEl);
-		  const confirmBtn = document.getElementById('confirmCloseBtn');
-		
-		  let allowClose = false;
-		
-		  modalEl.addEventListener('hide.bs.modal', (event) => {
-		    if (allowClose) {
-		      allowClose = false;
-		      return;
-		    }
-		
-		    const title = form.querySelector('input[name="surveyTitle"]').value.trim();
-		    const deadline = form.querySelector('input[name="deadline"]').value.trim();
-		    const items = Array.from(form.querySelectorAll('input[name="items"]')).some(input => input.value.trim() !== '');
-		    const hasTeams = document.querySelectorAll('#selectedTeam .badge').length > 0;
-		
-		    const hasInput = title || deadline || items || hasTeams;
-		
-		    if (hasInput) {
-		      event.preventDefault();
-		      confirmModal.show();
-		    }
-		  });
-		
-		  confirmBtn.addEventListener('click', () => {
-		    confirmModal.hide();
-		    allowClose = true;
-		    modal.hide();
-		  });
-		
-		  modalEl.addEventListener('hidden.bs.modal', () => {
-		    allowClose = false;
-		    form.reset();
-		    itemContainer.innerHTML = '';
-		    selectedTeam.innerHTML = '';
-		    selectedTeam.classList.remove('border', 'border-danger', 'rounded', 'p-2');
-		  });
-		});
+	// 설문 등록시 항목 추가 스크립트
+	document.addEventListener("DOMContentLoaded", function() {
+		const addItemButton = document.getElementById('addItemBtn');
+		const itemContainer = document.getElementById('itemContainer');
 	
-		// 설문 상세 조회
-		document.addEventListener('DOMContentLoaded', function () {
-		  document.getElementById('reportsList').addEventListener('click', function (event) {
-		    const button = event.target.closest('button[data-survey-id]');
-		    if (!button) return;
-		
-		    const surveyId = button.getAttribute('data-survey-id');
-		    const itemList = document.getElementById('surveyItemList-' + surveyId);
-		    if (!itemList) return;
-		
-		    itemList.innerHTML = '';
-		
-		    fetch('/survey/detail?id=' + surveyId)
-		    .then(response => response.json())
-		    .then(items => {
-		      if (items.length === 0) {
-		        itemList.innerHTML = '<li class="list-group-item">항목이 없습니다.</li>';
-		      } else {
-		        items.forEach((item, index) => {
-		          const wrapper = document.createElement('div');
-		          wrapper.className = 'vote-option d-flex justify-content-between align-items-center rounded p-2 mb-2 bg-light text-dark border';
-		          wrapper.setAttribute('onclick', `handleVoteClick(${surveyId}, ${index})`);
-		          wrapper.setAttribute('data-index', index);
-		          wrapper.setAttribute('data-item-no', item.itemNo);
-
-		          const label = document.createElement('span');
-		          label.className = 'fw-semibold';
-		          label.textContent = item.item;
-		          
-
-		          const countSpan = document.createElement('span');
-		          countSpan.id = `vote-count-${surveyId}-${index}`;
-		          countSpan.textContent = item.count + '표';
-
-		          if (item.voted === "Y") {
-	        	    wrapper.classList.add('border', 'border-success', 'bg-light');
-	        	    label.innerHTML += ' <span class="badge bg-success ms-2">내 투표</span>';
-	        	  }
-
-		          wrapper.appendChild(label);
-		          wrapper.appendChild(countSpan);
-		          itemList.appendChild(wrapper);
-		        });
-		      }
-		    });
-
-		  });
+		addItemButton.addEventListener('click', function() {
+			// wrapper div 생성
+			const wrapper = document.createElement('div');
+			wrapper.classList.add('d-flex', 'align-items-center', 'mb-2', 'item-wrapper');
+	
+			// input 생성
+			const input = document.createElement('input');
+			input.setAttribute('type', 'text');
+			input.setAttribute('name', 'items');
+			input.classList.add('form-control', 'me-2');
+	
+			// 삭제 버튼 생성
+			const removeBtn = document.createElement('button');
+			removeBtn.setAttribute('type', 'button');
+			removeBtn.classList.add('btn', 'btn-close', 'btn-sm');
+	
+			// 삭제 버튼 클릭 이벤트
+			removeBtn.addEventListener('click', function() {
+				wrapper.remove();
+			});
+	
+			// 요소 조립
+			wrapper.appendChild(input);
+			wrapper.appendChild(removeBtn);
+			itemContainer.appendChild(wrapper);
+	
+			// 설문 등록 항목 추가시 스크롤 맨 아래로 자동 이동
+			const scrollTarget = itemContainer.parentElement;
+			scrollTarget.scrollTop = scrollTarget.scrollHeight;
 		});
-
-		// 투표
-		function handleVoteClick(surveyId, itemIndex) {
-		  const modal = document.getElementById('survey-detail-' + surveyId);
-		  const allowMultiple = modal.getAttribute('data-allow-multiple') === 'on';
-		
-		  const allOptions = document.querySelectorAll(`#surveyItemList-${surveyId} .vote-option`);
-		  const selected = allOptions[itemIndex];
-		
-		  if (allowMultiple) {
-		    // 복수 선택 가능 → 토글
-		    const isSelected = selected.classList.contains('bg-primary');
-		    if (isSelected) {
-		      selected.classList.remove('bg-primary', 'border-2');
-		      selected.classList.add('bg-light');
-		    } else {
-		      selected.classList.remove('bg-light');
-		      selected.classList.add('bg-primary', 'border-2');
-		    }
-		  } else {
-		    // 단일 선택 → 기존 선택 해제 후 하나만 선택
-		    allOptions.forEach(el => {
-		      el.classList.remove('bg-primary', 'border-2');
-		      el.classList.add('bg-light');
-		    });
-		    selected.classList.remove('bg-light');
-		    selected.classList.add('bg-primary', 'border-2');
-		  }
-		}
-		
-		// 투표 버튼 클릭 스크립트
-		function submitVote(surveyId) {
-		  const allowMultiple = document.getElementById('survey-detail-' + surveyId).getAttribute('data-allow-multiple') === 'on';
-		  const selectedOptions = document.querySelectorAll(`#surveyItemList-${surveyId} .vote-option.bg-primary`);
-		
-		  if (selectedOptions.length === 0) {
-		    alert('항목을 하나 이상 선택해주세요.');
-		    return;
-		  }
-		
-		  const votedItems = Array.from(selectedOptions).map(el => parseInt(el.getAttribute('data-item-no')));
-		
-		  fetch('/survey/vote', {
-		    method: 'POST',
-		    headers: {
-		      'Content-Type': 'application/json',
-		      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-		    },
-		    body: JSON.stringify({
-		      surveyId: surveyId,
-		      votedItems: votedItems
-		    })
-		  })
-		  .then(res => res.json())
-		  .then(result => {
-		    if (result.success) {
-		      showVoteResult(surveyId); // 투표 결과 조회 후 표시
-		    } else {
-		      alert('투표에 실패했습니다.');
-		    }
-		  });
-		}
-		
-		// 득표수 표시
-		function showVoteResult(surveyId) {
-		  fetch(`/survey/vote-result?id=${surveyId}`)
-		    .then(res => res.json())
-		    .then(data => {
-		      const itemList = document.getElementById('surveyItemList-' + surveyId);
-		      itemList.innerHTML = '';
-		      
-		      const allowAnonymous = document.getElementById('survey-detail-' + surveyId)
-              .getAttribute('data-anonymous') === 'on';
-		      
-		      data.forEach((item, index) => {
-		        const wrapper = document.createElement('div');
-		        wrapper.className = 'd-flex justify-content-between align-items-center rounded p-2 mb-2 bg-light text-dark border';
-		
-		        const label = document.createElement('span');
-		        label.className = 'fw-semibold';
-		        label.textContent = item.name;
-		
-		        const voteCount = document.createElement('span');
-		        voteCount.textContent = `${item.count}표`;
-		        voteCount.setAttribute('data-bs-toggle', 'tooltip');
-		        voteCount.setAttribute('title', item.voters.join(', '));
-		        
-		        voteCount.setAttribute('title', allowAnonymous ? '익명 투표' : item.voters.join(', '));
-		
-		        wrapper.appendChild(label);
-		        wrapper.appendChild(voteCount);
-		        itemList.appendChild(wrapper);
-		      });
-		
-		      // Bootstrap Tooltip 활성화
-		      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-		      tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
-		    });
-		}
+	});
+	
+	// 설문 등록시 참여자 팀 선택 스크립트
+	document.getElementById('selectTeam').addEventListener('change', function () {
+	    const selectedTeamContainer = document.getElementById('selectedTeam');
+	    const selected = Array.from(this.selectedOptions);
+	
+	    selected.forEach(option => {
+	        const teamId = option.value;
+	        const teamName = option.text;
+	
+	        if (!document.getElementById('selected-team-' + teamId)) {
+	            const badge = document.createElement('span');
+	            badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
+	            badge.id = 'selected-team-' + teamId;
+	            badge.innerHTML = `
+	                ${teamName}
+	                <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeTeam('${teamId}')"></button>
+	                <input type="hidden" name="selectedTeamIds" value="${teamId}">
+	            `;
+	            selectedTeamContainer.appendChild(badge);
+	        }
+	    });
+	
+	    // 선택된 항목 초기화 (선택 후 자동 해제)
+	    this.selectedIndex = 0;
+	});
+	
+	// 선택된 팀 삭제
+	function removeTeam(teamId) {
+	    const badge = document.getElementById('selected-team-' + teamId);
+	    if (badge) badge.remove();
+	}
+	
+	// 모달창 닫기 초기화
+	document.addEventListener('DOMContentLoaded', () => {
+	  const form = document.getElementById('create-survey-form');
+	  const modalEl = document.getElementById('create-survey');
+	  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+	
+	  const confirmModalEl = document.getElementById('confirmCloseModal');
+	  const confirmModal = bootstrap.Modal.getOrCreateInstance(confirmModalEl);
+	  const confirmBtn = document.getElementById('confirmCloseBtn');
+	
+	  let allowClose = false;
+	
+	  modalEl.addEventListener('hide.bs.modal', (event) => {
+	    if (allowClose) {
+	      allowClose = false;
+	      return;
+	    }
+	
+	    const title = form.querySelector('input[name="surveyTitle"]').value.trim();
+	    const deadline = form.querySelector('input[name="deadline"]').value.trim();
+	    const items = Array.from(form.querySelectorAll('input[name="items"]')).some(input => input.value.trim() !== '');
+	    const hasTeams = document.querySelectorAll('#selectedTeam .badge').length > 0;
+	
+	    const hasInput = title || deadline || items || hasTeams;
+	
+	    if (hasInput) {
+	      event.preventDefault();
+	      confirmModal.show();
+	    }
+	  });
+	
+	  confirmBtn.addEventListener('click', () => {
+	    confirmModal.hide();
+	    allowClose = true;
+	    modal.hide();
+	  });
+	
+	  modalEl.addEventListener('hidden.bs.modal', () => {
+	    allowClose = false;
+	    form.reset();
+	    itemContainer.innerHTML = '';
+	    selectedTeam.innerHTML = '';
+	    selectedTeam.classList.remove('border', 'border-danger', 'rounded', 'p-2');
+	  });
+	});
+	
+	// 설문 상세 조회
+	document.addEventListener('DOMContentLoaded', function () {
+	  document.getElementById('reportsList').addEventListener('click', function (event) {
+	    const button = event.target.closest('button[data-survey-id]');
+	    if (!button) return;
+	
+	    const surveyId = button.getAttribute('data-survey-id');
+	    const itemList = document.getElementById('surveyItemList-' + surveyId);
+	    if (!itemList) return;
+	
+	    itemList.innerHTML = '';
+	
+	    fetch('/survey/detail?id=' + surveyId)
+	    .then(response => response.json())
+	    .then(items => {
+	      if (items.length === 0) {
+	        itemList.innerHTML = '<li class="list-group-item">항목이 없습니다.</li>';
+	      } else {
+	        items.forEach((item, index) => {
+	          const wrapper = document.createElement('div');
+	          wrapper.className = 'vote-option d-flex justify-content-between align-items-center rounded p-2 mb-2 bg-light text-dark border';
+	          wrapper.setAttribute('onclick', `handleVoteClick(${surveyId}, ${index})`);
+	          wrapper.setAttribute('data-index', index);
+	          wrapper.setAttribute('data-item-no', item.itemNo);
+	
+	          const label = document.createElement('span');
+	          label.className = 'fw-semibold';
+	          label.textContent = item.item;
+	          
+	
+	          const countSpan = document.createElement('span');
+	          countSpan.id = `vote-count-${surveyId}-${index}`;
+	          countSpan.textContent = item.count + '표';
+	
+	          if (item.voted === "Y") {
+	       	    wrapper.classList.add('border', 'border-primary', 'bg-light');
+	       	    label.innerHTML += ' <span class="badge bg-primary ms-2">내 투표</span>';
+	       	  }
+	
+	          wrapper.appendChild(label);
+	          wrapper.appendChild(countSpan);
+	          itemList.appendChild(wrapper);
+	        });
+	      }
+	    });
+	
+	  });
+	});
+	
+	// 투표 항목 렌더
+	function renderVoteOptions(surveyId, items) {
+	  const itemList = document.getElementById('surveyItemList-' + surveyId);
+	  if (!itemList) return;
+	
+	  itemList.innerHTML = '';
+	
+	  items.forEach((item, index) => {
+	    const wrapper = document.createElement('div');
+	    wrapper.className = 'vote-option d-flex justify-content-between align-items-center rounded p-2 mb-2 bg-light text-dark border';
+	    wrapper.setAttribute('onclick', `handleVoteClick(${surveyId}, ${index})`);
+	    wrapper.setAttribute('data-index', index);
+	    wrapper.setAttribute('data-item-no', item.itemNo);
+	
+	    const label = document.createElement('span');
+	    label.className = 'fw-semibold';
+	    label.textContent = item.item;
+	
+	    const countSpan = document.createElement('span');
+	    countSpan.id = `vote-count-${surveyId}-${index}`;
+	    countSpan.textContent = item.count + '표';
+	
+	    if (item.voted === "Y") {
+	      wrapper.classList.add('border', 'border-primary', 'bg-light');
+	      label.innerHTML += ' <span class="badge bg-primary ms-2">내 투표</span>';
+	    }
+	
+	    wrapper.appendChild(label);
+	    wrapper.appendChild(countSpan);
+	    itemList.appendChild(wrapper);
+	  });
+	}
+	
+	// 투표 항목 선택
+	function handleVoteClick(surveyId, itemIndex) {
+	  const modal = document.getElementById('survey-detail-' + surveyId);
+	  const allowMultiple = modal.getAttribute('data-allow-multiple') === 'on';
+	
+	  const allOptions = document.querySelectorAll(`#surveyItemList-${surveyId} .vote-option`);
+	  const selected = allOptions[itemIndex];
+	
+	  if (allowMultiple) {
+	    // 복수 선택 가능 → 토글
+	    const isSelected = selected.classList.contains('bg-primary');
+	    if (isSelected) {
+	      selected.classList.remove('bg-primary', 'border-2');
+	      selected.classList.add('bg-light');
+	    } else {
+	      selected.classList.remove('bg-light');
+	      selected.classList.add('bg-primary', 'border-2');
+	    }
+	  } else {
+	    // 단일 선택 → 기존 선택 해제 후 하나만 선택
+	    allOptions.forEach(el => {
+	      el.classList.remove('bg-primary', 'border-2');
+	      el.classList.add('bg-light');
+	    });
+	    selected.classList.remove('bg-light');
+	    selected.classList.add('bg-primary', 'border-2');
+	  }
+	}
+	
+	// 투표 제출 버튼 클릭 스크립트
+	function submitVote(surveyId) {
+	  const allowMultiple = document.getElementById('survey-detail-' + surveyId).getAttribute('data-allow-multiple') === 'on';
+	  const selectedOptions = document.querySelectorAll(`#surveyItemList-${surveyId} .vote-option.bg-primary`);
+	
+	  if (selectedOptions.length === 0) {
+	    alert('항목을 하나 이상 선택해주세요.');
+	    return;
+	  }
+	
+	  const votedItems = Array.from(selectedOptions).map(el => parseInt(el.getAttribute('data-item-no')));
+	
+	  fetch('/survey/vote', {
+	    method: 'POST',
+	    headers: {
+	      'Content-Type': 'application/json',
+	      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+	    },
+	    body: JSON.stringify({
+	      surveyId: surveyId,
+	      votedItems: votedItems
+	    })
+	  })
+	  .then(res => res.json())
+	  .then(result => {
+	    if (result.success) {
+	      showVoteResult(surveyId); // 투표 결과 조회 후 표시
+	    } else {
+	      alert('투표에 실패했습니다.');
+	    }
+	  });
+	}
+	
+	// 득표수 표시
+	function showVoteResult(surveyId) {
+	  fetch('/survey/vote-result?id=' + surveyId)
+	    .then(function(res) {
+	      return res.json();
+	    })
+	    .then(function(data) {
+	      const itemList = document.getElementById('surveyItemList-' + surveyId);
+	      itemList.innerHTML = '';
+	
+	      const allowAnonymous = document.getElementById('survey-detail-' + surveyId)
+	        .getAttribute('data-anonymous') === 'on';
+	
+	      data.forEach(function(item, index) {
+	        const wrapper = document.createElement('div');
+	        wrapper.className = 'd-flex justify-content-between align-items-center rounded p-2 mb-2 bg-light text-dark border';
+	
+	        const label = document.createElement('span');
+	        label.className = 'fw-semibold';
+	        label.textContent = item.name;
+	
+	        const voteCount = document.createElement('span');
+	        voteCount.textContent = item.count + '표';
+	        voteCount.setAttribute('data-bs-toggle', 'tooltip');
+	        voteCount.setAttribute('title', allowAnonymous ? '익명 투표' : item.voters.join(', '));
+	
+	        if (item.voted === "Y") {
+	          label.innerHTML += ' <span class="badge bg-primary ms-2">내 투표</span>';
+	          wrapper.classList.add('border-primary', 'border-2');
+	        }
+	
+	        wrapper.appendChild(label);
+	        wrapper.appendChild(voteCount);
+	        itemList.appendChild(wrapper);
+	      });
+	
+	      // 툴팁 활성화
+	      const tooltipTriggerList = [].slice.call(itemList.querySelectorAll('[data-bs-toggle="tooltip"]'));
+	      tooltipTriggerList.forEach(function (el) {
+	        const existing = bootstrap.Tooltip.getInstance(el);
+	        if (existing) existing.dispose();
+	        new bootstrap.Tooltip(el);
+	      });
+	    });
+	}
+	
+	// 모달 열릴 때 투표 결과 + 툴팁 다시 적용
+	document.addEventListener('shown.bs.modal', function (event) {
+	  const modal = event.target;
+	  if (modal.id && modal.id.startsWith('survey-detail-')) {
+	    const surveyId = modal.id.replace('survey-detail-', '');
+	
+	    fetch('/survey/detail?id=' + surveyId)
+	      .then(response => response.json())
+	      .then(items => {
+	        const hasVoted = items.some(item => item.voted === "Y");
+	
+	        if (hasVoted) {
+	          showVoteResult(surveyId); // 투표했으면 결과 표시
+	        } else {
+	          renderVoteOptions(surveyId, items); // 투표 안했으면 항목 선택 표시
+	        }
+	      });
+	  }
+	});
 	</script>
 	<!-- 모달 닫기 확인창 -->
 	<div class="modal fade" id="confirmCloseModal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-sm">
-			<div class="modal-content bg-dark text-white rounded-3 shadow-lg border border-white">
+			<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
 				<div class="modal-header border-0">
-					<h5 class="modal-title text-light">정말 닫을까요?</h5>
-					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="닫기"></button>
+					<h5 class="modal-title text-dark">정말 닫을까요?</h5>
+					<button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="닫기"></button>
 				</div>
 				<div class="modal-body text-center">
-					<p class="mb-0">
+					<p class="mb-0 text-body">
 						작성 중인 내용이 사라집니다.<br>정말 닫으시겠습니까?
 					</p>
 				</div>
 				<div class="modal-footer justify-content-center border-0">
-					<button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">취소</button>
-					<button type="button" class="btn btn-danger btn-sm" id="confirmCloseBtn">확인</button>
+					<button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+					<button type="button" class="btn btn-danger" id="confirmCloseBtn">확인</button>
 				</div>
 			</div>
 		</div>
