@@ -32,6 +32,7 @@ import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.security.EmployeeDetails;
+import com.eroom.websocket.ChatWebSocketHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -237,10 +238,10 @@ public class ChatController {
 	@ResponseBody
 	public Map<String, Object> getReceiver(@RequestParam("chatroomNo") Long chatroomNo) {
 	    Map<String, Object> resultMap = new HashMap<>();
-	    
+
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
-	    Employee loginUser = employeeDetails.getEmployee(); // 현재 로그인한 사람
+	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
 
 	    Chatroom chatroom = chatroomService.selectChatroomOne(chatroomNo);
 	    if (chatroom == null) {
@@ -248,18 +249,20 @@ public class ChatController {
 	        return resultMap;
 	    }
 
-	    List<ChatroomAttendee> attendees = chatroom.getChatroomMapping(); // 채팅방 참여자 리스트
-
-	    for (ChatroomAttendee attendee : attendees) {
-	        if (!attendee.getAttendee().getEmployeeNo().equals(loginUser.getEmployeeNo())) {
-	            resultMap.put("receiverNo", attendee.getAttendee().getEmployeeNo());
-	            return resultMap;
+	    // 1:1 채팅방인지 확인
+	    if ("N".equals(chatroom.getChatIsGroupYn())) {
+	        for (ChatroomAttendee attendee : chatroom.getChatroomMapping()) {
+	            if (!attendee.getAttendee().getEmployeeNo().equals(myEmployeeNo)) {
+	                resultMap.put("receiverNo", attendee.getAttendee().getEmployeeNo());
+	                return resultMap;
+	            }
 	        }
 	    }
 
-	    resultMap.put("receiverNo", null);
+	    resultMap.put("receiverNo", null); // 그룹 채팅은 receiverNo 없음
 	    return resultMap;
 	}
+
 	@PostMapping("/read")
 	@ResponseBody
 	public Map<String, String> readChat(@RequestBody Map<String, Long> payload) {
@@ -281,7 +284,20 @@ public class ChatController {
 
 	    return resultMap;
 	}
-
+	
+	// 채팅방 알림 개수 조회
+	@GetMapping("/unreadCount")
+	@ResponseBody
+	public Map<String, Integer> getUnreadCount(@RequestParam("chatroomNo") Long chatroomNo) {
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	    
+	    int count = chatAlarmRepository.countUnreadAlarms(myEmployeeNo, chatroomNo);
+	    Map<String, Integer> result = new HashMap<>();
+	    result.put("count", count);
+	    return result;
+	}
 
 
 }
