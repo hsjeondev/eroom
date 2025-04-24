@@ -34,8 +34,7 @@ public class Attendance {
 	@Column(name="attendance_no")
 	private Long attendanceNo; // 근태 번호
 	
-	@CreationTimestamp
-	@Column(updatable=false,name="attendance_check_in_time")
+	@Column(name="attendance_check_in_time")
 	private LocalDateTime attendanceCheckInTime; // 출근 시간
 
 	@Column(name="attendance_check_out_time")

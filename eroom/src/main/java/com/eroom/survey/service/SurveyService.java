@@ -1,5 +1,6 @@
 package com.eroom.survey.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -11,7 +12,6 @@ import com.eroom.survey.entity.SurveyItem;
 import com.eroom.survey.repository.SurveyItemRepository;
 import com.eroom.survey.repository.SurveyRepository;
 import com.eroom.survey.repository.SurveyVoteRepository;
-import com.eroom.survey.repository.SurveyVoterRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +21,7 @@ public class SurveyService {
 
 	private final SurveyRepository surveyRepository;
 	private final SurveyItemRepository surveyItemRepository;
+	private final SurveyVoteRepository surveyVoteRepository;
 
 	public Long saveSurvey(SurveyDto surveyDto, SurveyItemDto surveyItemDto) {
 		Long result = null;
@@ -41,6 +42,21 @@ public class SurveyService {
 
 	public List<Survey> findAllSurvey() {
 		return surveyRepository.findAll();
+	}
+	
+	// 응답자 수 조회
+	public List<SurveyDto> findAllSurveyWithVoterCount() {
+	    List<Survey> surveys = surveyRepository.findAll();
+	    List<SurveyDto> dtoList = new ArrayList<>();
+
+	    for (Survey survey : surveys) {
+	        SurveyDto dto = new SurveyDto().toDto(survey);
+	        int voterCount = surveyVoteRepository.countDistinctVotersBySurveyNo(survey.getSurveyNo());
+	        dto.setVoterCount(voterCount);
+	        dtoList.add(dto);
+	    }
+
+	    return dtoList;
 	}
 
 }

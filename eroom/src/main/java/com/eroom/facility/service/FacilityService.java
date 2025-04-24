@@ -18,4 +18,9 @@ public class FacilityService {
 	public List<Facility>selectVehicleAll(){
 		return repository.findBySeparatorCode("F002");
 	}
+	
+	//회의실 목록 조회
+	public List<Facility>selectMeetingRoomAll(){
+		return repository.findBySeparatorCode("F001");
+	}
 }

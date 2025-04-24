@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
 <th:block layout:fragment="content">
-<style>
+	<style>
 /* 삭제 버튼 css */
 .item-wrapper {
 	position: relative;
@@ -40,7 +40,6 @@
 												</div>
 												<div class="modal-body">
 													<!-- 설문 등록 모달 본문 -->
-													<!-- <input class="form-control" id="surveyWriter" name="surveyWriter" type="hidden" th:value="${#authentication.principal.employee.employeeName}"> -->
 													<div class="row mb-3">
 														<label class="col-sm-2 col-form-label text-end" for="surveyTitle">제목</label>
 														<div class="col-sm-8">
@@ -52,12 +51,10 @@
 														<label class="col-sm-2 col-form-label text-end" for="inputItem">항목</label>
 														<div class="col-sm-8">
 															<div id="itemScrollBox" style="max-height: 400px; overflow-y: auto;">
-																<div id="itemContainer1">
-																	<input class="form-control mb-2" id="inputItem" name="items" type="text" required style="width: 97.2%;">
+																<div id="itemContainerDefault">
+																	<input class="form-control mb-2" id="inputItem" name="items" type="text" style="width: 97.2%;" required> <input class="form-control mb-2" name="items" type="text" style="width: 97.2%;" required>
 																</div>
-																<div id="itemContainer">
-																	<input class="form-control mb-2" name="items" type="text" required style="width: 97.2%;">
-																</div>
+																<div id="itemContainer"></div>
 															</div>
 															<!-- 항목 추가 버튼 -->
 															<div class="text-center mt-2">
@@ -66,7 +63,7 @@
 														</div>
 													</div>
 													<div class="row mb-3">
-														<div class="col-form-label col-sm-2 pt-0"></div>
+														<label class="col-sm-2 col-form-label text-end" for="basic-form-dob">옵션</label>
 														<div class="col-sm-8">
 															<div class="form-check">
 																<input class="form-check-input" id="gridCheck1" name="allowMultiple" type="checkbox"> <label class="form-check-label" for="gridCheck1">복수선택</label>
@@ -79,20 +76,14 @@
 													<div class="row mb-3">
 														<label class="col-sm-2 col-form-label text-end" for="basic-form-dob">참여자</label>
 														<div class="col-8">
-															<!-- 팀 선택 -->
+															<!-- 참여자 선택 -->
 															<div class="row mb-3">
-																<div class="col-sm-8">
-																	<div class="mb-3">
-																		<select class="form-select" id="selectTeam" onchange="changeTeamSelection(this.value)" style="width: 97.2%;">
-																			<option disabled selected>-- 팀 선택 --</option>
-																			<option th:each="team : ${structureList}" th:value="${team.structure_no}" th:text="${team.code_name}"></option>
-																		</select>
-																	</div>
-																	<!-- 선택된 팀 보여주기 -->
-																	<div class="mb-3">
-																		<label class="form-label" style="padding-left: 0;">선택된 팀</label>
-																		<div id="selectedTeam">
-																			<!-- 선택된 팀 정보가 배지로 표시됨 -->
+																<div class="col-sm-10">
+																	<div class="row">
+																		<div class="col-6 col-md-6 mb-2" th:each="team : ${structureList}">
+																			<div class="form-check">
+																				<input class="form-check-input" type="checkbox" th:id="'team-' + ${team.structure_no}" th:name="selectedTeamIds" th:value="${team.structure_no}"> <label class="form-check-label" th:for="'team-' + ${team.structure_no}" th:text="${team.code_name}"></label>
+																			</div>
 																		</div>
 																	</div>
 																</div>
@@ -119,7 +110,7 @@
 					</div>
 				</div>
 				<div class="row g-3 list" id="reportsList">
-					<!-- 설문 상세 -->
+					<!-- 설문 목록 -->
 					<th:block th:if="${#lists.isEmpty(surveyList)}">
 						<div class="col-12">
 							<div class="alert alert-light text-center border border-secondary-light rounded py-4 fs-6 fw-semibold text-body-secondary">
@@ -132,51 +123,60 @@
 							<div class="card h-100">
 								<div class="card-body">
 									<div class="border-bottom border-translucent">
-										<div class="d-flex align-items-start mb-1">
-											<div class="d-sm-flex align-items-center ps-2">
-												<button class="btn btn-link me-1 mb-1 fs-6 p-0" th:attr="data-survey-id=${survey.surveyNo}, data-bs-target='#survey-detail-' + ${survey.surveyNo}" data-bs-toggle="modal" th:text="${survey.surveyTitle}">설문 제목</button>
-												<!-- 개별 모달 -->
-												<div class="modal fade" th:attr="id='survey-detail-' + ${survey.surveyNo}, data-allow-multiple=${survey.allowMultiple}, data-anonymous=${survey.anonymousVote}" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
-													<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
-														<div class="modal-content">
-															<div class="modal-header">
-																<h5 class="modal-title" id="scrollingLongModalLabel2" th:text="${survey.surveyTitle}">Modal title</h5>
-																<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-															</div>
-															<div class="modal-body">
-																<ul th:attr="id='surveyItemList-' + ${survey.surveyNo}" class="list-group"></ul>
-															</div>
-															<div class="modal-footer">
-																<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">취소</button>
-																<button class="btn btn-primary" type="button" th:onclick="'submitVote(' + ${survey.surveyNo} + ')'">투표</button>
-															</div>
-														</div>
-													</div>
+										<div class="d-flex align-items-center justify-content-between mb-1">
+											<!-- 제목 -->
+											<div class="ps-2">
+												<button class="btn btn-link me-1 mb-1 fs-6 p-0" th:attr="data-survey-id=${survey.surveyNo}, data-bs-target='#survey-detail-' + ${survey.surveyNo}" data-bs-toggle="modal" th:text="${survey.surveyTitle}" style="max-width: 100%; height: 2rem; overflow: hidden">설문 제목</button>
+											</div>
+											<!-- 상태 표시 -->
+											<div>
+												<div th:if="${survey.deadline >= T(java.time.LocalDateTime).now()}" class="d-flex align-items-center">
+													<span class="fa-solid fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1"></span> <span class="fw-bold fs-9 text-body lh-2">진행중</span>
 												</div>
-												<div class="d-flex align-items-center" th:if="${survey.deadline >= T(java.time.LocalDateTime).now()}">
-													<span class="fa-solid fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1"></span><span class="fw-bold fs-9 text-body lh-2">진행중</span>
-												</div>
-												<div class="d-flex align-items-center" th:if="${survey.deadline < T(java.time.LocalDateTime).now()}">
-													<span class="fa-solid fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1"></span><span class="fw-bold fs-9 text-body lh-2">마감</span>
+												<div th:if="${survey.deadline < T(java.time.LocalDateTime).now()}" class="d-flex align-items-center">
+													<span class="fa-solid fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1"></span> <span class="fw-bold fs-9 text-body lh-2">마감</span>
 												</div>
 											</div>
 										</div>
+
 										<p class="fs-9 fw-semibold text-body ms-1 text mb-4 ps-2" th:text="'작성자 : ' + ${survey.writer}">작성자</p>
 									</div>
-									<div class="row g-1 g-sm-3 mt-2 lh-1">
-										<div class="col-12 col-sm-auto">
+
+									<div class="row g-1 g-sm-3 mt-2 lh-1 justify-content-between align-items-center">
+										<div class="col-auto">
 											<div class="d-flex align-items-center">
 												<span class="me-2" data-feather="users" style="stroke-width: 2;"></span>
-												<p class="mb-0 fs-9 fw-semibold text-body-tertiary reports">응답자 수</p>
+												<p class="mb-0 fs-9 fw-semibold text-body-tertiary reports" th:text="'응답자 수 : ' + ${survey.voterCount} + ' 명'">응답자 수</p>
 											</div>
 										</div>
-										<div class="col-12 col-sm-auto">
+										<div class="col-auto ms-auto">
 											<div class="d-flex align-items-center">
 												<span class="me-2" data-feather="clock" style="stroke-width: 2;"></span>
 												<p class="mb-0 fs-9 fw-semibold text-body-tertiary date" th:text="'마감일시 : ' + ${#temporals.format(survey.deadline, 'yyyy.MM.dd HH:mm')}">마감일</p>
 											</div>
 										</div>
 									</div>
+									<!-- 개별 모달 -->
+									<div class="modal fade" th:attr="id='survey-detail-' + ${survey.surveyNo}, data-allow-multiple=${survey.allowMultiple}, data-anonymous=${survey.anonymousVote}" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
+										<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h5 class="modal-title" id="scrollingLongModalLabel2" th:text="${survey.surveyTitle}">Modal title</h5>
+													<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body">
+													<ul th:attr="id='surveyItemList-' + ${survey.surveyNo}" class="list-group"></ul>
+												</div>
+												<th:block th:if="${survey.deadline >= T(java.time.LocalDateTime).now()}">
+													<div class="modal-footer">
+														<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">취소</button>
+														<button class="btn btn-primary" type="button" th:onclick="'submitVote(' + ${survey.surveyNo} + ')'">투표</button>
+													</div>
+												</th:block>
+											</div>
+										</div>
+									</div>
+
 								</div>
 							</div>
 						</div>
@@ -222,6 +222,7 @@
 			input.setAttribute('type', 'text');
 			input.setAttribute('name', 'items');
 			input.classList.add('form-control', 'me-2');
+			input.required = true;
 	
 			// 삭제 버튼 생성
 			const removeBtn = document.createElement('button');
@@ -244,38 +245,43 @@
 		});
 	});
 	
-	// 설문 등록시 참여자 팀 선택 스크립트
-	document.getElementById('selectTeam').addEventListener('change', function () {
-	    const selectedTeamContainer = document.getElementById('selectedTeam');
-	    const selected = Array.from(this.selectedOptions);
+	// 설문 등록 유효성 검사
+	document.addEventListener("DOMContentLoaded", function () {
+	  const form = document.getElementById('create-survey-form');
 	
-	    selected.forEach(option => {
-	        const teamId = option.value;
-	        const teamName = option.text;
+	  form.addEventListener('submit', function (e) {
+	    const teamCheckboxes = form.querySelectorAll('input[name="selectedTeamIds"]:checked');
+	    const deadlineInput = form.querySelector('input[name="deadline"]');
+	    const deadlineValue = deadlineInput.value;
 	
-	        if (!document.getElementById('selected-team-' + teamId)) {
-	            const badge = document.createElement('span');
-	            badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
-	            badge.id = 'selected-team-' + teamId;
-	            badge.innerHTML = `
-	                ${teamName}
-	                <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="removeTeam('${teamId}')"></button>
-	                <input type="hidden" name="selectedTeamIds" value="${teamId}">
-	            `;
-	            selectedTeamContainer.appendChild(badge);
-	        }
-	    });
+	    // 참여자 체크 여부
+	    if (teamCheckboxes.length === 0) {
+	      e.preventDefault();
+	      showValidationAlert("제출 확인", "투표 참여 팀을 하나 이상 선택해주세요.");
+	      return;
+	    }
 	
-	    // 선택된 항목 초기화 (선택 후 자동 해제)
-	    this.selectedIndex = 0;
+	    // 마감일이 현재 시간 이후인지
+	    const deadlineDate = new Date(deadlineValue);
+	    const now = new Date();
+	
+	    if (!deadlineValue || deadlineDate <= now) {
+	      e.preventDefault();
+	      showValidationAlert("제출 확인", "올바른 마감일을 선택해주세요.");
+	      return;
+	    }
+	  });
 	});
 	
-	// 선택된 팀 삭제
-	function removeTeam(teamId) {
-	    const badge = document.getElementById('selected-team-' + teamId);
-	    if (badge) badge.remove();
-	}
+	// 유효성 검사 알림 메시지
+	function showValidationAlert(title, message) {
+	  document.getElementById('validationModalTitle').textContent = title;
+	  document.getElementById('validationModalMessage').innerHTML = message;
 	
+	  const validationModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('validationModal'));
+	  validationModal.show();
+	}
+
 	// 모달창 닫기 초기화
 	document.addEventListener('DOMContentLoaded', () => {
 	  const form = document.getElementById('create-survey-form');
@@ -356,11 +362,6 @@
 	          countSpan.id = `vote-count-${surveyId}-${index}`;
 	          countSpan.textContent = item.count + '표';
 	
-	          if (item.voted === "Y") {
-	       	    wrapper.classList.add('border', 'border-primary', 'bg-light');
-	       	    label.innerHTML += ' <span class="badge bg-primary ms-2">내 투표</span>';
-	       	  }
-	
 	          wrapper.appendChild(label);
 	          wrapper.appendChild(countSpan);
 	          itemList.appendChild(wrapper);
@@ -372,43 +373,86 @@
 	});
 	
 	// 투표 항목 렌더
-	function renderVoteOptions(surveyId, items) {
+	function renderVoteView(surveyId, items) {
 	  const itemList = document.getElementById('surveyItemList-' + surveyId);
 	  if (!itemList) return;
 	
 	  itemList.innerHTML = '';
 	
+	  const modal = document.getElementById('survey-detail-' + surveyId);
+	  const allowMultiple = modal.getAttribute('data-allow-multiple') === 'on';
+	  const allowAnonymous = modal.getAttribute('data-anonymous') === 'on';
+	
+	  const hasVoted = items.some(item => item.voted === "Y");
+	  
+	  const maxVotes = Math.max(...items.map(item => item.count));
+	
 	  items.forEach((item, index) => {
 	    const wrapper = document.createElement('div');
 	    wrapper.className = 'vote-option d-flex justify-content-between align-items-center rounded p-2 mb-2 bg-light text-dark border';
-	    wrapper.setAttribute('onclick', `handleVoteClick(${surveyId}, ${index})`);
 	    wrapper.setAttribute('data-index', index);
 	    wrapper.setAttribute('data-item-no', item.itemNo);
 	
 	    const label = document.createElement('span');
 	    label.className = 'fw-semibold';
 	    label.textContent = item.item;
+	    
+	    const isClosed = modal.querySelector('.btn-primary') === null;
+	    if (isClosed && item.count === maxVotes && maxVotes > 0) {
+	      label.textContent += ' 🏆';
+	      wrapper.classList.add('bg-warning-subtle', 'border-warning');
+	    }
 	
-	    const countSpan = document.createElement('span');
-	    countSpan.id = `vote-count-${surveyId}-${index}`;
-	    countSpan.textContent = item.count + '표';
+	    const voteCount = document.createElement('span');
+	    voteCount.textContent = item.count + '표';
 	
-	    if (item.voted === "Y") {
-	      wrapper.classList.add('border', 'border-primary', 'bg-light');
-	      label.innerHTML += ' <span class="badge bg-primary ms-2">내 투표</span>';
+	    if (hasVoted) {
+	      // 투표 결과 표시
+	      if (item.voted === "Y") {
+	    	  wrapper.classList.add('bg-info-subtle', 'border-primary', 'border-2');
+	      }
+	
+	      const voterList = allowAnonymous ? '익명 투표' : item.voters?.join('<br>') || '';
+	      voteCount.setAttribute('title', voterList);
+	      voteCount.setAttribute('data-bs-toggle', 'tooltip');
+	      voteCount.setAttribute('data-bs-placement', 'right');
+	      voteCount.setAttribute('data-bs-html', 'true');
+	    } else {
+	      // 투표 가능
+	      wrapper.setAttribute('onclick', `handleVoteClick(${surveyId}, ${index})`);
 	    }
 	
 	    wrapper.appendChild(label);
-	    wrapper.appendChild(countSpan);
+	    wrapper.appendChild(voteCount);
 	    itemList.appendChild(wrapper);
 	  });
-	}
 	
+	  // 버튼 설정
+	  const voteBtn = document.querySelector(`#survey-detail-${surveyId} .modal-footer .btn-primary`);
+	  if (voteBtn) {
+	    voteBtn.textContent = hasVoted ? '다시 투표' : '투표';
+	    voteBtn.onclick = hasVoted
+	      ? () => enableRevote(surveyId)
+	      : () => submitVote(surveyId);
+	  }
+	
+	  // 툴팁 활성화
+	  const tooltipTriggerList = [].slice.call(itemList.querySelectorAll('[data-bs-toggle="tooltip"]'));
+	  tooltipTriggerList.forEach(function (el) {
+	    const existing = bootstrap.Tooltip.getInstance(el);
+	    if (existing) existing.dispose();
+	    new bootstrap.Tooltip(el);
+	  });
+	}
+
 	// 투표 항목 선택
 	function handleVoteClick(surveyId, itemIndex) {
 	  const modal = document.getElementById('survey-detail-' + surveyId);
 	  const allowMultiple = modal.getAttribute('data-allow-multiple') === 'on';
 	
+	  const isClosed = modal.querySelector('.btn-primary') === null;
+	  if (isClosed) return;
+	  
 	  const allOptions = document.querySelectorAll(`#surveyItemList-${surveyId} .vote-option`);
 	  const selected = allOptions[itemIndex];
 	
@@ -459,124 +503,57 @@
 	  .then(res => res.json())
 	  .then(result => {
 		  if (result.success) {
-		    showVoteResult(surveyId);
-		    const voteBtn = document.querySelector(`#survey-detail-${surveyId} .modal-footer .btn-primary`);
-		    if (voteBtn) voteBtn.textContent = '다시 투표';
+		    fetch('/survey/detail?id=' + surveyId)
+		      .then(res => res.json())
+		      .then(items => {
+		        renderVoteView(surveyId, items);
+		      });
 		  } else {
-		    alert('투표에 실패했습니다.');
+			  const voteAuthorityModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('voteAuthorityModal'));
+			  voteAuthorityModal.show();
 		  }
 		});
 	}
 	
-	// 득표수 표시
-	function showVoteResult(surveyId) {
-	  fetch('/survey/vote-result?id=' + surveyId)
-	    .then(function(res) {
-	      return res.json();
-	    })
-	    .then(function(data) {
-	      const itemList = document.getElementById('surveyItemList-' + surveyId);
-	      itemList.innerHTML = '';
-	
-	      const allowAnonymous = document.getElementById('survey-detail-' + surveyId)
-	        .getAttribute('data-anonymous') === 'on';
-	
-	      data.forEach(function(item, index) {
-	        const wrapper = document.createElement('div');
-	        wrapper.className = 'd-flex justify-content-between align-items-center rounded p-2 mb-2 bg-light text-dark border';
-	
-	        const label = document.createElement('span');
-	        label.className = 'fw-semibold';
-	        label.textContent = item.name;
-	
-	        const voteCount = document.createElement('span');
-	        voteCount.textContent = item.count + '표';
-	        const voterList = allowAnonymous ? '익명 투표' : item.voters.join('<br>');
-	        voteCount.setAttribute('title', voterList);
-	        voteCount.setAttribute('data-bs-toggle', 'tooltip');
-	        voteCount.setAttribute('data-bs-placement', 'right');
-	        voteCount.setAttribute('data-bs-html', 'true');
-	
-	        if (item.voted === "Y") {
-	          label.innerHTML += ' <span class="badge bg-primary ms-2">내 투표</span>';
-	          wrapper.classList.add('border-primary', 'border-2');
-	        }
-	
-	        wrapper.appendChild(label);
-	        wrapper.appendChild(voteCount);
-	        itemList.appendChild(wrapper);
-	      });
-	      
-	    // showVoteResult 마지막에 추가
-	    const voteBtn = document.querySelector(`#survey-detail-${surveyId} .modal-footer .btn-primary`);
-	    if (voteBtn && voteBtn.textContent === '다시 투표') {
-	      voteBtn.onclick = () => enableRevote(surveyId);
-	    }
-	      
-	    // 이미 투표한 항목이 있다면 → 버튼을 '다시 투표'로 바꿔줌
-		const hasVoted = data.some(item => item.voted === "Y");
-		
-		if (voteBtn) {
-		  voteBtn.textContent = hasVoted ? '다시 투표' : '투표';
-		  voteBtn.onclick = hasVoted
-		    ? () => enableRevote(surveyId)
-		    : () => submitVote(surveyId);
-		}
-	
-		// 툴팁 활성화
-		const tooltipTriggerList = [].slice.call(itemList.querySelectorAll('[data-bs-toggle="tooltip"]'));
-		  tooltipTriggerList.forEach(function (el) {
-		    const existing = bootstrap.Tooltip.getInstance(el);
-		    if (existing) existing.dispose();
-		    new bootstrap.Tooltip(el);
-		  });
-		});
-	}
-	
+	// 다시 투표
 	function enableRevote(surveyId) {
 	  const itemList = document.getElementById('surveyItemList-' + surveyId);
 	  if (!itemList) return;
-
-	  // 항목 초기화
-	  itemList.querySelectorAll('.vote-option').forEach(el => {
-	    el.classList.remove('bg-primary', 'border-2', 'text-white', 'border-primary');
-	    el.classList.add('bg-light', 'text-dark');
-
-	    const label = el.querySelector('span.fw-semibold');
-	    if (label && label.innerHTML.includes('내 투표')) {
-	      label.innerHTML = label.innerHTML.replace(/<span.*<\/span>/, '');
-	    }
-	  });
-
-	  // 버튼 텍스트 복원
+	
+	  itemList.innerHTML = '';
+	
+	  fetch('/survey/detail?id=' + surveyId)
+	    .then(response => response.json())
+	    .then(items => {
+	      for (let i = 0; i < items.length; i++) {
+	        items[i].voted = "N";
+	      }
+	
+	      renderVoteView(surveyId, items);
+	    });
+	
 	  const voteBtn = document.querySelector(`#survey-detail-${surveyId} .modal-footer .btn-primary`);
-	  if (voteBtn) voteBtn.textContent = '투표';
-
-	  // 버튼 동작 복원
-	  voteBtn.onclick = () => submitVote(surveyId);
+	  if (voteBtn) {
+	    voteBtn.textContent = '투표';
+	    voteBtn.onclick = () => submitVote(surveyId);
+	  }
 	}
 	
 	// 모달 열릴 때 투표 결과 + 툴팁 다시 적용
 	document.addEventListener('shown.bs.modal', function (event) {
 	  const modal = event.target;
-	  if (modal.id && modal.id.startsWith('survey-detail-')) {
-	    const surveyId = modal.id.replace('survey-detail-', '');
+	  if (!modal.id || !modal.id.startsWith('survey-detail-')) return;
 	
-	    fetch('/survey/detail?id=' + surveyId)
-	      .then(response => response.json())
-	      .then(items => {
-	        const hasVoted = items.some(item => item.voted === "Y");
+	  const surveyId = modal.id.replace('survey-detail-', '');
 	
-	        if (hasVoted) {
-	          showVoteResult(surveyId); // 투표했으면 결과 표시
-	        } else {
-	          renderVoteOptions(surveyId, items); // 투표 안했으면 항목 선택 표시
-	        }
-	      });
-	  }
+	  fetch('/survey/detail?id=' + surveyId)
+	    .then(res => res.json())
+	    .then(items => {
+	      renderVoteView(surveyId, items);
+	    });
 	});
 	</script>
-	<!-- 모달 닫기 확인창 -->
+	<!-- 설문 생성 닫기 확인창 -->
 	<div class="modal fade" id="confirmCloseModal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-sm">
 			<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
@@ -592,6 +569,39 @@
 				<div class="modal-footer justify-content-center border-0">
 					<button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
 					<button type="button" class="btn btn-danger" id="confirmCloseBtn">확인</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 유효성 검사 확인창 -->
+	<div class="modal fade" id="validationModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+				<div class="modal-header border-0">
+					<h5 class="modal-title text-dark" id="validationModalTitle"></h5>
+					<button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="닫기"></button>
+				</div>
+				<div class="modal-body text-center">
+					<p class="mb-0 text-body" id="validationModalMessage"></p>
+				</div>
+				<div class="modal-footer justify-content-center border-0">
+					<button type="button" class="btn btn-phoenix-secondary bg-primary text-white" data-bs-dismiss="modal">확인</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 투표 권한 확인창 -->
+	<div class="modal fade" id="voteAuthorityModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content bg-body-secondary text-body rounded-3 shadow-lg border border-secondary-light">
+				<div class="modal-header border-0">
+					<h5 class="modal-title text-dark" id="voteAuthorityModalTitle"></h5>
+				</div>
+				<div class="modal-body text-center">
+					<p class="mb-0 text-body" id="voteAuthorityModalMessage">투표 권한이 없습니다.</p>
+				</div>
+				<div class="modal-footer justify-content-center border-0">
+					<button type="button" class="btn btn-phoenix-secondary me-1 mb-1" data-bs-dismiss="modal">확인</button>
 				</div>
 			</div>
 		</div>
