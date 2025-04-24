@@ -118,69 +118,77 @@
 							</div>
 						</div>
 					</th:block>
-					<th:block th:each="survey : ${surveyList}">
-						<th:block th:if="${survey.deadline < T(java.time.LocalDateTime).now()}">
-							<div class="col-12 col-xl-4">
-								<div class="card h-100">
-									<div class="card-body">
-										<div class="border-bottom border-translucent">
-											<div class="d-flex align-items-center justify-content-between mb-1">
-												<!-- 제목 -->
-												<div class="ps-2">
-													<button class="btn btn-link me-1 mb-1 fs-6 p-0" th:attr="data-survey-id=${survey.surveyNo}, data-bs-target='#survey-detail-' + ${survey.surveyNo}" data-bs-toggle="modal" th:text="${survey.surveyTitle}" style="max-width: 100%; height: 2rem; overflow: hidden">설문 제목</button>
-												</div>
-												<!-- 상태 표시 -->
-												<div>
-													<div th:if="${survey.deadline >= T(java.time.LocalDateTime).now()}" class="d-flex align-items-center">
-														<span class="fa-solid fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1"></span> <span class="fw-bold fs-9 text-body lh-2">진행중</span>
+					<!-- 마감된 설문이 없을 경우 -->
+					<th:block th:if="${surveyList.?[deadline < T(java.time.LocalDateTime).now()].size() == 0}">
+						<div class="col-12">
+							<div class="alert alert-light text-center border border-secondary-light rounded py-4 fs-6 fw-semibold text-body-secondary">
+								<i class="fa-solid fa-circle-info me-2 text-secondary"></i>마감된 설문이 없습니다.
+							</div>
+						</div>
+					</th:block>
+					<th:block th:if="${surveyList.?[deadline < T(java.time.LocalDateTime).now()].size() > 0}">
+						<th:block th:each="survey : ${surveyList}">
+							<th:block th:if="${survey.deadline < T(java.time.LocalDateTime).now()}">
+								<div class="col-12 col-xl-4">
+									<div class="card h-100">
+										<div class="card-body">
+											<div class="border-bottom border-translucent">
+												<div class="d-flex align-items-center justify-content-between mb-1">
+													<!-- 제목 -->
+													<div class="ps-2">
+														<button class="btn btn-link me-1 mb-1 fs-6 p-0" th:attr="data-survey-id=${survey.surveyNo}, data-bs-target='#survey-detail-' + ${survey.surveyNo}" data-bs-toggle="modal" th:text="${survey.surveyTitle}" style="max-width: 100%; height: 2rem; overflow: hidden">설문 제목</button>
 													</div>
-													<div th:if="${survey.deadline < T(java.time.LocalDateTime).now()}" class="d-flex align-items-center">
-														<span class="fa-solid fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1"></span> <span class="fw-bold fs-9 text-body lh-2">마감</span>
-													</div>
-												</div>
-											</div>
-
-											<p class="fs-9 fw-semibold text-body ms-1 text mb-4 ps-2" th:text="'작성자 : ' + ${survey.writer}">작성자</p>
-										</div>
-
-										<div class="row g-1 g-sm-3 mt-2 lh-1 justify-content-between align-items-center">
-											<div class="col-auto">
-												<div class="d-flex align-items-center">
-													<span class="me-2" data-feather="users" style="stroke-width: 2;"></span>
-													<p class="mb-0 fs-9 fw-semibold text-body-tertiary reports" th:text="'응답자 수 : ' + ${survey.voterCount} + ' 명'">응답자 수</p>
-												</div>
-											</div>
-											<div class="col-auto ms-auto">
-												<div class="d-flex align-items-center">
-													<span class="me-2" data-feather="clock" style="stroke-width: 2;"></span>
-													<p class="mb-0 fs-9 fw-semibold text-body-tertiary date" th:text="'마감일시 : ' + ${#temporals.format(survey.deadline, 'yyyy.MM.dd HH:mm')}">마감일</p>
-												</div>
-											</div>
-										</div>
-										<!-- 개별 모달 -->
-										<div class="modal fade" th:attr="id='survey-detail-' + ${survey.surveyNo}, data-allow-multiple=${survey.allowMultiple}, data-anonymous=${survey.anonymousVote}" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
-											<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
-												<div class="modal-content">
-													<div class="modal-header">
-														<h5 class="modal-title" id="scrollingLongModalLabel2" th:text="${survey.surveyTitle}">Modal title</h5>
-														<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-													</div>
-													<div class="modal-body">
-														<ul th:attr="id='surveyItemList-' + ${survey.surveyNo}" class="list-group"></ul>
-													</div>
-													<th:block th:if="${survey.deadline >= T(java.time.LocalDateTime).now()}">
-														<div class="modal-footer">
-															<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">취소</button>
-															<button class="btn btn-primary" type="button" th:onclick="'submitVote(' + ${survey.surveyNo} + ')'">투표</button>
+													<!-- 상태 표시 -->
+													<div>
+														<div th:if="${survey.deadline >= T(java.time.LocalDateTime).now()}" class="d-flex align-items-center">
+															<span class="fa-solid fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1"></span> <span class="fw-bold fs-9 text-body lh-2">진행중</span>
 														</div>
-													</th:block>
+														<div th:if="${survey.deadline < T(java.time.LocalDateTime).now()}" class="d-flex align-items-center">
+															<span class="fa-solid fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1"></span> <span class="fw-bold fs-9 text-body lh-2">마감</span>
+														</div>
+													</div>
+												</div>
+
+												<p class="fs-9 fw-semibold text-body ms-1 text mb-4 ps-2" th:text="'작성자 : ' + ${survey.writer}">작성자</p>
+											</div>
+											<div class="row g-1 g-sm-3 mt-2 lh-1 justify-content-between align-items-center">
+												<div class="col-auto">
+													<div class="d-flex align-items-center">
+														<span class="me-2" data-feather="users" style="stroke-width: 2;"></span>
+														<p class="mb-0 fs-9 fw-semibold text-body-tertiary reports" th:text="'응답자 수 : ' + ${survey.voterCount} + ' 명'">응답자 수</p>
+													</div>
+												</div>
+												<div class="col-auto ms-auto">
+													<div class="d-flex align-items-center">
+														<span class="me-2" data-feather="clock" style="stroke-width: 2;"></span>
+														<p class="mb-0 fs-9 fw-semibold text-body-tertiary date" th:text="'마감일시 : ' + ${#temporals.format(survey.deadline, 'yyyy.MM.dd HH:mm')}">마감일</p>
+													</div>
+												</div>
+											</div>
+											<!-- 개별 모달 -->
+											<div class="modal fade" th:attr="id='survey-detail-' + ${survey.surveyNo}, data-allow-multiple=${survey.allowMultiple}, data-anonymous=${survey.anonymousVote}" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
+												<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5 class="modal-title" id="scrollingLongModalLabel2" th:text="${survey.surveyTitle}">Modal title</h5>
+															<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+														</div>
+														<div class="modal-body">
+															<ul th:attr="id='surveyItemList-' + ${survey.surveyNo}" class="list-group"></ul>
+														</div>
+														<th:block th:if="${survey.deadline >= T(java.time.LocalDateTime).now()}">
+															<div class="modal-footer">
+																<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">취소</button>
+																<button class="btn btn-primary" type="button" th:onclick="'submitVote(' + ${survey.surveyNo} + ')'">투표</button>
+															</div>
+														</th:block>
+													</div>
 												</div>
 											</div>
 										</div>
-
 									</div>
 								</div>
-							</div>
+							</th:block>
 						</th:block>
 					</th:block>
 				</div>
