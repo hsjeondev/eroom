@@ -19,16 +19,14 @@
   <!-- Dropzone 업로드 영역 -->
   <div id="upload-zone" class="mb-3" style="display: none;">
     <form class="dropzone dropzone-multiple p-0" id="dropzone-multiple"
-          th:action="@{/drive/upload/multiple}" method="post" enctype="multipart/form-data">
-      <input type="hidden" name="separatorCode"
-             th:value="'USER_' + ${#authentication.principal.employee.employeeNo}" />
+          th:action="@{/drive/upload/personal}" method="post" enctype="multipart/form-data">
       <div class="dz-message" data-dz-message="data-dz-message">
         <img class="me-2" src="/assets/img/icons/cloud-upload.svg" width="25" alt=""> 여기에 파일을 놓으세요
       </div>
       <div class="dz-preview dz-preview-multiple m-0 d-flex flex-column"></div>
     </form>
     <div class="text-end mt-2">
-	  <button type="submit" class="btn btn-primary btn-sm">추가하기</button>
+	  <button type="submit" class="btn btn-primary btn-sm" id="upload-confirm-btn">추가하기</button>
 	</div>
   </div>
 
@@ -98,7 +96,7 @@
           </th>
         </tr>
       </thead>
-      <tbody class="list" th:if="${not #lists.isEmpty(fileList)}" th:each="file : ${fileList}">
+      <tbody class="table-list" th:if="${not #lists.isEmpty(fileList)}" th:each="file : ${fileList}">
         <tr>
           <td class="align-middle ps-3"><input class="form-check-input row-checkbox" type="checkbox" /></td>
           <td class="align-middle"><img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" width="24" height="24" alt="파일" /></td>
@@ -159,8 +157,10 @@
 
 	    if (!dropzoneInitialized && !open) {
 	    	dz = new Dropzone("#dropzone-multiple", {
-	    		  url: "/drive/upload/multiple", // 실제 업로드 경로
-	    		  autoProcessQueue: true,
+	    		  url: "/drive/upload/personal", // 실제 업로드 경로
+	    		  autoProcessQueue: false,
+	    		  paramName: "driveFiles",
+	    		  uploadMultiple: true,
 	    		  clickable: "#dropzone-multiple .dz-message",
 	    		  acceptedFiles: ".jpg,.png,.pdf,.xlsx,.docx",
 	    		  maxFilesize: 10,
@@ -177,27 +177,32 @@
 	    		    </div>
 	    		  `
 	    		});
-
+		    	document.getElementById("upload-confirm-btn").addEventListener("click", function () {
+		    	    dz.processQueue();
+		    	});
 	    		// 서버 전송 중 이벤트 (폼 입력값 자동 포함됨)
 	    		dz.on("sending", function (file, xhr, formData) {
-	    			document.querySelector("#upload-confirm-btn").disabled = true;
+    				document.querySelector("#upload-confirm-btn").disabled = true;
 	    		});
 	    		// 업로드 완료 후
 	    		dz.on("queuecomplete", function () {
-	    			  document.querySelector("#upload-confirm-btn").disabled = false;
+    			  document.querySelector("#upload-confirm-btn").disabled = false;
 	    		});
+	    		
+	    		dz.on("successmultiple", function (files, responseText) {
+	    			  try {
+	    			    let response = typeof responseText === "string" ? JSON.parse(responseText) : responseText;
+	    			    if (response.res_msg) {
+	    			      alert(response.res_msg);
+	    			    }
+	    			  } catch (e) {
+	    			    alert("서버 응답 처리 중 오류 발생");
+	    			    console.error(e);
+	    			  }
 
-	    		// 전송 완료 후
-	    		dz.on("successmultiple", function () {
-	    		  alert("파일 업로드 완료!");
-	    		  fetch("/drive/list")
-        		    .then(response => response.text())
-        		    .then(html => {
-        		      document.querySelector(".table-list").innerHTML = html;
-        		    });
-	    		});
-
-
+	    			  // 전체 완료 후 페이지 이동
+	    			  window.location.href = "/drive/personal";
+	    			});
 	      dropzoneInitialized = true;
 	    }
 	  });

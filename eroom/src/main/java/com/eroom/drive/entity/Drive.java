@@ -1,5 +1,7 @@
 package com.eroom.drive.entity;
 
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -34,7 +36,7 @@ public class Drive {
 	private Long driveAttachNo; // 첨부파일 번호
 	
 	@ManyToOne
-	@JoinColumn(name="employee_no")
+	@JoinColumn(name="uploader")
 	private Employee uploader; // 업로더 (사번 FK)
 	
 	@Column(name="separator_code")
@@ -59,12 +61,12 @@ public class Drive {
 	private Long downloadCount; // 다운로드 횟수
 	
 	@CreationTimestamp
-	@Column(name="drive_reg_date")
-	private String driveRegDate; // 등록일
+	@Column(updatable=false, name="drive_reg_date")
+	private LocalDateTime driveRegDate; // 등록일
 	
 	@UpdateTimestamp
-	@Column(name="drive_mod_date")
-	private String driveModDate; // 수정일
+	@Column(insertable=false, name="drive_mod_date")
+	private LocalDateTime driveModDate; // 수정일
 	
 	@Column(name="drive_editor")
 	private String driveEditor; // 수정자

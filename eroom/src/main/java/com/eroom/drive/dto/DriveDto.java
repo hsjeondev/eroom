@@ -1,5 +1,10 @@
 package com.eroom.drive.dto;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import com.eroom.drive.entity.Drive;
 import com.eroom.employee.entity.Employee;
 
@@ -16,7 +21,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @Builder
-public class DriverDto {
+public class DriveDto {
 
 	private Long driveAttachNo; // 첨부파일 번호
     private Long uploaderNo; // 업로더 (사번 FK)
@@ -28,14 +33,15 @@ public class DriverDto {
     private Long driveSize; // 파일크기
     private String drivePath; // 파일경로
     private Long downloadCount; // 다운로드 횟수
-    private String driveRegDate; // 등록일
-    private String driveModDate; // 수정일
+    private LocalDateTime driveRegDate; // 등록일
+    private LocalDateTime driveModDate; // 수정일
     private String driveEditor; //  수정자
     private String driveDeleteYn; // 삭제여부 
+    private List<MultipartFile> driveFiles; // 업로드 파일들
     
     // Entity -> DTO
-	public static DriverDto toDto(Drive entity) {
-		return DriverDto.builder()
+	public static DriveDto toDto(Drive entity) {
+		return DriveDto.builder()
 				.driveAttachNo(entity.getDriveAttachNo())
 				.uploaderNo(entity.getUploader().getEmployeeNo())
 				.uploaderName(entity.getUploader().getEmployeeName())
