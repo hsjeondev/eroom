@@ -27,7 +27,7 @@
 									<tr>
 										<th class="sort" data-sort="no" style="width: 5%;">번호</th>
 										<th class="sort" data-sort="vehicle" style="width: 25%;">차량</th>
-										<th class="sort" data-sort="passengers" style="width: 20%;">탑승
+										<th class="sort" data-sort="passengers" style="width: 20%;">탑승 가능
 											인원</th>
 										<th class="sort" data-sort="date" style="width: 20%;">등록일</th>
 										<th style="width: 10%;"></th>
@@ -48,7 +48,7 @@
 										<td class="text-end pe-0"><button
 												class="btn btn-sm btn-outline-primary"
 												data-bs-toggle="modal" data-bs-target="#addEventModal"
-												th:attr="data-facility-no=${result.facilityNo}">
+												th:attr="data-facility-no=${result.facilityNo}, data-facility-name=${result.facilityName}">
 												예약하기</button></td>
 									</tr>
 								</tbody>
@@ -77,6 +77,12 @@
 										    modal.addEventListener("show.bs.modal", function (event) {
 										      const button = event.relatedTarget;
 										      const facilityNo = button.getAttribute("data-facility-no");
+										      const facilityName = button.getAttribute("data-facility-name");
+										      console.log(facilityName);
+										      console.log(facilityNo);
+
+										      facilityInput.value = facilityNo;
+										      document.getElementById("selectedFacilityName").textContent = facilityName || "차량명이 없습니다";
 										     // console.log("facilityNo:", facilityNo); 
 										      facilityInput.value = facilityNo;
 										    });
@@ -94,7 +100,15 @@
 												value="F002" id="separator"> <input type="hidden"
 												name="reservation_creator"
 												th:value="${#authentication.principal.employee.employeeId}" />
-
+											<div class="mb-3 text-center">
+												<label class="form-label text-primary fw-semibold mb-1"
+													for="selectedFacilityName" style="font-size: 1rem;">
+													선택한 차량 </label>
+												<div class="form-control text-center fw-bold fs-5"
+													id="selectedFacilityName"
+													style="border: none; background-color: #f8f9fa;">차량이
+													선택되지 않았습니다</div>
+											</div>
 											<!-- 장소 -->
 											<div class="mb-3">
 												<label for="calendarLocation" class="form-label">
@@ -162,10 +176,21 @@
 													name="reservation_end" id="calendarEndTime">
 											</div>
 										</div>
-										<div class="modal-footer border-0 px-4 pb-3">
-											<button class="btn btn-primary w-100" type="submit">
-												예약하기</button>
+										<div class="modal-body p-4">
+											<!-- 안내 문구 추가 -->
+											<div class="alert text-center mb-3" role="alert"
+												style="font-size: 0.9rem; background-color: #E3F2FD; border: 1px solid #BBDEFB; color: #0D47A1;">
+												ℹ️ <strong>예약 확정 후에는 시간 수정이 불가능합니다.</strong><br> 변경이
+												필요할 경우 <strong>기존 예약을 취소</strong>한 뒤 다시 예약해주세요.<br> <br>
+												🚗 <strong>해당 차량은 다음 예약이 있을 수 있으므로</strong><br> <strong>최소
+													10분 전까지는 반납</strong>해 주시기 바랍니다.<br> <br> 신중한 예약과 정시 반납을
+												부탁드립니다 😊
+											</div>
 										</div>
+										<div class="modal-footer border-0 px-4 pb-3">
+												<button class="btn btn-primary w-100" type="submit">
+													예약하기</button>
+											</div>
 									</form>
 								</div>
 							</div>
@@ -207,8 +232,8 @@
 									<div
 										class="modal-footer d-flex justify-content-between align-items-center border-0">
 										<div class="d-flex">
-											<button class="btn btn-subtle-secondary me-1 mb-1"
-												type="button" id="editVehicleBtn">수정</button>
+											<!-- <button class="btn btn-subtle-secondary me-1 mb-1"
+												type="button" id="editVehicleBtn">수정</button> -->
 											<button class="btn btn-outline-info me-1 mb-1" type="button"
 												id="deleteVehicleBtn">삭제</button>
 										</div>
@@ -251,12 +276,15 @@
 
 						    if (sOpt) {
 						      sOpt.disabled = true;
-						      sOpt.textContent += " (예약됨)";
+						      sOpt.textContent += " (예약)";
 						    }
 						    if (eOpt) {
 						      eOpt.disabled = true;
-						      eOpt.textContent += " (예약됨)";
+						      eOpt.textContent += " (예약)";
 						    }
+						    if ([...startSelect.options].every(opt => opt.disabled)) {
+						        startSelect.selectedIndex = 0; // 선택 초기화
+						      }
 						  });
 						}
 
@@ -270,6 +298,8 @@
 						  fetch(`/resvehicle/booked-times?date=${startDate}&facilityNo=${facilityNo}`)
 						    .then(response => response.json())
 						    .then(bookedTimes => {
+						    	 console.log("!!!!!!!!!!!!예약된 시간 리스트:", bookedTimes);  
+						      console.log("예약된 시간 리스트:", bookedTimes);
 						      disableReservedTimes(bookedTimes);
 						    })
 						    .catch(error => {
@@ -305,52 +335,77 @@
 						});
 						
 						  // 예약 등록
-						  form.addEventListener('submit', function (e) {
-						    e.preventDefault();
+						form.addEventListener("submit", function (e) {
+						  e.preventDefault();
 						
-						    if (!form.reservation_location.value) {
-						      alert('목적지를 입력해주세요!');
+						  if (!form.reservation_location.value) {
+						    alert('목적지를 입력해주세요!');
+						    return;
+						  }
+						
+						  const startDate = form.reservation_start_date.value;
+						  const endDate = form.reservation_end_date.value;
+						  const startTime = form.startTime.value;
+						  const endTime = form.endTime.value;
+						
+						  const fullStart = `${startDate}T${startTime}`;
+						  const fullEnd = `${endDate}T${endTime}`;
+						
+						  // ⚠유효성 검사
+						  if (!startDate || !endDate || !startTime || !endTime) {
+						    alert("날짜와 시간을 모두 선택해주세요!");
+						    return;
+						  }
+						
+						  if (fullStart >= fullEnd) {
+						    alert("종료일시는 시작일시보다 늦어야 합니다!");
+						    return;
+						  }
+						
+						  // 중복 시간 검사 추가
+						  const startHour = parseInt(startTime.split(":")[0]);
+						  const endHour = parseInt(endTime.split(":")[0]);
+						
+						  const bookedHours = [...form.startTime.options]
+						    .filter(opt => opt.disabled)
+						    .map(opt => parseInt(opt.value.split(":")[0]));
+						
+						  for (let hour = startHour; hour < endHour; hour++) {
+						    if (bookedHours.includes(hour)) {
+						      alert("선택한 시간 범위에 이미 예약된 시간이 포함되어 있습니다!");
 						      return;
 						    }
+						  }
 						
-						    const startDate = form.reservation_start_date.value;
-						    const endDate = form.reservation_end_date.value;
-						    const startTime = form.startTime.value;
-						    const endTime = form.endTime.value;
+						  // hidden input에 값 설정
+						  form.calendarStartTime.value = fullStart;
+						  form.calendarEndTime.value = fullEnd;
 						
-						    if (!startDate || !endDate || !startTime || !endTime) {
-						      alert("날짜와 시간을 모두 선택해주세요!");
-						      return;
-						    }
+						  // FormData 생성 및 참여자 추가
+						  const payload = new FormData(form);
+						  const participantBadges = document.querySelectorAll('#selectedParticipants .badge');
+						  const participantIds = Array.from(participantBadges).map(badge => badge.dataset.id);
+						  participantIds.forEach(id => payload.append("participants", id));
 						
-						    const fullStart = `${startDate}T${startTime}`;
-						    const fullEnd = `${endDate}T${endTime}`;
-						
-						    if (fullStart >= fullEnd) {
-						      alert("종료일시는 시작일시보다 늦어야 합니다!");
-						      return;
-						    }
-						
-						    form.calendarStartTime.value = fullStart;
-						    form.calendarEndTime.value = fullEnd;
-						
-						    const payload = new FormData(form);
-						    fetch('/resvehicle/reservation', {
-						      method: 'post',
-						      headers: {
-						        'header': document.querySelector('meta[name="_csrf_header"]').content,
-						        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-						      },
-						      body: payload
-						    })
-						      .then(response => response.json())
-						      .then(data => {
-						        alert(data.res_msg);
-						        if (data.res_code == 200) {
-						          location.reload();
-						        }
-						      });
-						  });
+						  // fetch 전송
+						  fetch('/resvehicle/reservation', {
+						    method: 'post',
+						    headers: {
+						      'header': document.querySelector('meta[name="_csrf_header"]').content,
+						      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+						    },
+						    body: payload
+						  })
+						    .then(response => response.json())
+						    .then(data => {
+						      alert(data.res_msg);
+						      if (data.res_code == 200) {
+						        location.reload();
+						      }
+						    });
+						});
+
+
 						</script>
 						
 
@@ -376,9 +431,10 @@
 					</div>
 				</div>
 			</div>
-			
+
+		
 			<!-- 차량 예약 수정 모달 -->
-			<div class="modal fade" id="editVehicleModal" tabindex="-1">
+	<!-- 		<div class="modal fade" id="editVehicleModal" tabindex="-1">
 				<div class="modal-dialog modal-dialog-centered">
 					<div class="modal-content border border-translucent">
 						<form id="editVehicleForm" autocomplete="off"
@@ -390,25 +446,25 @@
 									type="button" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
 
-							<div class="modal-body p-4">
+							<div class="modal-body p-4"> -->
 								<!-- 숨겨진 값들 -->
-								<input type="hidden" name="reservation_no" id="editReservationNo" />
+						<!-- 		<input type="hidden" name="reservation_no" id="editReservationNo" />
 							    <input type="hidden"name="employee_no" th:value="${#authentication.principal.employee.employeeNo}" />
 								<input type="hidden" name="facility_no" id="editFacilityNo" />
 								<input type="hidden" name="separator_code" value="F002" id="editSeparator"> 
 								<input type="hidden" name="reservation_creator" th:value="${#authentication.principal.employee.employeeId}" />
-								<input type="hidden" name="reservation_editor" th:value="${#authentication.principal.employee.employeeId}" />
+								<input type="hidden" name="reservation_editor" th:value="${#authentication.principal.employee.employeeId}" /> -->
 
 								<!-- 장소 -->
-								<div class="mb-3">
+						<!-- 		<div class="mb-3">
 									<label for="editLocation" class="form-label">목적지</label> <input
 										type="text" class="form-control form-control-sm"
 										id="editLocation" name="reservation_location"
 										placeholder="목적지를 적어주세요" />
-								</div>
+								</div> -->
 
 								<!-- 날짜 선택 -->
-								<div class="row g-2 mb-3">
+					<!-- 			<div class="row g-2 mb-3">
 									<div class="col">
 										<label class="form-label">시작 날짜</label> <input type="date"
 											id="editStartDate" class="form-control"
@@ -419,10 +475,10 @@
 											id="editEndDate" class="form-control"
 											name="reservation_end_date" />
 									</div>
-								</div>
+								</div> -->
 
 								<!-- 시간 선택 -->
-								<div class="row g-2 mt-2">
+				<!-- 				<div class="row g-2 mt-2">
 									<div class="col">
 										<label class="form-label">시작 시간</label> <select
 											id="editStartTime" class="form-select">
@@ -458,7 +514,7 @@
 									</div>
 								</div>
 
-								<!-- 숨겨서 서버로 보낼 datetime-local 값 -->
+								숨겨서 서버로 보낼 datetime-local 값
 								<input type="hidden" name="reservation_start"
 									id="editCalendarStartTime" /> <input type="hidden"
 									name="reservation_end" id="editCalendarEndTime" />
@@ -471,7 +527,7 @@
 						</form>
 					</div>
 				</div>
-			</div>
+			</div> -->
 
 
 
@@ -572,7 +628,7 @@
 			    	  
 			    	  //로그인한 사람과 예약한 사람의 id가 같다면 수정/삭제
 			    	  const isOwner = loginEmployeeId === event.extendedProps.reservationCreator;
-			    	  document.getElementById("editVehicleBtn").style.display = isOwner ? 'inline-block' : 'none';
+			    	  //document.getElementById("editVehicleBtn").style.display = isOwner ? 'inline-block' : 'none';
 			    	  document.getElementById("deleteVehicleBtn").style.display = isOwner ? 'inline-block' : 'none';
 
 
@@ -658,7 +714,7 @@
 			  });
 			  
 			  //수정 모달에 값 채워넣기 + resvationNo 기준
-			document.getElementById("editVehicleBtn").addEventListener("click", function () {
+			/* document.getElementById("editVehicleBtn").addEventListener("click", function () {
 			  const reservationNo = document.getElementById("detailReservationNo").value;
 			
 			  // 상세 모달 닫기
@@ -761,12 +817,12 @@
 				      console.error("수정 중 오류:", error);
 				      alert("수정에 실패했습니다.");
 				    });
-				});
+				}); */
 			  	//예약 삭제
 			  	document.getElementById("deleteVehicleBtn").addEventListener("click", function () {
 				    const reservationNo = document.getElementById("detailReservationNo").value;
 
-				    const confirmDelete = confirm("정말 이 차량 예약을 삭제하시겠습니까?");
+				    const confirmDelete = confirm("차량 예약을 취소하시겠습니까?");
 				    if (!confirmDelete) return;
 
 				    fetch('/resvehicle/delete/'+reservationNo, {

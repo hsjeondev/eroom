@@ -1,11 +1,27 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-<!-- 시말서 -->
-</head>
-<body>
-
-</body>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="written_apology">
+  <form th:object="${approval}">
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle text-center mb-0">
+          <colgroup><col style="width: 100%;" /></colgroup>
+          <tbody>
+            <tr>
+              <td class="text-center bg-light text-dark fw-normal" style="line-height: 1.6;">
+                위 본인은 직원으로서 제 사규를 준수하고 맡은 바 책임과 의무를 다하여 성실히 복무하여야 함에도 불구하고,<br>
+                아래와 같이 회사의 관련 규정을 위반하였는바 이에 시말서를 제출하고,<br>
+                그에 따른 처벌을 감수하며 차후 본건을 계기로 과오의 재발이 없을 것임을 서약합니다.
+              </td>
+            </tr>
+            <tr>
+              <td th:text="*{approval_content['statementReason']}" style="white-space: pre-wrap;"></td>
+            </tr>
+            <tr>
+              <td class="text-center text-secondary fw-bold">상기 작성 내용에 허위가 없습니다.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  </form>
+</th:block>
 </html>
