@@ -45,7 +45,7 @@ public class SurveyController {
 	    List<SurveyDto> surveyDtoList = surveyService.findAllSurveyWithVoterCount();
 	    List<StructureDto> structureList = employeeService.findTeams();
 
-	    model.addAttribute("surveyList", surveyDtoList); // ⬅️ 여기도 바뀐 이름 주의
+	    model.addAttribute("surveyList", surveyDtoList);
 	    model.addAttribute("structureList", structureList);
 
 	    return "survey/list";
@@ -53,12 +53,26 @@ public class SurveyController {
 
 
 	@GetMapping("/ongoing")
-	public String surveyOngoing() {
+	public String surveyOngoing(Model model) {
+		
+	    List<SurveyDto> surveyDtoList = surveyService.findAllSurveyWithVoterCount();
+	    List<StructureDto> structureList = employeeService.findTeams();
+
+	    model.addAttribute("surveyList", surveyDtoList);
+	    model.addAttribute("structureList", structureList);
+		
 		return "survey/ongoing";
 	}
 
 	@GetMapping("/closed")
-	public String surveyClosed() {
+	public String surveyClosed(Model model) {
+		
+	    List<SurveyDto> surveyDtoList = surveyService.findAllSurveyWithVoterCount();
+	    List<StructureDto> structureList = employeeService.findTeams();
+
+	    model.addAttribute("surveyList", surveyDtoList);
+	    model.addAttribute("structureList", structureList);
+		
 		return "survey/closed";
 	}
 
