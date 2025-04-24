@@ -20,6 +20,7 @@ public class ApprovalFormatDto {
 	private Long approval_format_no;
 	private String approval_format_content;
 	private String approval_format_title;
+	private Long edit_approval_no;
 	
 	public ApprovalFormat toEntity() {
 		return ApprovalFormat.builder()

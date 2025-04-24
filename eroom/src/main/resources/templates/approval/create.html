@@ -161,7 +161,7 @@
                 <!-- 소속 선택 -->
                 <div class="mb-3">
                   <label class="form-label">소속</label>
-                  <select class="form-select" id="approver-departmentSelect" onchange="changeDepartment(this.value)">
+                  <select class="form-select" id="approver-departmentSelect">
                     <option disabled selected>-- 소속 선택 --</option>
                     <option th:each="dept : ${structureList}" 
                       th:value="${dept.separator_code}" 
@@ -177,7 +177,7 @@
                     <select id="approver-employeeSelect" class="form-select me-2" style="flex:1;">
                       <option disabled selected>-- 참여자 선택 --</option>
                     </select>
-                    <button type="button" class="btn btn-outline-primary" onclick="addParticipant()" data-action="addParticipant">추가</button>
+                    <button type="button" class="btn btn-outline-primary" data-action="addParticipant">추가</button>
                   </div>
                 </div>
                 <!-- 선택된 참여자 표시 -->
@@ -215,7 +215,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">소속</label>
-            <select class="form-select" id="agreer-departmentSelect" onchange="changeDepartment(this.value)">
+            <select class="form-select" id="agreer-departmentSelect">
               <option disabled selected>-- 소속 선택 --</option>
               <option th:each="dept : ${structureList}" 
                 th:value="${dept.separator_code}" 
@@ -229,7 +229,7 @@
               <select id="agreer-employeeSelect" class="form-select me-2" style="flex:1;">
                 <option disabled selected>-- 참여자 선택 --</option>
               </select>
-              <button type="button" class="btn btn-outline-primary" onclick="addParticipant(2)" data-action="addParticipant">추가</button>
+              <button type="button" class="btn btn-outline-primary" data-action="addParticipant">추가</button>
             </div>
           </div>
           <div class="mb-3">
@@ -264,7 +264,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">소속</label>
-            <select class="form-select" id="referer-departmentSelect" onchange="changeDepartment(this.value)">
+            <select class="form-select" id="referer-departmentSelect" >
               <option disabled selected>-- 소속 선택 --</option>
               <option th:each="dept : ${structureList}" 
                 th:value="${dept.separator_code}" 
@@ -278,7 +278,7 @@
               <select id="referer-employeeSelect" class="form-select me-2" style="flex:1;">
                 <option disabled selected>-- 참여자 선택 --</option>
               </select>
-              <button type="button" class="btn btn-outline-primary" onclick="addParticipant(3)" data-action="addParticipant">추가</button>
+              <button type="button" class="btn btn-outline-primary" data-action="addParticipant">추가</button>
             </div>
           </div>
           <div class="mb-3">
@@ -301,32 +301,56 @@
 		
 		
 		
-		<!-- 결재서 양식 선택시, fetch로 결재서 양식 내용 가져오기 -->
-		<script>
- 	document.getElementById("basic-select-format").addEventListener("change", function () {
-    const selectedValue = this.value;
-
-    fetch("/approval/format", {
-      method: 'POST',
-      headers: {
+	<!-- 결재서 양식 선택시 + 해당 페이지 진입시, fetch로 결재서 양식 내용 가져오기 -->
+	<script th:inline="javascript">
+	  function loadApprovalFormat() {
+	    const select = document.getElementById("basic-select-format");
+	    const selectedValue = select.value;
+	    const edit_approval_no = /*[[${approval?.approval_no}]]*/ null;
+	
+	    fetch("/approval/format", {
+	      method: 'POST',
+	      headers: {
 	        'Content-Type': 'application/json',
 	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
 	        'header': document.querySelector('meta[name="_csrf_header"]').content
 	      },
-	      body: JSON.stringify({ approval_format_no: selectedValue })
+	      body: JSON.stringify({
+	        approval_format_no: selectedValue,
+	        edit_approval_no: edit_approval_no
+	      })
 	    })
 	    .then(response => response.json())
 	    .then(data => {
 	      if (data.res_code == "200") {
 	        document.getElementById("basic-form-edit").innerHTML = data.approvalFormatContent;
 	        document.getElementById("approvalPageTitle").innerText = data.approvalFormatTitle + ' 결재서 작성';
+	
+	        const mode = data.mode;
+	        const approvalContent = data.approvalContent;
+	
+	        if (mode === 'edit' && approvalContent) {
+	          setTimeout(() => {
+	            for (const key in approvalContent) {
+	              const inputField = document.querySelector(`#basic-form-edit [name="${key}"]`);
+	              if (inputField) {
+	                inputField.value = approvalContent[key];
+	              }
+	            }
+	          }, 0);
+	        }
 	      } else {
-	        console.log(data.res_code);
-	        console.log(data.res_msg);
-      	}
-    	});
-  	});
+	        // alert("양식 불러오기에 실패했습니다.");
+	      }
+	    });
+	  }
+	
+	  // 페이지 로드시 + 양식 선택시 각각 실행
+	  document.addEventListener('DOMContentLoaded', loadApprovalFormat);
+	  document.getElementById("basic-select-format").addEventListener("change", loadApprovalFormat);
 	</script>
+
+
 	
 	<!-- 결재자 추가 스크립트 -->
 	<script>
@@ -510,7 +534,12 @@
 		  const writerFields = ["date", "department_name", "team_name", "employee_position", "employee_name"];
 		  const writerData = {};
 		  // edit모드일 경우 approval 객체에서 값 가져오기
-		  const editApprovalNo = /*[[${approval.approval_no}]]*/ null;
+			if(/*[[${mode}]]*/ null == 'edit') {
+				const editApprovalNo = /*[[${approval.approval_no}]]*/ null;
+			} else{
+				const editApprovalNo = null;
+			} 
+		  
 		  writerFields.forEach(field => {
 		    const el = document.getElementById(`basic-form-${field}`);
 		    writerData[field] = el ? (el.value ?? el.textContent.trim()) : null;

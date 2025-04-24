@@ -167,7 +167,10 @@ public class ApprovalController {
 		List<SeparatorDto> structureList = employeeService.findDistinctStructureNames();
 		model.addAttribute("structureList", structureList);
 		
-		
+	    if (!model.containsAttribute("approval")) {
+	        model.addAttribute("approval", new ApprovalDto());
+	    }
+	    
 		return "/approval/create";
 	}
 	
@@ -189,10 +192,10 @@ public class ApprovalController {
 	// 결재 생성 양식 리스트 조회
 	@PostMapping("/approval/format")
 	@ResponseBody
-	public Map<String, String> selectApprovalFormat(@RequestBody ApprovalFormatDto dto) {
+	public Map<String, Object> selectApprovalFormat(@RequestBody ApprovalFormatDto dto) {
 		// 결재 양식 조회
 		ApprovalFormat approvalFormat = approvalFormatService.getApprovalFormat(dto.getApproval_format_no());
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("res_code", "500");
 		map.put("res_msg", "양식 조회 실패");
 		if(approvalFormat != null) {
@@ -201,6 +204,18 @@ public class ApprovalController {
 			ApprovalFormatDto approvalFormatDto = new ApprovalFormatDto().toDto(approvalFormat);
 			map.put("approvalFormatContent", approvalFormatDto.getApproval_format_content());
 			map.put("approvalFormatTitle", approvalFormatDto.getApproval_format_title());
+			if(dto.getEdit_approval_no() != null) {
+				// 수정하는 결재인 경우
+				Approval approval = approvalService.selectApprovalByApprovalNo(dto.getEdit_approval_no());
+				ApprovalDto approvalDto = new ApprovalDto().toDto(approval);
+				if (approval != null) {
+//					map.put("approval", approvalDto);
+					map.put("approvalContent", approvalDto.getApproval_content());
+					map.put("mode", "edit");
+				} else {
+					map.put("mode", "create");
+				}
+			}
 		}
 		return map;
 	}
