@@ -86,4 +86,9 @@ public class EmployeeService {
 	        .collect(Collectors.toList());
 	}
 	
+	// employeeNo로 직원 조회
+	public Employee findEmployeeByEmployeeNo(Long employeeNo) {
+		return employeeRepository.findById(employeeNo).orElse(null);
+	}
+	
 }
