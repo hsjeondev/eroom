@@ -1,6 +1,8 @@
 package com.eroom.drive.service;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -32,54 +34,65 @@ public class DriveService {
 	            driverDto.setSeparatorCode(
 	                separatorRepository.findBySeparatorName("개인")
 	                    .map(s -> s.getSeparatorCode())
-	                    .orElse("E001")
+	                    .orElse("E001") 
 	            );
 	        }
 		
-		 for (MultipartFile file : driverDto.getDriveFiles()) {
-			    try {
-			    	System.out.println("파일 처리 시작: " + file.getOriginalFilename());
-			        // 1. 원본 파일명, 확장자
-			        String oriName = file.getOriginalFilename();
-			        String ext = oriName.substring(oriName.lastIndexOf("."));
+		List<String> descriptions = driverDto.getDriveDescriptions(); // 추가된 설명 리스트 가져오기
+		List<MultipartFile> files = driverDto.getDriveFiles();
 
-			        // 2. 새로운 파일명 생성
-			        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+		for (int i = 0; i < files.size(); i++) {
+		    MultipartFile file = files.get(i);
+		    try {
+		        System.out.println("파일 처리 시작: " + file.getOriginalFilename());
 
-			        // 3. 파일 저장 경로 먼저 정의해야 함
-			        String path = fileDir + "personal/" + newName;
-			        File savedFile = new File(path);
+		        String oriName = file.getOriginalFilename();
+		        String ext = oriName.substring(oriName.lastIndexOf("."));
+		        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
 
-			        // 4. 폴더가 없으면 자동 생성
-			        if (!savedFile.getParentFile().exists()) {
-			            savedFile.getParentFile().mkdirs();
-			        }
+		        String path = fileDir + "personal/" + newName;
+		        File savedFile = new File(path);
+		        if (!savedFile.getParentFile().exists()) {
+		            savedFile.getParentFile().mkdirs();
+		        }
+		        file.transferTo(savedFile);
 
-			        // 5. 파일 저장
-			        file.transferTo(savedFile);
+		        // 파일 설명 추가
+		        String description = (descriptions != null && descriptions.size() > i) ? descriptions.get(i) : null;
 
-			        // 6. Drive 엔티티 생성 및 저장
-			        Drive drive = Drive.builder()
-			                .uploader(Employee.builder().employeeNo(employeeNo).build())
-			                .separatorCode(driverDto.getSeparatorCode())
-			                .driveOriName(oriName)
-			                .driveNewName(newName)
-			                .driveType(ext)
-			                .driveSize(file.getSize())
-			                .drivePath("/upload/personal/" + newName)
-			                .downloadCount(0L)
-			                .driveDeleteYn("N")
-			                .build();
-
-			        driveRepository.save(drive);
-			        result++;
-
-			    } catch (Exception e) {
-			    	System.out.println("업로드 실패 파일명: " + file.getOriginalFilename());
-			        e.printStackTrace();
-			    }
+		        Drive drive = Drive.builder()
+		                .uploader(Employee.builder().employeeNo(employeeNo).build())
+		                .separatorCode(driverDto.getSeparatorCode())
+		                .driveOriName(oriName)
+		                .driveNewName(newName)
+		                .driveType(ext)
+		                .driveSize(file.getSize())
+		                .drivePath("/upload/personal/" + newName)
+		                .driveDescription(description)
+		                .downloadCount(0L)
+		                .driveDeleteYn("N")
+		                .build();
+		        
+		        driveRepository.save(drive);
+		        result++;
+		    } catch (Exception e) {
+		        System.out.println("업로드 실패 파일명: " + file.getOriginalFilename());
+		        e.printStackTrace();
+		    }
 		}
 		return result;
 	}
+
+	public List<DriveDto> findPersonalDriveFiles(Long employeeNo) {
+	    List<Drive> drives = driveRepository.findByUploader_EmployeeNoAndDriveDeleteYn(employeeNo, "N");
+	    List<DriveDto> result = new ArrayList<>();
+
+	    for (Drive drive : drives) {
+	        result.add(DriveDto.toDto(drive));
+	    }
+
+	    return result;
+	}
+
 
 }
