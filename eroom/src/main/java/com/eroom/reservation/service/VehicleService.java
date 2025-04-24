@@ -160,4 +160,8 @@ public class VehicleService {
 		Vehicle saved = repository.save(updated);
 		return new VehicleDto().toDto(saved);
 	}
+	
+	public boolean isConflict(Long facilityNo, LocalDateTime start, LocalDateTime end) {
+	    return repository.existsConflict(facilityNo, start, end);
+	}
 }

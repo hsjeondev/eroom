@@ -253,126 +253,10 @@
 							  const form = document.addEventForm;
 							  const modal = document.getElementById("addEventModal");
 							  const facilityInput = document.getElementById("modalFacilityNo");
-
-							  // 오늘 날짜 자동 설정
 							  const today = new Date().toISOString().split("T")[0];
-							  form.reservation_start_date.value = today;
-							  form.reservation_end_date.value = today;
 							  form.reservation_start_date.min = today;
 							  form.reservation_end_date.min = today;
 
-							  let reservedRanges = [];
-
-							  // 예약된 시간 disabled 처리 + 시작/종료 조건 포함
-								function disableReservedTimes(bookedTimes, targetDate) {
-								  const startSelect = form.startTime;
-								  const endSelect = form.endTime;
-								
-								  [...startSelect.options, ...endSelect.options].forEach(opt => {
-								    opt.disabled = false;
-								    opt.textContent = opt.value;
-								  });
-								
-								  const startDate = form.reservation_start_date.value;
-								  const endDate = form.reservation_end_date.value;
-								  const startTime = form.startTime.value;
-								  const endTime = form.endTime.value;
-								
-								  const isStartDay = targetDate === startDate;
-								  const isEndDay = targetDate === endDate;
-								
-								  [...startSelect.options, ...endSelect.options].forEach(opt => {
-								    const optTime = new Date(`${targetDate}T${opt.value}`);
-								
-								    // 예약된 시간으로 disabled 처리
-								    if (bookedTimes.includes(opt.value)) {
-								      opt.disabled = true;
-								      opt.textContent = `${opt.value} (예약)`;
-								    }
-								
-								    // 시작 시간 조건이 있을 경우에만 비교
-								    if (isStartDay && startTime && optTime >= new Date(`${startDate}T${startTime}`)) {
-								      opt.disabled = true;
-								    }
-								
-								    // 종료 시간 조건이 있을 경우에만 비교
-								    if (isEndDay && endTime && optTime < new Date(`${endDate}T${endTime}`)) {
-									  opt.disabled = true;
-									}
-								  });
-								}
-
-							  // 예약 범위 내 예약된 시간 있으면 알려주기
-							  function checkConflictInRange() {
-							    const startDate = form.reservation_start_date.value;
-							    const endDate = form.reservation_end_date.value;
-							    const facilityNo = facilityInput.value;
-
-							    if (!startDate || !endDate || !facilityNo) return;
-
-							    const datesInRange = [];
-							    let cur = new Date(startDate);
-							    const last = new Date(endDate);
-
-							    while (cur <= last) {
-							      datesInRange.push(cur.toISOString().split("T")[0]);
-							      cur.setDate(cur.getDate() + 1);
-							    }
-
-							    const fetches = datesInRange.map(date =>
-							      fetch(`/resvehicle/booked-times?date=${date}&facilityNo=${facilityNo}`)
-							        .then(res => res.json())
-							        .then(times => ({ date, times }))
-							    );
-
-							    Promise.all(fetches)
-							      .then(results => {
-							        const conflicts = results.filter(r => r.times.length > 0);
-							       
-							      })
-							      .catch(err => {
-							        console.error("예약 중복 확인 실패:", err);
-							      });
-							  }
-
-							  // 예약된 시간 fetch
-							  function fetchBothDatesBookedTimes() {
-							    const startDate = form.reservation_start_date.value;
-							    const endDate = form.reservation_end_date.value;
-							    const facilityNo = facilityInput.value;
-
-							    if (!startDate || !facilityNo) return;
-
-							    Promise.all([
-							      fetch(`/resvehicle/booked-times?date=${startDate}&facilityNo=${facilityNo}`).then(r => r.json()),
-							      fetch(`/resvehicle/booked-times?date=${endDate}&facilityNo=${facilityNo}`).then(r => r.json())
-							    ])
-							      .then(([startBooked, endBooked]) => {
-							        const merged = [...startBooked, ...endBooked];
-							        reservedRanges = merged;
-							        console.log("예약된 시간 범위:", reservedRanges);
-							        disableReservedTimes(merged); // disabled 처리
-							        checkConflictInRange(); // 중복 경고 띄우기
-							      })
-							      .catch(error => {
-							        console.error("예약된 시간 조회 실패:", error);
-							      });
-							  }
-
-							  form.reservation_end_date.addEventListener("change", fetchBothDatesBookedTimes);
-
-							  // 모달 열릴 때 facility 설정 + 시간 fetch
-							  modal.addEventListener("show.bs.modal", function (event) {
-							    const button = event.relatedTarget;
-							    const facilityNo = button.getAttribute("data-facility-no");
-							    const facilityName = button.getAttribute("data-facility-name");
-
-							    facilityInput.value = facilityNo;
-							    document.getElementById("selectedFacilityName").textContent =
-							      facilityName || "차량이 선택되지 않았습니다";
-
-							    fetchBothDatesBookedTimes();
-							  });
 
 							  // 예약 등록 submit
 							  form.addEventListener("submit", function (e) {
@@ -397,7 +281,7 @@
 							    const fullEnd = `${endDate}T${endTime}`;
 
 							    if (fullStart >= fullEnd) {
-							      alert("⏰ 종료일시는 시작일시보다 늦어야 합니다!");
+							      alert("종료일시는 시작일시보다 늦어야 합니다!");
 							      return;
 							    }
 
