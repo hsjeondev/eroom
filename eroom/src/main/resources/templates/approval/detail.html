@@ -1,6 +1,11 @@
 <!DOCTYPE html>
-<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org"
-  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      th:with="isPdfMode=${param.mode} == 'pdf'"
+      layout:decorate="~{/include/layout}"
+      th:remove="${isPdfMode} ? 'tag' : 'none'">
+
 <head>
   <meta charset="UTF-8"/>
   <meta name="_csrf" th:content="${_csrf.token}" />
@@ -15,7 +20,7 @@
       <div class="d-flex mb-3">
         <span class="fw-bold fs-6">결재서 상세</span>
         <button class="btn btn-light btn-sm me-2" id="topdf" type="button">pdf만들기</button>
-        <button class="btn btn-light btn-sm" onclick="history.back()">목록으로</button>
+        <button type="button" class="btn btn-light btn-sm" onclick="history.back()">목록으로</button>
       </div>
 
       <!-- 기본 정보 + 결재선 테이블 병렬 정렬 -->
@@ -23,7 +28,7 @@
   <div class="row align-items-start">
     <!-- 기본 정보 -->
     <div class="col-lg-8">
-    <div class="text-center fs-5 fw-bold" th:text="${approval.approval_title}">sdfsdf</div>
+    <div class="text-center fs-6 fw-bold" th:text="${approval.approval_title}">결재 제목</div>
       <table class="table table-bordered text-dark mb-0 text-center align-items-center align-middle">
       	<!-- <thead>
       		<tr>
@@ -31,6 +36,10 @@
    			</tr>
       	</thead> -->
         <tbody>
+          <tr>
+            <th class="table-light text-center" style="width: 150px;">서류번호</th>
+            <td th:text="${approvalNoFormatted}">서류번호</td>
+          </tr>
           <tr>
             <th class="table-light text-center" style="width: 150px;">신청일</th>
             <td th:text="${approval.reg_date}">신청일</td>
@@ -47,10 +56,10 @@
             <th class="table-light text-center">직급</th>
             <td th:text="${approval.employee.employeePosition}">직급</td>
           </tr>
-          <tr>
+          <!-- <tr>
             <th class="table-light text-center">제목</th>
             <td colspan="3" th:text="${approval.approval_title}">제목</td>
-          </tr>
+          </tr> -->
           <!-- <tr>
             <th class="table-light text-center">양식 종류</th>
             <td colspan="3" th:text="${approval.approval_format.approvalFormatTitle}">양식 종류</td>
@@ -234,7 +243,8 @@
 	</script>
 		
     <!-- pdf 생성 버튼 -->
-	<script>
+	<script th:inline="javascript">
+		const approvalNoPdf = /*[[${approval.approval_no}]]*/ 0;
 	  document.getElementById("topdf").addEventListener("click", function() {
 	    // meta 태그에서 CSRF 토큰과 헤더명 읽기
 	    var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
@@ -242,7 +252,7 @@
 	
 	    // GET 요청일 경우, 쿼리 파라미터로 CSRF 토큰 전달 (예: headerName=token)
 	    // CSRF 토큰이 필요 없다면 Spring Security 설정에서 GET은 제외할 수도 있습니다.
-	    window.location.href = "/approval/detail/pdf?" 
+	    window.location.href = "/approval/" + approvalNoPdf + "/pdf?" 
 	        + encodeURIComponent(csrfHeader) + "=" + encodeURIComponent(csrfToken);
 	  });
 	</script>
