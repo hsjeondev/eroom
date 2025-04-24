@@ -32,6 +32,8 @@ public class ProjectMemberDto {
 	
 	private String is_manager;
 	
+	private String visible_yn;
+	
 	
 	public ProjectMemberDto toDto(ProjectMember entity) {
 	    return ProjectMemberDto.builder()
@@ -41,6 +43,7 @@ public class ProjectMemberDto {
 	            .project_manager(entity.getProjectManager())
 	            .github_username(entity.getGithubUsername())
 	            .is_manager(entity.getIsManager())
+	            .visible_yn(entity.getVisibleYn())
 	            .build();
 	}
 
@@ -52,6 +55,7 @@ public class ProjectMemberDto {
 	            .projectManager(project_manager)
 	            .githubUsername(github_username)
 	            .isManager(is_manager)
+	            .visibleYn(visible_yn)
 	            .build();
 	}
 
