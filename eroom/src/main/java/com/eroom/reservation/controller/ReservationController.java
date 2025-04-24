@@ -14,11 +14,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.eroom.calendar.dto.EmployeeCalendarDto;
+import com.eroom.employee.dto.EmployeeDto;
+import com.eroom.employee.service.EmployeeService;
 import com.eroom.facility.entity.Facility;
 import com.eroom.facility.service.FacilityService;
+import com.eroom.reservation.dto.MeetingRoomDto;
 import com.eroom.reservation.dto.VehicleDto;
 import com.eroom.reservation.entity.Vehicle;
+import com.eroom.reservation.service.MeetingRoomService;
 import com.eroom.reservation.service.VehicleService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,8 @@ public class ReservationController {
 
 	private final FacilityService facilityService;
 	private final VehicleService vehicleService;
+	private final EmployeeService employeeService;
+	private final MeetingRoomService meetingRoomService;
 
 	// ========================화면 전환 =============================
 	@GetMapping("/reservation/sleep")
@@ -47,8 +52,24 @@ public class ReservationController {
 	}
 
 	@GetMapping("/reservation/meetingroom")
-	public String meetingroomReservationView() {
+	public String meetingroomReservationView(@RequestParam(name = "department" ,required = false) String department, Model model) {
+		List<Facility>result = facilityService.selectMeetingRoomAll();
+
+	    model.addAttribute("structureList", employeeService.findDistinctStructureNames());
+		model.addAttribute("list",result);
 		return "reservation/meetingroomrev";
+	}
+	
+	//회의실 예약 참가자 선택
+	@GetMapping("/reservation/employees")
+	@ResponseBody
+	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam("separator_code") String separatorCode) {
+	    String temp = separatorCode.substring(0,1);
+	    if ("T".equals(temp)) {
+	        return employeeService.findEmployeesByStructureName(separatorCode);
+	    } else {
+	        return employeeService.findEmployeesByParentCode(separatorCode);
+	    }
 	}
 
 	// ========================차량 등록 =============================
@@ -70,8 +91,34 @@ public class ReservationController {
 
 		return resultMap;
 	}
+	
+	// ===================회의실 등록===============================
+	@PostMapping("/reservation/meetingroom/reserve")
+	@ResponseBody
+	public Map<String, String> reserveMeetingRoom(
+			MeetingRoomDto param,
+	    @RequestParam("participants") List<Long> participantIds) {
 
-	// ====================차량 목록 조회 =========================
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "예약을 실패하였습니다");
+
+	    // 회의실 예약 등록
+	    MeetingRoomDto savedDto = meetingRoomService.meetingRoomServiceReservation(param);
+
+	    if (savedDto != null) {
+	        // 참여자 매핑 저장 
+	        meetingRoomService.saveParticipants(savedDto.getReservation_no(), participantIds);
+
+	        resultMap.put("res_code", "200");
+	        resultMap.put("res_msg", "회의실 예약이 완료되었습니다!");
+	    }
+
+	    return resultMap;
+	}
+	
+
+	// ====================차량 목록 조회 ==========================
 	@GetMapping("/resvehicle/list/{separator}")
 	@ResponseBody
 	public List<Map<String, Object>> getVehicleList(@PathVariable("separator") String separator) {
@@ -151,6 +198,14 @@ public class ReservationController {
 	public List<String> getBookedTimes(@RequestParam("date") String date,
 			@RequestParam("facilityNo") String facilityNo) {
 		return vehicleService.getBookedTimes(date, facilityNo);
+	}
+	
+	//==================회의실 예약 시간 막기===============================
+	@GetMapping("/meetingroom/booked-times")
+	@ResponseBody
+	public List<String> getMeetingRoomTimes(@RequestParam("date") String date,
+			@RequestParam("facilityNo") String facilityNo) {
+		return meetingRoomService.getMeetingRoomTimes(date,facilityNo);
 	}
 
 }

@@ -68,7 +68,7 @@ public class VehicleService {
 		LocalDateTime startOfDay = targetDate.atStartOfDay();
 		LocalDateTime endOfDay = targetDate.plusDays(1).atStartOfDay();
 
-		Long facilityNo = Long.parseLong(facilityNoStr); // ← Long 변환 잊지 마!
+		Long facilityNo = Long.parseLong(facilityNoStr); // 
 		List<Vehicle> reservedList = repository.findByFacilityNoAndReservationDate(facilityNo, startOfDay, endOfDay);
 
 		Set<String> bookedTimesSet = new HashSet<>();
