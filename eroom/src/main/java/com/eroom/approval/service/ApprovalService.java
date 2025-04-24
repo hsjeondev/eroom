@@ -44,8 +44,13 @@ public class ApprovalService {
 				Approval temp = approvalRepository.findById(dto.getEditApprovalNo()).orElse(null);
 				if(temp != null) {
 					ApprovalDto approvalDto = new ApprovalDto().toDto(temp);
+					// 결재 상태가 반려일 경우 visible N으로 변경
+					if(temp.getApprovalStatus().equals("F")) {
+						approvalDto.setApproval_visible_yn("N");
+					} else {
+						
+					}
 					approvalDto.setApproval_no(dto.getEditApprovalNo());
-					approvalDto.setApproval_visible_yn("N");
 					approvalDto.setApproval_completed_date(LocalDateTime.now());
 					temp = approvalDto.toEntity();
 					approvalRepository.save(temp);
