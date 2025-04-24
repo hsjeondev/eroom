@@ -30,6 +30,8 @@ public class SurveyDto {
 	@CreationTimestamp
 	private LocalDateTime regDate;
 	
+	private int voterCount;
+	
 	public Survey toEntity() {
 		return Survey.builder()
 				.surveyNo(surveyNo)
