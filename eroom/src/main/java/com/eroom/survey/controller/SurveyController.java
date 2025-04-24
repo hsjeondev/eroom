@@ -111,11 +111,18 @@ public class SurveyController {
 	    Map<String, Object> response = new HashMap<>();
 
 	    try {
-	        surveyVoteService.saveVote(voteRequest);
-	        response.put("success", true);
+	    	boolean success = surveyVoteService.saveVote(voteRequest);
+
+	        if (!success) {
+	            response.put("success", false);
+	            response.put("message", "투표 권한이 없습니다.");
+	        } else {
+	            response.put("success", true);
+	        }
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        response.put("success", false);
+	        response.put("message", "예상치 못한 오류가 발생했습니다.");
 	    }
 
 	    return response;

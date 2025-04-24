@@ -52,11 +52,9 @@
 														<div class="col-sm-8">
 															<div id="itemScrollBox" style="max-height: 400px; overflow-y: auto;">
 																<div id="itemContainerDefault">
-																	<input class="form-control mb-2" id="inputItem" name="items" type="text" style="width: 97.2%;" required>
-																	<input class="form-control mb-2" name="items" type="text" style="width: 97.2%;" required>
+																	<input class="form-control mb-2" id="inputItem" name="items" type="text" style="width: 97.2%;" required> <input class="form-control mb-2" name="items" type="text" style="width: 97.2%;" required>
 																</div>
-																<div id="itemContainer">
-																</div>
+																<div id="itemContainer"></div>
 															</div>
 															<!-- 항목 추가 버튼 -->
 															<div class="text-center mt-2">
@@ -169,12 +167,12 @@
 												<div class="modal-body">
 													<ul th:attr="id='surveyItemList-' + ${survey.surveyNo}" class="list-group"></ul>
 												</div>
-												<div class="modal-footer">
-													<th:block th:if="${survey.deadline >= T(java.time.LocalDateTime).now()}">
+												<th:block th:if="${survey.deadline >= T(java.time.LocalDateTime).now()}">
+													<div class="modal-footer">
 														<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">취소</button>
 														<button class="btn btn-primary" type="button" th:onclick="'submitVote(' + ${survey.surveyNo} + ')'">투표</button>
-													</th:block>
-												</div>
+													</div>
+												</th:block>
 											</div>
 										</div>
 									</div>
@@ -364,11 +362,6 @@
 	          countSpan.id = `vote-count-${surveyId}-${index}`;
 	          countSpan.textContent = item.count + '표';
 	
-	          /* if (item.voted === "Y") {
-	       	    wrapper.classList.add('border', 'border-primary', 'bg-light');
-	       	    label.innerHTML += ' <span class="badge bg-primary ms-2">내 투표</span>';
-	       	  } */
-	
 	          wrapper.appendChild(label);
 	          wrapper.appendChild(countSpan);
 	          itemList.appendChild(wrapper);
@@ -407,14 +400,14 @@
 	    const isClosed = modal.querySelector('.btn-primary') === null;
 	    if (isClosed && item.count === maxVotes && maxVotes > 0) {
 	      label.textContent += ' 🏆';
-	      wrapper.classList.add('bg-warning-subtle', 'border-warning', 'border-2');
+	      wrapper.classList.add('bg-warning-subtle', 'border-warning');
 	    }
 	
 	    const voteCount = document.createElement('span');
 	    voteCount.textContent = item.count + '표';
 	
 	    if (hasVoted) {
-	      // 투표 결과 표시 모드
+	      // 투표 결과 표시
 	      if (item.voted === "Y") {
 	    	  wrapper.classList.add('bg-info-subtle', 'border-primary', 'border-2');
 	      }
@@ -425,7 +418,7 @@
 	      voteCount.setAttribute('data-bs-placement', 'right');
 	      voteCount.setAttribute('data-bs-html', 'true');
 	    } else {
-	      // 투표 가능 모드
+	      // 투표 가능
 	      wrapper.setAttribute('onclick', `handleVoteClick(${surveyId}, ${index})`);
 	    }
 	
@@ -457,6 +450,9 @@
 	  const modal = document.getElementById('survey-detail-' + surveyId);
 	  const allowMultiple = modal.getAttribute('data-allow-multiple') === 'on';
 	
+	  const isClosed = modal.querySelector('.btn-primary') === null;
+	  if (isClosed) return;
+	  
 	  const allOptions = document.querySelectorAll(`#surveyItemList-${surveyId} .vote-option`);
 	  const selected = allOptions[itemIndex];
 	
@@ -513,7 +509,8 @@
 		        renderVoteView(surveyId, items);
 		      });
 		  } else {
-		    alert('투표에 실패했습니다.');
+			  const voteAuthorityModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('voteAuthorityModal'));
+			  voteAuthorityModal.show();
 		  }
 		});
 	}
@@ -585,11 +582,26 @@
 					<button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="닫기"></button>
 				</div>
 				<div class="modal-body text-center">
-					<p class="mb-0 text-body" id="validationModalMessage">
-					</p>
+					<p class="mb-0 text-body" id="validationModalMessage"></p>
 				</div>
 				<div class="modal-footer justify-content-center border-0">
 					<button type="button" class="btn btn-phoenix-secondary bg-primary text-white" data-bs-dismiss="modal">확인</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 투표 권한 확인창 -->
+	<div class="modal fade" id="voteAuthorityModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content bg-body-secondary text-body rounded-3 shadow-lg border border-secondary-light">
+				<div class="modal-header border-0">
+					<h5 class="modal-title text-dark" id="voteAuthorityModalTitle"></h5>
+				</div>
+				<div class="modal-body text-center">
+					<p class="mb-0 text-body" id="voteAuthorityModalMessage">투표 권한이 없습니다.</p>
+				</div>
+				<div class="modal-footer justify-content-center border-0">
+					<button type="button" class="btn btn-phoenix-secondary me-1 mb-1" data-bs-dismiss="modal">확인</button>
 				</div>
 			</div>
 		</div>
