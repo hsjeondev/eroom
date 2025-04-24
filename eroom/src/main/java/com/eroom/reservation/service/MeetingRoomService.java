@@ -13,10 +13,11 @@ import org.springframework.stereotype.Service;
 
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
+import com.eroom.facility.entity.Facility;
+import com.eroom.facility.repository.FacilityRepository;
 import com.eroom.reservation.dto.MeetingRoomDto;
 import com.eroom.reservation.entity.MeetingRoom;
 import com.eroom.reservation.entity.ReservationEmployeeMapping;
-import com.eroom.reservation.entity.Vehicle;
 import com.eroom.reservation.repository.MeetingRoomRepository;
 import com.eroom.reservation.repository.ReservationEmployeeMappingRepository;
 
@@ -29,6 +30,7 @@ public class MeetingRoomService {
 	private final MeetingRoomRepository repository;
 	private final EmployeeRepository employeeRepository;
 	private final ReservationEmployeeMappingRepository mappingRepository;	
+	private final FacilityRepository facilityRepository;
 	
 	//예약실 등록
 	public MeetingRoomDto meetingRoomServiceReservation(MeetingRoomDto dto) {
@@ -57,7 +59,7 @@ public class MeetingRoomService {
 	    }
 
 	
-
+	//예약 시간 막기
 	public List<String>getMeetingRoomTimes(String date,String FacilityNoStr){
 		
 			LocalDate targetDate = LocalDate.parse(date);
@@ -71,7 +73,7 @@ public class MeetingRoomService {
 			for (MeetingRoom v : reservedList) {
 				LocalTime start = v.getReservationStart().toLocalTime();
 				LocalTime end = v.getReservationEnd().toLocalTime();
-				for (int hour = start.getHour(); hour < end.getHour(); hour++) {
+				for (int hour = start.getHour(); hour <= end.getHour(); hour++) {
 					bookedTimesSet.add(String.format("%02d:00", hour));
 				}
 			}
@@ -83,8 +85,33 @@ public class MeetingRoomService {
 			Collections.sort(bookedTimes);
 			return bookedTimes;
 		}
+	
+
+
+	public List<MeetingRoomDto> getMeetingRoomList(String separator){
+	    List<MeetingRoom> list = repository.findBySeparatorCodeAndVisibleYn(separator,"Y");
+	    List<MeetingRoomDto> dtoList = new ArrayList<>();
+
+	    for (MeetingRoom meeting : list) {
+	        MeetingRoomDto dto = new MeetingRoomDto().toDto(meeting);
+
+	        Facility facility = facilityRepository.findByFacilityNo(meeting.getFacilityNo());
+	        if (facility != null) {
+	            dto.setMeetingRoomName(facility.getFacilityName()); // ✅ 회의실 이름 설정
+	        }
+
+	        Employee employee = employeeRepository.findByEmployeeNo(meeting.getEmployeeNo());
+	        if (employee != null) {
+	            dto.setReserverName(employee.getEmployeeName()); // 예약자 이름
+	        }
+
+	        dtoList.add(dto);
+	    }
+
+	    return dtoList;
 	}
 
 	
-
+		
+}
 

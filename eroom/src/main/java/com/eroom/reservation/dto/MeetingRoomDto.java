@@ -28,7 +28,7 @@ public class MeetingRoomDto {
 	private LocalDateTime reservation_start;
 	private LocalDateTime reservation_end;
 	private String visible_yn="Y";
-	private String vehicleName;
+	private String meetingRoomName;
 	private String reserverName;
 	private String reservation_creator;
 	private String reservation_editor;
@@ -69,6 +69,28 @@ public class MeetingRoomDto {
 				.reservation_location(meetingRoom.getReservationLocation())
 				.build();
 	}
+	
+	public Map<String, Object> toFullCalendarEvent() {
+	    Map<String, Object> event = new HashMap<>();
+	    event.put("title", "[" + this.meetingRoomName + "] " + this.reserverName);
+	    event.put("start", this.reservation_start != null ? this.reservation_start.toString() : "");
+	    event.put("end", this.reservation_end != null ? this.reservation_end.toString() : "");
+
+
+	    // FullCalendar에서 사용할 정보들 추가
+	    event.put("reservation_no", this.reservation_no);  
+	    event.put("meetingRoomName", this.meetingRoomName);        
+	    event.put("reserverName", this.reserverName);    
+	    event.put("reservationLocation", this.reservation_location); 
+
+	    event.put("separator", this.separator_code != null ? this.separator_code : "");
+	    event.put("reservationCreator", this.reservation_creator != null ? this.reservation_creator : "");
+	    event.put("type", "vehicle");
+
+	    return event;
+	}
+
+
 
 
 }

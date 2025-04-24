@@ -15,7 +15,7 @@ import com.eroom.reservation.entity.Vehicle;
 public interface VehicleRepository extends JpaRepository<Vehicle,Long>,JpaSpecificationExecutor<Vehicle> {
 	List<Vehicle> findBySeparatorCodeAndVisibleYn(String separatorCode, String visibleYn);
 	
-	@Query("SELECT v FROM Vehicle v WHERE v.facilityNo = :facilityNo AND v.reservationStart >= :startOfDay AND v.reservationStart < :endOfDay")
+	@Query("SELECT v FROM Vehicle v WHERE v.facilityNo = :facilityNo AND v.reservationStart < :endOfDay AND v.reservationEnd > :startOfDay")
 	List<Vehicle> findByFacilityNoAndReservationDate(
 	    @Param("facilityNo") Long facilityNo,
 	    @Param("startOfDay") LocalDateTime startOfDay,

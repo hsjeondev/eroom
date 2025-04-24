@@ -131,7 +131,20 @@ public class ReservationController {
 		}
 
 		return result;
+	}
+	//=======================회의실 목록 조회============================
+	@GetMapping("/meetingroom/list/{separator}")
+	@ResponseBody
+	public List<Map<String, Object>> getMeetingRoomList(@PathVariable("separator") String separator) {
+		List<Map<String, Object>> result = new ArrayList<>();
+		// System.out.println(separator);
+		List<MeetingRoomDto> list = meetingRoomService.getMeetingRoomList(separator);
 
+		for (MeetingRoomDto dto : list) {
+			result.add(dto.toFullCalendarEvent());
+		}
+
+		return result;
 	}
 	
 	//======================차량 예약 수정 모달에 값 넣기 ===========================
