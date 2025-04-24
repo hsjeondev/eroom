@@ -49,16 +49,17 @@
         </div>
         <div class="row g-3">
           <div class="col-md-4 mb-3">
-			  <label class="form-label" for="pms">PM</label>
+			  <label class="form-label" for="pm">PM</label>
 			  <div class="position-relative">
-			    <input class="form-control pe-5" id="pms" name="pmNames" th:value="${pmNames}" type="text" placeholder="PM"
+			    <input class="form-control pe-5" id="pm" name="pmName" th:value="${pmName}" type="text" placeholder="PM"
 			           data-bs-toggle="modal" data-bs-target="#select_pm_modal" readonly>
 			    <i class="uil uil-search fs-8 position-absolute"
 			       style="top: 50%; right: 15px; transform: translateY(-50%); pointer-events: none;"></i>
 			  </div>
 			</div>
+			
 			<div id="pmIdsContainer" style="display: none;">
-			  <input type="hidden" name="pmIds" th:each="id : ${pmIds}" th:value="${id}">
+			  <input type="hidden" name="pmId" th:value="${pmId}">
 			</div>
 
           <div class="col-md-4 mb-3">
@@ -81,10 +82,17 @@
         <div id="participantIdsContainer" style="display: none;">
 		  <input type="hidden" name="participantIds" th:each="id : ${participantIds}" th:value="${id}">
 		</div>
-        <div class="text-end">
-          <button class="btn btn-outline-primary" type="button" onclick="window.history.back()">취소</button>
-          <button class="btn btn-primary" type="submit">수정</button>
-        </div>
+		<div class="d-flex justify-content-between">
+  <div>
+    <button class="btn btn-outline-danger" type="button" onclick="holdProject();">보류</button>
+    <button class="btn btn-subtle-success" type="button" onclick="doneProject();">오늘 자로 완료</button>
+  </div>
+  <div>
+    <button class="btn btn-outline-primary" type="button" onclick="window.history.back()">취소</button>
+    <button class="btn btn-primary" type="submit">수정</button>
+  </div>
+</div>
+
       </form>
       <!-- 폼 끝 -->
 
@@ -177,6 +185,42 @@
           </div>
         </div>
       </div>
+      
+      <!-- PM 선택 모달 -->
+<div class="modal fade" id="select_pm_modal" tabindex="-1" aria-labelledby="selectPmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="selectPmModalLabel">PM 선택</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <!-- 부서 선택 -->
+        <div class="mb-3">
+          <label class="form-label">소속 선택</label>
+          <select class="form-select" id="pmDepartmentSelect" onchange="changePmDepartment(this.value)">
+            <option disabled selected>-- 소속 선택 --</option>
+          </select>
+        </div>
+
+        <!-- 직원 선택 -->
+        <div class="mb-3">
+          <label class="form-label">직원 선택</label>
+          <div class="d-flex">
+            <select id="pmEmployeeSelect" class="form-select me-2" style="flex:1;">
+              <option disabled selected>-- PM 선택 --</option>
+            </select>
+            <button type="button" class="btn btn-outline-primary" onclick="selectPm()">선택</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">취소</button>
+      </div>
+    </div>
+  </div>
+</div>
+      
       
       <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
 	  <div class="modal-dialog modal-dialog-centered">
@@ -379,6 +423,68 @@
           }
         }
         
+        document.getElementById('select_pm_modal').addEventListener('shown.bs.modal', function () {
+        	  const deptSelect = document.getElementById('pmDepartmentSelect');
+        	  deptSelect.innerHTML = '<option disabled selected>-- 소속 선택 --</option>';
+
+        	  fetch('/project/selectStructure')
+        	    .then(res => res.json())
+        	    .then(data => {
+        	      data.forEach(dept => {
+        	        const option = document.createElement('option');
+        	        option.value = dept.separator_code;
+        	        option.text = dept.separator_name;
+        	        deptSelect.appendChild(option);
+        	      });
+        	    });
+        	});
+
+        	// 소속에 따른 직원 목록 가져오기
+        	function changePmDepartment(deptId) {
+        	  fetch('/project/selectEmployees?separator_code=' + encodeURIComponent(deptId))
+        	    .then(res => res.json())
+        	    .then(data => {
+        	      const select = document.getElementById('pmEmployeeSelect');
+        	      select.innerHTML = '<option disabled selected>-- PM 선택 --</option>';
+        	      data.forEach(emp => {
+        	        const option = document.createElement('option');
+        	        option.value = emp.employee_no;
+        	        option.text = emp.employee_name;
+        	        select.appendChild(option);
+        	      });
+        	    });
+        	}
+
+        	// PM 선택 완료 → input에 이름 표시 + hidden input에 ID 저장
+        	function selectPm() {
+        	  const select = document.getElementById('pmEmployeeSelect');
+        	  const pmId = select.value;
+        	  const pmName = select.options[select.selectedIndex].text;
+
+        	  if (!pmId) {
+        	    alert('PM을 선택해주세요.');
+        	    return;
+        	  }
+
+        	  // input에 표시
+        	  document.getElementById('pm').value = pmName;
+
+        	  // hidden input 업데이트
+        	  const container = document.getElementById('pmIdsContainer');
+        	  container.innerHTML = '';
+        	  const hiddenInput = document.createElement('input');
+        	  hiddenInput.type = 'hidden';
+        	  hiddenInput.name = 'pmId';
+        	  hiddenInput.value = pmId;
+        	  container.appendChild(hiddenInput);
+
+        	  // 모달 닫기
+        	  const modalElem = document.getElementById('select_pm_modal');
+        	  const modalInstance = bootstrap.Modal.getInstance(modalElem);
+        	  if (modalInstance) modalInstance.hide();
+        	}
+
+        
         document.getElementById('select_manager_modal').addEventListener('hidden.bs.modal', function () {
         	  // 부서 드롭다운 초기화
         	  const deptSelect = document.getElementById('managerDepartmentSelect');
@@ -496,9 +602,6 @@
 
         	  return null;
         	}
-
-
-
         
         // 폼 제출 이벤트 처리 (유효성 검증 후)
         // 전역 변수로 선언해서 fetch 결과를 저장
@@ -543,7 +646,8 @@
 		  }
 		
 		  const payload = new FormData(form);
-		  fetch("/project/update", {
+		  const projectNo = form.project_no.value;
+		  fetch("/project/"+projectNo+"/update", {
 		    method: "post",
 		    headers: {
 		      [document.querySelector('meta[name="_csrf_header"]').content]:
@@ -574,6 +678,59 @@
 		    location.href = redirectUrlAfterConfirm;
 		  }
 		});
+		
+		const holdProject = function() {
+			const projectNo = form.project_no.value;
+			fetch("/project/"+projectNo+"/holding", {
+				method : "post",
+				headers: {
+					[document.querySelector('meta[name="_csrf_header"]').content]:
+				        document.querySelector('meta[name="_csrf"]').content,
+				}
+			})
+			.then(response => response.json())
+			.then(data => {
+				if(data.res_code == "200") {
+					redirectUrlAfterConfirm = "/project/hold";
+			        document.querySelector("#confirmModal .modal-body").textContent = data.res_msg;
+			        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+			        modal.show();
+				} else {
+					alert(data.res_msg);
+				}
+			})
+			.catch(error => {
+				alert("보류 처리 중 오류가 발생하였습니다.");
+			})
+			
+		}
+		
+		const doneProject = function() {
+			const projectNo = form.project_no.value;
+			fetch("/project/"+projectNo+"/done", {
+				method : "post",
+				headers: {
+					[document.querySelector('meta[name="_csrf_header"]').content]:
+				        document.querySelector('meta[name="_csrf"]').content,
+				}
+			})
+			.then(response => response.json())
+			.then(data => {
+				if(data.res_code == "200") {
+					redirectUrlAfterConfirm = "/project/done";
+			        document.querySelector("#confirmModal .modal-body").textContent = data.res_msg;
+			        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+			        modal.show();
+				} else {
+					alert(data.res_msg);
+				}
+			})
+			.catch(error => {
+				alert("완료 처리 중 오류가 발생하였습니다.");
+			})
+			
+		}
+		
 
       </script>
     </main>

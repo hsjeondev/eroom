@@ -215,19 +215,26 @@ public class ProjectController {
 	    
 	    ProjectDto project = projectService.findByProjectNo(projectNo);
 
-	    List<Long> pmIds = new ArrayList<>();
-	    List<String> pmNames = new ArrayList<>();
+	    Long pmId = null;
+	    String pmName = null;
 	    List<Long> managerIds = new ArrayList<>();
 	    List<String> managerNames = new ArrayList<>();
 	    List<Long> participantIds = new ArrayList<>();
 	    List<String> participantNames = new ArrayList<>();
 
 	    for (ProjectMemberDto dto : project.getProject_members()) {
-	        if ("Y".equals(dto.getProject_manager())) {
-	            pmIds.add(dto.getProject_member().getEmployeeNo());
-	            pmNames.add(dto.getProject_member().getEmployeeName());
+	        // visibleYn이 "Y"인 멤버만 처리
+	        if (!"Y".equals(dto.getVisible_yn())) {
+	            continue;
 	        }
-	        
+
+	        // PM
+	        if ("Y".equals(dto.getProject_manager())) {
+	            pmId   = dto.getProject_member().getEmployeeNo();
+	            pmName = dto.getProject_member().getEmployeeName();
+	        }
+
+	        // 관리자 / 참가자 분류
 	        if ("Y".equals(dto.getIs_manager())) {
 	            managerIds.add(dto.getProject_member().getEmployeeNo());
 	            managerNames.add(dto.getProject_member().getEmployeeName());
@@ -237,8 +244,8 @@ public class ProjectController {
 	        }
 	    }
 
-	    model.addAttribute("pmIds", pmIds);
-	    model.addAttribute("pmNames", String.join(", ", pmNames));
+	    model.addAttribute("pmId", pmId);
+	    model.addAttribute("pmName", pmName);
 	    model.addAttribute("managerIds", managerIds);
 	    model.addAttribute("managerNames", String.join(", ", managerNames));
 	    model.addAttribute("participantIds", participantIds);
@@ -248,15 +255,102 @@ public class ProjectController {
 	    return "project/projectUpdate";
 	}
 
+
 	
 	@PostMapping("/{project_no}/update")
 	@ResponseBody
-	public Map<String, String> updateProjectApi(@PathVariable("project_no") Long projectNo) {
-		
+	public Map<String, String> updateProjectApi(
+	        @PathVariable("project_no") Long projectNo,
+	        @ModelAttribute ProjectDto projectDto,
+	        @RequestParam("pmId") Long pmEmployeeNo,
+	        @RequestParam(value = "managerIds", required = false) List<Long> managerIds,
+	        @RequestParam(value = "participantIds", required = false) List<Long> participantIds) {
+
+	    Map<String, String> map = new HashMap<>();
+	    map.put("res_code", "500");
+	    map.put("res_msg", "프로젝트 수정 중 오류가 발생하였습니다. 다시 시도해주세요.");
+
+	    // DTO에도 projectNo 설정 (필요하다면)
+	    projectDto.setProject_no(projectNo);
+
+	    List<ProjectMemberDto> memberDtos = new ArrayList<>();
+
+	    // 1) PM
+	    ProjectMemberDto pmDto = ProjectMemberDto.builder()
+	            .project_member(Employee.builder().employeeNo(pmEmployeeNo).build())
+	            .project_manager("Y")
+	            .build();
+	    memberDtos.add(pmDto);
+
+	    // 2) 관리자
+	    if (managerIds != null) {
+	        for (Long managerId : managerIds) {
+	            // PM과 중복인 경우 제외
+	            if (managerId.equals(pmEmployeeNo)) continue;
+	            ProjectMemberDto managerDto = ProjectMemberDto.builder()
+	                    .project_member(Employee.builder().employeeNo(managerId).build())
+	                    .is_manager("Y")
+	                    .build();
+	            memberDtos.add(managerDto);
+	        }
+	    }
+
+	    // 3) 참가자
+	    if (participantIds != null) {
+	        for (Long participantId : participantIds) {
+	            ProjectMemberDto participantDto = ProjectMemberDto.builder()
+	                    .project_member(Employee.builder().employeeNo(participantId).build())
+	                    .is_manager("N")
+	                    .build();
+	            memberDtos.add(participantDto);
+	        }
+	    }
+
+	    // 서비스 호출: 수정 로직 수행
+	    Long result = projectService.updateProject(projectDto, memberDtos);
+	    if (result != null && result != 0L) {
+	        map.put("res_code", "200");
+	        map.put("res_msg", "프로젝트가 정상적으로 수정 되었습니다.");
+	        map.put("res_project_no", result.toString());
+	    }
+
+	    return map;
+	}
+	
+	@PostMapping("/{project_no}/holding")
+	@ResponseBody
+	public Map<String, String> holdingProjectApi(@PathVariable("project_no") Long projectNo) {
 		Map<String, String> map = new HashMap<String, String>();
+		map.put("res_code", "500");
+		map.put("res_msg", "보류 처리 중 오류가 발생하였습니다. 다시 시도해주세요.");
 		
+		int result = projectService.holdingProject(projectNo);
+
+		if(result > 0) {
+			map.put("res_code", "200");
+			map.put("res_msg", "보류 처리가 정상적으로 되었습니다.");
+		}
+
 		return map;
 	}
+	
+	@PostMapping("/{project_no}/done")
+	@ResponseBody
+	public Map<String, String> doneProjectApi(@PathVariable("project_no") Long projectNo) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("res_code", "500");
+		map.put("res_msg", "완료 처리 중 오류가 발생하였습니다. 다시 시도해주세요.");
+		
+		int result = projectService.doneProject(projectNo);
+
+		if(result > 0) {
+			map.put("res_code", "200");
+			map.put("res_msg", "완료 처리가 정상적으로 되었습니다.");
+		}
+
+		return map;
+	}
+
 
 	
 }
