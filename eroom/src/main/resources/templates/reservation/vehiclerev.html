@@ -146,7 +146,7 @@
 															<option value="14:00">14:00</option>
 															<option value="15:00">15:00</option>
 															<option value="16:00">16:00</option>
-															<option value="17:00">17:00</option>
+															<option value="17:00">17:00</option>															
 														</select>
 													</div>
 													<div class="col">
@@ -249,164 +249,83 @@
 
 						<!-- 등록을 위한 fetch -->
 						<script>
-						const form = document.addEventForm;
-
-						// 오늘 날짜 자동 설정
-						const today = new Date().toISOString().split("T")[0];
-						form.reservation_start_date.value = today;
-						form.reservation_end_date.value = today;
-						form.reservation_start_date.min = today;
-						form.reservation_end_date.min = today;
-
-						// 예약된 시간 비활성화 처리 함수
-						function disableReservedTimes(bookedTimes) {
-						  const startSelect = form.startTime;
-						  const endSelect = form.endTime;
-
-						  // 먼저 모두 활성화 초기화
-						  [...startSelect.options, ...endSelect.options].forEach(opt => {
-						    opt.disabled = false;
-						    opt.textContent = opt.value;
-						  });
-
-						  // 예약된 시간들만 비활성화
-						  bookedTimes.forEach(time => {
-						    const sOpt = [...startSelect.options].find(o => o.value === time);
-						    const eOpt = [...endSelect.options].find(o => o.value === time);
-
-						    if (sOpt) {
-						      sOpt.disabled = true;
-						      sOpt.textContent += " (예약)";
-						    }
-						    if (eOpt) {
-						      eOpt.disabled = true;
-						      eOpt.textContent += " (예약)";
-						    }
-						    if ([...startSelect.options].every(opt => opt.disabled)) {
-						        startSelect.selectedIndex = 0; // 선택 초기화
-						      }
-						  });
-						}
-
-						// 예약된 시간 fetch 함수 (공통으로 사용)
-						function fetchBookedTimes() {
-						  const startDate = form.reservation_start_date.value;
-						  const facilityNo = document.getElementById("modalFacilityNo").value;
-
-						  if (!startDate || !facilityNo) return;
-
-						  fetch(`/resvehicle/booked-times?date=${startDate}&facilityNo=${facilityNo}`)
-						    .then(response => response.json())
-						    .then(bookedTimes => {
-						    	 console.log("!!!!!!!!!!!!예약된 시간 리스트:", bookedTimes);  
-						      console.log("예약된 시간 리스트:", bookedTimes);
-						      disableReservedTimes(bookedTimes);
-						    })
-						    .catch(error => {
-						      console.error(" 예약된 시간 조회 실패:", error);
-						    });
-						}
-
-						// 시작 날짜 변경 시 - 종료 날짜 제한 + 예약된 시간 다시 fetch
-						form.reservation_start_date.addEventListener("change", function () {
-						  const start = form.reservation_start_date.value;
-						  form.reservation_end_date.min = start;
-
-						  if (form.reservation_end_date.value < start) {
-						    form.reservation_end_date.value = start;
-						  }
-
-						  // 예약된 시간 다시 가져오기
-						  fetchBookedTimes();
-						});
-
-						// 모달이 열릴 때 예약된 시간 조회
 						document.addEventListener("DOMContentLoaded", function () {
-						  const modal = document.getElementById("addEventModal");
-						  const facilityInput = document.getElementById("modalFacilityNo");
-
-						  modal.addEventListener("show.bs.modal", function (event) {
-						    const button = event.relatedTarget;
-						    const facilityNo = button.getAttribute("data-facility-no");
-						    facilityInput.value = facilityNo;
-
-						    fetchBookedTimes(); // 모달 열릴 때도 예약된 시간 가져오기
-						  });
-						});
-						
-						  // 예약 등록
-						form.addEventListener("submit", function (e) {
-						  e.preventDefault();
-						
-						  if (!form.reservation_location.value) {
-						    alert('목적지를 입력해주세요!');
-						    return;
-						  }
-						
-						  const startDate = form.reservation_start_date.value;
-						  const endDate = form.reservation_end_date.value;
-						  const startTime = form.startTime.value;
-						  const endTime = form.endTime.value;
-						
-						  const fullStart = `${startDate}T${startTime}`;
-						  const fullEnd = `${endDate}T${endTime}`;
-						
-						  // ⚠유효성 검사
-						  if (!startDate || !endDate || !startTime || !endTime) {
-						    alert("날짜와 시간을 모두 선택해주세요!");
-						    return;
-						  }
-						
-						  if (fullStart >= fullEnd) {
-						    alert("종료일시는 시작일시보다 늦어야 합니다!");
-						    return;
-						  }
-						
-						  // 중복 시간 검사 추가
-						  const startHour = parseInt(startTime.split(":")[0]);
-						  const endHour = parseInt(endTime.split(":")[0]);
-						
-						  const bookedHours = [...form.startTime.options]
-						    .filter(opt => opt.disabled)
-						    .map(opt => parseInt(opt.value.split(":")[0]));
-						
-						  for (let hour = startHour; hour < endHour; hour++) {
-						    if (bookedHours.includes(hour)) {
-						      alert("선택한 시간 범위에 이미 예약된 시간이 포함되어 있습니다!");
-						      return;
-						    }
-						  }
-						
-						  // hidden input에 값 설정
-						  form.calendarStartTime.value = fullStart;
-						  form.calendarEndTime.value = fullEnd;
-						
-						  // FormData 생성 및 참여자 추가
-						  const payload = new FormData(form);
-						  const participantBadges = document.querySelectorAll('#selectedParticipants .badge');
-						  const participantIds = Array.from(participantBadges).map(badge => badge.dataset.id);
-						  participantIds.forEach(id => payload.append("participants", id));
-						
-						  // fetch 전송
-						  fetch('/resvehicle/reservation', {
-						    method: 'post',
-						    headers: {
-						      'header': document.querySelector('meta[name="_csrf_header"]').content,
-						      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-						    },
-						    body: payload
-						  })
-						    .then(response => response.json())
-						    .then(data => {
-						      alert(data.res_msg);
-						      if (data.res_code == 200) {
-						        location.reload();
-						      }
-						    });
-						});
+							  const form = document.addEventForm;
+							  const modal = document.getElementById("addEventModal");
+							  const facilityInput = document.getElementById("modalFacilityNo");
+							  const today = new Date().toISOString().split("T")[0];
+							  form.reservation_start_date.min = today;
+							  form.reservation_end_date.min = today;
 
 
-						</script>
+							  // 예약 등록 submit
+							  form.addEventListener("submit", function (e) {
+							    e.preventDefault();
+
+							    const startDate = form.reservation_start_date.value;
+							    const endDate = form.reservation_end_date.value;
+							    const startTime = form.startTime.value;
+							    const endTime = form.endTime.value;
+
+							    if (!form.reservation_location.value) {
+							      alert("목적지를 입력해주세요!");
+							      return;
+							    }
+
+							    if (!startDate || !endDate || !startTime || !endTime) {
+							      alert("날짜와 시간을 모두 선택해주세요!");
+							      return;
+							    }
+
+							    const fullStart = `${startDate}T${startTime}`;
+							    const fullEnd = `${endDate}T${endTime}`;
+
+							    if (fullStart >= fullEnd) {
+							      alert("종료일시는 시작일시보다 늦어야 합니다!");
+							      return;
+							    }
+
+							    // 중복 시간 검사
+							    const startHour = parseInt(startTime.split(":")[0]);
+							    const endHour = parseInt(endTime.split(":")[0]);
+
+							    const bookedHours = [...form.startTime.options]
+							      .filter(opt => opt.disabled)
+							      .map(opt => parseInt(opt.value.split(":")[0]));
+
+							    for (let hour = startHour; hour < endHour; hour++) {
+							      if (bookedHours.includes(hour)) {
+							        alert("선택한 시간 범위에 이미 예약된 시간이 포함되어 있습니다!");
+							        return;
+							      }
+							    }
+
+							    form.calendarStartTime.value = fullStart;
+							    form.calendarEndTime.value = fullEnd;
+
+							    // FormData 구성
+							    const payload = new FormData(form);
+
+							    fetch('/resvehicle/reservation', {
+							      method: 'POST',
+							      headers: {
+							        'header': document.querySelector('meta[name="_csrf_header"]').content,
+							        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+							      },
+							      body: payload
+							    })
+							      .then(response => response.json())
+							      .then(data => {
+							        alert(data.res_msg);
+							        if (data.res_code == 200) {
+							          location.reload();
+							        }
+							      });
+							  });
+							});
+
+							</script>
+
 						
 
 

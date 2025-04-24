@@ -23,5 +23,16 @@ public interface VehicleRepository extends JpaRepository<Vehicle,Long>,JpaSpecif
 	);
 	 
 	 List<Vehicle> findByFacilityNo(Long facilityNo);
+	 
+	 @Query("SELECT COUNT(v) > 0 FROM Vehicle v " +
+		       "WHERE v.facilityNo = :facilityNo " +
+		       "AND v.visibleYn = 'Y' " +
+		       "AND v.reservationStart < :end " +
+		       "AND v.reservationEnd > :start")
+		boolean existsConflict(
+		    @Param("facilityNo") Long facilityNo,
+		    @Param("start") LocalDateTime start,
+		    @Param("end") LocalDateTime end
+		);
 	
 }

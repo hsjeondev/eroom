@@ -20,5 +20,16 @@ public interface MeetingRoomRepository extends JpaRepository<MeetingRoom,Long>,J
 	);
 	
 	List<MeetingRoom> findBySeparatorCodeAndVisibleYn(String separatorCode, String visibleYn);
-
+	
+	
+	@Query("SELECT COUNT(m) > 0 FROM MeetingRoom m " +
+		       "WHERE m.facilityNo = :facilityNo " +
+		       "AND m.visibleYn = 'Y' " +
+		       "AND m.reservationStart < :end " +
+		       "AND m.reservationEnd > :start")
+		boolean existsConflict(
+		    @Param("facilityNo") Long facilityNo,
+		    @Param("start") LocalDateTime start,
+		    @Param("end") LocalDateTime end
+		);
 }
