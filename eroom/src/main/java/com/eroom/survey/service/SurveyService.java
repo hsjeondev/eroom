@@ -10,33 +10,37 @@ import com.eroom.survey.entity.Survey;
 import com.eroom.survey.entity.SurveyItem;
 import com.eroom.survey.repository.SurveyItemRepository;
 import com.eroom.survey.repository.SurveyRepository;
+import com.eroom.survey.repository.SurveyVoteRepository;
+import com.eroom.survey.repository.SurveyVoterRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class SurveyService {
+
 	private final SurveyRepository surveyRepository;
 	private final SurveyItemRepository surveyItemRepository;
 
-	public int saveSurvey(SurveyDto surveyDto, SurveyItemDto surveyItemDto) {
-		int result = 0;
+	public Long saveSurvey(SurveyDto surveyDto, SurveyItemDto surveyItemDto) {
+		Long result = null;
 		try {
 			Survey savedSurvey = surveyRepository.save(surveyDto.toEntity());
 			Long surveyNo = savedSurvey.getSurveyNo();
-			
-			for(String item : surveyItemDto.getItems()) {
-				SurveyItem surveyItem = SurveyItem.builder()
-						.item(item)
-						.surveyNo(surveyNo)
-						.build();
+
+			for (String item : surveyItemDto.getItems()) {
+				SurveyItem surveyItem = SurveyItem.builder().item(item).surveyNo(surveyNo).build();
 				surveyItemRepository.save(surveyItem);
 			}
-			
-			result = 1;
+			result = surveyNo;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return result;
 	}
+
+	public List<Survey> findAllSurvey() {
+		return surveyRepository.findAll();
+	}
+
 }

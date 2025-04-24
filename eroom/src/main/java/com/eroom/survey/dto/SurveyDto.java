@@ -1,7 +1,9 @@
 package com.eroom.survey.dto;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.eroom.survey.entity.Survey;
 
@@ -20,32 +22,33 @@ import lombok.ToString;
 @Builder
 public class SurveyDto {
 	private Long surveyNo;
+	private String writer;
 	private String surveyTitle;
-	private LocalDate deadline;
-    private String anonymousVote = "N";
-    private String allowMultiple = "N";
-	private Long employeeNo;
+	private LocalDateTime deadline;
+    private String anonymousVote = "off";
+    private String allowMultiple = "off";
+	@CreationTimestamp
 	private LocalDateTime regDate;
 	
 	public Survey toEntity() {
 		return Survey.builder()
 				.surveyNo(surveyNo)
+				.writer(writer)
 				.surveyTitle(surveyTitle)
 				.deadline(deadline)
-				.anonymousVote(anonymousVote != null ? anonymousVote : "N")
-				.allowMultiple(allowMultiple != null ? allowMultiple : "N")
-				.employeeNo(employeeNo)
+				.anonymousVote(anonymousVote)
+				.allowMultiple(allowMultiple)
 				.build();
 	}
 	
 	public SurveyDto toDto(Survey survey) {
 		return SurveyDto.builder()
 				.surveyNo(survey.getSurveyNo())
+				.writer(survey.getWriter())
 				.surveyTitle(survey.getSurveyTitle())
 				.deadline(survey.getDeadline())
 				.anonymousVote(survey.getAnonymousVote())
 				.allowMultiple(survey.getAllowMultiple())
-				.employeeNo(survey.getEmployeeNo())
 				.build();
 	}
 }

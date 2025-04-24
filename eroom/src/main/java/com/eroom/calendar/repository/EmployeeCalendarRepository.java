@@ -8,5 +8,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.eroom.calendar.entity.EmployeeCalendar;
 
 public interface EmployeeCalendarRepository extends JpaRepository<EmployeeCalendar,Long>,JpaSpecificationExecutor<EmployeeCalendar> {
-	List<EmployeeCalendar> findByEmployeeEmployeeNo(Long employeeNo);
+	List<EmployeeCalendar> findByEmployeeNoAndVisibleYnAndSeparator(Long employeeNo, String visibleYn, String separator);
+	
+	
+	
 }

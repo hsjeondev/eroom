@@ -18,10 +18,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name="attendance")
 @Builder
+@Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,8 +38,7 @@ public class Attendance {
 	@Column(updatable=false,name="attendance_check_in_time")
 	private LocalDateTime attendanceCheckInTime; // 출근 시간
 
-	@CreationTimestamp
-	@Column(updatable=false,name="attendance_check_out_time")
+	@Column(name="attendance_check_out_time")
 	private LocalDateTime attendanceCheckOutTime; // 퇴근 시간
 	
 	@Column(name="attendance_late_yn")

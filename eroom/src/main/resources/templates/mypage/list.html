@@ -5,6 +5,7 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{/include/layout}">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <meta charset="UTF-8">
 <title>마이페이지</title>
 <style>
@@ -37,7 +38,34 @@
     .profile-wrapper:hover .camera-overlay {
       opacity: 1;
     }
-  </style>
+ 
+   .bg-primary-soft {
+    background-color: rgba(13, 110, 253, 0.1); /* Bootstrap primary with 투명도 */
+  }
+  .bg-success-soft {
+    background-color: rgba(25, 135, 84, 0.1); /* Bootstrap success with 투명도 */
+  }   
+
+	.carousel-indicators {
+	  bottom: -26px; /* ✅ 기본보다 아래로 내림 */
+	  justify-content: center; /* ✅ 가운데 정렬 (기본) */
+	} 
+	
+	.carousel-indicators [data-bs-target] {
+	  width: 10px;
+	  height: 3px;
+	/*   background-color: rgba(13, 110, 253, 0.5); */ /* 반투명 primary */
+	  background-color: rgba(108, 117, 125, 0.5); /* secondary 반투명 */  
+	/*   margin: 0 4px; */
+	/*   border-radius: 50%; */
+	  border: none;
+	}
+	
+	.carousel-indicators .active {
+	 /*  background-color: #0d6efd; */ /* 활성화된 점 */
+	  background-color: #6c757d; /* secondary 진한 색 */  
+	}
+</style>
 </head>
 <body>
 <main class="main" id="top" layout:fragment="content">
@@ -46,31 +74,10 @@
 		<!-- 상단 제목 -->
 		<div class="d-flex justify-content-start">
 			<span class="fw-bold fs-6">마이페이지</span>
-		</div> 
-	<!-- 삭제. 수정 버튼 col-auto로 하면 왼쪽 col-auto ms-auto 는 오른쪽 -->
-<!-- 		<div class="col-auto ms-auto">
-			<div class="row g-3">
-				<div class="col-auto">
-					<button class="btn btn-phoenix-danger">
-						<svg class="svg-inline--fa fa-trash-can me-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-can" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
-							<path fill="currentColor" d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z"></path>
-						</svg><span class="fa-solid fa-trash-can me-2"></span> Font Awesome fontawesome.com
-						Delete customer
-					</button>
-				</div>
-				<div class="col-auto">
-					<button class="btn btn-phoenix-secondary">
-						<svg class="svg-inline--fa fa-key me-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="key" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
-							<path fill="currentColor" d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"></path>
-						</svg><span class="fas fa-key me-2"></span> Font Awesome fontawesome.com
-						Reset password
-					</button>
-				</div>
-			</div>
-		</div> -->
-	</div>
+		</div>
+	</div>	
 
-	<div class="row g-5">
+    <div class="row g-5">
 		<div class="col-12 col-md-4 col-xxl-4">
 			<div class="row g-3">
 				<div class="col-12">
@@ -78,34 +85,30 @@
 						<div class="card-body">
 							<div class="row align-items-center g-5 mb-3 text-center text-sm-start">
 								<div class="col-12 col-sm-auto mb-sm-2">
-								
-								  <div class="profile-wrapper" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
-								    <img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
-								    <div class="camera-overlay">
-								      <svg class="svg-inline--fa fa-camera fs-4" aria-hidden="true" focusable="false"
-								        data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg"
-								        viewBox="0 0 512 512" style="width: 24px; height: 24px;">
-								        <path fill="currentColor"
-								          d="M149.1 64.3c7.8-14.3 22.9-23.1 39.4-23.1h134.9c16.5 0 31.6 8.9 39.4 23.1l14.9 27.4H464c26.5 0 48 21.5 48 48v272c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V139.7c0-26.5 21.5-48 48-48h86.1l14.9-27.4zM256 408c66.3 0 120-53.7 120-120s-53.7-120-120-120s-120 53.7-120 120s53.7 120 120 120zm0-48a72 72 0 1 0 0-144 72 72 0 1 0 0 144z">
-								        </path>
-								      </svg>
-								    </div>
-								  </div>
+									<div class="profile-wrapper" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
+										<img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
+										<div class="camera-overlay">
+											<svg class="svg-inline--fa fa-camera fs-4" aria-hidden="true" focusable="false"
+											  data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg"
+											  viewBox="0 0 512 512" style="width: 24px; height: 24px;">
+												  <path fill="currentColor"
+												    d="M149.1 64.3c7.8-14.3 22.9-23.1 39.4-23.1h134.9c16.5 0 31.6 8.9 39.4 23.1l14.9 27.4H464c26.5 0 48 21.5 48 48v272c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V139.7c0-26.5 21.5-48 48-48h86.1l14.9-27.4zM256 408c66.3 0 120-53.7 120-120s-53.7-120-120-120s-120 53.7-120 120s53.7 120 120 120zm0-48a72 72 0 1 0 0-144 72 72 0 1 0 0 144z">
+												  </path>
+											</svg>
+										</div>
+									</div>
 								</div>
-								
-								
-
 								 <!-- 프로필 상단 -->
 								<div class="col-12 col-sm-auto flex-1">
 									<!-- 이름 -->
 									<div class="d-flex">
-										<span class="fw-bold fs-7">강성관</span>
+										<span class="fw-bold fs-7" th:text="${employee.employeeName}">이름</span>
 									</div>
 									<!-- 직급 -->
-									<p class="text-body-secondary">CEO</p>
+									<p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p>
 								</div>
 							</div>
-							<!-- 하단 정보 -->
+						<!-- 하단 정보 -->
 							<div class="d-flex flex-between-center border-top border-dashed pt-4">
 								<div>
 									<h6>Following</h6>
@@ -120,548 +123,556 @@
 									<p class="fs-7 text-body-secondary mb-0">97</p>
 								</div>
 							</div>
-						</div>
-					</div>
-				</div>
+						</div><!-- card-body -->
+					</div><!-- card h-100 -->
+				</div><!-- col-12 -->
 				<!-- 주소록 정보 -->
-			<div class="col-12">
-			  <div class="card h-100 position-relative">
-			    <div class="card-body fs-9">
-			      <div class="d-flex align-items-center mb-2">
-			        <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span>
-			
-			        <!--  수정 버튼 -->
-			        <button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
-			                data-bs-toggle="modal" data-bs-target="#editInfoModal">
-			          <svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
-			               focusable="false" data-prefix="fas" data-icon="pen" role="img"
-			               xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-			            <path fill="currentColor"
-			                  d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
-			          </svg>
-			        </button>
-			      </div>
-			
-			      <!-- 기본 정보 -->
-			      <h5 class="text-body-secondary">직급</h5>
-			      <p class="text-body-secondary">CEO</p>
-			
-			      <h5 class="text-body-secondary">부서</h5>
-			      <p class="text-body-secondary">운영부</p>
-			
-			      <div class="mb-3">
-			        <h5 class="text-body-secondary">Email</h5>
-			        <a href="mailto:shatinon@jeemail.com" id="emailValue">shatinon@jeemail.com</a>
-			      </div>
-			
-			      <h5 class="text-body-secondary">Phone</h5>
-			      <p class="text-body-secondary" id="phoneValue">01011112222</p>
-			
-			      <h5 class="text-body-secondary">주소</h5>
-			      <p class="text-body-secondary" id="addressValue">서울특별시 금천구 가산디지털2로 95</p>
-			    </div>
-			  </div>
-			</div>
-			<!-- 주소록 끝 -->
+				<div class="col-12">
+					<div class="card h-100 position-relative">
+						<div class="card-body fs-9">
+							<div class="d-flex align-items-center mb-2">
+								<!-- <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span> -->
+								
+								<!--  수정 버튼 -->
+								<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
+								        data-bs-toggle="modal" data-bs-target="#editInfoModal">
+									<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
+									     focusable="false" data-prefix="fas" data-icon="pen" role="img"
+									     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+										<path fill="currentColor"
+									        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
+									</svg>
+								</button>
+							</div>
+						
+							<!-- 기본 정보 -->
+							<h5 class="text-body-secondary">사번</h5>
+							<p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
+
+							<h5 class="text-body-secondary">직급</h5>
+							<p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p>
 							
-			<!-- 정보 수정 모달 -->
-			<div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editInfoModalLabel" aria-hidden="true">
-			  <div class="modal-dialog modal-dialog-centered">
-			    <div class="modal-content">
-			      <div class="modal-header">
-			        <h5 class="modal-title" id="editInfoModalLabel">정보 수정</h5>
-			        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-			      </div>
-			      <div class="modal-body">
-			        <form id="editInfoForm">
-			          <div class="mb-3">
-			            <label for="emailInput" class="form-label">이메일</label>
-			            <input type="email" class="form-control" id="emailInput" required>
-			          </div>
-			          <div class="mb-3">
-			            <label for="phoneInput" class="form-label">전화번호</label>
-			            <input type="text" class="form-control" id="phoneInput" required>
-			          </div>
-			          <div class="mb-3">
-			            <label for="addressInput" class="form-label">주소</label>
-			            <input type="text" class="form-control" id="addressInput" required>
-			          </div>
-			        </form>
-			      </div>
-			      <div class="modal-footer">
-			        <button class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-			        <button class="btn btn-primary" onclick="saveInfo()">저장</button>
-			      </div>
+							<h5 class="text-body-secondary">부서</h5>
+							<p class="text-body-secondary" th:text="${departmentName != null ? departmentName : '-'}">부서</p>
+							
+							<div class="mb-3">
+							  <h5 class="text-body-secondary">Email</h5>
+							  <a href="mailto:shatinon@jeemail.com" id="emailValue" th:text="${directory != null and directory.directory_email != null ? directory.directory_email : '-'}">Email</a>
+							</div>
+							
+							<h5 class="text-body-secondary">Phone</h5>
+							<p class="text-body-secondary" id="phoneValue" th:text="${directory != null and directory.directory_phone != null ? directory.directory_phone : '-'}">01000000000</p>
+							
+							<!-- <h5 class="text-body-secondary">주소</h5>
+							<p class="text-body-secondary" id="addressValue">서울특별시 금천구 가산디지털2로 95</p> -->
+						</div><!-- card-body -->
+					</div><!-- card h-100 -->
+				</div><!-- col-12 -->
+				<!-- 주소록 끝 -->
+							
+			</div> <!-- row g-3 프로필 & 주소록 끝 -->
+		</div> <!-- col-12 col-md-4 col-xxl-4 -->
+		<!-- 상단 우측 -->
+		<div class="col-12 col-md-8 col-xxl-8">
+			<div class="row g-4">
+				<!-- 우측: 정보 요약 카드 -->
+				<div class="col-md-12">
+				
+					<!-- 결재 & 프로젝트 활동 요약 카드 차트 -->
+					<div class="card p-4 mb-4 shadow-sm">
+						<h5 class="fw-bold mb-3">결재 및 프로젝트 활동 요약</h5>
+						<canvas id="approvalProjectChart" height="200"></canvas>
+					</div>				
+				
+					<!-- 최근 결재문서 -->
+					<div class="card p-3 mb-4">
+						<div class="d-flex justify-content-start">
+							<span class="fw-bold fs-8">결재 문서</span>
+						</div>
+						<!-- <h5 class="fw-bold mb-3">결재 문서 요약</h5> -->
+						<div class="row g-3">
+						  
+							<!-- 진행 중인 결재 문서 -->
+							<div class="col-md-6 position-relative">
+								<div class="d-flex justify-content-center align-items-center gap-2">
+									<i class="fas fa-circle fs-10 text-primary mt-n1"></i>
+									<span class="fw-bold fs-9">진행 중인 결재</span>
+								</div>
+								<!-- <h6 class="fw-bold mb-2">📌 진행 중인 결재</h6> -->
+								<div id="approvalPendingCarousel" class="carousel slide" data-bs-ride="carousel">
+									<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+									<div class="carousel-indicators">
+									  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+									  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+									  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+									</div>								
+									<div class="carousel-inner px-4">
+										<div class="carousel-item active">
+										  <div class="border rounded p-3 bg-primary-soft">
+										    <h6 class="mb-1">회의실 예약 요청</h6>
+										    <p class="text-muted mb-0">2025-04-14</p>
+										  </div>
+										</div>
+										<div class="carousel-item">
+										  <div class="border rounded p-3 bg-primary-soft">
+										    <h6 class="mb-1">출장 신청서</h6>
+										    <p class="text-muted mb-0">2025-04-13</p>
+										  </div>
+										</div>
+									</div>
+									<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+									        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="prev"
+									        style="top: 60%; left: -10px; z-index: 2;">
+										<i class="fas fa-chevron-left fs-7"></i>
+									</button>
+									<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+									        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="next"
+									        style="top: 60%; right: -10px; z-index: 2;">
+										<i class="fas fa-chevron-right fs-7"></i>
+									</button>
+								</div>
+							</div>
+						
+							<!-- 승인 완료된 결재 문서 -->
+							<div class="col-md-6 position-relative">
+								<div class="d-flex justify-content-center align-items-center gap-2">
+									<i class="fas fa-circle fs-10 text-success mt-n1"></i>
+									<span class="fw-bold fs-9">승인된 결재</span>
+								</div>
+								<!-- <h6 class="fw-bold mb-2">✅ 승인된 결재</h6> -->
+								<div id="approvalApprovedCarousel" class="carousel slide" data-bs-ride="carousel">
+									<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+									<div class="carousel-indicators">
+									  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+									  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+									  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+									</div>								
+									<div class="carousel-inner px-4">
+										<div class="carousel-item active">
+										  <div class="border rounded p-3 bg-success-soft">
+										    <h6 class="mb-1">연차 신청서</h6>
+										    <p class="text-muted mb-0">2025-04-10</p>
+										  </div>
+										</div>
+										<div class="carousel-item">
+										  <div class="border rounded p-3 bg-success-soft">
+										    <h6 class="mb-1">출장 보고서</h6>
+										    <p class="text-muted mb-0">2025-04-08</p>
+										  </div>
+										</div>
+									</div>
+									<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+									        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="prev"
+									        style="top: 60%; left: -10px; z-index: 2;">
+										<i class="fas fa-chevron-left fs-7"></i>
+									</button>
+									<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+									        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="next"
+									        style="top: 60%; right: -10px; z-index: 2;">
+										<i class="fas fa-chevron-right fs-7"></i>
+									</button>
+								</div>
+							</div>
+						
+						</div>
+					</div>
+					<!-- 최근 결재문서 끝 -->
+					
+					<!-- 참여 프로젝트 -->
+					<!-- 참여 중인 프로젝트 슬라이드 형태 -->
+					<div class="card p-3 mb-4">
+						<div class="d-flex justify-content-start">
+							<span class="fw-bold fs-8">프로젝트</span>
+						</div>
+						<!-- <h5 class="fw-bold mb-3">나의 프로젝트</h5> -->
+						<div class="row g-3">
+							<!-- 참여 중인 프로젝트 -->
+							<div class="col-md-6 position-relative">
+								<div class="d-flex justify-content-center align-items-center gap-2">
+									<i class="fas fa-circle fs-10 text-primary mt-n1"></i>
+									<span class="fw-bold fs-9">진행 중인 프로젝트</span>
+								</div>
+								<!-- <h6 class="fw-bold mb-2">참여 중인 프로젝트</h6> -->
+								<div id="projectActiveCarousel" class="carousel slide" data-bs-ride="carousel">
+									<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+									<div class="carousel-indicators">
+									  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+									  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+									  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+									</div>
+									<!-- 예시 -->
+									<!-- <div class="carousel-indicators">
+									  <th:block th:each="slide, i : ${slideList}">
+									    <button type="button"
+									            th:data-bs-target="#myCarousel"
+									            th:data-bs-slide-to="${i.index}"
+									            th:classappend="${i.index == 0} ? 'active'"
+									            th:aria-label="'슬라이드 ' + ${i.index + 1}">
+									    </button>
+									  </th:block>
+									</div> -->
+									
+									<div class="carousel-inner px-4">
+										<div class="carousel-item active">
+										  <div class="border rounded p-3 bg-primary-soft">
+										    <h6 class="mb-1">Flowlog</h6>
+										    <p class="mb-0 text-muted">실시간 근태 차트 및 자동 연차 계산</p>
+										  </div>
+										</div>
+										<div class="carousel-item">
+										  <div class="border rounded p-3 bg-primary-soft">
+										    <h6 class="mb-1">click click</h6>
+										    <p class="mb-0 text-muted">회원가입/로그인, WebSocket</p>
+										  </div>
+										</div>
+									</div>
+									<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+									        type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="prev"
+									        style="top: 60%; left: -10px; z-index: 2;">
+										<i class="fas fa-chevron-left fs-7"></i>
+									</button>
+									<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+									        type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="next"
+									        style="top: 60%; right: -10px; z-index: 2;">
+										<i class="fas fa-chevron-right fs-7"></i>
+									</button>
+								</div>
+							</div>
+						
+							<!-- 완료한 프로젝트 -->
+							<div class="col-md-6 position-relative">
+								<div class="d-flex justify-content-center align-items-center gap-2">
+									<i class="fas fa-circle fs-10 text-success mt-n1"></i>
+									<span class="fw-bold fs-9">완료한 프로젝트</span>
+								</div>
+								<!-- <h6 class="fw-bold mb-2">완료한 프로젝트</h6> -->
+								<div id="projectDoneCarousel" class="carousel slide" data-bs-ride="carousel">
+									<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+									<div class="carousel-indicators">
+									  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+									  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+									  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+									</div>								
+									<div class="carousel-inner px-4">
+										<div class="carousel-item active">
+										  <div class="border rounded p-3 bg-success-soft">
+										    <h6 class="mb-1">Portfolio Page</h6>
+										    <p class="mb-0 text-muted">Notion 기반 포트폴리오</p>
+										  </div>
+										</div>
+										<div class="carousel-item">
+										  <div class="border rounded p-3 bg-success-soft">
+										    <h6 class="mb-1">KDT Diary</h6>
+										    <p class="mb-0 text-muted">Java 기반 할일관리 앱, 페이징</p>
+										  </div>
+									  </div>
+									</div>
+									<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+									        type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="prev"
+									        style="top: 60%; left: -10px; z-index: 2;">
+										<i class="fas fa-chevron-left fs-7"></i>
+									</button>
+									<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+									        type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="next"
+									        style="top: 60%; right: -10px; z-index: 2;">
+										<i class="fas fa-chevron-right fs-7"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+<!-- 					<div th:each="item, stat : ${carouselList}">
+					  <div class="carousel-item" th:classappend="${stat.index == 0} ? ' active'">
+					    <div class="border rounded p-3"
+					         th:classappend="${item.status == '진행중'} ? ' bg-primary-soft' : ' bg-success-soft'">
+					      <h6 class="mb-1" th:text="${item.title}">제목</h6>
+					      <p class="text-muted mb-0" th:text="${item.date}">2025-04-14</p>
+					    </div>
+					  </div>
+					</div> -->
+
+					<!-- 참여프로젝트 끝 -->
+				</div><!-- col-md-12 -->
+			<!-- 우측 정보 -->
+			</div><!-- row g-4 -->
+		</div><!-- col-12 col-md-8 col-xxl-8 -->
+	</div><!-- row g-5 -->	
+</div><!-- mb-9(상단 프로필+주소록, 결재/프로젝트 -->
+
+
+<div class="mb-9">
+	<!-- 북마크 게시글 목록 -->
+	<div class="card-body pt-0">
+		<div class="d-flex justify-content-start align-items-center mb-2">
+		  <i class="fas fa-bookmark text-primary me-2"></i>
+		  <span class="fw-bold fs-7">북마크게시글</span>
+		</div>
+		<div class="row gx-xxl-9" id="bulk-select-body">
+			<div id="bookmarkTable" data-list='{"valueNames":["no","title","writer","views","date"], "page": 5, "pagination": true}'>
+				<div class="table-responsive">
+					<table class="table table-sm fs-9 mb-0 text-center">
+						<thead class="text-center align-middle">
+							<tr>
+								<th class="sort" data-sort="no" style="width: 60px;">번호</th>
+								<th class="sort" data-sort="title">글 제목</th>
+								<th class="sort" data-sort="writer">작성자</th>
+								<th class="sort" data-sort="views">조회수</th>
+								<th class="sort" data-sort="date">등록일</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody class="list align-middle">
+							<tr>
+								<td class="no">1</td>
+								<td class="title"><svg class="svg-inline--fa fa-folder fs-9 text-body-tertiary" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="folder" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 16px; height: 16px;"><path fill="currentColor" d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"></path></svg> <a class="fw-semibold text-body-highlight name" href="#">게시글 제목</a></td>
+								<td class="writer">작성자명</td>
+								<td class="views">123</td>
+								<td class="date">2025-04-10</td>
+								<td>
+								  <button class="btn btn-sm btn-reveal" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								    <i class="fas fa-ellipsis"></i>
+								  </button>
+								  <div class="dropdown-menu dropdown-menu-end py-2">
+								    <a class="dropdown-item" href="#">수정</a>
+								    <a class="dropdown-item text-danger" href="#">삭제</a>
+								  </div>
+								</td>
+							</tr>
+							<tr>
+								<td class="no">2</td>
+								<td class="title"><img src="../../assets/img/file-manager/9.png" alt="파일" style="width: 16px; height: 16px;" class="rounded" /> <a class="fw-semibold text-body-highlight name" href="#">Retro Ring.jpg</a></td>
+								<td class="writer">작성자명</td>
+								<td class="views">123</td>
+								<td class="date">2025-04-10</td>
+								<td>
+									<button class="btn btn-sm btn-reveal" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									  <i class="fas fa-ellipsis"></i>
+									</button>
+									<div class="dropdown-menu dropdown-menu-end py-2">
+									  <a class="dropdown-item" href="#">수정</a>
+									  <a class="dropdown-item text-danger" href="#">삭제</a>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			  <div class="d-flex justify-content-center mt-3">
+			    <div class="d-flex align-items-center">
+			      <button class="page-link px-3 me-2" data-list-pagination="prev" disabled><i class="fas fa-chevron-left"></i></button>
+			      <ul class="pagination mb-0"></ul>
+			      <button class="page-link px-3 ms-2" data-list-pagination="next"><i class="fas fa-chevron-right"></i></button>
 			    </div>
 			  </div>
 			</div>
-			
-			<script>
-			  // 모달 열릴 때 input에 기존 정보 세팅
-			  const editInfoModal = document.getElementById('editInfoModal');
-			  editInfoModal.addEventListener('show.bs.modal', function () {
-			    const email = document.getElementById('emailValue').textContent.trim();
-			    const phone = document.getElementById('phoneValue').textContent.trim();
-			    const address = document.getElementById('addressValue').textContent.trim();
-			
-			    document.getElementById('emailInput').value = email;
-			    document.getElementById('phoneInput').value = phone;
-			    document.getElementById('addressInput').value = address;
-			  });
-			
-			  // 저장 버튼 클릭 시 값 반영
-			  function saveInfo() {
-			    const email = document.getElementById('emailInput').value;
-			    const phone = document.getElementById('phoneInput').value;
-			    const address = document.getElementById('addressInput').value;
-			
-			    // 카드 안 텍스트 갱신
-			    document.getElementById('emailValue').textContent = email;
-			    document.getElementById('emailValue').href = "mailto:" + email;
-			    document.getElementById('phoneValue').textContent = phone;
-			    document.getElementById('addressValue').textContent = address;
-			
-			    // 모달 닫기
-			    const modal = bootstrap.Modal.getInstance(editInfoModal);
-			    modal.hide();
-			  }
-			</script>			
-				
-			
-			</div> <!-- 프로필 & 주소록 끝 -->
-		</div> <!-- col-12 col-md-4 col-xxl-4 -->
-		
-		<!-- 근태 카드 -->
-		<div class="col-12 col-md-8 col-xxl-8">
-			<div class="row g-4">			
-				<!-- 카드1 START -->
-				<div class="col-md-6">
-					<div class="deals-col me-4">
-						<div class="w-100 h-50" data-sortable="data-sortable">
-							<div class="card mb-3">
-								<div class="card-body">
-									<table class="w-100 text-center mx-auto w-auto text-center">
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">총 연차</span>
-													</div>
-												</div>		
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">  
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">사용 연차</span>
-													</div>
-												</div>
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">잔여 연차</span>
-													</div>
-												</div>
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-									</table>
-								</div> <!-- card-body 끝 -->
-							</div> <!-- card mb-3 끝 -->
-						</div> <!-- w-100 min-vh-50 끝  -->
-					</div><!-- deals-col me-4 끝 -->
-				</div><!-- col-md-6 -->
-	            <!-- 카드1 END -->		
-				
-				<div class="col-md-6">
-					<div class="deals-col me-4">
-						<div class="w-100 h-50" data-sortable="data-sortable">
-							<div class="card mb-3">
-								<div class="card-body">
-									<table class="w-100 text-center mx-auto w-auto text-center">
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">지각</span>
-													</div>
-												</div>		
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">  
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">조퇴</span>
-													</div>
-												</div>
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">결근</span>
-													</div>
-												</div>
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-									</table>
-								</div> <!-- card-body 끝 -->
-							</div> <!-- card mb-3 끝 -->
-						</div> <!-- w-100 min-vh-50 끝  -->
-					</div><!-- deals-col me-4 끝 -->              
-				</div><!-- col-md-6 -->
-
-
-				<!-- 차트 -->
-				<div class="row flex-between-center mb-4 g-3">
-					<div class="col-auto">
-						<div class="d-flex justify-content-start">
-							<span class="fw-bold fs-7">근무 시간</span>
-						</div>
-						<p class="text-body-tertiary lh-sm mb-0">
-						  Payment received across all channels
-						</p>
-					</div>
-					<div class="col-8 col-sm-4">
-						<select class="form-select form-select-sm" id="select-gross-revenue-month">
-						  <option>Mar 1 - 31, 2022</option>
-						  <option>April 1 - 30, 2022</option>
-						  <option>May 1 - 31, 2022</option>
-						</select>
-					</div>
-				</div>
-				
-				<div class="echart-total-sales-chart"
-				     style="min-height: 220px; width: 100%; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;">
-					<div style="position: relative; width: 854px; height: 320px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
-						<canvas data-zr-dom-id="zr_0"
-						        width="1067"
-						        height="400"
-						        style="position: absolute; left: 0px; top: 0px; width: 854px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;">
-						</canvas>
-						<canvas data-zr-dom-id="zr_1"
-						        width="1067"
-						        height="400"
-						        style="position: absolute; left: 0px; top: 0px; width: 854px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;">
-						</canvas>
-						<canvas data-zr-dom-id="zr_2"
-						        width="1067"
-						        height="400"
-						        style="position: absolute; left: 0px; top: 0px; width: 854px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;">
-						</canvas>
-					</div>
-				
-					<div class=""
-					     style="position: absolute; display: block; border-style: solid; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; background-color: rgb(239, 242, 246); border-width: 1px; border-radius: 4px; color: rgb(20, 24, 36); font: 14px / 21px 'Microsoft YaHei'; padding: 10px; top: 0px; left: 0px; transform: translate3d(44px, 109px, 0px); border-color: rgb(203, 208, 221); z-index: 1000; pointer-events: none; visibility: hidden; opacity: 0;">
-						<div class="ms-1">
-							<h6 class="fs-9 text-body-tertiary false">
-								<svg class="svg-inline--fa fa-circle me-2" style="color: #3874ff;" aria-hidden="true"
-								     focusable="false" data-prefix="fas" data-icon="circle" role="img"
-								     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
-								     data-fa-i2svg="">
-								  <path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
-								</svg>
-								May 01 : 100
-							</h6>
-							<h6 class="fs-9 text-body-tertiary mb-0">
-								<svg class="svg-inline--fa fa-circle me-2" style="color: #0097eb;" aria-hidden="true"
-								     focusable="false" data-prefix="fas" data-icon="circle" role="img"
-								     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
-								     data-fa-i2svg="">
-								  <path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
-								</svg>
-								Apr 01 : 200
-							</h6>
-						</div>
-					</div>
-				</div>
-
-			</div> <!-- row g-4 끝 -->
-		
-		</div> <!-- col-12 col-md-8 col-xxl-8 -->	<!-- 우측 근태카드 + 차트 부분 끝 -->
-	</div>	<!-- row g-5 --> 
-</div><!-- mb-9 -->   <!-- 프로필, 근태, 차트 위치된 상단 부분. -->
-
-<hr>
-<!-- 결재 내역 -->    
-<div class="card-body pt-0">
-	<!--  <div class="myfiles-action-bar mx-n4 mb-4"> -->
-	<div class="d-flex justify-content-start align-items-center mb-2">
-	  <i class="fas fa-file-lines text-primary me-2"></i>
-	  <span class="fw-bold fs-7">최근 결재</span>
-	</div>
-	<!-- </div> -->
-	<div class="row gx-xxl-9" id="bulk-select-body">
-		  <div id="approvalTable" data-list='{"valueNames":["no","title","writer","approver","date"], "page": 5, "pagination": true}'>
-			<div class="table-responsive">
-				<table class="table table-sm fs-9 mb-0 text-center">
-				
-					<thead class="text-center align-middle">
-						<tr>
-							<th class="sort" data-sort="no" style="width: 60px;">번호</th>
-							<th class="sort" data-sort="title">글 제목</th>
-							<th class="sort" data-sort="writer">작성자</th>
-							<th class="sort" data-sort="approver">결재자</th>
-							<th class="sort" data-sort="date">등록일</th>
-							<th></th>
-						</tr>
-					</thead>
-					
-					<tbody class="list align-middle">
-						<tr>
-							<td class="no">1</td>
-							<td class="title">
-								<!-- <div class="d-flex align-items-center gap-3 ps-5"> -->
-									<svg class="svg-inline--fa fa-folder fs-9 text-body-tertiary" aria-hidden="true" focusable="false"
-									data-prefix="fas" data-icon="folder" role="img" xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 512 512" style="width: 16px; height: 16px;">
-									<path fill="currentColor" d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"></path>
-									</svg>
-									<a class="fw-semibold text-body-highlight name" href="#!">게시글 제목</a>
-								<!-- </div> -->
-							</td>
-							<td class="writer">작성자명</td>
-							<td class="approver">결재자명</td>
-							<td class="date">2025.04.12</td>
-							<td>
-								<button class="btn btn-sm btn-reveal" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								  <i class="fas fa-ellipsis"></i>
-								</button>
-								<div class="dropdown-menu dropdown-menu-end py-2">
-								  <a class="dropdown-item" href="#">수정</a>
-								  <a class="dropdown-item text-danger" href="#">삭제</a>
-								</div>
-							</td>
-						</tr>
-						
-						<tr>
-							<td class="no">2</td>
-							<td class="title">
-								<!-- <div class="d-flex align-items-center gap-3 ps-5"> -->
-									<img src="../../assets/img/file-manager/9.png" alt="파일" style="width: 16px; height: 16px;" class="rounded" />
-									<a class="fw-semibold text-body-highlight name" href="#!">Retro Ring.jpg</a>
-								<!-- </div> -->
-							</td>
-							<td class="writer">작성자명</td>
-							<td class="approver">결재자명</td>
-							<td class="date">2025.04.11</td>
-							<td>
-								<button class="btn btn-sm btn-reveal" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									<i class="fas fa-ellipsis"></i>
-								</button>
-								<div class="dropdown-menu dropdown-menu-end py-2">
-									<a class="dropdown-item" href="#">수정</a>
-									<a class="dropdown-item text-danger" href="#">삭제</a>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		
-			<!-- 페이징 -->
-			<div class="d-flex justify-content-center mt-3">
-				<div class="d-flex align-items-center">
-					<button class="page-link px-3 me-2" data-list-pagination="prev" disabled>
-					  <i class="fas fa-chevron-left"></i>
-					</button>
-					<ul class="pagination mb-0"></ul>
-					<button class="page-link px-3 ms-2" data-list-pagination="next">
-					  <i class="fas fa-chevron-right"></i>
-					</button>
-				</div>
-			</div>
 		</div>
 	</div>
 
-</div> <!-- 결재 목록 끝 -->      
-
-
-<hr>
-
-<!-- 북마크 게시글 목록 -->    
-<div class="card-body pt-0">
-	<!--  <div class="myfiles-action-bar mx-n4 mb-4"> -->
-	<div class="d-flex justify-content-start align-items-center mb-2">
-		<i class="fas fa-bookmark text-primary me-2"></i> <!-- warning:노랑/danger:빨강/secondary:회색/success:초록/primary:파랑 -->
-		<span class="fw-bold fs-7">북마크게시글</span>
-	</div>
-	<!-- </div> -->
-	<div class="row gx-xxl-9" id="bulk-select-body">
-		  <div id="bookmarkTable" data-list='{"valueNames":["no","title","writer","views","date"], "page": 5, "pagination": true}'>
-			<div class="table-responsive">
-				<table class="table table-sm fs-9 mb-0 text-center">
-				
-					<thead class="text-center align-middle">
-						<tr>
-							<th class="sort" data-sort="no" style="width: 60px;">번호</th>
-							<th class="sort" data-sort="title">글 제목</th>
-							<th class="sort" data-sort="writer">작성자</th>
-							<th class="sort" data-sort="views">조회수</th>
-							<th class="sort" data-sort="date">등록일</th>
-							<th></th>
-						</tr>
-					</thead>
-					
-					<tbody class="list align-middle">
-						<tr>
-							<td class="no">1</td>
-							<td class="title">
-								<!-- <div class="d-flex align-items-center gap-3 ps-5"> -->
-									<svg class="svg-inline--fa fa-folder fs-9 text-body-tertiary" aria-hidden="true" focusable="false"
-									data-prefix="fas" data-icon="folder" role="img" xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 512 512" style="width: 16px; height: 16px;">
-									<path fill="currentColor" d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"></path>
-									</svg>
-									<a class="fw-semibold text-body-highlight name" href="#!">게시글 제목</a>
-								<!-- </div> -->
-							</td>
-							<td class="writer">작성자명</td>
-							<td class="views">123</td>
-							<td class="date">2025-04-10</td>
-							<td>
-								<button class="btn btn-sm btn-reveal" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								  <i class="fas fa-ellipsis"></i>
-								</button>
-								<div class="dropdown-menu dropdown-menu-end py-2">
-								  <a class="dropdown-item" href="#">수정</a>
-								  <a class="dropdown-item text-danger" href="#">삭제</a>
-								</div>
-							</td>
-						</tr>
-						
-						<tr>
-							<td class="no">2</td>
-							<td class="title">
-								<!-- <div class="d-flex align-items-center gap-3 ps-5"> -->
-									<img src="../../assets/img/file-manager/9.png" alt="파일" style="width: 16px; height: 16px;" class="rounded" />
-									<a class="fw-semibold text-body-highlight name" href="#!">Retro Ring.jpg</a>
-								<!-- </div> -->
-							</td>
-							<td class="writer">작성자명</td>
-							<td class="views">123</td>
-							<td class="date">2025-04-10</td>
-							<td>
-								<button class="btn btn-sm btn-reveal" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									<i class="fas fa-ellipsis"></i>
-								</button>
-								<div class="dropdown-menu dropdown-menu-end py-2">
-									<a class="dropdown-item" href="#">수정</a>
-									<a class="dropdown-item text-danger" href="#">삭제</a>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		
-			<!-- 페이징 -->
-			<div class="d-flex justify-content-center mt-3">
-				<div class="d-flex align-items-center">
-					<button class="page-link px-3 me-2" data-list-pagination="prev" disabled>
-					  <i class="fas fa-chevron-left"></i>
-					</button>
-					<ul class="pagination mb-0"></ul>
-					<button class="page-link px-3 ms-2" data-list-pagination="next">
-					  <i class="fas fa-chevron-right"></i>
-					</button>
+	<!-- 내가 작성한 게시글 테이블 (북마크와 동일한 구조) -->
+	<div class="card-body pt-4">
+		<div class="d-flex justify-content-start align-items-center mb-2">
+			<i class="fas fa-pen text-primary me-2"></i>
+			<span class="fw-bold fs-7">내가 작성한 게시글</span>
+		</div>
+		<div class="row gx-xxl-9">
+			<div id="myPostTable" data-list='{"valueNames":["no","title","writer","views","date"], "page": 5, "pagination": true}'>
+				<div class="table-responsive">
+					<table class="table table-sm fs-9 mb-0 text-center">
+						<thead class="text-center align-middle">
+							<tr>
+								<th class="sort" data-sort="no" style="width: 60px;">번호</th>
+								<th class="sort" data-sort="title">글 제목</th>
+								<th class="sort" data-sort="writer">작성자</th>
+								<th class="sort" data-sort="views">조회수</th>
+								<th class="sort" data-sort="date">등록일</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody class="list align-middle">
+							<tr>
+								<td class="no">1</td>
+								<td class="title"><a class="fw-semibold text-body-highlight name" href="#">전자결재 도입 후기</a></td>
+								<td class="writer">강성관</td>
+								<td class="views">45</td>
+								<td class="date">2025-04-01</td>
+								<td>
+									<button class="btn btn-sm btn-reveal" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+										<i class="fas fa-ellipsis"></i>
+									</button>
+									<div class="dropdown-menu dropdown-menu-end py-2">
+										<a class="dropdown-item" href="#">수정</a>
+										<a class="dropdown-item text-danger" href="#">삭제</a>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
-			</div>
+				<!-- 페이징 -->
+				<div class="d-flex justify-content-center mt-3">
+					<div class="d-flex align-items-center">
+						<button class="page-link px-3 me-2" data-list-pagination="prev" disabled><i class="fas fa-chevron-left"></i></button>
+						<ul class="pagination mb-0"></ul>
+						<button class="page-link px-3 ms-2" data-list-pagination="next"><i class="fas fa-chevron-right"></i></button>
+					</div>
+				</div>
+			</div><!-- myPostTable -->
 		</div>
 	</div>
-
-</div> <!-- 북마크 목록 끝 -->      
+</div><!-- mb-9 하단 -->
  
-<!-- 모달 -->
-								<div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
-								  <div class="modal-dialog modal-dialog-centered">
-								    <div class="modal-content">
-								      <div class="modal-header">
-								        <h5 class="modal-title" id="profileUploadModalLabel">프로필 사진 변경</h5>
-								        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-								      </div>
-								      <div class="modal-body text-center">
-								        <button class="btn btn-outline-primary mb-3" onclick="setDefaultProfile()">
-								          기본 프로필 적용하기
-								        </button>
-								        <br>
-								        <label class="btn btn-primary" for="profileUploadInput">
-								          프로필 사진 업로드하기
-								        </label>
-								        <input type="file" id="profileUploadInput" class="d-none" accept="image/*" onchange="previewProfileImage(event)">
-								      </div>
-								    </div>
-								  </div>
-								</div>
-								
-								
-								<script>
-								  function setDefaultProfile() {
-								    const profileImage = document.getElementById('profileImage');
-								    profileImage.src = '/assets/img/team/avatar.webp'; // 부트스트랩 기본 프로필 이미지
-								    const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
-								    modal.hide();
-								  }
-								
-								  function previewProfileImage(event) {
-								    const file = event.target.files[0];
-								    if (file) {
-								      const profileImage = document.getElementById('profileImage');
-								      profileImage.src = URL.createObjectURL(file);
-								      const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
-								      modal.hide();
-								    }
-								  }
-								</script>                
-                
-                
+
+
+<!-- 프로필 변경 모달 -->
+<div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">프로필 사진 변경</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body text-center">
+        <button class="btn btn-outline-primary mb-3" onclick="setDefaultProfile()">기본 프로필 적용하기</button><br>
+        <label class="btn btn-primary" for="profileUploadInput">프로필 사진 업로드하기</label>
+        <input type="file" id="profileUploadInput" class="d-none" accept="image/*" onchange="previewProfileImage(event)">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 주소록 정보 수정 모달 -->
+<div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editInfoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">정보 수정</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editInfoForm">
+          <div class="mb-3">
+            <label for="emailInput" class="form-label">이메일</label>
+            <input type="email" class="form-control" id="emailInput" required>
+          </div>
+          <div class="mb-3">
+            <label for="phoneInput" class="form-label">전화번호</label>
+            <input type="text" class="form-control" id="phoneInput" required>
+          </div>
+          <div class="mb-3">
+            <label for="addressInput" class="form-label">주소</label>
+            <input type="text" class="form-control" id="addressInput" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light" data-bs-dismiss="modal">취소</button>
+        <button class="btn btn-primary" onclick="saveInfo()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function setDefaultProfile() {
+    const profileImage = document.getElementById('profileImage');
+    profileImage.src = '/assets/img/team/avatar.webp';
+    const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
+    modal.hide();
+  }
+
+  function previewProfileImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const profileImage = document.getElementById('profileImage');
+      profileImage.src = URL.createObjectURL(file);
+      const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
+      modal.hide();
+    }
+  }
+
+  const editInfoModal = document.getElementById('editInfoModal');
+  editInfoModal.addEventListener('show.bs.modal', function () {
+    const email = document.getElementById('emailValue').textContent.trim();
+    const phone = document.getElementById('phoneValue').textContent.trim();
+    const address = document.getElementById('addressValue').textContent.trim();
+
+    document.getElementById('emailInput').value = email;
+    document.getElementById('phoneInput').value = phone;
+    document.getElementById('addressInput').value = address;
+  });
+
+  function saveInfo() {
+    const email = document.getElementById('emailInput').value;
+    const phone = document.getElementById('phoneInput').value;
+    const address = document.getElementById('addressInput').value;
+
+    document.getElementById('emailValue').textContent = email;
+    document.getElementById('emailValue').href = "mailto:" + email;
+    document.getElementById('phoneValue').textContent = phone;
+    document.getElementById('addressValue').textContent = address;
+
+    const modal = bootstrap.Modal.getInstance(editInfoModal);
+    modal.hide();
+  }
+  
+  const ctx = document.getElementById('approvalProjectChart').getContext('2d');
+  new Chart(ctx, {
+    data: {
+      labels: ['작성한 결재', '결재한 문서', '반려한 문서', '진행 중 프로젝트', '완료한 프로젝트'],
+      datasets: [
+        {
+          type: 'bar',
+          label: '결재 활동',
+          data: [6, 4, 1, null, null],
+          backgroundColor: ['#0d6efd', '#0d6efd99', '#0d6efd66']
+        },
+        {
+          type: 'bar',
+          label: '프로젝트 현황',
+          data: [null, null, null, 2, 1],
+         /*  borderColor: '#198754', */
+          backgroundColor: 'rgba(255, 99, 132, 0.6)',
+          tension: 0.3,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const val = context.raw;
+              return context.dataset.label + ': ' + (val !== null ? val + '건' : '');
+            }
+          }
+        },
+        legend: {
+          position: 'top'
+        },
+        title: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: '건수'
+          }
+        }
+      }
+    }
+  });  
+  
+  
+</script>
+
+			
 </main>
 </body>
 </html>

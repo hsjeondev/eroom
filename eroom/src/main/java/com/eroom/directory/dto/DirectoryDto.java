@@ -18,8 +18,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @Builder
+@ToString(exclude = "employee")
 public class DirectoryDto {
 	
 	private Long directory_no;
@@ -30,10 +30,24 @@ public class DirectoryDto {
 	private String directory_creator;
 	private String directory_editor;
 	private String visible_yn;
+	private String directory_position;
+	private String directory_department;
+	private String directory_team;
 	private LocalDateTime directory_reg_date;
 	private LocalDateTime directory_mod_date;
 	private Long employee_no;
 	private String separator_code;
+	private String employee_name;
+	private String employee_position;
+	private String code_name;
+	private Employee employee;
+	
+	// structure 변수 담기
+	private String department_name;
+	private String team_name;
+	// 입사일 퇴사일 String 저장
+	private String formatted_hire_date;
+	private String formatted_end_date;
 	
 //	private String employee_name;
 //	private String department_name;
@@ -51,6 +65,9 @@ public class DirectoryDto {
 				.directoryCreator(directory_creator)
 				.directoryEditor(directory_editor)
 				.visibleYn(visible_yn)
+				.directoryPosition(directory_position)
+				.directoryDepartment(directory_department)
+				.directoryTeam(directory_team)
 				.directoryRegDate(directory_reg_date)
 				.directoryModDate(directory_mod_date)
 				.employee(Employee.builder().employeeNo(employee_no).build())
@@ -59,6 +76,12 @@ public class DirectoryDto {
 	}
 	
 	public DirectoryDto toDto(Directory entity) {
+	    Employee emp = entity.getEmployee();
+	    
+		if (emp == null) {
+			return null;
+		}
+		
 	    return DirectoryDto.builder()
 	            .directory_no(entity.getDirectoryNo())
 	            .directory_email(entity.getDirectoryEmail())
@@ -68,27 +91,21 @@ public class DirectoryDto {
 	            .directory_creator(entity.getDirectoryCreator())
 				.directory_editor(entity.getDirectoryEditor())
 				.visible_yn(entity.getVisibleYn())
+				.directory_department(entity.getDirectoryDepartment())
+				.directory_position(entity.getDirectoryPosition())
+				.directory_team(entity.getDirectoryTeam())
 				.directory_reg_date(entity.getDirectoryRegDate())
 				.directory_mod_date(entity.getDirectoryModDate())
 				.employee_no(entity.getEmployee().getEmployeeNo())
+				.employee_name(entity.getEmployee().getEmployeeName())
+				.employee_position(entity.getEmployee().getEmployeePosition())
+				.code_name(entity.getSeparator().getSeparatorName())
 				.separator_code(entity.getSeparator().getSeparatorCode())
+				.employee(entity.getEmployee())
+				.formatted_hire_date(emp.getEmployeeHireDate() != null ? emp.getEmployeeHireDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
+				.formatted_end_date(emp.getEmployeeEndDate() != null ? emp.getEmployeeEndDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
 	            .build();
 	}
-	
-//	public String getFormattedHireDate() {
-//		if(employee_hire_date != null) {
-//			return employee_hire_date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-//		} else {
-//			return "-";
-//		}
-//	}
-//	public String getFormattedEndDate() {
-//		if(employee_end_date != null) {
-//			return employee_end_date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-//		} else {
-//			return "-";
-//		}
-//	}
 	
 	
 }

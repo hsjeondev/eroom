@@ -14,18 +14,159 @@
 	<div class="col">
               <div class="card email-content">
                 <div class="card-body">
-                  <form class="d-flex flex-column h-100"
+                  <form method="post" class="d-flex flex-column h-100"
                   action="/mail/create" name="mail_create_form" enctype="multipart/form-data">
-                  <!-- 직관적이지만 header에 넣는게 더 정석적인 방법 -->
-                  <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
+                  <!-- 본인 히든 처리 -->
+                  <input type="hidden" name="employee_no"
+								th:value="${#authentication.principal.employee.employeeNo}" />
                     <div class="row g-3 mb-2">
-                      <div class="col-4">
-                        <input class="form-control" type="email" name="to" placeholder="수신자" />
-                      </div>
-                      <div class="col-4">
+	                    <div class="col-4">
+	                   		<input class="form-control" type="text" name="receiver" placeholder="받는 사람" id="receiverInput" readonly data-bs-toggle="modal" data-bs-target="#orgModal" />
+	                   </div>
+						<!-- 이메일 정보 서칭하는거 -->
+									<!-- <div th:each="employee : ${employeeList}">
+    <span th:text="${employee.directory != null && employee.directory.directoryEmail != null ? employee.directory.directoryEmail : '이메일 없음'}"></span>
+							</div> -->
+					<div class="modal fade" id="orgModal" tabindex="-1" aria-labelledby="orgModalLabel" aria-hidden="true">
+					  <div class="modal-dialog modal-md">
+					    <div class="modal-content">
+					      <div class="modal-header">
+					        <h5 class="modal-title" id="orgModalLabel">조직도에서 직원 선택</h5>
+					        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+					      </div>
+					      <div class="modal-body">
+					        <!-- 소속 선택 -->
+					        <label for="deptSelect" class="form-label">소속</label>
+					        <select class="form-select" id="deptSelect">
+							  <option selected disabled>-- 소속 선택 --</option>
+							  <option th:each="dept : ${departments}"
+							          th:value="${dept.separator_code}"
+							          th:text="${dept.separator_name}"></option>
+							</select>
+					
+					        <!-- 참여자 선택 -->
+					        <label for="employeeSelect" class="form-label mt-3">참여자 선택</label>
+					        <div class="d-flex">
+					          <select class="form-select me-2" id="employeeSelect">
+					            <option selected>-- 참여자 선택 --</option>
+					            <!-- JS로 채워짐 -->
+					          </select>
+					          <button type="button" class="btn btn-primary" id="addEmployeeBtn" onclick="addParticipant()">추가</button>
+					        </div>
+					
+					        <!-- 선택된 참여자 표시 -->
+					        <div class="mt-3">
+					          <strong>선택된 참여자</strong>
+					          <ul id="selectedEmployeeList" class="list-unstyled mt-2"></ul>
+					        </div>
+					      </div>
+					      <div class="modal-footer">
+					        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+					        <button type="button" class="btn btn-primary" id="confirmSelectionBtn" data-bs-dismiss="modal">선택</button>
+					      </div>
+					    </div>
+					  </div>
+					</div>
+					<!-- 나중에 밑에 두기  -->
+					<script>
+					document.getElementById("deptSelect").addEventListener("change", function () {
+						  const separatorCode = this.value;
+
+						  fetch("/search-employees?separator_code=" + separatorCode)
+						    .then(response => response.json())
+						    .then(data => {
+						      const employeeSelect = document.getElementById("employeeSelect");
+						      employeeSelect.innerHTML = '<option selected disabled>-- 참여자 선택 --</option>'; // 초기화
+
+						      data.forEach(emp => {
+						        const option = document.createElement("option");
+						        option.value = emp.employee_no;
+						        option.textContent = emp.employee_name;
+						        employeeSelect.appendChild(option);
+						      });
+						    })
+						    .catch(error => console.error("직원 불러오기 실패", error));
+						});
+					/* test */	
+					function addParticipant() {
+					  const select = document.getElementById('employeeSelect');
+					  const selectedOptions = Array.from(select.selectedOptions);
+					
+					  if (selectedOptions.length === 0) {
+					    alert('참여자를 선택해주세요.');
+					    return;
+					  }
+					
+					  selectedOptions.forEach(option => {
+					    const employeeNo = option.value;
+					    const employeeName = option.text;
+					
+					    if (document.getElementById('receiver-' + employeeNo)) {
+					      alert('이미 추가된 참여자입니다.');
+					      return;
+					    }
+					
+					    // 배지 생성
+					    const badge = document.createElement('span');
+					    badge.className = 'badge bg-secondary text-white me-2 mb-2';
+					    badge.id = 'receiver-' + employeeNo;
+					    badge.innerHTML = `
+					      ${employeeName}
+					      <button type="button" class="btn-close btn-close-white btn-sm ms-2" style="font-size: 0.6rem;" onclick="removeParticipant('${employeeNo}')"></button>
+					      <input type="hidden" name="receiverNos" value="${employeeNo}">
+					    `;
+					    document.getElementById('selectedEmployeeList').appendChild(badge);
+					    select.selectedIndex = 0;
+					  });
+					  updateReceiverInput();
+					}
+					
+					function removeParticipant(employeeNo) {
+					  const badge = document.getElementById('receiver-' + employeeNo);
+					  if (badge) {
+					    badge.remove();
+					    updateReceiverInput();
+					  }
+					}
+					function updateReceiverInput() {
+						  const badges = document.querySelectorAll('#selectedEmployeeList .badge');
+						  const names = Array.from(badges).map(badge => badge.childNodes[0].textContent.trim());
+						  document.getElementById('receiverInput').value = names.join(', ');
+						}
+					
+					
+					
+					/*function confirmManagerSelection() {
+				          const selectedBadges = document.getElementById('selectedManagers').querySelectorAll('.badge');
+				          let managerNames = [];
+				          const container = document.getElementById('managerIdsContainer');
+				          container.innerHTML = ""; // 기존 hidden 값 초기화
+				          selectedBadges.forEach(badge => {
+				            const managerId = badge.id.replace('manager-', '');
+				            managerNames.push(badge.textContent.replace('×', '').trim());
+				            // hidden input 생성
+				            const hiddenInput = document.createElement('input');
+				            hiddenInput.type = "hidden";
+				            hiddenInput.name = "managerIds";
+				            hiddenInput.value = managerId;
+				            container.appendChild(hiddenInput);
+				          });
+				          document.getElementById('managers').value = managerNames.join(', ');
+				          
+				          // 모달 닫기
+				          const modalElem = document.getElementById('select_manager_modal');
+				          const modalInstance = bootstrap.Modal.getInstance(modalElem);
+				          if (modalInstance) {
+				            modalInstance.hide();
+				          }
+				        }*/
+					
+					</script>
+
+                      <!-- <div class="col-4">
                         <input class="form-control" type="email" name="cc" placeholder="참조" />
                       </div>
-                      <!-- <div class="col-4">
+                      <div class="col-4">
                         <input class="form-control" type="email" placeholder="BCC" />
                       </div> -->
                       <div class="col-4">
@@ -47,7 +188,7 @@
                       </div>
                       <div class="d-flex">
                         <button class="btn btn-link text-body fs-10 text-decoration-none">Discard</button>
-                        <button class="btn btn-primary fs-10" type="submit">Send<span class="fa-solid fa-paper-plane ms-1"></span></button>
+                        <button class="btn btn-primary fs-10" type="submit">발송<span class="fa-solid fa-paper-plane ms-1"></span></button>
                       </div>
                     </div>
                   </form>
@@ -59,7 +200,6 @@
             	form.addEventListener('submit', (e)=>{
     				 e.preventDefault();
     				 tinymce.triggerSave();
-            		console.log(form);
     				const payload = new FormData(form);
     				fetch("/mail/create",{
 						method:'post',
@@ -73,7 +213,7 @@
 					.then(data=>{
 						alert(data.res_msg);
 						if(data.res_code==200){
-							location.href='/mail';
+							location.href='/mail/sent';
 						}
 					});
             	})
