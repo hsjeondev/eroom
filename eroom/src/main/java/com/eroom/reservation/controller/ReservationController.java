@@ -190,7 +190,7 @@ public class ReservationController {
 	public Map<String,String> deleteVehicle(@PathVariable("reservationNo") Long id){
 		Map<String,String> result = new HashMap<String,String>();
 		result.put("res_code", "500");
-		result.put("res_msg", "삭제를 실패했습니다");
+		result.put("res_msg", "취소를 실패했습니다");
 		
 		//System.out.println("==================="+ id + "===================");
 		
@@ -198,7 +198,27 @@ public class ReservationController {
 		
 		if(deleteVehicle != null) {
 			result.put("res_code", "200");
-			result.put("res_msg", "예약을 삭제하였습니다!");
+			result.put("res_msg", "예약을 취소하였습니다!");
+		}
+		
+		return result;
+	}
+	
+	//=====================회의실 예약 삭제=============================
+	@PostMapping("/meetingroom/delete/{reservationNo}")
+	@ResponseBody
+	public Map<String,String> deleteMeetingRoom(@PathVariable("reservationNo") Long id){
+		Map<String,String> result = new HashMap<String,String>();
+		result.put("res_code", "500");
+		result.put("res_msg", "취소를 실패했습니다");
+		
+		//System.out.println("==================="+ id + "===================");
+		
+		MeetingRoomDto deleteVehicle = meetingRoomService.deleteMeetingRoom(id);
+		
+		if(deleteVehicle != null) {
+			result.put("res_code", "200");
+			result.put("res_msg", "예약을 취소하였습니다!");
 		}
 		
 		return result;

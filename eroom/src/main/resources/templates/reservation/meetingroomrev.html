@@ -683,6 +683,34 @@
 			    	}
 			      }
 			  });
+			  	//예약 삭제
+			  	document.getElementById("deleteVehicleBtn").addEventListener("click", function () {
+				    const reservationNo = document.getElementById("detailReservationNo").value;
+					//console.log(reservationNo+"삭제를 위한!!!!!!!!!!!!!!");
+				    
+				    const confirmDelete = confirm("회의실 예약을 취소하시겠습니까?");
+				    if (!confirmDelete) return;
+
+				    fetch('/meetingroom/delete/'+reservationNo, {
+				      method: "post",
+				      headers: {
+				        'header': document.querySelector('meta[name="_csrf_header"]').content,
+				        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+				      }
+				    })
+				    .then(response => response.json())
+				    .then(data => {
+				      alert(data.res_msg);
+				      if (data.res_code == 200) {
+				        location.reload();
+				      }
+				    })
+				    .catch(error => {
+				      console.error("삭제 중 오류:", error);
+				      alert("삭제에 실패했습니다.");
+				    });
+				  });
+			  
 			  
 			  	// setTimeout 사용
 				/* <head>에 있는 FullCalendar CSS 파일이 아직 로드 중이라

@@ -87,7 +87,7 @@ public class MeetingRoomService {
 		}
 	
 
-
+	//회의실 이름, 참여자 이름 , 예약자 이름 가져오기
 	public List<MeetingRoomDto> getMeetingRoomList(String separator){
 	    List<MeetingRoom> list = repository.findBySeparatorCodeAndVisibleYn(separator,"Y");
 	    List<MeetingRoomDto> dtoList = new ArrayList<>();
@@ -97,7 +97,7 @@ public class MeetingRoomService {
 
 	        Facility facility = facilityRepository.findByFacilityNo(meeting.getFacilityNo());
 	        if (facility != null) {
-	            dto.setMeetingRoomName(facility.getFacilityName()); // ✅ 회의실 이름 설정
+	            dto.setMeetingRoomName(facility.getFacilityName()); //  회의실 이름 설정
 	        }
 
 	        Employee employee = employeeRepository.findByEmployeeNo(meeting.getEmployeeNo());
@@ -121,6 +121,33 @@ public class MeetingRoomService {
 	    }
 
 	    return dtoList;
+	}
+	
+	public MeetingRoomDto deleteMeetingRoom(Long id) {
+		MeetingRoom target = repository.findById(id).orElse(null);
+		if(target == null) {
+			return null;
+		}
+		
+		String changeYtoN = "Y".equals(target.getVisibleYn()) ? "N" : "Y";
+		
+		MeetingRoom updated = MeetingRoom.builder()
+			    .reservationNo(target.getReservationNo())
+	            .facilityNo(target.getFacilityNo())
+	            .employeeNo(target.getEmployeeNo())
+	            .separatorCode(target.getSeparatorCode())
+	            .reservationStart(target.getReservationStart())
+	            .reservationEnd(target.getReservationEnd())
+	            .visibleYn(changeYtoN) 
+	            .reservationCreator(target.getReservationCreator())
+	            .reservationEditor(target.getReservationEditor())
+	            .reservationRegDate(target.getReservationRegDate())
+	            .reservationModDate(target.getReservationModDate())
+	            .reservationLocation(target.getReservationLocation())
+	            .build();
+		MeetingRoom saved = repository.save(updated);
+		return new MeetingRoomDto().toDto(saved);
+				
 	}
 
 	

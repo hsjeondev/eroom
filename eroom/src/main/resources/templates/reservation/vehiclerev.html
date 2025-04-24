@@ -822,7 +822,7 @@
 			  	document.getElementById("deleteVehicleBtn").addEventListener("click", function () {
 				    const reservationNo = document.getElementById("detailReservationNo").value;
 
-				    const confirmDelete = confirm("정말 이 차량 예약을 삭제하시겠습니까?");
+				    const confirmDelete = confirm("차량 예약을 취소하시겠습니까?");
 				    if (!confirmDelete) return;
 
 				    fetch('/resvehicle/delete/'+reservationNo, {
