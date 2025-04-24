@@ -2,6 +2,7 @@ package com.eroom.reservation.dto;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.eroom.reservation.entity.MeetingRoom;
@@ -29,6 +30,7 @@ public class MeetingRoomDto {
 	private LocalDateTime reservation_end;
 	private String visible_yn="Y";
 	private String meetingRoomName;
+	private List<String> participantNames;
 	private String reserverName;
 	private String reservation_creator;
 	private String reservation_editor;
@@ -76,16 +78,16 @@ public class MeetingRoomDto {
 	    event.put("start", this.reservation_start != null ? this.reservation_start.toString() : "");
 	    event.put("end", this.reservation_end != null ? this.reservation_end.toString() : "");
 
-
-	    // FullCalendar에서 사용할 정보들 추가
-	    event.put("reservation_no", this.reservation_no);  
-	    event.put("meetingRoomName", this.meetingRoomName);        
-	    event.put("reserverName", this.reserverName);    
-	    event.put("reservationLocation", this.reservation_location); 
+	    // 모달에 들어갈 데이터
+	    event.put("reservation_no", this.reservation_no);
+	    event.put("meetingRoomName", this.meetingRoomName);
+	    event.put("reservationLocation", this.reservation_location);
+	    event.put("reservationCreator", this.reservation_creator);
+	    event.put("reserverName", this.reserverName);  // 예약자
+	    event.put("participantNames", this.participantNames);
 
 	    event.put("separator", this.separator_code != null ? this.separator_code : "");
-	    event.put("reservationCreator", this.reservation_creator != null ? this.reservation_creator : "");
-	    event.put("type", "vehicle");
+	    event.put("type", "meetingroom");
 
 	    return event;
 	}

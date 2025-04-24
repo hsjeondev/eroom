@@ -104,6 +104,18 @@ public class MeetingRoomService {
 	        if (employee != null) {
 	            dto.setReserverName(employee.getEmployeeName()); // 예약자 이름
 	        }
+	        
+	        // 참여자 이름 리스트
+	        List<ReservationEmployeeMapping> mappings = mappingRepository.findByReservation(meeting);
+	        List<String> participantNames = new ArrayList<>();
+	        for (ReservationEmployeeMapping mapping : mappings) {
+	            Employee emp = mapping.getEmployee();
+	            if (emp != null) {
+	                participantNames.add(emp.getEmployeeName());
+	            }
+	        }
+	        
+	        dto.setParticipantNames(participantNames);  // 
 
 	        dtoList.add(dto);
 	    }

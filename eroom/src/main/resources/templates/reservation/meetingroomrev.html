@@ -431,30 +431,32 @@
 						
 					
 
-						<!-- 차량 예약 상세조회 모달 -->
+						<!-- 회의실 예약 상세조회 모달 -->
 						<div class="modal fade" id="vehicleDetailModal" tabindex="-1"
 							aria-labelledby="vehicleDetailModalLabel" aria-hidden="true">
 							<div class="modal-dialog modal-dialog-centered">
 								<div class="modal-content border border-translucent">
 									<div class="modal-header px-card border-0 position-relative">
 										<h5 class="mb-0 lh-sm text-body-highlight"
-											id="vehicleDetailModalLabel">차량 예약 상세조회</h5>
+											id="vehicleDetailModalLabel">회의실 예약 상세조회</h5>
 										<button
 											class="btn-close position-absolute top-0 end-0 mt-2 me-2"
 											type="button" data-bs-dismiss="modal" aria-label="Close"></button>
 									</div>
 
 									<div class="modal-body p-4">
-										<input type="hidden" id="detailReservationNo"> 
-										<input type="hidden" name="reservation_creator" id="loginEmployeeId" th:value="${#authentication.principal.employee.employeeId}" />
+										<input type="hidden" id="detailReservationNo"> <input
+											type="hidden" name="reservation_creator" id="loginEmployeeId"
+											th:value="${#authentication.principal.employee.employeeId}" />
+
 										<div class="mb-3">
-											<strong>차량명:</strong> <span id="detailVehicleName"></span>
+											<strong>회의실명:</strong> <span id="detailVehicleName"></span>
 										</div>
 										<div class="mb-3">
 											<strong>예약자:</strong> <span id="detailReserverName"></span>
 										</div>
 										<div class="mb-3">
-											<strong>목적지:</strong> <span id="detailLocation"></span>
+											<strong>참여자:</strong> <span id="detailLocation"></span>
 										</div>
 										<div class="mb-3">
 											<strong>시작 시간:</strong> <span id="detailStartTime"></span>
@@ -468,7 +470,7 @@
 										class="modal-footer d-flex justify-content-between align-items-center border-0">
 										<div class="d-flex">
 											<!-- <button class="btn btn-subtle-secondary me-1 mb-1"
-												type="button" id="editVehicleBtn">수정</button> -->
+						type="button" id="editVehicleBtn">수정</button> -->
 											<button class="btn btn-outline-info me-1 mb-1" type="button"
 												id="deleteVehicleBtn">삭제</button>
 										</div>
@@ -599,6 +601,31 @@
 			    	    hour: '2-digit',
 			    	    minute: '2-digit',
 			    	    hour12: false
+			    	  };
+			    	  const isOwner = loginEmployeeId === event.extendedProps.reservationCreator;
+			    	  document.getElementById("deleteVehicleBtn").style.display = isOwner ? 'inline-block' : 'none';
+
+			    	  // 상세 모달 값 채우기
+			    	  document.getElementById("detailReservationNo").value = event.extendedProps.reservation_no || '';
+			    	  document.getElementById("detailVehicleName").textContent = event.extendedProps.meetingRoomName || '';
+			    	  document.getElementById("detailReserverName").textContent = event.extendedProps.reserverName || '';
+			    	  document.getElementById("detailLocation").textContent = 
+			    		  (event.extendedProps.participantNames || []).join(', ') || '없음';
+
+			    	  // 날짜 형식 정리해서 표시
+			    	  document.getElementById("detailStartTime").textContent =
+			    	    new Intl.DateTimeFormat('ko-KR', options).format(new Date(event.start));
+
+			    	  document.getElementById("detailEndTime").textContent =
+			    	    new Intl.DateTimeFormat('ko-KR', options).format(new Date(event.end));
+			    	  
+			    	  // 모달 열기
+			    	  const modalElement = document.getElementById('vehicleDetailModal');
+			    	  if (modalElement) {
+			    	    const modal = new bootstrap.Modal(modalElement);
+			    	    modal.show();
+			    	  } else {
+			    	    console.error("모달이 없습니다.");
 			    	  }
 			      },
 			    	  
