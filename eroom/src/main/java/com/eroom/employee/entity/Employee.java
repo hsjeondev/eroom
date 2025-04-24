@@ -11,6 +11,7 @@ import com.eroom.chat.entity.Chatroom;
 import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.entity.DirectoryMemo;
+import com.eroom.drive.entity.Drive;
 import com.eroom.mail.entity.Mail;
 import com.eroom.mail.entity.MailReceiver;
 import com.eroom.project.entity.ProjectMember;
@@ -124,4 +125,8 @@ public class Employee {
 
 	@OneToMany(mappedBy = "employee")
 	private List<ChatAlarm> chatAlarms; // 채팅 알림 목록
+	
+	// 드라이브
+	@OneToMany(mappedBy="uploader")
+	private List<Drive> drives; // 업로드한 드라이브 목록
 }
