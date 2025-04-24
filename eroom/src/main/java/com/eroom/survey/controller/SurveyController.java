@@ -1,6 +1,5 @@
 package com.eroom.survey.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +21,7 @@ import com.eroom.employee.service.EmployeeService;
 import com.eroom.security.EmployeeDetails;
 import com.eroom.survey.dto.SurveyDto;
 import com.eroom.survey.dto.SurveyItemDto;
-import com.eroom.survey.dto.SurveyVoteDto;
 import com.eroom.survey.dto.VoteRequest;
-import com.eroom.survey.dto.VoteResultDto;
-import com.eroom.survey.entity.Survey;
 import com.eroom.survey.service.SurveyItemService;
 import com.eroom.survey.service.SurveyService;
 import com.eroom.survey.service.SurveyVoteService;
@@ -44,21 +40,17 @@ public class SurveyController {
 	private final EmployeeService employeeService;
 
 	@GetMapping("/list")
-	public String surveyList(Model model, SurveyDto surveyDto, SurveyItemDto surveyItemDto) {
+	public String surveyList(Model model) {
 
-		List<Survey> surveyList = surveyService.findAllSurvey();
-		List<SurveyDto> surveyDtoList = new ArrayList<SurveyDto>();
-		for (Survey survey : surveyList) {
-			surveyDto = new SurveyDto().toDto(survey);
-			surveyDtoList.add(surveyDto);
-		}
-		List<StructureDto> structureList = employeeService.findTeams();
+	    List<SurveyDto> surveyDtoList = surveyService.findAllSurveyWithVoterCount();
+	    List<StructureDto> structureList = employeeService.findTeams();
 
-		model.addAttribute("surveyList", surveyList);
-		model.addAttribute("structureList", structureList);
+	    model.addAttribute("surveyList", surveyDtoList); // ⬅️ 여기도 바뀐 이름 주의
+	    model.addAttribute("structureList", structureList);
 
-		return "survey/list";
+	    return "survey/list";
 	}
+
 
 	@GetMapping("/ongoing")
 	public String surveyOngoing() {
@@ -128,12 +120,5 @@ public class SurveyController {
 
 	    return response;
 	}
-	
-	@GetMapping("/vote-result")
-	@ResponseBody
-	public List<VoteResultDto> getVoteResult(@RequestParam("id") Long surveyId) {
-	    return surveyVoteService.findVoteResults(surveyId);
-	}
-
 
 }

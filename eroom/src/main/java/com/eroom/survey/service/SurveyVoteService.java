@@ -36,14 +36,14 @@ public class SurveyVoteService {
         EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long voterNo = userDetails.getEmployee().getEmployeeNo();
 
-        // 설문 정보 조회
-        Survey survey = surveyRepository.findBySurveyNo(request.getSurveyId());
-        String allowMultiple = survey.getAllowMultiple(); // "Y" or "N"
-
-        // 단일 선택인데 여러 개 선택한 경우 예외 발생
-        if ("N".equals(allowMultiple) && request.getVotedItems().size() > 1) {
-            throw new IllegalArgumentException("단일 선택 설문은 하나만 선택할 수 있습니다.");
-        }
+//        // 설문 정보 조회
+//        Survey survey = surveyRepository.findBySurveyNo(request.getSurveyId());
+//        String allowMultiple = survey.getAllowMultiple(); // "Y" or "N"
+//
+//        // 단일 선택인데 여러 개 선택한 경우 예외 발생
+//        if ("N".equals(allowMultiple) && request.getVotedItems().size() > 1) {
+//            throw new IllegalArgumentException("단일 선택 설문은 하나만 선택할 수 있습니다.");
+//        }
 
         // 기존 투표 삭제
         surveyVoteRepository.deleteBySurveyNoAndVoter(request.getSurveyId(), voterNo);

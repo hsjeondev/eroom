@@ -23,5 +23,8 @@ public interface SurveyVoteRepository extends JpaRepository<SurveyVote, Long>{
 	@Modifying
 	@Query("DELETE FROM SurveyVote v WHERE v.surveyNo = :surveyNo AND v.voter = :voter")
 	void deleteBySurveyNoAndVoter(@Param("surveyNo") Long surveyNo, @Param("voter") Long voter);
+	
+	@Query("SELECT COUNT(DISTINCT v.voter) FROM SurveyVote v WHERE v.surveyNo = :surveyNo")
+	int countDistinctVotersBySurveyNo(@Param("surveyNo") Long surveyNo);
 
 }
