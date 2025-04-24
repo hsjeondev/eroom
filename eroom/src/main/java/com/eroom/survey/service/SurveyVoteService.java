@@ -2,20 +2,21 @@ package com.eroom.survey.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.security.EmployeeDetails;
-import com.eroom.survey.dto.SurveyVoteDto;
+import com.eroom.survey.dto.VoteRequest;
 import com.eroom.survey.dto.VoteResultDto;
 import com.eroom.survey.entity.SurveyItem;
 import com.eroom.survey.entity.SurveyVote;
 import com.eroom.survey.repository.SurveyItemRepository;
 import com.eroom.survey.repository.SurveyVoteRepository;
+import com.eroom.survey.repository.SurveyVoterRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,26 +25,38 @@ import lombok.RequiredArgsConstructor;
 public class SurveyVoteService {
 	private final SurveyItemRepository surveyItemRepository;
     private final SurveyVoteRepository surveyVoteRepository;
+    private final SurveyVoterRepository surveyVoterRepository;
     private final EmployeeRepository employeeRepository;
 
-    public void saveVote(SurveyVoteDto dto) {
-        // 중복 여부 확인
-        boolean exists = surveyVoteRepository.existsBySurveyNoAndItemNoAndVoter(
-                dto.getSurveyNo(),
-                dto.getItemNo(),
-                dto.getVoter()
-        );
+    @Transactional
+    public boolean saveVote(VoteRequest request) {
+        // 로그인한 사용자 정보 가져오기
+        EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long voterNo = userDetails.getEmployee().getEmployeeNo();
 
-        if (exists) {
-            // 중복일 경우 저장하지 않음
-            System.out.println("중복 투표 방지됨: 설문 " + dto.getSurveyNo() + ", 항목 " + dto.getItemNo() + ", 유저 " + dto.getVoter());
-            return;
+        boolean hasAuthority = surveyVoterRepository.existsBySurveyNoAndVoter(request.getSurveyId(), voterNo);
+        if (!hasAuthority) {
+            return false;
         }
+        
+        // 기존 투표 삭제
+        surveyVoteRepository.deleteBySurveyNoAndVoter(request.getSurveyId(), voterNo);
 
         // 새 투표 저장
-        SurveyVote vote = dto.toEntity();
-        surveyVoteRepository.save(vote);
+        List<SurveyVote> votes = new ArrayList<>();
+        for (Long itemNo : request.getVotedItems()) {
+            SurveyVote vote = SurveyVote.builder()
+                    .surveyNo(request.getSurveyId())
+                    .itemNo(itemNo)
+                    .voter(voterNo)
+                    .build();
+            votes.add(vote);
+        }
+
+        surveyVoteRepository.saveAll(votes);
+        return true;
     }
+
 
     public List<VoteResultDto> findVoteResults(Long surveyId) {
         List<SurveyItem> items = surveyItemRepository.findItemsBySurveyNo(surveyId);
@@ -59,22 +72,29 @@ public class SurveyVoteService {
         for (SurveyItem item : items) {
             Long itemNo = item.getItemNo();
 
-            // ✅ 해당 항목에 투표한 사람 목록 조회
+            // 해당 항목에 투표한 사람 목록 조회
             List<SurveyVote> votes = surveyVoteRepository.findByItemNo(itemNo);
 
-            List<String> voterNames = votes.stream()
-                .map(vote -> employeeRepository.findById(vote.getVoter())
-                    .map(Employee::getEmployeeName)
-                    .orElse(null))
-                .collect(Collectors.toList());
+            List<String> voterNames = new ArrayList<>();
+            for (int i = 0; i < votes.size(); i++) {
+                SurveyVote vote = votes.get(i);
+                Long voterId = vote.getVoter();
+
+                Employee emp = employeeRepository.findById(voterId).orElse(null);
+                if (emp != null) {
+                    voterNames.add(emp.getEmployeeName());
+                }
+            }
 
             // 로그인 유저가 투표했는지 확인
             String voted = voterNames.contains(userName) ? "Y" : "N";
 
             // VoteResultDto 생성 및 추가
-            result.add(VoteResultDto.of(item, votes.size(), voterNames, voted));
+            VoteResultDto dto = VoteResultDto.of(item, votes.size(), voterNames, voted);
+            result.add(dto);
         }
 
         return result;
     }
+
 }

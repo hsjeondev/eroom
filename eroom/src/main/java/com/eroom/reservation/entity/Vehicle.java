@@ -34,6 +34,9 @@ public class Vehicle {
 
 	@Column(name = "employee_no")
 	private Long employeeNo;
+	
+	@Column(name = "separator_code")
+	private String separatorCode;
 
 	@Column(name = "reservation_start")
 	private LocalDateTime reservationStart;

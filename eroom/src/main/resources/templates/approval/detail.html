@@ -128,13 +128,19 @@
 
       <!-- 승인/반려 버튼 -->
       <div class="mt-4 text-end"  th:if="${line.approval_line_step >= 1 and line.employee.employeeNo == employee.employeeNo and line.approval_line_status == 'S'}" th:each="line : ${approvalLineList}">
-        <button data-status="A" id="approvalApproveBtn" type="button" class="btn btn-primary me-2 approveDenyBtn">승인</button>
-        <button data-status="D" id="approvalDenyBtn" type="button" class="btn btn-outline-danger approveDenyBtn">반려</button>
+        <button data-approval-status="A" id="approvalApproveBtn" type="button" class="btn btn-primary me-2 approveDenyBtn">승인</button>
+        <button data-approval-status="D" id="approvalDenyBtn" type="button" class="btn btn-outline-danger approveDenyBtn">반려</button>
+      </div>
+      <!-- 합의/거절 버튼 -->
+      <div class="mt-4 text-end"  th:if="${line.approval_line_step == 0 and line.employee.employeeNo == employee.employeeNo and line.approval_line_status == 'S'}" th:each="line : ${approvalLineList}">
+        <button data-approval-status="A" id="agreementApproveBtn" type="button" class="btn btn-primary me-2 approveDenyBtn">합의</button>
+        <button data-approval-status="D" id="agreementDenyBtn" type="button" class="btn btn-outline-danger approveDenyBtn">반려</button>
       </div>
       <!-- 결재 삭제 버튼 -->
       <div class="mt-4 text-end">
-        <button  th:if="${approval.employee.employeeNo == employee.employeeNo or employee.employeeName.contains('admin')}" id="deleteBtn" type="button" class="btn btn-outline-danger">삭제</button>
-        <button  th:if="${approval.employee.employeeNo == employee.employeeNo}" id="fallBackBtn" type="button" class="btn btn-outline-danger">회수</button>
+        <button th:if="${approval.employee.employeeNo == employee.employeeNo or employee.employeeName.contains('admin')}" id="deleteBtn" type="button" class="btn btn-outline-danger">삭제</button>
+        <button th:if="${approval.employee.employeeNo == employee.employeeNo and approval.approval_status == 'S'}" id="fallBackBtn" type="button" class="btn btn-outline-danger">회수</button>
+        <button th:if="${approval.employee.employeeNo == employee.employeeNo and approval.approval_status == 'F' or approval.employee.employeeNo == employee.employeeNo and approval.approval_status == 'A'}" id="rewriteBtn" type="button" class="btn btn-primary me-2 approveDenyBtn">재기안</button>
       </div>
     </div>
     
@@ -180,7 +186,7 @@
 	<!-- 회수 버튼 -->
 	<script th:inline="javascript">
 	
-		document.getElementByClassName("fallBackBtn").addEventListener("click", function(){
+		document.getElementById("fallBackBtn").addEventListener("click", function(){
 			const fallBackNo = /*[[${approval.approval_no}]]*/ 0;
 			if(confirm('결재를 회수하시겠습니까?')){
 				fetch('/approval/' + fallBackNo + '/fallBack',{
@@ -211,10 +217,27 @@
 			btn.addEventListener("click", function () {
 				const approvalNo = /*[[${approval.approval_no}]]*/ 0;
 				const employeeNo = /*[[${employee.employeeNo}]]*/ 0;
-				const status = this.dataset.status;
-				const actionText = status === 'A' ? '승인' : (status === 'D' ? '반려' : '처리');
-				if (confirm(`결재를 ${actionText}하시겠습니까?`)) {
-					fetch('/approvalLine/approveDeny', {
+				const status = this.dataset.approvalStatus;
+	
+				let con1;
+				let delimeter;
+	
+				if (this.id === 'approvalApproveBtn' || this.id === 'approvalDenyBtn') {
+					const actionText1 = status === 'A' ? '승인' : (status === 'D' ? '반려' : '처리');
+					con1 = confirm(`결재를 ${actionText1}하시겠습니까?`);
+				} else if (this.id === 'agreementApproveBtn' || this.id === 'agreementDenyBtn') {
+					const actionText2 = status === 'A' ? '합의' : (status === 'D' ? '반려' : '처리');
+					con1 = confirm(`결재를 ${actionText2}하시겠습니까?`);
+				}
+	
+				if (con1 === true) {
+					delimeter = 0;
+				} else {
+					delimeter = 1;
+				}
+			    
+				if(con1 == true){
+					fetch('/approvalLine/approveDenyAgreement', {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
@@ -224,7 +247,8 @@
 						body: JSON.stringify({
 							approval_no : approvalNo,
 							approval_line_status : status,
-							employee_no : employeeNo
+							employee_no : employeeNo,
+							delimeter : delimeter
 						})
 					})
 					.then(response => response.json())
@@ -233,14 +257,22 @@
 						if (data.res_code == 200) {
 							location.reload();
 						}
-					})
-				} else {
-
+					});
+					
 				}
+				
+				
 			});
-		})
-	</script>
+		});
 
+	</script>
+    <!-- 재기안 버튼 -->
+    <script th:inline="javascript">
+    	document.getElementById("rewriteBtn").addEventListener("click", function(){
+    		const editNo = /*[[${approval.approval_no}]]*/ null;
+    		location.href = '/approval/' + editNo + '/edit';
+    	});
+    </script>
 	</main>
 </body>
 </html>

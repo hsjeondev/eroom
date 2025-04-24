@@ -21,7 +21,6 @@ import lombok.ToString;
 @Table(name="project_member")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -48,5 +47,8 @@ public class ProjectMember {
 	
 	@Column(name="is_manager")
 	private String isManager;
+	
+	@Column(name="visible_yn")
+	private String visibleYn;
 	
 }

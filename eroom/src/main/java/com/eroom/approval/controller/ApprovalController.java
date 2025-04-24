@@ -116,8 +116,33 @@ public class ApprovalController {
 		return "/approval/myRequestedApprovals";
 	}
 	// 결재 생성 페이지 진입
-	@GetMapping("/approval/create")
-	public String selectApprovalCreate(Model model, Authentication authentication) {
+	@GetMapping({"/approval/create", "/approval/{approvalNo}/edit"})
+	public String selectApprovalCreate(Model model, Authentication authentication, @PathVariable(value = "approvalNo", required = false) Long approvalNo) {
+		// 새로운 결재인지 수정하는 결재인지 확인
+		if(approvalNo != null) {
+			// 수정하는 결재인 경우
+			model.addAttribute("mode", "edit");
+			// 결재 번호로 결재 정보 조회
+			Approval approval = approvalService.selectApprovalByApprovalNo(approvalNo);
+			// 결재 정보가 없으면 404 에러 페이지로 이동
+			if (approval == null) {
+				return "redirect:/error/404";
+			}
+			ApprovalDto approvalDto = new ApprovalDto().toDto(approval);
+			model.addAttribute("approval", approvalDto);
+			// 결재 라인 정보 조회
+			List<ApprovalLine> temp = approvalLineService.getApprovalLineByApprovalNo(approvalNo);
+			List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
+			for (ApprovalLine approvalLine : temp) {
+				ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
+				approvalLineDtoList.add(approvalLineDto);
+			}
+			model.addAttribute("approvalLineList", approvalLineDtoList);
+		} else {
+			// 새로운 결재인 경우
+			model.addAttribute("mode", "create");
+		}
+		
 		// 로그인한 사용자 정보 가져오기
 		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 		Employee employee = employeeDetails.getEmployee();
@@ -141,6 +166,11 @@ public class ApprovalController {
         // 부서 코드네임 조회
 		List<SeparatorDto> structureList = employeeService.findDistinctStructureNames();
 		model.addAttribute("structureList", structureList);
+		
+	    if (!model.containsAttribute("approval")) {
+	        model.addAttribute("approval", new ApprovalDto());
+	    }
+	    
 		return "/approval/create";
 	}
 	
@@ -162,10 +192,10 @@ public class ApprovalController {
 	// 결재 생성 양식 리스트 조회
 	@PostMapping("/approval/format")
 	@ResponseBody
-	public Map<String, String> selectApprovalFormat(@RequestBody ApprovalFormatDto dto) {
+	public Map<String, Object> selectApprovalFormat(@RequestBody ApprovalFormatDto dto) {
 		// 결재 양식 조회
 		ApprovalFormat approvalFormat = approvalFormatService.getApprovalFormat(dto.getApproval_format_no());
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("res_code", "500");
 		map.put("res_msg", "양식 조회 실패");
 		if(approvalFormat != null) {
@@ -174,6 +204,18 @@ public class ApprovalController {
 			ApprovalFormatDto approvalFormatDto = new ApprovalFormatDto().toDto(approvalFormat);
 			map.put("approvalFormatContent", approvalFormatDto.getApproval_format_content());
 			map.put("approvalFormatTitle", approvalFormatDto.getApproval_format_title());
+			if(dto.getEdit_approval_no() != null) {
+				// 수정하는 결재인 경우
+				Approval approval = approvalService.selectApprovalByApprovalNo(dto.getEdit_approval_no());
+				ApprovalDto approvalDto = new ApprovalDto().toDto(approval);
+				if (approval != null) {
+//					map.put("approval", approvalDto);
+					map.put("approvalContent", approvalDto.getApproval_content());
+					map.put("mode", "edit");
+				} else {
+					map.put("mode", "create");
+				}
+			}
 		}
 		return map;
 	}
@@ -413,17 +455,22 @@ public class ApprovalController {
 					List<ApprovalLine> temp = approval.getApprovalLines();
 					Boolean bool = false;
 					Boolean stackBool = false;
+					int count = 0;
 					// step이 0인 사람(합의자) 중 결재 상태가 A인 사람이 한명이라도 있으면 stackBool = false처리
 					for(int i = 0; i < temp.size(); i++) {
 						if(temp.get(i).getApprovalLineStep() != 0) {
 							continue;
 						}
-						if(temp.get(i).getApprovalLineStep() == 0 && !temp.get(i).getApprovalLineStatus().equals("A")) {
-							stackBool = false;
-							break;
-						} else if(temp.get(i).getApprovalLineStep() == 0 && temp.get(i).getApprovalLineStatus().equals("A")) {
-							stackBool = true;
+						if(temp.get(i).getApprovalLineStep() == 0) {
+							count++;
+							if(!temp.get(i).getApprovalLineStatus().equals("A")) {
+								stackBool = false;
+								break;
+							} else if(temp.get(i).getApprovalLineStatus().equals("A")) {
+								stackBool = true;
+							}
 						}
+						
 						
 				    }
 					// 결재 라인에 있는 사람들 중~
@@ -443,9 +490,16 @@ public class ApprovalController {
 							}
 						}
 						// 모든 합의자가 status = A, 나의 결재 차례인 경우에만 approval을 담아서 보내기
-						if(bool && stackBool && !approval.getApprovalStatus().equals("F")) {
-							temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
-							resultApprovalList.add(temp2);
+						if(count == 0) {
+							if(bool && !approval.getApprovalStatus().equals("F")) {
+								temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
+								resultApprovalList.add(temp2);
+							}
+						} else {
+							if(bool && stackBool && !approval.getApprovalStatus().equals("F")) {
+								temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
+								resultApprovalList.add(temp2);
+							}
 						}
 					}
 				}

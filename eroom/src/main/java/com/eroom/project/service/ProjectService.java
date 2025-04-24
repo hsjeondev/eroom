@@ -11,10 +11,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eroom.employee.entity.Employee;
 import com.eroom.project.dto.GithubPullRequestDto;
 import com.eroom.project.dto.ProjectDto;
 import com.eroom.project.dto.ProjectMemberDto;
 import com.eroom.project.entity.Project;
+import com.eroom.project.entity.ProjectMember;
 import com.eroom.project.repository.ProjectMemberRepository;
 import com.eroom.project.repository.ProjectRepository;
 import com.eroom.rsacryption.RSACryptor;
@@ -39,15 +41,17 @@ public class ProjectService {
     		String encryptedToken = rsaCryptor.encrypt(projectDto.getProject_github_token());
     		projectDto.setProject_github_token(encryptedToken);
     		
-    		// proceed에 시작일이 오늘이거나 오늘보다 이전이면 진행 중, 오늘보다 이후면 진행 예정 설정
-    	    LocalDate today = LocalDate.now();
-    	    LocalDate startDate = projectDto.getProject_start();
-    	    
-    	    if (!startDate.isAfter(today)) {
-    	        projectDto.setProceed("진행 중");
-    	    } else {
-    	        projectDto.setProceed("진행 예정");
-    	    }
+    		LocalDate today     = LocalDate.now();
+            LocalDate startDate = projectDto.getProject_start();
+            LocalDate endDate   = projectDto.getProject_end();
+
+            if (endDate != null && endDate.isEqual(today)) {
+            	projectDto.setProceed("완료");
+            } else if (!startDate.isAfter(today)) {
+            	projectDto.setProceed("진행 중");
+            } else {
+            	projectDto.setProceed("진행 예정");
+            }
     		
     		Project project = projectRepository.save(projectDto.toEntity());
     		
@@ -88,6 +92,9 @@ public class ProjectService {
     	
     	if(project != null) {
     		projectdto = new ProjectDto().toDto(project);
+    		String encryptedToken = projectdto.getProject_github_token();
+            String decryptedToken = rsaCryptor.decrypt(encryptedToken);
+            projectdto.setProject_github_token(decryptedToken);
     	}
     	
     	return projectdto;
@@ -141,5 +148,124 @@ public class ProjectService {
             return null;
         }
     }
+    
+    @Transactional(rollbackFor = Exception.class)
+    public Long updateProject(ProjectDto dto, List<ProjectMemberDto> memberDtos) {
+        Long result = 0L;
+        
+        try {
+        	
+        	Project findProject = projectRepository.findById(dto.getProject_no()).orElse(null);
+        	
+            String encryptedToken = rsaCryptor.encrypt(dto.getProject_github_token());
+            dto.setProject_github_token(encryptedToken);
+            
+            LocalDate today     = LocalDate.now();
+            LocalDate startDate = dto.getProject_start();
+            LocalDate endDate   = dto.getProject_end();
+
+            if (endDate != null && endDate.isEqual(today)) {
+                dto.setProceed("완료");
+            } else if (!startDate.isAfter(today)) {
+                dto.setProceed("진행 중");
+            } else {
+                dto.setProceed("진행 예정");
+            }
+            
+            dto.setProgress(findProject.getProgress());
+            
+            Project project = dto.toEntity();
+            projectRepository.save(project);
+
+            List<ProjectMember> existing = 
+                projectMemberRepository.findByProject_ProjectNo(project.getProjectNo());
+            for (ProjectMember pm : existing) {
+                pm.setVisibleYn("N");
+                projectMemberRepository.save(pm);
+            }
+
+            for (ProjectMemberDto mDto : memberDtos) {
+                Long   empNo   = mDto.getProject_member().getEmployeeNo();
+                String pmFlag  = mDto.getProject_manager();
+                String mgrFlag = mDto.getIs_manager();
+
+                ProjectMember found = null;
+                for (ProjectMember pm : existing) {
+                    if (pm.getEmployee().getEmployeeNo().equals(empNo)) {
+                        found = pm;
+                        break;
+                    }
+                }
+
+                if (found != null) {
+                    found.setVisibleYn("Y");
+                    found.setProjectManager(pmFlag);
+                    found.setIsManager(mgrFlag);
+                } else {
+                    ProjectMember pm = ProjectMember.builder()
+                        .project(project)
+                        .employee(Employee.builder().employeeNo(empNo).build())
+                        .visibleYn("Y")
+                        .projectManager(pmFlag)
+                        .isManager(mgrFlag)
+                        .build();
+                    projectMemberRepository.save(pm);
+                }
+            }
+
+            result = project.getProjectNo();
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public int holdingProject(Long projectNo) {
+    	int result = 0;
+    	
+    	try {
+    		
+    		Project project = projectRepository.findById(projectNo).orElse(null);
+    		
+    		if(project != null) {
+    			project.setProceed("보류");
+    			projectRepository.save(project);
+
+    			result = 1;
+    		}
+    		
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    	
+    	return result;
+    }
+    
+    public int doneProject(Long projectNo) {
+    	int result = 0;
+    	
+    	try {
+    		
+    		Project project = projectRepository.findById(projectNo).orElse(null);
+    		
+    		if(project != null) {
+    			project.setProceed("완료");
+    			project.setProjectEnd(LocalDate.now());
+    			projectRepository.save(project);
+
+    			result = 1;
+    		}
+    		
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    	
+    	return result;
+    }
+
 
 }
