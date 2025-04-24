@@ -64,29 +64,33 @@ public class VehicleService {
 	
 	//해당 예약시간 select창에서 막기
 	public List<String> getBookedTimes(String date, String facilityNoStr) {
-		LocalDate targetDate = LocalDate.parse(date);
-		LocalDateTime startOfDay = targetDate.atStartOfDay();
-		LocalDateTime endOfDay = targetDate.plusDays(1).atStartOfDay();
+	    LocalDate targetDate = LocalDate.parse(date);
+	    LocalDateTime startOfDay = targetDate.atStartOfDay();      // 00:00
+	    LocalDateTime endOfDay = targetDate.plusDays(1).atStartOfDay(); // 다음 날 00:00
 
-		Long facilityNo = Long.parseLong(facilityNoStr); // ← Long 변환 잊지 마!
-		List<Vehicle> reservedList = repository.findByFacilityNoAndReservationDate(facilityNo, startOfDay, endOfDay);
+	    Long facilityNo = Long.parseLong(facilityNoStr);
+	    List<Vehicle> reservedList = repository.findByFacilityNoAndReservationDate(facilityNo, startOfDay, endOfDay);
 
-		Set<String> bookedTimesSet = new HashSet<>();
-		for (Vehicle v : reservedList) {
-			LocalTime start = v.getReservationStart().toLocalTime();
-			LocalTime end = v.getReservationEnd().toLocalTime();
-			for (int hour = start.getHour(); hour < end.getHour(); hour++) {
-				bookedTimesSet.add(String.format("%02d:00", hour));
-			}
-		}
+	    Set<String> bookedTimesSet = new HashSet<>();
 
-		List<String> bookedTimes = new ArrayList<>();
-		for (String time : bookedTimesSet) {
-			bookedTimes.add(time);
-		}
-		Collections.sort(bookedTimes);
-		return bookedTimes;
+	    for (Vehicle v : reservedList) {
+	        LocalDateTime resStart = v.getReservationStart();
+	        LocalDateTime resEnd = v.getReservationEnd();
+
+	        // 시작시간이 조회일 이전이면 00시부터 막고, 종료시간이 다음날 이후면 23시까지 막음
+	        LocalTime startTime = resStart.isBefore(startOfDay) ? LocalTime.of(0, 0) : resStart.toLocalTime();
+	        LocalTime endTime = resEnd.isAfter(endOfDay) ? LocalTime.of(23, 59) : resEnd.toLocalTime();
+
+	        for (int hour = startTime.getHour(); hour < endTime.getHour(); hour++) {
+	            bookedTimesSet.add(String.format("%02d:00", hour));
+	        }
+	    }
+
+	    List<String> bookedTimes = new ArrayList<>(bookedTimesSet);
+	    Collections.sort(bookedTimes);
+	    return bookedTimes;
 	}
+
 	
 	//해당 예약 단일 조회
 	public VehicleDto findByReservationNo(Long id) {
