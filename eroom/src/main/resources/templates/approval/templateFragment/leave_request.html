@@ -1,11 +1,31 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-<!-- 휴가신청서 -->
-</head>
-<body>
-
-</body>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="leave_request">
+  <form th:object="${approval}">
+      <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle mb-0">
+          <colgroup><col style="width: 25%;" /><col style="width: 75%;" /></colgroup>
+          <tbody>
+            <tr>
+              <th class="bg-light">휴가 종류</th>
+              <td th:text="*{approval_content['vacationType']}"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">휴가 기간</th>
+              <td th:text="|*{approval_content['vacationStart']} ~ *{approval_content['vacationEnd']}|"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">휴가 사유</th>
+              <td th:text="*{approval_content['vacationReason']}"></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="text-center text-secondary fw-bold">
+                휴가기준 제 13조에 의거 휴가를 신청하오니 허락하여 주시기 바랍니다.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  </form>
+</th:block>
 </html>
