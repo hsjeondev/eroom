@@ -18,29 +18,32 @@
 	transform: translateY(-50%);
 }
 </style>
+	<link href="vendors/choices/choices.min.css" rel="stylesheet" />
+	<script src="vendors/choices/choices.min.js"></script>
 	<main class="main" id="top">
 		<div class="pb-8">
 			<h2 class="mb-4">설문</h2>
-			<div id="reports" data-list='{"valueNames":["title","text","priority","reportsby","reports","date"],"page":10,"pagination":true}'>
+			<div id="reports" data-list='{"valueNames":["title","text","priority","reportsby","reports","date"],"page":9,"pagination":true}'>
 				<div class="row g-3 justify-content-between mb-2">
 					<div class="col-12">
 						<div class="d-md-flex justify-content-between">
 							<div class="mb-3">
 								<!-- 설문 생성 팝업창 -->
-								<form th:action="@{/survey/create}" method="post">
+								<form th:action="@{/survey/create}" method="post" id="create-survey-form">
+									<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 									<div class="modal fade" id="create-survey" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
-										<div class="modal-dialog modal-dialog-scrollable">
+										<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
 											<div class="modal-content">
 												<div class="modal-header">
 													<h5 class="modal-title" id="scrollingLongModalLabel2">설문 등록</h5>
 													<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
 												</div>
 												<div class="modal-body">
-													<!-- 모달 본문 -->
+													<!-- 설문 등록 모달 본문 -->
 													<div class="row mb-3">
 														<label class="col-sm-2 col-form-label text-end" for="surveyTitle">제목</label>
 														<div class="col-sm-8">
-															<input class="form-control" id="surveyTitle" name="surveyTitle" type="text" style="width: 97.2%;">
+															<input class="form-control" id="surveyTitle" name="surveyTitle" type="text" required style="width: 97.2%;">
 														</div>
 													</div>
 													<!-- 항목 div -->
@@ -48,9 +51,10 @@
 														<label class="col-sm-2 col-form-label text-end" for="inputItem">항목</label>
 														<div class="col-sm-8">
 															<div id="itemScrollBox" style="max-height: 400px; overflow-y: auto;">
-																<div id="itemContainer">
-																	<input class="form-control mb-2" name="items" type="text" style="width: 97.2%;">
+																<div id="itemContainerDefault">
+																	<input class="form-control mb-2" id="inputItem" name="items" type="text" style="width: 97.2%;" required> <input class="form-control mb-2" name="items" type="text" style="width: 97.2%;" required>
 																</div>
+																<div id="itemContainer"></div>
 															</div>
 															<!-- 항목 추가 버튼 -->
 															<div class="text-center mt-2">
@@ -59,7 +63,7 @@
 														</div>
 													</div>
 													<div class="row mb-3">
-														<div class="col-form-label col-sm-2 pt-0"></div>
+														<label class="col-sm-2 col-form-label text-end" for="basic-form-dob">옵션</label>
 														<div class="col-sm-8">
 															<div class="form-check">
 																<input class="form-check-input" id="gridCheck1" name="allowMultiple" type="checkbox"> <label class="form-check-label" for="gridCheck1">복수선택</label>
@@ -70,77 +74,115 @@
 														</div>
 													</div>
 													<div class="row mb-3">
+														<label class="col-sm-2 col-form-label text-end" for="basic-form-dob">참여자</label>
+														<div class="col-8">
+															<!-- 참여자 선택 -->
+															<div class="row mb-3">
+																<div class="col-sm-10">
+																	<div class="row">
+																		<div class="col-6 col-md-6 mb-2" th:each="team : ${structureList}">
+																			<div class="form-check">
+																				<input class="form-check-input" type="checkbox" th:id="'team-' + ${team.structure_no}" th:name="selectedTeamIds" th:value="${team.structure_no}"> <label class="form-check-label" th:for="'team-' + ${team.structure_no}" th:text="${team.code_name}"></label>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+													<div class="row mb-3">
 														<label class="col-sm-2 col-form-label text-end" for="basic-form-dob">마감일</label>
 														<div class="col-sm-8">
-															<input class="form-control" id="basic-form-dob" name="deadline" type="date" style="width: 97.2%;">
+															<input class="form-control" id="basic-form-dob" name="deadline" type="datetime-local" style="width: 97.2%;" required>
 														</div>
 													</div>
 												</div>
 												<div class="modal-footer">
-													<button class="btn btn-primary" type="submit">등록</button>
 													<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">취소</button>
+													<button class="btn btn-primary" type="submit">등록</button>
 												</div>
 											</div>
 										</div>
 									</div>
 								</form>
-								<!-- 문서화 버튼? -->
-								<!-- <button class="btn btn-link text-body px-0"><span class="fa-solid fa-file-export fs-9 me-2"></span>Export </button> -->
 							</div>
 						</div>
 					</div>
 				</div>
 				<div class="row g-3 list" id="reportsList">
-					<div class="col-12 col-xl-6">
-						<div class="card h-100">
-							<div class="card-body">
-								<div class="border-bottom border-translucent">
-									<div class="d-flex align-items-start mb-1">
-										<div class="d-sm-flex align-items-center ps-2">
-											<!-- 설문 상세 -->
-											<button class="btn btn-link me-1 mb-1 fs-6 p-0" type="button" data-bs-toggle="modal" data-bs-target="#survey-detail">설문 제목</button>
-											<div class="modal fade" id="survey-detail" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
-												<div class="modal-dialog modal-dialog-scrollable">
-													<div class="modal-content">
-														<div class="modal-header">
-															<h5 class="modal-title" id="scrollingLongModalLabel2">Modal title</h5>
-															<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-														</div>
-														<div class="modal-body">본문</div>
-														<div class="modal-footer">
-															<button class="btn btn-primary" type="button">Okay</button>
-															<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancel</button>
-														</div>
+					<!-- 설문 목록 -->
+					<th:block th:if="${#lists.isEmpty(surveyList)}">
+						<div class="col-12">
+							<div class="alert alert-light text-center border border-secondary-light rounded py-4 fs-6 fw-semibold text-body-secondary">
+								<i class="fa-solid fa-circle-info me-2 text-secondary"></i>등록된 설문이 없습니다.
+							</div>
+						</div>
+					</th:block>
+					<th:block th:each="survey : ${surveyList}">
+						<th:block th:if="${survey.deadline < T(java.time.LocalDateTime).now()}">
+							<div class="col-12 col-xl-4">
+								<div class="card h-100">
+									<div class="card-body">
+										<div class="border-bottom border-translucent">
+											<div class="d-flex align-items-center justify-content-between mb-1">
+												<!-- 제목 -->
+												<div class="ps-2">
+													<button class="btn btn-link me-1 mb-1 fs-6 p-0" th:attr="data-survey-id=${survey.surveyNo}, data-bs-target='#survey-detail-' + ${survey.surveyNo}" data-bs-toggle="modal" th:text="${survey.surveyTitle}" style="max-width: 100%; height: 2rem; overflow: hidden">설문 제목</button>
+												</div>
+												<!-- 상태 표시 -->
+												<div>
+													<div th:if="${survey.deadline >= T(java.time.LocalDateTime).now()}" class="d-flex align-items-center">
+														<span class="fa-solid fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1"></span> <span class="fw-bold fs-9 text-body lh-2">진행중</span>
+													</div>
+													<div th:if="${survey.deadline < T(java.time.LocalDateTime).now()}" class="d-flex align-items-center">
+														<span class="fa-solid fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1"></span> <span class="fw-bold fs-9 text-body lh-2">마감</span>
 													</div>
 												</div>
 											</div>
-											<div class="d-flex align-items-center">
-												<span class="fa-solid fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1"></span><span class="fw-bold fs-9 text-body lh-2">진행중</span>
+
+											<p class="fs-9 fw-semibold text-body ms-1 text mb-4 ps-2" th:text="'작성자 : ' + ${survey.writer}">작성자</p>
+										</div>
+
+										<div class="row g-1 g-sm-3 mt-2 lh-1 justify-content-between align-items-center">
+											<div class="col-auto">
+												<div class="d-flex align-items-center">
+													<span class="me-2" data-feather="users" style="stroke-width: 2;"></span>
+													<p class="mb-0 fs-9 fw-semibold text-body-tertiary reports" th:text="'응답자 수 : ' + ${survey.voterCount} + ' 명'">응답자 수</p>
+												</div>
 											</div>
-											<div class="d-flex align-items-center">
-												<span class="fa-solid fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1"></span><span class="fw-bold fs-9 text-body lh-2">마감</span>
+											<div class="col-auto ms-auto">
+												<div class="d-flex align-items-center">
+													<span class="me-2" data-feather="clock" style="stroke-width: 2;"></span>
+													<p class="mb-0 fs-9 fw-semibold text-body-tertiary date" th:text="'마감일시 : ' + ${#temporals.format(survey.deadline, 'yyyy.MM.dd HH:mm')}">마감일</p>
+												</div>
 											</div>
 										</div>
-									</div>
-									<p class="fs-9 fw-semibold text-body ms-1 text mb-4 ps-2">작성자</p>
-								</div>
-								<div class="row g-1 g-sm-3 mt-2 lh-1">
-									<div class="col-12 col-sm-auto">
-										<div class="d-flex align-items-center">
-											<span class="me-2" data-feather="users" style="stroke-width: 2;"></span>
-											<p class="mb-0 fs-9 fw-semibold text-body-tertiary reports">응답자 수</p>
+										<!-- 개별 모달 -->
+										<div class="modal fade" th:attr="id='survey-detail-' + ${survey.surveyNo}, data-allow-multiple=${survey.allowMultiple}, data-anonymous=${survey.anonymousVote}" tabindex="-1" aria-labelledby="scrollingLongModalLabel2" aria-hidden="true">
+											<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h5 class="modal-title" id="scrollingLongModalLabel2" th:text="${survey.surveyTitle}">Modal title</h5>
+														<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<div class="modal-body">
+														<ul th:attr="id='surveyItemList-' + ${survey.surveyNo}" class="list-group"></ul>
+													</div>
+													<th:block th:if="${survey.deadline >= T(java.time.LocalDateTime).now()}">
+														<div class="modal-footer">
+															<button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">취소</button>
+															<button class="btn btn-primary" type="button" th:onclick="'submitVote(' + ${survey.surveyNo} + ')'">투표</button>
+														</div>
+													</th:block>
+												</div>
+											</div>
 										</div>
-									</div>
-									<div class="col-12 col-sm-auto">
-										<div class="d-flex align-items-center">
-											<span class="me-2" data-feather="clock" style="stroke-width: 2;"></span>
-											<p class="mb-0 fs-9 fw-semibold text-body-tertiary date">마감일 Dec 30, 2022</p>
-										</div>
+
 									</div>
 								</div>
 							</div>
-						</div>
-					</div>
+						</th:block>
+					</th:block>
 				</div>
 				<div class="row align-items-center justify-content-between py-2 pe-0 fs-9 mt-2">
 					<div class="col-4 d-flex">
@@ -167,41 +209,404 @@
 		</div>
 	</main>
 	<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			const addItemButton = document.getElementById('addItemBtn');
-			const itemContainer = document.getElementById('itemContainer');
-
-			addItemButton.addEventListener('click', function() {
-				// wrapper div 생성
-				const wrapper = document.createElement('div');
-				wrapper.classList.add('d-flex', 'align-items-center', 'mb-2', 'item-wrapper');
-
-				// input 생성
-				const input = document.createElement('input');
-				input.setAttribute('type', 'text');
-				input.setAttribute('name', 'items');
-				input.classList.add('form-control', 'me-2');
-
-				// 삭제 버튼 생성
-				const removeBtn = document.createElement('button');
-				removeBtn.setAttribute('type', 'button');
-				removeBtn.classList.add('btn', 'btn-close', 'btn-sm');
-
-				// 삭제 버튼 클릭 이벤트
-				removeBtn.addEventListener('click', function() {
-					wrapper.remove();
-				});
-
-				// 요소 조립
-				wrapper.appendChild(input);
-				wrapper.appendChild(removeBtn);
-				itemContainer.appendChild(wrapper);
-
-				// 설문 등록 항목 추가시 스크롤 맨 아래로 자동 이동
-				const scrollTarget = itemContainer.parentElement;
-				scrollTarget.scrollTop = scrollTarget.scrollHeight;
+	// 설문 등록시 항목 추가 스크립트
+	document.addEventListener("DOMContentLoaded", function() {
+		const addItemButton = document.getElementById('addItemBtn');
+		const itemContainer = document.getElementById('itemContainer');
+	
+		addItemButton.addEventListener('click', function() {
+			// wrapper div 생성
+			const wrapper = document.createElement('div');
+			wrapper.classList.add('d-flex', 'align-items-center', 'mb-2', 'item-wrapper');
+	
+			// input 생성
+			const input = document.createElement('input');
+			input.setAttribute('type', 'text');
+			input.setAttribute('name', 'items');
+			input.classList.add('form-control', 'me-2');
+			input.required = true;
+	
+			// 삭제 버튼 생성
+			const removeBtn = document.createElement('button');
+			removeBtn.setAttribute('type', 'button');
+			removeBtn.classList.add('btn', 'btn-close', 'btn-sm');
+	
+			// 삭제 버튼 클릭 이벤트
+			removeBtn.addEventListener('click', function() {
+				wrapper.remove();
 			});
+	
+			// 요소 조립
+			wrapper.appendChild(input);
+			wrapper.appendChild(removeBtn);
+			itemContainer.appendChild(wrapper);
+	
+			// 설문 등록 항목 추가시 스크롤 맨 아래로 자동 이동
+			const scrollTarget = itemContainer.parentElement;
+			scrollTarget.scrollTop = scrollTarget.scrollHeight;
 		});
+	});
+	
+	// 설문 등록 유효성 검사
+	document.addEventListener("DOMContentLoaded", function () {
+	  const form = document.getElementById('create-survey-form');
+	
+	  form.addEventListener('submit', function (e) {
+	    const teamCheckboxes = form.querySelectorAll('input[name="selectedTeamIds"]:checked');
+	    const deadlineInput = form.querySelector('input[name="deadline"]');
+	    const deadlineValue = deadlineInput.value;
+	
+	    // 참여자 체크 여부
+	    if (teamCheckboxes.length === 0) {
+	      e.preventDefault();
+	      showValidationAlert("제출 확인", "투표 참여 팀을 하나 이상 선택해주세요.");
+	      return;
+	    }
+	
+	    // 마감일이 현재 시간 이후인지
+	    const deadlineDate = new Date(deadlineValue);
+	    const now = new Date();
+	
+	    if (!deadlineValue || deadlineDate <= now) {
+	      e.preventDefault();
+	      showValidationAlert("제출 확인", "올바른 마감일을 선택해주세요.");
+	      return;
+	    }
+	  });
+	});
+	
+	// 유효성 검사 알림 메시지
+	function showValidationAlert(title, message) {
+	  document.getElementById('validationModalTitle').textContent = title;
+	  document.getElementById('validationModalMessage').innerHTML = message;
+	
+	  const validationModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('validationModal'));
+	  validationModal.show();
+	}
+
+	// 모달창 닫기 초기화
+	document.addEventListener('DOMContentLoaded', () => {
+	  const form = document.getElementById('create-survey-form');
+	  const modalEl = document.getElementById('create-survey');
+	  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+	
+	  const confirmModalEl = document.getElementById('confirmCloseModal');
+	  const confirmModal = bootstrap.Modal.getOrCreateInstance(confirmModalEl);
+	  const confirmBtn = document.getElementById('confirmCloseBtn');
+	
+	  let allowClose = false;
+	
+	  modalEl.addEventListener('hide.bs.modal', (event) => {
+	    if (allowClose) {
+	      allowClose = false;
+	      return;
+	    }
+	
+	    const title = form.querySelector('input[name="surveyTitle"]').value.trim();
+	    const deadline = form.querySelector('input[name="deadline"]').value.trim();
+	    const items = Array.from(form.querySelectorAll('input[name="items"]')).some(input => input.value.trim() !== '');
+	    const hasTeams = document.querySelectorAll('#selectedTeam .badge').length > 0;
+	
+	    const hasInput = title || deadline || items || hasTeams;
+	
+	    if (hasInput) {
+	      event.preventDefault();
+	      confirmModal.show();
+	    }
+	  });
+	
+	  confirmBtn.addEventListener('click', () => {
+	    confirmModal.hide();
+	    allowClose = true;
+	    modal.hide();
+	  });
+	
+	  modalEl.addEventListener('hidden.bs.modal', () => {
+	    allowClose = false;
+	    form.reset();
+	    itemContainer.innerHTML = '';
+	    selectedTeam.innerHTML = '';
+	    selectedTeam.classList.remove('border', 'border-danger', 'rounded', 'p-2');
+	  });
+	});
+	
+	// 설문 상세 조회
+	document.addEventListener('DOMContentLoaded', function () {
+	  document.getElementById('reportsList').addEventListener('click', function (event) {
+	    const button = event.target.closest('button[data-survey-id]');
+	    if (!button) return;
+	
+	    const surveyId = button.getAttribute('data-survey-id');
+	    const itemList = document.getElementById('surveyItemList-' + surveyId);
+	    if (!itemList) return;
+	
+	    itemList.innerHTML = '';
+	
+	    fetch('/survey/detail?id=' + surveyId)
+	    .then(response => response.json())
+	    .then(items => {
+	      if (items.length === 0) {
+	        itemList.innerHTML = '<li class="list-group-item">항목이 없습니다.</li>';
+	      } else {
+	        items.forEach((item, index) => {
+	          const wrapper = document.createElement('div');
+	          wrapper.className = 'vote-option d-flex justify-content-between align-items-center rounded p-2 mb-2 bg-light text-dark border';
+	          wrapper.setAttribute('onclick', `handleVoteClick(${surveyId}, ${index})`);
+	          wrapper.setAttribute('data-index', index);
+	          wrapper.setAttribute('data-item-no', item.itemNo);
+	
+	          const label = document.createElement('span');
+	          label.className = 'fw-semibold';
+	          label.textContent = item.item;
+	          
+	
+	          const countSpan = document.createElement('span');
+	          countSpan.id = `vote-count-${surveyId}-${index}`;
+	          countSpan.textContent = item.count + '표';
+	
+	          wrapper.appendChild(label);
+	          wrapper.appendChild(countSpan);
+	          itemList.appendChild(wrapper);
+	        });
+	      }
+	    });
+	
+	  });
+	});
+	
+	// 투표 항목 렌더
+	function renderVoteView(surveyId, items) {
+	  const itemList = document.getElementById('surveyItemList-' + surveyId);
+	  if (!itemList) return;
+	
+	  itemList.innerHTML = '';
+	
+	  const modal = document.getElementById('survey-detail-' + surveyId);
+	  const allowMultiple = modal.getAttribute('data-allow-multiple') === 'on';
+	  const allowAnonymous = modal.getAttribute('data-anonymous') === 'on';
+	
+	  const hasVoted = items.some(item => item.voted === "Y");
+	  
+	  const maxVotes = Math.max(...items.map(item => item.count));
+	
+	  items.forEach((item, index) => {
+	    const wrapper = document.createElement('div');
+	    wrapper.className = 'vote-option d-flex justify-content-between align-items-center rounded p-2 mb-2 bg-light text-dark border';
+	    wrapper.setAttribute('data-index', index);
+	    wrapper.setAttribute('data-item-no', item.itemNo);
+	
+	    const label = document.createElement('span');
+	    label.className = 'fw-semibold';
+	    label.textContent = item.item;
+	    
+	    const isClosed = modal.querySelector('.btn-primary') === null;
+	    if (isClosed && item.count === maxVotes && maxVotes > 0) {
+	      label.textContent += ' 🏆';
+	      wrapper.classList.add('bg-warning-subtle', 'border-warning');
+	    }
+	
+	    const voteCount = document.createElement('span');
+	    voteCount.textContent = item.count + '표';
+	
+	    if (hasVoted) {
+	      // 투표 결과 표시
+	      if (item.voted === "Y") {
+	    	  wrapper.classList.add('bg-info-subtle', 'border-primary', 'border-2');
+	      }
+	
+	      const voterList = allowAnonymous ? '익명 투표' : item.voters?.join('<br>') || '';
+	      voteCount.setAttribute('title', voterList);
+	      voteCount.setAttribute('data-bs-toggle', 'tooltip');
+	      voteCount.setAttribute('data-bs-placement', 'right');
+	      voteCount.setAttribute('data-bs-html', 'true');
+	    } else {
+	      // 투표 가능
+	      wrapper.setAttribute('onclick', `handleVoteClick(${surveyId}, ${index})`);
+	    }
+	
+	    wrapper.appendChild(label);
+	    wrapper.appendChild(voteCount);
+	    itemList.appendChild(wrapper);
+	  });
+	
+	  // 버튼 설정
+	  const voteBtn = document.querySelector(`#survey-detail-${surveyId} .modal-footer .btn-primary`);
+	  if (voteBtn) {
+	    voteBtn.textContent = hasVoted ? '다시 투표' : '투표';
+	    voteBtn.onclick = hasVoted
+	      ? () => enableRevote(surveyId)
+	      : () => submitVote(surveyId);
+	  }
+	
+	  // 툴팁 활성화
+	  const tooltipTriggerList = [].slice.call(itemList.querySelectorAll('[data-bs-toggle="tooltip"]'));
+	  tooltipTriggerList.forEach(function (el) {
+	    const existing = bootstrap.Tooltip.getInstance(el);
+	    if (existing) existing.dispose();
+	    new bootstrap.Tooltip(el);
+	  });
+	}
+
+	// 투표 항목 선택
+	function handleVoteClick(surveyId, itemIndex) {
+	  const modal = document.getElementById('survey-detail-' + surveyId);
+	  const allowMultiple = modal.getAttribute('data-allow-multiple') === 'on';
+	
+	  const isClosed = modal.querySelector('.btn-primary') === null;
+	  if (isClosed) return;
+	  
+	  const allOptions = document.querySelectorAll(`#surveyItemList-${surveyId} .vote-option`);
+	  const selected = allOptions[itemIndex];
+	
+	  if (allowMultiple) {
+	    // 복수 선택 가능 → 토글
+	    const isSelected = selected.classList.contains('bg-primary');
+	    if (isSelected) {
+	      selected.classList.remove('bg-primary', 'border-2', 'text-white');
+	      selected.classList.add('bg-light');
+	    } else {
+	      selected.classList.remove('bg-light');
+	      selected.classList.add('bg-primary', 'border-2', 'text-white');
+	    }
+	  } else {
+	    // 단일 선택 → 기존 선택 해제 후 하나만 선택
+	    allOptions.forEach(el => {
+	      el.classList.remove('bg-primary', 'border-2', 'text-white');
+	      el.classList.add('bg-light');
+	    });
+	    selected.classList.remove('bg-light');
+	    selected.classList.add('bg-primary', 'border-2', 'text-white');
+	  }
+	}
+	
+	// 투표 제출 버튼 클릭 스크립트
+	function submitVote(surveyId) {
+	  const allowMultiple = document.getElementById('survey-detail-' + surveyId).getAttribute('data-allow-multiple') === 'on';
+	  const selectedOptions = document.querySelectorAll(`#surveyItemList-${surveyId} .vote-option.bg-primary`);
+	
+	  if (selectedOptions.length === 0) {
+	    alert('항목을 하나 이상 선택해주세요.');
+	    return;
+	  }
+	
+	  const votedItems = Array.from(selectedOptions).map(el => parseInt(el.getAttribute('data-item-no')));
+	
+	  fetch('/survey/vote', {
+	    method: 'POST',
+	    headers: {
+	      'Content-Type': 'application/json',
+	      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+	    },
+	    body: JSON.stringify({
+	      surveyId: surveyId,
+	      votedItems: votedItems
+	    })
+	  })
+	  .then(res => res.json())
+	  .then(result => {
+		  if (result.success) {
+		    fetch('/survey/detail?id=' + surveyId)
+		      .then(res => res.json())
+		      .then(items => {
+		        renderVoteView(surveyId, items);
+		      });
+		  } else {
+			  const voteAuthorityModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('voteAuthorityModal'));
+			  voteAuthorityModal.show();
+		  }
+		});
+	}
+	
+	// 다시 투표
+	function enableRevote(surveyId) {
+	  const itemList = document.getElementById('surveyItemList-' + surveyId);
+	  if (!itemList) return;
+	
+	  itemList.innerHTML = '';
+	
+	  fetch('/survey/detail?id=' + surveyId)
+	    .then(response => response.json())
+	    .then(items => {
+	      for (let i = 0; i < items.length; i++) {
+	        items[i].voted = "N";
+	      }
+	
+	      renderVoteView(surveyId, items);
+	    });
+	
+	  const voteBtn = document.querySelector(`#survey-detail-${surveyId} .modal-footer .btn-primary`);
+	  if (voteBtn) {
+	    voteBtn.textContent = '투표';
+	    voteBtn.onclick = () => submitVote(surveyId);
+	  }
+	}
+	
+	// 모달 열릴 때 투표 결과 + 툴팁 다시 적용
+	document.addEventListener('shown.bs.modal', function (event) {
+	  const modal = event.target;
+	  if (!modal.id || !modal.id.startsWith('survey-detail-')) return;
+	
+	  const surveyId = modal.id.replace('survey-detail-', '');
+	
+	  fetch('/survey/detail?id=' + surveyId)
+	    .then(res => res.json())
+	    .then(items => {
+	      renderVoteView(surveyId, items);
+	    });
+	});
 	</script>
+	<!-- 설문 생성 닫기 확인창 -->
+	<div class="modal fade" id="confirmCloseModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+				<div class="modal-header border-0">
+					<h5 class="modal-title text-dark">정말 닫을까요?</h5>
+					<button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="닫기"></button>
+				</div>
+				<div class="modal-body text-center">
+					<p class="mb-0 text-body">
+						작성 중인 내용이 사라집니다.<br>정말 닫으시겠습니까?
+					</p>
+				</div>
+				<div class="modal-footer justify-content-center border-0">
+					<button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+					<button type="button" class="btn btn-danger" id="confirmCloseBtn">확인</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 유효성 검사 확인창 -->
+	<div class="modal fade" id="validationModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+				<div class="modal-header border-0">
+					<h5 class="modal-title text-dark" id="validationModalTitle"></h5>
+					<button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="닫기"></button>
+				</div>
+				<div class="modal-body text-center">
+					<p class="mb-0 text-body" id="validationModalMessage"></p>
+				</div>
+				<div class="modal-footer justify-content-center border-0">
+					<button type="button" class="btn btn-phoenix-secondary bg-primary text-white" data-bs-dismiss="modal">확인</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 투표 권한 확인창 -->
+	<div class="modal fade" id="voteAuthorityModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content bg-body-secondary text-body rounded-3 shadow-lg border border-secondary-light">
+				<div class="modal-header border-0">
+					<h5 class="modal-title text-dark" id="voteAuthorityModalTitle"></h5>
+				</div>
+				<div class="modal-body text-center">
+					<p class="mb-0 text-body" id="voteAuthorityModalMessage">투표 권한이 없습니다.</p>
+				</div>
+				<div class="modal-footer justify-content-center border-0">
+					<button type="button" class="btn btn-phoenix-secondary me-1 mb-1" data-bs-dismiss="modal">확인</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </th:block>
 </html>
