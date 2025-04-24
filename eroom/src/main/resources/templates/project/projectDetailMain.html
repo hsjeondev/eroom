@@ -12,7 +12,15 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		      <i class="uil uil-angle-left-b fs-5"></i>
 		    </a>
 		    <h4 class="text-primary mb-0 fs-5" th:text="${project.project_name}">프로젝트 디테일</h4>
-		    <span class="badge badge-phoenix fs-10 badge-phoenix-success" th:text="${project.proceed}">completed</span>
+		    <span class="badge badge-phoenix fs-10"
+			      th:classappend="${project.proceed eq '진행 중'   ? ' badge-phoenix-success'   : 
+			                       project.proceed eq '완료'      ? ' badge-phoenix-primary'   : 
+			                       project.proceed eq '보류'      ? ' badge-phoenix-secondary' : 
+			                       project.proceed eq '진행 예정' ? ' badge-phoenix-warning'   : ''}"
+			      th:text="${project.proceed}">
+			</span>
+
+
 		  </div>
 		
 		  <div>
@@ -90,7 +98,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				<div class="mb-3">
 				  <strong>기획 :</strong>
 				  <span th:each="member : ${project.project_members}"
-				        th:if="${member.project_member.structure.codeName == '기획팀' and member.is_manager == 'N'}"
+				        th:if="${member.project_member.structure.codeName == '기획팀' and member.is_manager == 'N' and member.visible_yn == 'Y'}"
 				        class="me-2 d-inline-block text-muted"
 				        th:text="|${member.project_member.employeeName}(${member.project_member.employeePosition}/${member.project_member.structure.codeName})|">
 				    이름(직급/기획)
@@ -100,7 +108,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				<div class="mb-3">
 				  <strong>디자인 :</strong>
 				  <span th:each="member : ${project.project_members}"
-				        th:if="${member.project_member.structure.codeName == '디자인팀' and member.is_manager == 'N'}"
+				        th:if="${member.project_member.structure.codeName == '디자인팀' and member.is_manager == 'N' and member.visible_yn == 'Y'}"
 				        class="me-2 d-inline-block text-muted"
 				        th:text="|${member.project_member.employeeName}(${member.project_member.employeePosition}/${member.project_member.structure.codeName})|">
 				    이름(직급/디자인)
@@ -110,7 +118,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				<div class="mb-3">
 				  <strong>개발 :</strong>
 				  <span th:each="member : ${project.project_members}"
-				        th:if="${member.project_member.structure.codeName == '개발팀' and member.is_manager == 'N'}"
+				        th:if="${member.project_member.structure.codeName == '개발팀' and member.is_manager == 'N' and member.visible_yn == 'Y'}"
 				        class="me-2 d-inline-block text-muted"
 				        th:text="|${member.project_member.employeeName}(${member.project_member.employeePosition}/${member.project_member.structure.codeName})|">
 				    이름(직급/개발)

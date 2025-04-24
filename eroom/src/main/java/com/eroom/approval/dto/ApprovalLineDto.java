@@ -28,6 +28,7 @@ public class ApprovalLineDto {
 	private LocalDateTime approval_line_signed_date; // 결재 라인 결재일
 	private Employee employee; // 결재자
 	private String approval_line_deny_reason; // 결재 반려 사유
+	private int delimeter; // 결재 구분자
 	
 	public ApprovalLine toEntity() {
 		return ApprovalLine.builder()

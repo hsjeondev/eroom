@@ -48,4 +48,7 @@ public class ProjectMember {
 	@Column(name="is_manager")
 	private String isManager;
 	
+	@Column(name="visible_yn")
+	private String visibleYn;
+	
 }
