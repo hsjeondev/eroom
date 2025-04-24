@@ -32,7 +32,7 @@ public class DriveService {
 	            driverDto.setSeparatorCode(
 	                separatorRepository.findBySeparatorName("개인")
 	                    .map(s -> s.getSeparatorCode())
-	                    .orElse("E001") // 기본값 fallback
+	                    .orElse("E001")
 	            );
 	        }
 		
