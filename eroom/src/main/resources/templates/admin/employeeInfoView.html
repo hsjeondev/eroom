@@ -5,6 +5,8 @@
       layout:decorate="~{/include/layout}">
 <head>
   <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
   <title>근태 상세</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -36,7 +38,12 @@
 
   .profile-wrapper:hover .camera-overlay {
     opacity: 1;
-  }    
+  }  
+  .modal-header {
+  height: 40px; /* 원하는 높이로 조절 */
+  padding: 0.5rem 1rem; /* 패딩도 조절 가능 */
+  align-items: center; /* 내용 세로 중앙 정렬 */
+}  
   </style>
 </head>
 <body>
@@ -269,8 +276,8 @@
 						  	data-bs-toggle="modal" data-bs-target="#editAttendanceModal">
 						  	수정
 						  	</a>
-						  <div class="dropdown-divider"></div>
-						  <a class="dropdown-item text-danger" href="#!">삭제</a>
+<!-- 						  <div class="dropdown-divider"></div>
+						  <a class="dropdown-item text-danger" href="#!">삭제</a> -->
 						</div>
 					</div>
 				 </td>
@@ -301,37 +308,38 @@
 
 
 <!-- 근태 정보 수정 모달 -->
-<div class="modal fade" id="editAttendanceModal" tabindex="-1">
+<div class="modal fade" id="editAttendanceModal" tabindex="-1" aria-labelledby="editAttendanceModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
-	  <div class="modal-content border border-translucent rounded-3 shadow-sm">
+	  <div class="modal-content border border-secondary">
 	    <form id="editAttendanceForm" autocomplete="off" name="editAttendanceForm">
 	
 	      <!-- 헤더 -->
-	      <div class="modal-header px-4 py-3 border-0">
-	        <h5 class="modal-title fw-bold">근태 정보 수정</h5>
-	        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+	      <div class="modal-header bg-light">
+	        <h5 class="modal-title" id="editAttendanceModalLagel">근태 정보 수정</h5>
+	        <button class="btn-close btn-close-secondary" type="button" aria-label="Close"></button>
 	      </div>
 	
 	      <!-- 바디 -->
 	      <div class="modal-body px-4 py-2">
-	
+			<input type="hidden" id="employeeNo" name="employeeNo" th:value="${employee.employeeNo}"/>
+			<input type="hidden" id="attendanceNo" name="attendance_no"/>
 			<!-- 출근일시 + 지각 -->
 			<div class="mb-3">
 			  <label for="editCheckInTime" class="form-label fw-semibold">출근일시</label>
-			  <div class="d-flex align-items-center justify-content-between">
+			  <div class="d-flex align-items-center">
 			    <input type="datetime-local" class="form-control" id="editCheckInTime"
-			           name="attendance_check_in_time" style="width: 70%;">
-			    <span id="lateStatus" class="ms-2 text-danger fw-semi-bold" style="width: 20%; text-align: right">지각여부</span>
+			           name="attendance_check_in_time" style="width: 70%;" step="1">
+			    <span id="lateStatus" class="text-danger small fw-semibold ms-7" style="margin-left: 8px;">지각여부</span>
 			  </div>
 			</div>
 			
 			<!-- 퇴근일시 + 조퇴 -->
 			<div class="mb-3">
 			  <label for="editCheckOutTime" class="form-label fw-semibold">퇴근일시</label>
-			  <div class="d-flex align-items-center justify-content-between">
+			  <div class="d-flex align-items-center">
 			    <input type="datetime-local" class="form-control" id="editCheckOutTime"
-			           name="attendance_check_out_time" style="width: 70%;">
-			    <span id="earlyLeaveStatus" class="ms-2 text-danger fw-semi-bold" style="width: 20%; text-align: right">조퇴여부</span>
+			           name="attendance_check_out_time" style="width: 70%;" step="1">
+			    <span id="earlyLeaveStatus" class="text-danger small fw-semibold ms-7" style="margin-left: 8px;">조퇴여부</span>
 			  </div>
 			</div>
 	
@@ -339,8 +347,8 @@
 	
 	      <!-- 푸터 -->
 	      <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
-	        <button type="button" class="btn btn-outline-secondary me-2" id="cancelEditBtn">취소</button>
-	        <button type="submit" class="btn btn-primary">수정하기</button>
+	        <button type="button" class="btn btn-light me-2" id="cancelEditBtn">취소</button>
+	        <button type="button" class="btn btn-primary" id="editSubmitBtn">수정하기</button>
 	      </div>
 	    </form>
 	  </div>
@@ -350,16 +358,16 @@
 <!-- confirm Modal -->
 <div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
+    <div class="modal-content border border-secondary">
+      <div class="modal-header bg-light">
         <h5 class="modal-title" id="confirmSaveModalLabel">수정 확인</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         정말 수정하시겠습니까?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="cancelSaveBtn">취소</button>
+        <button type="button" class="btn btn-light" id="cancelSaveBtn">취소</button>
         <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
       </div>
     </div>
@@ -369,10 +377,10 @@
 <!-- Alert Modal (닫기 경고용) -->
 <div class="modal fade" id="unsavedAlertModal" tabindex="-1" aria-labelledby="unsavedAlertModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="unsavedAlertModalLabel"></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-content border border-secondary">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="unsavedAlertModalLabel">창닫기</h5>
+        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         창을 닫으면 입력한 정보는 사라집니다.<br>계속 닫으시겠습니까?
@@ -384,16 +392,18 @@
     </div>
   </div>
 </div>
-<!-- 수정 이력 없음 안내 모달 -->
-<div class="modal fade" id="noChangeModal" tabindex="-1">
+
+<!-- 퇴근시간 유효성 경고 모달 -->
+<div class="modal fade" id="invalidCheckOutModal" tabindex="-1" aria-labelledby="invalidCheckOutModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">알림</h5>
-        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-content border border-secondary">
+      <div class="modal-header bg-light text-white">
+        <h5 class="modal-title" id="invalidCheckOutModalLabel">입력 오류</h5>
+        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        수정된 이력이 없습니다.
+        퇴근 시간은 출근 시간보다 늦어야 합니다.<br>
+        다시 선택해 주세요.
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary" data-bs-dismiss="modal">확인</button>
@@ -401,7 +411,26 @@
     </div>
   </div>
 </div>
+<!-- 알림 모달 (성공/실패 공통) -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border border-secondary">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="alertMessageModalLabel">알림</h5>
+        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body" id="alertMessageContent">
+        <!-- 서버 응답 메시지가 들어갈 자리 -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+
 	// 상단에 현재 날짜 표시
 	function updateCurrentTime() {
 		const now = new Date();
@@ -412,6 +441,27 @@
 	}
 	updateCurrentTime();
 
+	//서버 응답 메시지를 모달에 표시하고 확인 시 콜백 실행
+	function showAlertModal(message, callback) {
+	  // 메시지를 알림 모달 본문에 삽입
+	  document.getElementById('alertMessageContent').textContent = message;
+
+	  // 알림 모달 인스턴스 생성 또는 가져오기
+	  const alertModal = new bootstrap.Modal(document.getElementById('alertMessageModal'));
+	  alertModal.show();
+
+	  // 확인 버튼 클릭 시 실행할 콜백 등록
+	  const confirmBtn = document.querySelector('#alertMessageModal .btn-primary');
+
+	  // 한 번만 실행되도록 리스너 등록
+	  const handler = () => {
+	    if (callback) callback(); // 예: location.reload()
+	    confirmBtn.removeEventListener('click', handler); // 중복 방지
+	  };
+
+	  confirmBtn.addEventListener('click', handler);
+	}
+	
 	// 차트 데이터를 받아서 각 차트를 렌더링하는 함수
 	async function renderCharts() {
 		
@@ -542,75 +592,170 @@
 	renderCharts();
 
 	// 수정 버튼 클릭 시 모달 열기 및 데이터 채우기
-	document.addEventListener("DOMContentLoaded", function () {
-		  // 수정 버튼 클릭 이벤트 등록
-		  const editButtons = document.querySelectorAll('.edit-attendance-btn');
 
-		  editButtons.forEach(button => {
-		    button.addEventListener('click', function () {
-		      const attendanceNo = this.getAttribute('data-attendance-no');
-		      console.log('클릭한 attendanceNo:', attendanceNo);
 
-		      fetch(`/admin/attendanceDetail?attendanceNo=${attendanceNo}`)
-		        .then(response => {
-		          if (!response.ok) throw new Error('서버 응답 실패');
-		          return response.json();
-		        })
-		        .then(data => {
-		          console.log('받은 데이터:', data);
+  const editModal = document.getElementById('editAttendanceModal');
+  const bsEditModal = bootstrap.Modal.getOrCreateInstance(editModal); // 모달 인스턴스 가져오기 or 생성
+  const alertModal = new bootstrap.Modal(document.getElementById('unsavedAlertModal')); // 닫기 확인용 모달
+  const invalidModal = new bootstrap.Modal(document.getElementById('invalidCheckOutModal')); // 시간 유효성 확인 모달
 
-		          // datetime-local input 형식 맞추기
-		          const checkIn = data.attendance_check_in_time?.replace(' ', 'T') || '';
-		          const checkOut = data.attendance_check_out_time?.replace(' ', 'T') || '';
+  const checkInInput = document.getElementById('editCheckInTime');
+  const checkOutInput = document.getElementById('editCheckOutTime');
 
-		          document.getElementById('editCheckInTime').value = checkIn;
-		          document.getElementById('editCheckOutTime').value = checkOut;
+  // 원래 값을 저장하여 모달 닫기 전 비교용으로 사용
+  let originalData = {
+    checkInTime: '',
+    checkOutTime: ''
+  };
 
-		          document.getElementById('lateStatus').textContent = data.attendance_late_yn === 'Y' ? '지각' : '';
-		          document.getElementById('earlyLeaveStatus').textContent = data.attendance_early_leave_yn === 'Y' ? '조퇴' : '';
-		        })
-		        .catch(err => {
-		          console.error('에러 발생:', err);
-		        });
-		    });
-		  });
+  // 수정 버튼 클릭 시 해당 attendanceNo 기반으로 데이터 fetch
+  document.querySelectorAll('.edit-attendance-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const attendanceNo = button.getAttribute('data-attendance-no');
+
+      document.getElementById('attendanceNo').value = attendanceNo; // attendanceNo input에 값 세팅
+      
+      fetch(`/admin/attendanceDetail?attendanceNo=${attendanceNo}`)
+        .then(res => res.json())
+        .then(data => {
+          // 날짜+시간 값을 input[type="datetime-local"]에 맞춰 세팅
+          const checkIn = data.attendance_check_in_time?.replace(' ', 'T') || '';
+          const checkOut = data.attendance_check_out_time?.replace(' ', 'T') || '';
+
+          // input 값 세팅
+          checkInInput.value = checkIn;
+          checkOutInput.value = checkOut;
+
+          // originalData 설정 (나중에 비교 용도)
+          originalData.checkInTime = checkIn;
+          originalData.checkOutTime = checkOut;
+
+          // 상태 표시 텍스트 설정
+          document.getElementById('lateStatus').textContent = data.attendance_late_yn === 'Y' ? '지각' : '';
+          document.getElementById('earlyLeaveStatus').textContent = data.attendance_early_leave_yn === 'Y' ? '조퇴' : '';
+        });
+    });
+  });
+
+  // 퇴근시간이 출근시간보다 이전이면 오류 모달 표시
+  checkOutInput.addEventListener('change', () => {
+    const inTime = checkInInput.value;
+    const outTime = checkOutInput.value;
+
+    if (inTime && outTime && new Date(outTime) < new Date(inTime)) {
+      // 유효하지 않은 경우 경고 모달 표시, 입력값 초기화 
+      invalidModal.show();
+      checkOutInput.value = ''; // 퇴근시간 초기화
+    }
+  });
+
+  // 닫기 또는 취소 시 변경 여부 확인
+  const closeBtns = [
+    editModal.querySelector('.btn-close'), // 모달 상단의 X버튼
+   document.getElementById('cancelEditBtn') // 푸터의 취소 버튼
+  ];
+
+  closeBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault(); // 기본 닫기 방지
+      // 초 단위를 제거해서 datetime 값을 비교하기 위한 헬퍼 함수
+      // datetime-local input의 값은 'yyyy-MM-ddTHH:mm' 형식이며, 일부 상황에서 초(:ss)까지 붙는 경우가 있음
+      // substring(0, 16)을 사용하면 'yyyy-MM-ddTHH:mm'까지만 잘라서 비교할 수 있음
+      const trimSeconds = (datetimeStr) => datetimeStr.length >= 16 ? datetimeStr.substring(0, 16) : datetimeStr;
+      // 현재 입력된 출근 시간과 퇴근 시간을 input에서 가져와 초 단위를 제거한 문자열로 변환
+      const nowIn = trimSeconds(checkInInput.value);
+      const nowOut = trimSeconds(checkOutInput.value);
+      
+      const originalIn = trimSeconds(originalData.checkInTime);
+      const originalOut = trimSeconds(originalData.checkOutTime);     
+     // 초 단위 차이(예: 09:00:00 vs 09:00)로 인해 false positives를 방지
+    const isModified = (nowIn !== originalIn || nowOut !== originalOut);
+
+      if (isModified) {
+    	  // e.preventDefault(); // 기본 동작 방지
+    	// 변경 내역이 있을 경우 경고 모달 표시  
+        alertModal.show();
+        // 현재 editModal에 prevent-close 클래스를 추가하여 닫기 방지
+        editModal.classList.add('prevent-close');
+      } else {
+    	// 변경 없으면 모달 닫기
+        bsEditModal.hide();
+      }
+    });
+  });
+
+  // 경고 모달 "예" → 닫기 실행
+  document.getElementById('confirmCloseBtn').addEventListener('click', () => {
+    alertModal.hide();
+    bsEditModal.hide();
+    editModal.classList.remove('prevent-close');
+  });
+
+  // 경고 모달 "아니오" → 수정 모달 유지
+  document.getElementById('stayModalBtn').addEventListener('click', () => {
+    alertModal.hide();
+    // 닫혔을 경우에 대비해 prevent-close 클래스를 제거하고 다시 열기
+    if (editModal.classList.contains('prevent-close')) {
+      bsEditModal.show();
+      editModal.classList.remove('prevent-close');
+    }
+  });
+
+	// 수정 모달의 수정하기 버튼 클릭 -> confirm모달 열기
+	const editSubmitBtn = document.getElementById('editSubmitBtn');
+	const confirmModalEl = document.getElementById('confirmSaveModal');
+	const confirmModal = bootstrap.Modal.getOrCreateInstance(confirmModalEl);
+	editSubmitBtn.addEventListener('click', function (e) {
+		e.preventDefault(); // 기본 동작 방지
+		// 모달 열기
+		confirmModal.show();
+	});
+
+	// confirm모달 취소 버튼 클릭 시 confirm 모달만 닫기
+	document.getElementById('cancelSaveBtn').addEventListener('click', function () {
+	  confirmModal.hide();
+	  bsEditModal.hide(); // 수정 모달도 함께 닫기
+	});
+	// confirm모달 확인 버튼 클릭 -> fetch요청
+	// 수정하기 버튼 클릭 시 폼 제출
+		document.getElementById('confirmSaveBtn').addEventListener('click',function(e){
+			 console.log("수정 버튼 클릭됨");
+			 e.preventDefault();
+			// confirm 모달 닫기
+			confirmModal.hide();
+			
+			
+			const form = document.getElementById('editAttendanceForm');
+			const payload = new FormData(form);
+			console.log("폼 데이터:", [...payload.entries()]);
+			fetch('/admin/attendanceUpdate',{
+				method: 'POST',
+				headers:{
+				      'header': document.querySelector('meta[name="_csrf_header"]').content,
+				      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content			
+				},
+				body: payload
+			})
+			.then(response => response.json())
+			.then(data => {
+				
+				console.log("=== 서버 응답 ===");
+				  console.log(data);
+				// 알림 메세지 모달에 서버응답(res_msg) 출력
+				showAlertModal(data.res_msg, function(){
+					if(data.res_code == 200){
+						const employeeNo = document.getElementById('employeeNo').value;
+						location.reload(); // 페이지 새로고침
+						 console.log("페이지 리로드됨");
+					}
+				});
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				showAlertModal("정보 수정 중 오류가 발생했습니다.");
+			});
 		});
-		
-	document.addEventListener('DOMContentLoaded', () => {
-		  const editModal = document.getElementById('editAttendanceModal');
-		  const bsEditModal = bootstrap.Modal.getOrCreateInstance(editModal);
-		  const alertModal = new bootstrap.Modal(document.getElementById('unsavedAlertModal'));
-
-		  // 닫기 버튼 (모달의 오른쪽 상단 X)
-		  editModal.querySelector('.btn-close').addEventListener('click', function (e) {
-		    e.preventDefault();
-		    alertModal.show();
-		  });
-
-		  // 푸터의 취소 버튼
-		document.getElementById('stayModalBtn').addEventListener('click', function (e) {
-		  e.preventDefault();
-		  e.stopPropagation();
-		  alertModal.hide();
-		  
-		  const currentState = document.getElementById('editAttendanceModal').classList.contains('show');
-		  if(!currentState) {
-				bsEditModal.show();
-			}
-		});
-
-		  // 경고 모달: 예 (진짜 닫기)
-		  document.getElementById('confirmCloseBtn').addEventListener('click', function () {
-		    alertModal.hide();
-		    bsEditModal.hide();
-		  });
-
-		  // 경고 모달: 아니오 (유지)
-		  document.getElementById('stayModalBtn').addEventListener('click', function () {
-		    alertModal.hide();
-		  });
-		});	
-
+});
 </script>                         
 
 </main>

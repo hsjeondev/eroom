@@ -445,5 +445,41 @@ public class AttendanceService {
 		return new AttendanceDto().toDto(attendance);
 	}
 	
+	// 근태 기록 수정
+	public AttendanceDto updateAttendance(Long attendanceNo, String checkIn, String checkOut) {
+		Attendance attendance = attendanceRepository.findById(attendanceNo).orElse(null);
+		
+		// 문자열로 받은 시간 -> LocalDateTime 변환
+//		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+//		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+		// 초 부분에 [] 붙이면 초가 있어도, 없어도 파싱 가능
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm[:ss]");
+		try {
+			if (checkIn != null && !checkIn.isEmpty()) {
+				LocalDateTime checkInTime = LocalDateTime.parse(checkIn,formatter);
+				attendance.setAttendanceCheckInTime(checkInTime);
+				attendance.setAttendanceLateYn(checkInTime.toLocalTime().isAfter(LocalTime.of(9, 0, 0)) ? "Y" : "N");
+				
+			}
+			
+			if(checkOut != null && !checkOut.isEmpty()) {
+				LocalDateTime checkOutTime = LocalDateTime.parse(checkOut,formatter);
+				attendance.setAttendanceCheckOutTime(checkOutTime);
+				attendance.setAttendanceEarlyLeaveYn(checkOutTime.toLocalTime().isBefore(LocalTime.of(18, 0, 0 )) ? "Y" : "N");
+				
+			}
+			
+			 Attendance saved = attendanceRepository.save(attendance);
+		        return new AttendanceDto().toDto(saved);
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		
+		
+	}
+	
 
 }

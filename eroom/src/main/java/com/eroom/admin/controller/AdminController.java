@@ -3,6 +3,7 @@ package com.eroom.admin.controller;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -228,18 +229,28 @@ public class AdminController {
 	public AttendanceDto getAttendanceDetail(@RequestParam("attendanceNo") Long attendanceNo){
 	    System.out.println("받은 attendanceNo: " + attendanceNo);
 	    AttendanceDto dto = attendanceService.findAttendanceByNo(attendanceNo);
-	    System.out.println("반환할 DTO: " + dto);
 	    return dto;
 	}
 	
 	@PostMapping("attendanceUpdate")
 	@ResponseBody
-	public Map<String, Object> updateAttendance(@RequestParam("attendanceNo") Long attendanceNo,
-			@RequestParam("attendanceCheckInTime") String attendanceCheckInTime,
-			@RequestParam("attendanceCheckOutTime") String attendanceCheckOutTime) {
+	public Map<String, Object> updateAttendance(@RequestParam("attendance_no") Long attendanceNo,
+			@RequestParam("attendance_check_in_time") String checkIn,
+			@RequestParam("attendance_check_out_time") String checkOut) {
+		
 		// 출근시간, 퇴근시간 수정
-		// return attendanceService.updateAttendance(attendanceNo, attendanceCheckInTime, attendanceCheckOutTime);
-		return null;
+		AttendanceDto updateDto = attendanceService.updateAttendance(attendanceNo, checkIn, checkOut);
+		
+	    Map<String, Object> resultMap = new HashMap<>();
+	    if(updateDto != null) {
+	    	resultMap.put("res_code", 200);
+	    	resultMap.put("res_msg", "근태 정보가 성공적으로 수정되었습니다.");
+	    	resultMap.put("updateAttendance", updateDto);
+	    }else {
+			resultMap.put("res_code", 500);
+			resultMap.put("res_msg", "근태 정보 수정에 실패하였습니다.");
+	    }
+		return resultMap;
 	}
 	
 	
