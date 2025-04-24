@@ -428,7 +428,7 @@
 
 	</script>
 
-	<script>
+	<script th:inline="javascript">
 		document.getElementById('approvalSubmitBtn').addEventListener('click', function (event) {
 		  event.preventDefault(); // 기본 제출 방지
 		
@@ -509,6 +509,8 @@
 		  // [4] 작성자 정보 수집
 		  const writerFields = ["date", "department_name", "team_name", "employee_position", "employee_name"];
 		  const writerData = {};
+		  // edit모드일 경우 approval 객체에서 값 가져오기
+		  const editApprovalNo = /*[[${approval.approval_no}]]*/ null;
 		  writerFields.forEach(field => {
 		    const el = document.getElementById(`basic-form-${field}`);
 		    writerData[field] = el ? (el.value ?? el.textContent.trim()) : null;
@@ -532,7 +534,8 @@
 		      agreerIds,
 		      agreerSteps,
 		      refererIds,
-		      refererSteps
+		      refererSteps,
+		      editApprovalNo : editApprovalNo
 		    })
 		  })
 		  .then(res => res.json())

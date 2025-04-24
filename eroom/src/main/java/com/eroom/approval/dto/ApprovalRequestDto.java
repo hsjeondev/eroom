@@ -24,5 +24,7 @@ public class ApprovalRequestDto {
 
     private List<Long> refererIds;
     private List<Integer> refererSteps;
+    
+    private Long editApprovalNo;
 
 }

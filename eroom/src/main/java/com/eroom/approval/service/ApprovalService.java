@@ -38,6 +38,20 @@ public class ApprovalService {
 		try {
 //			ObjectMapper objectMapper = new ObjectMapper();
 //			String json = objectMapper .writeValueAsString(dto.getContent());
+			
+			
+			if(dto.getEditApprovalNo() != null) {
+				Approval temp = approvalRepository.findById(dto.getEditApprovalNo()).orElse(null);
+				if(temp != null) {
+					ApprovalDto approvalDto = new ApprovalDto().toDto(temp);
+					approvalDto.setApproval_no(dto.getEditApprovalNo());
+					approvalDto.setApproval_visible_yn("N");
+					approvalDto.setApproval_completed_date(LocalDateTime.now());
+					temp = approvalDto.toEntity();
+					approvalRepository.save(temp);
+				}
+			}
+			
 			Employee emp = employeeRepository.findById(employeeNo).orElse(null);
 			
 			Approval approval = Approval.builder()

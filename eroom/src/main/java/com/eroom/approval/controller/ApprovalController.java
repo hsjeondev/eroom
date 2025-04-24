@@ -166,6 +166,8 @@ public class ApprovalController {
         // 부서 코드네임 조회
 		List<SeparatorDto> structureList = employeeService.findDistinctStructureNames();
 		model.addAttribute("structureList", structureList);
+		
+		
 		return "/approval/create";
 	}
 	
