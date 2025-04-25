@@ -210,7 +210,7 @@
                     return confirmationMessage;
                 }
             }); */
-            window.onpageshow = function(event) {
+            /* window.onpageshow = function(event) {
                 // 뒤로가기 시에도 이 코드 실행됨
                 if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
                     const draftData = sessionStorage.getItem("mail_draft");
@@ -236,7 +236,7 @@
                         }
                     }
                 }
-            };
+            }; */
             
             document.getElementById("tempSaveBtn").addEventListener("click", function () {
                 if (confirm("작성 중인 메일을 임시저장하시겠습니까?")) {
