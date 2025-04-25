@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -141,6 +143,43 @@ public class DriveController {
 			return ResponseEntity.badRequest().build();
 		}
 	}
+	// 개인 파일 일괄 다운로드
+	@PostMapping("/download/personal/bulk")
+	public ResponseEntity<Resource> bulkDownload(@RequestParam("fileIds") List<Long> fileIds) {
+	    try {
+	        // 임시 zip 파일 생성
+	        Path zipPath = Files.createTempFile("bulk-download-", ".zip");
+
+	        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(zipPath))) {
+	            for (Long id : fileIds) {
+	                Drive drive = driveService.findByDriveAttachNo(id);
+	                if (drive == null) continue;
+
+	                Path filePath = Paths.get(fileDir + drive.getDrivePath());
+	                if (!Files.exists(filePath)) continue;
+
+	                // ZIP 안에 들어갈 파일 이름
+	                String zipEntryName = drive.getDriveOriName();
+	                zos.putNextEntry(new ZipEntry(zipEntryName));
+	                Files.copy(filePath, zos);
+	                zos.closeEntry();
+	            }
+	        }
+	        // zip 파일 리소스화
+	        Resource resource = new InputStreamResource(Files.newInputStream(zipPath));
+
+	        return ResponseEntity.ok()
+	                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"bulk-download.zip\"")
+	                .contentType(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM)
+	                .contentLength(Files.size(zipPath))
+	                .body(resource);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.badRequest().build();
+	    }
+	}
+
 	
 	
 	// -------------------------------------------- 파일 삭제 ------------------------------------------

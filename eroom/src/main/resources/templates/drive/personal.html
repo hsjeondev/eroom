@@ -99,7 +99,7 @@
                 <i class="fas fa-ellipsis fs-10"></i>
               </button>
               <div class="dropdown-menu dropdown-menu-end py-2">
-                <a class="dropdown-item" href="#">일괄 다운로드</a>
+                <a class="dropdown-item" href="#" id="bulk-download">일괄 다운로드</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item text-danger" href="#">일괄 삭제</a>
               </div>
@@ -340,6 +340,56 @@
 	        });
 	    });
 	});
+//전체 선택 체크박스 동작
+  document.addEventListener('DOMContentLoaded', function () {
+    const selectAllCheckbox = document.getElementById('select-all');
+    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener('change', function () {
+        rowCheckboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+      });
+    }
+
+    // 체크된 파일 일괄 다운로드
+    const bulkDownloadBtn = document.getElementById('bulk-download');
+    if (bulkDownloadBtn) {
+      bulkDownloadBtn.addEventListener('click', function () {
+        const checkboxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+
+        if (checkboxes.length === 0) {
+          alert('다운로드할 파일을 선택하세요.');
+          return;
+        }
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/drive/download/personal/bulk';
+        form.style.display = 'none';
+	
+        // CSRF 토큰 추가 (form submit 시 필요)
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_csrf';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+        
+        checkboxes.forEach(cb => {
+          const row = cb.closest('tr');
+          const id = row.querySelector('.delete-file').getAttribute('data-id');
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'fileIds';
+          input.value = id;
+          form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+      });
+    }
+  });
 
 </script>
 
