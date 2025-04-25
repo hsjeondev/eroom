@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +21,7 @@ import com.eroom.security.EmployeeDetails;
 import com.eroom.survey.dto.SurveyDto;
 import com.eroom.survey.dto.SurveyItemDto;
 import com.eroom.survey.dto.VoteRequest;
+import com.eroom.survey.dto.VoteResultDto;
 import com.eroom.survey.service.SurveyItemService;
 import com.eroom.survey.service.SurveyService;
 import com.eroom.survey.service.SurveyVoteService;
@@ -113,10 +113,8 @@ public class SurveyController {
 
 	@GetMapping("/detail")
 	@ResponseBody
-	public List<SurveyItemDto> surveyDetail(@RequestParam("id") Long surveyNo,
-	                                        @AuthenticationPrincipal EmployeeDetails userDetails) {
-	    Long voterId = userDetails.getEmployee().getEmployeeNo();
-	    return surveyItemService.findVotedItem(surveyNo, voterId);
+	public List<VoteResultDto> surveyDetail(@RequestParam("id") Long surveyNo) {
+	    return surveyVoteService.findVoteResults(surveyNo);
 	}
 
 	@PostMapping("/vote")
@@ -140,6 +138,16 @@ public class SurveyController {
 	    }
 
 	    return response;
+	}
+	
+	@GetMapping("/voter-count")
+	@ResponseBody
+	public Map<String, Integer> getVoterCount(@RequestParam("id") Long surveyId) {
+		int count = surveyVoteService.getVoterCount(surveyId);
+
+		Map<String, Integer> result = new HashMap<>();
+		result.put("voterCount", count);
+		return result;
 	}
 
 }
