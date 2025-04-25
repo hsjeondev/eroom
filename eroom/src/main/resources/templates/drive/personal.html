@@ -68,13 +68,23 @@
       </ul>
     </div>
   </div>
-
-  <!-- 드라이브 테이블 -->
+  <!-- 검색,정렬,페이징  -->
   <div id="tableExample3" data-list='{"valueNames":["filename","filesize","description","writer","date","download"],"page":5,"pagination":true}'>
+  <!-- 검색창  -->  
+  <div class="search-box mb-3 mx-auto">
+      <form class="position-relative">
+        <input class="form-control search-input search form-control-sm" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
+        <svg class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+        </svg>
+      </form>
+    </div>
+  
+  <!-- 드라이브 테이블 -->
   <div class="table-responsive">
     <table class="table table-striped table-sm fs-9 mb-0">
       <thead class="align-middle">
-        <tr style="vertical-align: middle;">
+        <tr class="align-middle" style="vertical-align: middle;">
           <th class="ps-3 py-2"><input class="form-check-input" type="checkbox" id="select-all" /></th>
           <th class="sort py-2">파일</th>
           <th class="sort py-2" data-sort="filename">파일명</th>
@@ -97,7 +107,7 @@
           </th>
         </tr>
       </thead>
-      <tbody class="table-list" th:if="${not #lists.isEmpty(fileList)}" th:each="file : ${fileList}">
+      <tbody class="list" th:if="${not #lists.isEmpty(fileList)}" th:each="file : ${fileList}">
         <tr>
           <td class="align-middle ps-3"><input class="form-check-input row-checkbox" type="checkbox" /></td>
           <td class="align-middle"><img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" width="24" height="24" alt="파일" /></td>
@@ -166,6 +176,7 @@
 	    </form>
 	  </div>
 	</div>
+  </div>
 	
     <!-- 페이징 -->
     <div class="d-flex justify-content-between mt-3">
@@ -178,7 +189,6 @@
         <button class="page-link pe-0" data-list-pagination="next" disabled><i class="fas fa-chevron-right"></i></button>
       </div>
     </div>
-  </div>
 </div>
   <!-- 스크립트 -->
   <script>
@@ -217,6 +227,7 @@
     			  </div>
     			`
 	    		});
+	    		
 		    	document.getElementById("upload-confirm-btn").addEventListener("click", function () {
 		    	    dz.processQueue();
 		    	});
@@ -232,8 +243,6 @@
     	    			}
     	    		});
 	    		});
-	    		
-	    		
 	    		// 업로드 완료 후
 	    		dz.on("queuecomplete", function () {
     			  document.querySelector("#upload-confirm-btn").disabled = false;
