@@ -15,6 +15,8 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
 	// 개인 드라이브 파일 리스트 조회
 	List<Drive> findByUploader_EmployeeNoAndDriveDeleteYn(Long employeeNo, String deleteYn);
 
+	 Drive findByDriveAttachNo(Long driveAttachNo);
+	
 	@Modifying
 	@Query("UPDATE Drive df SET df.driveDeleteYn = 'Y' WHERE df.driveAttachNo = :attachNo")
 	int updateDeleteStatus(@Param("attachNo") Long attachNo);

@@ -73,7 +73,7 @@ public class DriveService {
 		                .driveNewName(newName)
 		                .driveType(ext)
 		                .driveSize(file.getSize())
-		                .drivePath("/upload/personal/" + newName)
+		                .drivePath("personal/" + newName)
 		                .driveDescription(description)
 		                .downloadCount(0L)
 		                .driveDeleteYn("N")
@@ -120,7 +120,7 @@ public class DriveService {
 	            drive.setDriveNewName(newName);
 	            drive.setDriveType(ext);
 	            drive.setDriveSize(file.getSize());
-	            drive.setDrivePath("/upload/personal/" + newName);
+	            drive.setDrivePath("personal/" + newName);
 	        }
 	        // 설명만 변경할 수도 있음
 	        drive.setDriveDescription(description);
@@ -137,6 +137,12 @@ public class DriveService {
 	@Transactional
 	public int deleteDriveFile(Long driveAttachNo) {
 	    return driveRepository.updateDeleteStatus(driveAttachNo);
+	}
+	// ------------------------- 개인 드라이브 파일 다운로드 --------------------------
+	public Drive findByDriveAttachNo(Long id) {
+		Drive drive = driveRepository.findByDriveAttachNo(id);
+		System.out.println("drive 객채 : "+ drive);
+		return drive;
 	}
 
 

@@ -1,9 +1,17 @@
-package com.eroom.drive.contorller;
+package com.eroom.drive.controller;
 
+import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.eroom.drive.dto.DriveDto;
+import com.eroom.drive.entity.Drive;
 import com.eroom.drive.service.DriveService;
 import com.eroom.security.EmployeeDetails;
 
@@ -28,6 +37,10 @@ import lombok.RequiredArgsConstructor;
 public class DriveController {
 
 	private final DriveService driveService;
+	// 파일 저장 경로 
+		 @Value("${ffupload.location}")
+		 private String fileDir;
+	
 	
 	// ------------------------------------------ 드라이브 메인 ------------------------------------------
 	// 회사 드라이브 
@@ -92,7 +105,42 @@ public class DriveController {
 
 	
 	// ---------------------------------- 파일 다운로드 ------------------------------------------
-	
+	// 개인 파일 다운로드
+	@GetMapping("/download/personal/{driveAttachNo}")
+	public ResponseEntity<Object> fileDownload(@PathVariable("driveAttachNo") Long id) {
+		System.out.println("다운로드 시도: " + id);
+		try {
+			// DB에서 파일 정보 가져오기
+			Drive drive = driveService.findByDriveAttachNo(id);
+			if (drive == null) {
+			    System.out.println("해당 ID로 파일을 찾을 수 없음");
+			    return ResponseEntity.notFound().build();
+			}
+			// 실제 파일 경로
+			System.out.println("drive.getDrivePath(): " + drive.getDrivePath());
+			Path filePath = Paths.get(fileDir + drive.getDrivePath());
+			System.out.println("파일 경로: " + filePath.toString());
+			System.out.println("파일 존재 여부: " + Files.exists(filePath));
+			if(!Files.exists(filePath)) {
+				return ResponseEntity.notFound().build();
+			}
+			// 파일명 한글 깨짐 방지
+			String encodedFileName = URLEncoder.encode(drive.getDriveOriName(), "UTF-8")
+											   .replaceAll("\\+", "%20");
+            // 응답 생성
+			Resource resource = new InputStreamResource(Files.newInputStream(filePath));
+			// 다운로드 응답
+			return ResponseEntity.ok()
+					.header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+					.contentType(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM)
+					.body(resource);
+			
+		} catch (Exception e) {
+			System.out.println("파일 다운로드 중 예외 발생: " + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.badRequest().build();
+		}
+	}
 	
 	
 	// -------------------------------------------- 파일 삭제 ------------------------------------------
