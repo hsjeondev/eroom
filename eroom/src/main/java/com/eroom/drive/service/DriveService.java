@@ -17,6 +17,7 @@ import com.eroom.drive.repository.DriveRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.SeparatorRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 
@@ -26,9 +27,12 @@ public class DriveService {
 	
 	private final DriveRepository driveRepository;
 	private final SeparatorRepository separatorRepository;
+	
+	// 파일 저장 경로 
 	 @Value("${ffupload.location}")
 	 private String fileDir;
-	// 파일 업로드
+	
+	// ------------------------- 개인 드라이브 파일 업로드 --------------------------
 	public int uploadDriveFiles(DriveDto driverDto, Long employeeNo) {
 		int result = 0;
 		
@@ -84,7 +88,7 @@ public class DriveService {
 		}
 		return result;
 	}
-	// 개인 드라이브 파일 리스트 조회
+	// ------------------------- 개인 드라이브 파일 리스트 조회 --------------------------
 	public List<DriveDto> findPersonalDriveFiles(Long employeeNo) {
 	    List<Drive> drives = driveRepository.findByUploader_EmployeeNoAndDriveDeleteYn(employeeNo, "N");
 	    List<DriveDto> result = new ArrayList<>();
@@ -95,7 +99,7 @@ public class DriveService {
 
 	    return result;
 	}
-	// 파일 수정
+	// ------------------------- 개인 드라이브 파일 수정 --------------------------
 	public boolean updateDriveFile(Long attachNo, MultipartFile file, String description) {
 	    try {
 	        Optional<Drive> optionalDrive = driveRepository.findById(attachNo);
@@ -128,6 +132,11 @@ public class DriveService {
 	        e.printStackTrace();
 	        return false;
 	    }
+	}
+	// ------------------------- 개인 드라이브 파일 삭제 --------------------------
+	@Transactional
+	public int deleteDriveFile(Long driveAttachNo) {
+	    return driveRepository.updateDeleteStatus(driveAttachNo);
 	}
 
 
