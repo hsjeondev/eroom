@@ -45,10 +45,10 @@
 							</select>
 					
 					        <!-- 참여자 선택 -->
-					        <label for="employeeSelect" class="form-label mt-3">참여자 선택</label>
+					        <label for="employeeSelect" class="form-label mt-3">수신자 선택</label>
 					        <div class="d-flex">
 					          <select class="form-select me-2" id="employeeSelect">
-					            <option selected>-- 참여자 선택 --</option>
+					            <option selected>-- 수신자 선택 --</option>
 					            <!-- JS로 채워짐 -->
 					          </select>
 					          <button type="button" class="btn btn-primary" id="addEmployeeBtn" onclick="addParticipant()">추가</button>
@@ -56,7 +56,7 @@
 					
 					        <!-- 선택된 참여자 표시 -->
 					        <div class="mt-3">
-					          <strong>선택된 참여자</strong>
+					          <strong>선택된 수신자</strong>
 					          <ul id="selectedEmployeeList" class="list-unstyled mt-2"></ul>
 					        </div>
 					      </div>
@@ -76,7 +76,7 @@
 						    .then(response => response.json())
 						    .then(data => {
 						      const employeeSelect = document.getElementById("employeeSelect");
-						      employeeSelect.innerHTML = '<option selected disabled>-- 참여자 선택 --</option>'; // 초기화
+						      employeeSelect.innerHTML = '<option selected disabled>-- 수신자 선택 --</option>'; // 초기화
 
 						      data.forEach(emp => {
 						        const option = document.createElement("option");
@@ -87,13 +87,12 @@
 						    })
 						    .catch(error => console.error("직원 불러오기 실패", error));
 						});
-					/* test */	
 					function addParticipant() {
 					  const select = document.getElementById('employeeSelect');
 					  const selectedOptions = Array.from(select.selectedOptions);
 					
 					  if (selectedOptions.length === 0) {
-					    alert('참여자를 선택해주세요.');
+					    alert('수진자를 선택해주세요.');
 					    return;
 					  }
 					
@@ -102,7 +101,7 @@
 					    const employeeName = option.text;
 					
 					    if (document.getElementById('receiver-' + employeeNo)) {
-					      alert('이미 추가된 참여자입니다.');
+					      alert('이미 추가된 수신자입니다.');
 					      return;
 					    }
 					
@@ -133,34 +132,6 @@
 						  const names = Array.from(badges).map(badge => badge.childNodes[0].textContent.trim());
 						  document.getElementById('receiverInput').value = names.join(', ');
 						}
-					
-					
-					
-					/*function confirmManagerSelection() {
-				          const selectedBadges = document.getElementById('selectedManagers').querySelectorAll('.badge');
-				          let managerNames = [];
-				          const container = document.getElementById('managerIdsContainer');
-				          container.innerHTML = ""; // 기존 hidden 값 초기화
-				          selectedBadges.forEach(badge => {
-				            const managerId = badge.id.replace('manager-', '');
-				            managerNames.push(badge.textContent.replace('×', '').trim());
-				            // hidden input 생성
-				            const hiddenInput = document.createElement('input');
-				            hiddenInput.type = "hidden";
-				            hiddenInput.name = "managerIds";
-				            hiddenInput.value = managerId;
-				            container.appendChild(hiddenInput);
-				          });
-				          document.getElementById('managers').value = managerNames.join(', ');
-				          
-				          // 모달 닫기
-				          const modalElem = document.getElementById('select_manager_modal');
-				          const modalInstance = bootstrap.Modal.getInstance(modalElem);
-				          if (modalInstance) {
-				            modalInstance.hide();
-				          }
-				        }*/
-					
 					</script>
 
                       <!-- <div class="col-4">
@@ -170,8 +141,117 @@
                         <input class="form-control" type="email" placeholder="BCC" />
                       </div> -->
                       <div class="col-4">
-                      	<input class="form-control" type="text" value="참조자 넣을곳">
+                      	<input class="form-control" type="text" id="ccInput" placeholder="참조자" readonly data-bs-toggle="modal" data-bs-target="#ccModal" />
                       </div>
+                      <!-- 참조자 모달 -->
+                      <div class="modal fade" id="ccModal" tabindex="-1" aria-labelledby="ccModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ccModalLabel">참조자 선택</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <!-- 소속 선택 -->
+        <label for="ccDeptSelect" class="form-label">소속</label>
+        <select class="form-select" id="ccDeptSelect">
+          <option selected disabled>-- 소속 선택 --</option>
+          <option th:each="dept : ${departments}"
+                  th:value="${dept.separator_code}"
+                  th:text="${dept.separator_name}"></option>
+        </select>
+
+        <!-- 참조자 선택 -->
+        <label for="ccEmployeeSelect" class="form-label mt-3">참조자 선택</label>
+        <div class="d-flex">
+          <select class="form-select me-2" id="ccEmployeeSelect">
+            <option selected>-- 참조자 선택 --</option>
+            <!-- JS로 채워짐 -->
+          </select>
+          <button type="button" class="btn btn-primary" id="addCcBtn" onclick="addCc()">추가</button>
+        </div>
+
+        <!-- 선택된 참조자 표시 -->
+        <div class="mt-3">
+          <strong>선택된 참조자</strong>
+          <ul id="selectedCcList" class="list-unstyled mt-2"></ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmCcSelectionBtn" data-bs-dismiss="modal">선택</button>
+      </div>
+    </div>
+  </div>
+</div>
+                      <!-- 참조자 모달 -->
+                      <script>
+                      document.getElementById("ccDeptSelect").addEventListener("change", function () {
+                    	  const separatorCode = this.value;
+
+                    	  // 참조자 목록을 로드하는 API 호출
+                    	  fetch("/search-employees?separator_code=" + separatorCode)
+                    	    .then(response => response.json())
+                    	    .then(data => {
+                    	      const ccEmployeeSelect = document.getElementById("ccEmployeeSelect");
+                    	      ccEmployeeSelect.innerHTML = '<option selected disabled>-- 참조자 선택 --</option>'; // 초기화
+
+                    	      data.forEach(emp => {
+                    	        const option = document.createElement("option");
+                    	        option.value = emp.employee_no;
+                    	        option.textContent = emp.employee_name;
+                    	        ccEmployeeSelect.appendChild(option);
+                    	      });
+                    	    })
+                    	    .catch(error => console.error("직원 불러오기 실패", error));
+                    	});
+
+                    	function addCcParticipant() {
+                    	  const select = document.getElementById('ccEmployeeSelect');
+                    	  const selectedOptions = Array.from(select.selectedOptions);
+
+                    	  if (selectedOptions.length === 0) {
+                    	    alert('참조자를 선택해주세요.');
+                    	    return;
+                    	  }
+
+                    	  selectedOptions.forEach(option => {
+                    	    const employeeNo = option.value;
+                    	    const employeeName = option.text;
+
+                    	    if (document.getElementById('cc-' + employeeNo)) {
+                    	      alert('이미 추가된 참조자입니다.');
+                    	      return;
+                    	    }
+
+                    	    // 배지 생성
+                    	    const badge = document.createElement('span');
+                    	    badge.className = 'badge bg-secondary text-white me-2 mb-2';
+                    	    badge.id = 'cc-' + employeeNo;
+                    	    badge.innerHTML = `
+                    	      ${employeeName}
+                    	      <button type="button" class="btn-close btn-close-white btn-sm ms-2" style="font-size: 0.6rem;" onclick="removeCcParticipant('${employeeNo}')"></button>
+                    	      <input type="hidden" name="ccNos" value="${employeeNo}">
+                    	    `;
+                    	    document.getElementById('selectedCcList').appendChild(badge);
+                    	  });
+                    	  updateCcInput();
+                    	}
+
+                    	function removeCcParticipant(employeeNo) {
+                    	  const badge = document.getElementById('cc-' + employeeNo);
+                    	  if (badge) {
+                    	    badge.remove();
+                    	    updateCcInput();
+                    	  }
+                    	}
+
+                    	function updateCcInput() {
+                    	  const badges = document.querySelectorAll('#selectedCcList .badge');
+                    	  const names = Array.from(badges).map(badge => badge.childNodes[0].textContent.trim());
+                    	  document.getElementById('ccInput').value = names.join(', ');
+                    	}
+                      </script>
                       <div class="col-12">
                         <input class="form-control" type="text" name="mail_title" id="mail_title" placeholder="제목" />
                       </div>
@@ -182,9 +262,10 @@
                     <div class="d-flex justify-content-between align-items-center">
                       <div class="d-flex">
                         <label class="btn btn-link py-0 px-2 text-body fs-9" for="emailAttachment"> <span class="fa-solid fa-paperclip"></span></label>
-                        <input class="d-none" id="emailAttachment" type="file" />
-                        <label class="btn btn-link py-0 px-2 text-body fs-9" for="emailPhotos"><span class="fa-solid fa-image"></span></label>
-                        <input class="d-none" id="emailPhotos" type="file" accept="image/*" />
+                        <input class="d-none" id="emailAttachment" name="mail_files" type="file" multiple/>
+                        <div id="filePreview" class="mt-2"></div>
+                        <!-- <label class="btn btn-link py-0 px-2 text-body fs-9" for="emailPhotos"><span class="fa-solid fa-image"></span></label>
+                        <input class="d-none" id="emailPhotos" type="file" accept="image/*" /> -->
                       </div>
                       <div class="d-flex">
                         <button class="btn btn-link text-body fs-10 text-decoration-none" type="button" id="tempSaveBtn">임시저장</button>
@@ -268,6 +349,9 @@
     				 e.preventDefault();
     				 tinymce.triggerSave();
     				const payload = new FormData(form);
+    				selectedFiles.forEach(file => {
+    			        payload.append("mail_files", file); // name="mail_files"와 동일해야 함
+    			    });
     				fetch("/mail/create",{
 						method:'post',
 						headers : {
@@ -284,6 +368,57 @@
 						}
 					});
             	})
+            	
+            	const selectedFiles = [];
+
+				document.getElementById('emailAttachment').addEventListener('change', function(event) {
+				    const fileList = Array.from(event.target.files);
+				    const previewContainer = document.getElementById('filePreview');
+				
+				    // 새로 선택된 파일들을 기존 배열에 추가
+				    fileList.forEach(file => {
+				        // 중복 방지 (같은 파일명+크기 조합)
+				        const exists = selectedFiles.some(f => f.name === file.name && f.size === file.size);
+				        if (!exists) selectedFiles.push(file);
+				    });
+				
+				    // 미리보기 다시 렌더링
+				    renderFilePreview();
+				    
+				    // input 초기화해서 같은 파일도 다시 선택 가능하게 만듦
+				    event.target.value = "";
+				});
+				
+				function renderFilePreview() {
+				    const previewContainer = document.getElementById('filePreview');
+				    previewContainer.innerHTML = '';
+				    if (selectedFiles.length === 0) {
+				        //previewContainer.innerHTML = '<small class="text-muted">선택된 파일이 없습니다.</small>';
+				        return;
+				    }
+				
+				    const ul = document.createElement('ul');
+				    ul.className = 'list-unstyled';
+				
+				    selectedFiles.forEach((file, index) => {
+				        const li = document.createElement('li');
+				        li.className = 'mb-1';
+				        li.innerHTML = `
+				        	  <span class="badge bg-light text-dark d-flex align-items-center justify-content-between px-2 py-1" style="font-size: 0.85rem; min-width: 180px;">
+				        	    ${file.name} <small>(${(file.size / 1024).toFixed(1)} KB)</small>
+				        	    <button type="button" class="btn btn-sm btn-outline-secondary ms-2 py-0 px-1" style="font-size: 0.7rem; line-height: 1;" onclick="removeSelectedFile(${index})">✕</button>
+				        	  </span>
+				        	`;
+				        ul.appendChild(li);
+				    });
+				
+				    previewContainer.appendChild(ul);
+				}
+				
+				function removeSelectedFile(index) {
+				    selectedFiles.splice(index, 1);
+				    renderFilePreview();
+				}
             </script>
             
 </main>
