@@ -170,6 +170,27 @@ public class MailController {
 		model.addAttribute("departments", departments); // 부서 드롭다운용
 		return "mail/mailCreate";
 	}
+	
+	// 메일 임시저장 
+
+	@PostMapping("/mail/draft") // 임시저장
+	@ResponseBody
+	public Map<String, String> saveDraft(MailDto mailDto,
+										@RequestParam(name="mail_status") String mailStatus) {
+		Map<String, String> resultMap = new HashMap<String,String>();
+		resultMap.put("res_code", "500");
+		resultMap.put("res_msg", "임시저장중 오류가 발생하였습니다.");
+		int result = mailService.saveMail(mailDto, mailStatus);
+		if(result >0) {
+			resultMap.put("res_code", "200");
+			resultMap.put("res_msg", "임시저장 되었습니다..");	
+		}
+	    //mailDto.setMailStatus("Y"); // mail_status 직접 세팅
+				//mailService.saveDraft(mailDto);
+				return resultMap;
+	}
+	
+	
 	// 메일 작성 로직
 	// mail DB에 데이터 넣는거만 가능
 	@PostMapping("/mail/create")
