@@ -196,7 +196,7 @@
       	</table>
       	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/business_trip_report :: business_trip_report}"></div>
       </div>
-      <!-- 휴가신청서 -->
+      <!-- 연차신청서 -->
       <div th:if="${approval.approval_format.approvalFormatNo == 7}"  >
       	<table class="table table-bordered text-center align-middle mb-0">
       		<tr>
@@ -204,6 +204,15 @@
       		</tr>
       	</table>
       	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/leave_request :: leave_request}"></div>
+      </div>
+      <!-- 반차신청서 -->
+      <div th:if="${approval.approval_format.approvalFormatNo == 8}"  >
+      	<table class="table table-bordered text-center align-middle mb-0">
+      		<tr>
+      			<th class="fw-bold fs-7" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      		</tr>
+      	</table>
+      	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/leave_half_request :: leave_half_request}"></div>
       </div>
    </div>
 
@@ -318,22 +327,25 @@
 				const employeeNo = /*[[${employee.employeeNo}]]*/ 0;
 				const status = this.dataset.approvalStatus;
 	
-				let con1;
+				let con1 = false;
+				let con2 = false;
 				let delimeter;
 	
 				if (this.id === 'approvalApproveBtn' || this.id === 'approvalDenyBtn') {
 					const actionText1 = status === 'A' ? '승인' : (status === 'D' ? '반려' : '처리');
 					con1 = confirm(`결재를 ${actionText1}하시겠습니까?`);
+					delimeter = 1;
 				} else if (this.id === 'agreementApproveBtn' || this.id === 'agreementDenyBtn') {
 					const actionText2 = status === 'A' ? '합의' : (status === 'D' ? '반려' : '처리');
-					con1 = confirm(`결재를 ${actionText2}하시겠습니까?`);
+					con2 = confirm(`결재를 ${actionText2}하시겠습니까?`);
+					delimeter = 0;
 				}
 	
-				if (con1 === true) {
+				/* if (con1 === true) {
 					delimeter = 0;
 				} else {
 					delimeter = 1;
-				}
+				} */
 			    
 				if(con1 == true){
 					fetch('/approvalLine/approveDenyAgreement', {

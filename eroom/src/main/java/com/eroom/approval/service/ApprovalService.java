@@ -1,7 +1,12 @@
 package com.eroom.approval.service;
 
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +18,9 @@ import com.eroom.approval.entity.ApprovalFormat;
 import com.eroom.approval.entity.ApprovalLine;
 import com.eroom.approval.repository.ApprovalLineRepository;
 import com.eroom.approval.repository.ApprovalRepository;
+import com.eroom.attendance.dto.AnnualLeaveDto;
+import com.eroom.attendance.entity.AnnualLeave;
+import com.eroom.attendance.repository.AnnualLeaveRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 
@@ -25,6 +33,7 @@ public class ApprovalService {
 	private final ApprovalRepository approvalRepository;
 	private final EmployeeRepository employeeRepository;
 	private final ApprovalLineRepository approvalLineRepository;
+	private final AnnualLeaveRepository annualLeaveRepository;
 
 	// 내가 올린 결재 리스트 조회 + 신청일 기준으로 최신순 정렬
 	public List<Approval> getMyRequestedApprovals(Long employeeNo, String visible) {
@@ -172,7 +181,8 @@ public class ApprovalService {
 		return approvals;
 	}
 
-	// 결재와 합의 승인,반려 처리
+	// 결재글의 결재자와 합의자의 승인,반려 처리
+	@Transactional(rollbackFor = Exception.class)
 	public int approvalApproveDeny(ApprovalLine approvalLine, Boolean isFinalApprovalLineisMe) {
 		int result = 0;
 		try {
@@ -184,13 +194,69 @@ public class ApprovalService {
 				approvalDto.setApproval_completed_date(LocalDateTime.now());
 				approval = approvalDto.toEntity();
 				if(isFinalApprovalLineisMe || approvalDto.getApproval_status().equals("D")) {
-					approvalRepository.save(approval);
+					Approval endApproval = approvalRepository.save(approval);
+					// 연차 관련 결재인가 판단
+					Employee approvalEmployee = approval.getEmployee();
+					AnnualLeave annualLeave = null;
+//					AnnualLeaveDto annualLeaveDto = null;
+					System.out.println(endApproval.getApprovalStatus() + " : 이거 A여야해");
+					if(endApproval.getApprovalStatus().equals("A") && (approval.getApprovalFormat().getApprovalFormatNo() == 7 || approval.getApprovalFormat().getApprovalFormatNo() ==  8)) {
+						// 연차 관련 결재
+						if(approvalEmployee != null) {
+							// 연차일
+							Map<String, String> approvalContent = approval.getApprovalContent();
+							DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+							
+							// 날짜 차이 계산
+							
+							// 연차 정보 수정
+							annualLeave = annualLeaveRepository.findByEmployee_EmployeeNo(approvalEmployee.getEmployeeNo());
+							if(annualLeave != null) {
+								Double annualLeaveUsed = annualLeave.getAnnualLeaveUsed();
+//								annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
+								if(approval.getApprovalFormat().getApprovalFormatNo() == 7) {
+									// 연차의 경우
+									// 날짜값 가져와야함
+									String vacationStart = approvalContent.get("vacationStart");
+									String vacationEnd = approvalContent.get("vacationEnd");
+									LocalDate vacationStartFormatted = LocalDate.parse(vacationStart, dtf);
+									LocalDate vacationEndFormatted = LocalDate.parse(vacationEnd, dtf);
+									Long diffDays = ChronoUnit.DAYS.between(vacationStartFormatted, vacationEndFormatted);
+									annualLeaveUsed = annualLeaveUsed + (diffDays + 1);
+									// 연차 정보 캘린더 기입
+									// 연차 정보 캘린더 기입
+									// 연차 정보 캘린더 기입
+									
+									
+									
+								} else if(approval.getApprovalFormat().getApprovalFormatNo() == 8) {
+									// 반차의 경우
+									String vacation = approvalContent.get("vacation");
+									LocalDate vacationStartFormatted = LocalDate.parse(vacation, dtf);
+									annualLeaveUsed = annualLeaveUsed + 0.5;
+									// 연차 정보 캘린더 기입
+									// 연차 정보 캘린더 기입
+									// 연차 정보 캘린더 기입
+									
+								}
+								annualLeave.setAnnualLeaveUsed(annualLeaveUsed);
+								annualLeaveRepository.save(annualLeave);
+								
+							}
+							
+						} else {
+//							System.out.println("여기로 테스트");
+						}
+					
+					}
+					
                 }
 				result = 1;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			result = 0;
+			throw e; // 이렇게 해줘야 트랙잭션 롤백 가능!! 
 		}
 		return result;
 	}
