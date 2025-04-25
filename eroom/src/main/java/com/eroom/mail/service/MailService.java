@@ -41,7 +41,7 @@ public class MailService {
 	    mailReceiverRepository.updateReadYn(employeeNo,id); // 읽음 처리
 		return mailRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("메일을 찾을 수 없습니다."));
 	}
-	
+	// 휴지통 조회하는곳
 	public List<MailReceiver> getTrashMailsByEmployee(Long employeeNo, String sortOrder) {
 	    List<MailReceiver> resultList;
 
@@ -56,6 +56,17 @@ public class MailService {
 	    return filterOnlyDeletedMails(resultList);
 	}
 	
+	// 임시저장 여부 확인 메소드
+	private List<Mail> filterNotDraftMails(List<Mail> mails) {
+	    List<Mail> result = new ArrayList<>();
+	    for (Mail mail : mails) {
+	        if (!"Y".equals(mail.getMailStatus())) { // mail_status가 Y면 임시저장
+	            result.add(mail);
+	        }
+	    }
+	    return result;
+	}
+	
 	// 휴지통 여부 로직 메소드
 	public List<MailReceiver> filterNotDeletedMails(List<MailReceiver> mails) {
 	    List<MailReceiver> result = new ArrayList<>();
@@ -66,6 +77,9 @@ public class MailService {
 	    }
 	    return result;
 	}
+	
+	
+	// 휴지통조회 Y인 메일만 조회
 	private List<MailReceiver> filterOnlyDeletedMails(List<MailReceiver> mails) {
 	    List<MailReceiver> result = new ArrayList<>();
 	    for (MailReceiver mail : mails) {
@@ -99,6 +113,7 @@ public class MailService {
 	
 	// 지금은 최신순
 	// 조건줘서 최신 > 오래된 변환하게 
+	// 임시 저장도 넣어야함
 	public List<Mail> findMailsBySender(Long employeeNo,String sortOrder) {
 		List<Mail> resultList = null;
 		
@@ -107,7 +122,7 @@ public class MailService {
 		}else if(sortOrder.equals("oldest")) {
 			 resultList= mailRepository.findBySenderEmployeeNoOrderByMailSentTimeAsc(employeeNo);
 		}
-		return resultList;
+		return filterNotDraftMails(resultList);
 	}
 
 	// 지금 쓰는곳 없음 삭제 해도 될듯
@@ -119,6 +134,20 @@ public class MailService {
 	public List<Employee> selectEmployeeAll(){
 		List<Employee> list = employeeRepository.findAll();
 		return list;
+	}
+	
+	// 임시 저장
+	public int saveMail(MailDto mailDto, String mailStatus) {
+		int result = 0;
+		try {
+			mailDto.setMail_status(mailStatus);
+			Mail mailEntity = mailDto.toEntity();
+			Mail mailSaver = mailRepository.save(mailEntity);
+			result = 1;
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 	
 	// 메일 생성
@@ -147,7 +176,7 @@ public class MailService {
 		            
 		            
 		            
-		            ;
+		            
 		            MailReceiver mailReceiver = mailReceiverDto.toEntity(mailSaver, receiver);
 		            mailReceiverRepository.save(mailReceiver);
 		            
