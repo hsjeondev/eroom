@@ -101,7 +101,7 @@
               <div class="dropdown-menu dropdown-menu-end py-2">
                 <a class="dropdown-item" href="#" id="bulk-download">일괄 다운로드</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item text-danger" href="#">일괄 삭제</a>
+                <a class="dropdown-item text-danger" href="#" id="bulk-delete">일괄 삭제</a>
               </div>
             </div>
           </th>
@@ -390,8 +390,52 @@
       });
     }
   });
+  // 일괄 삭제
+	document.addEventListener('DOMContentLoaded', function () {
+    const bulkDeleteBtn = document.getElementById('bulk-delete');
+    if (bulkDeleteBtn) {
+        bulkDeleteBtn.addEventListener('click', function () {
+            const checkboxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
 
-</script>
+            if (checkboxes.length === 0) {
+                alert('삭제할 파일을 선택하세요.');
+                return;
+            }
+
+            const confirmation = confirm('정말로 선택한 파일을 삭제하시겠습니까?');
+            if (!confirmation) return;
+
+            // 체크된 파일들의 ID를 추출
+            const ids = checkboxes.map(cb => cb.closest('tr').querySelector('.delete-file').getAttribute('data-id'));
+
+            // JSON 형태로 요청 보내기
+            fetch('/drive/delete/personal/bulk', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content, 
+                    'header': document.querySelector('meta[name="_csrf_header"]').content,
+                },
+                body: JSON.stringify({ fileIds: ids }),  // fileIds를 JSON으로 보냄
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.res_code === '200') {
+                    alert('파일이 성공적으로 삭제되었습니다.');
+                    location.reload();  // 삭제 후 페이지 리로드
+                } else {
+                    alert('파일 삭제에 실패하였습니다. 다시 시도해 주세요.');
+                }
+            })
+            .catch(err => {
+                alert('오류가 발생했습니다.');
+                console.error(err);
+            });
+        });
+    }
+});
+
+  </script>
 
 <!-- 부트스트랩 js  -->
 <script src="/vendors/dropzone/dropzone-min.js"></script>

@@ -136,14 +136,25 @@ public class DriveService {
 	// ------------------------- 개인 드라이브 파일 삭제 --------------------------
 	@Transactional
 	public int deleteDriveFile(Long driveAttachNo) {
-	    return driveRepository.updateDeleteStatus(driveAttachNo);
+	   return driveRepository.updateDeleteStatus(driveAttachNo);
 	}
+	// ------------------------- 개인 드라이브 파일 다중 삭제 --------------------------
+	@Transactional
+    public int bulkDeleteDriveFiles(List<Long> fileIds) {
+       return driveRepository.updateBulkDeleteStatus(fileIds);  // 파일 상태 일괄 업데이트
+    }
 	// ------------------------- 개인 드라이브 파일 다운로드 --------------------------
 	public Drive findByDriveAttachNo(Long id) {
 		Drive drive = driveRepository.findByDriveAttachNo(id);
-		System.out.println("drive 객채 : "+ drive);
+		if(drive != null) {
+			drive.setDownloadCount(drive.getDownloadCount() + 1);
+			driveRepository.save(drive);
+		} else {
+			System.out.println("해당 ID로 파일을 찾을 수 없음");
+		}
 		return drive;
 	}
+	
 
 
 

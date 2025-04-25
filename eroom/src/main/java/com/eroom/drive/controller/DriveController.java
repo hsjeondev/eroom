@@ -16,11 +16,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -183,6 +185,7 @@ public class DriveController {
 	
 	
 	// -------------------------------------------- 파일 삭제 ------------------------------------------
+	// 개인 드라이브 파일 삭제
 	@DeleteMapping("/delete/{attachNo}")
 	@ResponseBody
 	public Map<String, String> deleteDriveFile(@PathVariable("attachNo") Long driveAttachNo) {
@@ -199,5 +202,29 @@ public class DriveController {
 
 		return resultMap;
 	}
-	
+	// 개인 드라이브 파일 일괄 삭제
+	@PostMapping("/delete/personal/bulk")
+	@ResponseBody
+	@Transactional
+	public ResponseEntity<Map<String, String>> bulkDelete(@RequestBody Map<String, List<Long>> requestData) {
+	    // JSON에서 fileIds를 추출
+	    List<Long> fileIds = requestData.get("fileIds");
+
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "삭제 실패");
+
+	    // 받은 fileIds를 콘솔에 출력 (디버깅 용도)
+	    System.out.println("Received fileIds: " + fileIds);
+
+	    // 파일 삭제 서비스 호출
+	    int result = driveService.bulkDeleteDriveFiles(fileIds);
+
+	    if (result > 0) {
+	        resultMap.put("res_code", "200");
+	        resultMap.put("res_msg", "삭제 성공");
+	    }
+
+	    return ResponseEntity.ok(resultMap);
+	}
 }
