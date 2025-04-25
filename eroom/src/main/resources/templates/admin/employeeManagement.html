@@ -58,21 +58,38 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					<div class="btn-group position-static" role="group">
 						<div class="btn-group position-static text-nowrap">
 							<button class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-							  부서<svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com --></button>
+							  	  <span th:text="${deptLabel}">부서</span>
+								  <svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+								  	<path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path>
+								  </svg><!-- <span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com -->
+							  </button>
 							<ul class="dropdown-menu">
-							  <li><a class="dropdown-item" href="#">영업부</a></li>
-							  <li><a class="dropdown-item" href="#">운영부</a></li>
-							  <li><a class="dropdown-item" href="#">기획부</a></li>
+							  <li>
+							  	<a class="dropdown-item" th:href="@{/admin/employeeManagement}" th:classappend="${deptId == null} ? 'active'">전체</a>
+							  </li>
+							  <li th:each="dept : ${deptList}">
+							  	<a class="dropdown-item" th:href="@{/admin/employeeManagement(deptId=${dept.structureNo})}"
+							  		th:text="${dept.codeName}" th:classappend="${dept.structureNo == deptId} ? 'active' : ''">부서명</a>
+							  </li>
 							</ul>
 						</div>
 						<div class="btn-group position-static text-nowrap">
 							<button class="btn btn-sm btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-							  팀<svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com --></button>
+							  <span th:text="${teamLabel}">팀</span>
+							  <svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+							  	<path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path>
+							  </svg><!-- <span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com -->
+							</button>
 							<ul class="dropdown-menu">
-							  <li><a class="dropdown-item" href="#">인사팀</a></li>
-							  <li><a class="dropdown-item" href="#">개발팀</a></li>
-							  <li><a class="dropdown-item" href="#">영업팀</a></li>
-							  <li></li>
+							  <li>
+							  	<a class="dropdown-item" th:href="@{/admin/employeeManagement(deptId=${deptId})}" th:classappend="${teamId == null} ? 'active'">전체</a>
+							  </li>
+							  <li th:each="team : ${teamList}">
+							 	 <a class="dropdown-item" th:href="@{/admin/employeeManagement(deptId=${deptId},teamId=${team.structureNo})}"
+							 	 th:text="${team.codeName}" th:classappend="${team.structureNo == teamId} ? 'active' : ''">
+							 	 	팀명
+							 	 </a>
+							  </li>
 							</ul>
 						</div>
 					</div>
@@ -157,8 +174,16 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
 	</div><!-- employeeTable -->
 	
+	
+	
+	
+	
+	
+	
+	
+	
 	<!-- 회원 생성 모달 -->
-	<div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
+<!-- 	<div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
 			<div class="modal-content">
 				<div class="modal-header py-2">
@@ -167,27 +192,27 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				</div>
 				<div class="modal-body px-4">
 					<form>
-						<!-- 이름 -->
+						이름
 						<div class="mb-3">
 						  <label for="name" class="form-label fw-semibold">이름</label>
 						  <input type="text" class="form-control form-control-sm" id="name" placeholder="홍길동">
 						</div>
-						<!-- 전화번호 -->
+						전화번호
 						<div class="mb-3">
 						  <label for="phone" class="form-label fw-semibold">전화번호</label>
 						  <input type="text" class="form-control form-control-sm" id="phone" placeholder="010-1234-5678">
 						</div>
-						<!-- 이메일 -->
+						이메일
 						<div class="mb-3">
 						  <label for="email" class="form-label fw-semibold">이메일</label>
 						  <input type="text" class="form-control form-control-sm" id="email" placeholder="example@email.com">
 						</div>
-						<!-- 생년월일 -->
+						생년월일
 						<div class="mb-3">
 						  <label for="birth" class="form-label fw-semibold">생년월일</label>
 						  <input type="text" class="form-control form-control-sm" id="birth" placeholder="YYYYMMDD">
 						</div>
-						<!-- 부서 -->
+						부서
 						<div class="mb-3">
 						  <label for="dept" class="form-label fw-semibold">부서</label>
 						  <select class="form-select form-select-sm" id="dept">
@@ -197,7 +222,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						    <option value="기술부">기술부</option>
 						  </select>
 						</div>
-						<!-- 팀 -->
+						팀
 						<div class="mb-3">
 						  <label for="team" class="form-label fw-semibold">팀</label>
 						  <select class="form-select form-select-sm" id="team">
@@ -207,7 +232,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						    <option value="영업팀">영업팀</option>
 						  </select>
 						</div>
-						 <!-- 직급 -->
+						 직급
 						<div class="mb-3">
 						  <label for="job" class="form-label fw-semibold">직급</label>
 						  <select class="form-select form-select-sm" id="job">
@@ -230,7 +255,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		</div>
 	</div>	
 
-	<!-- Confirm Modal -->
+	Confirm Modal
 	<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
 	  <div class="modal-dialog modal-dialog-centered">
 	    <div class="modal-content bg-light border border-2 border-secondary-subtle shadow">
@@ -249,11 +274,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  </div>
 	</div>
 
-	<!-- 알림 영역 -->
-	<div id="alertContainer" class="mt-3" style="display: none;"></div>
+	알림 영역
+	<div id="alertContainer" class="mt-3" style="display: none;"></div> -->
 
 <script>
-  function showConfirm() {
+/*   function showConfirm() {
     const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
     modal.show();
   }
@@ -270,7 +295,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
     alertContainer.innerHTML = isSuccess
       ? '<div class="alert alert-subtle-primary" role="alert">등록이 완료되었습니다!</div>'
       : '<div class="alert alert-subtle-danger" role="alert">등록에 실패했습니다. 다시 시도해주세요.</div>';
-  });
+  }); */
 </script>
 	
 </div><!-- mb-9 -->

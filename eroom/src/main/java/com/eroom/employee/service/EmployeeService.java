@@ -91,4 +91,16 @@ public class EmployeeService {
 		return employeeRepository.findById(employeeNo).orElse(null);
 	}
 	
+	//  structureNo로 소속 직원 조회
+	public List<Employee> findByStructureNo(Long structureNo){
+		return employeeRepository.findByStructure_StructureNo(structureNo);
+	}
+	
+	// 여러 structureNo에 속한 직원 일괄 조회
+	public List<Employee> findByStructureNoIn(List<Long> structureNos){
+		return employeeRepository.findByStructure_StructureNoIn(structureNos);
+	}
+	
+	
+	
 }

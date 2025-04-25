@@ -1,5 +1,6 @@
 package com.eroom.employee.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -26,5 +27,23 @@ public class StructureService {
 	// 부서코드를 통한 부서 하위의 모든 팀 조회
 	public List<Structure> selectTeamAll(String parentCode) {
 		return structureRepository.findByParentCode(parentCode);
+	}
+	
+	// 부서 미선택 시, 전체 팀 조회 -> parentCode != null 이고 visibleYn = 'Y'인 팀들 조회
+	public List<Structure> selectAllTeams(){
+		List<Structure> all = structureRepository.findAll();
+		List<Structure> teams = new ArrayList<>();
+		for(Structure s : all) {
+			// parentCode 가 있으면 팀
+			if(s.getParentCode() != null && "Y".equals(s.getVisibleYn())) {
+				teams.add(s);
+			}
+		}
+		return teams;
+	}
+	
+	// separatorCode 를 통한 부서 조회 / parentCode -> 부서코드
+	public Structure getBySeparatorCode(String separatorCode) {
+		return structureRepository.findBySeparatorCode(separatorCode);
 	}
 }

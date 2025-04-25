@@ -73,10 +73,83 @@ public class AdminController {
 	
 	// 회원 관리
 	@GetMapping("/employeeManagement")
-	public String selectEmployeeManagementList(Model model) {
-		// 사원의 정보 조회
-		List<Employee> employeeList = employeeService.findAllEmployee();
+	public String selectEmployeeManagementList(@RequestParam(name="deptId",required=false) Long deptId, @RequestParam(name="teamId",required=false) Long teamId,Model model) {
 		
+		// 모든 부서 목록 조회(부모코드가 null인 것들)
+		List<Structure> deptList = structureService.selectDepartmentAll();
+		model.addAttribute("deptList", deptList);
+		model.addAttribute("deptId",deptId);
+		
+		// 부서에 속한 팀 목록 조회
+		List<Structure> teamList = new ArrayList<>();
+		Structure selectedDept = null;
+		if(deptId != null) {
+			// 부서가 선택된 경우
+			for(Structure dept : deptList) {
+				if(dept.getStructureNo().equals(deptId)) {
+					selectedDept = dept;
+					break;
+				}
+			}
+			if(selectedDept != null) {
+				// parentCode(=separatorCode)로 팀 목록 조회
+				teamList = structureService.selectTeamAll(selectedDept.getSeparatorCode());
+			}
+		}else {
+			// 부서가 선택되지 않은 경우
+			teamList = structureService.selectAllTeams();
+		}
+		model.addAttribute("teamList", teamList);
+		model.addAttribute("teamId",teamId);
+		
+		
+		// 드롭다운 버튼 라벨 텍스트 지정
+		String deptLabel = "부서";
+		if(deptId != null) {
+			for(Structure dept : deptList) {
+				if(dept.getStructureNo().equals(deptId)) {
+					deptLabel = dept.getCodeName();
+					break;
+				}
+			}
+		}
+		
+		String teamLabel = "팀";
+		if(teamId != null) {
+			for (Structure team : teamList) {
+				if (team.getStructureNo().equals(teamId)) {
+					teamLabel = team.getCodeName();
+					break;
+				}
+			}
+		}
+		
+		model.addAttribute("deptLabel", deptLabel);
+		model.addAttribute("teamLabel", teamLabel);
+		
+		
+		
+		
+		// 사원의 정보 조회
+		List<Employee> employeeList =  new ArrayList<>();; 
+		if(teamId != null) {
+			// 팀만 선택된 경우
+			employeeList = employeeService.findByStructureNo(teamId);
+		}else if(deptId != null) {
+			// 부서만 선택된 경우 : 그 부서의 모든 팀
+			List<Long> teamNos = new ArrayList<>();
+			for(Structure t : teamList) {
+				teamNos.add(t.getStructureNo());
+			}
+			
+			if(!teamNos.isEmpty()) {
+				employeeList = employeeService.findByStructureNoIn(teamNos);
+			}
+			
+		}else {
+			// 부서, 팀 모두 선택되지 않은 경우
+			employeeList = employeeService.findAllEmployee();
+		}
 		// 반환용 DTO리스트
 		List<EmployeeManageDto> manageDtoList = new ArrayList<>();
 	

@@ -40,6 +40,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 	//Vehicle Reservation에서 예약자 이름을 가져옴
 	Employee findByEmployeeNo(Long long1);
 	
+	// structureNo로 직원 조회
+	List<Employee> findByStructure_StructureNo(Long structureNo);
 	
+	// 여러 팀 리스트로 직원 조회
+	List<Employee> findByStructure_StructureNoIn(List<Long> structureNos);
 
 }
