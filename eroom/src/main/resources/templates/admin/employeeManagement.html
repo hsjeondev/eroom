@@ -97,7 +97,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			
 				<!-- 회원 생성 버튼 -->
 				<div class="col-auto">
-					<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">회원 등록</button>
+					<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEmployeeModal">회원 등록</button>
 				</div>
 			             
 			</div>
@@ -174,128 +174,91 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
 	</div><!-- employeeTable -->
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	<!-- 회원 생성 모달 -->
-<!-- 	<div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
-			<div class="modal-content">
-				<div class="modal-header py-2">
-					<h5 class="modal-title fw-bold" id="addEmployeeModalLabel">회원 정보 입력</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-				</div>
-				<div class="modal-body px-4">
-					<form>
-						이름
-						<div class="mb-3">
-						  <label for="name" class="form-label fw-semibold">이름</label>
-						  <input type="text" class="form-control form-control-sm" id="name" placeholder="홍길동">
-						</div>
-						전화번호
-						<div class="mb-3">
-						  <label for="phone" class="form-label fw-semibold">전화번호</label>
-						  <input type="text" class="form-control form-control-sm" id="phone" placeholder="010-1234-5678">
-						</div>
-						이메일
-						<div class="mb-3">
-						  <label for="email" class="form-label fw-semibold">이메일</label>
-						  <input type="text" class="form-control form-control-sm" id="email" placeholder="example@email.com">
-						</div>
-						생년월일
-						<div class="mb-3">
-						  <label for="birth" class="form-label fw-semibold">생년월일</label>
-						  <input type="text" class="form-control form-control-sm" id="birth" placeholder="YYYYMMDD">
-						</div>
-						부서
-						<div class="mb-3">
-						  <label for="dept" class="form-label fw-semibold">부서</label>
-						  <select class="form-select form-select-sm" id="dept">
-						    <option selected>선택</option>
-						    <option value="영업부">영업부</option>
-						    <option value="운영부">운영부</option>
-						    <option value="기술부">기술부</option>
-						  </select>
-						</div>
-						팀
-						<div class="mb-3">
-						  <label for="team" class="form-label fw-semibold">팀</label>
-						  <select class="form-select form-select-sm" id="team">
-						    <option selected>선택</option>
-						    <option value="인사팀">인사팀</option>
-						    <option value="개발팀">개발팀</option>
-						    <option value="영업팀">영업팀</option>
-						  </select>
-						</div>
-						 직급
-						<div class="mb-3">
-						  <label for="job" class="form-label fw-semibold">직급</label>
-						  <select class="form-select form-select-sm" id="job">
-						    <option selected>선택</option>
-						    <option value="사원">사원</option>
-						    <option value="주임">주임</option>
-						    <option value="대리">대리</option>
-						    <option value="과장">과장</option>
-						    <option value="차장">차장</option>
-						    <option value="부장">부장</option>
-						  </select>
-						</div>
-					</form>
-				</div>
-				<div class="modal-footer py-2">
-				  <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
-				  <button type="submit" class="btn btn-primary btn-sm" onclick="showConfirm()">등록</button>
-				</div>
-			</div>
-		</div>
-	</div>	
+<!-- 회원 생성 모달 -->
+<div class="modal fade" id="createEmployeeModal" tabindex="-1" aria-labelledby="createEmployeeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+    <div class="modal-content border border-secondary">
+      <form id="createrEmployeeForm" autocomplete="off">
+        <!-- 헤더 -->
+        <div class="modal-header bg-light">
+          <h5 class="modal-title" id="createEmployeeModalLabel">회원 생성</h5>
+          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
 
-	Confirm Modal
-	<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
-	  <div class="modal-dialog modal-dialog-centered">
-	    <div class="modal-content bg-light border border-2 border-secondary-subtle shadow">
-	      <div class="modal-header border-bottom-0">
-	        <h5 class="modal-title fw-semibold">등록 확인</h5>
-	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-	      </div>
-	      <div class="modal-body">
-	        정말 등록하시겠습니까?
-	      </div>
-	      <div class="modal-footer border-top-0">
-	        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">취소</button>
-	        <button type="button" class="btn btn-primary btn-sm" id="confirmSubmitBtn">확인</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
+        <!-- 바디 -->
+        <div class="modal-body px-4 py-3">
 
-	알림 영역
-	<div id="alertContainer" class="mt-3" style="display: none;"></div> -->
+          <!-- 이름 + 중복 확인 -->
+          <div class="row mb-3">
+            <div class="col">
+              <label for="employeeName" class="form-label fw-semibold">이름</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="employeeName" name="employee_name" placeholder="이름을 입력하세요" required>
+                <button type="button" class="btn btn-outline-secondary" id="checkNameBtn">중복확인</button>
+              </div>
+              <small id="nameCheckMsg" class="form-text d-none"></small>
+            </div>
+
+            <div class="col">
+              <label for="employeePosition" class="form-label fw-semibold">직급</label>
+              <select class="form-select" id="employeePosition" name="employee_position" required>
+                <option value="" disabled selected>직급 선택</option>
+                <option value="사원">사원</option>
+                <option value="대리">대리</option>
+                <option value="과장">과장</option>
+                <option value="차장">차장</option>
+                <option value="부장">부장</option>
+                <option value="직접 입력">직접 입력</option>
+              </select>
+              <input type="text" class="form-control mt-2 d-none" id="customPositionInput" placeholder="직접 입력" name="custom_position">
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col">
+              <label for="departmentSelect" class="form-label fw-semibold">부서</label>
+              <select class="form-select" id="departmentSelect" name="department_no" required>
+                <option value="" disabled selected>부서 선택</option>
+                <!-- 옵션은 JS로 채움 -->
+              </select>
+            </div>
+            <div class="col">
+              <label for="teamSelect" class="form-label fw-semibold">팀</label>
+              <select class="form-select" id="teamSelect" name="team_no">
+                <option value="">(선택안함)</option>
+                <!-- 옵션은 JS로 채움 -->
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="directoryPhone" class="form-label fw-semibold">연락처</label>
+            <input type="text" class="form-control" id="directoryPhone" name="directory_phone" required placeholder="010-1234-5678">
+          </div>
+
+          <div class="mb-3">
+            <label for="employeeBirth" class="form-label fw-semibold">생년월일</label>
+            <input type="date" class="form-control" id="employeeBirth" name="employee_birth" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="employeeHireDate" class="form-label fw-semibold">입사일</label>
+            <input type="date" class="form-control" id="employeeHireDate" name="employee_hire_date" required>
+          </div>
+        </div>
+
+        <!-- 푸터 -->
+        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="registerEmployeeBtn">회원 생성</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <script>
-/*   function showConfirm() {
-    const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-    modal.show();
-  }
 
-  document.getElementById('confirmSubmitBtn').addEventListener('click', function () {
-    const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
-    confirmModal.hide();
-
-    // 비동기 처리나 유효성 검사 후 결과에 따라 성공/실패 처리
-    const isSuccess = Math.random() > 0.5; // 예시: 랜덤 성공/실패 처리
-    const alertContainer = document.getElementById('alertContainer');
-
-    alertContainer.style.display = 'block';
-    alertContainer.innerHTML = isSuccess
-      ? '<div class="alert alert-subtle-primary" role="alert">등록이 완료되었습니다!</div>'
-      : '<div class="alert alert-subtle-danger" role="alert">등록에 실패했습니다. 다시 시도해주세요.</div>';
-  }); */
 </script>
 	
 </div><!-- mb-9 -->
