@@ -39,6 +39,7 @@ import com.eroom.employee.service.EmployeeService;
 import com.eroom.employee.service.StructureService;
 import com.eroom.security.EmployeeDetails;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 
@@ -261,9 +262,15 @@ public class ApprovalController {
 	}
 	
 	@GetMapping("/approval/{approvalNo}/detail")
-	public String selectApprovalDetail(@PathVariable("approvalNo") Long approvalNo, Model model, Authentication authentication) {
-		
-		
+	public String selectApprovalDetail(@PathVariable("approvalNo") Long approvalNo, Model model, Authentication authentication, HttpServletRequest request) {
+//		String uri = request.getRequestURI();
+//		if(uri.endsWith("/detail")) {
+//			// 상세 페이지 처리 로직
+//			System.out.println("상세 페이지 처리 로직");
+//		} else if(uri.endsWith("/pdf")) {
+//			// pdf 처리 로직
+//			System.out.println("pdf 처리 로직");
+//		}
 		
 		// 선택한 결재 번호로 결재 정보 조회
 		Approval approval = approvalService.selectApprovalByApprovalNo(approvalNo);
@@ -301,6 +308,15 @@ public class ApprovalController {
 		if (!authorityList.contains(employee.getEmployeeNo()) && !employee.getEmployeeName().contains("admin")) {
 	        return "redirect:/error/403";
 	    }
+		
+		String strTemp = String.valueOf(approvalDto.getApproval_no());
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < 8 - strTemp.length(); i++) {
+			sb.append("0");
+		}
+		sb.append(strTemp);
+		String approvalNoFormatted = "FL-007-" + sb.toString();
+		model.addAttribute("approvalNoFormatted", approvalNoFormatted);
 		
 		return "/approval/detail";
 	}
@@ -772,6 +788,55 @@ public class ApprovalController {
 //
 //	    return "/approval/receivedApprovals";
 //	}
-	
+	@GetMapping("/pdf/test/test")
+	public String testPdftest(Model model, Authentication authentication) {
+		Long approvalNo = 37L;
+		// 선택한 결재 번호로 결재 정보 조회
+				Approval approval = approvalService.selectApprovalByApprovalNo(approvalNo);
+				// 결재 정보가 없으면 404 에러 페이지로 이동
+				if (approval == null) {
+				    return "redirect:/error/404";
+				}
+				ApprovalDto approvalDto = new ApprovalDto().toDto(approval);
+				model.addAttribute("approval", approvalDto);
+				
+				// 로그인한 사용자 정보 조회
+				EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+				Employee employee = employeeDetails.getEmployee();
+				model.addAttribute("employee", employee);
+				
+				// 결재 라인 정보 조회
+				List<ApprovalLine> temp = approvalLineService.getApprovalLineByApprovalNo(approvalNo);
+				List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
+				for (ApprovalLine approvalLine : temp) {
+					ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
+					approvalLineDtoList.add(approvalLineDto);
+				}
+				model.addAttribute("approvalLineList", approvalLineDtoList);
+				
+				// 권한 리스트 조회
+				Set<Long> authorityList = new HashSet<Long>();
+				for(ApprovalLine t : temp) {
+					// 결재자, 합의자, 참조자 중 결재라인에 있는 사람들
+					authorityList.add(t.getEmployee().getEmployeeNo());
+				}
+				// 기안자
+				authorityList.add(approval.getEmployee().getEmployeeNo());
+				
+				// 결재 관련 인원 + 관리자만 접근 가능
+				if (!authorityList.contains(employee.getEmployeeNo()) && !employee.getEmployeeName().contains("admin")) {
+			        return "redirect:/error/403";
+			    }
+				
+				String strTemp = String.valueOf(approvalDto.getApproval_no());
+				StringBuilder sb = new StringBuilder();
+				for(int i = 0; i < 8 - strTemp.length(); i++) {
+					sb.append("0");
+				}
+				sb.append(strTemp);
+				String approvalNoFormatted = "FL-007-" + sb.toString();
+				model.addAttribute("approvalNoFormatted", approvalNoFormatted);
+		return "approval/templatePdf/detailPdfTemplate";
+	}
 
 }

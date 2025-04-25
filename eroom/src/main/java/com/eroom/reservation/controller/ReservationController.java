@@ -1,5 +1,6 @@
 package com.eroom.reservation.controller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -73,49 +75,107 @@ public class ReservationController {
 	}
 
 	// ========================차량 등록 =============================
+	
 	@PostMapping("/resvehicle/reservation")
-	@ResponseBody
-	public Map<String, String> vehicleReservation(VehicleDto param) {
-		Map<String, String> resultMap = new HashMap<String, String>();
-		resultMap.put("res_code", "500");
-		resultMap.put("res_msg", "예약을 실패하였습니다");
+	public ResponseEntity<Map<String, Object>> reserveVehicle(@ModelAttribute VehicleDto dto) {
+	    LocalDateTime start = dto.getReservation_start();
+	    LocalDateTime end = dto.getReservation_end();
+	    Long facilityNo = dto.getFacility_no();
 
-		// System.out.println(param);
+	    if (vehicleService.isConflict(facilityNo, start, end)) {
+	        return ResponseEntity.ok(Map.of(
+	            "res_code", 400,
+	            "res_msg", "이미 예약된 시간이 존재합니다!"
+	        ));
+	    }
 
-		VehicleDto dto = vehicleService.vehicleReservation(param);
+	    vehicleService.vehicleReservation(dto);
 
-		if (dto != null) {
-			resultMap.put("res_code", "200");
-			resultMap.put("res_msg", "예약을 성공적으로 완료했습니다");
-		}
-
-		return resultMap;
+	    return ResponseEntity.ok(Map.of(
+	        "res_code", 200,
+	        "res_msg", "차량 예약이 완료되었습니다!"
+	    ));
 	}
+//	@PostMapping("/resvehicle/reservation")
+//	@ResponseBody
+//	public Map<String, String> vehicleReservation(VehicleDto param) {
+//		Map<String, String> resultMap = new HashMap<String, String>();
+//		resultMap.put("res_code", "500");
+//		resultMap.put("res_msg", "예약을 실패하였습니다");
+//
+//		// System.out.println(param);
+//
+//		VehicleDto dto = vehicleService.vehicleReservation(param);
+//
+//		if (dto != null) {
+//			resultMap.put("res_code", "200");
+//			resultMap.put("res_msg", "예약을 성공적으로 완료했습니다");
+//		}
+//
+//		return resultMap;
+//	}
 	
 	// ===================회의실 등록===============================
 	@PostMapping("/reservation/meetingroom/reserve")
 	@ResponseBody
 	public Map<String, String> reserveMeetingRoom(
-			MeetingRoomDto param,
-	    @RequestParam("participants") List<Long> participantIds) {
+	        MeetingRoomDto param,
+	        @RequestParam("participants") List<Long> participantIds) {
 
 	    Map<String, String> resultMap = new HashMap<>();
 	    resultMap.put("res_code", "500");
-	    resultMap.put("res_msg", "예약을 실패하였습니다");
+	    resultMap.put("res_msg", "회의실 예약을 실패하였습니다.");
 
-	    // 회의실 예약 등록
+	    // 1. 중복 예약 검사
+	    if (meetingRoomService.isConflict(
+	            param.getFacility_no(),
+	            param.getReservation_start(),
+	            param.getReservation_end())) {
+
+	        resultMap.put("res_code", "400");
+	        resultMap.put("res_msg", "이미 예약된 시간이 존재합니다!");
+	        return resultMap;
+	    }
+
+	    // 2. 예약 등록
 	    MeetingRoomDto savedDto = meetingRoomService.meetingRoomServiceReservation(param);
 
 	    if (savedDto != null) {
-	        // 참여자 매핑 저장 
 	        meetingRoomService.saveParticipants(savedDto.getReservation_no(), participantIds);
-
 	        resultMap.put("res_code", "200");
 	        resultMap.put("res_msg", "회의실 예약이 완료되었습니다!");
 	    }
 
 	    return resultMap;
 	}
+	
+	
+	
+	
+	
+//	@PostMapping("/reservation/meetingroom/reserve")
+//	@ResponseBody
+//	public Map<String, String> reserveMeetingRoom(
+//			MeetingRoomDto param,
+//	    @RequestParam("participants") List<Long> participantIds) {
+//
+//	    Map<String, String> resultMap = new HashMap<>();
+//	    resultMap.put("res_code", "500");
+//	    resultMap.put("res_msg", "예약을 실패하였습니다");
+//
+//	    // 회의실 예약 등록
+//	    MeetingRoomDto savedDto = meetingRoomService.meetingRoomServiceReservation(param);
+//
+//	    if (savedDto != null) {
+//	        // 참여자 매핑 저장 
+//	        meetingRoomService.saveParticipants(savedDto.getReservation_no(), participantIds);
+//
+//	        resultMap.put("res_code", "200");
+//	        resultMap.put("res_msg", "회의실 예약이 완료되었습니다!");
+//	    }
+//
+//	    return resultMap;
+//	}
 	
 
 	// ====================차량 목록 조회 ==========================
@@ -240,5 +300,7 @@ public class ReservationController {
 			@RequestParam("facilityNo") String facilityNo) {
 		return meetingRoomService.getMeetingRoomTimes(date,facilityNo);
 	}
+	
+
 
 }

@@ -113,7 +113,12 @@
               </button>
               <div class="dropdown-menu dropdown-menu-end py-2">
                 <a class="dropdown-item" th:href="@{'/drive/download/' + ${file.driveAttachNo}}">파일 다운로드</a>
-                <a class="dropdown-item" href="#">파일 수정</a>
+                <a class="dropdown-item" href="#" 
+				   data-bs-toggle="modal" 
+				   data-bs-target="#editFileModal"
+				   th:attr="data-id=${file.driveAttachNo},data-name=${file.driveOriName} ,data-desc=${file.driveDescription}">
+				   파일 수정
+				</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item text-danger" href="#">파일 삭제</a>
               </div>
@@ -127,7 +132,40 @@
         </tr>
       </tbody>
     </table>
-
+	<!-- 파일 수정 모달 -->
+	<div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <form id="editFileForm" enctype="multipart/form-data">
+	      <div class="modal-content">
+	        <div class="modal-header">
+	          <h5 class="modal-title" id="editFileModalLabel">파일 수정</h5>
+	          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+	        </div>
+	        <div class="modal-body">
+	          <input type="hidden" name="driveAttachNo" id="editDriveAttachNo">
+			<div class="mb-3">
+			  <label for="originalFileName" class="form-label">기존 파일명</label>
+			  <input class="form-control" type="text" id="originalFileName" readonly>
+			</div>
+	          <div class="mb-3">
+	            <label for="editDriveFile" class="form-label">새 파일 선택</label>
+	            <input class="form-control" type="file" id="editDriveFile" name="driveFile">
+	          </div>
+	
+	          <div class="mb-3">
+	            <label for="editDriveDescription" class="form-label">파일 설명</label>
+	            <input class="form-control" type="text" id="editDriveDescription" name="driveDescription">
+	          </div>
+	        </div>
+	        <div class="modal-footer">
+	          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+	          <button type="submit" class="btn btn-primary">수정 저장</button>
+	        </div>
+	      </div>
+	    </form>
+	  </div>
+	</div>
+	
     <!-- 페이징 -->
     <div class="d-flex justify-content-between mt-3">
       <span class="d-none d-sm-inline-block" data-list-info="data-list-info">1 to 4 <span class="text-body-tertiary"> Items of </span>4</span>
@@ -216,6 +254,44 @@
 	    			});
 	      dropzoneInitialized = true;
 	    }
+	  });
+	});
+  document.querySelectorAll('a[data-bs-target="#editFileModal"]').forEach(button => {
+	  button.addEventListener('click', function () {
+	    const driveAttachNo = this.getAttribute('data-id');
+	    const driveDescription = this.getAttribute('data-desc') || "";
+	    const driveOriName = this.getAttribute('data-name') || "";
+
+	    document.getElementById('editDriveAttachNo').value = driveAttachNo;
+	    document.getElementById('editDriveDescription').value = driveDescription;
+	    document.getElementById('originalFileName').value = driveOriName;
+	  });
+	});
+  document.getElementById("editFileForm").addEventListener("submit", function (e) {
+	  e.preventDefault();
+	  const formData = new FormData(this);
+	  const attachNo = formData.get("driveAttachNo");
+
+	  fetch(`/drive/update/${attachNo}`, {
+	    method: "POST",
+	    headers : {
+	      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+	      'header': document.querySelector('meta[name="_csrf_header"]').content
+		},
+	    body: formData
+	  })
+	  .then(response => response.json())
+	  .then(data => {
+	    if (data.res_code === "200") {
+	      alert("수정 완료!");
+	      location.reload();
+	    } else {
+	      alert("수정 실패: " + data.res_msg);
+	    }
+	  })
+	  .catch(err => {
+	    alert("오류 발생");
+	    console.error(err);
 	  });
 	});
 

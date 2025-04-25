@@ -1,8 +1,10 @@
 package com.eroom.drive.service;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +28,7 @@ public class DriveService {
 	private final SeparatorRepository separatorRepository;
 	 @Value("${ffupload.location}")
 	 private String fileDir;
-	
+	// 파일 업로드
 	public int uploadDriveFiles(DriveDto driverDto, Long employeeNo) {
 		int result = 0;
 		
@@ -82,7 +84,7 @@ public class DriveService {
 		}
 		return result;
 	}
-
+	// 개인 드라이브 파일 리스트 조회
 	public List<DriveDto> findPersonalDriveFiles(Long employeeNo) {
 	    List<Drive> drives = driveRepository.findByUploader_EmployeeNoAndDriveDeleteYn(employeeNo, "N");
 	    List<DriveDto> result = new ArrayList<>();
@@ -93,6 +95,41 @@ public class DriveService {
 
 	    return result;
 	}
+	// 파일 수정
+	public boolean updateDriveFile(Long attachNo, MultipartFile file, String description) {
+	    try {
+	        Optional<Drive> optionalDrive = driveRepository.findById(attachNo);
+	        if (optionalDrive.isEmpty()) return false;
+
+	        Drive drive = optionalDrive.get();
+
+	        // 파일이 있으면 교체
+	        if (file != null && !file.isEmpty()) {
+	            String ext = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+	            String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+	            String path = fileDir + "personal/" + newName;
+	            File newFile = new File(path);
+	            if (!newFile.getParentFile().exists()) newFile.getParentFile().mkdirs();
+	            file.transferTo(newFile);
+	            // 기존 정보 업데이트
+	            drive.setDriveOriName(file.getOriginalFilename());
+	            drive.setDriveNewName(newName);
+	            drive.setDriveType(ext);
+	            drive.setDriveSize(file.getSize());
+	            drive.setDrivePath("/upload/personal/" + newName);
+	        }
+	        // 설명만 변경할 수도 있음
+	        drive.setDriveDescription(description);
+	        drive.setDriveModDate(LocalDateTime.now());
+
+	        driveRepository.save(drive);
+	        return true;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
 
 
 }
