@@ -154,6 +154,17 @@ public class MeetingRoomService {
         return repository.existsConflict(facilityNo, start, end);
     }
 
+    public List<MeetingRoomDto> getTodayReservations() {
+        List<MeetingRoom> entityList = repository.findTodayMeetingRoomReservations();
+
+        List<MeetingRoomDto> dtoList = new ArrayList<>();
+        for (MeetingRoom meetingRoom : entityList) {
+            MeetingRoomDto dto = new MeetingRoomDto().toDto(meetingRoom); // entity → dto 변환
+            dtoList.add(dto);
+        }
+
+        return dtoList;
+    }
 	
 		
 }

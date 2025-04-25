@@ -66,6 +66,8 @@ public class VehicleDto {
 				.reservation_reg_date(vehicle.getReservationRegDate())
 				.reservation_mod_date(vehicle.getReservationModDate())
 				.reservation_location(vehicle.getReservationLocation())
+				.vehicleName(vehicle.getFacility() != null ? vehicle.getFacility().getFacilityName() : "")
+		        .reserverName(vehicle.getEmployee() != null ? vehicle.getEmployee().getEmployeeName() : "")
 				.build();
 	}
 	

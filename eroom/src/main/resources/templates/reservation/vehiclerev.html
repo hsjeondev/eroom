@@ -3,6 +3,7 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{/include/layout}">
 <head>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <meta charset="UTF-8">
 <title>차량 목록</title>
 </head>
@@ -12,13 +13,12 @@
 	<main class="main" id="top" layout:fragment="content">
 
 		<div class="row">
-			<!--  차량 예약 목록 (왼쪽) -->
-			<div class="col-md-6">
-				<div class="mb-3">
-					<div class="d-flex align-items-center mb-2">
-						<span class="fw-bold fs-7"> 차량 예약</span>
-					</div>
+			<!-- 왼쪽: 차량 예약 목록 + 오늘 예약 현황 -->
+			<div class="col-md-6 d-flex flex-column gap-4">
 
+				<!-- 🚗 차량 예약 목록 -->
+				<div>
+					<h5 class="fw-bold">차량 예약 목록</h5>
 					<div id="vehicleTable"
 						data-list='{"valueNames":["no","vehicle","passengers","date"], "page": 5, "pagination": true}'>
 						<div class="table-responsive">
@@ -27,15 +27,15 @@
 									<tr>
 										<th class="sort" data-sort="no" style="width: 5%;">번호</th>
 										<th class="sort" data-sort="vehicle" style="width: 25%;">차량</th>
-										<th class="sort" data-sort="passengers" style="width: 20%;">탑승 가능
-											인원</th>
+										<th class="sort" data-sort="passengers" style="width: 20%;">탑승
+											가능 인원</th>
 										<th class="sort" data-sort="date" style="width: 20%;">등록일</th>
 										<th style="width: 10%;"></th>
 									</tr>
 								</thead>
 								<tbody class="list align-middle">
 									<tr th:if="${#lists.isEmpty(list)}">
-										<td colspan="4">등록된 차량이 없습니다 😓</td>
+										<td colspan="5">등록된 차량이 없습니다 😓</td>
 									</tr>
 									<tr class="align-middle vehicle-row"
 										th:if="${!#lists.isEmpty(list)}"
@@ -45,31 +45,95 @@
 										<td class="passengers" th:text="${result.facilityCapacity}"></td>
 										<td class="date"
 											th:text="${#temporals.format(result.facilityRegDate, 'yy-MM-dd')}"></td>
-										<td class="text-end pe-0"><button
-												class="btn btn-sm btn-outline-primary"
+										<td class="text-end pe-0">
+											<button class="btn btn-sm btn-outline-primary"
 												data-bs-toggle="modal" data-bs-target="#addEventModal"
 												th:attr="data-facility-no=${result.facilityNo}, data-facility-name=${result.facilityName}">
-												예약하기</button></td>
+												예약하기</button>
+										</td>
 									</tr>
 								</tbody>
 							</table>
-
 						</div>
-						<div class="modal fade" id="addEventModal" tabindex="-1">
-							<div class="modal-dialog modal-dialog-centered">
-								<div class="modal-content border border-translucent">
-									<form id="addEventForm" autocomplete="off" name="addEventForm">
-										<div class="modal-header px-card border-0">
-											<h5 class="mb-0 text-body-highlight">차량 예약</h5>
-											<button
-												class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 mt-2 me-2 px-2 py-1"
-												style="font-size: 0.9rem;" type="button"
-												data-bs-dismiss="modal" aria-label="Close">×</button>
-										</div>
+
+						<!-- ✅ 페이징 영역 -->
+						<div class="d-flex justify-content-center mt-3">
+							<div class="d-flex">
+								<button class="page-link disabled" data-list-pagination="prev"
+									disabled>
+									<i class="fas fa-chevron-left"></i>
+								</button>
+								<ul class="mb-0 pagination">
+									<li class="active">
+										<button class="page" type="button" data-i="1" data-page="5">1</button>
+									</li>
+								</ul>
+								<button class="page-link pe-0" data-list-pagination="next"
+									disabled>
+									<i class="fas fa-chevron-right"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				
+				<!-- 📅 오늘 예약 현황 -->
+				<div>
+					<h5 class="fw-bold">오늘 예약 현황</h5>
+					<div class="table-responsive">
+						<table class="table table-striped table-sm fs-9 mb-0 text-center">
+							<thead class="text-center align-middle">
+								<tr>
+									<th style="width: 5%;">번호</th>
+									<th style="width: 20%;">차량</th>
+									<th style="width: 20%;">예약자</th>
+									<th style="width: 20%;">예약 날짜</th>
+									<!-- ✅ 추가 -->
+									<th style="width: 25%;">예약 시간</th>
+								</tr>
+							</thead>
+							<tbody class="align-middle">
+								<tr th:if="${#lists.isEmpty(todayReservations)}">
+									<td colspan="5">오늘 예약된 차량이 없습니다 😊</td>
+								</tr>
+								<tr th:each="res, stat : ${todayReservations}">
+									<td th:text="${stat.count}"></td>
+									<td th:text="${res.vehicleName}"></td>
+									<td th:text="${res.reserverName}"></td>
+									<td
+										th:text="${#temporals.format(res.reservation_start, 'yyyy-MM-dd')}"></td>
+									
+									<td><span
+										th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span>
+										~ <span
+										th:text="${#temporals.format(res.reservation_end, 'HH:mm')}"></span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+			</div>
 
 
-										<!-- 모달창 안에 facilityNo값을 넣어주는 script -->
-										<script>
+
+			<div class="modal fade" id="addEventModal" tabindex="-1">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content border border-translucent">
+						<form id="addEventForm" autocomplete="off" name="addEventForm">
+							<div class="modal-header px-card border-0">
+								<h5 class="mb-0 text-body-highlight">차량 예약</h5>
+								<button
+									class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 mt-2 me-2 px-2 py-1"
+									style="font-size: 0.9rem;" type="button"
+									data-bs-dismiss="modal" aria-label="Close">×</button>
+							</div>
+
+
+							<!-- 모달창 안에 facilityNo값을 넣어주는 script -->
+							<script>
 										  document.addEventListener("DOMContentLoaded", function () {
 										    const modal = document.getElementById("addEventModal");
 										    const facilityInput = document.getElementById("modalFacilityNo");
@@ -90,165 +154,180 @@
 										</script>
 
 
-										<!-- 등록 모달창 -->
-										<div class="modal-body p-4">
-											<!-- 숨겨진 값들 -->
-											<input type="hidden" name="employee_no"
-												th:value="${#authentication.principal.employee.employeeNo}" />
-											<input type="hidden" name="facility_no" id="modalFacilityNo"
-												value="" /> <input type="hidden" name="separator_code"
-												value="F002" id="separator"> <input type="hidden"
-												name="reservation_creator"
-												th:value="${#authentication.principal.employee.employeeId}" />
-											<div class="mb-3 text-center">
-												<label class="form-label text-primary fw-semibold mb-1"
-													for="selectedFacilityName" style="font-size: 1rem;">
-													선택한 차량 </label>
-												<div class="form-control text-center fw-bold fs-5"
-													id="selectedFacilityName"
-													style="border: none; background-color: #f8f9fa;">차량이
-													선택되지 않았습니다</div>
-											</div>
-											<!-- 장소 -->
-											<div class="mb-3">
-												<label for="calendarLocation" class="form-label">
-													목적지</label> <input type="text" class="form-control form-control-sm"
-													id="calendarLocation" name="reservation_location"
-													placeholder="목적지를 적어주세요" />
-											</div>
-
-											<!-- 시간 -->
-											<div class="row g-2 mb-3">
-												<!-- 날짜 선택 -->
-												<div class="row g-2">
-													<div class="col">
-														<label class="form-label">시작 날짜</label> <input type="date"
-															id="startDate" class="form-control"
-															name="reservation_start_date">
-													</div>
-													<div class="col">
-														<label class="form-label">종료 날짜</label> <input type="date"
-															id="endDate" class="form-control"
-															name="reservation_end_date">
-													</div>
-												</div>
-
-												<!-- 시간 선택 -->
-												<div class="row g-2 mt-2">
-													<div class="col">
-														<label class="form-label">시작 시간</label> <select
-															id="startTime" class="form-select">
-															<option value="09:00">09:00</option>
-															<option value="10:00">10:00</option>
-															<option value="11:00">11:00</option>
-															<option value="12:00">12:00</option>
-															<option value="13:00">13:00</option>
-															<option value="14:00">14:00</option>
-															<option value="15:00">15:00</option>
-															<option value="16:00">16:00</option>
-															<option value="17:00">17:00</option>															
-														</select>
-													</div>
-													<div class="col">
-														<label class="form-label">종료 시간</label> <select
-															id="endTime" class="form-select">
-															<option value="10:00">10:00</option>
-															<option value="11:00">11:00</option>
-															<option value="12:00">12:00</option>
-															<option value="13:00">13:00</option>
-															<option value="14:00">14:00</option>
-															<option value="15:00">15:00</option>
-															<option value="16:00">16:00</option>
-															<option value="17:00">17:00</option>
-															<option value="18:00">18:00</option>
-															<option value="19:00">19:00</option>
-															<option value="20:00">20:00</option>
-															<option value="21:00">21:00</option>
-															<option value="22:00">22:00</option>
-															<option value="23:00">23:00</option>
-														</select>
-													</div>
-												</div>
-
-												<!-- 숨겨서 서버로 보낼 datetime-local 값 -->
-												<input type="hidden" name="reservation_start"
-													id="calendarStartTime"> <input type="hidden"
-													name="reservation_end" id="calendarEndTime">
-											</div>
-										</div>
-										<div class="modal-body p-4">
-											<!-- 안내 문구 추가 -->
-											<div class="alert text-center mb-3" role="alert"
-												style="font-size: 0.9rem; background-color: #E3F2FD; border: 1px solid #BBDEFB; color: #0D47A1;">
-												ℹ️ <strong>예약 확정 후에는 시간 수정이 불가능합니다.</strong><br> 변경이
-												필요할 경우 <strong>기존 예약을 취소</strong>한 뒤 다시 예약해주세요.<br> <br>
-												🚗 <strong>해당 차량은 다음 예약이 있을 수 있으므로</strong><br> <strong>최소
-													10분 전까지는 반납</strong>해 주시기 바랍니다.<br> <br> 신중한 예약과 정시 반납을
-												부탁드립니다 😊
-											</div>
-										</div>
-										<div class="modal-footer border-0 px-4 pb-3">
-												<button class="btn btn-primary w-100" type="submit">
-													예약하기</button>
-											</div>
-									</form>
+							<!-- 등록 모달창 -->
+							<div class="modal-body p-4">
+								<!-- 숨겨진 값들 -->
+								<input type="hidden" name="employee_no"
+									th:value="${#authentication.principal.employee.employeeNo}" />
+								<input type="hidden" name="facility_no" id="modalFacilityNo"
+									value="" /> <input type="hidden" name="separator_code"
+									value="F002" id="separator"> <input type="hidden"
+									name="reservation_creator"
+									th:value="${#authentication.principal.employee.employeeId}" />
+								<div class="mb-3 text-center">
+									<label class="form-label text-primary fw-semibold mb-1"
+										for="selectedFacilityName" style="font-size: 1rem;">
+										선택한 차량 </label>
+									<div class="form-control text-center fw-bold fs-5"
+										id="selectedFacilityName"
+										style="border: none; background-color: #f8f9fa;">차량이
+										선택되지 않았습니다</div>
 								</div>
+								<!-- 장소 -->
+								<div class="mb-3">
+									<label for="calendarLocation" class="form-label">목적지</label>
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm"
+											id="calendarLocation" name="reservation_location"
+											placeholder="주소를 검색하려면 오른쪽 버튼을 눌러주세요" readonly />
+										<button type="button" class="btn btn-outline-secondary btn-sm"
+											onclick="openPostcode()">주소 검색</button>
+									</div>
+								</div>
+
+								<!-- 시간 -->
+								<div class="row g-2 mb-3">
+									<!-- 날짜 선택 -->
+									<div class="row g-2">
+										<div class="col">
+											<label class="form-label">시작 날짜</label> <input type="date"
+												id="startDate" class="form-control"
+												name="reservation_start_date">
+										</div>
+										<div class="col">
+											<label class="form-label">종료 날짜</label> <input type="date"
+												id="endDate" class="form-control"
+												name="reservation_end_date">
+										</div>
+									</div>
+
+									<!-- 시간 선택 -->
+									<div class="row g-2 mt-2">
+										<div class="col">
+											<label class="form-label">시작 시간</label> <select
+												id="startTime" class="form-select">
+												<option value="09:00">09:00</option>
+												<option value="10:00">10:00</option>
+												<option value="11:00">11:00</option>
+												<option value="12:00">12:00</option>
+												<option value="13:00">13:00</option>
+												<option value="14:00">14:00</option>
+												<option value="15:00">15:00</option>
+												<option value="16:00">16:00</option>
+												<option value="17:00">17:00</option>
+											</select>
+										</div>
+										<div class="col">
+											<label class="form-label">종료 시간</label> <select id="endTime"
+												class="form-select">
+												<option value="10:00">10:00</option>
+												<option value="11:00">11:00</option>
+												<option value="12:00">12:00</option>
+												<option value="13:00">13:00</option>
+												<option value="14:00">14:00</option>
+												<option value="15:00">15:00</option>
+												<option value="16:00">16:00</option>
+												<option value="17:00">17:00</option>
+												<option value="18:00">18:00</option>
+												<option value="19:00">19:00</option>
+												<option value="20:00">20:00</option>
+												<option value="21:00">21:00</option>
+												<option value="22:00">22:00</option>
+												<option value="23:00">23:00</option>
+											</select>
+										</div>
+									</div>
+
+									<!-- 숨겨서 서버로 보낼 datetime-local 값 -->
+									<input type="hidden" name="reservation_start"
+										id="calendarStartTime"> <input type="hidden"
+										name="reservation_end" id="calendarEndTime">
+								</div>
+							</div>
+							<div class="modal-body p-4">
+								<!-- 안내 문구 추가 -->
+								<div class="alert text-center mb-3" role="alert"
+									style="font-size: 0.9rem; background-color: #E3F2FD; border: 1px solid #BBDEFB; color: #0D47A1;">
+									ℹ️ <strong>예약 확정 후에는 시간 수정이 불가능합니다.</strong><br> 변경이 필요할
+									경우 <strong>기존 예약을 취소</strong>한 뒤 다시 예약해주세요.<br> <br>
+									🚗 <strong>해당 차량은 다음 예약이 있을 수 있으므로</strong><br> <strong>최소
+										10분 전까지는 반납</strong>해 주시기 바랍니다.<br> <br> 신중한 예약과 정시 반납을
+									부탁드립니다 😊
+								</div>
+							</div>
+							<div class="modal-footer border-0 px-4 pb-3">
+								<button class="btn btn-primary w-100" type="submit">
+									예약하기</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<script>
+			  function openPostcode() {
+			    new daum.Postcode({
+			      oncomplete: function(data) {
+			        // 선택한 주소를 input에 자동으로 입력
+			        document.getElementById("calendarLocation").value = data.address;
+			      }
+			    }).open();
+			  }
+			</script>
+
+			<!-- 차량 예약 상세조회 모달 -->
+			<div class="modal fade" id="vehicleDetailModal" tabindex="-1"
+				aria-labelledby="vehicleDetailModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content border border-translucent">
+						<div class="modal-header px-card border-0 position-relative">
+							<h5 class="mb-0 lh-sm text-body-highlight"
+								id="vehicleDetailModalLabel">차량 예약 상세조회</h5>
+							<button class="btn-close position-absolute top-0 end-0 mt-2 me-2"
+								type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+
+						<div class="modal-body p-4">
+							<input type="hidden" id="detailReservationNo"> <input
+								type="hidden" name="reservation_creator" id="loginEmployeeId"
+								th:value="${#authentication.principal.employee.employeeId}" />
+							<div class="mb-3">
+								<strong>차량명:</strong> <span id="detailVehicleName"></span>
+							</div>
+							<div class="mb-3">
+								<strong>예약자:</strong> <span id="detailReserverName"></span>
+							</div>
+							<div class="mb-3">
+								<strong>목적지:</strong> <span id="detailLocation"></span>
+							</div>
+							<div class="mb-3">
+								<strong>시작 시간:</strong> <span id="detailStartTime"></span>
+							</div>
+							<div class="mb-3">
+								<strong>종료 시간:</strong> <span id="detailEndTime"></span>
 							</div>
 						</div>
 
-						<!-- 차량 예약 상세조회 모달 -->
-						<div class="modal fade" id="vehicleDetailModal" tabindex="-1"
-							aria-labelledby="vehicleDetailModalLabel" aria-hidden="true">
-							<div class="modal-dialog modal-dialog-centered">
-								<div class="modal-content border border-translucent">
-									<div class="modal-header px-card border-0 position-relative">
-										<h5 class="mb-0 lh-sm text-body-highlight"
-											id="vehicleDetailModalLabel">차량 예약 상세조회</h5>
-										<button
-											class="btn-close position-absolute top-0 end-0 mt-2 me-2"
-											type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-									</div>
-
-									<div class="modal-body p-4">
-										<input type="hidden" id="detailReservationNo"> 
-										<input type="hidden" name="reservation_creator" id="loginEmployeeId" th:value="${#authentication.principal.employee.employeeId}" />
-										<div class="mb-3">
-											<strong>차량명:</strong> <span id="detailVehicleName"></span>
-										</div>
-										<div class="mb-3">
-											<strong>예약자:</strong> <span id="detailReserverName"></span>
-										</div>
-										<div class="mb-3">
-											<strong>목적지:</strong> <span id="detailLocation"></span>
-										</div>
-										<div class="mb-3">
-											<strong>시작 시간:</strong> <span id="detailStartTime"></span>
-										</div>
-										<div class="mb-3">
-											<strong>종료 시간:</strong> <span id="detailEndTime"></span>
-										</div>
-									</div>
-
-									<div
-										class="modal-footer d-flex justify-content-between align-items-center border-0">
-										<div class="d-flex">
-											<!-- <button class="btn btn-subtle-secondary me-1 mb-1"
+						<div
+							class="modal-footer d-flex justify-content-between align-items-center border-0">
+							<div class="d-flex">
+								<!-- <button class="btn btn-subtle-secondary me-1 mb-1"
 												type="button" id="editVehicleBtn">수정</button> -->
-											<button class="btn btn-outline-info me-1 mb-1" type="button"
-												id="deleteVehicleBtn">삭제</button>
-										</div>
-										<div>
-											<button class="btn btn-primary px-4" type="button"
-												data-bs-dismiss="modal">확인</button>
-										</div>
-									</div>
-								</div>
+								<button class="btn btn-outline-info me-1 mb-1" type="button"
+									id="deleteVehicleBtn">삭제</button>
+							</div>
+							<div>
+								<button class="btn btn-primary px-4" type="button"
+									data-bs-dismiss="modal">확인</button>
 							</div>
 						</div>
+					</div>
+				</div>
+			</div>
 
 
-						<!-- 등록을 위한 fetch -->
-						<script>
+			<!-- 등록을 위한 fetch -->
+			<script>
 						document.addEventListener("DOMContentLoaded", function () {
 							  const form = document.addEventForm;
 							  const modal = document.getElementById("addEventModal");
@@ -326,11 +405,11 @@
 
 							</script>
 
-						
 
 
-						<!-- 페이징 -->
-						<div class="d-flex justify-content-center mt-3">
+
+			<!-- 페이징 -->
+			<!-- 			<div class="d-flex justify-content-center mt-3">
 							<div class="d-flex">
 								<button class="page-link disabled" data-list-pagination="prev"
 									disabled>
@@ -349,11 +428,11 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> -->
 
-		
+
 			<!-- 차량 예약 수정 모달 -->
-	<!-- 		<div class="modal fade" id="editVehicleModal" tabindex="-1">
+			<!-- 		<div class="modal fade" id="editVehicleModal" tabindex="-1">
 				<div class="modal-dialog modal-dialog-centered">
 					<div class="modal-content border border-translucent">
 						<form id="editVehicleForm" autocomplete="off"
@@ -366,24 +445,24 @@
 							</div>
 
 							<div class="modal-body p-4"> -->
-								<!-- 숨겨진 값들 -->
-						<!-- 		<input type="hidden" name="reservation_no" id="editReservationNo" />
+			<!-- 숨겨진 값들 -->
+			<!-- 		<input type="hidden" name="reservation_no" id="editReservationNo" />
 							    <input type="hidden"name="employee_no" th:value="${#authentication.principal.employee.employeeNo}" />
 								<input type="hidden" name="facility_no" id="editFacilityNo" />
 								<input type="hidden" name="separator_code" value="F002" id="editSeparator"> 
 								<input type="hidden" name="reservation_creator" th:value="${#authentication.principal.employee.employeeId}" />
 								<input type="hidden" name="reservation_editor" th:value="${#authentication.principal.employee.employeeId}" /> -->
 
-								<!-- 장소 -->
-						<!-- 		<div class="mb-3">
+			<!-- 장소 -->
+			<!-- 		<div class="mb-3">
 									<label for="editLocation" class="form-label">목적지</label> <input
 										type="text" class="form-control form-control-sm"
 										id="editLocation" name="reservation_location"
 										placeholder="목적지를 적어주세요" />
 								</div> -->
 
-								<!-- 날짜 선택 -->
-					<!-- 			<div class="row g-2 mb-3">
+			<!-- 날짜 선택 -->
+			<!-- 			<div class="row g-2 mb-3">
 									<div class="col">
 										<label class="form-label">시작 날짜</label> <input type="date"
 											id="editStartDate" class="form-control"
@@ -396,8 +475,8 @@
 									</div>
 								</div> -->
 
-								<!-- 시간 선택 -->
-				<!-- 				<div class="row g-2 mt-2">
+			<!-- 시간 선택 -->
+			<!-- 				<div class="row g-2 mt-2">
 									<div class="col">
 										<label class="form-label">시작 시간</label> <select
 											id="editStartTime" class="form-select">
@@ -455,8 +534,8 @@
 			<div class="col-md-6">
 				<div class="calendar-outline" id="appCalendar"
 					style="height: 400px;"></div>
-				</div>
 			</div>
+		</div>
 		<!-- 캘린더 script -->
 		<script>
 		document.addEventListener('DOMContentLoaded', function () {

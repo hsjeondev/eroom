@@ -69,6 +69,8 @@ public class MeetingRoomDto {
 				.reservation_reg_date(meetingRoom.getReservationRegDate())
 				.reservation_mod_date(meetingRoom.getReservationModDate())
 				.reservation_location(meetingRoom.getReservationLocation())
+				.meetingRoomName(meetingRoom.getFacility() != null ? meetingRoom.getFacility().getFacilityName() : "")
+				.reserverName(meetingRoom.getEmployee() != null ? meetingRoom.getEmployee().getEmployeeName() : "")
 				.build();
 	}
 	
