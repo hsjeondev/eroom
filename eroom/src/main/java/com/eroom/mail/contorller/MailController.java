@@ -197,15 +197,18 @@ public class MailController {
 	@PostMapping("/mail/create")
 	@ResponseBody
 	public Map<String, String> createMailApi(MailDto mailDto,
-											 @RequestParam(name="mail_files") List<MultipartFile> mail_files) {
-		System.out.println(mail_files);
+											 @RequestParam(name="mail_files") List<MultipartFile> mailFiles) {
+		System.out.println(mailFiles);
 		Map<String, String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "메일 등록중 오류가 발생하였습니다.");
-		/*
-		 * int result = mailService.createMail(mailDto); if(result>0) {
-		 * resultMap.put("res_code", "200"); resultMap.put("res_msg", "메일이 발송되었습니다."); }
-		 */
+		
+		  int result = mailService.createMail(mailDto, mailFiles); 
+		  
+		  if(result>0) {
+		  resultMap.put("res_code", "200"); resultMap.put("res_msg", "메일이 발송되었습니다."); 
+		  }
+		 
 		return resultMap;
 	}
 	
