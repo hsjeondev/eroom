@@ -268,6 +268,53 @@
 								</div>
 							</div>
 						</div>
+						
+						<script>
+							  document.addEventListener("DOMContentLoaded", function () {
+							    const modal = document.getElementById("addEventModal");
+							
+							    if (!modal) return;
+							
+							    modal.addEventListener("show.bs.modal", function () {
+							      const form = document.forms["addEventForm"];
+							      if (!form) return;
+							
+							      // 기본 form 초기화
+							      form.reset();
+							
+							      // 참여자 선택 영역 초기화
+							      const selectedDiv = document.getElementById("selectedParticipants");
+							      if (selectedDiv) selectedDiv.innerHTML = "";
+							
+							      // 회의실명 초기화
+							      const facilityNameDiv = document.getElementById("selectedFacilityName");
+							      if (facilityNameDiv) facilityNameDiv.textContent = "회의실이 선택되지 않았습니다";
+							
+							      // department select 초기화
+							      const deptSelect = document.getElementById("departmentSelect");
+							      if (deptSelect) deptSelect.selectedIndex = 0;
+							
+							      // employee select 초기화
+							      const empSelect = document.getElementById("employeeSelect");
+							      if (empSelect) empSelect.selectedIndex = 0;
+							
+							      // 날짜/시간 초기화
+							      const startDate = document.getElementById("startDate");
+							      const endDate = document.getElementById("endDate");
+							      const startTime = document.getElementById("startTime");
+							      const endTime = document.getElementById("endTime");
+							
+							      if (startDate) startDate.value = "";
+							      if (endDate) endDate.value = "";
+							      if (startTime) startTime.selectedIndex = 0;
+							      if (endTime) endTime.selectedIndex = 0;
+							
+							      // 숨겨진 datetime-local 값도 초기화
+							      document.getElementById("calendarStartTime").value = "";
+							      document.getElementById("calendarEndTime").value = "";
+							    });
+							  });
+							</script>
 
 						<!-- 모달창 안에 facilityNo값을 넣어주는 script -->
 						<script>

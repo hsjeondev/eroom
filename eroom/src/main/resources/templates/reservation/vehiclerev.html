@@ -3,9 +3,11 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{/include/layout}">
 <head>
-<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <meta charset="UTF-8">
 <title>차량 목록</title>
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1f65e375f9cf9d0f6897e2c7a4c57332&libraries=services"></script>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
 </head>
 
 
@@ -130,27 +132,51 @@
 									style="font-size: 0.9rem;" type="button"
 									data-bs-dismiss="modal" aria-label="Close">×</button>
 							</div>
+							
+					
 
 
 							<!-- 모달창 안에 facilityNo값을 넣어주는 script -->
 							<script>
-										  document.addEventListener("DOMContentLoaded", function () {
-										    const modal = document.getElementById("addEventModal");
-										    const facilityInput = document.getElementById("modalFacilityNo");
-											
-										    modal.addEventListener("show.bs.modal", function (event) {
-										      const button = event.relatedTarget;
-										      const facilityNo = button.getAttribute("data-facility-no");
-										      const facilityName = button.getAttribute("data-facility-name");
-										      console.log(facilityName);
-										      console.log(facilityNo);
+							document.addEventListener("DOMContentLoaded", function () {
+								  const modal = document.getElementById("addEventModal");
+								  const facilityInput = document.getElementById("modalFacilityNo");
 
-										      facilityInput.value = facilityNo;
-										      document.getElementById("selectedFacilityName").textContent = facilityName || "차량명이 없습니다";
-										     // console.log("facilityNo:", facilityNo); 
-										      facilityInput.value = facilityNo;
-										    });
-										  });
+								  modal.addEventListener("show.bs.modal", function (event) {
+								    // 차량 정보 표시
+								    const button = event.relatedTarget;
+								    const facilityNo = button?.getAttribute("data-facility-no") || "";
+								    const facilityName = button?.getAttribute("data-facility-name") || "차량명이 없습니다";
+
+								    facilityInput.value = facilityNo;
+								    document.getElementById("selectedFacilityName").textContent = facilityName;
+
+								    // 초기화 코드
+								    const form = document.forms["addEventForm"];
+								    if (form) form.reset();
+
+								    document.getElementById("calendarLocation").value = "";
+								    document.getElementById("calendarStartTime").value = "";
+								    document.getElementById("calendarEndTime").value = "";
+
+								    const distanceBox = document.getElementById("distanceInfoBox");
+								    if (distanceBox) {
+								      distanceBox.style.display = "none";
+								      document.getElementById("distanceText").textContent = "";
+								      document.getElementById("durationText").textContent = "";
+								    }
+
+								    const startDate = document.getElementById("startDate");
+								    const endDate = document.getElementById("endDate");
+								    if (startDate) startDate.value = "";
+								    if (endDate) endDate.value = "";
+
+								    const startTime = document.getElementById("startTime");
+								    const endTime = document.getElementById("endTime");
+								    if (startTime) startTime.selectedIndex = 0;
+								    if (endTime) endTime.selectedIndex = 0;
+								  });
+								});
 										</script>
 
 
@@ -182,6 +208,15 @@
 											placeholder="주소를 검색하려면 오른쪽 버튼을 눌러주세요" readonly />
 										<button type="button" class="btn btn-outline-secondary btn-sm"
 											onclick="openPostcode()">주소 검색</button>
+									</div>
+								</div>
+
+								<div id="distanceInfoBox" class="mt-2" style="display: none;">
+									<div class="text-center px-2 py-1 rounded"
+										style="background-color: #f2f6fa; font-size: 0.85rem; color: #333;">
+										<strong id="distanceText"
+											style="display: block; font-weight: 500;"></strong> <small
+											id="durationText" style="font-size: 0.75rem;"></small>
 									</div>
 								</div>
 
@@ -263,17 +298,12 @@
 					</div>
 				</div>
 			</div>
+			
+			
 
-			<script>
-			  function openPostcode() {
-			    new daum.Postcode({
-			      oncomplete: function(data) {
-			        // 선택한 주소를 input에 자동으로 입력
-			        document.getElementById("calendarLocation").value = data.address;
-			      }
-			    }).open();
-			  }
-			</script>
+		
+		
+			  
 
 			<!-- 차량 예약 상세조회 모달 -->
 			<div class="modal fade" id="vehicleDetailModal" tabindex="-1"
@@ -328,6 +358,7 @@
 
 			<!-- 등록을 위한 fetch -->
 			<script>
+				
 						document.addEventListener("DOMContentLoaded", function () {
 							  const form = document.addEventForm;
 							  const modal = document.getElementById("addEventModal");
@@ -850,6 +881,78 @@
 			  }, 0); 
 			});
 		</script>
+		
+		<!-- 카카오 TMAP -->
+		<script>
+	      const companyLat = 37.477902;
+		  const companyLng = 126.886443;
+		  const TMAP_APP_KEY = "";
+		
+		  function getDistanceFromTmap(address) {
+		    const geocoder = new kakao.maps.services.Geocoder();
+		    geocoder.addressSearch(address, function (result, status) {
+		      if (status === kakao.maps.services.Status.OK) {
+		        const userLat = parseFloat(result[0].y);
+		        const userLng = parseFloat(result[0].x);
+		
+		        fetch("https://apis.openapi.sk.com/tmap/routes?version=1", {
+		          method: "POST",
+		          headers: {
+		            "Content-Type": "application/json",
+		            "appKey": TMAP_APP_KEY
+		          },
+		          body: JSON.stringify({
+		            startX: companyLng.toString(),
+		            startY: companyLat.toString(),
+		            endX: userLng.toString(),
+		            endY: userLat.toString(),
+		            reqCoordType: "WGS84GEO",
+		            resCoordType: "WGS84GEO",
+		            searchOption: 0
+		          })
+		        })
+		        .then(res => res.json())
+		        .then(data => {
+		          const distance = data.features[0].properties.totalDistance;
+		          const time = data.features[0].properties.totalTime;
+		          
+		          onAddressSelected(distance, time);
+		          
+		        });
+		      } else {
+		        alert("주소 좌표 못 찾았어 😭");
+		      }
+		    });
+		  }
+		  
+		  function onAddressSelected(distance, time) {
+				// 거리/시간 표시용 텍스트
+				const distanceStr = `🚗 ${(distance / 1000).toFixed(2)}km 거리`;
+				const timeStr = `⏰ ${(time / 60).toFixed(1)}분 소요 예상`;
+
+				// 숨겨졌던 div 보이게 하기
+				document.getElementById("distanceInfoBox").style.display = "block";
+
+				// 텍스트 채워주기
+				document.getElementById("distanceText").innerText = distanceStr;
+				document.getElementById("durationText").innerText = timeStr;
+			}
+		
+		  // 전역 함수 등록
+		  function openPostcode() {
+		    new daum.Postcode({
+		      oncomplete: function (data) {
+		        const address = data.address;
+		        document.getElementById("calendarLocation").value = address;
+		        document.activeElement.blur();
+		        getDistanceFromTmap(address);
+		      }
+		    }).open();
+		  }
+		</script>
+
+
+
 	</main>
 </body>
 </html>
