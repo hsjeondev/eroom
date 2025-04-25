@@ -22,7 +22,9 @@ import com.eroom.employee.service.EmployeeService;
 import com.eroom.project.dto.GithubPullRequestDto;
 import com.eroom.project.dto.ProjectDto;
 import com.eroom.project.dto.ProjectMemberDto;
+import com.eroom.project.dto.ProjectTodoListDto;
 import com.eroom.project.service.ProjectService;
+import com.eroom.project.service.ProjectTodoService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +35,7 @@ public class ProjectController {
 	
 	private final EmployeeService employeeService;
 	private final ProjectService projectService;
+	private final ProjectTodoService projectTodoService;
 
 	@GetMapping("/all")
 	public String allProjectView(Model model) {
@@ -105,7 +108,10 @@ public class ProjectController {
 	public String detailProjectTodoView(@PathVariable("project_no") Long project_no, Model model) {
 		
 		ProjectDto project = projectService.findByProjectNo(project_no);
+		List<ProjectTodoListDto> projectTodoList = projectTodoService.findByProjectNo(project_no);
+		
 		model.addAttribute("project", project);
+		model.addAttribute("projectTodoList", projectTodoList);
 		
 		return "project/projectDetailTodoTab";
 	}

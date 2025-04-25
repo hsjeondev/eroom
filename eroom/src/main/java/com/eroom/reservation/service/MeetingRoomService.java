@@ -149,6 +149,10 @@ public class MeetingRoomService {
 		return new MeetingRoomDto().toDto(saved);
 				
 	}
+	
+    public boolean isConflict(Long facilityNo, LocalDateTime start, LocalDateTime end) {
+        return repository.existsConflict(facilityNo, start, end);
+    }
 
 	
 		
