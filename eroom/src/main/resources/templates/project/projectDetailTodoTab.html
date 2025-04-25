@@ -6,6 +6,26 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  layout:decorate="~{/include/layout}">
   <body>
     <main class="main" id="top" layout:fragment="content">
+    
+	    <style>
+		    .color-swatch {
+		      display: flex;
+		      flex-direction: row-reverse; /* ← 순서 반전 */
+		      align-items: center;
+		      gap: 0.25rem;
+		      cursor: pointer;
+		    }
+		    .color-swatch input[type="radio"] {
+		      margin: 0;
+		    }
+		    .color-swatch .swatch {
+		      width: 1.5rem;
+		      height: 1.5rem;
+		      border-radius: 0.25rem;
+		      flex-shrink: 0;
+		    }
+		  </style>
+    
 		<div class="d-flex align-items-center gap-2">
 		  	<a th:href="@{/project/all}" class="text-decoration-none text-dark me-2">
 		  		<i class="uil uil-angle-left-b fs-4"></i>
@@ -34,155 +54,482 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		<br>
 	        
         <div class="kanban-container scrollbar" data-kanban-container="data-kanban-container">
-          
-          <!-- Review 덩어리 -->
-          <div class="kanban-column scrollbar">
-            <div class="kanban-column-header px-4 hover-actions-trigger">
-              <div class="d-flex align-items-center border-bottom border-3 py-3 border-info">
-                <h5 class="mb-0 kanban-column-title" th:text="${projectTodoList[0].list_name}">Review<span class="kanban-title-badge">4</span></h5>
-                <div class="hover-actions-trigger">
-                  <button class="btn btn-sm btn-phoenix-default kanban-header-dropdown-btn hover-actions" type="button" data-boundary="viewport" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg class="svg-inline--fa fa-ellipsis" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"></path></svg><!-- <span class="fas fa-ellipsis-h"></span> Font Awesome fontawesome.com --></button>
-                  <div class="dropdown-menu dropdown-menu-end py-2" style="width: 15rem;"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Sort tasks</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Sort all tasks</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Move all tasks</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Remove all tasks</span></a>
-                    <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Import</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Export</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a>
-                    <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Move column</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Duplicate column</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Delete column</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Archive column</span></a>
-                    <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Edit title &amp; description</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Edit colour</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a>
-                  </div>
-                </div><span class="uil uil-left-arrow-to-left fs-8 ms-auto kanban-collapse-icon" data-kanban-collapse="data-kanban-collapse"></span><span class="uil uil-arrow-from-right fs-8 ms-auto kanban-collapse-icon" data-kanban-collapse="data-kanban-collapse"></span>
-              </div>
-            </div>
-            <!-- Review 아이템 공간 -->
-            <div class="kanban-items-container" data-sortable="data-sortable">
-              
-              <div class="sortable-item-wrapper border-bottom border-translucent px-2 py-2">
-                <div class="card sortable-item hover-actions-trigger">
-                  <div class="card-body py-3 px-3">
-                    <div class="kanban-status mb-1 position-relative lh-1"><svg class="svg-inline--fa fa-circle me-2 d-inline-block text-warning" style="min-width: 1rem;transform-origin: 0.5em 0.6875em;" data-fa-transform="shrink-1 down-3" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><g transform="translate(256 256)"><g transform="translate(0, 96)  scale(0.9375, 0.9375)  rotate(0 0 0)"><path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path></g></g></svg><!-- <span class="fa fa-circle me-2 d-inline-block text-warning" style="min-width:1rem" data-fa-transform="shrink-1 down-3"></span> Font Awesome fontawesome.com --><span class="badge badge-phoenix fs-10 badge-phoenix-warning"><span>Issue</span><svg class="svg-inline--fa fa-triangle-exclamation ms-1 d-inline-block" data-fa-transform="up-2" style="height: 7.8px;width: 7.8px;transform-origin: 0.5em 0.375em;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="triangle-exclamation" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><g transform="translate(256 256)"><g transform="translate(0, -64)  scale(1, 1)  rotate(0 0 0)"><path fill="currentColor" d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z" transform="translate(-256 -256)"></path></g></g></svg><!-- <span class="ms-1 d-inline-block fa-solid fa-triangle-exclamation" data-fa-transform="up-2" style="height:7.8px;width:7.8px;"></span> Font Awesome fontawesome.com --></span>
-                      <button class="btn btn-sm btn-phoenix-default kanban-item-dropdown-btn hover-actions" type="button" data-boundary="viewport" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg class="svg-inline--fa fa-ellipsis fa-rotate-90" data-fa-transform="shrink-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style="transform-origin: 0.4375em 0.5em;"><g transform="translate(224 256)"><g transform="translate(0, 0)  scale(0.875, 0.875)  rotate(0 0 0)"><path fill="currentColor" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" transform="translate(-224 -256)"></path></g></g></svg><!-- <span class="fas fa-ellipsis-h fa-rotate-90" data-fa-transform="shrink-2"></span> Font Awesome fontawesome.com --></button>
-                      <div class="dropdown-menu dropdown-menu-end py-2" style="width: 15rem;"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Move</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Duplicate</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Jump to top</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Jump to bottom</span></a>
-                        <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Print/Download</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Share</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a>
-                        <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Move to archive</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent text-danger" href="#!"><span>Delete</span></a>
-                      </div>
-                    </div>
-                    <p class="mb-0 stretched-link" data-bs-toggle="modal" data-bs-target="#KanbanItemDetailsModal">Create a fresh visual identity for Phoenix with a new logo design</p>
-                    <div class="d-flex mt-2 align-items-center">
-                      <p class="mb-0 text-body-tertiary text-opacity-85 fs-9 lh-1"><svg class="svg-inline--fa fa-square-check fs-9 me-2 d-inline-block" style="min-width: 1rem;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM337 209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"></path></svg><!-- <span class="fa fa-check-square fs-9 me-2 d-inline-block" style="min-width: 1rem;"></span> Font Awesome fontawesome.com -->5/34</p>
-                      
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              
-            </div>
-            <!-- Review 아이템 추가 -->
-            <div class="py-3 px-4 kanban-add-task">
-              <button class="btn bg-sm bg-body-tertiary me-2 px-0" data-bs-toggle="modal" data-bs-target="#kanbanAddTask"><svg class="svg-inline--fa fa-plus text-white dark__text-gray-400" data-fa-transform="grow-4 down-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style="transform-origin: 0.4375em 0.5625em;"><g transform="translate(224 256)"><g transform="translate(0, 32)  scale(1.25, 1.25)  rotate(0 0 0)"><path fill="currentColor" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" transform="translate(-224 -256)"></path></g></g></svg><!-- <span class="fas fa-plus text-white dark__text-gray-400" data-fa-transform="grow-4 down-1"></span> Font Awesome fontawesome.com --></button>
-              <input class="form-control search-input rounded-3 px-3" placeholder="Add new task">
-            </div>
-          </div>
-          
-          <!-- Release 덩어리  -->
-          <div class="kanban-column scrollbar">
-            <div class="kanban-column-header px-4 hover-actions-trigger">
-              <div class="d-flex align-items-center border-bottom border-3 py-3 border-success">
-                <h5 class="mb-0 kanban-column-title" th:text="${projectTodoList[1].list_name}">Release<span class="kanban-title-badge">3</span></h5>
-                <div class="hover-actions-trigger">
-                  <button class="btn btn-sm btn-phoenix-default kanban-header-dropdown-btn hover-actions" type="button" data-boundary="viewport" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg class="svg-inline--fa fa-ellipsis" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"></path></svg><!-- <span class="fas fa-ellipsis-h"></span> Font Awesome fontawesome.com --></button>
-                  <div class="dropdown-menu dropdown-menu-end py-2" style="width: 15rem;"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Sort tasks</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Sort all tasks</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Move all tasks</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Remove all tasks</span></a>
-                    <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Import</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Export</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a>
-                    <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Move column</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Duplicate column</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Delete column</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Archive column</span></a>
-                    <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Edit title &amp; description</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Edit colour</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a>
-                  </div>
-                </div><span class="uil uil-left-arrow-to-left fs-8 ms-auto kanban-collapse-icon" data-kanban-collapse="data-kanban-collapse"></span><span class="uil uil-arrow-from-right fs-8 ms-auto kanban-collapse-icon" data-kanban-collapse="data-kanban-collapse"></span>
-              </div>
-            </div>
-            
-            <!-- Release 아이템 공간 -->
-            <div class="kanban-items-container" data-sortable="data-sortable">
-              
-              <div class="sortable-item-wrapper border-bottom border-translucent px-2 py-2">
-                <div class="card sortable-item hover-actions-trigger">
-                  <div class="card-body py-3 px-3">
-                    <div class="kanban-status mb-1 position-relative lh-1"><svg class="svg-inline--fa fa-circle me-2 d-inline-block text-warning" style="min-width: 1rem;transform-origin: 0.5em 0.6875em;" data-fa-transform="shrink-1 down-3" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><g transform="translate(256 256)"><g transform="translate(0, 96)  scale(0.9375, 0.9375)  rotate(0 0 0)"><path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path></g></g></svg><!-- <span class="fa fa-circle me-2 d-inline-block text-warning" style="min-width:1rem" data-fa-transform="shrink-1 down-3"></span> Font Awesome fontawesome.com --><span class="badge badge-phoenix fs-10 badge-phoenix-warning"><span>Issue</span><svg class="svg-inline--fa fa-triangle-exclamation ms-1 d-inline-block" data-fa-transform="up-2" style="height: 7.8px;width: 7.8px;transform-origin: 0.5em 0.375em;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="triangle-exclamation" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><g transform="translate(256 256)"><g transform="translate(0, -64)  scale(1, 1)  rotate(0 0 0)"><path fill="currentColor" d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z" transform="translate(-256 -256)"></path></g></g></svg><!-- <span class="ms-1 d-inline-block fa-solid fa-triangle-exclamation" data-fa-transform="up-2" style="height:7.8px;width:7.8px;"></span> Font Awesome fontawesome.com --></span>
-                      <button class="btn btn-sm btn-phoenix-default kanban-item-dropdown-btn hover-actions" type="button" data-boundary="viewport" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg class="svg-inline--fa fa-ellipsis fa-rotate-90" data-fa-transform="shrink-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style="transform-origin: 0.4375em 0.5em;"><g transform="translate(224 256)"><g transform="translate(0, 0)  scale(0.875, 0.875)  rotate(0 0 0)"><path fill="currentColor" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" transform="translate(-224 -256)"></path></g></g></svg><!-- <span class="fas fa-ellipsis-h fa-rotate-90" data-fa-transform="shrink-2"></span> Font Awesome fontawesome.com --></button>
-                      <div class="dropdown-menu dropdown-menu-end py-2" style="width: 15rem;"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Move</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Duplicate</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Jump to top</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Jump to bottom</span></a>
-                        <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Print/Download</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Share</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a>
-                        <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Move to archive</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent text-danger" href="#!"><span>Delete</span></a>
-                      </div>
-                    </div>
-                    <p class="mb-0 stretched-link" data-bs-toggle="modal" data-bs-target="#KanbanItemDetailsModal">Create a fresh visual identity for Phoenix with a new logo design</p>
-                    <div class="d-flex mt-2 align-items-center">
-                      <p class="mb-0 text-body-tertiary text-opacity-85 fs-9 lh-1"><svg class="svg-inline--fa fa-square-check fs-9 me-2 d-inline-block" style="min-width: 1rem;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM337 209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"></path></svg><!-- <span class="fa fa-check-square fs-9 me-2 d-inline-block" style="min-width: 1rem;"></span> Font Awesome fontawesome.com -->5/34</p>
-                      
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              
-            </div>
-            <!-- Release 아이템 추가 -->
-            <div class="py-3 px-4 kanban-add-task">
-              <button class="btn bg-sm bg-body-tertiary me-2 px-0" data-bs-toggle="modal" data-bs-target="#kanbanAddTask"><svg class="svg-inline--fa fa-plus text-white dark__text-gray-400" data-fa-transform="grow-4 down-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style="transform-origin: 0.4375em 0.5625em;"><g transform="translate(224 256)"><g transform="translate(0, 32)  scale(1.25, 1.25)  rotate(0 0 0)"><path fill="currentColor" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" transform="translate(-224 -256)"></path></g></g></svg><!-- <span class="fas fa-plus text-white dark__text-gray-400" data-fa-transform="grow-4 down-1"></span> Font Awesome fontawesome.com --></button>
-              <input class="form-control search-input rounded-3 px-3" placeholder="Add new task">
-            </div>
-          </div>
-          
-          
-          <!-- Release 덩어리  -->
-          <div class="kanban-column scrollbar">
-            <div class="kanban-column-header px-4 hover-actions-trigger">
-              <div class="d-flex align-items-center border-bottom border-3 py-3 border-success">
-                <h5 class="mb-0 kanban-column-title" th:text="${projectTodoList[2].list_name}">Release<span class="kanban-title-badge">3</span></h5>
-                <div class="hover-actions-trigger">
-                  <button class="btn btn-sm btn-phoenix-default kanban-header-dropdown-btn hover-actions" type="button" data-boundary="viewport" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg class="svg-inline--fa fa-ellipsis" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"></path></svg><!-- <span class="fas fa-ellipsis-h"></span> Font Awesome fontawesome.com --></button>
-                  <div class="dropdown-menu dropdown-menu-end py-2" style="width: 15rem;"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Sort tasks</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Sort all tasks</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Move all tasks</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Remove all tasks</span></a>
-                    <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Import</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Export</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a>
-                    <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Move column</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Duplicate column</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Delete column</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Archive column</span></a>
-                    <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Edit title &amp; description</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Edit colour</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a>
-                  </div>
-                </div><span class="uil uil-left-arrow-to-left fs-8 ms-auto kanban-collapse-icon" data-kanban-collapse="data-kanban-collapse"></span><span class="uil uil-arrow-from-right fs-8 ms-auto kanban-collapse-icon" data-kanban-collapse="data-kanban-collapse"></span>
-              </div>
-            </div>
-            
-            <!-- Release 아이템 공간 -->
-            <div class="kanban-items-container" data-sortable="data-sortable">
-              
-              <div class="sortable-item-wrapper border-bottom border-translucent px-2 py-2">
-                <div class="card sortable-item hover-actions-trigger">
-                  <div class="card-body py-3 px-3">
-                    <div class="kanban-status mb-1 position-relative lh-1"><svg class="svg-inline--fa fa-circle me-2 d-inline-block text-warning" style="min-width: 1rem;transform-origin: 0.5em 0.6875em;" data-fa-transform="shrink-1 down-3" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><g transform="translate(256 256)"><g transform="translate(0, 96)  scale(0.9375, 0.9375)  rotate(0 0 0)"><path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path></g></g></svg><!-- <span class="fa fa-circle me-2 d-inline-block text-warning" style="min-width:1rem" data-fa-transform="shrink-1 down-3"></span> Font Awesome fontawesome.com --><span class="badge badge-phoenix fs-10 badge-phoenix-warning"><span>Issue</span><svg class="svg-inline--fa fa-triangle-exclamation ms-1 d-inline-block" data-fa-transform="up-2" style="height: 7.8px;width: 7.8px;transform-origin: 0.5em 0.375em;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="triangle-exclamation" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><g transform="translate(256 256)"><g transform="translate(0, -64)  scale(1, 1)  rotate(0 0 0)"><path fill="currentColor" d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z" transform="translate(-256 -256)"></path></g></g></svg><!-- <span class="ms-1 d-inline-block fa-solid fa-triangle-exclamation" data-fa-transform="up-2" style="height:7.8px;width:7.8px;"></span> Font Awesome fontawesome.com --></span>
-                      <button class="btn btn-sm btn-phoenix-default kanban-item-dropdown-btn hover-actions" type="button" data-boundary="viewport" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg class="svg-inline--fa fa-ellipsis fa-rotate-90" data-fa-transform="shrink-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style="transform-origin: 0.4375em 0.5em;"><g transform="translate(224 256)"><g transform="translate(0, 0)  scale(0.875, 0.875)  rotate(0 0 0)"><path fill="currentColor" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" transform="translate(-224 -256)"></path></g></g></svg><!-- <span class="fas fa-ellipsis-h fa-rotate-90" data-fa-transform="shrink-2"></span> Font Awesome fontawesome.com --></button>
-                      <div class="dropdown-menu dropdown-menu-end py-2" style="width: 15rem;"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Move</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Duplicate</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Jump to top</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Jump to bottom</span></a>
-                        <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Print/Download</span></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Share</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a>
-                        <hr class="my-2"><a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined" href="#!"><span>Move to archive</span><svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg><!-- <span class="fas fa-angle-right fs-10"></span> Font Awesome fontawesome.com --></a><a class="dropdown-item d-flex flex-between-center border-1 border-translucent text-danger" href="#!"><span>Delete</span></a>
-                      </div>
-                    </div>
-                    <p class="mb-0 stretched-link" data-bs-toggle="modal" data-bs-target="#KanbanItemDetailsModal">Create a fresh visual identity for Phoenix with a new logo design</p>
-                    <div class="d-flex mt-2 align-items-center">
-                      <p class="mb-0 text-body-tertiary text-opacity-85 fs-9 lh-1"><svg class="svg-inline--fa fa-square-check fs-9 me-2 d-inline-block" style="min-width: 1rem;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM337 209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"></path></svg><!-- <span class="fa fa-check-square fs-9 me-2 d-inline-block" style="min-width: 1rem;"></span> Font Awesome fontawesome.com -->5/34</p>
-                      
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              
-            </div>
-            <!-- Release 아이템 추가 -->
-            <div class="py-3 px-4 kanban-add-task">
-              <button class="btn bg-sm bg-body-tertiary me-2 px-0" data-bs-toggle="modal" data-bs-target="#kanbanAddTask"><svg class="svg-inline--fa fa-plus text-white dark__text-gray-400" data-fa-transform="grow-4 down-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style="transform-origin: 0.4375em 0.5625em;"><g transform="translate(224 256)"><g transform="translate(0, 32)  scale(1.25, 1.25)  rotate(0 0 0)"><path fill="currentColor" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" transform="translate(-224 -256)"></path></g></g></svg><!-- <span class="fas fa-plus text-white dark__text-gray-400" data-fa-transform="grow-4 down-1"></span> Font Awesome fontawesome.com --></button>
-              <input class="form-control search-input rounded-3 px-3" placeholder="Add new task">
-            </div>
-          </div>
-          
-          <!-- 리스트 추가 -->
-          <div class="kanban-column scrollbar position-relative bg-transparent">
-            <div class="d-flex h-100 flex-center fw-bold bg-body-hover"><a class="text-decoration-none stretched-link text-body-secondary" href="#!">
-                <div class="circle-btn bg-body-secondary mx-auto"><svg class="svg-inline--fa fa-plus" data-fa-transform="shrink-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style="transform-origin: 0.4375em 0.5em;"><g transform="translate(224 256)"><g transform="translate(0, 0)  scale(0.875, 0.875)  rotate(0 0 0)"><path fill="currentColor" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" transform="translate(-224 -256)"></path></g></g></svg><!-- <span class="fas fa-plus" data-fa-transform="shrink-2"></span> Font Awesome fontawesome.com --></div><span>Add another list</span>
-              </a></div>
-          </div>
-        </div>
+		  <!-- projectTodoList의 각 요소마다 이 블록이 반복됩니다 -->
+		  <div th:each="list : ${projectTodoList}" class="kanban-column scrollbar">
+		    <!-- 컬럼 헤더 -->
+		    <div class="kanban-column-header px-4 hover-actions-trigger">
+		      <div
+  class="d-flex align-items-center border-bottom border-3 py-3"
+  th:style="'border-bottom-color:' + ${list.list_color} + ' !important'">
+		        <h5 class="mb-0 kanban-column-title">
+		          <!-- 리스트 이름 -->
+		          <span th:text="${list.list_name}">Review</span>
+		          <!-- 태스크 개수 -->
+		          <span class="kanban-title-badge" >4</span>
+		        </h5>
+		        <div class="hover-actions-trigger">
+		          <button class="btn btn-sm btn-phoenix-default kanban-header-dropdown-btn hover-actions"
+		                  type="button" data-boundary="viewport" data-bs-toggle="dropdown"
+		                  aria-haspopup="true" aria-expanded="false">
+		            <svg class="svg-inline--fa fa-ellipsis" aria-hidden="true" focusable="false"
+		                 data-prefix="fas" data-icon="ellipsis" role="img"
+		                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+		                 data-fa-i2svg="">
+		              <path fill="currentColor"
+		                    d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0
+		                       56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112
+		                       56 56 0 1 1 0-112z"></path>
+		            </svg>
+		          </button>
+		          <div class="dropdown-menu dropdown-menu-end py-2" style="width: 15rem;">
+		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		               href="#!">
+		              <span>Sort tasks</span>
+		              <svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false"
+		                   data-prefix="fas" data-icon="angle-right" role="img"
+		                   xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"
+		                   data-fa-i2svg="">
+		                <path fill="currentColor"
+		                      d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5
+		                         12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256
+		                         73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5
+		                         45.3 0l160 160z"></path>
+		              </svg>
+		            </a>
+		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		               href="#!"><span>Sort all tasks</span></a>
+		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		               href="#!">
+		              <span>Move all tasks</span>
+		              <svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false"
+		                   data-prefix="fas" data-icon="angle-right" role="img"
+		                   xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"
+		                   data-fa-i2svg="">
+		                <path fill="currentColor"
+		                      d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5
+		                         12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256
+		                         73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5
+		                         45.3 0l160 160z"></path>
+		              </svg>
+		            </a>
+		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		               href="#!"><span>Remove all tasks</span></a>
+		            <hr class="my-2">
+		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		               href="#!"><span>Import</span></a>
+		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		               href="#!">
+		              <span>Export</span>
+		              <svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false"
+		                   data-prefix="fas" data-icon="angle-right" role="img"
+		                   xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"
+		                   data-fa-i2svg="">
+		                <path fill="currentColor"
+		                      d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5
+		                         12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256
+		                         73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5
+		                         45.3 0l160 160z"></path>
+		              </svg>
+		            </a>
+		            <hr class="my-2">
+		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		               href="#!">
+		              <span>Move column</span>
+		              <svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false"
+		                   data-prefix="fas" data-icon="angle-right" role="img"
+		                   xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"
+		                   data-fa-i2svg="">
+		                <path fill="currentColor"
+		                      d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5
+		                         12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256
+		                         73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5
+		                         45.3 0l160 160z"></path>
+		              </svg>
+		            </a>
+		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		               href="#!"><span>Duplicate column</span></a>
+		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		               href="#!"><span>Delete column</span></a>
+		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		               href="#!"><span>Archive column</span></a>
+		            <hr class="my-2">
+		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		               href="#!"><span>Edit title &amp; description</span></a>
+		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		               href="#!">
+		              <span>Edit colour</span>
+		              <svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true" focusable="false"
+		                   data-prefix="fas" data-icon="angle-right" role="img"
+		                   xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"
+		                   data-fa-i2svg="">
+		                <path fill="currentColor"
+		                      d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5
+		                         12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256
+		                         73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5
+		                         45.3 0l160 160z"></path>
+		              </svg>
+		            </a>
+		          </div>
+		        </div>
+		        <span class="uil uil-left-arrow-to-left fs-8 ms-auto kanban-collapse-icon"
+		              data-kanban-collapse="data-kanban-collapse"></span>
+		        <span class="uil uil-arrow-from-right fs-8 ms-auto kanban-collapse-icon"
+		              data-kanban-collapse="data-kanban-collapse"></span>
+		      </div>
+		    </div>
+		
+		    <!-- Review 아이템 공간(예시) -->
+		    <div class="kanban-items-container" data-sortable="data-sortable">
+		      <div class="sortable-item-wrapper border-bottom border-translucent px-2 py-2">
+		        <div class="card sortable-item hover-actions-trigger">
+		          <div class="card-body py-3 px-3">
+		            <div class="kanban-status mb-1 position-relative lh-1">
+		              <svg class="svg-inline--fa fa-circle me-2 d-inline-block text-warning"
+		                   style="min-width: 1rem;transform-origin: 0.5em 0.6875em;"
+		                   data-fa-transform="shrink-1 down-3" aria-hidden="true" focusable="false"
+		                   data-prefix="fas" data-icon="circle" role="img"
+		                   xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+		                   data-fa-i2svg="">
+		                <g transform="translate(256 256)">
+		                  <g transform="translate(0, 96)  scale(0.9375, 0.9375)  rotate(0 0 0)">
+		                    <path fill="currentColor"
+		                          d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"
+		                          transform="translate(-256 -256)"></path>
+		                  </g>
+		                </g>
+		              </svg>
+		              <span class="badge badge-phoenix fs-10 badge-phoenix-warning">
+		                <span>Issue</span>
+		                <svg class="svg-inline--fa fa-triangle-exclamation ms-1 d-inline-block"
+		                     data-fa-transform="up-2"
+		                     style="height: 7.8px;width: 7.8px;transform-origin: 0.5em 0.375em;"
+		                     aria-hidden="true" focusable="false" data-prefix="fas"
+		                     data-icon="triangle-exclamation" role="img"
+		                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+		                     data-fa-i2svg="">
+		                  <g transform="translate(256 256)">
+		                    <g transform="translate(0, -64)  scale(1, 1)  rotate(0 0 0)">
+		                      <path fill="currentColor"
+		                            d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3
+		                               12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3
+		                               0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7
+		                               39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24
+		                               24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32
+		                               224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
+		                            transform="translate(-256 -256)"></path>
+		                    </g>
+		                  </g>
+		                </svg>
+		              </span>
+		              <button class="btn btn-sm btn-phoenix-default kanban-item-dropdown-btn hover-actions"
+		                      type="button" data-boundary="viewport" data-bs-toggle="dropdown"
+		                      aria-haspopup="true" aria-expanded="false">
+		                <svg class="svg-inline--fa fa-ellipsis fa-rotate-90" data-fa-transform="shrink-2"
+		                     aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis"
+		                     role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+		                     data-fa-i2svg="" style="transform-origin: 0.4375em 0.5em;">
+		                  <g transform="translate(224 256)">
+		                    <g transform="translate(0, 0)  scale(0.875, 0.875)  rotate(0 0 0)">
+		                      <path fill="currentColor"
+		                            d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160
+		                               0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56
+		                               56 0 1 1 0 112 56 56 0 1 1 0-112z"
+		                            transform="translate(-224 -256)"></path>
+		                    </g>
+		                  </g>
+		                </svg>
+		              </button>
+		              <div class="dropdown-menu dropdown-menu-end py-2" style="width: 15rem;">
+		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		                   href="#!"><span>Move</span>
+		                  <svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true"
+		                       focusable="false" data-prefix="fas" data-icon="angle-right" role="img"
+		                       xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"
+		                       data-fa-i2svg="">
+		                    <path fill="currentColor"
+		                          d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5
+		                             12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256
+		                             73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5
+		                             45.3 0l160 160z"></path>
+		                  </svg>
+		                </a>
+		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		                   href="#!"><span>Duplicate</span></a>
+		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		                   href="#!"><span>Jump to top</span></a>
+		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		                   href="#!"><span>Jump to bottom</span></a>
+		                <hr class="my-2">
+		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		                   href="#!"><span>Print/Download</span></a>
+		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		                   href="#!"><span>Share</span>
+		                  <svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true"
+		                       focusable="false" data-prefix="fas" data-icon="angle-right" role="img"
+		                       xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"
+		                       data-fa-i2svg="">
+		                    <path fill="currentColor"
+		                          d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5
+		                             12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256
+		                             73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5
+		                             45.3 0l160 160z"></path>
+		                  </svg>
+		                </a>
+		                <hr class="my-2">
+		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
+		                   href="#!"><span>Move to archive</span>
+		                  <svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true"
+		                       focusable="false" data-prefix="fas" data-icon="angle-right" role="img"
+		                       xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"
+		                       data-fa-i2svg="">
+		                    <path fill="currentColor"
+		                          d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5
+		                             12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256
+		                             73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5
+		                             45.3 0l160 160z"></path>
+		                  </svg>
+		                </a>
+		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent text-danger"
+		                   href="#!"><span>Delete</span></a>
+		              </div>
+		            </div>
+		            <p class="mb-0 stretched-link" data-bs-toggle="modal"
+		               data-bs-target="#KanbanItemDetailsModal">
+		              Create a fresh visual identity for Phoenix with a new logo design
+		            </p>
+		            <div class="d-flex mt-2 align-items-center">
+		              <p class="mb-0 text-body-tertiary text-opacity-85 fs-9 lh-1">
+		                <svg class="svg-inline--fa fa-square-check fs-9 me-2 d-inline-block"
+		                     style="min-width: 1rem;" aria-hidden="true" focusable="false"
+		                     data-prefix="fas" data-icon="square-check" role="img"
+		                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+		                     data-fa-i2svg="">
+		                  <path fill="currentColor"
+		                        d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64
+		                           64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM337
+		                           209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6
+		                           0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4 9.4 24.6 9.4
+		                           33.9 0s9.4-24.6 0-33.9z"></path>
+		                </svg>
+		                5/34
+		              </p>
+		            </div>
+		          </div>
+		        </div>
+		      </div>
+		    </div>
+		
+		    <!-- 새 아이템 추가 -->
+		    <div class="py-3 px-4 kanban-add-task">
+		      <button class="btn bg-sm bg-body-tertiary me-2 px-0" data-bs-toggle="modal"
+		              data-bs-target="#kanbanAddTask">
+		        <svg class="svg-inline--fa fa-plus text-white dark__text-gray-400"
+		             data-fa-transform="grow-4 down-1" aria-hidden="true" focusable="false"
+		             data-prefix="fas" data-icon="plus" role="img"
+		             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+		             data-fa-i2svg="" style="transform-origin: 0.4375em 0.5625em;">
+		          <g transform="translate(224 256)">
+		            <g transform="translate(0, 32)  scale(1.25, 1.25)  rotate(0 0 0)">
+		              <path fill="currentColor"
+		                    d="M256 80c0-17.7-14.3-32-32-32s-32
+		                       14.3-32 32V224H48c-17.7 0-32 14.3-32
+		                       32s14.3 32 32 32H192V432c0
+		                       17.7 14.3 32 32 32s32-14.3
+		                       32-32V288H400c17.7 0 32-14.3
+		                       32-32s-14.3-32-32-32H256V80z"
+		                    transform="translate(-224 -256)"></path>
+		            </g>
+		          </g>
+		        </svg>
+		      </button>
+		      <input class="form-control search-input rounded-3 px-3" placeholder="Add new task">
+		    </div>
+		  </div>
+  
+		  <div class="kanban-column scrollbar position-relative bg-transparent">
+		     <div class="d-flex h-100 flex-center fw-bold bg-body-hover"><a class="text-decoration-none stretched-link text-body-secondary" href="#!" data-bs-toggle="modal" 
+      data-bs-target="#addEventModal">
+		        <div class="circle-btn bg-body-secondary mx-auto"><svg class="svg-inline--fa fa-plus" data-fa-transform="shrink-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style="transform-origin: 0.4375em 0.5em;"><g transform="translate(224 256)"><g transform="translate(0, 0)  scale(0.875, 0.875)  rotate(0 0 0)"><path fill="currentColor" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" transform="translate(-224 -256)"></path></g></g></svg></div><span>새로운 리스트 생성</span>
+		     </a></div>
+		  </div>
+		</div>
+        
+		<!-- 모달 창 -->
+		<!-- 모달 창 (기존 부분 그대로 유지) -->
+		<div class="modal fade" id="addEventModal" tabindex="-1">
+		  <div class="modal-dialog modal-dialog-centered">
+		    <div class="modal-content border border-translucent">
+		      <form name="addTodoList">
+		      <input type="hidden" name="project_no" th:value="${project.project_no}">
+		        <!-- 헤더 -->
+		        <div class="modal-header px-card border-0">
+		          <div class="w-100 d-flex justify-content-between align-items-start">
+		            <h5 class="mb-0 lh-sm text-body-highlight">리스트 추가</h5>
+		            <button class="btn p-1 fs-10 text-body" type="button"
+		                    data-bs-dismiss="modal" aria-label="Close">닫기</button>
+		          </div>
+		        </div>
+		
+		        <!-- 바디 -->
+		        <div class="modal-body p-card pt-3">
+		          <!-- 리스트 이름 -->
+		          <div class="mb-3">
+		            <label for="calendarTitle" class="form-label">리스트 이름</label>
+		            <input name="list_name" type="text" class="form-control form-control-sm"
+		                   id="calendarTitle"
+		                   placeholder="일정 제목" autocomplete="off" />
+		          </div>
+		
+		          <!-- 색상 선택 -->
+		          <div class="mb-3">
+					  <label class="form-label">색상</label>
+					  <div class="d-flex flex-wrap gap-2">
+					    <!-- 10가지 색상 예시 -->
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #e74c3c;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#e74c3c" checked>
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #2ecc71;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#2ecc71">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #3498db;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#3498db">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #f1c40f;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#f1c40f">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #9b59b6;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#9b59b6">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #e67e22;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#e67e22">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #1abc9c;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#1abc9c">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #34495e;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#34495e">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #7f8c8d;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#7f8c8d">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #e84393;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#e84393">
+					    </label>
+					  </div>
+					</div>
+
+		
+		          <!-- 순서 입력 (Input Group 사용) -->
+					<div class="mb-3" 
+					     th:if="${not #lists.isEmpty(projectTodoList)}">
+					  <label class="form-label">삽입 위치</label>
+					  <div class="input-group input-group-sm">
+					    <!-- 앞/뒤 선택 -->
+					    <select name="position" class="form-select">
+					      <option value="0" selected disabled>위치</option>
+					      <option value="1">앞에 추가</option>
+					      <option value="-1">뒤에 추가</option>
+					    </select>
+					
+					    <!-- 기준이 되는 순서 선택 -->
+					    <select name="standard_list_name" class="form-select">
+					      <option value="0" selected disabled>기준 순서 선택</option>
+					      <option th:each="projectTodo : ${projectTodoList}"
+					              th:value="${projectTodo.project_todo_list_no}"
+					              th:text="${projectTodo.list_name}">
+					      </option>
+					    </select>
+					  </div>
+					</div>
+		        </div>
+		
+		        <!-- 푸터 -->
+		        <div class="modal-footer border-0">
+		          <button type="submit" class="btn btn-primary px-4">리스트 추가</button>
+		        </div>
+		      </form>
+		    </div>
+		  </div>
+		</div>
+	
+		<script>
+		  const form = document.addTodoList;
+		
+		  form.addEventListener('submit', function(e) {
+		    e.preventDefault();
+		
+		    let vali_check = true;
+		    let vali_text = '';
+		
+		    // 1) 리스트 이름 검증
+		    if (!form.list_name.value.trim()) {
+		      vali_text = "리스트 이름을 입력해주세요.";
+		      vali_check = false;
+		    }
+		
+		    // 2) position 필드가 있을 때만 검증
+		    if (vali_check && form.position) {
+		      if (form.position.value === '0') {
+		        vali_text = "위치를 선택해주세요.";
+		        vali_check = false;
+		      }
+		    }
+		
+		    // 3) standard_list_name 필드가 있을 때만 검증
+		    if (vali_check && form.standard_list_name) {
+		      if (form.standard_list_name.value === '0') {
+		        vali_text = "기준 리스트를 선택해주세요.";
+		        vali_check = false;
+		      }
+		    }
+		
+		    if (!vali_check) {
+		      alert(vali_text);
+		      return;
+		    }
+		
+		    // 검증 통과하면 전송
+		    const payload = new FormData(form);
+		    fetch("/projectTodo/addList", {
+		      method: "post",
+		      headers: {
+		        [document.querySelector('meta[name="_csrf_header"]').content]:
+		          document.querySelector('meta[name="_csrf"]').content
+		      },
+		      body: payload
+		    })
+		    .then(res => res.json())
+		    .then(data => {
+		      alert(data.res_msg);
+		      if (data.res_code === "200") location.reload();
+		    })
+		    .catch(() => {
+		      alert("리스트 생성 중 오류가 발생하였습니다.");
+		    });
+		  });
+		</script>
+
+
 
     </main>
   </body>
