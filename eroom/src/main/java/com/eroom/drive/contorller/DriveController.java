@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -95,6 +96,21 @@ public class DriveController {
 	
 	
 	// -------------------------------------------- 파일 삭제 ------------------------------------------
-	
+	@DeleteMapping("/delete/{attachNo}")
+	@ResponseBody
+	public Map<String, String> deleteDriveFile(@PathVariable("attachNo") Long driveAttachNo) {
+		Map<String, String> resultMap = new HashMap<String, String>();
+		resultMap.put("res_code", "500");
+		resultMap.put("res_msg", "삭제 실패");
+		System.out.println("Deleting file with attachNo: " + driveAttachNo);
+		int result = driveService.deleteDriveFile(driveAttachNo);
+
+		if (result > 0) {
+			resultMap.put("res_code", "200");
+			resultMap.put("res_msg", "삭제 성공");
+		}
+
+		return resultMap;
+	}
 	
 }

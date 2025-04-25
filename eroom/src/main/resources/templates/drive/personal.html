@@ -131,7 +131,7 @@
 				   파일 수정
 				</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item text-danger" href="#">파일 삭제</a>
+                <a class="dropdown-item text-danger delete-file" href="#" th:data-id="${file.driveAttachNo}">파일 삭제</a>
               </div>
             </div>
           </td>
@@ -303,6 +303,42 @@
 	    alert("오류 발생");
 	    console.error(err);
 	  });
+	});
+  // 파일 삭제
+  document.addEventListener('DOMContentLoaded', function () {
+	    const deleteButtons = document.querySelectorAll('.delete-file');
+	    
+	    deleteButtons.forEach(button => {
+	        button.addEventListener('click', function () {
+	            const attachNo = this.getAttribute('data-id');  // 클릭한 파일의 attachNo를 가져옴
+	            console.log("삭제 파일 번호 : "+attachNo); 
+	            const confirmation = confirm('정말로 이 파일을 삭제하시겠습니까?');  // 사용자 확인
+	            
+	            if (confirmation) {
+	                // DELETE 요청 보내기
+	                fetch(`/drive/delete/${attachNo}`, {
+	                    method: 'DELETE',
+	                    headers: {
+	                        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+	                        'header': document.querySelector('meta[name="_csrf_header"]').content
+	                    }
+	                })
+	                .then(response => response.json())
+	                .then(data => {
+	                    if (data.res_code === '200') {
+	                        alert('파일이 성공적으로 삭제되었습니다.');
+	                        location.reload(); // 페이지 리로드로 업데이트된 상태 표시
+	                    } else {
+	                        alert('파일 삭제에 실패하였습니다. 다시 시도해 주세요.');
+	                    }
+	                })
+	                .catch(err => {
+	                    alert('오류가 발생했습니다.');
+	                    console.error(err);
+	                });
+	            }
+	        });
+	    });
 	});
 
 </script>
