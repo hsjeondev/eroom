@@ -12,22 +12,22 @@
 	<main class="main" id="top" layout:fragment="content">
 
 		<div class="row">
-			<!--  차량 예약 목록 (왼쪽) -->
-			<div class="col-md-6">
-				<div class="mb-3">
-					<div class="d-flex align-items-center mb-2">
-						<span class="fw-bold fs-7"> 회의실 예약</span>
-					</div>
 
-					<div id="vehicleTable"
-						data-list='{"valueNames":["no","vehicle","passengers","date"], "page": 5, "pagination": true}'>
+			<!-- 왼쪽: 회의실 예약 목록 + 오늘 예약 현황 -->
+			<div class="col-md-6 d-flex flex-column gap-4">
+
+				<!-- 회의실 예약 목록 -->
+				<div>
+					<h5 class="fw-bold">회의실 예약 목록</h5>
+					<div id="meetingRoomTable"
+						data-list='{"valueNames":["no","room","capacity","date"], "page": 5, "pagination": true}'>
 						<div class="table-responsive">
 							<table class="table table-striped table-sm fs-9 mb-0 text-center">
 								<thead class="text-center align-middle">
 									<tr>
 										<th class="sort" data-sort="no" style="width: 5%;">번호</th>
-										<th class="sort" data-sort="vehicle" style="width: 25%;">회의실</th>
-										<th class="sort" data-sort="passengers" style="width: 20%;">수용
+										<th class="sort" data-sort="room" style="width: 25%;">회의실</th>
+										<th class="sort" data-sort="capacity" style="width: 20%;">수용
 											인원</th>
 										<th class="sort" data-sort="date" style="width: 20%;">등록일</th>
 										<th style="width: 10%;"></th>
@@ -35,27 +35,90 @@
 								</thead>
 								<tbody class="list align-middle">
 									<tr th:if="${#lists.isEmpty(list)}">
-										<td colspan="4">등록된 회의실이 없습니다 😓</td>
+										<td colspan="5">등록된 회의실이 없습니다 😓</td>
 									</tr>
-									<tr class="align-middle vehicle-row"
-										th:if="${!#lists.isEmpty(list)}"
-										th:each="result, resultstatus : ${list}">
-										<td class="no" th:text="${resultstatus.count}"></td>
-										<td class="vehicle" th:text="${result.facilityName}"></td>
-										<td class="passengers" th:text="${result.facilityCapacity}"></td>
+									<tr class="align-middle room-row"
+										th:each="result, stat : ${list}">
+										<td class="no" th:text="${stat.count}"></td>
+										<td class="room" th:text="${result.facilityName}"></td>
+										<td class="capacity" th:text="${result.facilityCapacity}"></td>
 										<td class="date"
 											th:text="${#temporals.format(result.facilityRegDate, 'yy-MM-dd')}"></td>
-										<td class="text-end pe-0"><button
-												class="btn btn-sm btn-outline-primary"
+										<td class="text-end pe-0">
+											<button class="btn btn-sm btn-outline-primary"
 												data-bs-toggle="modal" data-bs-target="#addEventModal"
 												th:attr="data-facility-no=${result.facilityNo}, data-facility-name=${result.facilityName}">
-												예약하기</button></td>
+												예약하기</button>
+										</td>
 									</tr>
 								</tbody>
 							</table>
-
 						</div>
-						<div class="modal fade" id="addEventModal" tabindex="-1">
+
+						<!-- ✅ 페이징 -->
+						<div class="d-flex justify-content-center mt-3">
+							<div class="d-flex">
+								<button class="page-link" data-list-pagination="prev">
+									<i class="fas fa-chevron-left"></i>
+								</button>
+								<ul class="mb-0 pagination"></ul>
+								<button class="page-link" data-list-pagination="next">
+									<i class="fas fa-chevron-right"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 오늘 예약 현황 -->
+				<div>
+					<h5 class="fw-bold">오늘 예약 현황</h5>
+					<div class="table-responsive">
+						<table class="table table-striped table-sm fs-9 mb-0 text-center">
+							<thead class="text-center align-middle">
+								<tr>
+									<th style="width: 5%;">번호</th>
+									<th style="width: 20%;">회의실</th>
+									<th style="width: 20%;">예약자</th>
+									<th style="width: 20%;">예약 날짜</th>
+									<th style="width: 25%;">예약 시간</th>
+								</tr>
+							</thead>
+							<tbody class="align-middle">
+								<tr th:if="${#lists.isEmpty(todayReservations)}">
+									<td colspan="5">오늘 예약된 회의실이 없습니다 😊</td>
+								</tr>
+								<tr th:each="res, stat : ${todayReservations}">
+									<td th:text="${stat.count}"></td>
+									<td th:text="${res.meetingRoomName}"></td>
+									<td th:text="${res.reserverName}"></td>
+									<td
+										th:text="${#temporals.format(res.reservation_start, 'yyyy-MM-dd')}"></td>
+									<td><span
+										th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span>
+										~ <span
+										th:text="${#temporals.format(res.reservation_end, 'HH:mm')}"></span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+			</div>
+
+			<!-- 오른쪽: 캘린더 -->
+			<div class="col-md-6">
+				<div class="calendar-outline" id="appCalendar"
+					style="height: 400px;"></div>
+			</div>
+
+		</div>
+		
+		
+		
+		
+		<div class="modal fade" id="addEventModal" tabindex="-1">
 							<div class="modal-dialog modal-dialog-centered">
 								<div class="modal-content border border-translucent">
 									<form id="addEventForm" autocomplete="off" name="addEventForm">
@@ -205,6 +268,53 @@
 								</div>
 							</div>
 						</div>
+						
+						<script>
+							  document.addEventListener("DOMContentLoaded", function () {
+							    const modal = document.getElementById("addEventModal");
+							
+							    if (!modal) return;
+							
+							    modal.addEventListener("show.bs.modal", function () {
+							      const form = document.forms["addEventForm"];
+							      if (!form) return;
+							
+							      // 기본 form 초기화
+							      form.reset();
+							
+							      // 참여자 선택 영역 초기화
+							      const selectedDiv = document.getElementById("selectedParticipants");
+							      if (selectedDiv) selectedDiv.innerHTML = "";
+							
+							      // 회의실명 초기화
+							      const facilityNameDiv = document.getElementById("selectedFacilityName");
+							      if (facilityNameDiv) facilityNameDiv.textContent = "회의실이 선택되지 않았습니다";
+							
+							      // department select 초기화
+							      const deptSelect = document.getElementById("departmentSelect");
+							      if (deptSelect) deptSelect.selectedIndex = 0;
+							
+							      // employee select 초기화
+							      const empSelect = document.getElementById("employeeSelect");
+							      if (empSelect) empSelect.selectedIndex = 0;
+							
+							      // 날짜/시간 초기화
+							      const startDate = document.getElementById("startDate");
+							      const endDate = document.getElementById("endDate");
+							      const startTime = document.getElementById("startTime");
+							      const endTime = document.getElementById("endTime");
+							
+							      if (startDate) startDate.value = "";
+							      if (endDate) endDate.value = "";
+							      if (startTime) startTime.selectedIndex = 0;
+							      if (endTime) endTime.selectedIndex = 0;
+							
+							      // 숨겨진 datetime-local 값도 초기화
+							      document.getElementById("calendarStartTime").value = "";
+							      document.getElementById("calendarEndTime").value = "";
+							    });
+							  });
+							</script>
 
 						<!-- 모달창 안에 facilityNo값을 넣어주는 script -->
 						<script>
@@ -443,7 +553,7 @@
 						</div>
 
 						<!-- 페이징 -->
-						<div class="d-flex justify-content-center mt-3">
+	<!-- 					<div class="d-flex justify-content-center mt-3">
 							<div class="d-flex">
 								<button class="page-link disabled" data-list-pagination="prev"
 									disabled>
@@ -463,16 +573,11 @@
 					</div>
 				</div>
 			</div>
-
+ -->
 		
 
 
-			<!-- 캘린더 (오른쪽) -->
-			<div class="col-md-6">
-				<div class="calendar-outline" id="appCalendar"
-					style="height: 400px;"></div>
-				</div>
-			</div>
+		
 		<!-- 캘린더 script -->
 		<script>
 		document.addEventListener('DOMContentLoaded', function () {

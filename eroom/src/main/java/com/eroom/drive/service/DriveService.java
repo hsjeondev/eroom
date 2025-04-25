@@ -17,6 +17,7 @@ import com.eroom.drive.repository.DriveRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.SeparatorRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 
@@ -26,9 +27,12 @@ public class DriveService {
 	
 	private final DriveRepository driveRepository;
 	private final SeparatorRepository separatorRepository;
+	
+	// 파일 저장 경로 
 	 @Value("${ffupload.location}")
 	 private String fileDir;
-	// 파일 업로드
+	
+	// ------------------------- 개인 드라이브 파일 업로드 --------------------------
 	public int uploadDriveFiles(DriveDto driverDto, Long employeeNo) {
 		int result = 0;
 		
@@ -69,7 +73,7 @@ public class DriveService {
 		                .driveNewName(newName)
 		                .driveType(ext)
 		                .driveSize(file.getSize())
-		                .drivePath("/upload/personal/" + newName)
+		                .drivePath("personal/" + newName)
 		                .driveDescription(description)
 		                .downloadCount(0L)
 		                .driveDeleteYn("N")
@@ -84,7 +88,7 @@ public class DriveService {
 		}
 		return result;
 	}
-	// 개인 드라이브 파일 리스트 조회
+	// ------------------------- 개인 드라이브 파일 리스트 조회 --------------------------
 	public List<DriveDto> findPersonalDriveFiles(Long employeeNo) {
 	    List<Drive> drives = driveRepository.findByUploader_EmployeeNoAndDriveDeleteYn(employeeNo, "N");
 	    List<DriveDto> result = new ArrayList<>();
@@ -95,7 +99,7 @@ public class DriveService {
 
 	    return result;
 	}
-	// 파일 수정
+	// ------------------------- 개인 드라이브 파일 수정 --------------------------
 	public boolean updateDriveFile(Long attachNo, MultipartFile file, String description) {
 	    try {
 	        Optional<Drive> optionalDrive = driveRepository.findById(attachNo);
@@ -116,7 +120,7 @@ public class DriveService {
 	            drive.setDriveNewName(newName);
 	            drive.setDriveType(ext);
 	            drive.setDriveSize(file.getSize());
-	            drive.setDrivePath("/upload/personal/" + newName);
+	            drive.setDrivePath("personal/" + newName);
 	        }
 	        // 설명만 변경할 수도 있음
 	        drive.setDriveDescription(description);
@@ -129,6 +133,28 @@ public class DriveService {
 	        return false;
 	    }
 	}
+	// ------------------------- 개인 드라이브 파일 삭제 --------------------------
+	@Transactional
+	public int deleteDriveFile(Long driveAttachNo) {
+	   return driveRepository.updateDeleteStatus(driveAttachNo);
+	}
+	// ------------------------- 개인 드라이브 파일 다중 삭제 --------------------------
+	@Transactional
+    public int bulkDeleteDriveFiles(List<Long> fileIds) {
+       return driveRepository.updateBulkDeleteStatus(fileIds);  // 파일 상태 일괄 업데이트
+    }
+	// ------------------------- 개인 드라이브 파일 다운로드 --------------------------
+	public Drive findByDriveAttachNo(Long id) {
+		Drive drive = driveRepository.findByDriveAttachNo(id);
+		if(drive != null) {
+			drive.setDownloadCount(drive.getDownloadCount() + 1);
+			driveRepository.save(drive);
+		} else {
+			System.out.println("해당 ID로 파일을 찾을 수 없음");
+		}
+		return drive;
+	}
+	
 
 
 

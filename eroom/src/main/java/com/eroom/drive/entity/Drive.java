@@ -77,4 +77,7 @@ public class Drive {
 	
 	@Column(name = "drive_description")
 	private String driveDescription; // 파일 설명
+	
+	@Column(name = "param1")
+	private Long param1;
 }

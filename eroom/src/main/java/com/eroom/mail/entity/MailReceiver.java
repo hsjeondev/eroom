@@ -1,6 +1,7 @@
 package com.eroom.mail.entity;
 
-import com.eroom.directory.entity.Directory;
+import java.time.LocalDateTime;
+
 import com.eroom.employee.entity.Employee;
 
 import jakarta.persistence.Column;
@@ -40,6 +41,9 @@ public class MailReceiver {
 	
 	@Column(name="mail_receiver_important_yn")
 	private String mailReceiverImportantYn;
+	
+	@Column(name="mail_receiver_deleted_time")
+	private LocalDateTime mailReceiverDeletedTime;
 	
 	@ManyToOne
 	@JoinColumn(name = "mail_no")  // FK 컬럼명 명시
