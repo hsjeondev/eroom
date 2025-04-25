@@ -307,7 +307,7 @@
 	    const select = document.getElementById("basic-select-format");
 	    const selectedValue = select.value;
 	    const edit_approval_no = /*[[${approval?.approval_no}]]*/ null;
-	
+		
 	    fetch("/approval/format", {
 	      method: 'POST',
 	      headers: {
@@ -337,12 +337,32 @@
 	                inputField.value = approvalContent[key];
 	              }
 	            }
+	            
 	          }, 0);
 	        }
+	        
+	        
+
+			const selectedFormValue = document.getElementById("basic-select-format").value;
+			console.log(selectedFormValue + 'asdfasdf');
+			if(selectedFormValue == '5') {
+				const dateInput = document.querySelector('[name="issuedDate"]');
+				console.log(dateInput + '진짜에요?');
+				if(dateInput){
+				const today = new Date().toISOString().split('T')[0];
+				dateInput.value = today;
+				}
+			}
+	        
+	        
+	        
 	      } else {
 	        // alert("양식 불러오기에 실패했습니다.");
 	      }
 	    });
+	    
+
+	    
 	  }
 	
 	  // 페이지 로드시 + 양식 선택시 각각 실행
@@ -516,8 +536,9 @@
 		  const refererIds = Array.from(document.querySelectorAll('input[name="refererIds"]')).map(el => el.value);
 		  const refererSteps = Array.from(document.querySelectorAll('input[name="refererSteps"]')).map(el => parseInt(el.value));
 		
-		  if (approverSteps.length === 0 && agreerSteps.length === 0 && refererSteps.length === 0) {
-		    alert("결재자, 합의자, 참조자를 한 명 이상 선택해주세요.");
+//		  if (approverSteps.length === 0 && agreerSteps.length === 0 && refererSteps.length === 0) {
+		  if (approverSteps.length === 0 && agreerSteps.length === 0) {
+		    alert("결재자, 합의자를 한 명 이상 선택해주세요.");
 		    return;
 		  }
 		
@@ -533,12 +554,11 @@
 		  // [4] 작성자 정보 수집
 		  const writerFields = ["date", "department_name", "team_name", "employee_position", "employee_name"];
 		  const writerData = {};
+		  let editApprovalNo = null;
 		  // edit모드일 경우 approval 객체에서 값 가져오기
 			if(/*[[${mode}]]*/ null == 'edit') {
-				const editApprovalNo = /*[[${approval.approval_no}]]*/ null;
-			} else{
-				const editApprovalNo = null;
-			} 
+				editApprovalNo = /*[[${approval.approval_no}]]*/ null;
+			}
 		  
 		  writerFields.forEach(field => {
 		    const el = document.getElementById(`basic-form-${field}`);

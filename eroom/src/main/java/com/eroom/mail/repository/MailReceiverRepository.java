@@ -35,7 +35,7 @@ public interface MailReceiverRepository extends JpaRepository<MailReceiver, Long
 	@Transactional
 	@Modifying
 	@Query("UPDATE MailReceiver mr SET mr.mailReceiverDeletedYn = 'Y' WHERE mr.receiver.employeeNo = :employeeNo AND mr.mail.mailNo = :mailNo")
-	void updateDeletedYn(@Param("employeeNo") Long employeeNo, @Param("mailId") Long mailNo);
+	void updateDeletedYn(@Param("employeeNo") Long employeeNo, @Param("mailNo") Long mailNo);
 	
 	// delete문 안쓰기로 했지만 mail 완전히 삭제 로직
 	@Modifying
