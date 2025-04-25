@@ -49,16 +49,21 @@ public class ReservationController {
 		List<Facility> result = facilityService.selectVehicleAll();
 		// 목록이 정상적으로 출력
 		// System.out.println(result);
-		model.addAttribute("list", result);
+		model.addAttribute("list", result);		
+		//오늘 예약 현황
+		List<VehicleDto> todayReservations = vehicleService.getTodayReservations();
+		model.addAttribute("todayReservations",todayReservations);
 		return "reservation/vehiclerev";
 	}
 
 	@GetMapping("/reservation/meetingroom")
 	public String meetingroomReservationView(@RequestParam(name = "department" ,required = false) String department, Model model) {
 		List<Facility>result = facilityService.selectMeetingRoomAll();
-
+		List<MeetingRoomDto>todayReservations = meetingRoomService.getTodayReservations();
 	    model.addAttribute("structureList", employeeService.findDistinctStructureNames());
 		model.addAttribute("list",result);
+		model.addAttribute("todayReservations",todayReservations);
+		
 		return "reservation/meetingroomrev";
 	}
 	
@@ -286,12 +291,12 @@ public class ReservationController {
 
 	// =================차량 예약 시간 막기==============================
 	// 예약 시간 막기
-	@GetMapping("/resvehicle/booked-times")
-	@ResponseBody
-	public List<String> getBookedTimes(@RequestParam("date") String date,
-			@RequestParam("facilityNo") String facilityNo) {
-		return vehicleService.getBookedTimes(date, facilityNo);
-	}
+//	@GetMapping("/resvehicle/booked-times")
+//	@ResponseBody
+//	public List<String> getBookedTimes(@RequestParam("date") String date,
+//			@RequestParam("facilityNo") String facilityNo) {
+//		return vehicleService.getBookedTimes(date, facilityNo);
+//	}
 	
 	//==================회의실 예약 시간 막기===============================
 	@GetMapping("/meetingroom/booked-times")

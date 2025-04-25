@@ -63,50 +63,50 @@ public class VehicleService {
 	}
 	
 	//해당 예약시간 select창에서 막기
-	public List<String> getBookedTimes(String date, String facilityNoStr) {
-	    LocalDate targetDate = LocalDate.parse(date);
-	    Long facilityNo = Long.parseLong(facilityNoStr);
-
-	    // 오늘 날짜의 09:00 ~ 23:59 범위
-	    LocalDateTime dayStart = targetDate.atTime(9, 0);
-	    LocalDateTime dayEnd = targetDate.atTime(23, 59);
-
-	    // 예약 리스트 조회 (전날 ~ 다음날까지 겹치는 예약 모두 포함)
-	    List<Vehicle> reservedList = repository.findByFacilityNoAndReservationDate(
-	        facilityNo,
-	        dayStart.minusDays(1),
-	        dayEnd.plusDays(1)
-	    );
-
-	    Set<String> bookedTimesSet = new HashSet<>();
-
-	    for (Vehicle v : reservedList) {
-	        LocalDateTime resStart = v.getReservationStart();
-	        LocalDateTime resEnd = v.getReservationEnd();
-
-	        // 조회일과 겹치는 구간만 필터링
-	        if (resEnd.isBefore(dayStart) || resStart.isAfter(dayEnd)) continue;
-
-	        // 예약 시작/종료가 현재 날짜 기준인지 확인
-	        boolean startsToday = resStart.toLocalDate().isEqual(targetDate);
-	        boolean endsToday = resEnd.toLocalDate().isEqual(targetDate);
-
-	        int startHour = startsToday ? Math.max(resStart.getHour(), 9) : 9;
-	        int endHour = endsToday 
-	            ? (resEnd.getMinute() > 0 ? resEnd.getHour() + 1 : resEnd.getHour()) 
-	            : 23;
-
-	        for (int hour = startHour; hour <= endHour; hour++) {
-	            if (hour >= 9 && hour <= 23) {
-	                bookedTimesSet.add(String.format("%02d:00", hour));
-	            }
-	        }
-	    }
-
-	    List<String> result = new ArrayList<>(bookedTimesSet);
-	    Collections.sort(result);
-	    return result;
-	}
+//	public List<String> getBookedTimes(String date, String facilityNoStr) {
+//	    LocalDate targetDate = LocalDate.parse(date);
+//	    Long facilityNo = Long.parseLong(facilityNoStr);
+//
+//	    // 오늘 날짜의 09:00 ~ 23:59 범위
+//	    LocalDateTime dayStart = targetDate.atTime(9, 0);
+//	    LocalDateTime dayEnd = targetDate.atTime(23, 59);
+//
+//	    // 예약 리스트 조회 (전날 ~ 다음날까지 겹치는 예약 모두 포함)
+//	    List<Vehicle> reservedList = repository.findByFacilityNoAndReservationDate(
+//	        facilityNo,
+//	        dayStart.minusDays(1),
+//	        dayEnd.plusDays(1)
+//	    );
+//
+//	    Set<String> bookedTimesSet = new HashSet<>();
+//
+//	    for (Vehicle v : reservedList) {
+//	        LocalDateTime resStart = v.getReservationStart();
+//	        LocalDateTime resEnd = v.getReservationEnd();
+//
+//	        // 조회일과 겹치는 구간만 필터링
+//	        if (resEnd.isBefore(dayStart) || resStart.isAfter(dayEnd)) continue;
+//
+//	        // 예약 시작/종료가 현재 날짜 기준인지 확인
+//	        boolean startsToday = resStart.toLocalDate().isEqual(targetDate);
+//	        boolean endsToday = resEnd.toLocalDate().isEqual(targetDate);
+//
+//	        int startHour = startsToday ? Math.max(resStart.getHour(), 9) : 9;
+//	        int endHour = endsToday 
+//	            ? (resEnd.getMinute() > 0 ? resEnd.getHour() + 1 : resEnd.getHour()) 
+//	            : 23;
+//
+//	        for (int hour = startHour; hour <= endHour; hour++) {
+//	            if (hour >= 9 && hour <= 23) {
+//	                bookedTimesSet.add(String.format("%02d:00", hour));
+//	            }
+//	        }
+//	    }
+//
+//	    List<String> result = new ArrayList<>(bookedTimesSet);
+//	    Collections.sort(result);
+//	    return result;
+//	}
 
 	
 	//해당 예약 단일 조회
@@ -161,7 +161,21 @@ public class VehicleService {
 		return new VehicleDto().toDto(saved);
 	}
 	
+	//예약 시간 중복 alert
 	public boolean isConflict(Long facilityNo, LocalDateTime start, LocalDateTime end) {
 	    return repository.existsConflict(facilityNo, start, end);
+	}
+	
+	//오늘 예약 현황
+	public List<VehicleDto> getTodayReservations() {
+	    List<Vehicle> entityList = repository.findTodayVehicleReservations();
+
+	    List<VehicleDto> dtoList = new ArrayList<>();
+	    for (Vehicle vehicle : entityList) {
+	        VehicleDto dto = new VehicleDto().toDto(vehicle); // entity → dto 변환
+	        dtoList.add(dto);
+	    }
+
+	    return dtoList;
 	}
 }
