@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
@@ -195,15 +196,16 @@ public class MailController {
 	// mail DB에 데이터 넣는거만 가능
 	@PostMapping("/mail/create")
 	@ResponseBody
-	public Map<String, String> createMailApi(MailDto mailDto) {
+	public Map<String, String> createMailApi(MailDto mailDto,
+											 @RequestParam(name="mail_files") List<MultipartFile> mail_files) {
+		System.out.println(mail_files);
 		Map<String, String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "메일 등록중 오류가 발생하였습니다.");
-		int result = mailService.createMail(mailDto);
-		if(result>0) {
-		resultMap.put("res_code", "200");
-		resultMap.put("res_msg", "메일이 발송되었습니다.");	
-		}
+		/*
+		 * int result = mailService.createMail(mailDto); if(result>0) {
+		 * resultMap.put("res_code", "200"); resultMap.put("res_msg", "메일이 발송되었습니다."); }
+		 */
 		return resultMap;
 	}
 	

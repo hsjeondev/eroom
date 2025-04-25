@@ -24,9 +24,9 @@ public class MailService {
 	private final MailRepository mailRepository;
 	private final MailReceiverRepository mailReceiverRepository;
 	private final EmployeeRepository employeeRepository;
-
+	// 휴지통 N > Y 업데이트 
 	public void moveToTrash(Long employeeNo, Long id) {
-	    mailReceiverRepository.updateDeletedYn(employeeNo, id);
+	    mailReceiverRepository.updateDeletedYnAndTime(employeeNo, id);
 	}
 	
 	@Transactional
