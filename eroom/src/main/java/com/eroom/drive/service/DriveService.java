@@ -155,7 +155,59 @@ public class DriveService {
 		return drive;
 	}
 	
+	// ------------------------- 결재 파일 업로드 --------------------------
+	public int uploadApprovalAttachFiles(DriveDto driverDto, Long employeeNo) {
+		int result = 0;
+		
+		 if (driverDto.getSeparatorCode() == null || driverDto.getSeparatorCode().isEmpty()) {
+	            driverDto.setSeparatorCode(
+	                separatorRepository.findBySeparatorName("결재파일")
+	                    .map(s -> s.getSeparatorCode())
+	                    .orElse("FL007") 
+	            );
+	        }
+		
+		List<MultipartFile> files = driverDto.getDriveFiles();
 
+		for (int i = 0; i < files.size(); i++) {
+		    MultipartFile file = files.get(i);
+		    try {
+		        System.out.println("파일 처리 시작: " + file.getOriginalFilename());
+
+		        String oriName = file.getOriginalFilename();
+		        String ext = oriName.substring(oriName.lastIndexOf("."));
+		        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+
+		        String path = fileDir + "personal/" + newName;
+		        File savedFile = new File(path);
+		        if (!savedFile.getParentFile().exists()) {
+		            savedFile.getParentFile().mkdirs();
+		        }
+		        file.transferTo(savedFile);
+
+
+		        Drive drive = Drive.builder()
+		                .uploader(Employee.builder().employeeNo(employeeNo).build())
+		                .separatorCode(driverDto.getSeparatorCode())
+		                .driveOriName(oriName)
+		                .driveNewName(newName)
+		                .driveType(ext)
+		                .driveSize(file.getSize())
+		                .drivePath(path + newName)
+		                .downloadCount(0L)
+		                .driveDeleteYn("N")
+		                .param1(driverDto.getParam1())
+		                .build();
+		        
+		        driveRepository.save(drive);
+		        result = 1;
+		    } catch (Exception e) {
+		        System.out.println("업로드 실패 파일명: " + file.getOriginalFilename());
+		        e.printStackTrace();
+		    }
+		}
+		return result;
+	}
 
 
 }

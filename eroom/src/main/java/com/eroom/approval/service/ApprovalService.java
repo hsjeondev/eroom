@@ -1,7 +1,5 @@
 package com.eroom.approval.service;
 
-import java.lang.module.ModuleDescriptor.Builder;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -11,6 +9,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eroom.approval.dto.ApprovalDto;
 import com.eroom.approval.dto.ApprovalRequestDto;
@@ -19,13 +18,13 @@ import com.eroom.approval.entity.ApprovalFormat;
 import com.eroom.approval.entity.ApprovalLine;
 import com.eroom.approval.repository.ApprovalLineRepository;
 import com.eroom.approval.repository.ApprovalRepository;
-import com.eroom.attendance.dto.AnnualLeaveDto;
 import com.eroom.attendance.entity.AnnualLeave;
 import com.eroom.attendance.repository.AnnualLeaveRepository;
 import com.eroom.calendar.dto.CompanyCalendarDto;
-import com.eroom.calendar.dto.CompanyCalendarDto.CompanyCalendarDtoBuilder;
 import com.eroom.calendar.entity.CompanyCalendar;
 import com.eroom.calendar.repository.CompanyCalendarRepository;
+import com.eroom.drive.dto.DriveDto;
+import com.eroom.drive.service.DriveService;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 
@@ -40,6 +39,7 @@ public class ApprovalService {
 	private final ApprovalLineRepository approvalLineRepository;
 	private final AnnualLeaveRepository annualLeaveRepository;
 	private final CompanyCalendarRepository companyRepository;
+	private final DriveService driveService;
 	
 
 	// 내가 올린 결재 리스트 조회 + 신청일 기준으로 최신순 정렬
@@ -49,7 +49,7 @@ public class ApprovalService {
 	}
 
 	// 결재 생성
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public int createApproval(ApprovalRequestDto dto, Long employeeNo) {
 		try {
 //			ObjectMapper objectMapper = new ObjectMapper();
@@ -83,7 +83,25 @@ public class ApprovalService {
 					.approvalStatus("S")
 					.build();
 			
-			approvalRepository.save(approval);
+			Approval approvalResult = approvalRepository.save(approval);
+			
+			
+			
+			
+	        // 파일이 확인용
+	        if (dto.getFiles() != null && !dto.getFiles().isEmpty()) {
+                DriveDto driveDto = DriveDto.builder()
+                					.uploaderNo(employeeNo)
+                					.separatorCode("FL007")
+                					.driveFiles(dto.getFiles())
+                					.param1(approvalResult.getApprovalNo())
+                					.build();
+                driveService.uploadApprovalAttachFiles(driveDto, employeeNo);
+	        }
+			
+			
+			
+			
 			
 			
 			

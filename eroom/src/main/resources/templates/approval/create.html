@@ -136,7 +136,7 @@
 				</div>
 
 				<div class="mb-3">
-					<label class="form-label">파일 업로드</label> <input class="form-control" type="file" multiple>
+					<label class="form-label">파일 업로드</label> <input id="approvalAttachFiles" class="form-control" type="file" multiple>
 				</div>
 				<button type="button" class="btn btn-light" onclick="history.back()">취소</button>
 				<button id="approvalSubmitBtn" class="btn btn-primary" type="submit">등록</button>
@@ -479,6 +479,7 @@
 		  const formatSelect = document.getElementById("basic-select-format");
 		  const approvalFormatNo = formatSelect?.value;
 		  let isValid = true;
+		  const approvalAttachFiles = document.getElementById("approvalAttachFiles");
 		
 		  if (!approvalTitle) {
 		    document.getElementById("basic-form-title").style.border = "1px solid red";
@@ -540,9 +541,6 @@
 		    return;
 		  }
 		  if (approverSteps.length > 5 || agreerSteps.length > 5) {
-			  console.log(approverIds, approverSteps);
-			  console.log(agreerIds, agreerSteps);
-			  console.log(refererIds, refererSteps);
 
 			  alert("결재자, 합의자는 각각 최대 5명까지 선택 가능합니다.");
 		    return;
@@ -570,9 +568,10 @@
 		    const el = document.getElementById(`basic-form-${field}`);
 		    writerData[field] = el ? (el.value ?? el.textContent.trim()) : null;
 		  });
+		  
 		
 		  // [5] 서버 전송
-		  fetch('/approval/create', {
+		  /* fetch('/approval/create', {
 		    method: 'POST',
 		    headers: {
 		      'Content-Type': 'application/json',
@@ -590,6 +589,7 @@
 		      agreerSteps,
 		      refererIds,
 		      refererSteps,
+		      approvalAttachFiles,
 		      editApprovalNo : editApprovalNo
 		    })
 		  })
@@ -605,7 +605,67 @@
 		  .catch(err => {
 		    console.error(err);
 		    alert("요청 중 오류가 발생했습니다.");
+		  }); */
+		  
+		  
+		  
+
+		  // 파일 기능 추가를 위한 formData 추가 버전
+		  const fileFormData = new FormData();
+		  // 기본 데이터
+		  fileFormData.append("title", approvalTitle);
+		  fileFormData.append("format_no", approvalFormatNo);
+		  fileFormData.append("editApprovalNo", editApprovalNo ?? '');
+
+		  // 작성자 정보
+		  fileFormData.append("writer", new Blob([JSON.stringify(writerData)], { type: "application/json" }));
+
+		  // 본문 내용
+		  fileFormData.append("content", new Blob([JSON.stringify(approvalContent)], { type: "application/json" }));
+
+		  // 결재선 정보
+		  fileFormData.append("approverIds", new Blob([JSON.stringify(approverIds)], { type: "application/json" }));
+		  fileFormData.append("approverSteps", new Blob([JSON.stringify(approverSteps)], { type: "application/json" }));
+		  fileFormData.append("agreerIds", new Blob([JSON.stringify(agreerIds)], { type: "application/json" }));
+		  fileFormData.append("agreerSteps", new Blob([JSON.stringify(agreerSteps)], { type: "application/json" }));
+		  fileFormData.append("refererIds", new Blob([JSON.stringify(refererIds)], { type: "application/json" }));
+		  fileFormData.append("refererSteps", new Blob([JSON.stringify(refererSteps)], { type: "application/json" }));
+
+		  // 첨부파일 추가
+		  for (const file of approvalAttachFiles.files) {
+			  fileFormData.append("files", file); // name="files"가 DTO랑 맞아야 해
+		  }
+
+		  // [3] 서버 전송
+		  fetch('/approval/create', {
+		    method: 'POST',
+		    headers: {
+		      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+		      'header': document.querySelector('meta[name="_csrf_header"]').content
+		    },
+		    body: fileFormData
+		  })
+		  .then(res => res.json())
+		  .then(data => {
+		    if (data.res_code === "200") {
+		      alert("결재서가 성공적으로 제출되었습니다.");
+		      location.href = '/approval/myRequestedApprovals';
+		    } else {
+		      alert("결재서 제출에 실패했습니다: " + data.res_msg);
+		    }
+		  })
+		  .catch(err => {
+		    console.error(err);
+		    alert("요청 중 오류가 발생했습니다.");
 		  });
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
 		});
 	</script>
 	

@@ -15,11 +15,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eroom.approval.dto.ApprovalDto;
 import com.eroom.approval.dto.ApprovalFormatDto;
@@ -31,6 +34,7 @@ import com.eroom.approval.entity.ApprovalLine;
 import com.eroom.approval.service.ApprovalFormatService;
 import com.eroom.approval.service.ApprovalLineService;
 import com.eroom.approval.service.ApprovalService;
+import com.eroom.drive.dto.DriveDto;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
@@ -38,6 +42,10 @@ import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.employee.service.StructureService;
 import com.eroom.security.EmployeeDetails;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -237,10 +245,27 @@ public class ApprovalController {
 		
 	}
 	
+//	기존 방식
+//	public Map<String, String> createApproval(@RequestBody ApprovalRequestDto dto, Authentication authentication) {
+	//	파일 추가 버전
 	// 결재 생성 Create
 	@PostMapping("/approval/create")
 	@ResponseBody
-	public Map<String, String> createApproval(@RequestBody ApprovalRequestDto dto, Authentication authentication) {
+	public Map<String, String> createApproval(
+		    @RequestPart("title") String title,
+		    @RequestPart("format_no") String formatNo,
+		    @RequestPart(value = "editApprovalNo", required = false) String editApprovalNo,
+		    @RequestPart("writer") String writerJson,
+		    @RequestPart("content") String contentJson,
+		    @RequestPart("approverIds") String approverIdsJson,
+		    @RequestPart("approverSteps") String approverStepsJson,
+		    @RequestPart("agreerIds") String agreerIdsJson,
+		    @RequestPart("agreerSteps") String agreerStepsJson,
+		    @RequestPart("refererIds") String refererIdsJson,
+		    @RequestPart("refererSteps") String refererStepsJson,
+		    @RequestPart(value = "files", required = false) List<MultipartFile> files,
+		    Authentication authentication
+		) throws JsonMappingException, JsonProcessingException {
 		Map<String, String> map = new HashMap<String, String>();
 
 		// 로그인한 사용자 정보 가져오기
@@ -248,6 +273,37 @@ public class ApprovalController {
 		Employee employee = employeeDetails.getEmployee();
 		Long employeeNo = employee.getEmployeeNo();
 		
+//		파일 추가하면서 추가한 부분
+		// JSON String을 파싱해서 실제 객체로 변환해야 함
+	    ObjectMapper mapper = new ObjectMapper();
+
+	    Map<String, String> content = mapper.readValue(contentJson, new TypeReference<Map<String, String>>() {});
+	    List<Long> approverIds = mapper.readValue(approverIdsJson, new TypeReference<List<Long>>() {});
+	    List<Integer> approverSteps = mapper.readValue(approverStepsJson, new TypeReference<List<Integer>>() {});
+	    List<Long> agreerIds = mapper.readValue(agreerIdsJson, new TypeReference<List<Long>>() {});
+	    List<Integer> agreerSteps = mapper.readValue(agreerStepsJson, new TypeReference<List<Integer>>() {});
+	    List<Long> refererIds = mapper.readValue(refererIdsJson, new TypeReference<List<Long>>() {});
+	    List<Integer> refererSteps = mapper.readValue(refererStepsJson, new TypeReference<List<Integer>>() {});
+	    
+	    Long parsedEditApprovalNo = (editApprovalNo == null || editApprovalNo.isEmpty()) 
+                ? null 
+                : Long.valueOf(editApprovalNo);
+	    
+	    ApprovalRequestDto dto = ApprovalRequestDto.builder()
+	    						.title(title)
+	    						.format_no(Long.valueOf(formatNo))
+	    						.editApprovalNo(parsedEditApprovalNo)
+	    						.writer(new EmployeeDto().toDto(employee))
+	    						.content(content)
+	    						.approverIds(approverIds)
+	    						.approverSteps(approverSteps)
+	    						.agreerIds(agreerIds)
+	    						.agreerSteps(agreerSteps)
+	    						.refererIds(refererIds)
+	    						.refererSteps(refererSteps)
+	    						.files(files)
+	    						.build();
+//		파일 추가하면서 추가한 부분
 		int result = approvalService.createApproval(dto, employeeNo);
 		
 		
