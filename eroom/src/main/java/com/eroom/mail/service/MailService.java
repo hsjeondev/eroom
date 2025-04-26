@@ -186,6 +186,21 @@ public class MailService {
 		            mailReceiverRepository.save(mailReceiver);
 
 		        }
+		        List<Long> ccNos = mailDto.getCcNos(); // 참조자 리스트
+		        if (ccNos != null) {
+		            for (Long ccNo : ccNos) {
+		                Employee ccReceiver = employeeRepository.findById(ccNo).orElseThrow(() ->
+		                    new IllegalArgumentException("존재하지 않는 사원 번호: " + ccNo));
+
+		                MailReceiverDto ccReceiverDto = new MailReceiverDto();
+		                ccReceiverDto.setEmployee_no(ccNo);
+		                ccReceiverDto.setMail_no(mailSaver.getMailNo());
+
+		                MailReceiver mailReceiver = ccReceiverDto.toEntity(mailSaver, ccReceiver);
+		                mailReceiverRepository.save(mailReceiver);
+		            }
+		        }
+		        
 		        for (MultipartFile file : mailFiles) {
 		            if (!file.isEmpty()) {
 		                // DriveDto 생성

@@ -31,7 +31,8 @@ public class MailDto {
 	// 받는 사람 나중에 List로 바꿀 예정
 	//private Employee receiver;
 	
-	private List<Long> receiverNos;
+	private List<Long> receiverNos; // 수신자 no값
+	private List<Long> ccNos;  // 참조자 no값
 	
 	public Mail toEntity() {
 		return Mail.builder()
