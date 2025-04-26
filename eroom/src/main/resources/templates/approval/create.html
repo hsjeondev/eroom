@@ -80,7 +80,7 @@
 									<button type="button" class="btn-close btn-close-white position-absolute top-0 end-0" th:attr="data-idx=${stat.count}"
 										aria-label="Remove" style="scale: 0.8;">
 									</button>
-									<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="approverSteps" th:value="0">
+									<input type="hidden" name="agreerIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="agreerSteps" th:value="0">
 								</div>							
 							</div>
 						</div>
@@ -93,7 +93,7 @@
 										<button type="button" class="btn-close btn-close-white position-absolute top-0 end-0" th:attr="data-idx=${stat.count}"
 											aria-label="Remove" style="scale: 0.8;">
 										</button>
-										<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="approverSteps" th:value="-1">
+										<input type="hidden" name="refererIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="refererSteps" th:value="-1">
 									</div>							
 								</div>
 							</div>
@@ -344,10 +344,8 @@
 	        
 
 			const selectedFormValue = document.getElementById("basic-select-format").value;
-			console.log(selectedFormValue + 'asdfasdf');
 			if(selectedFormValue == '5') {
 				const dateInput = document.querySelector('[name="issuedDate"]');
-				console.log(dateInput + '진짜에요?');
 				if(dateInput){
 				const today = new Date().toISOString().split('T')[0];
 				dateInput.value = today;
@@ -539,6 +537,14 @@
 //		  if (approverSteps.length === 0 && agreerSteps.length === 0 && refererSteps.length === 0) {
 		  if (approverSteps.length === 0 && agreerSteps.length === 0) {
 		    alert("결재자, 합의자를 한 명 이상 선택해주세요.");
+		    return;
+		  }
+		  if (approverSteps.length > 5 || agreerSteps.length > 5) {
+			  console.log(approverIds, approverSteps);
+			  console.log(agreerIds, agreerSteps);
+			  console.log(refererIds, refererSteps);
+
+			  alert("결재자, 합의자는 각각 최대 5명까지 선택 가능합니다.");
 		    return;
 		  }
 		

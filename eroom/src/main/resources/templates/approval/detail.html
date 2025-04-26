@@ -27,7 +27,7 @@
 <div class="card shadow-sm p-3 rounded-2xl mb-4">
   <div class="row align-items-start">
     <!-- 기본 정보 -->
-    <div class="col-lg-8">
+    <div class="col-lg-5">
     <div class="text-center fs-6 fw-bold" th:text="${approval.approval_title}">결재 제목</div>
       <table class="table table-bordered text-dark mb-0 text-center align-items-center align-middle">
       	<!-- <thead>
@@ -69,7 +69,7 @@
     </div>
 
     <!-- 결재선 -->
-    <div class="col-lg-4">
+    <div class="col-lg-7 ps-lg-2 d-flex flex-column align-items-end">
       <div class="ps-lg-2">
         <!-- 결재라인 -->
         <div class="mb-3">
@@ -77,7 +77,7 @@
           <table class="table table-bordered text-center align-middle mb-0" th:if="${#lists.size(approvalLineList.?[approval_line_step >= 1]) > 0}">
             <thead class="table-light">
               <tr>
-                <th th:each="line : ${approvalLineList}" th:if="${line.approval_line_step >= 1}"
+                <th style="width: 100px;" th:each="line : ${approvalLineList}" th:if="${line.approval_line_step >= 1}"
                     th:utext="|${line.employee.employeePosition}<br>${line.employee.employeeName}|">
                   직급<br>결재자
                 </th>
@@ -138,6 +138,7 @@
 
       </div>
     </div>
+    
   </div>
   
   <div class="my-2"></div>
