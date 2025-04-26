@@ -26,5 +26,6 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
     @Query("UPDATE Drive df SET df.driveDeleteYn = 'Y' WHERE df.driveAttachNo IN :attachNos")
     int updateBulkDeleteStatus(@Param("attachNos") List<Long> attachNos);
 
-	
+	// 메일 파일 조회
+	List<Drive> findBySeparatorCodeAndParam1AndDriveDeleteYn(String separatorCode, Long param1, String driveDeleteYn);
 }

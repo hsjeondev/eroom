@@ -2,8 +2,11 @@ package com.eroom.mail.service;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,6 +39,14 @@ public class MailService {
 	@Value("${ffupload.location}")
 	 private String fileDir;
 	
+	public String getPreviewContent(Mail mail) {
+	    String content = mail.getMailContent();
+	    if (content == null) return "";
+
+	    String plainText = content.replaceAll("<[^>]*>", ""); // HTML 태그 제거
+	    return plainText.length() > 30 ? plainText.substring(0, 30) + "..." : plainText;
+	}
+	
 	// 휴지통 N > Y 업데이트 
 	public void moveToTrash(Long employeeNo, Long id) {
 	    mailReceiverRepository.updateDeletedYnAndTime(employeeNo, id);
@@ -53,6 +64,18 @@ public class MailService {
 	    mailReceiverRepository.updateReadYn(employeeNo,id); // 읽음 처리
 		return mailRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("메일을 찾을 수 없습니다."));
 	}
+	
+	// 다운로드 파일 정보 
+	public Drive findAttachmentById(Long driveId) {
+	    return driveRepository.findById(driveId)
+	            .orElse(null);
+	}
+	
+	// 디테일에서 파일 조회
+	public List<Drive> findMailAttachments(Long mailId) {
+	    return driveRepository.findBySeparatorCodeAndParam1AndDriveDeleteYn("FL002", mailId, "N");
+	}
+	
 	// 휴지통 조회하는곳
 	public List<MailReceiver> getTrashMailsByEmployee(Long employeeNo, String sortOrder) {
 	    List<MailReceiver> resultList;
@@ -126,7 +149,8 @@ public class MailService {
 	// 지금은 최신순
 	// 조건줘서 최신 > 오래된 변환하게 
 	// 임시 저장도 넣어야함
-	public List<Mail> findMailsBySender(Long employeeNo,String sortOrder) {
+	
+	  /*public List<Mail> findMailsBySender(Long employeeNo,String sortOrder) {
 		List<Mail> resultList = null;
 		
 		if(sortOrder.equals("latest")) {
@@ -135,7 +159,33 @@ public class MailService {
 			 resultList= mailRepository.findBySenderEmployeeNoOrderByMailSentTimeAsc(employeeNo);
 		}
 		return filterNotDraftMails(resultList);
+	}*/
+	public List<Mail> findMailsBySender(Long employeeNo, String sortOrder) {
+	    List<Mail> resultList = null;
+
+	    if ("latest".equals(sortOrder)) {
+	        resultList = mailRepository.findBySenderEmployeeNoOrderByMailSentTimeDesc(employeeNo);
+	    } else if ("oldest".equals(sortOrder)) {
+	        resultList = mailRepository.findBySenderEmployeeNoOrderByMailSentTimeAsc(employeeNo);
+	    }
+	    // 휴지통 여부도 해야함
+	    // 중요 여부도 해야함
+	    // 사용 여부도 해야함 
+	    
+	    // 임시저장 여부
+	    List<Mail> filtered = filterNotDraftMails(resultList);
+	    
+
+	    // HTML 태그 제거한 값으로 mailContent 직접 덮어쓰기
+	    for (Mail mail : filtered) {
+	        String preview = getPreviewContent(mail); // 이 함수 안에서 태그 제거함
+	        mail.setMailContent(preview); // 덮어쓰기!
+	    }
+
+	    return filtered;
 	}
+	
+	
 
 	// 지금 쓰는곳 없음 삭제 해도 될듯
 	public List<Mail> selectMailAll(){
@@ -172,6 +222,8 @@ public class MailService {
 			Mail mailSaver = mailRepository.save(mailEntity);
 			
 			
+			
+			// 수신자
 			 List<Long> receiverNos = mailDto.getReceiverNos();
 		        for (Long receiverNo : receiverNos) {
 		            // FK 관계 맞춰줌
@@ -180,12 +232,14 @@ public class MailService {
 		            
 		            MailReceiverDto mailReceiverDto = new MailReceiverDto();
 		            mailReceiverDto.setEmployee_no(receiverNo);
+		            // mailReceiverDto.setMail_recervier_type("To");
 		            mailReceiverDto.setMail_no(mailSaver.getMailNo());
 
 		            MailReceiver mailReceiver = mailReceiverDto.toEntity(mailSaver, receiver);
 		            mailReceiverRepository.save(mailReceiver);
 
 		        }
+		        // 참조자
 		        List<Long> ccNos = mailDto.getCcNos(); // 참조자 리스트
 		        if (ccNos != null) {
 		            for (Long ccNo : ccNos) {
@@ -195,19 +249,19 @@ public class MailService {
 		                MailReceiverDto ccReceiverDto = new MailReceiverDto();
 		                ccReceiverDto.setEmployee_no(ccNo);
 		                ccReceiverDto.setMail_no(mailSaver.getMailNo());
-
+		                // ccReceiverDto.setMail_recervier_type("Cc");
 		                MailReceiver mailReceiver = ccReceiverDto.toEntity(mailSaver, ccReceiver);
 		                mailReceiverRepository.save(mailReceiver);
 		            }
 		        }
-		        
+		        // 파일
 		        for (MultipartFile file : mailFiles) {
 		            if (!file.isEmpty()) {
 		                // DriveDto 생성
 		                String oriName = file.getOriginalFilename();
 				        String ext = oriName.substring(oriName.lastIndexOf("."));
 				        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
-				        String path = fileDir + "personal/" + newName;
+				        String path = fileDir + "mail/" + newName;
 		                DriveDto driveDto = new DriveDto();
 		                
 		                File savedFile = new File(path);
@@ -228,7 +282,7 @@ public class MailService {
 		                drive.setDriveNewName(newName); // 파일 고유 이름 생성
 		                drive.setDriveSize(driveDto.getDriveSize());
 		                drive.setDriveType(ext);
-		                drive.setDrivePath("/upload/mail/" + newName); // 실제 저장 경로로 변경 필요
+		                drive.setDrivePath("/mail/" + newName); // 실제 저장 경로로 변경 필요
 		                drive.setUploader(Employee.builder().employeeNo(mailDto.getEmployee_no()).build());
 		                drive.setParam1(mailSaver.getMailNo()); // 메일 참조 연결
 		                drive.setSeparatorCode("FL002");
@@ -238,46 +292,19 @@ public class MailService {
 		                
 		            }
 		        }
-		        
-				/*
-				 * for (MultipartFile file : mailFiles) { if (!file.isEmpty()) { Drive drive =
-				 * new Drive(); drive.setDriveOriName(file.getOriginalFilename());
-				 * drive.setDriveNewName(UUID.randomUUID().toString());
-				 * drive.setDriveType(FilenameUtils.getExtension(file.getOriginalFilename()));
-				 * drive.setDriveSize(file.getSize()); drive.setDrivePath("저장경로"); // 네 프로젝트
-				 * 기준으로 수정
-				 * drive.setUploader(Employee.builder().employeeNo(mailDto.getEmployee_no()).
-				 * build()); drive.setPrm1(mailSaver.getMailNo()); // 메일 참조 연결!
-				 * 
-				 * driveRepository.save(drive); } }
-				 */
-			
-			
-			
-			
-			
-			
-			/*// 전송 메일 저장
-			MailReceiverDto receiverDto=null;
-			MailReceiver mailReceiverEntity = receiverDto.toEntity();
-			MailReceiver mailReceiverSaver = MailReceiver.builder()
-//					.receiver(mailDto.getReceiverNos())
-					.mail(mailSaver)
-					.build();
-			mailRecevierRepository.save(mailReceiverEntity);*/
-			
-			//List<String> receiverList = Arrays.asList(mailDto.getReceiver().split(","));
+		     // 본인
+		        /* 폐기 
+				Employee sender = employeeRepository.findById(mailDto.getEmployee_no())
+		                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사원 번호: " + mailDto.getEmployee_no()));
 
-			//for (String receiver : receiverList) {
-//			    MailReceiver mailReceiver = MailReceiver.builder()
-//			        .mail(saver)
-//			        .receiver(mailDto.getEmployee_no()) // 혹은 receiverId 등
-//			        .build();
-//
-//			    mailRecevierRepository.save(mailReceiver);
-			//}
-			
-			
+		        MailReceiverDto selfReceiverDto = new MailReceiverDto();
+		        selfReceiverDto.setEmployee_no(sender.getEmployeeNo());
+		        selfReceiverDto.setMail_no(mailSaver.getMailNo());
+		        selfReceiverDto.setMail_recervier_type("Me");
+		        MailReceiver selfReceiver = selfReceiverDto.toEntity(mailSaver, sender);
+		        mailReceiverRepository.save(selfReceiver);
+		        */
+
 			result =1;
 		}catch (Exception e) {
 			e.printStackTrace();

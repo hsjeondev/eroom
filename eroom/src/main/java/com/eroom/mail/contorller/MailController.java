@@ -1,9 +1,21 @@
 package com.eroom.mail.contorller;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.eroom.drive.entity.Drive;
+import com.eroom.drive.service.DriveService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
@@ -32,7 +46,8 @@ public class MailController {
 
 	private final MailService mailService;
 	private final EmployeeService employeeService;
-	
+	@Value("${ffupload.location}")
+	 private String fileDir;
 	/* 테스트로 만들어 놓은거
 	 * @GetMapping("/mail") public String selectMailAll(Model model) { // 조건 필요함
 	 * reveiver에 // to일때는 내가 보낸거 // 조건이 cc면 받은거
@@ -150,7 +165,70 @@ public class MailController {
 	    return "mail/mailTrash";
 	}
 	
-	// 디테일
+	// 디테일 파일 다운로드
+	/*@GetMapping("/mail/download/{attachmentId}")
+	@ResponseBody
+	public ResponseEntity<Resource> downloadFile(@PathVariable("attachmentId") Long attachmentId) {
+	    // 파일 경로와 파일명을 가져옵니다.
+	    Drive drive = mailService.findAttachmentById(attachmentId);
+
+	    // 파일이 없으면 404 반환
+	    if (drive == null) {
+	        return ResponseEntity.notFound().build();
+	    }
+
+	    // drive.getDrivePath()는 이미 전체 경로를 포함하고 있으므로 그대로 사용
+	    Path path = Paths.get(fileDir+drive.getDrivePath());
+	    Resource resource = null;
+	    try {
+	        resource = new UrlResource(path.toUri());
+	    } catch (MalformedURLException e) {
+	        return ResponseEntity.badRequest().build();
+	    }
+
+	    // 파일이 존재하면 다운로드
+	    return ResponseEntity.ok()
+	            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + drive.getDriveOriName() + "\"")
+	            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+	            .body(resource);
+	}*/
+	@GetMapping("/mail/download/{driveAttachNo}")
+	public ResponseEntity<Object> fileDownload(@PathVariable("driveAttachNo") Long id) {
+	    try {
+	        // DB에서 파일 정보 가져오기
+	        Drive drive = mailService.findAttachmentById(id);
+	        if (drive == null) {
+	            return ResponseEntity.notFound().build();
+	        }
+	        
+	        // 파일 경로 생성
+	        Path filePath = Paths.get(fileDir + drive.getDrivePath());
+	        
+	        // 파일 존재 여부 확인
+	        if (!Files.exists(filePath)) {
+	            return ResponseEntity.notFound().build();
+	        }
+	        
+	        // 한글 파일명 인코딩 처리
+	        String encodedFileName = URLEncoder.encode(drive.getDriveOriName(), "UTF-8")
+	                                         .replaceAll("\\+", "%20");
+	        
+	        // 파일 리소스 생성
+	        Resource resource = new InputStreamResource(Files.newInputStream(filePath));
+	        
+	        // 다운로드 응답
+	        return ResponseEntity.ok()
+	                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+	                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+	                .body(resource);
+	        
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 다운로드 중 오류가 발생했습니다.");
+	    }
+	}
+	
+	// 디테일 ( 파일 불러오기 성공 )
 	@GetMapping("/mail/detail/{id}")
 	public String selectMailOne(@PathVariable("id") Long id,
 								Model model,
@@ -158,8 +236,14 @@ public class MailController {
 		Long employeeNo = employeeDetails.getEmployee().getEmployeeNo(); // employeeNo값 
 		Mail mail = mailService.selectMailOne(employeeNo,id);
 		model.addAttribute("mail",mail);
+		
+		List<Drive> attachments = mailService.findMailAttachments(id);
+	    model.addAttribute("attachments", attachments);
+		
+		
 		return "mail/mailDetail";
 	}
+	
 	
 	// 메일 작성 페이지
 	@GetMapping("/mail/mailCreate")
@@ -210,6 +294,8 @@ public class MailController {
 		 
 		return resultMap;
 	}
+	
+	
 	
 	@GetMapping("/search-employees")
     @ResponseBody
