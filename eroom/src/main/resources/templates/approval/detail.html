@@ -217,16 +217,16 @@
       </div>
    </div>
 
-      <!-- 첨부 파일 -->
-      <div class="mt-4">
-        <h6 class="mb-2">첨부 파일</h6>
-        <ul class="ps-3">
-          <li><a href="#" class="text-primary text-decoration-underline" onmouseover="this.style.textDecoration='none'" onmouseout="this.style.textDecoration='underline'">경조금_신청서.pdf</a></li>
-          <li><a href="#" class="text-primary text-decoration-underline" onmouseover="this.style.textDecoration='none'" onmouseout="this.style.textDecoration='underline'">가족관계증명서.jpg</a></li>
-        </ul>
-      </div>
+	<!-- 첨부 파일 -->
+	<div class="mt-4">
+		<h6 class="mb-2">첨부 파일</h6>
+		<ul class="ps-3">
+			<li th:each="approvalAttachFile : ${driveList}"><a th:href="@{'/drive/download/approval/' + ${approvalAttachFile.driveAttachNo}}" th:text="${approvalAttachFile.driveOriName}" class="text-primary text-decoration-underline" onmouseover="this.style.textDecoration='none'" onmouseout="this.style.textDecoration='underline'">첨부된 파일이 없습니다.</a></li>
+			<li th:if="${#lists.isEmpty(driveList)}" class="text-muted">첨부된 파일이 없습니다.</li>
+		</ul>
+	</div>
 
-      <!-- 승인/반려 버튼 -->
+			<!-- 승인/반려 버튼 -->
       <div class="mt-4 text-end"  th:if="${line.approval_line_step >= 1 and line.employee.employeeNo == employee.employeeNo and line.approval_line_status == 'S'}" th:each="line : ${approvalLineList}">
         <button data-approval-status="A" id="approvalApproveBtn" type="button" class="btn btn-primary me-2 approveDenyBtn">승인</button>
         <button data-approval-status="D" id="approvalDenyBtn" type="button" class="btn btn-outline-danger approveDenyBtn">반려</button>

@@ -35,6 +35,7 @@ import com.eroom.approval.service.ApprovalFormatService;
 import com.eroom.approval.service.ApprovalLineService;
 import com.eroom.approval.service.ApprovalService;
 import com.eroom.drive.dto.DriveDto;
+import com.eroom.drive.service.DriveService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
@@ -60,6 +61,8 @@ public class ApprovalController {
 	private final ApprovalFormatService approvalFormatService;
 	private final StructureService structureService;
 	private final EmployeeService employeeService;
+	private final DriveService driveService;
+	
 	
 	// 내가 올린 결재 리스트 조회
 	@GetMapping("/approval/myRequestedApprovals")
@@ -68,34 +71,34 @@ public class ApprovalController {
 		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 		Employee employee = employeeDetails.getEmployee();
 		model.addAttribute("employee", employee);
-		// 관리자용 전체(visible Y) 결재 보기
-		if (employee.getEmployeeName().contains("admin")) {
-			List<Approval> temp = approvalService.findAllApprovalsVisibleY("Y");
-			List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
-			Map<Long, List<ApprovalLineDto>> approvalLineMap = new HashMap<Long, List<ApprovalLineDto>>();
-			for (Approval approval : temp) {
-				// approval 리스트의 approval_no를 사용해서 approval_line 리스트 조회
-				List<ApprovalLine> temp2 = approvalLineService.getApprovalLineByApprovalNo(approval.getApprovalNo());
-				List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
-				for (ApprovalLine approvalLine : temp2) {
-					ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
-					approvalLineDtoList.add(approvalLineDto);
-				}
-				// approval_line 리스트를 approval_no를 키로 하는 맵에 저장
-				approvalLineMap.put(approval.getApprovalNo(), approvalLineDtoList);
-				
-				
-				ApprovalDto dto = new ApprovalDto();
-				dto = dto.toDto(approval);
-				resultList.add(dto);
-			}
-			model.addAttribute("approvalLineMap", approvalLineMap);
-			model.addAttribute("resultList", resultList);
-			
-			
-			return "/approval/myRequestedApprovals";
-			
-		}
+		// 관리자용 전체(visible Y) 결재 보기 - 회의시 필요없는 기능으로 판단. 필요할 수 있으니 주석으로 남겨두기
+//		if (employee.getEmployeeName().contains("admin")) {
+//			List<Approval> temp = approvalService.findAllApprovalsVisibleY("Y");
+//			List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
+//			Map<Long, List<ApprovalLineDto>> approvalLineMap = new HashMap<Long, List<ApprovalLineDto>>();
+//			for (Approval approval : temp) {
+//				// approval 리스트의 approval_no를 사용해서 approval_line 리스트 조회
+//				List<ApprovalLine> temp2 = approvalLineService.getApprovalLineByApprovalNo(approval.getApprovalNo());
+//				List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
+//				for (ApprovalLine approvalLine : temp2) {
+//					ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
+//					approvalLineDtoList.add(approvalLineDto);
+//				}
+//				// approval_line 리스트를 approval_no를 키로 하는 맵에 저장
+//				approvalLineMap.put(approval.getApprovalNo(), approvalLineDtoList);
+//				
+//				
+//				ApprovalDto dto = new ApprovalDto();
+//				dto = dto.toDto(approval);
+//				resultList.add(dto);
+//			}
+//			model.addAttribute("approvalLineMap", approvalLineMap);
+//			model.addAttribute("resultList", resultList);
+//			
+//			
+//			return "/approval/myRequestedApprovals";
+//			
+//		}
 		
 		
 		// 내가 올린 approval 리스트 조회
@@ -373,6 +376,11 @@ public class ApprovalController {
 		sb.append(strTemp);
 		String approvalNoFormatted = "FL-007-" + sb.toString();
 		model.addAttribute("approvalNoFormatted", approvalNoFormatted);
+		
+//		파일 조회 - 해당 결재글이 드라이브의 param1에 들어있어야함.
+		List<DriveDto> driveList = driveService.findApprovalDriveFiles(approvalNo);
+		model.addAttribute("driveList", driveList);
+//		파일 조회 - 해당 결재글이 드라이브의 param1에 들어있어야함.
 		
 		return "/approval/detail";
 	}

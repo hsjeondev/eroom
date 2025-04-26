@@ -172,7 +172,7 @@ public class DriveService {
 		for (int i = 0; i < files.size(); i++) {
 		    MultipartFile file = files.get(i);
 		    try {
-		        System.out.println("파일 처리 시작: " + file.getOriginalFilename());
+//		        System.out.println("파일 처리 시작: " + file.getOriginalFilename());
 
 		        String oriName = file.getOriginalFilename();
 		        String ext = oriName.substring(oriName.lastIndexOf("."));
@@ -193,7 +193,7 @@ public class DriveService {
 		                .driveNewName(newName)
 		                .driveType(ext)
 		                .driveSize(file.getSize())
-		                .drivePath(path + newName)
+		                .drivePath(path)
 		                .downloadCount(0L)
 		                .driveDeleteYn("N")
 		                .param1(driverDto.getParam1())
@@ -208,6 +208,16 @@ public class DriveService {
 		}
 		return result;
 	}
+	// ------------------------- 결재 파일 리스트 조회 --------------------------
+	public List<DriveDto> findApprovalDriveFiles(Long param1) {
+	    List<Drive> drives = driveRepository.findByParam1AndDriveDeleteYn(param1, "N");
+	    List<DriveDto> result = new ArrayList<>();
 
+	    for (Drive drive : drives) {
+	        result.add(DriveDto.toDto(drive));
+	    }
+
+	    return result;
+	}
 
 }
