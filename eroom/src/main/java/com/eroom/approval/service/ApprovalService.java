@@ -200,7 +200,8 @@ public class ApprovalService {
 				approvalDto.setApproval_status(approvalLine.getApprovalLineStatus());
 				approvalDto.setApproval_completed_date(LocalDateTime.now());
 				approval = approvalDto.toEntity();
-				if(isFinalApprovalLineisMe || approvalDto.getApproval_status().equals("D")) {
+				if(isFinalApprovalLineisMe || approvalDto.getApproval_status().equals("S")) {
+					// 내가 마지막 (결재자 || 합의자) 인 경우 || 결재가 진행 상태인경우
 					Approval endApproval = approvalRepository.save(approval);
 					// 연차 관련 결재인가 판단
 					Employee approvalEmployee = approval.getEmployee();
@@ -215,9 +216,7 @@ public class ApprovalService {
 							DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 							DateTimeFormatter dtfFull = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 							
-							// 날짜 차이 계산
-							
-							// 연차 정보 수정
+							// 연차 정보 수정 + 캘린더 추가
 							annualLeave = annualLeaveRepository.findByEmployee_EmployeeNo(approvalEmployee.getEmployeeNo());
 							if(annualLeave != null) {
 								Double annualLeaveUsed = annualLeave.getAnnualLeaveUsed();
@@ -249,8 +248,6 @@ public class ApprovalService {
 									Long diffDays = ChronoUnit.DAYS.between(vacationStartFormatted, vacationEndFormatted);
 									annualLeaveUsed = annualLeaveUsed + (diffDays + 1);
 									// 연차 정보 캘린더 기입
-									// 연차 정보 캘린더 기입
-									// 연차 정보 캘린더 기입
 									vacationStart += " 09:00:00";
 									vacationEnd += " 18:00:00";
 									companyCalendarDto.setCompany_content("연차");
@@ -262,8 +259,6 @@ public class ApprovalService {
 									String delimeter = approvalContent.get("amPm");
 //									LocalDate vacationStartFormatted = LocalDate.parse(vacation, dtf);
 									annualLeaveUsed = annualLeaveUsed + 0.5;
-									// 연차 정보 캘린더 기입
-									// 연차 정보 캘린더 기입
 									// 연차 정보 캘린더 기입
 									// 오전, 오후 정보가 있어야함
 									if("am".equals(delimeter)) {
