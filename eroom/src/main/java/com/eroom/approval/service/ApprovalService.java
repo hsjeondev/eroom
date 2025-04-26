@@ -1,5 +1,6 @@
 package com.eroom.approval.service;
 
+import java.lang.module.ModuleDescriptor.Builder;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +22,10 @@ import com.eroom.approval.repository.ApprovalRepository;
 import com.eroom.attendance.dto.AnnualLeaveDto;
 import com.eroom.attendance.entity.AnnualLeave;
 import com.eroom.attendance.repository.AnnualLeaveRepository;
+import com.eroom.calendar.dto.CompanyCalendarDto;
+import com.eroom.calendar.dto.CompanyCalendarDto.CompanyCalendarDtoBuilder;
+import com.eroom.calendar.entity.CompanyCalendar;
+import com.eroom.calendar.repository.CompanyCalendarRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 
@@ -34,6 +39,8 @@ public class ApprovalService {
 	private final EmployeeRepository employeeRepository;
 	private final ApprovalLineRepository approvalLineRepository;
 	private final AnnualLeaveRepository annualLeaveRepository;
+	private final CompanyCalendarRepository companyRepository;
+	
 
 	// 내가 올린 결재 리스트 조회 + 신청일 기준으로 최신순 정렬
 	public List<Approval> getMyRequestedApprovals(Long employeeNo, String visible) {
@@ -199,13 +206,14 @@ public class ApprovalService {
 					Employee approvalEmployee = approval.getEmployee();
 					AnnualLeave annualLeave = null;
 //					AnnualLeaveDto annualLeaveDto = null;
-					System.out.println(endApproval.getApprovalStatus() + " : 이거 A여야해");
+//					System.out.println(endApproval.getApprovalStatus() + " : 이거 A여야해");
 					if(endApproval.getApprovalStatus().equals("A") && (approval.getApprovalFormat().getApprovalFormatNo() == 7 || approval.getApprovalFormat().getApprovalFormatNo() ==  8)) {
 						// 연차 관련 결재
 						if(approvalEmployee != null) {
 							// 연차일
 							Map<String, String> approvalContent = approval.getApprovalContent();
 							DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+							DateTimeFormatter dtfFull = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 							
 							// 날짜 차이 계산
 							
@@ -214,11 +222,28 @@ public class ApprovalService {
 							if(annualLeave != null) {
 								Double annualLeaveUsed = annualLeave.getAnnualLeaveUsed();
 //								annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
+								
+								// 캘린더Dto 준비
+								String approvalEmployeeTeam = approvalEmployee.getStructure().getCodeName();
+								String approvalEmployeeName = approvalEmployee.getEmployeeName();
+								String approvalEmployeePosition = approvalEmployee.getEmployeePosition();
+								String calendarTitleEmployeeInfo = approvalEmployeeTeam + " " + approvalEmployeeName + " " + approvalEmployeePosition + " ";
+								CompanyCalendarDto companyCalendarDto = CompanyCalendarDto.builder()
+										.employee_no(approvalEmployee.getEmployeeNo())
+										.company_creator(approvalEmployee.getEmployeeId())
+										.company_location("-")
+										.separator("A001")
+										.visibleYn("Y")
+										.build();
+								CompanyCalendar companyCalendarEntity = null;
+								String vacationStart = "";
+								String vacationEnd = "";
+								
 								if(approval.getApprovalFormat().getApprovalFormatNo() == 7) {
 									// 연차의 경우
 									// 날짜값 가져와야함
-									String vacationStart = approvalContent.get("vacationStart");
-									String vacationEnd = approvalContent.get("vacationEnd");
+									vacationStart = approvalContent.get("vacationStart");
+									vacationEnd = approvalContent.get("vacationEnd");
 									LocalDate vacationStartFormatted = LocalDate.parse(vacationStart, dtf);
 									LocalDate vacationEndFormatted = LocalDate.parse(vacationEnd, dtf);
 									Long diffDays = ChronoUnit.DAYS.between(vacationStartFormatted, vacationEndFormatted);
@@ -226,23 +251,50 @@ public class ApprovalService {
 									// 연차 정보 캘린더 기입
 									// 연차 정보 캘린더 기입
 									// 연차 정보 캘린더 기입
-									
-									
+									vacationStart += " 09:00:00";
+									vacationEnd += " 18:00:00";
+									companyCalendarDto.setCompany_content("연차");
+									companyCalendarDto.setCompany_title(calendarTitleEmployeeInfo + " 연차");
 									
 								} else if(approval.getApprovalFormat().getApprovalFormatNo() == 8) {
 									// 반차의 경우
 									String vacation = approvalContent.get("vacation");
-									LocalDate vacationStartFormatted = LocalDate.parse(vacation, dtf);
+									String delimeter = approvalContent.get("amPm");
+//									LocalDate vacationStartFormatted = LocalDate.parse(vacation, dtf);
 									annualLeaveUsed = annualLeaveUsed + 0.5;
 									// 연차 정보 캘린더 기입
 									// 연차 정보 캘린더 기입
 									// 연차 정보 캘린더 기입
+									// 오전, 오후 정보가 있어야함
+									if("am".equals(delimeter)) {
+										vacationStart = vacation + " 09:00:00";
+										vacationEnd = vacation + " 12:00:00";
+										companyCalendarDto.setCompany_content("오전 반차");
+										companyCalendarDto.setCompany_title(calendarTitleEmployeeInfo + " 반차(오전)");
+									} else if("pm".equals(delimeter)) {
+										vacationStart = vacation + " 12:00:00";
+										vacationEnd = vacation + " 18:00:00";
+										companyCalendarDto.setCompany_content("오후 반차");
+										companyCalendarDto.setCompany_title(calendarTitleEmployeeInfo + " 반차(오후)");
+									}
+									
 									
 								}
+								// 연차 정보 수정
 								annualLeave.setAnnualLeaveUsed(annualLeaveUsed);
 								annualLeaveRepository.save(annualLeave);
 								
+								// 캘린더 연차,반차 일정 추가
+								LocalDateTime vacationStartFullFormatted = LocalDateTime.parse(vacationStart, dtfFull);
+								LocalDateTime vacationEndFullFormatted = LocalDateTime.parse(vacationEnd, dtfFull);
+								companyCalendarDto.setCalendar_start_time(vacationStartFullFormatted);
+								companyCalendarDto.setCalendar_end_time(vacationEndFullFormatted);
+								companyCalendarEntity = companyCalendarDto.toEntity();
+								companyRepository.save(companyCalendarEntity);
+								
 							}
+							
+							
 							
 						} else {
 //							System.out.println("여기로 테스트");

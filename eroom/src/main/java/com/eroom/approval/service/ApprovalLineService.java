@@ -46,15 +46,15 @@ public class ApprovalLineService {
 			Long approvalNo = approvalLine.getApproval().getApprovalNo();
 			Long employeeNo = approvalLine.getEmployee().getEmployeeNo();
 			
-			System.out.println("결재 번호 : " + approvalNo);
-			System.out.println("내 직원번호 나와야함 2 : " + employeeNo);
+//			System.out.println("결재 번호 : " + approvalNo);
+//			System.out.println("로그인한 직원번호 나와야함 : " + employeeNo);
 			
 			ApprovalLine appLine = approvalLineRepository.findByApproval_ApprovalNoAndEmployee_EmployeeNo(approvalNo, employeeNo);
-			System.out.println("결재 번호 : " + appLine.getApproval().getApprovalNo());
-			System.out.println("내 직원번호 나와야함 2 : " + appLine.getEmployee().getEmployeeNo());
+//			System.out.println("결재 번호 : " + appLine.getApproval().getApprovalNo());
+//			System.out.println("로그인한 직원번호 나와야함 : " + employeeNo);
 			appLine.setApprovalLineSignedDate(LocalDateTime.now());
 			appLine.setApprovalLineStatus(approvalLine.getApprovalLineStatus());
-			System.out.println("이거이거 A 맞아?" + appLine.getApprovalLineStatus());
+//			System.out.println("이거이거 A 맞아?" + appLine.getApprovalLineStatus());
 			if (appLine != null) {
 				appLine.setApprovalLineStatus(approvalLine.getApprovalLineStatus());
 				approvalLineRepository.save(appLine);

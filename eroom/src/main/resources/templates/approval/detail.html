@@ -248,7 +248,10 @@
 	<script>
 	  const refList = document.getElementById("referenceList").innerText;
 	  const trimmed = refList.replace(/,\s*$/, ''); // 마지막 콤마 제거
-	  document.getElementById("referenceDisplay").innerText = trimmed;
+	  let temp01 = document.getElementById("referenceDisplay");
+	  if(temp01){
+		  document.getElementById("referenceDisplay").innerText = trimmed;
+	  }
 	</script>
 		
     <!-- pdf 생성 버튼 -->
@@ -267,55 +270,60 @@
 	</script>
 	<!-- 삭제 버튼 -->
 	<script th:inline="javascript">
-		document.getElementById("deleteBtn").addEventListener("click", function(){
-			const deleteNo = /*[[${approval.approval_no}]]*/ 0;
-			if(confirm('결재를 삭제하시겠습니까?')){
-				fetch('/approval/' + deleteNo + '/delete',{
-					method : 'POST',
-					headers : {
-				      'Content-Type': 'application/json',
-				      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
-				      'header': document.querySelector('meta[name="_csrf_header"]').content
-					}
-				})
-				.then(response => response.json())
-				.then(data =>{
-					alert(data.res_msg)
-					if(data.res_code == 200){
-						location.href='/approval/myRequestedApprovals';
-					}
-				})
-			} else{
-				
-			}
-		});
+		let deleteBtn = document.getElementById("deleteBtn");
+		if(deleteBtn){
+			document.getElementById("deleteBtn").addEventListener("click", function(){
+				const deleteNo = /*[[${approval.approval_no}]]*/ 0;
+				if(confirm('결재를 삭제하시겠습니까?')){
+					fetch('/approval/' + deleteNo + '/delete',{
+						method : 'POST',
+						headers : {
+					      'Content-Type': 'application/json',
+					      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+					      'header': document.querySelector('meta[name="_csrf_header"]').content
+						}
+					})
+					.then(response => response.json())
+					.then(data =>{
+						alert(data.res_msg)
+						if(data.res_code == 200){
+							location.href='/approval/myRequestedApprovals';
+						}
+					})
+				} else{
+					
+				}
+			});
+		}
 	
 	</script>
 	<!-- 회수 버튼 -->
 	<script th:inline="javascript">
-	
-		document.getElementById("fallBackBtn").addEventListener("click", function(){
-			const fallBackNo = /*[[${approval.approval_no}]]*/ 0;
-			if(confirm('결재를 회수하시겠습니까?')){
-				fetch('/approval/' + fallBackNo + '/fallBack',{
-					method : 'POST',
-					headers : {
-				      'Content-Type': 'application/json',
-				      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
-				      'header': document.querySelector('meta[name="_csrf_header"]').content
-					}
-				})
-				.then(response => response.json())
-				.then(data =>{
-					alert(data.res_msg)
-					if(data.res_code == 200){
-						location.href='/approval/myRequestedApprovals';
-					}
-				})
-			} else{
-				
-			}
-		});
+		let fallBackBtn = document.getElementById("fallBackBtn");
+		if(fallBackBtn){
+			document.getElementById("fallBackBtn").addEventListener("click", function(){
+				const fallBackNo = /*[[${approval.approval_no}]]*/ 0;
+				if(confirm('결재를 회수하시겠습니까?')){
+					fetch('/approval/' + fallBackNo + '/fallBack',{
+						method : 'POST',
+						headers : {
+					      'Content-Type': 'application/json',
+					      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+					      'header': document.querySelector('meta[name="_csrf_header"]').content
+						}
+					})
+					.then(response => response.json())
+					.then(data =>{
+						alert(data.res_msg)
+						if(data.res_code == 200){
+							location.href='/approval/myRequestedApprovals';
+						}
+					})
+				} else{
+					
+				}
+			});
+		}
 	
 	</script>
 	
@@ -329,7 +337,7 @@
 	
 				let con1 = false;
 				let con2 = false;
-				let delimeter;
+				let delimeter = -1;
 	
 				if (this.id === 'approvalApproveBtn' || this.id === 'approvalDenyBtn') {
 					const actionText1 = status === 'A' ? '승인' : (status === 'D' ? '반려' : '처리');
@@ -340,14 +348,8 @@
 					con2 = confirm(`결재를 ${actionText2}하시겠습니까?`);
 					delimeter = 0;
 				}
-	
-				/* if (con1 === true) {
-					delimeter = 0;
-				} else {
-					delimeter = 1;
-				} */
 			    
-				if(con1 == true){
+				if(con1 == true || con2 == true){
 					fetch('/approvalLine/approveDenyAgreement', {
 						method: 'POST',
 						headers: {

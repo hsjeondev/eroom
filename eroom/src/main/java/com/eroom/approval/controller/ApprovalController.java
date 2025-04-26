@@ -505,7 +505,7 @@ public class ApprovalController {
 								}
 							}
 						}
-						// 모든 합의자가 status = A, 나의 결재 차례인 경우에만 approval을 담아서 보내기
+						// 모든 합의자가 status = A, 나의 결재 차례 이후인 경우에만 approval을 담아서 보내기
 						if(count == 0) {
 							if(bool && !approval.getApprovalStatus().equals("F")) {
 								temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
@@ -522,6 +522,9 @@ public class ApprovalController {
 			}
 		}
 		// 결재 리스트옹 - 내가 결재 순서인 approval들을 Dto로 변환
+//		List<Approval> orderByDESCRegDate = new ArrayList<Approval>();
+//		orderByDESCRegDate = resultApprovalList.sort(null)
+		resultApprovalList.sort((a1, a2) -> a2.getApprovalRegDate().compareTo(a1.getApprovalRegDate()));
 		for (Approval t : resultApprovalList) {
 			ApprovalDto dto = new ApprovalDto();
 			dto = dto.toDto(t);
@@ -580,6 +583,7 @@ public class ApprovalController {
 			}
 		}
 		// 결재 리스트옹 - 내가 합의자인 approval들을 Dto로 변환
+		resultApprovalList.sort((a1, a2) -> a2.getApprovalRegDate().compareTo(a1.getApprovalRegDate()));
 		for (Approval t : resultApprovalList) {
 			ApprovalDto dto = new ApprovalDto();
 			dto = dto.toDto(t);
@@ -637,6 +641,7 @@ public class ApprovalController {
 			}
 		}
 		// 결재 리스트옹 - 내가 참조자인 approval들을 Dto로 변환
+		resultApprovalList.sort((a1, a2) -> a2.getApprovalRegDate().compareTo(a1.getApprovalRegDate()));
 		for (Approval t : resultApprovalList) {
 			ApprovalDto dto = new ApprovalDto();
 			dto = dto.toDto(t);

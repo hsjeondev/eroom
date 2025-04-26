@@ -76,9 +76,9 @@ public class ApprovalTransactionalService {
 		
 		cnt = 0;
 		isFinalApprovalLineisMe = false;
-		System.out.println(result + "result");
-		System.out.println(approveResult + "approveResult");
-		System.out.println(denyResult + "denyResult");
+//		System.out.println(result + "result");
+//		System.out.println(approveResult + "approveResult");
+//		System.out.println(denyResult + "denyResult");
 		if(result > 0 && (approveResult > 0 || denyResult > 0)) {
 			map.put("res_code", "200");
 			map.put("res_msg", res_msg_success);
