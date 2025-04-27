@@ -33,7 +33,7 @@ import org.apache.commons.io.IOUtils;
 
 @Controller
 @RequiredArgsConstructor
-public class PdfController2 {
+public class PdfControllerTest {
 
 //    private final TemplateEngine templateEngine;
 //

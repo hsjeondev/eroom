@@ -155,7 +155,102 @@ public class DriveService {
 		return drive;
 	}
 	
+	// ------------------------- 결재 파일 업로드 --------------------------
+	public int uploadApprovalAttachFiles(DriveDto driverDto, Long employeeNo) {
+		int result = 0;
+		
+		 if (driverDto.getSeparatorCode() == null || driverDto.getSeparatorCode().isEmpty()) {
+	            driverDto.setSeparatorCode(
+	                separatorRepository.findBySeparatorName("결재파일")
+	                    .map(s -> s.getSeparatorCode())
+	                    .orElse("FL007") 
+	            );
+	        }
+		
+		List<MultipartFile> files = driverDto.getDriveFiles();
+
+		for (int i = 0; i < files.size(); i++) {
+		    MultipartFile file = files.get(i);
+		    try {
+//		        System.out.println("파일 처리 시작: " + file.getOriginalFilename());
+
+		        String oriName = file.getOriginalFilename();
+		        String ext = oriName.substring(oriName.lastIndexOf("."));
+		        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+
+		        String path = fileDir + "personal/" + newName;
+		        File savedFile = new File(path);
+		        if (!savedFile.getParentFile().exists()) {
+		            savedFile.getParentFile().mkdirs();
+		        }
+		        file.transferTo(savedFile);
 
 
+		        Drive drive = Drive.builder()
+		                .uploader(Employee.builder().employeeNo(employeeNo).build())
+		                .separatorCode(driverDto.getSeparatorCode())
+		                .driveOriName(oriName)
+		                .driveNewName(newName)
+		                .driveType(ext)
+		                .driveSize(file.getSize())
+		                .drivePath(path)
+		                .downloadCount(0L)
+		                .driveDeleteYn("N")
+		                .param1(driverDto.getParam1())
+		                .build();
+		        
+		        driveRepository.save(drive);
+		        result = 1;
+		    } catch (Exception e) {
+		        System.out.println("업로드 실패 파일명: " + file.getOriginalFilename());
+		        e.printStackTrace();
+		    }
+		}
+		return result;
+	}
+	// ------------------------- 결재 파일 리스트 조회 --------------------------
+	// 결재 번호(param1)로 조회
+	public List<DriveDto> findApprovalDriveFiles(Long param1) {
+	    List<Drive> drives = driveRepository.findByParam1AndDriveDeleteYnAndSeparatorCode(param1, "N", "Fl007");
+	    List<DriveDto> result = new ArrayList<>();
+
+	    for (Drive drive : drives) {
+	        result.add(DriveDto.toDto(drive));
+	    }
+
+	    return result;
+	}
+	// drive 번호(param1)로 조회 및 approvalNo 주입 후 새로운 Entity로 save
+	public int createNewFilesUseOldFiles(List<Long> approvalAttachFileIds, Long approvalNo) {
+		int result = 0;
+		try {
+			for(Long l : approvalAttachFileIds) {
+				Drive oldDrive = driveRepository.findByDriveAttachNoAndDriveDeleteYnAndSeparatorCode(l, "N", "FL007");
+				// 영속성 없는 객체 생성
+	            Drive newDrive = new Drive();
+	            
+	            newDrive.setUploader(oldDrive.getUploader());
+	            newDrive.setSeparatorCode(oldDrive.getSeparatorCode());
+	            newDrive.setDriveOriName(oldDrive.getDriveOriName());
+	            newDrive.setDriveNewName(oldDrive.getDriveNewName());
+	            newDrive.setDriveType(oldDrive.getDriveType());
+	            newDrive.setDriveSize(oldDrive.getDriveSize());
+	            newDrive.setDrivePath(oldDrive.getDrivePath());
+	            newDrive.setDriveDescription(oldDrive.getDriveDescription());
+	            newDrive.setDownloadCount(0L);
+	            newDrive.setDriveDeleteYn("N");
+	            newDrive.setParam1(approvalNo);
+
+	            driveRepository.save(newDrive);
+			}
+			result = 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	// ------------------------- 결재 파일 삭제 --------------------------
+	// bulkDeleteDriveFiles() 사용
 
 }

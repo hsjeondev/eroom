@@ -227,4 +227,42 @@ public class DriveController {
 
 	    return ResponseEntity.ok(resultMap);
 	}
+	
+	// 결재 파일 다운로드 - 개인 다운로드 기능 그대로 가져왔는데 개인 다운로드 기능 변화 없으면 병합 필요(결재의 detail.html a태그 링크만 바꾸면 됨)
+	@GetMapping("/download/approval/{driveAttachNo}")
+	public ResponseEntity<Object> approvalFileDownload(@PathVariable("driveAttachNo") Long id) {
+//		System.out.println("다운로드 시도: " + id);
+		try {
+			// DB에서 파일 정보 가져오기
+			Drive drive = driveService.findByDriveAttachNo(id);
+			if (drive == null) {
+			    System.out.println("해당 ID로 파일을 찾을 수 없음");
+			    return ResponseEntity.notFound().build();
+			}
+			// 실제 파일 경로
+//			System.out.println("drive.getDrivePath(): " + drive.getDrivePath());
+//			Path filePath = Paths.get(fileDir + drive.getDrivePath());
+			Path filePath = Paths.get(drive.getDrivePath());
+//			System.out.println("파일 경로: " + filePath.toString());
+//			System.out.println("파일 존재 여부: " + Files.exists(filePath));
+			if(!Files.exists(filePath)) {
+				return ResponseEntity.notFound().build();
+			}
+			// 파일명 한글 깨짐 방지
+			String encodedFileName = URLEncoder.encode(drive.getDriveOriName(), "UTF-8")
+											   .replaceAll("\\+", "%20");
+            // 응답 생성
+			Resource resource = new InputStreamResource(Files.newInputStream(filePath));
+			// 다운로드 응답
+			return ResponseEntity.ok()
+					.header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+					.contentType(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM)
+					.body(resource);
+			
+		} catch (Exception e) {
+			System.out.println("파일 다운로드 중 예외 발생: " + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.badRequest().build();
+		}
+	}
 }

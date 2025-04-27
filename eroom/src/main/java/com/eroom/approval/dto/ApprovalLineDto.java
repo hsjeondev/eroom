@@ -42,6 +42,17 @@ public class ApprovalLineDto {
 				.approvalLineDenyReason(approval_line_deny_reason)
 				.build();
 	}
+//	public ApprovalLine toEntity() {
+//		return ApprovalLine.builder()
+//				.approvalLineNo(approval_line_no)
+//				.approvalLineStep(approval_line_step)
+//				.approvalLineStatus(approval_line_status)
+//				.approvalLineSignedDate(approval_line_signed_date)
+//				.approvalLineDenyReason(approval_line_deny_reason)
+////				.approval(Approval.builder().approvalNo(approval_no).build())
+////				.employee(Employee.builder().employeeNo(employee_no).build())
+//				.build();
+//	}
 	
 	public ApprovalLineDto toDto(ApprovalLine entity) {
         return ApprovalLineDto.builder()

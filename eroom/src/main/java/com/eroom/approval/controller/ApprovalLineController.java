@@ -15,6 +15,7 @@ import com.eroom.approval.entity.ApprovalLine;
 import com.eroom.approval.service.ApprovalFormatService;
 import com.eroom.approval.service.ApprovalLineService;
 import com.eroom.approval.service.ApprovalService;
+import com.eroom.approval.service.ApprovalTransactionalService;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.employee.service.StructureService;
@@ -31,6 +32,7 @@ public class ApprovalLineController {
 	private final ApprovalFormatService approvalFormatService;
 	private final StructureService structureService;
 	private final EmployeeService employeeService;
+	private final ApprovalTransactionalService approvalTransactionalService;
 	
 	// 결재 승인/반려
 	@PostMapping("/approvalLine/approveDenyAgreement")
@@ -52,68 +54,77 @@ public class ApprovalLineController {
 			return map;
 		}
 		
-		Map<Integer, String> delimeterMap = new HashMap<Integer, String>();
-		int delimeter = dto.getDelimeter();
-		delimeterMap.put(0, "합의");
-		delimeterMap.put(1, "결재");
-		map.put("res_code", "500");
-		map.put("res_msg", delimeterMap.get(delimeter)+ " 승인 실패");
+//		Map<Integer, String> delimeterMap = new HashMap<Integer, String>();
+//		int delimeter = dto.getDelimeter();
+//		delimeterMap.put(0, "합의");
+//		delimeterMap.put(1, "결재");
+//		map.put("res_code", "500");
+//		map.put("res_msg", delimeterMap.get(delimeter)+ " 승인 실패");
 		
 		Boolean isMyReceived = approvalLineService.isMyLineApproval(dto.getApproval_no(), dto.getEmployee_no());
 		if (!isMyReceived) {
 			map.put("res_code", "500");
-			map.put("res_msg", delimeterMap.get(delimeter)+ " 실패(권한 없음)");
+			map.put("res_msg", "실패(권한 없음)");
 		} else {
-			ApprovalLine approvalLine = dto.toEntity();
+//			ApprovalLine approvalLine = dto.toEntity();
 			// 결재 라인에서 나의 승인/반려 반영
-			int result = approvalLineService.approvalLineApproveDeny(approvalLine);
-			String res_msg_success = "";
-			String res_msg_fail = "";
+			// 트랜잭션 필요
+//			int result = approvalLineService.approvalLineApproveDeny(approvalLine);
+//			String res_msg_success = "";
+//			String res_msg_fail = "";
 			
 			// 결재자 중 마지막 결재자이면 결재 완료 처리
 			// 결재 번호로 결재 라인 조회
-			List<ApprovalLine> approvalLines = approvalLineService.getApprovalLineByApprovalNo(dto.getApproval_no());
-			int cnt = 0;
-			int myApprovalLineStep = -1;
-			Boolean isFinalApprovalLineisMe = false;
-			for(int i = 0; i < approvalLines.size(); i++) {
-				if(approvalLines.get(i).getApprovalLineStep() >= 1) {
-					cnt++;
-				}
-				if(approvalLines.get(i).getEmployee().getEmployeeNo() == employeeNo) {
-					myApprovalLineStep = approvalLines.get(i).getApprovalLineStep();
-				}
-			}
+//			List<ApprovalLine> approvalLines = approvalLineService.getApprovalLineByApprovalNo(dto.getApproval_no());
+//			int cnt = 0;
+//			int myApprovalLineStep = -1;
+//			Boolean isFinalApprovalLineisMe = false;
+//			for(int i = 0; i < approvalLines.size(); i++) {
+//				if(approvalLines.get(i).getApprovalLineStep() >= 1) {
+//					cnt++;
+//				}
+//				if(approvalLines.get(i).getEmployee().getEmployeeNo() == employeeNo) {
+//					myApprovalLineStep = approvalLines.get(i).getApprovalLineStep();
+//				}
+//			}
+//			
+//			int approveResult = 0;
+//			int denyResult = 0;
+//			if(cnt == myApprovalLineStep) {
+//				isFinalApprovalLineisMe = true;
+//			}
 			
-			int approveResult = 0;
-			int denyResult = 0;
-			if(cnt == myApprovalLineStep) {
-				isFinalApprovalLineisMe = true;
-			}
+			// 트랜잭션 필요
+			// 트랜잭션 필요
+			Map<String, String> mapTemp = approvalTransactionalService.approvalApproveDenyTransaction(dto, employeeNo);
+			// 트랜잭션 필요
+			// 트랜잭션 필요
+			// 트랜잭션 필요
 			
-			if(dto.getApproval_line_status().equals("A")) {
-				approveResult = approvalService.approvalApproveDeny(approvalLine, isFinalApprovalLineisMe);
-				res_msg_success = delimeterMap.get(delimeter)+ " 승인 성공";
-				res_msg_fail = delimeterMap.get(delimeter)+ " 승인 실패(서버 오류)";
-			} else if(dto.getApproval_line_status().equals("D")) {
-				denyResult = approvalService.approvalApproveDeny(approvalLine, isFinalApprovalLineisMe);
-				res_msg_success = delimeterMap.get(delimeter)+ " 반려 성공";
-				res_msg_fail = delimeterMap.get(delimeter)+ " 반려 실패(서버 오류)";
-			}
-			
-			cnt = 0;
-			isFinalApprovalLineisMe = false;
-			
-			if(result > 0 && (approveResult > 0 || denyResult > 0)) {
-				map.put("res_code", "200");
-				map.put("res_msg", res_msg_success);
-			} else {
-				map.put("res_code", "500");
-				map.put("res_msg", res_msg_fail);
-			}
-		}
+//			if(dto.getApproval_line_status().equals("A")) {
+//				approveResult = approvalService.approvalApproveDeny(approvalLine, isFinalApprovalLineisMe);
+//				res_msg_success = delimeterMap.get(delimeter)+ " 승인 성공";
+//				res_msg_fail = delimeterMap.get(delimeter)+ " 승인 실패(서버 오류)";
+//			} else if(dto.getApproval_line_status().equals("D")) {
+//				denyResult = approvalService.approvalApproveDeny(approvalLine, isFinalApprovalLineisMe);
+//				res_msg_success = delimeterMap.get(delimeter)+ " 반려 성공";
+//				res_msg_fail = delimeterMap.get(delimeter)+ " 반려 실패(서버 오류)";
+//			}
+//			
+//			cnt = 0;
+//			isFinalApprovalLineisMe = false;
+//			System.out.println(approveResult + "approveResult");
+//			System.out.println(denyResult + "denyResult");
+//			if(result > 0 && (approveResult > 0 || denyResult > 0)) {
+//				map.put("res_code", "200");
+//				map.put("res_msg", res_msg_success);
+//			} else {
+//				map.put("res_code", "500");
+//				map.put("res_msg", res_msg_fail);
+//			}
+//		}
 		
-		return map;
+		return mapTemp;
 		
 	}
 //	// 결재 합의/거절
@@ -188,8 +199,8 @@ public class ApprovalLineController {
 //			}
 //		}
 //		
-//		return map;
-//		
-//	}
+		return map;
+		
+	}
 	
 }

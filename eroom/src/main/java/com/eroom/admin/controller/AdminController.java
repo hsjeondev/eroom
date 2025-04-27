@@ -12,10 +12,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eroom.admin.dto.CreateEmployeeDto;
 import com.eroom.admin.dto.EmployeeManageDto;
 import com.eroom.attendance.dto.AnnualLeaveDto;
 import com.eroom.attendance.dto.AttendanceDto;
@@ -26,6 +28,7 @@ import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.EmployeeDirectoryService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.StructureDto;
+import com.eroom.employee.dto.TeamDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.EmployeeService;
@@ -73,10 +76,83 @@ public class AdminController {
 	
 	// 회원 관리
 	@GetMapping("/employeeManagement")
-	public String selectEmployeeManagementList(Model model) {
-		// 사원의 정보 조회
-		List<Employee> employeeList = employeeService.findAllEmployee();
+	public String selectEmployeeManagementList(@RequestParam(name="deptId",required=false) Long deptId, @RequestParam(name="teamId",required=false) Long teamId,Model model) {
 		
+		// 모든 부서 목록 조회(부모코드가 null인 것들)
+		List<Structure> deptList = structureService.selectDepartmentAll();
+		model.addAttribute("deptList", deptList);
+		model.addAttribute("deptId",deptId);
+		
+		// 부서에 속한 팀 목록 조회
+		List<Structure> teamList = new ArrayList<>();
+		Structure selectedDept = null;
+		if(deptId != null) {
+			// 부서가 선택된 경우
+			for(Structure dept : deptList) {
+				if(dept.getStructureNo().equals(deptId)) {
+					selectedDept = dept;
+					break;
+				}
+			}
+			if(selectedDept != null) {
+				// parentCode(=separatorCode)로 팀 목록 조회
+				teamList = structureService.selectTeamAll(selectedDept.getSeparatorCode());
+			}
+		}else {
+			// 부서가 선택되지 않은 경우
+			teamList = structureService.selectAllTeams();
+		}
+		model.addAttribute("teamList", teamList);
+		model.addAttribute("teamId",teamId);
+		
+		
+		// 드롭다운 버튼 라벨 텍스트 지정
+		String deptLabel = "부서";
+		if(deptId != null) {
+			for(Structure dept : deptList) {
+				if(dept.getStructureNo().equals(deptId)) {
+					deptLabel = dept.getCodeName();
+					break;
+				}
+			}
+		}
+		
+		String teamLabel = "팀";
+		if(teamId != null) {
+			for (Structure team : teamList) {
+				if (team.getStructureNo().equals(teamId)) {
+					teamLabel = team.getCodeName();
+					break;
+				}
+			}
+		}
+		
+		model.addAttribute("deptLabel", deptLabel);
+		model.addAttribute("teamLabel", teamLabel);
+		
+		
+		
+		
+		// 사원의 정보 조회
+		List<Employee> employeeList =  new ArrayList<>();; 
+		if(teamId != null) {
+			// 팀만 선택된 경우
+			employeeList = employeeService.findByStructureNo(teamId);
+		}else if(deptId != null) {
+			// 부서만 선택된 경우 : 그 부서의 모든 팀
+			List<Long> teamNos = new ArrayList<>();
+			for(Structure t : teamList) {
+				teamNos.add(t.getStructureNo());
+			}
+			
+			if(!teamNos.isEmpty()) {
+				employeeList = employeeService.findByStructureNoIn(teamNos);
+			}
+			
+		}else {
+			// 부서, 팀 모두 선택되지 않은 경우
+			employeeList = employeeService.findAllEmployee();
+		}
 		// 반환용 DTO리스트
 		List<EmployeeManageDto> manageDtoList = new ArrayList<>();
 	
@@ -120,6 +196,11 @@ public class AdminController {
 			AnnualLeaveDto annualLeaveDto = null;
 			if(annualLeave != null) {
 				annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
+			}else {
+				annualLeaveDto = new AnnualLeaveDto();
+				annualLeaveDto.setAnnual_leave_total(0.0);
+				annualLeaveDto.setAnnual_leave_used(0.0);
+				annualLeaveDto.setAnnual_leave_remain(0.0);
 			}
 			
 			// EmployeeManageDto 통합 DTO 생성
@@ -184,11 +265,16 @@ public class AdminController {
 
 		// 연차 정보 조회
 		AnnualLeave annualLeave = attendanceService.selectAnnualLeaveByEmployeeNo(employeeNo);
+		AnnualLeaveDto annualLeaveDto;
 		if (annualLeave != null) {
-			AnnualLeaveDto annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
-			model.addAttribute("annualLeave", annualLeaveDto);
+			annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
+		}else {
+			annualLeaveDto = new AnnualLeaveDto();
+			annualLeaveDto.setAnnual_leave_total(0.0);
+			annualLeaveDto.setAnnual_leave_used(0.0);
+			annualLeaveDto.setAnnual_leave_remain(0.0);
 		}
-		
+		model.addAttribute("annualLeave",annualLeaveDto);
 		// 근태 기록이 있는 월 목록 조회
 		List<String> monthList = attendanceService.selectAttendanceMonthList(employeeNo);
 		// 현재 년월 가져오기
@@ -253,5 +339,52 @@ public class AdminController {
 		return resultMap;
 	}
 	
+	// 회원 이름 중복 확인
+	@GetMapping("checkNameDuplicate")
+	@ResponseBody
+	public Map<String, Object> checkNameDuplicate(@RequestParam("name") String name){
+		Map<String,Object> result = new HashMap<>();
+		
+		boolean isDuplicate = employeeService.existsByEmployeeName(name);
+		
+		result.put("duplicate",isDuplicate);
+		return result;
 	
+	}
+	
+	// 부서 선택에 따른 팀 리스트 반환
+	@GetMapping("/findTeamsByDeptId")
+	@ResponseBody
+	public List<TeamDto> findTeamsByDeptId(@RequestParam("deptId") Long deptId){
+		List<TeamDto> resultList = new ArrayList<>();
+		
+		Structure dept = structureService.getStructureById(deptId);
+		
+		if(dept != null) {
+			List<Structure> teamList = structureService.selectTeamAll(dept.getSeparatorCode());
+			for(Structure team : teamList) {
+				resultList.add(TeamDto.toDto(team)); 
+			}
+		}
+		return resultList;
+	}
+	
+	// 회원 생성
+	@PostMapping("/createEmployee")
+	@ResponseBody
+	public Map<String,Object> createEmployee(@RequestBody CreateEmployeeDto dto){
+		Map<String,Object> result = new HashMap<>();
+		
+		try {
+			employeeService.createEmployee(dto);
+			result.put("res_code", 200);
+			result.put("res_msg", "회원 등록이 완료되었습니다.");
+		}catch(Exception e) {
+			e.printStackTrace();
+			result.put("res_code",500);
+			result.put("res_msg", "회원 등록에 실패했습니다.");
+		}
+		
+		return result;
+	}
 }

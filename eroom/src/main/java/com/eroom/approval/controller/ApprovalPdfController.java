@@ -48,7 +48,7 @@ public class ApprovalPdfController {
 		
 		
 		
-		
+//		ApprovalController의 selectApprovalDetail메소드와 동일 로직. 컨트롤러끼리 메소드를 불러오면 구조 이상.
 //		----------------------------------------------------------------
 		// 선택한 결재 번호로 결재 정보 조회
 		Approval approval = approvalService.selectApprovalByApprovalNo(approvalNo);
