@@ -71,6 +71,9 @@ public class Employee {
 	@Column(name="employee_position")
 	private String employeePosition; // 직급
 	
+	@Column(name="employee_birth")
+	private String employeeBirth; // 생년월일
+	
 	@ManyToOne
 	@JoinColumn(name="structure_no")
 	@ToString.Exclude
