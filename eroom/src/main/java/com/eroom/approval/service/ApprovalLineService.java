@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eroom.approval.dto.ApprovalLineDto;
 import com.eroom.approval.entity.ApprovalLine;
 import com.eroom.approval.repository.ApprovalLineRepository;
+import com.eroom.approval.repository.ApprovalRepository;
+import com.eroom.employee.service.EmployeeService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 public class ApprovalLineService {
 
 	private final ApprovalLineRepository approvalLineRepository;
+	private final ApprovalRepository approvalRepository;
+	private final EmployeeService employeeService;
 	
 	// 결재 번호로 결재 라인 조회
 	public List<ApprovalLine> getApprovalLineByApprovalNo(Long approvalNo) {
@@ -34,17 +38,23 @@ public class ApprovalLineService {
 		return resultList;
 	}
 
-
-	@Transactional
+	// 결재라인 합의자라인의 승인,반려 처리
+	@Transactional(rollbackFor = Exception.class)
 	public int approvalLineApproveDeny(ApprovalLine approvalLine) {
 		int result = 0;
 		try {
 			Long approvalNo = approvalLine.getApproval().getApprovalNo();
 			Long employeeNo = approvalLine.getEmployee().getEmployeeNo();
+			
+//			System.out.println("결재 번호 : " + approvalNo);
+//			System.out.println("로그인한 직원번호 나와야함 : " + employeeNo);
+			
 			ApprovalLine appLine = approvalLineRepository.findByApproval_ApprovalNoAndEmployee_EmployeeNo(approvalNo, employeeNo);
-			ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(appLine);
-			approvalLineDto.setApproval_line_signed_date(LocalDateTime.now());
-			appLine = approvalLineDto.toEntity();
+//			System.out.println("결재 번호 : " + appLine.getApproval().getApprovalNo());
+//			System.out.println("로그인한 직원번호 나와야함 : " + employeeNo);
+			appLine.setApprovalLineSignedDate(LocalDateTime.now());
+			appLine.setApprovalLineStatus(approvalLine.getApprovalLineStatus());
+//			System.out.println("이거이거 A 맞아?" + appLine.getApprovalLineStatus());
 			if (appLine != null) {
 				appLine.setApprovalLineStatus(approvalLine.getApprovalLineStatus());
 				approvalLineRepository.save(appLine);
@@ -53,6 +63,7 @@ public class ApprovalLineService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			result = -1;
+			throw e;
 		}
 		return result;
 	}
