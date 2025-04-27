@@ -89,7 +89,27 @@ public class MailController {
 	  
 	  return "mail/mailSent"; // 뷰 파일 이름 
 	  }
-	 
+	// 임시 저장 조회할곳
+		/*@GetMapping("/mail/draft")
+		public String selectDraftMailAll(Model model,
+										@A) {
+			
+			return "mail/mailDraft";
+		}*/
+		@GetMapping("/mail/draft")
+		public String getDraftMails(Model model,
+		                            @AuthenticationPrincipal EmployeeDetails employeeDetails,
+		                            @RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder) {
+
+		    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+
+		    // 임시저장 상태("Y"로 저장된) 메일만 가져오도록 서비스 메서드 호출
+		    List<Mail> draftMailList = mailService.findOnlyDraftMailsBySender(employeeNo, sortOrder);
+
+		    model.addAttribute("draftMailList", draftMailList);
+
+		    return "mail/mailDraft"; // 뷰 파일 이름
+		}
 	
 	
 	
@@ -114,12 +134,7 @@ public class MailController {
 		return "mail/mailReceiverCc";
 	}
 	
-	// 임시 저장 조회할곳
-	@GetMapping("/mail/draft")
-	public String selectDraftMailAll() {
-		
-		return "mail/mailDraft";
-	}
+	
 	
 	
 	// 중요한 메일 조회할곳
@@ -268,7 +283,7 @@ public class MailController {
 		int result = mailService.saveMail(mailDto, mailStatus);
 		if(result >0) {
 			resultMap.put("res_code", "200");
-			resultMap.put("res_msg", "임시저장 되었습니다..");	
+			resultMap.put("res_msg", "임시저장 되었습니다.");	
 		}
 	    //mailDto.setMailStatus("Y"); // mail_status 직접 세팅
 				//mailService.saveDraft(mailDto);

@@ -91,6 +91,41 @@ public class MailService {
 	    return filterOnlyDeletedMails(resultList);
 	}
 	
+	// 임시저장된 메일 조회 메소드 
+	private List<Mail> filterOnlyDraftMails(List<Mail> mails) {
+	    List<Mail> result = new ArrayList<>();
+	    for (Mail mail : mails) {
+	        if ("Y".equals(mail.getMailStatus())) { // mail_status가 Y면 임시저장
+	            result.add(mail);
+	        }
+	    }
+	    return result;
+	}
+	public List<Mail> findOnlyDraftMailsBySender(Long employeeNo, String sortOrder) {
+	    List<Mail> resultList = null;
+
+	    if ("latest".equals(sortOrder)) {
+	        resultList = mailRepository.findBySenderEmployeeNoOrderByMailSentTimeDesc(employeeNo);
+	    } else if ("oldest".equals(sortOrder)) {
+	        resultList = mailRepository.findBySenderEmployeeNoOrderByMailSentTimeAsc(employeeNo);
+	    } else {
+	        throw new IllegalArgumentException("정렬 조건이 올바르지 않습니다: " + sortOrder);
+	    }
+
+	    // 임시저장만 필터
+	    List<Mail> filteredDrafts = filterOnlyDraftMails(resultList);
+
+	    // 미리보기 내용 설정
+	    for (Mail mail : filteredDrafts) {
+	        String preview = getPreviewContent(mail);
+	        mail.setMailContent(preview);
+	    }
+
+	    return filteredDrafts;
+	}
+	
+	
+	
 	// 임시저장 여부 확인 메소드
 	private List<Mail> filterNotDraftMails(List<Mail> mails) {
 	    List<Mail> result = new ArrayList<>();
