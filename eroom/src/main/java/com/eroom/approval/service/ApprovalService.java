@@ -28,6 +28,7 @@ import com.eroom.drive.dto.DriveDto;
 import com.eroom.drive.service.DriveService;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
+import com.eroom.websocket.ApprovalWebSocketHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +42,7 @@ public class ApprovalService {
 	private final AnnualLeaveRepository annualLeaveRepository;
 	private final CompanyCalendarRepository companyRepository;
 	private final DriveService driveService;
+	private final ApprovalWebSocketHandler approvalWebSocketHandler;
 	
 
 	// 내가 올린 결재 리스트 조회 + 신청일 기준으로 최신순 정렬
@@ -230,9 +232,17 @@ public class ApprovalService {
 				approvalDto.setApproval_status(approvalLine.getApprovalLineStatus());
 				approvalDto.setApproval_completed_date(LocalDateTime.now());
 				approval = approvalDto.toEntity();
-				if(isFinalApprovalLineisMe || approvalDto.getApproval_status().equals("S")) {
+				if(isFinalApprovalLineisMe || approvalDto.getApproval_status().equals("D")) {
 					// 내가 마지막 (결재자 || 합의자) 인 경우 || 결재가 진행 상태인경우
 					Approval endApproval = approvalRepository.save(approval);
+					String message = "";
+					// 웹소켓 알림 기능. 기안자의 EmployeeNo를 보내준다.
+					if(endApproval.getApprovalStatus().equals("A")) {
+						message = approval.getApprovalFormat().getApprovalFormatTitle() + "의 결재가 완료 되었습니다!";
+					} else if(endApproval.getApprovalStatus().equals("D")) {
+						message = approval.getApprovalFormat().getApprovalFormatTitle() + "의 결재가 반려 되었습니다!";
+					}
+			        approvalWebSocketHandler.sendApprovalNotification(endApproval.getEmployee().getEmployeeNo(), message, endApproval);
 					// 연차 관련 결재인가 판단
 					Employee approvalEmployee = approval.getEmployee();
 					AnnualLeave annualLeave = null;

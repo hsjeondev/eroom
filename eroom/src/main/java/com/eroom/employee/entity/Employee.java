@@ -4,6 +4,7 @@ package com.eroom.employee.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.eroom.approval.entity.ApprovalAlarm;
 import com.eroom.attendance.entity.Attendance;
 import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.chat.entity.ChatMessage;
@@ -132,4 +133,8 @@ public class Employee {
 	// 드라이브
 	@OneToMany(mappedBy="uploader")
 	private List<Drive> drives; // 업로드한 드라이브 목록
+	
+	// 결재 알람 테이블
+	@OneToMany(mappedBy = "receiver")
+	private List<ApprovalAlarm> approvalAlarms; 
 }
