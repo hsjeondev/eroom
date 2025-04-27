@@ -18,22 +18,22 @@ import lombok.ToString;
 @Builder
 public class AnnualLeaveDto {
 
-	private Long annualLeaveNo;
-	private Long employeeNo;
-	private Double annualLeaveTotal;
-	private Double annualLeaveUsed;
+	private Long annual_leave_no;
+	private Long employee_no;
+	private Double annual_leave_total;
+	private Double annual_leave_used;
 	private Long year; // 연차 년도
 	
 	// 잔여 연차
-	private Double annualLeaveRemain;
+	private Double annual_leave_remain;
 	
 	public AnnualLeave toEntity() {
 		return AnnualLeave.builder()
-						.annualLeaveNo(annualLeaveNo)
-						.annualLeaveTotal(annualLeaveTotal)
-						.annualLeaveUsed(annualLeaveUsed)
+						.annualLeaveNo(annual_leave_no)
+						.annualLeaveTotal(annual_leave_total)
+						.annualLeaveUsed(annual_leave_used)
 						.year(year)
-						.employee(Employee.builder().employeeNo(employeeNo).build())
+						.employee(Employee.builder().employeeNo(employee_no).build())
 						.build();
 		
 	}
@@ -41,11 +41,11 @@ public class AnnualLeaveDto {
 	
 	public AnnualLeaveDto toDto(AnnualLeave annualLeave) {
 		return AnnualLeaveDto.builder()
-				            .annualLeaveNo(annualLeave.getAnnualLeaveNo())
+				            .annual_leave_no(annualLeave.getAnnualLeaveNo())
 				            .year(annualLeave.getYear())
-							.annualLeaveTotal(annualLeave.getAnnualLeaveTotal())
-							.annualLeaveUsed(annualLeave.getAnnualLeaveUsed())
-							.annualLeaveRemain(annualLeave.getAnnualLeaveTotal() - annualLeave.getAnnualLeaveUsed())
+							.annual_leave_total(annualLeave.getAnnualLeaveTotal())
+							.annual_leave_used(annualLeave.getAnnualLeaveUsed())
+							.annual_leave_remain(annualLeave.getAnnualLeaveTotal() - annualLeave.getAnnualLeaveUsed())
 							.build();
 	}
 }
