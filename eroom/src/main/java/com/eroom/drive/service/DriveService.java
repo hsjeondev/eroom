@@ -250,5 +250,7 @@ public class DriveService {
 		
 		return result;
 	}
+	// ------------------------- 결재 파일 삭제 --------------------------
+	// bulkDeleteDriveFiles() 사용
 
 }

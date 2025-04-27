@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -162,6 +163,7 @@ public class ApprovalService {
 	}
 
 	// 결재 삭제
+	@Transactional(rollbackFor = Exception.class)
 	public int updateVisibleYn(Long approvalNo) {
 		int result = 0;
 		try {
@@ -171,8 +173,14 @@ public class ApprovalService {
 					approval.setApprovalVisibleYn("N");
 					approvalRepository.save(approval);
 				}
-				result = 1;
 			}
+			List<DriveDto> driveDtoList = driveService.findApprovalDriveFiles(approvalNo);
+			List<Long> driveNoList = new ArrayList<Long>();
+			for(DriveDto driveDto : driveDtoList) {
+				driveNoList.add(driveDto.getDriveAttachNo());
+			}
+			driveService.bulkDeleteDriveFiles(driveNoList);
+			result = 1;
 		} catch (Exception e) {
 			e.printStackTrace();
 			result = 0;
