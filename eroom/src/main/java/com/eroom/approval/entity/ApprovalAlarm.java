@@ -34,9 +34,9 @@ public class ApprovalAlarm {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long approvalAlarmNo; // 결재 알람 번호
 	
-	@ManyToOne
-	@JoinColumn(name = "approval_line_no")
-	private ApprovalLine approvalLine; // 결재 라인 번호
+//	@ManyToOne
+//	@JoinColumn(name = "approval_line_no")
+//	private ApprovalLine approvalLine; // 결재 라인 번호
 	
 	@Column(name = "approval_alarm_comment")
 	private String approvalAlarmComment; // 결재 알람 내용
@@ -44,6 +44,14 @@ public class ApprovalAlarm {
 	@Column(name = "approval_alarm_read_yn")
 	private String approvalAlarmReadYn; // 결재 알람 읽음 여부
 	
-	@Column(name = "approval_alarm_reg_date")
+	@Column(name = "approval_alarm_reg_date", insertable = false, updatable = false)
 	private LocalDateTime approvalAlarmRegDate; // 결재 알람 등록일
+	
+    @ManyToOne
+    @JoinColumn(name = "employee_no")
+    private Employee receiver; // 알림 받는 사람 (기안자든 결재자든 상관없이)
+    
+    @ManyToOne
+    @JoinColumn(name = "approval_no") 
+    private Approval approval; // 결재 문서 기준으로 FK 연결
 }

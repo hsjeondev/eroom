@@ -1,6 +1,7 @@
 package com.eroom.approval.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -63,9 +64,10 @@ public class Approval {
 	
 	@OneToMany(mappedBy = "approval")
 	@OrderBy("approvalLineNo ASC")
-	private List<ApprovalLine> approvalLines;
+	private List<ApprovalLine> approvalLines; // 결재라인 테이블
 
-
+	@OneToMany(mappedBy = "approval")
+	private List<ApprovalAlarm> approvalAlarms; // 알람 테이블
 
 	
 }
