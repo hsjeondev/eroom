@@ -87,8 +87,12 @@ public class ApprovalService {
 			
 			
 			
+			// 기존 파일 확인용
+			if(!dto.getApprovalAttachFileIds().isEmpty() && dto.getApprovalAttachFileIds() != null) {
+				driveService.createNewFilesUseOldFiles(dto.getApprovalAttachFileIds(), approvalResult.getApprovalNo());
+			}
 			
-	        // 파일이 확인용
+	        // 새 파일 확인용
 	        if (dto.getFiles() != null && !dto.getFiles().isEmpty()) {
                 DriveDto driveDto = DriveDto.builder()
                 					.uploaderNo(employeeNo)

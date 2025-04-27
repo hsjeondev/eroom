@@ -127,10 +127,10 @@ public class ApprovalController {
 		
 		return "/approval/myRequestedApprovals";
 	}
-	// 결재 생성 페이지 진입
-	@GetMapping({"/approval/create", "/approval/{approvalNo}/edit"})
+	// 재기안 재결재
+	@GetMapping({"approval/create", "/approval/{approvalNo}/edit"})
 	public String selectApprovalCreate(Model model, Authentication authentication, @PathVariable(value = "approvalNo", required = false) Long approvalNo) {
-		// 새로운 결재인지 수정하는 결재인지 확인
+		// 새로운 결재인지 수정하는 결재(재기안, 재결재 기능)인지 확인
 		if(approvalNo != null) {
 			// 수정하는 결재인 경우
 			model.addAttribute("mode", "edit");
@@ -150,6 +150,9 @@ public class ApprovalController {
 				approvalLineDtoList.add(approvalLineDto);
 			}
 			model.addAttribute("approvalLineList", approvalLineDtoList);
+//			파일 조회 - 해당 결재글이 드라이브의 param1에 들어있어야함.
+			List<DriveDto> driveList = driveService.findApprovalDriveFiles(approvalNo);
+			model.addAttribute("driveList", driveList);
 		} else {
 			// 새로운 결재인 경우
 			model.addAttribute("mode", "create");
@@ -266,6 +269,7 @@ public class ApprovalController {
 		    @RequestPart("agreerSteps") String agreerStepsJson,
 		    @RequestPart("refererIds") String refererIdsJson,
 		    @RequestPart("refererSteps") String refererStepsJson,
+		    @RequestPart(value = "approvalAttachFileIds", required = false) String approvalAttachFileIdsJson,
 		    @RequestPart(value = "files", required = false) List<MultipartFile> files,
 		    Authentication authentication
 		) throws JsonMappingException, JsonProcessingException {
@@ -287,6 +291,7 @@ public class ApprovalController {
 	    List<Integer> agreerSteps = mapper.readValue(agreerStepsJson, new TypeReference<List<Integer>>() {});
 	    List<Long> refererIds = mapper.readValue(refererIdsJson, new TypeReference<List<Long>>() {});
 	    List<Integer> refererSteps = mapper.readValue(refererStepsJson, new TypeReference<List<Integer>>() {});
+	    List<Long> approvalAttachFileIds = mapper.readValue(approvalAttachFileIdsJson, new TypeReference<List<Long>>() {});
 	    
 	    Long parsedEditApprovalNo = (editApprovalNo == null || editApprovalNo.isEmpty()) 
                 ? null 
@@ -304,6 +309,7 @@ public class ApprovalController {
 	    						.agreerSteps(agreerSteps)
 	    						.refererIds(refererIds)
 	    						.refererSteps(refererSteps)
+	    						.approvalAttachFileIds(approvalAttachFileIds)
 	    						.files(files)
 	    						.build();
 //		파일 추가하면서 추가한 부분
@@ -374,7 +380,7 @@ public class ApprovalController {
 			sb.append("0");
 		}
 		sb.append(strTemp);
-		String approvalNoFormatted = "FL-007-" + sb.toString();
+		String approvalNoFormatted = "FL007-" + sb.toString();
 		model.addAttribute("approvalNoFormatted", approvalNoFormatted);
 		
 //		파일 조회 - 해당 결재글이 드라이브의 param1에 들어있어야함.
@@ -385,7 +391,7 @@ public class ApprovalController {
 		return "/approval/detail";
 	}
 	
-	@PostMapping("/approval/{approvalNo}/delete")
+	@DeleteMapping("/approval/{approvalNo}/delete")
 	@ResponseBody
 	public Map<String, String> deleteApproval(@PathVariable("approvalNo") Long approvalNo, Model model,
 			Authentication authentication) {
@@ -600,6 +606,7 @@ public class ApprovalController {
 		return "/approval/receivedApprovals";
 	}
 
+	// 합의 결재
 	@GetMapping("/approval/agreementApprovals")
 	public String selectAgreementApprovalsList(Model model, Authentication authentication) {
 		// 로그인한 사용자 정보 가져오기
@@ -658,6 +665,7 @@ public class ApprovalController {
 		
 		return "/approval/agreementApprovals";
 	}
+	// 참조 결재
 	@GetMapping("/approval/referencedApprovals")
 	public String selectReferencedApprovalsList(Model model, Authentication authentication) {
 		// 로그인한 사용자 정보 가져오기
@@ -716,6 +724,7 @@ public class ApprovalController {
 		
 		return "/approval/referencedApprovals";
 	}
+	// 회수 결재
 	@GetMapping("/approval/fallBackApprovals")
 	public String selectWithdrawnApprovalsList(Model model, Authentication authentication) {
 		// 로그인한 사용자 정보 가져오기

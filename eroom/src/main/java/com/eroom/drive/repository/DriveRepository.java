@@ -26,8 +26,13 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
     @Query("UPDATE Drive df SET df.driveDeleteYn = 'Y' WHERE df.driveAttachNo IN :attachNos")
     int updateBulkDeleteStatus(@Param("attachNos") List<Long> attachNos);
 	
+	
+	
+	// ------- 결재 관련해서 생성한 JPA
 	// param1과 Drive_delete_yn N을 기준으로 조회
-	List<Drive> findByParam1AndDriveDeleteYn(Long param1, String string);
+	List<Drive> findByParam1AndDriveDeleteYnAndSeparatorCode(Long param1, String deleteYn, String separatorCode);
+	// driveAttachNo와 Drive_delete_yn N을 기준으로 조회
+	Drive findByDriveAttachNoAndDriveDeleteYnAndSeparatorCode(Long driveAttachNo, String deleteYn, String separatorCode);
 
 	
 }

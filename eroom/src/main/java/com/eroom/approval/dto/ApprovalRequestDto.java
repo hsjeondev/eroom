@@ -41,6 +41,7 @@ public class ApprovalRequestDto {
     
     private Long editApprovalNo;
     
+    private List<Long> approvalAttachFileIds;
     private List<MultipartFile> files;
 
 }

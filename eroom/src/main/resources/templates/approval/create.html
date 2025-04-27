@@ -135,6 +135,23 @@
 					<div th:if="${mode == 'edit'}" th:utext="${approval.approval_format.approvalFormatContent}" class="form-control" id="basic-form-edit"></div>
 				</div>
 
+				<div class="mb-3" th:if="${mode == 'edit'}">
+					<h6 class="mb-2">기존 첨부 파일</h6>
+					<ul class="ps-3">
+						<li th:each="approvalAttachFile : ${driveList}">
+							<a th:href="@{'/drive/download/approval/' + ${approvalAttachFile.driveAttachNo}}" th:text="${approvalAttachFile.driveOriName}" class="text-primary text-decoration-underline" onmouseover="this.style.textDecoration='none'" onmouseout="this.style.textDecoration='underline'">첨부된 파일이 없습니다.
+							</a>
+							<input type="hidden" name="approvalAttachFileIds" th:value="${approvalAttachFile.driveAttachNo}">
+							<!-- 삭제 뱃지 넣을 곳 -->
+						    <span class="badge bg-danger ms-2" style="cursor: pointer;" onclick="removeFile(this)">
+						      삭제
+						    </span>
+							<!-- 삭제 뱃지 넣을 곳 -->
+						</li>
+						<li th:if="${#lists.isEmpty(driveList)}" class="text-muted">기존 첨부 파일이 없습니다.</li>
+					</ul>
+					
+				</div>
 				<div class="mb-3">
 					<label class="form-label">파일 업로드</label> <input id="approvalAttachFiles" class="form-control" type="file" multiple>
 				</div>
@@ -534,6 +551,7 @@
 		  const agreerSteps = Array.from(document.querySelectorAll('input[name="agreerSteps"]')).map(el => parseInt(el.value));
 		  const refererIds = Array.from(document.querySelectorAll('input[name="refererIds"]')).map(el => el.value);
 		  const refererSteps = Array.from(document.querySelectorAll('input[name="refererSteps"]')).map(el => parseInt(el.value));
+		  
 		
 //		  if (approverSteps.length === 0 && agreerSteps.length === 0 && refererSteps.length === 0) {
 		  if (approverSteps.length === 0 && agreerSteps.length === 0) {
@@ -631,7 +649,10 @@
 		  fileFormData.append("refererIds", new Blob([JSON.stringify(refererIds)], { type: "application/json" }));
 		  fileFormData.append("refererSteps", new Blob([JSON.stringify(refererSteps)], { type: "application/json" }));
 
-		  // 첨부파일 추가
+		  // 기존 첨부파일 추가
+		  const approvalAttachFileIds = Array.from(document.querySelectorAll('input[name="approvalAttachFileIds"]')).map(el => parseInt(el.value));
+		  fileFormData.append("approvalAttachFileIds", new Blob([JSON.stringify(approvalAttachFileIds)], { type: "application/json" }));
+		  // 새 첨부파일 추가
 		  for (const file of approvalAttachFiles.files) {
 			  fileFormData.append("files", file); // name="files"가 DTO랑 맞아야 해
 		  }
@@ -681,6 +702,15 @@
 	      });
 	    });
 	  });
+	</script>
+	<!-- 기존 파일 삭제 뱃지 -->
+	<script>
+	function removeFile(element) {
+	  const li = element.closest('li');
+	  if (li) {
+	    li.remove();
+	  }
+	}
 	</script>
 
 

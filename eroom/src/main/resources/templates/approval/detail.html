@@ -277,7 +277,7 @@
 				const deleteNo = /*[[${approval.approval_no}]]*/ 0;
 				if(confirm('결재를 삭제하시겠습니까?')){
 					fetch('/approval/' + deleteNo + '/delete',{
-						method : 'POST',
+						method : 'DELETE',
 						headers : {
 					      'Content-Type': 'application/json',
 					      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
