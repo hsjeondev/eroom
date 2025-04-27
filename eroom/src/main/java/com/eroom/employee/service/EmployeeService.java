@@ -1,7 +1,5 @@
 package com.eroom.employee.service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,15 +14,16 @@ import com.eroom.admin.dto.CreateEmployeeDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.repository.EmployeeDirectoryRepository;
 import com.eroom.employee.dto.EmployeeDto;
+import com.eroom.employee.dto.EmployeeUpdateDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.dto.StructureDto;
 import com.eroom.employee.entity.Employee;
+import com.eroom.employee.entity.Separator;
 import com.eroom.employee.entity.Structure;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.employee.repository.SeparatorRepository;
 import com.eroom.employee.repository.StructureRepository;
 import com.eroom.security.EmployeeDetails;
-import com.eroom.employee.entity.Separator;
 
 import lombok.RequiredArgsConstructor;
 
@@ -200,6 +199,36 @@ public class EmployeeService {
 		
 		employeeDirectoryRepository.save(directory);
 		
+	}
+	
+	// 회원 정보 수정
+	@Transactional
+	public void updateEmployee(EmployeeUpdateDto dto) {
+		// employee 가져오기
+		Employee employee = employeeRepository.findById(dto.getEmployee_no()).orElse(null);
+		
+		// employee 수정
+		employee.setEmployeeName(dto.getEmployee_name());
+		employee.setEmployeePosition(dto.getEmployee_position());
+		employee.setEmployeeBirth(dto.getEmployee_birth());
+		employee.setEmployeeHireDate(dto.getEmployee_hire_date());
+		employee.setEmployeeEndDate(dto.getEmployee_end_date());
+		employee.setEmployeeEmploymentYn(dto.getEmployee_employment_yn());
+		
+		// 부서 팀 변경
+		if(dto.getStructure_no() != null) {
+			Structure structure = structureRepository.findById(dto.getStructure_no()).orElse(null);
+			employee.setStructure(structure);
+		}
+		
+		employeeRepository.save(employee);
+		
+		// directory 수정
+		Directory directory = employee.getDirectory();
+		if(directory != null) {
+			directory.setDirectoryPhone(dto.getDirectory_phone());
+			employeeDirectoryRepository.save(directory);
+		}
 	}
 	
 }
