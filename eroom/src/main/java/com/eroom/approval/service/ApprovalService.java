@@ -1,10 +1,16 @@
 package com.eroom.approval.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eroom.approval.dto.ApprovalDto;
 import com.eroom.approval.dto.ApprovalRequestDto;
@@ -13,6 +19,13 @@ import com.eroom.approval.entity.ApprovalFormat;
 import com.eroom.approval.entity.ApprovalLine;
 import com.eroom.approval.repository.ApprovalLineRepository;
 import com.eroom.approval.repository.ApprovalRepository;
+import com.eroom.attendance.entity.AnnualLeave;
+import com.eroom.attendance.repository.AnnualLeaveRepository;
+import com.eroom.calendar.dto.CompanyCalendarDto;
+import com.eroom.calendar.entity.CompanyCalendar;
+import com.eroom.calendar.repository.CompanyCalendarRepository;
+import com.eroom.drive.dto.DriveDto;
+import com.eroom.drive.service.DriveService;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 
@@ -25,6 +38,10 @@ public class ApprovalService {
 	private final ApprovalRepository approvalRepository;
 	private final EmployeeRepository employeeRepository;
 	private final ApprovalLineRepository approvalLineRepository;
+	private final AnnualLeaveRepository annualLeaveRepository;
+	private final CompanyCalendarRepository companyRepository;
+	private final DriveService driveService;
+	
 
 	// 내가 올린 결재 리스트 조회 + 신청일 기준으로 최신순 정렬
 	public List<Approval> getMyRequestedApprovals(Long employeeNo, String visible) {
@@ -33,7 +50,7 @@ public class ApprovalService {
 	}
 
 	// 결재 생성
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public int createApproval(ApprovalRequestDto dto, Long employeeNo) {
 		try {
 //			ObjectMapper objectMapper = new ObjectMapper();
@@ -67,7 +84,29 @@ public class ApprovalService {
 					.approvalStatus("S")
 					.build();
 			
-			approvalRepository.save(approval);
+			Approval approvalResult = approvalRepository.save(approval);
+			
+			
+			
+			// 기존 파일 확인용
+			if(!dto.getApprovalAttachFileIds().isEmpty() && dto.getApprovalAttachFileIds() != null) {
+				driveService.createNewFilesUseOldFiles(dto.getApprovalAttachFileIds(), approvalResult.getApprovalNo());
+			}
+			
+	        // 새 파일 확인용
+	        if (dto.getFiles() != null && !dto.getFiles().isEmpty()) {
+                DriveDto driveDto = DriveDto.builder()
+                					.uploaderNo(employeeNo)
+                					.separatorCode("FL007")
+                					.driveFiles(dto.getFiles())
+                					.param1(approvalResult.getApprovalNo())
+                					.build();
+                driveService.uploadApprovalAttachFiles(driveDto, employeeNo);
+	        }
+			
+			
+			
+			
 			
 			
 			
@@ -124,6 +163,7 @@ public class ApprovalService {
 	}
 
 	// 결재 삭제
+	@Transactional(rollbackFor = Exception.class)
 	public int updateVisibleYn(Long approvalNo) {
 		int result = 0;
 		try {
@@ -133,8 +173,14 @@ public class ApprovalService {
 					approval.setApprovalVisibleYn("N");
 					approvalRepository.save(approval);
 				}
-				result = 1;
 			}
+			List<DriveDto> driveDtoList = driveService.findApprovalDriveFiles(approvalNo);
+			List<Long> driveNoList = new ArrayList<Long>();
+			for(DriveDto driveDto : driveDtoList) {
+				driveNoList.add(driveDto.getDriveAttachNo());
+			}
+			driveService.bulkDeleteDriveFiles(driveNoList);
+			result = 1;
 		} catch (Exception e) {
 			e.printStackTrace();
 			result = 0;
@@ -172,7 +218,8 @@ public class ApprovalService {
 		return approvals;
 	}
 
-	// 결재와 합의 승인,반려 처리
+	// 결재글의 결재자와 합의자의 승인,반려 처리
+	@Transactional(rollbackFor = Exception.class)
 	public int approvalApproveDeny(ApprovalLine approvalLine, Boolean isFinalApprovalLineisMe) {
 		int result = 0;
 		try {
@@ -183,14 +230,110 @@ public class ApprovalService {
 				approvalDto.setApproval_status(approvalLine.getApprovalLineStatus());
 				approvalDto.setApproval_completed_date(LocalDateTime.now());
 				approval = approvalDto.toEntity();
-				if(isFinalApprovalLineisMe || approvalDto.getApproval_status().equals("D")) {
-					approvalRepository.save(approval);
+				if(isFinalApprovalLineisMe || approvalDto.getApproval_status().equals("S")) {
+					// 내가 마지막 (결재자 || 합의자) 인 경우 || 결재가 진행 상태인경우
+					Approval endApproval = approvalRepository.save(approval);
+					// 연차 관련 결재인가 판단
+					Employee approvalEmployee = approval.getEmployee();
+					AnnualLeave annualLeave = null;
+//					AnnualLeaveDto annualLeaveDto = null;
+//					System.out.println(endApproval.getApprovalStatus() + " : 이거 A여야해");
+					if(endApproval.getApprovalStatus().equals("A") && (approval.getApprovalFormat().getApprovalFormatNo() == 7 || approval.getApprovalFormat().getApprovalFormatNo() ==  8)) {
+						// 연차 관련 결재
+						if(approvalEmployee != null) {
+							// 연차일
+							Map<String, String> approvalContent = approval.getApprovalContent();
+							DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+							DateTimeFormatter dtfFull = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+							
+							// 연차 정보 수정 + 캘린더 추가
+							annualLeave = annualLeaveRepository.findByEmployee_EmployeeNo(approvalEmployee.getEmployeeNo());
+							if(annualLeave != null) {
+								Double annualLeaveUsed = annualLeave.getAnnualLeaveUsed();
+//								annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
+								
+								// 캘린더Dto 준비
+								String approvalEmployeeTeam = approvalEmployee.getStructure().getCodeName();
+								String approvalEmployeeName = approvalEmployee.getEmployeeName();
+								String approvalEmployeePosition = approvalEmployee.getEmployeePosition();
+								String calendarTitleEmployeeInfo = approvalEmployeeTeam + " " + approvalEmployeeName + " " + approvalEmployeePosition + " ";
+								CompanyCalendarDto companyCalendarDto = CompanyCalendarDto.builder()
+										.employee_no(approvalEmployee.getEmployeeNo())
+										.company_creator(approvalEmployee.getEmployeeId())
+										.company_location("-")
+										.separator("A001")
+										.visibleYn("Y")
+										.build();
+								CompanyCalendar companyCalendarEntity = null;
+								String vacationStart = "";
+								String vacationEnd = "";
+								
+								if(approval.getApprovalFormat().getApprovalFormatNo() == 7) {
+									// 연차의 경우
+									// 날짜값 가져와야함
+									vacationStart = approvalContent.get("vacationStart");
+									vacationEnd = approvalContent.get("vacationEnd");
+									LocalDate vacationStartFormatted = LocalDate.parse(vacationStart, dtf);
+									LocalDate vacationEndFormatted = LocalDate.parse(vacationEnd, dtf);
+									Long diffDays = ChronoUnit.DAYS.between(vacationStartFormatted, vacationEndFormatted);
+									annualLeaveUsed = annualLeaveUsed + (diffDays + 1);
+									// 연차 정보 캘린더 기입
+									vacationStart += " 09:00:00";
+									vacationEnd += " 18:00:00";
+									companyCalendarDto.setCompany_content("연차");
+									companyCalendarDto.setCompany_title(calendarTitleEmployeeInfo + " 연차");
+									
+								} else if(approval.getApprovalFormat().getApprovalFormatNo() == 8) {
+									// 반차의 경우
+									String vacation = approvalContent.get("vacation");
+									String delimeter = approvalContent.get("amPm");
+//									LocalDate vacationStartFormatted = LocalDate.parse(vacation, dtf);
+									annualLeaveUsed = annualLeaveUsed + 0.5;
+									// 연차 정보 캘린더 기입
+									// 오전, 오후 정보가 있어야함
+									if("am".equals(delimeter)) {
+										vacationStart = vacation + " 09:00:00";
+										vacationEnd = vacation + " 12:00:00";
+										companyCalendarDto.setCompany_content("오전 반차");
+										companyCalendarDto.setCompany_title(calendarTitleEmployeeInfo + " 반차(오전)");
+									} else if("pm".equals(delimeter)) {
+										vacationStart = vacation + " 12:00:00";
+										vacationEnd = vacation + " 18:00:00";
+										companyCalendarDto.setCompany_content("오후 반차");
+										companyCalendarDto.setCompany_title(calendarTitleEmployeeInfo + " 반차(오후)");
+									}
+									
+									
+								}
+								// 연차 정보 수정
+								annualLeave.setAnnualLeaveUsed(annualLeaveUsed);
+								annualLeaveRepository.save(annualLeave);
+								
+								// 캘린더 연차,반차 일정 추가
+								LocalDateTime vacationStartFullFormatted = LocalDateTime.parse(vacationStart, dtfFull);
+								LocalDateTime vacationEndFullFormatted = LocalDateTime.parse(vacationEnd, dtfFull);
+								companyCalendarDto.setCalendar_start_time(vacationStartFullFormatted);
+								companyCalendarDto.setCalendar_end_time(vacationEndFullFormatted);
+								companyCalendarEntity = companyCalendarDto.toEntity();
+								companyRepository.save(companyCalendarEntity);
+								
+							}
+							
+							
+							
+						} else {
+//							System.out.println("여기로 테스트");
+						}
+					
+					}
+					
                 }
 				result = 1;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			result = 0;
+			throw e; // 이렇게 해줘야 트랙잭션 롤백 가능!! 
 		}
 		return result;
 	}

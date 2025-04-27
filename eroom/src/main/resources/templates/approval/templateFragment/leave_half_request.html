@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<th:block th:fragment="leave_request">
+<th:block th:fragment="leave_half_request">
   <form th:object="${approval}">
       <div class="table-responsive">
         <table class="table table-bordered text-center align-middle mb-0">
@@ -8,7 +8,10 @@
           <tbody>
             <tr>
               <th class="bg-light">휴가 기간</th>
-              <td th:text="|*{approval_content['vacationStart']} ~ *{approval_content['vacationEnd']}|"></td>
+              <td>
+				  <span th:text="|*{approval_content['vacation']} |"></span>
+				  <span th:text="*{approval_content['amPm']} == 'AM' ? '오전' : '오후'"></span>
+			  </td>
             </tr>
             <tr>
               <th class="bg-light">휴가 사유</th>

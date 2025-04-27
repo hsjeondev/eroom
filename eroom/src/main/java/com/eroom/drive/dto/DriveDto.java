@@ -40,6 +40,7 @@ public class DriveDto {
     private String driveDescription; // 파일 설명
     private List<MultipartFile> driveFiles; // 업로드 파일들
     private List<String> driveDescriptions; // 파일 설명들
+    private Long param1; // 매개변수1
     
     // Entity -> DTO
 	public static DriveDto toDto(Drive entity) {
@@ -59,6 +60,7 @@ public class DriveDto {
 				.driveEditor(entity.getDriveEditor())
 				.driveDeleteYn(entity.getDriveDeleteYn())
 				.driveDescription(entity.getDriveDescription())
+				.param1(entity.getParam1())
 				.build();
 	}
 	// DTO -> Entity
@@ -75,6 +77,7 @@ public class DriveDto {
 				.driveEditor(driveEditor)
 				.driveDeleteYn(driveDeleteYn)
 				.driveDescription(driveDescription)
+				.param1(param1)
 				.build();
 	}
     
