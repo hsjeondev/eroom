@@ -73,10 +73,16 @@ public class AttendanceController {
         
         // 연차 정보 조회
         AnnualLeave annualLeave = attendanceService.selectAnnualLeaveByEmployeeNo(employeeNo);
-		if (annualLeave != null) {
-			AnnualLeaveDto annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
-			model.addAttribute("annualLeave", annualLeaveDto);
+        AnnualLeaveDto annualLeaveDto;
+        if (annualLeave != null) {
+        	annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
+		}else {
+			annualLeaveDto = new AnnualLeaveDto();
+			annualLeaveDto.setAnnual_leave_total(0.0);
+			annualLeaveDto.setAnnual_leave_used(0.0);
+			annualLeaveDto.setAnnual_leave_remain(0.0);
 		}
+        model.addAttribute("annualLeave",annualLeaveDto);
         
 		// 근태 기록이 있는 월 목록 조회
 		List<String> monthList = attendanceService.selectAttendanceMonthList(employeeNo);

@@ -46,4 +46,9 @@ public class StructureService {
 	public Structure getBySeparatorCode(String separatorCode) {
 		return structureRepository.findBySeparatorCode(separatorCode);
 	}
+	
+	// structure_no 로 Structure 조회
+	public Structure getStructureById(Long structureNo) {
+		return structureRepository.findById(structureNo).orElse(null);
+	}
 }

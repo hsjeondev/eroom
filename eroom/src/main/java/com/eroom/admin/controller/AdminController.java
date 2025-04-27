@@ -12,10 +12,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eroom.admin.dto.CreateEmployeeDto;
 import com.eroom.admin.dto.EmployeeManageDto;
 import com.eroom.attendance.dto.AnnualLeaveDto;
 import com.eroom.attendance.dto.AttendanceDto;
@@ -26,6 +28,7 @@ import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.EmployeeDirectoryService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.StructureDto;
+import com.eroom.employee.dto.TeamDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.EmployeeService;
@@ -193,6 +196,11 @@ public class AdminController {
 			AnnualLeaveDto annualLeaveDto = null;
 			if(annualLeave != null) {
 				annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
+			}else {
+				annualLeaveDto = new AnnualLeaveDto();
+				annualLeaveDto.setAnnual_leave_total(0.0);
+				annualLeaveDto.setAnnual_leave_used(0.0);
+				annualLeaveDto.setAnnual_leave_remain(0.0);
 			}
 			
 			// EmployeeManageDto 통합 DTO 생성
@@ -257,11 +265,16 @@ public class AdminController {
 
 		// 연차 정보 조회
 		AnnualLeave annualLeave = attendanceService.selectAnnualLeaveByEmployeeNo(employeeNo);
+		AnnualLeaveDto annualLeaveDto;
 		if (annualLeave != null) {
-			AnnualLeaveDto annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
-			model.addAttribute("annualLeave", annualLeaveDto);
+			annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
+		}else {
+			annualLeaveDto = new AnnualLeaveDto();
+			annualLeaveDto.setAnnual_leave_total(0.0);
+			annualLeaveDto.setAnnual_leave_used(0.0);
+			annualLeaveDto.setAnnual_leave_remain(0.0);
 		}
-		
+		model.addAttribute("annualLeave",annualLeaveDto);
 		// 근태 기록이 있는 월 목록 조회
 		List<String> monthList = attendanceService.selectAttendanceMonthList(employeeNo);
 		// 현재 년월 가져오기
@@ -326,5 +339,52 @@ public class AdminController {
 		return resultMap;
 	}
 	
+	// 회원 이름 중복 확인
+	@GetMapping("checkNameDuplicate")
+	@ResponseBody
+	public Map<String, Object> checkNameDuplicate(@RequestParam("name") String name){
+		Map<String,Object> result = new HashMap<>();
+		
+		boolean isDuplicate = employeeService.existsByEmployeeName(name);
+		
+		result.put("duplicate",isDuplicate);
+		return result;
 	
+	}
+	
+	// 부서 선택에 따른 팀 리스트 반환
+	@GetMapping("/findTeamsByDeptId")
+	@ResponseBody
+	public List<TeamDto> findTeamsByDeptId(@RequestParam("deptId") Long deptId){
+		List<TeamDto> resultList = new ArrayList<>();
+		
+		Structure dept = structureService.getStructureById(deptId);
+		
+		if(dept != null) {
+			List<Structure> teamList = structureService.selectTeamAll(dept.getSeparatorCode());
+			for(Structure team : teamList) {
+				resultList.add(TeamDto.toDto(team)); 
+			}
+		}
+		return resultList;
+	}
+	
+	// 회원 생성
+	@PostMapping("/createEmployee")
+	@ResponseBody
+	public Map<String,Object> createEmployee(@RequestBody CreateEmployeeDto dto){
+		Map<String,Object> result = new HashMap<>();
+		
+		try {
+			employeeService.createEmployee(dto);
+			result.put("res_code", 200);
+			result.put("res_msg", "회원 등록이 완료되었습니다.");
+		}catch(Exception e) {
+			e.printStackTrace();
+			result.put("res_code",500);
+			result.put("res_msg", "회원 등록에 실패했습니다.");
+		}
+		
+		return result;
+	}
 }
