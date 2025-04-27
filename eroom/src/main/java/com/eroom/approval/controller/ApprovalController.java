@@ -868,7 +868,7 @@ public class ApprovalController {
 //	}
 	@GetMapping("/pdf/test/test")
 	public String testPdftest(Model model, Authentication authentication) {
-		Long approvalNo = 37L;
+		Long approvalNo = 42L;
 		// 선택한 결재 번호로 결재 정보 조회
 				Approval approval = approvalService.selectApprovalByApprovalNo(approvalNo);
 				// 결재 정보가 없으면 404 에러 페이지로 이동
@@ -912,8 +912,10 @@ public class ApprovalController {
 					sb.append("0");
 				}
 				sb.append(strTemp);
-				String approvalNoFormatted = "FL-007-" + sb.toString();
+				String approvalNoFormatted = "FL007-" + sb.toString();
 				model.addAttribute("approvalNoFormatted", approvalNoFormatted);
+				List<DriveDto> driveList = driveService.findApprovalDriveFiles(approvalNo);
+				model.addAttribute("driveList", driveList);
 		return "approval/templatePdf/detailPdfTemplate";
 	}
 

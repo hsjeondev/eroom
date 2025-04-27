@@ -45,6 +45,10 @@
             <td th:text="${approval.reg_date}">신청일</td>
           </tr>
           <tr>
+            <th class="table-light text-center" style="width: 150px;">완료일</th>
+            <td th:text="${approval.completed_date}">완료일</td>
+          </tr>
+          <tr>
             <th class="table-light text-center">신청자</th>
             <td th:text="${approval.employee.employeeName}">신청자</td>
           </tr>
@@ -147,7 +151,7 @@
       <div th:if="${approval.approval_format.approvalFormatNo == 1}"  >
       	<table class="table table-bordered text-center align-middle mb-0">
       		<tr>
-      			<th class="fw-bold fs-7" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
       		</tr>
       	</table>
       	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/congratulatory_payment :: congratulatory_payment}"></div>
@@ -156,7 +160,7 @@
       <div th:if="${approval.approval_format.approvalFormatNo == 2}"  >
       	<table class="table table-bordered text-center align-middle mb-0">
       		<tr>
-      			<th class="fw-bold fs-7" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
       		</tr>
       	</table>
       	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/corporate_card_request :: corporate_card_request}"></div>
@@ -165,7 +169,7 @@
       <div th:if="${approval.approval_format.approvalFormatNo == 3}"  >
       	<table class="table table-bordered text-center align-middle mb-0">
       		<tr>
-      			<th class="fw-bold fs-7" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
       		</tr>
       	</table>
       	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/written_apology :: written_apology}"></div>
@@ -174,7 +178,7 @@
       <div th:if="${approval.approval_format.approvalFormatNo == 4}"  >
       	<table class="table table-bordered text-center align-middle mb-0">
       		<tr>
-      			<th class="fw-bold fs-7" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
       		</tr>
       	</table>
       	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/overtime_work_request :: overtime_work_request}"></div>
@@ -183,7 +187,7 @@
       <div th:if="${approval.approval_format.approvalFormatNo == 5}"  >
       	<table class="table table-bordered text-center align-middle mb-0">
       		<tr>
-      			<th class="fw-bold fs-7" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
       		</tr>
       	</table>
       	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/certificate_of_employment :: certificate_of_employment}"></div>
@@ -192,7 +196,7 @@
       <div th:if="${approval.approval_format.approvalFormatNo == 6}"  >
       	<table class="table table-bordered text-center align-middle mb-0">
       		<tr>
-      			<th class="fw-bold fs-7" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
       		</tr>
       	</table>
       	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/business_trip_report :: business_trip_report}"></div>
@@ -201,7 +205,7 @@
       <div th:if="${approval.approval_format.approvalFormatNo == 7}"  >
       	<table class="table table-bordered text-center align-middle mb-0">
       		<tr>
-      			<th class="fw-bold fs-7" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
       		</tr>
       	</table>
       	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/leave_request :: leave_request}"></div>
@@ -210,7 +214,7 @@
       <div th:if="${approval.approval_format.approvalFormatNo == 8}"  >
       	<table class="table table-bordered text-center align-middle mb-0">
       		<tr>
-      			<th class="fw-bold fs-7" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
       		</tr>
       	</table>
       	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/leave_half_request :: leave_half_request}"></div>
@@ -238,7 +242,7 @@
       </div>
       <!-- 결재 삭제 버튼 -->
       <div class="mt-4 text-end">
-        <button th:if="${approval.employee.employeeNo == employee.employeeNo or employee.employeeName.contains('admin')}" id="deleteBtn" type="button" class="btn btn-outline-danger">삭제</button>
+        <button th:if="${(approval.employee.employeeNo == employee.employeeNo and approval.approval_status != 'D' and approval.approval_status != 'A') or employee.employeeName.contains('admin')}" id="deleteBtn" type="button" class="btn btn-outline-danger">삭제</button>
         <button th:if="${approval.employee.employeeNo == employee.employeeNo and approval.approval_status == 'S'}" id="fallBackBtn" type="button" class="btn btn-outline-danger">회수</button>
         <button th:if="${approval.employee.employeeNo == employee.employeeNo and approval.approval_status == 'F' or approval.employee.employeeNo == employee.employeeNo and approval.approval_status == 'A'}" id="rewriteBtn" type="button" class="btn btn-primary me-2 approveDenyBtn">재기안</button>
       </div>

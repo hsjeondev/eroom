@@ -60,7 +60,7 @@ public class ApprovalDto {
 				.approval_status(entity.getApprovalStatus())
 				.approval_title(entity.getApprovalTitle())
 				.approval_content(entity.getApprovalContent())
-				.reg_date(entity.getApprovalRegDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")))
+				.reg_date(entity.getApprovalRegDate() != null ? entity.getApprovalRegDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
 				.completed_date(entity.getApprovalCompletedDate() != null ? entity.getApprovalCompletedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
 				.employee(entity.getEmployee())
 				.approval_format(entity.getApprovalFormat())
