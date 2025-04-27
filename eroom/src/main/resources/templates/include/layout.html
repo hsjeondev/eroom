@@ -83,7 +83,40 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
           navbarVertical.setAttribute('data-navbar-appearance', 'darker');
         }
       </script>
+	  <!-- 웹소켓 공용. 웹소켓 쓰려면 이거 따라서 쓰시면 됩니다. -->
+	  <!-- <script th:inline="javascript">
+	    const employeeNo = /*[[${employee.employeeNo}]]*/ null; // 로그인 사용자 넘기기
 	
+	    if (employeeNo) {
+	      const approvalSocket = new WebSocket('ws://localhost:8080/ws/approval?employeeNo=' + employeeNo);
+	
+	      approvalSocket.onopen = function() {
+	        console.log('웹소켓 연결 성공!');
+	      };
+	
+	      approvalSocket.onmessage = function(event) {
+	    	// 기능 작동 확인 완료
+	        console.log(event.data);
+	        alert(event.data);
+	        // 알림 뱃지 추가 로직 넣기
+	        // 알림 뱃지 추가 로직 넣기
+	        // 알림 뱃지 추가 로직 넣기
+	        // 알림 뱃지 추가 로직 넣기
+	        // 알림 뱃지 추가 로직 넣기
+	        // 알림 뱃지 추가 로직 넣기
+	      };
+	
+	      approvalSocket.onclose = function() {
+	        console.log('웹소켓 연결 종료');
+	      };
+	
+	      approvalSocket.onerror = function(error) {
+	        console.error('웹소켓 에러 발생:', error);
+	      };
+	    } else {
+	      console.log('로그인 사용자 없음 → 웹소켓 연결 안 함');
+	    }
+	  </script> -->
 	<script th:src="@{/vendors/popper/popper.min.js}"></script>
 	<script th:src="@{/vendors/bootstrap/bootstrap.min.js}"></script>
 	<script th:src="@{/vendors/anchorjs/anchor.min.js}"></script>

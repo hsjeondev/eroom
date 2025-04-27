@@ -14,6 +14,7 @@ public class WebSocketConfig implements WebSocketConfigurer{
 
 	private final BasicWebSocketHandler basicWebSocketHandler;
 	private final ChatWebSocketHandler chatWebSocketHandler;
+	private final ApprovalWebSocketHandler approvalWebSocketHandler;
 	
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -24,5 +25,9 @@ public class WebSocketConfig implements WebSocketConfigurer{
 		registry.addHandler(chatWebSocketHandler, "/ws/chat")
 				.addInterceptors(new CustomHandshakeInterceptor())
 				.setAllowedOrigins("http://localhost:8080");
+		
+		registry.addHandler(approvalWebSocketHandler, "/ws/approval")
+		.addInterceptors(new CustomHandshakeInterceptor())
+		.setAllowedOrigins("http://localhost:8080");
 	}
 }
