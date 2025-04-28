@@ -40,6 +40,7 @@ public class SurveyDto {
 				.deadline(deadline)
 				.anonymousVote(anonymousVote)
 				.allowMultiple(allowMultiple)
+				.visible("Y")
 				.build();
 	}
 	
