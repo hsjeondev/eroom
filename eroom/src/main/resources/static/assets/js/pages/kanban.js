@@ -31,6 +31,36 @@
           window.bootstrap.Dropdown.getInstance(dropdownElement)?.hide();
         });
 
+		
+		  // 여기에 onEnd 추가
+		  itemInstance.option('onEnd', async e => {
+		    const movedElement = e.item;
+		    const newParentList = movedElement.closest('.kanban-column');
+		    const listNo = newParentList.getAttribute('data-list-no');
+			console.log("listNo", listNo);
+		    const todoNo = movedElement.getAttribute('data-todo-no');
+			console.log("todoNo", todoNo);
+		    const newIndex = [...newParentList.querySelectorAll('[data-todo-no]')].indexOf(movedElement);
+			console.log("newIndex", newIndex);
+
+		    const payload = {
+		      listNo,
+		      todoNo,
+		      newIndex
+		    };
+
+		    await fetch('/projectTodo/updateElement', {
+		      method: 'POST',
+		      headers: {
+		        'Content-Type': 'application/json',
+		        [document.querySelector('meta[name="_csrf_header"]').content]:
+		          document.querySelector('meta[name="_csrf"]').content
+		      },
+		      body: JSON.stringify(payload)
+		    });
+			document.body.classList.remove('sortable-dragging');
+		  });
+		
         // return itemInstance;
       });
     }

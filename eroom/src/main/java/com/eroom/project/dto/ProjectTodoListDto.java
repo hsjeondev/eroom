@@ -1,8 +1,9 @@
 package com.eroom.project.dto;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.eroom.project.entity.ProjectTodoElement;
 import com.eroom.project.entity.ProjectTodoList;
 
 import lombok.AllArgsConstructor;
@@ -30,18 +31,33 @@ public class ProjectTodoListDto {
 	
 	private String list_color;
 	
+	private List<ProjectTodoElementDto> projectTodoElements;
+
+	
 	
 	public ProjectTodoListDto toDto(ProjectTodoList projectTodoList) {
-		return ProjectTodoListDto
-				.builder()
-				.project_todo_list_no(projectTodoList.getProjectTodoListNo())
-				.project_no(projectTodoList.getProjectNo())
-				.list_name(projectTodoList.getListName())
-				.list_sequence(projectTodoList.getListSequence())
-				.list_color(projectTodoList.getListColor())
-				.build();
+	    ProjectTodoListDto dto = ProjectTodoListDto.builder()
+	            .project_todo_list_no(projectTodoList.getProjectTodoListNo())
+	            .project_no(projectTodoList.getProjectNo())
+	            .list_name(projectTodoList.getListName())
+	            .list_sequence(projectTodoList.getListSequence())
+	            .list_color(projectTodoList.getListColor())
+	            .build();
+
+	    if (projectTodoList.getProjectTodoElements() != null) {
+	        List<ProjectTodoElementDto> elementDtoList = new ArrayList<>();
+	        for (ProjectTodoElement element : projectTodoList.getProjectTodoElements()) {
+	            ProjectTodoElementDto elementDto = new ProjectTodoElementDto();
+	            elementDto = elementDto.toDto(element);
+	            elementDtoList.add(elementDto);
+	        }
+	        dto.setProjectTodoElements(elementDtoList);
+	    }
+
+
+	    return dto;
 	}
-	
+
 	public ProjectTodoList toEntity() {
 		return ProjectTodoList
 				.builder()
