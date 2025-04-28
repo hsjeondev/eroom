@@ -11,7 +11,7 @@
 <main class="main" id="top" layout:fragment="content">
 
   <!-- 헤더 및 업로드 버튼 -->
-  <div class="mb-3 d-flex justify-content-between align-items-center">
+  <div class="mb-3">
     <h3 class="fw-bold mb-2">개인 드라이브</h3>
     <button class="btn btn-primary btn-sm" type="button" id="toggle-upload-btn">파일 업로드</button>
   </div>
@@ -31,7 +31,7 @@
   </div>
 
   <!-- 드라이브 세부정보 카드 -->
-  <div class="card p-3 mb-4" style="max-width: 360px; font-size: 0.8rem;">
+  <div class="card p-3 mb-4" style="width: 100%; font-size: 0.8rem;">
     <div class="d-flex justify-content-between align-items-center">
       <h6 class="fw-bold mb-0">드라이브 세부정보</h6>
       <button class="btn btn-sm p-0 text-primary" type="button" data-bs-toggle="collapse"
@@ -74,7 +74,7 @@
   <div class="search-box mb-3 mx-auto">
       <form class="position-relative">
         <input class="form-control search-input search form-control-sm" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
-        <svg class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <svg style="height: 40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
           <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
         </svg>
       </form>
@@ -107,42 +107,42 @@
           </th>
         </tr>
       </thead>
-      <tbody class="list" th:if="${not #lists.isEmpty(fileList)}" th:each="file : ${fileList}">
-        <tr>
-          <td class="align-middle ps-3"><input class="form-check-input row-checkbox" type="checkbox" /></td>
-          <td class="align-middle"><img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" width="24" height="24" alt="파일" /></td>
-          <td class="align-middle filename" th:text="${file.driveOriName}">파일명</td>
-          <td class="align-middle filesize" th:text="${#numbers.formatDecimal(file.driveSize / 1024.0, 0, 1)} + ' KB'">크기</td>
-          <td class="align-middle description" th:text="${file.driveDescription} ?: '-'">-</td>
-          <td class="align-middle writer" th:text="${file.uploaderName}">작성자</td>
-          <td class="align-middle date" th:text="${#temporals.format(file.driveRegDate, 'yyyy-MM-dd')}">등록일</td>
-          <td class="align-middle download" th:text="${file.downloadCount}">횟수</td>
-          <td class="align-middle text-end pe-0">
-            <div class="btn-reveal-trigger position-static">
-              <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown">
-                <i class="fas fa-ellipsis fs-10"></i>
-              </button>
-              <div class="dropdown-menu dropdown-menu-end py-2">
-                <a class="dropdown-item" th:href="@{'/drive/download/personal/' + ${file.driveAttachNo}}">파일 다운로드</a>
-                <a class="dropdown-item" href="#" 
-				   data-bs-toggle="modal" 
-				   data-bs-target="#editFileModal"
-				   th:attr="data-id=${file.driveAttachNo},data-name=${file.driveOriName} ,data-desc=${file.driveDescription}">
-				   파일 수정
-				</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item text-danger delete-file" href="#" th:data-id="${file.driveAttachNo}">파일 삭제</a>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-      <tbody th:if="${#lists.isEmpty(fileList)}">
-        <tr>
-          <td colspan="9" class="text-center text-muted py-4">업로드된 파일이 없습니다.</td>
-        </tr>
-      </tbody>
+      <tbody class="list">
+	  <tr th:if="${not #lists.isEmpty(fileList)}" th:each="file : ${fileList}">
+	    <td class="align-middle ps-3"><input class="form-check-input row-checkbox" type="checkbox" /></td>
+	    <td class="align-middle"><img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" width="24" height="24" alt="파일" /></td>
+	    <td class="align-middle filename" th:text="${file.driveOriName}">파일명</td>
+	    <td class="align-middle filesize" th:text="${#numbers.formatDecimal(file.driveSize / 1024.0, 0, 1)} + ' KB'">크기</td>
+	    <td class="align-middle description" th:text="${file.driveDescription} ?: '-'">-</td>
+	    <td class="align-middle writer" th:text="${file.uploaderName}">작성자</td>
+	    <td class="align-middle date" th:text="${#temporals.format(file.driveRegDate, 'yyyy-MM-dd')}">등록일</td>
+	    <td class="align-middle download" th:text="${file.downloadCount}">횟수</td>
+	    <td class="align-middle text-end pe-0">
+	      <div class="btn-reveal-trigger position-static">
+	        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown">
+	          <i class="fas fa-ellipsis fs-10"></i>
+	        </button>
+	        <div class="dropdown-menu dropdown-menu-end py-2">
+	          <a class="dropdown-item" th:href="@{'/drive/download/personal/' + ${file.driveAttachNo}}">파일 다운로드</a>
+	          <a class="dropdown-item" href="#" 
+	             data-bs-toggle="modal" 
+	             data-bs-target="#editFileModal"
+	             th:attr="data-id=${file.driveAttachNo},data-name=${file.driveOriName},data-desc=${file.driveDescription}">
+	             파일 수정
+	          </a>
+	          <div class="dropdown-divider"></div>
+	          <a class="dropdown-item text-danger delete-file" href="#" th:data-id="${file.driveAttachNo}">파일 삭제</a>
+	        </div>
+	      </div>
+	    </td>
+	  </tr>
+	  <!-- 파일이 아예 없을 때 표시 -->
+	  <tr th:if="${#lists.isEmpty(fileList)}">
+	    <td colspan="9" class="text-center text-muted py-4">업로드된 파일이 없습니다.</td>
+	  </tr>
+	</tbody>
     </table>
+  </div>
 	<!-- 파일 수정 모달 -->
 	<div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true">
 	  <div class="modal-dialog">
@@ -176,7 +176,6 @@
 	    </form>
 	  </div>
 	</div>
-  </div>
 	
     <!-- 페이징 -->
     <div class="d-flex justify-content-between mt-3">
@@ -193,10 +192,24 @@
   <!-- 스크립트 -->
   <script>
   document.addEventListener('DOMContentLoaded', function () {
+
+	  // 업로드 영역이 존재할 때만 Dropzone 초기화
+	  if (document.getElementById('dropzone-multiple')) {
+	    initDropzone();
+	  }
+
+	  // 리스트가 존재할 때만 List.js 초기화
+	  if (document.querySelector('[data-list]')) {
+	    initListJs();
+	  }
+
+	});
+
+	// ✅ Dropzone 초기화 함수
+	function initDropzone() {
+	  let dropzoneInitialized = false;
 	  const toggleBtn = document.getElementById('toggle-upload-btn');
 	  const uploadZone = document.getElementById('upload-zone');
-	  
-	  let dropzoneInitialized = false;
 	  let dz = null;
 
 	  toggleBtn.addEventListener('click', function () {
@@ -205,67 +218,82 @@
 	    toggleBtn.textContent = open ? '파일 업로드' : '업로드 닫기';
 
 	    if (!dropzoneInitialized && !open) {
-	    	dz = new Dropzone("#dropzone-multiple", {
-	    		  url: "/drive/upload/personal", // 실제 업로드 경로
-	    		  autoProcessQueue: false,
-	    		  paramName: "driveFiles",
-	    		  uploadMultiple: true,
-	    		  clickable: "#dropzone-multiple .dz-message",
-	    		  acceptedFiles: ".jpg,.png,.pdf,.xlsx,.docx,.zip",
-	    		  maxFilesize: 10,
-	    		  previewTemplate: `
-    			  <div class="card shadow-sm mb-2 p-2 border d-flex flex-row align-items-center" style="max-width: 360px;">
-    			    <img data-dz-thumbnail style="width: 48px; height: 48px; object-fit: cover;" class="rounded me-2" />
-    			    <div class="flex-grow-1">
-    			      <div class="fw-bold text-truncate" data-dz-name></div>
-    			      <small class="text-muted" data-dz-size></small>
-    			      <input type="text" class="form-control form-control-sm mt-1" name="driveDescriptions" placeholder="파일 설명 입력" />
-    			    </div>
-    			    <button data-dz-remove class="btn btn-sm btn-outline-danger ms-2" title="삭제">
-    			      <i class="fas fa-times"></i>
-    			    </button>
-    			  </div>
-    			`
-	    		});
-	    		
-		    	document.getElementById("upload-confirm-btn").addEventListener("click", function () {
-		    	    dz.processQueue();
-		    	});
-	    		// 서버 전송 중 이벤트 (폼 입력값 자동 포함됨)
-	    		dz.on("sending", function (file, xhr, formData) {
-    				document.querySelector("#upload-confirm-btn").disabled = true;
-    				
-    				const previews = document.querySelectorAll('.dz-preview');
-    	    		previews.forEach((preview, index) =>{
-    	    			const desc = preview.querySelector('input[name="driveDescriptions"]');
-    	    			if(desc){
-    	    				formData.append("driveDescriptions", desc.value);
-    	    			}
-    	    		});
-	    		});
-	    		// 업로드 완료 후
-	    		dz.on("queuecomplete", function () {
-    			  document.querySelector("#upload-confirm-btn").disabled = false;
-	    		});
-	    		
-	    		dz.on("successmultiple", function (files, responseText) {
-	    			  try {
-	    			    let response = typeof responseText === "string" ? JSON.parse(responseText) : responseText;
-	    			    if (response.res_msg) {
-	    			      alert(response.res_msg);
-	    			    }
-	    			  } catch (e) {
-	    			    alert("서버 응답 처리 중 오류 발생");
-	    			    console.error(e);
-	    			  }
+	      dz = new Dropzone("#dropzone-multiple", {
+	        url: "/drive/upload/personal",
+	        autoProcessQueue: false,
+	        paramName: "driveFiles",
+	        uploadMultiple: true,
+	        clickable: "#dropzone-multiple .dz-message",
+	        acceptedFiles: ".jpg,.png,.pdf,.xlsx,.docx,.zip",
+	        maxFilesize: 10,
+	        previewTemplate: `
+	          <div class="card shadow-sm mb-2 p-2 border d-flex flex-row align-items-center" style="width: 100%; max-width: 720px;">
+	            <img data-dz-thumbnail style="width: 48px; height: 48px; object-fit: cover;" class="rounded me-2" />
+	            <div class="flex-grow-1">
+	              <div class="fw-bold text-truncate" data-dz-name></div>
+	              <small class="text-muted" data-dz-size></small>
+	              <input type="text" class="form-control form-control-sm mt-1" name="driveDescriptions" placeholder="파일 설명 입력" />
+	            </div>
+	            <button data-dz-remove class="btn btn-sm btn-outline-danger ms-2" title="삭제">
+	              <i class="fas fa-times"></i>
+	            </button>
+	          </div>
+	        `
+	      });
 
-	    			  // 전체 완료 후 페이지 이동
-	    			  window.location.href = "/drive/personal";
-	    			});
+	      document.getElementById("upload-confirm-btn").addEventListener("click", function () {
+	        dz.processQueue();
+	      });
+
+	      dz.on("sending", function (file, xhr, formData) {
+	        document.getElementById("upload-confirm-btn").disabled = true;
+	        const previews = document.querySelectorAll('.dz-preview');
+	        previews.forEach(preview => {
+	          const desc = preview.querySelector('input[name="driveDescriptions"]');
+	          if (desc) {
+	            formData.append("driveDescriptions", desc.value);
+	          }
+	        });
+	      });
+
+	      dz.on("queuecomplete", function () {
+	        document.getElementById("upload-confirm-btn").disabled = false;
+	      });
+
+	      dz.on("successmultiple", function (files, responseText) {
+	        try {
+	          let response = typeof responseText === "string" ? JSON.parse(responseText) : responseText;
+	          if (response.res_msg) {
+	            alert(response.res_msg);
+	          }
+	        } catch (e) {
+	          alert("서버 응답 처리 중 오류 발생");
+	          console.error(e);
+	        }
+	        window.location.href = "/drive/personal";
+	      });
+
 	      dropzoneInitialized = true;
 	    }
 	  });
-	});
+	}
+
+	// List.js 초기화 함수
+	function initListJs() {
+	  try {
+	    const lists = document.querySelectorAll('[data-list]');
+	    lists.forEach(el => {
+	      const tbody = el.querySelector('tbody.list');  // tbody.list 찾기
+	      if (tbody && tbody.children.length > 0) {      // 자식 tr이 있을 때만
+	        new List(el.id, JSON.parse(el.getAttribute('data-list')));
+	      }
+	    });
+	  } catch (error) {
+	    console.error('리스트 초기화 중 오류 발생', error);
+	  }
+	}
+
+
   document.querySelectorAll('a[data-bs-target="#editFileModal"]').forEach(button => {
 	  button.addEventListener('click', function () {
 	    const driveAttachNo = this.getAttribute('data-id');

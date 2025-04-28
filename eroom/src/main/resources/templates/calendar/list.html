@@ -2,6 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
 <head>
   <title>부서 캘린더</title>
+  <style>
+.fc-event-main::after {
+  display: none !important;
+}
+</style>
 </head>
 <body>
   <main class="main" id="top" layout:fragment="content">
