@@ -130,7 +130,7 @@
 											</div>
 											<!-- 삭제 버튼 -->
 											<div>
-												<button type="button" class="btn-close position-absolute top-0 end-0 mt-3 me-3" th:if="${survey.voterCount == 0 or survey.deadline < T(java.time.LocalDateTime).now()}" th:onclick="'deleteSurvey(' + ${survey.surveyNo} + ')'"></button>
+												<button type="button" class="btn-close position-absolute top-0 end-0 mt-3 me-3" th:if="${survey.writer == #authentication.principal.employee.employeeName and (survey.voterCount == 0 or survey.deadline < T(java.time.LocalDateTime).now())}" th:onclick="'deleteSurvey(' + ${survey.surveyNo} + ')'"></button>
 											</div>
 										</div>
 										<div class="d-flex align-items-center justify-content-between mb-3 ps-2 pe-2">
@@ -923,39 +923,39 @@
 			</div>
 		</div>
 	</div>
-	
-	
-	
+
+
+
 	<!-- 설문 삭제 확인창 -->
 	<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
-	  <div class="modal-dialog modal-dialog-centered modal-sm">
-	    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
-	      <div class="modal-header border-0">
-	        <h5 class="modal-title text-dark">정말 삭제할까요?</h5>
-	      </div>
-	      <div class="modal-body text-center">
-	        <p class="mb-0 text-body">설문을 삭제하시겠습니까?<br>삭제 후 자동으로 새로고침됩니다.</p>
-	      </div>
-	      <div class="modal-footer justify-content-center border-0">
-	        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
-	        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">삭제</button>
-	      </div>
-	    </div>
-	  </div>
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+				<div class="modal-header border-0">
+					<h5 class="modal-title text-dark">정말 삭제할까요?</h5>
+				</div>
+				<div class="modal-body text-center">
+					<p class="mb-0 text-body">
+						설문을 삭제하시겠습니까?<br>삭제 후 자동으로 새로고침됩니다.
+					</p>
+				</div>
+				<div class="modal-footer justify-content-center border-0">
+					<button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+					<button type="button" class="btn btn-danger" id="confirmDeleteBtn">삭제</button>
+				</div>
+			</div>
+		</div>
 	</div>
-	
-	
-	
+
+
+
 	<!-- 삭제 결과 토스트 -->
 	<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1100">
-	  <div id="deleteToast" class="toast fade align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
-	    <div class="d-flex">
-	      <div class="toast-body" id="deleteToastMessage">
-	        삭제되었습니다.
-	      </div>
-	    </div>
-	  </div>
+		<div id="deleteToast" class="toast fade align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="d-flex">
+				<div class="toast-body" id="deleteToastMessage">삭제되었습니다.</div>
+			</div>
+		</div>
 	</div>
-	
+
 </th:block>
 </html>
