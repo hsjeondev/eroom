@@ -311,6 +311,19 @@ public class ReservationController {
 		return meetingRoomService.getMeetingRoomTimes(date,facilityNo);
 	}
 	
+	@GetMapping("/meetingroom/resources")
+    public List<Map<String, Object>> getMeetingRoomResources() {
+        List<Facility> meetingRooms = meetingRoomService.getMeetingRooms(); // DB에서 회의실 리스트 조회
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Facility room : meetingRooms) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", room.getFacilityNo());      // FullCalendar resourceId
+            map.put("title", room.getFacilityName());  // FullCalendar title
+            result.add(map);
+        }
+        return result;
+    }
 
 
 }

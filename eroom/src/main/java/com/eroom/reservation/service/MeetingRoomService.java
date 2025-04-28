@@ -165,6 +165,12 @@ public class MeetingRoomService {
 
         return dtoList;
     }
+    
+    //회의실 이름 가져오기 
+    public List<Facility> getMeetingRooms() {
+        // facility 테이블에서 separator_code = 'F001' 인 것만 가져온다
+        return facilityRepository.findBySeparatorCode("F001");
+    }
 	
 		
 }

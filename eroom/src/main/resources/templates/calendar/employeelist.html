@@ -5,6 +5,11 @@
 
 <head>
 <title>개인 캘린더</title>
+<style>
+.fc-event-main::after {
+  display: none !important;
+}
+</style>
 </head>
 <body>
 
@@ -634,110 +639,115 @@
   	
 	
 	<!-- 일정 등록 -->
-	<script>
+		<script>
 		document.addEventListener("DOMContentLoaded", function () {
-		    const startInput = document.getElementById("calendarStartTime");
-		    const endInput = document.getElementById("calendarEndTime");
-		    const titleInput = document.getElementById("calendarTitle");
-		    const form = document.addEventForm;
-	
+		  const startInput = document.getElementById("calendarStartTime");
+		  const endInput = document.getElementById("calendarEndTime");
+		  const titleInput = document.getElementById("calendarTitle");
+		  const form = document.addEventForm;
+		  const modal = document.getElementById("addEventModal"); // 모달 찾기
 		
-		    //  현재 시간 기준으로 시작/종료 시간 자동 설정
-		    function setDefaultTimeValuesNow() {
-		    	if (!startInput || !endInput) return;
-
-		    	const now = new Date();
-
-		    	// 시간 보정 (한국 시간 = UTC + 9)
-		    	const pad = (n) => n.toString().padStart(2, '0');
-
-		    	const format = (date) => {
-		    	    const yyyy = date.getFullYear();
-		    	    const MM = pad(date.getMonth() + 1);
-		    	    const dd = pad(date.getDate());
-		    	    const HH = pad(date.getHours());
-		    	    const mm = pad(date.getMinutes());
-		    	    return `${yyyy}-${MM}-${dd}T${HH}:${mm}`;
-		    	};
-
-		    	// 시작: 현재 시간
-		    	const startTime = new Date(now);
-
-		    	// 종료: 현재 시간 + 1시간
-		    	const endTime = new Date(now);
-		    	endTime.setHours(endTime.getHours() + 1);
-
-		    	startInput.value = format(startTime);
-		    	endInput.value = format(endTime);
-
-		    	// 종료시간 최소값도 시작시간으로 설정
-		    	endInput.min = startInput.value;
+		  const submitBtn = form.querySelector('button[type="submit"]'); // 등록 버튼
+		
+		  function setDefaultTimeValuesNow() {
+		    if (!startInput || !endInput) return;
+		
+		    const now = new Date();
+		    const pad = (n) => n.toString().padStart(2, '0');
+		    const format = (date) => {
+		      const yyyy = date.getFullYear();
+		      const MM = pad(date.getMonth() + 1);
+		      const dd = pad(date.getDate());
+		      const HH = pad(date.getHours());
+		      const mm = pad(date.getMinutes());
+		      return `${yyyy}-${MM}-${dd}T${HH}:${mm}`;
+		    };
+		
+		    const startTime = new Date(now);
+		    const endTime = new Date(now);
+		    endTime.setHours(endTime.getHours() + 1);
+		
+		    startInput.value = format(startTime);
+		    endInput.value = format(endTime);
+		
+		    endInput.min = startInput.value;
+		  }
+		
+		  function setMinEndTime() {
+		    if (startInput && endInput) {
+		      endInput.min = startInput.value;
+		
+		      if (endInput.value < startInput.value) {
+		        endInput.value = startInput.value;
+		      }
+		    }
+		  }
+		
+		  if (startInput) {
+		    startInput.addEventListener("change", setMinEndTime);
+		  }
+		
+		  form.addEventListener("submit", async function (e) {
+		    e.preventDefault();
+		
+		    submitBtn.disabled = true; // 버튼 비활성화
+		
+		    const startTimeValue = Date.parse(startInput.value);
+		    const endTimeValue = Date.parse(endInput.value);
+		
+		    if (!titleInput.value.trim()) {
+		      alert("제목을 입력해주세요!");
+		      submitBtn.disabled = false;
+		      return;
 		    }
 		
-		    // 시작시간 바뀔 때 종료시간 제한 다시 걸기
-		    function setMinEndTime() {
-		        if (startInput && endInput) {
-		            endInput.min = startInput.value;
-		
-		            if (endInput.value < startInput.value) {
-		                endInput.value = startInput.value;
-		            }
-		        }
+		    if (startTimeValue > endTimeValue) {
+		      endInput.setCustomValidity("종료시간은 시작시간 이후여야 합니다!");
+		      endInput.reportValidity();
+		      submitBtn.disabled = false;
+		      return;
+		    } else {
+		      endInput.setCustomValidity("");
 		    }
 		
-		    // 시작시간 바뀌면 min 재설정
-		    if (startInput) {
-		        startInput.addEventListener("change", setMinEndTime);
+		    const payload = new FormData(form);
+		
+		    try {
+		      const response = await fetch("/employeecalendar/add", {
+		        method: "POST",
+		        headers: {
+		          'header': document.querySelector('meta[name="_csrf_header"]').content,
+		          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+		        },
+		        body: payload
+		      });
+		
+		      const data = await response.json();
+		      alert(data.res_msg);
+		      if (data.res_code == 200) {
+		        location.reload();
+		      } else {
+		        submitBtn.disabled = false;
+		      }
+		    } catch (error) {
+		      console.error("등록 중 오류 발생:", error);
+		      alert("일정 등록에 실패했습니다.");
+		      submitBtn.disabled = false;
 		    }
+		  });
 		
-		    // 등록 폼 submit
-		    form.addEventListener("submit", function (e) {
-		        e.preventDefault();
+		  // 페이지 처음 들어올 때 기본값 세팅
+		  setDefaultTimeValuesNow();
 		
-		        const startTime = Date.parse(startInput.value);
-		        const endTime = Date.parse(endInput.value);
-	
-		
-		        if (!titleInput.value.trim()) {
-		            alert("제목을 입력해주세요!");
-		            return;
-		        }
-		
-		        if (startTime > endTime) {
-		        	
-		            endInput.setCustomValidity("종료시간은 시작시간 이후여야 합니다!");
-		            endInput.reportValidity(); 
-		            return;
-		        } else {
-		            endInput.setCustomValidity("");
-		        }
-		
-		        const payload = new FormData(form);
-		        fetch("/employeecalendar/add", {
-		            method: "POST",
-		            headers: {
-		                'header': document.querySelector('meta[name="_csrf_header"]').content,
-		                'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-		            },
-		            body: payload
-		        })
-		        .then(response => response.json())
-		        .then(data => {
-		            alert(data.res_msg);
-		            if (data.res_code == 200) {
-		                location.reload();
-		            }
-		        })
-		        .catch(error => {
-		            console.error("등록 중 오류 발생:", error);
-		            alert("일정 등록에 실패했습니다.");
-		        });
+		  // 모달 열릴 때마다 현재시간으로 세팅
+		  if (modal) {
+		    modal.addEventListener("show.bs.modal", function () {
+		      setDefaultTimeValuesNow();
 		    });
-		
-		    // 페이지 로드 시, 기본 시간 미리 설정 
-		    setDefaultTimeValuesNow();
+		  }
 		});
-	</script>
+		</script>
+
 	
 		</main>
 	</body>
