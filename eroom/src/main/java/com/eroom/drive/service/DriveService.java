@@ -56,7 +56,7 @@ public class DriveService {
 		        String ext = oriName.substring(oriName.lastIndexOf("."));
 		        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
 
-		        String path = fileDir + "personal/" + newName;
+		        String path = fileDir + "drive/personal/" + newName;
 		        File savedFile = new File(path);
 		        if (!savedFile.getParentFile().exists()) {
 		            savedFile.getParentFile().mkdirs();
@@ -73,7 +73,7 @@ public class DriveService {
 		                .driveNewName(newName)
 		                .driveType(ext)
 		                .driveSize(file.getSize())
-		                .drivePath("personal/" + newName)
+		                .drivePath("drive/personal/" + newName)
 		                .driveDescription(description)
 		                .downloadCount(0L)
 		                .driveDeleteYn("N")
@@ -120,7 +120,7 @@ public class DriveService {
 	            drive.setDriveNewName(newName);
 	            drive.setDriveType(ext);
 	            drive.setDriveSize(file.getSize());
-	            drive.setDrivePath("personal/" + newName);
+	            drive.setDrivePath("drive/personal/" + newName);
 	        }
 	        // 설명만 변경할 수도 있음
 	        drive.setDriveDescription(description);
@@ -144,16 +144,17 @@ public class DriveService {
        return driveRepository.updateBulkDeleteStatus(fileIds);  // 파일 상태 일괄 업데이트
     }
 	// ------------------------- 개인 드라이브 파일 다운로드 --------------------------
+	@Transactional
 	public Drive findByDriveAttachNo(Long id) {
-		Drive drive = driveRepository.findByDriveAttachNo(id);
-		if(drive != null) {
-			drive.setDownloadCount(drive.getDownloadCount() + 1);
-			driveRepository.save(drive);
-		} else {
-			System.out.println("해당 ID로 파일을 찾을 수 없음");
-		}
-		return drive;
+	    Drive drive = driveRepository.findByDriveAttachNo(id);
+	    if (drive != null) {
+	        driveRepository.updateDownloadCount(id); // downloadCount만 올림
+	    } else {
+	        System.out.println("해당 ID로 파일을 찾을 수 없음");
+	    }
+	    return drive;
 	}
+
 	
 	// ------------------------- 결재 파일 업로드 --------------------------
 	public int uploadApprovalAttachFiles(DriveDto driverDto, Long employeeNo) {
