@@ -223,6 +223,9 @@ public class DriveController {
 			return ResponseEntity.badRequest().build();
 		}
 	}
+	// 팀 파일 다운로드
+	
+	
 	// 개인 파일 일괄 다운로드
 	@PostMapping("/download/personal/bulk")
 	public ResponseEntity<Resource> bulkDownload(@RequestParam("fileIds") List<Long> fileIds) {
