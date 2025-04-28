@@ -426,11 +426,18 @@ public class AdminController {
 			}
 			resultMap.put("employee_name", employee.getEmployeeName());
 			resultMap.put("employee_position", employee.getEmployeePosition());
-			resultMap.put("employee_birth", employee.getEmployeeBirth());
 			resultMap.put("employee_hire_date", employee.getEmployeeHireDate() != null? employee.getEmployeeHireDate().toLocalDate().toString() : "");
 			resultMap.put("employee_end_date", employee.getEmployeeEndDate() != null ? employee.getEmployeeEndDate().toLocalDate().toString() : "");
-			resultMap.put("employee_employment_yn", employee.getEmployeeEmploymentYn() != null ? employee.getEmployeeEmploymentYn() : 'Y');
+			resultMap.put("employee_employment_yn", employee.getEmployeeEmploymentYn() != null ? employee.getEmployeeEmploymentYn() : "Y");
 			
+			// 생일 문자열 -> 날짜형태 변환
+			String birth = employee.getEmployeeBirth();
+			if(birth != null && birth.length() == 8) {
+				String formettedBirth = birth.substring(0,4) + "-" + birth.substring(4,6) + "-" + birth.substring(6,8);
+				resultMap.put("employee_birth", formettedBirth);
+			}else {
+				resultMap.put("employee_birth", "");
+			}
 			// 사원의 directory 정보 가져오기
 			Directory directory = employee.getDirectory();
 			if(directory != null) {
