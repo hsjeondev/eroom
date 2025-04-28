@@ -56,7 +56,7 @@ public class DriveService {
 		        String ext = oriName.substring(oriName.lastIndexOf("."));
 		        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
 
-		        String path = fileDir + "personal/" + newName;
+		        String path = fileDir + "drive/personal/" + newName;
 		        File savedFile = new File(path);
 		        if (!savedFile.getParentFile().exists()) {
 		            savedFile.getParentFile().mkdirs();
@@ -73,10 +73,10 @@ public class DriveService {
 		                .driveNewName(newName)
 		                .driveType(ext)
 		                .driveSize(file.getSize())
-		                .drivePath("personal/" + newName)
+		                .drivePath("drive/personal/" + newName)
 		                .driveDescription(description)
 		                .downloadCount(0L)
-		                .driveDeleteYn("N")
+		                .visibleYn("Y")
 		                .build();
 		        
 		        driveRepository.save(drive);
@@ -88,9 +88,66 @@ public class DriveService {
 		}
 		return result;
 	}
+	//
+	public int uploadTeamDriveFiles(DriveDto driverDto, Long employeeNo) {
+		int result = 0;
+		
+		 if (driverDto.getSeparatorCode() == null || driverDto.getSeparatorCode().isEmpty()) {
+	            driverDto.setSeparatorCode(
+	                separatorRepository.findBySeparatorName("개인")
+	                    .map(s -> s.getSeparatorCode())
+	                    .orElse("E001") 
+	            );
+	        }
+		
+		List<String> descriptions = driverDto.getDriveDescriptions(); // 추가된 설명 리스트 가져오기
+		List<MultipartFile> files = driverDto.getDriveFiles();
+
+		for (int i = 0; i < files.size(); i++) {
+		    MultipartFile file = files.get(i);
+		    try {
+		        System.out.println("파일 처리 시작: " + file.getOriginalFilename());
+
+		        String oriName = file.getOriginalFilename();
+		        String ext = oriName.substring(oriName.lastIndexOf("."));
+		        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+
+		        String path = fileDir + "drive/team/" + newName;
+		        File savedFile = new File(path);
+		        if (!savedFile.getParentFile().exists()) {
+		            savedFile.getParentFile().mkdirs();
+		        }
+		        file.transferTo(savedFile);
+
+		        // 파일 설명 추가
+		        String description = (descriptions != null && descriptions.size() > i) ? descriptions.get(i) : null;
+
+		        Drive drive = Drive.builder()
+		                .uploader(Employee.builder().employeeNo(employeeNo).build())
+		                .separatorCode(driverDto.getSeparatorCode())
+		                .driveOriName(oriName)
+		                .driveNewName(newName)
+		                .driveType(ext)
+		                .driveSize(file.getSize())
+		                .drivePath("drive/team/" + newName)
+		                .driveDescription(description)
+		                .downloadCount(0L)
+		                .visibleYn("Y")
+		                .build();
+		        
+		        driveRepository.save(drive);
+		        result++;
+		    } catch (Exception e) {
+		        System.out.println("업로드 실패 파일명: " + file.getOriginalFilename());
+		        e.printStackTrace();
+		    }
+		}
+		return result;
+	}
+	
 	// ------------------------- 개인 드라이브 파일 리스트 조회 --------------------------
 	public List<DriveDto> findPersonalDriveFiles(Long employeeNo) {
-	    List<Drive> drives = driveRepository.findByUploader_EmployeeNoAndDriveDeleteYn(employeeNo, "N");
+	    List<Drive> drives = driveRepository.findByUploader_EmployeeNoAndVisibleYn(employeeNo, "Y");
 	    List<DriveDto> result = new ArrayList<>();
 
 	    for (Drive drive : drives) {
@@ -99,6 +156,18 @@ public class DriveService {
 
 	    return result;
 	}
+	// ------------------------- 팀 드라이브 파일 리스트 조회 -------------------------- 
+	public List<DriveDto> findTeamDriveFiles(String separatorCode) {
+		List<Drive> drives = driveRepository.findBySeparatorCodeAndVisibleYn(separatorCode, "Y");
+		List<DriveDto> result = new ArrayList<>();
+		
+		for (Drive drive : drives) {
+			result.add(DriveDto.toDto(drive));
+		}
+		
+		return result;
+	}
+	
 	// ------------------------- 개인 드라이브 파일 수정 --------------------------
 	public boolean updateDriveFile(Long attachNo, MultipartFile file, String description) {
 	    try {
@@ -111,7 +180,7 @@ public class DriveService {
 	        if (file != null && !file.isEmpty()) {
 	            String ext = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
 	            String newName = UUID.randomUUID().toString().replace("-", "") + ext;
-	            String path = fileDir + "personal/" + newName;
+	            String path = fileDir + "drive/personal/" + newName;
 	            File newFile = new File(path);
 	            if (!newFile.getParentFile().exists()) newFile.getParentFile().mkdirs();
 	            file.transferTo(newFile);
@@ -120,7 +189,7 @@ public class DriveService {
 	            drive.setDriveNewName(newName);
 	            drive.setDriveType(ext);
 	            drive.setDriveSize(file.getSize());
-	            drive.setDrivePath("personal/" + newName);
+	            drive.setDrivePath("drive/personal/" + newName);
 	        }
 	        // 설명만 변경할 수도 있음
 	        drive.setDriveDescription(description);
@@ -133,6 +202,52 @@ public class DriveService {
 	        return false;
 	    }
 	}
+	// ------------------------- 팀 드라이브 파일 수정 --------------------------
+	public boolean updateTeamDriveFile(Long attachNo, MultipartFile file, String description, String separatorCode ,String driveEditor) {
+	    try {
+	        // 해당 파일을 DB에서 찾아옵니다.
+	        Optional<Drive> optionalDrive = driveRepository.findById(attachNo);
+	        if (optionalDrive.isEmpty()) return false; // 파일이 없다면 false 반환
+
+	        Drive drive = optionalDrive.get();
+
+	        // 파일의 소속 팀 코드 확인
+	        if (!drive.getSeparatorCode().equals(separatorCode)) {
+	            return false; // 현재 드라이브가 팀 소속과 맞지 않으면 수정할 수 없음
+	        }
+
+	        // 파일이 존재하면 교체
+	        if (file != null && !file.isEmpty()) {
+	            String ext = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+	            String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+	            String path = fileDir + "drive/team/" + newName;
+	            File newFile = new File(path);
+	            if (!newFile.getParentFile().exists()) newFile.getParentFile().mkdirs();
+	            file.transferTo(newFile);
+
+	            // 파일 수정 후 기존 정보 업데이트
+	            drive.setDriveOriName(file.getOriginalFilename());
+	            drive.setDriveNewName(newName);
+	            drive.setDriveType(ext);
+	            drive.setDriveSize(file.getSize());
+	            drive.setDrivePath("drive/team/" + newName);
+	        }
+
+	        // 설명만 수정하는 경우
+	        drive.setDriveDescription(description); // 설명 업데이트
+	        drive.setDriveModDate(LocalDateTime.now()); // 수정 시간 업데이트
+	        drive.setDriveEditor(driveEditor); // 수정자 업데이트
+	        // 드라이브 정보 저장
+	        driveRepository.save(drive);
+	        return true;
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false; 
+	    }
+	}
+
+
 	// ------------------------- 개인 드라이브 파일 삭제 --------------------------
 	@Transactional
 	public int deleteDriveFile(Long driveAttachNo) {
@@ -144,16 +259,17 @@ public class DriveService {
        return driveRepository.updateBulkDeleteStatus(fileIds);  // 파일 상태 일괄 업데이트
     }
 	// ------------------------- 개인 드라이브 파일 다운로드 --------------------------
+	@Transactional
 	public Drive findByDriveAttachNo(Long id) {
-		Drive drive = driveRepository.findByDriveAttachNo(id);
-		if(drive != null) {
-			drive.setDownloadCount(drive.getDownloadCount() + 1);
-			driveRepository.save(drive);
-		} else {
-			System.out.println("해당 ID로 파일을 찾을 수 없음");
-		}
-		return drive;
+	    Drive drive = driveRepository.findByDriveAttachNo(id);
+	    if (drive != null) {
+	        driveRepository.updateDownloadCount(id); // downloadCount만 올림
+	    } else {
+	        System.out.println("해당 ID로 파일을 찾을 수 없음");
+	    }
+	    return drive;
 	}
+
 	
 	// ------------------------- 결재 파일 업로드 --------------------------
 	public int uploadApprovalAttachFiles(DriveDto driverDto, Long employeeNo) {
@@ -178,7 +294,7 @@ public class DriveService {
 		        String ext = oriName.substring(oriName.lastIndexOf("."));
 		        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
 
-		        String path = fileDir + "personal/" + newName;
+		        String path = fileDir + "approval/" + newName;
 		        File savedFile = new File(path);
 		        if (!savedFile.getParentFile().exists()) {
 		            savedFile.getParentFile().mkdirs();
@@ -195,7 +311,7 @@ public class DriveService {
 		                .driveSize(file.getSize())
 		                .drivePath(path)
 		                .downloadCount(0L)
-		                .driveDeleteYn("N")
+		                .visibleYn("Y")
 		                .param1(driverDto.getParam1())
 		                .build();
 		        
@@ -211,7 +327,7 @@ public class DriveService {
 	// ------------------------- 결재 파일 리스트 조회 --------------------------
 	// 결재 번호(param1)로 조회
 	public List<DriveDto> findApprovalDriveFiles(Long param1) {
-	    List<Drive> drives = driveRepository.findByParam1AndDriveDeleteYnAndSeparatorCode(param1, "N", "Fl007");
+	    List<Drive> drives = driveRepository.findByParam1AndVisibleYnAndSeparatorCode(param1, "Y", "Fl007");
 	    List<DriveDto> result = new ArrayList<>();
 
 	    for (Drive drive : drives) {
@@ -225,7 +341,7 @@ public class DriveService {
 		int result = 0;
 		try {
 			for(Long l : approvalAttachFileIds) {
-				Drive oldDrive = driveRepository.findByDriveAttachNoAndDriveDeleteYnAndSeparatorCode(l, "N", "FL007");
+				Drive oldDrive = driveRepository.findByDriveAttachNoAndVisibleYnAndSeparatorCode(l, "Y", "FL007");
 				// 영속성 없는 객체 생성
 	            Drive newDrive = new Drive();
 	            
@@ -238,7 +354,7 @@ public class DriveService {
 	            newDrive.setDrivePath(oldDrive.getDrivePath());
 	            newDrive.setDriveDescription(oldDrive.getDriveDescription());
 	            newDrive.setDownloadCount(0L);
-	            newDrive.setDriveDeleteYn("N");
+	            newDrive.setVisibleYn("Y");
 	            newDrive.setParam1(approvalNo);
 
 	            driveRepository.save(newDrive);
@@ -250,6 +366,7 @@ public class DriveService {
 		
 		return result;
 	}
+	
 	// ------------------------- 결재 파일 삭제 --------------------------
 	// bulkDeleteDriveFiles() 사용
 

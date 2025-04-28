@@ -17,7 +17,7 @@ public class CustomHandshakeInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                    WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
         URI uri = request.getURI();
-        HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
+         HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
         if (uri.getQuery() != null) {
             String[] params = uri.getQuery().split("&");
             for (String param : params) {

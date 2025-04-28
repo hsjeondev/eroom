@@ -421,13 +421,7 @@
 				      <li class="collapsed-nav-item-title d-none">예약</li>
 				
 				      <!-- 숙직실 예약 -->
-				      <li class="nav-item">
-				        <a class="nav-link"
-				           th:href="@{/reservation/sleep}"
-					        th:classappend="${(requestURI != null and requestURI.startsWith('/reservation/sleep')) ? 'active' : ''}">
-				          <div class="d-flex align-items-center"><span class="nav-link-text">숙직실 예약</span></div>
-				        </a>
-				      </li>
+
 				
 				      <!-- 차량 예약 -->
 				      <li class="nav-item">
@@ -524,7 +518,7 @@
 				        <a class="nav-link"
 				           th:href="@{/drive/company}"
 					        th:classappend="${(requestURI != null and requestURI.startsWith('/drive/company')) ? 'active' : ''}">
-				          <div class="d-flex align-items-center"><span class="nav-link-text">회사 저장소</span></div>
+				          <div class="d-flex align-items-center"><span class="nav-link-text">회사 드라이브</span></div>
 				        </a>
 				      </li>
 				
@@ -533,7 +527,7 @@
 				        <a class="nav-link"
 				           th:href="@{/drive/department}"
 					        th:classappend="${(requestURI != null and requestURI.startsWith('/drive/department')) ? 'active' : ''}">
-				          <div class="d-flex align-items-center"><span class="nav-link-text">부서 저장소</span></div>
+				          <div class="d-flex align-items-center"><span class="nav-link-text">부서 드라이브</span></div>
 				        </a>
 				      </li>
 				
@@ -542,7 +536,7 @@
 				        <a class="nav-link"
 				           th:href="@{/drive/team}"
 					        th:classappend="${(requestURI != null and requestURI.startsWith('/drive/team')) ? 'active' : ''}">
-				          <div class="d-flex align-items-center"><span class="nav-link-text">팀 저장소</span></div>
+				          <div class="d-flex align-items-center"><span class="nav-link-text">팀 드라이브</span></div>
 				        </a>
 				      </li>
 				
@@ -551,7 +545,7 @@
 				        <a class="nav-link"
 				           th:href="@{/drive/personal}"
 					        th:classappend="${(requestURI != null and requestURI.startsWith('/drive/personal')) ? 'active' : ''}">
-				          <div class="d-flex align-items-center"><span class="nav-link-text">개인 저장소</span></div>
+				          <div class="d-flex align-items-center"><span class="nav-link-text">개인 드라이브</span></div>
 				        </a>
 				      </li>
 				
