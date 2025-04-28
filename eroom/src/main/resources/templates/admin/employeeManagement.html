@@ -450,15 +450,31 @@ document.addEventListener('DOMContentLoaded',function(){
 	const deptSelect = document.getElementById('departmentSelect');
 	const teamSelect = document.getElementById('teamSelect');
 	
+	const saveEditEmployeeBtn = document.getElementById('saveEditEmployeeBtn');
+	
 	const editEmployeePositionSelect = document.getElementById('editEmployeePosition');
 	const editCustomPositionInput = document.getElementById('editCustomPositionInput');
 	
+	// 모달
+	const createModalElement = document.getElementById('createEmployeeModal');
+	const createModal = bootstrap.Modal.getInstance(createModalElement) || new bootstrap.Modal(createModalElement);
+	
+	const editModalElement = document.getElementById('editEmployeeModal');
+	const editModal = bootstrap.Modal.getInstance(editModalElement) || new bootstrap.Modal(editModalElement);
+	
+	const unsavedModalElement = document.getElementById('unsavedAlertModal');
+	const unsavedModal = bootstrap.Modal.getInstance(unsavedModalElement) || new bootstrap.Modal(unsavedModalElement);
+
+	const confirmSaveModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+	const alertModal = new bootstrap.Modal(document.getElementById('alertMessageModal'));	
 	
 	let isNameChecked = false; // 이름 중복 확인 완료 여부
 	let isFormEdited = false; // 회원 생성 폼 수정 여부
 	let isEditFormEdited = false; // 회원 수정 폼 수정 여부
 	
 	let currentMode = ''; // 'create' or 'edit'
+	
+	let editingEmployeeNo = null; // 수정할 대상 employeeNo를 저장할 변수
 	
 	// 공통 알림 모달
 	function showAlert(message, callback){
@@ -484,48 +500,44 @@ document.addEventListener('DOMContentLoaded',function(){
 		const formattedToday = `${year}-${month}-${day}`;
 		hireDateInput.value = formattedToday;
 	}
-	
-	// 모달
-	const createModalElement = document.getElementById('createEmployeeModal');
-	const createModal = bootstrap.Modal.getInstance(createModalElement) || new bootstrap.Modal(createModalElement);
-	
-	const editModalElement = document.getElementById('editEmployeeModal');
-	const editModal = bootstrap.Modal.getInstance(editModalElement) || new bootstrap.Modal(editModalElement);
-	
-	const unsavedModalElement = document.getElementById('unsavedAlertModal');
-	const unsavedModal = bootstrap.Modal.getInstance(unsavedModalElement) || new bootstrap.Modal(unsavedModalElement);
 
-	const confirmSaveModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
-	const alertModal = new bootstrap.Modal(document.getElementById('alertMessageModal'));
-	
+	// 부서 선택시 팀 목록 가져오기 (회원 생성 모달용)
+	deptSelect.addEventListener('change', function () {
+		loadTeamsByDepartment(this.value, teamSelect);
+	});	
 
 	
-	// 부서 선택시 -> 해당 부서의 팀 목록 가져오기
-	deptSelect.addEventListener('change',function(){
-		const deptId = this.value;
-		
-		if(!deptId){
-			teamSelect.innerHTML = '<option value="">(선택안함)</option>';
+	// 수정모달 부서선택 시 팀 변경
+	const editDepartmentSelect = document.getElementById('editDepartmentSelect');
+	const editTeamSelect = document.getElementById('editTeamSelect');
+
+	editDepartmentSelect.addEventListener('change', function () {
+		loadTeamsByDepartment(this.value, editTeamSelect);
+	});
+
+	function loadTeamsByDepartment(deptId, teamSelectElement) {
+		if (!deptId) {
+			teamSelectElement.innerHTML = '<option value="">(선택안함)</option>';
 			return;
 		}
-		
+
 		fetch(`/admin/findTeamsByDeptId?deptId=${deptId}`)
 			.then(response => response.json())
 			.then(teams => {
-				teamSelect.innerHTML = '<option value="">(선택안함)</option>';
+				teamSelectElement.innerHTML = '<option value="">(선택안함)</option>';
 				teams.forEach(team => {
 					const option = document.createElement('option');
 					option.value = team.structure_no;
 					option.textContent = team.code_name;
-					teamSelect.appendChild(option);
+					teamSelectElement.appendChild(option);
 				});
 			})
 			.catch(() => {
 				showAlert('팀 목록을 가져오는 중 오류가 발생했습니다.');
 			});
-	});
+	}
 	
-	// 직급 선택이 '직접 입력'인 경우 텍스트 인풋 표시
+	// 직급 선택이 '직접 입력'인 경우 텍스트 인풋 표시(회원 생성용)
 	positionSelect.addEventListener('change',function(){
 		if(this.value == '직접 입력'){
 			customPositionInput.classList.remove('d-none');
@@ -535,6 +547,20 @@ document.addEventListener('DOMContentLoaded',function(){
 			customPositionInput.required = false;
 		}
 	});
+	
+	// 직급 선택이 '직접 입력'인 경우 텍스트 인풋 표시 (회원 수정용)
+	editEmployeePositionSelect.addEventListener('change', function () {
+		if (this.value === '직접 입력') {
+			editCustomPositionInput.classList.remove('d-none');
+			editCustomPositionInput.required = true;
+			editCustomPositionInput.value = '';
+			editCustomPositionInput.focus();
+		} else {
+			editCustomPositionInput.classList.add('d-none');
+			editCustomPositionInput.required = false;
+			editCustomPositionInput.value = '';
+		}
+	});	
 	
 	// 이름 중복 확인 버튼 클릭
 	checkNameBtn.addEventListener('click',function(){
@@ -564,10 +590,7 @@ document.addEventListener('DOMContentLoaded',function(){
 		
 	});
 	
-	// 입력 감지 
-	createForm.addEventListener('input',function(){
-		isFormEdited = true;
-	});
+
 	
 	// 회원 생성 버튼 클릭
 	createBtn.addEventListener('click',function(){
@@ -617,6 +640,73 @@ document.addEventListener('DOMContentLoaded',function(){
 		confirmSaveModal.show(); // 등록 확인 모달 띄우기
 	});
 	
+	// 생성폼 입력 감지 
+	createForm.addEventListener('input',function(){
+		isFormEdited = true;
+	});
+	
+	// 수정폼 입력 감지
+	document.getElementById('editEmployeeForm').addEventListener('input', function () {
+		isEditFormEdited = true;
+	});	
+	
+	// saveEditEmployeeBtn 클릭 시 (회원 수정 요청 전 확인 모달 띄우기)
+	saveEditEmployeeBtn.addEventListener('click', function () {
+		// 수정폼 데이터가 다 들어온 경우에만 저장 모드로
+		const editEmployeeName = document.getElementById('editEmployeeName').value;
+		
+		if(!editEmployeeName.trim()){
+			showAlert("수정할 회원 정보를 먼저 불러오세요.");
+			return;
+		}
+		currentMode = 'edit';
+		isFormEdited = true;
+		confirmSaveModal.show();
+	});
+	
+	// confirmSaveModal의 확인 버튼
+	document.getElementById('confirmSaveBtn').addEventListener('click', function (e) {
+		e.preventDefault();
+		confirmSaveModal.hide();
+
+		if (currentMode == 'create') {
+			sendCreateEmployee();
+		} else if (currentMode == 'edit') {
+			sendUpdateEmployee();
+		}
+	});
+	
+	// 모달 닫기 방지 (회원 생성 모달)
+	createModalElement.addEventListener('hide.bs.modal', function (e) {
+		if (isFormEdited) {
+			e.preventDefault();
+			unsavedModal.show();
+		}
+	});
+	
+	// 모달 닫기 방지 (회원 수정 모달)
+	editModalElement.addEventListener('hide.bs.modal', function (e) {
+		if (isEditFormEdited) {
+			e.preventDefault();
+			unsavedModal.show();
+		}
+	});
+	
+	// unsavedModal에서 계속 닫기 버튼
+	document.getElementById('confirmCloseBtn').addEventListener('click', function () {
+		isFormEdited = false;
+		isEditFormEdited = false;
+		unsavedModal.hide();
+
+		unsavedModalElement.addEventListener('hidden.bs.modal', function handler() {
+			if (currentMode === 'create') {
+				createModal.hide();
+			} else {
+				editModal.hide();
+			}
+			unsavedModalElement.removeEventListener('hidden.bs.modal', handler);
+		});
+	});
 	
 	// =================== 회원 생성 함수 =========================
 	function sendCreateEmployee(){
@@ -627,7 +717,7 @@ document.addEventListener('DOMContentLoaded',function(){
 			payload[key] = value;
 		}
 		if(payload.employee_position === '직접 입력'){  
-			payload.employee_position = payload.custom_position; // 커스텀 포지션
+			payload.employee_position = payload.custom_position; 
 		}
 		delete payload.custom_position; // 커스텀 포지션 삭제
 		
@@ -657,64 +747,16 @@ document.addEventListener('DOMContentLoaded',function(){
 		});
 	}
 	
-	
-	// 모달 닫기 시 수정사항 있을 경우 경고 모달
-	// const modalElement = document.getElementById('createEmployeeModal'); // 회원 생성 모달
-	createModalElement.addEventListener('hide.bs.modal',function(e){
-		if(isFormEdited){
-			e.preventDefault(); // 모달 닫기 방지
-			unsavedModal.show(); // 수정사항 알림 모달 띄우기
-		}
-	});
-	
-	// unsavedAlertModal에서 계속 닫기 클릭 시 모달 닫기
-	document.getElementById('confirmCloseBtn').addEventListener('click',function(){
-		isFormEdited = false; // 수정사항 감지 플래그 끄기
-		unsavedModal.hide(); // 수정 경고 모달 닫기
-		
-		unsavedModalElement.addEventListener('hidden.bs.modal',function handler(){
-			createForm.reset(); // 회원 생성 폼 초기화
-			nameCheckMsg.textContent = ''; // 이름 중복 메세지 지우기
-			nameCheckMsg.className = 'form-text d-none'; // 메세지 숨기기
-			
-			createModal.hide(); // 회원 생성 모달 닫기
-			unsavedModalElement.removeEventListener('hidden.bs.modal',handler); // 이벤트 중복 방지
-		});
-	});
-	
 	// ============ 회원 수정 ==============
-		
-	
-
-	
-	editEmployeePositionSelect.addEventListener('change',function(){
-		if(this.value === '직접 입력'){
-			// 직접 입력 선택하면 직접 입력 인풋 보이게하기
-			editCustomPositionInput.classList.remove('d-none');
-			editCustomPositionInput.required = true;
-			editCustomPositionInput.value = '';
-			editCustomPositionInput.focus();
-		}else{
-			// 다른 선택이면 직접 입력 인풋 숨기기
-			editCustomPositionInput.classList.add('d-none');
-			editCustomPositionInput.required = false;
-			editCustomPositionInput.value = '';
-		}
-	});
-	
-	// 수정폼 수정 감지
-	document.getElementById('editEmployeeForm').addEventListener('input',function(){
-		isEditFormEdited = true;
-	});
 	
 	// 회원 수정 버튼 클릭시 fetch로 회원 정보 가져오기
 	document.querySelectorAll('.editEmployeeBtn').forEach(function(btn){
 		btn.addEventListener('click',function(e){
 			e.preventDefault(); 
 			
-			const employeeNo = this.getAttribute('data-employee-no');
+			editingEmployeeNo = this.getAttribute('data-employee-no');
 			// 서버에서 회원 상세 정보 가져오기
-			fetch(`/admin/getEmployeeDetail?employeeNo=${employeeNo}`)
+			fetch(`/admin/getEmployeeDetail?employeeNo=${editingEmployeeNo}`)
 				.then(response => response.json())
 				.then(data => {
 					if(data.res_code === 200){
@@ -796,12 +838,21 @@ document.addEventListener('DOMContentLoaded',function(){
 		});
 	});
 	
-	saveEditEmployeeBtn.addEventListener('click',function(){
-		currentMode = 'edit'; // 회원 수정 모드 설정
-		isFormEdited = true;
-		confirmSaveModal.show();
+	editModalElement.addEventListener('hide.bs.modal',function(e){
+		if(isEditFormEdited){
+			e.preventDefault();
+			unsavedModal.show();
+			
+			unsavedModalElement.addEventListener('hidden.bs.modal',function handler(){
+				editModal.hide();
+				isEditFormEdited = false;
+				unsavedModalElement.removeEventListener('hidden.bs.modal',handler);
+			});
+		}
 	});
 	
+	const hireDate = document.getElementById('editEmployeeHireDate').value;
+	const endDate = document.getElementById('editEmployeeEndDate').value;
 		// ================= 회원 수정 함수 =======================
 		function sendUpdateEmployee(){
 			
@@ -814,14 +865,15 @@ document.addEventListener('DOMContentLoaded',function(){
 			}
 			
 			const payload = {
+					employee_no : editingEmployeeNo,
 					employee_name : document.getElementById('editEmployeeName').value,
 					employee_position : finalPosition,
 					department_no : document.getElementById('editDepartmentSelect').value,
 					team_no : document.getElementById('editTeamSelect').value,
 					directory_phone : document.getElementById('editDirectoryPhone').value,
 					employee_birth : document.getElementById('editEmployeeBirth').value,
-					employee_hire_date : document.getElementById('editEmployeeHireDate').value,
-					employee_end_date : document.getElementById('editEmployeeEndDate').value,
+					employee_hire_date: hireDate ? `${hireDate}T00:00:00` : null,
+					employee_end_date: endDate ? `${endDate}T00:00:00` : null,
 					employee_employment_yn : document.getElementById('editEmployeeEmploymentYn').value
 			};
 			
@@ -851,18 +903,7 @@ document.addEventListener('DOMContentLoaded',function(){
 			});
 
 		}
-		
-		// ================== confirmSaveModal 의 save버튼 클릭 시 ===================================
-			document.getElementById('confirmSaveBtn').addEventListener('click',function(){
-				e.preventDefault();
-				confirmSaveModal.hide();
-				
-				if(currentMode == 'create'){
-					sendCreateEmployee(); // 회원 생성 fetch 호출
-				}else if(currentMode == 'edit'){
-					sendUpdateEmployee();
-				}
-			});
+
 	
 });
 </script>
