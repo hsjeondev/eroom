@@ -184,7 +184,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		        <div class="card sortable-item hover-actions-trigger">
 		          <div class="card-body py-3 px-3">
 		            <div class="kanban-status mb-1 position-relative lh-1">
-		              <svg class="svg-inline--fa fa-circle me-2 d-inline-block text-warning"
+		              <svg class="svg-inline--fa fa-circle me-2 d-inline-block text-danger "
 		                   style="min-width: 1rem;transform-origin: 0.5em 0.6875em;"
 		                   data-fa-transform="shrink-1 down-3" aria-hidden="true" focusable="false"
 		                   data-prefix="fas" data-icon="circle" role="img"
@@ -198,28 +198,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		                  </g>
 		                </g>
 		              </svg>
-		              <span class="badge badge-phoenix fs-10 badge-phoenix-warning">
-		                <span>Issue</span>
-		                <svg class="svg-inline--fa fa-triangle-exclamation ms-1 d-inline-block"
-		                     data-fa-transform="up-2"
-		                     style="height: 7.8px;width: 7.8px;transform-origin: 0.5em 0.375em;"
-		                     aria-hidden="true" focusable="false" data-prefix="fas"
-		                     data-icon="triangle-exclamation" role="img"
-		                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
-		                     data-fa-i2svg="">
-		                  <g transform="translate(256 256)">
-		                    <g transform="translate(0, -64)  scale(1, 1)  rotate(0 0 0)">
-		                      <path fill="currentColor"
-		                            d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3
-		                               12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3
-		                               0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7
-		                               39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24
-		                               24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32
-		                               224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
-		                            transform="translate(-256 -256)"></path>
-		                    </g>
-		                  </g>
-		                </svg>
+		              <span class="badge badge-phoenix fs-10 badge-phoenix-danger">
+		                <span>긴급</span>
 		              </span>
 		              <button class="btn btn-sm btn-phoenix-default kanban-item-dropdown-btn hover-actions"
 		                      type="button" data-boundary="viewport" data-bs-toggle="dropdown"
@@ -297,7 +277,9 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		               data-bs-target="#KanbanItemDetailsModal">
 		              Create a fresh visual identity for Phoenix with a new logo design
 		            </p>
-		            <div class="d-flex mt-2 align-items-center">
+		            <br>
+		            <div class="d-flex mt-2 align-items-center justify-content-between">
+		            <p class="mb-0 text-body-tertiary text-opacity-85 fs-9 lh-1">담당자 : </p>
 		              <p class="mb-0 text-body-tertiary text-opacity-85 fs-9 lh-1">
 		                <svg class="svg-inline--fa fa-square-check fs-9 me-2 d-inline-block"
 		                     style="min-width: 1rem;" aria-hidden="true" focusable="false"
@@ -311,7 +293,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		                           0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4 9.4 24.6 9.4
 		                           33.9 0s9.4-24.6 0-33.9z"></path>
 		                </svg>
-		                5/34
+		                0/0
 		              </p>
 		            </div>
 		          </div>
@@ -321,7 +303,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		
 		    <!-- 새 아이템 추가 -->
 		    <div class="py-3 px-4 kanban-add-task">
-		      <button class="btn bg-sm bg-body-tertiary me-2 px-0" data-bs-toggle="modal"
+		      <button class="btn bg-sm bg-body-tertiary me-2 px-0 w-100 h-100" data-bs-toggle="modal"
 		              data-bs-target="#kanbanAddTask">
 		        <svg class="svg-inline--fa fa-plus text-white dark__text-gray-400"
 		             data-fa-transform="grow-4 down-1" aria-hidden="true" focusable="false"
@@ -342,7 +324,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		          </g>
 		        </svg>
 		      </button>
-		      <input class="form-control search-input rounded-3 px-3" placeholder="Add new task">
+		      
 		    </div>
 		  </div>
   
