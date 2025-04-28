@@ -149,5 +149,27 @@ public class SurveyController {
 		result.put("voterCount", count);
 		return result;
 	}
+	
+	@PostMapping("/delete")
+	@ResponseBody
+	public Map<String, Object> deleteSurvey(@RequestParam("id") Long surveyNo) {
+	    Map<String, Object> response = new HashMap<>();
+
+	    try {
+	        int result = surveyService.deleteSurvey(surveyNo);
+	        if (result > 0) {
+	            response.put("success", true);
+	            response.put("message", "삭제되었습니다.");
+	        } else {
+	            response.put("success", false);
+	            response.put("message", "삭제 실패했습니다.");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        response.put("success", false);
+	        response.put("message", "오류가 발생했습니다.");
+	    }
+	    return response;
+	}
 
 }
