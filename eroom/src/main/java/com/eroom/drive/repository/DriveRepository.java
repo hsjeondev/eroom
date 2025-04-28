@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eroom.drive.entity.Drive;
 
@@ -25,6 +26,12 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
 	@Modifying
     @Query("UPDATE Drive df SET df.driveDeleteYn = 'Y' WHERE df.driveAttachNo IN :attachNos")
     int updateBulkDeleteStatus(@Param("attachNos") List<Long> attachNos);
+	
+	// 파일 다운로드 카운트 증가
+	@Modifying
+	@Transactional
+	@Query("UPDATE Drive d SET d.downloadCount = d.downloadCount + 1 WHERE d.driveAttachNo = :id")
+	void updateDownloadCount(@Param("id") Long id);
 	
 	
 	
