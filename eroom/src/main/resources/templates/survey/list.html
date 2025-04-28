@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
 <th:block layout:fragment="content">
-<style>
+	<style>
 /* 삭제 버튼 css */
 .item-wrapper {
 	position: relative;
@@ -121,27 +121,31 @@
 					<th:block th:each="survey : ${surveyList}">
 						<div class="col-12 col-xl-4">
 							<div class="card h-100">
-								<div class="card-body">
+								<div class="card-body position-relative">
 									<div class="border-bottom border-translucent">
 										<div class="d-flex align-items-center justify-content-between mb-1">
 											<!-- 제목 -->
 											<div class="ps-2">
 												<button class="btn btn-link me-1 mb-1 fs-6 p-0" th:attr="data-survey-id=${survey.surveyNo}, data-bs-target='#survey-detail-' + ${survey.surveyNo}" data-bs-toggle="modal" th:text="${survey.surveyTitle}" style="max-width: 100%; height: 2rem; overflow: hidden">설문 제목</button>
 											</div>
-											<!-- 상태 표시 -->
+											<!-- 삭제 버튼 -->
 											<div>
-												<div th:if="${survey.deadline >= T(java.time.LocalDateTime).now()}" class="d-flex align-items-center">
-													<span class="fa-solid fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1"></span> <span class="fw-bold fs-9 text-body lh-2">진행중</span>
-												</div>
-												<div th:if="${survey.deadline < T(java.time.LocalDateTime).now()}" class="d-flex align-items-center">
-													<span class="fa-solid fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1"></span> <span class="fw-bold fs-9 text-body lh-2">마감</span>
-												</div>
+												<button type="button" class="btn-close position-absolute top-0 end-0 mt-3 me-3" th:if="${survey.voterCount == 0 or survey.deadline < T(java.time.LocalDateTime).now()}" th:onclick="'deleteSurvey(' + ${survey.surveyNo} + ')'"></button>
 											</div>
 										</div>
-
-										<p class="fs-9 fw-semibold text-body ms-1 text mb-4 ps-2" th:text="'작성자 : ' + ${survey.writer}">작성자</p>
+										<div class="d-flex align-items-center justify-content-between mb-3 ps-2 pe-2">
+											<p class="fs-9 fw-semibold text-body mb-0">
+												작성자 : <span th:text="${survey.writer}">작성자명</span>
+											</p>
+											<!-- 상태 표시 -->
+											<div th:if="${survey.deadline >= T(java.time.LocalDateTime).now()}" class="d-flex align-items-center">
+												<span class="fa-solid fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1"></span> <span class="fw-bold fs-9 text-body lh-2">진행중</span>
+											</div>
+											<div th:if="${survey.deadline < T(java.time.LocalDateTime).now()}" class="d-flex align-items-center">
+												<span class="fa-solid fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1"></span> <span class="fw-bold fs-9 text-body lh-2">마감</span>
+											</div>
+										</div>
 									</div>
-
 									<div class="row g-1 g-sm-3 mt-2 lh-1 justify-content-between align-items-center">
 										<div class="col-auto">
 											<div class="d-flex align-items-center">
@@ -188,7 +192,6 @@
 											</div>
 										</div>
 									</div>
-
 								</div>
 							</div>
 						</div>
@@ -777,6 +780,88 @@
 	  fetchSurveyDetail(surveyId, items => renderVoteView(surveyId, items));
 	});
 
+	
+	
+	
+	
+	// 설문 삭제
+	
+	// 설문 삭제용 변수
+	let pendingDeleteSurveyId = null;
+
+	// 삭제할 설문 ID 설정 및 삭제 확인 모달 열기
+	function deleteSurvey(surveyId) {
+	    pendingDeleteSurveyId = surveyId;
+	    const confirmDeleteModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteModal'));
+	    confirmDeleteModal.show();
+	}
+
+	// 페이지 로딩 완료 후 삭제 확인 버튼에 이벤트 연결
+	document.addEventListener('DOMContentLoaded', function () {
+	    const confirmBtn = document.getElementById('confirmDeleteBtn');
+
+	    confirmBtn.addEventListener('click', function () {
+	        if (pendingDeleteSurveyId === null) return; // 삭제할 설문 ID가 없는 경우 중단
+
+	        // 삭제 확인 모달 닫기
+	        const confirmDeleteModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteModal'));
+	        confirmDeleteModal.hide();
+
+	        // 삭제 요청
+	        fetch('/survey/delete?id=' + pendingDeleteSurveyId, {
+	            method: 'POST',
+	            headers: {
+	                'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+	            }
+	        })
+	        .then(res => res.json())
+	        .then(result => {
+	            const toastEl = document.getElementById('deleteToast');
+	            const toastMessage = document.getElementById('deleteToastMessage');
+	            const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 1000 }); // 1초 후 자동 닫힘
+
+	            if (result.success) {
+	                // 삭제 성공 시 토스트
+	                toastEl.classList.remove('bg-danger');
+	                toastEl.classList.add('bg-primary');
+	                toastMessage.textContent = result.message || '삭제되었습니다.';
+
+	                toast.show();
+
+	                // 토스트 보여준 뒤 1초 후 새로고침
+	                setTimeout(() => {
+	                    location.reload();
+	                }, 1000);
+	                
+	            } else {
+	                // 삭제 실패 시 토스트
+	                toastEl.classList.remove('bg-primary');
+	                toastEl.classList.add('bg-danger');
+	                toastMessage.textContent = result.message || '삭제 실패했습니다.';
+
+	                toast.show();
+	            }
+	        })
+	        .catch(error => {
+	            console.error('삭제 요청 중 오류 발생:', error);
+
+	            const toastEl = document.getElementById('deleteToast');
+	            const toastMessage = document.getElementById('deleteToastMessage');
+	            const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 2000 }); // 2초 후 자동 닫힘
+
+	            // 오류 발생 시 토스트
+	            toastEl.classList.remove('bg-primary');
+	            toastEl.classList.add('bg-danger');
+	            toastMessage.textContent = '삭제 중 오류가 발생했습니다.';
+
+	            toast.show();
+	        });
+	    });
+	});
+
+	
+	
+	
 	</script>
 
 
@@ -800,9 +885,9 @@
 			</div>
 		</div>
 	</div>
-	
-	
-	
+
+
+
 	<!-- 유효성 검사 확인창 -->
 	<div class="modal fade" id="validationModal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-sm">
@@ -819,9 +904,9 @@
 			</div>
 		</div>
 	</div>
-	
-	
-	
+
+
+
 	<!-- 투표 권한 확인창 -->
 	<div class="modal fade" id="voteAuthorityModal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-sm">
@@ -838,8 +923,39 @@
 			</div>
 		</div>
 	</div>
-
-
-
+	
+	
+	
+	<!-- 설문 삭제 확인창 -->
+	<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered modal-sm">
+	    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+	      <div class="modal-header border-0">
+	        <h5 class="modal-title text-dark">정말 삭제할까요?</h5>
+	      </div>
+	      <div class="modal-body text-center">
+	        <p class="mb-0 text-body">설문을 삭제하시겠습니까?<br>삭제 후 자동으로 새로고침됩니다.</p>
+	      </div>
+	      <div class="modal-footer justify-content-center border-0">
+	        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+	        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">삭제</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	
+	
+	<!-- 삭제 결과 토스트 -->
+	<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1100">
+	  <div id="deleteToast" class="toast fade align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+	    <div class="d-flex">
+	      <div class="toast-body" id="deleteToastMessage">
+	        삭제되었습니다.
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
 </th:block>
 </html>
