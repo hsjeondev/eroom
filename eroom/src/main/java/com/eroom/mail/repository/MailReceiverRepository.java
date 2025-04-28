@@ -52,4 +52,6 @@ public interface MailReceiverRepository extends JpaRepository<MailReceiver, Long
     @Transactional
     @Query("DELETE FROM MailReceiver mr WHERE mr.mailReceiverNo = :mailReceiverNo AND mr.receiver.employeeNo = :employeeNo")
     void deleteByIdAndEmployeeNo(@Param("mailReceiverNo") Long mailReceiverNo, @Param("employeeNo") Long employeeNo);
+	
+	
 }

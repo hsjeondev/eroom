@@ -277,6 +277,31 @@
               </div>
             </div>
             <script>
+            window.onload = function () {
+                // 페이지 로드 시 임시 저장된 메일이 있는지 확인
+                const draftData = sessionStorage.getItem("mail_draft");
+                if (draftData) {
+                    const draft = JSON.parse(draftData);
+
+                    // 임시 저장된 메일의 제목을 입력 필드에 설정
+                    document.getElementById("mail_title").value = draft.title;
+
+                    // TinyMCE 내용 설정
+                    if (tinymce.get("mail_content")) {
+                        tinymce.get("mail_content").setContent(draft.content);
+                    } else {
+                        // TinyMCE가 아직 로드되지 않았다면, 로드된 후 내용을 설정
+                        tinymce.init({
+                            selector: "#mail_content",
+                            setup: function(editor) {
+                                editor.on("init", function() {
+                                    editor.setContent(draft.content);
+                                });
+                            }
+                        });
+                    }
+                }
+            };
             // 로직 조금 이상함
            /*  window.addEventListener("beforeunload", function (e) {
                 if (document.getElementById("mail_title").value.trim() !== "" ||

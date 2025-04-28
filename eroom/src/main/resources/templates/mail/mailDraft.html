@@ -82,22 +82,17 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                     
                     
                     <div class="col-auto">
-                    	 <!-- <a class="text-body-emphasis fw-bold inbox-link fs-9 senderName"  href="../../apps/email/email-detail.html"
-                    	 th:text="${sentMail.sender != null ? sentMail.sender.employeeName : '알 수 없음'}"
-                    	> 
-                    	
-                    	 보낸 사람
-                    	 받은 사람 : (OOO) 으로 바꿀 예정
-                    	 </a> -->
-                    	 <div class="text-body-emphasis fw-bold inbox-link fs-9 senderName">받는 사람:
-                    	 	<span th:with="size=${#lists.size(draftMail.receivers)}">
+                    	 <div class="text-body-emphasis fw-bold inbox-link fs-9 senderName">
+                    	 	<!-- 붉은 글씨  -->
+                    	 	<span >임시저장됨</span>
+                    	 	<!-- <span th:with="size=${#lists.size(draftMail.receivers)}">
                     	 	<span th:if="${size == 1}" th:text="${draftMail.receivers[0].receiver.employeeName}"></span>
 					        <span th:if="${size > 1}">
 						      <span th:text="${draftMail.receivers[0].receiver.employeeName}"></span>
 						      <span th:text="' 외 ' + (${size} - 1) + '명'"></span>
 						      
 						    </span>
-						    </span>
+						    </span> -->
 						    <!-- 마우스 호버 생각중  -->
 					        <!-- <span th:each="receiver : ${sentMail.receivers}" 
 					              th:text="${receiver.receiver.employeeName}"
@@ -130,12 +125,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					
                     </div>
                   </div>
+                  <!-- 내용 클릭하면 바로 작성하는 곳으로 이동 예정 -->
                   <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11">
                   	<!-- <a class="d-block inbox-link" th:href="@{/mail/detail}"> -->
-                  	<a class="d-block inbox-link" th:href="@{/mail/detail/{id}(id=${draftMail.mailNo})}">
+                  	<!-- <a class="d-block inbox-link" th:href="@{/mail/detail/{id}(id=${draftMail.mailNo})}">
                   		<span class="fs-9 line-clamp-1 text-body-emphasis mailTitle"  th:text="${draftMail.mailTitle}"></span>
                   		<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"  th:utext="${draftMail.mailContent}"></span>
-                    </a>
+                    </a> -->
+                    <a th:href="@{/mail/draft/{id}(id=${draftMail.mailNo})}">test</a>
                   </div>
                 </div>
 					</div>

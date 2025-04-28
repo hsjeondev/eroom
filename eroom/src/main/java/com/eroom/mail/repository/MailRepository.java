@@ -1,12 +1,9 @@
 package com.eroom.mail.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.eroom.mail.entity.Mail;
 
@@ -18,5 +15,5 @@ public interface MailRepository extends JpaRepository<Mail, Long>{
 	// 오래된 순
 	List<Mail> findBySenderEmployeeNoOrderByMailSentTimeAsc(Long employeeNo);
 	
-
+	 Optional<Mail> findById(Long mailNo);
 }

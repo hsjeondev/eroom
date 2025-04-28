@@ -2,11 +2,8 @@ package com.eroom.mail.service;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -47,6 +44,16 @@ public class MailService {
 	    return plainText.length() > 30 ? plainText.substring(0, 30) + "..." : plainText;
 	}
 	
+	private List<MailReceiver> filterOnlyToStatusMails(List<MailReceiver> mails) {
+	    List<MailReceiver> result = new ArrayList<>();
+	    for (MailReceiver mail : mails) {
+	        if ("To".equals(mail.getMailReceiverType())) {  // "To" 상태 필터링
+	            result.add(mail);
+	        }
+	    }
+	    return result;
+	}
+	
 	// 휴지통 N > Y 업데이트 
 	public void moveToTrash(Long employeeNo, Long id) {
 	    mailReceiverRepository.updateDeletedYnAndTime(employeeNo, id);
@@ -73,7 +80,7 @@ public class MailService {
 	
 	// 디테일에서 파일 조회
 	public List<Drive> findMailAttachments(Long mailId) {
-	    return driveRepository.findBySeparatorCodeAndParam1AndDriveDeleteYn("FL002", mailId, "N");
+	    return driveRepository.findBySeparatorCodeAndParam1AndVisibleYn("FL002", mailId, "Y");
 	}
 	
 	// 휴지통 조회하는곳
@@ -91,16 +98,7 @@ public class MailService {
 	    return filterOnlyDeletedMails(resultList);
 	}
 	
-	// 임시저장된 메일 조회 메소드 
-	private List<Mail> filterOnlyDraftMails(List<Mail> mails) {
-	    List<Mail> result = new ArrayList<>();
-	    for (Mail mail : mails) {
-	        if ("Y".equals(mail.getMailStatus())) { // mail_status가 Y면 임시저장
-	            result.add(mail);
-	        }
-	    }
-	    return result;
-	}
+	
 	public List<Mail> findOnlyDraftMailsBySender(Long employeeNo, String sortOrder) {
 	    List<Mail> resultList = null;
 
@@ -123,9 +121,22 @@ public class MailService {
 
 	    return filteredDrafts;
 	}
+	// 임시 저장 불러오기중
+	public Mail getMailById(Long mailNo) {
+        return mailRepository.findById(mailNo)
+                .orElseThrow(() -> new RuntimeException("Mail not found with id: " + mailNo));
+    }
 	
-	
-	
+	// 임시저장된 메일 조회 메소드 
+		private List<Mail> filterOnlyDraftMails(List<Mail> mails) {
+		    List<Mail> result = new ArrayList<>();
+		    for (Mail mail : mails) {
+		        if ("Y".equals(mail.getMailStatus())) { // mail_status가 Y면 임시저장
+		            result.add(mail);
+		        }
+		    }
+		    return result;
+		}
 	// 임시저장 여부 확인 메소드
 	private List<Mail> filterNotDraftMails(List<Mail> mails) {
 	    List<Mail> result = new ArrayList<>();
@@ -173,6 +184,7 @@ public class MailService {
 			 resultList= mailReceiverRepository.findByEmployeeNoOrderByOldest(employeeNo);
 		}
 		// 휴지통 Y여부 확인해서 걸러줌
+		
 		return filterNotDeletedMails(resultList);
 	}
 	
@@ -267,7 +279,7 @@ public class MailService {
 		            
 		            MailReceiverDto mailReceiverDto = new MailReceiverDto();
 		            mailReceiverDto.setEmployee_no(receiverNo);
-		            // mailReceiverDto.setMail_recervier_type("To");
+		            mailReceiverDto.setMail_recervier_type("To");
 		            mailReceiverDto.setMail_no(mailSaver.getMailNo());
 
 		            MailReceiver mailReceiver = mailReceiverDto.toEntity(mailSaver, receiver);
@@ -284,7 +296,7 @@ public class MailService {
 		                MailReceiverDto ccReceiverDto = new MailReceiverDto();
 		                ccReceiverDto.setEmployee_no(ccNo);
 		                ccReceiverDto.setMail_no(mailSaver.getMailNo());
-		                // ccReceiverDto.setMail_recervier_type("Cc");
+		                ccReceiverDto.setMail_recervier_type("Cc");
 		                MailReceiver mailReceiver = ccReceiverDto.toEntity(mailSaver, ccReceiver);
 		                mailReceiverRepository.save(mailReceiver);
 		            }
@@ -328,7 +340,7 @@ public class MailService {
 		            }
 		        }
 		     // 본인
-		        /* 폐기 
+		        
 				Employee sender = employeeRepository.findById(mailDto.getEmployee_no())
 		                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사원 번호: " + mailDto.getEmployee_no()));
 
@@ -338,7 +350,7 @@ public class MailService {
 		        selfReceiverDto.setMail_recervier_type("Me");
 		        MailReceiver selfReceiver = selfReceiverDto.toEntity(mailSaver, sender);
 		        mailReceiverRepository.save(selfReceiver);
-		        */
+		        
 
 			result =1;
 		}catch (Exception e) {

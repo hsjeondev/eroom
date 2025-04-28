@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,9 +47,6 @@ public class Mail {
 	@Column(name="mail_sent_time")
 	private LocalDateTime mailSentTime;
 	
-	@Column(name="mail_status")
-	private String mailStatus;
-	
 
 	@OneToMany(mappedBy = "mail")
 	private List<MailReceiver> receivers; // 수신자 목록
@@ -59,5 +57,11 @@ public class Mail {
 	@JoinColumn(name = "employee_no")  // mail 테이블에 외래키 컬럼 생성됨
 	private Employee sender;
 	
+	@OneToOne
+    @JoinColumn(name = "mail_status_no")
+    private MailStatus mailStatus;
 
+	@OneToOne(mappedBy = "mail")
+	@JoinColumn(name = "mail_draft_no")
+    private MailDraft mailDraft;
 }

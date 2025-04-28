@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.eroom.drive.entity.Drive;
-import com.eroom.drive.service.DriveService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
@@ -71,6 +70,7 @@ public class MailController {
 	    model.addAttribute("receivedMails", received);
 	    return "mail/mailReceiverTo";
 	}
+	// 본인 조회 다시 receiver "Me"
 	
 	// 04/17 본인것만 조회되게 
 	
@@ -321,5 +321,17 @@ public class MailController {
             return employeeService.findEmployeesByParentCode(separatorCode);
         }
     }
+	
+	 /*@GetMapping("/mail/detail/{mailNo}")
+	    public String viewMailDetail(@PathVariable Long mailNo, Model model) {
+	        // mailNo로 메일 조회
+	        Mail draftMail = mailService.getMailById(mailNo);
+
+	        // 메일 정보를 Model에 추가
+	        model.addAttribute("draftMail", draftMail);
+	        
+	        // 메일 작성 페이지로 이동
+	        return "mail/mailCreate";
+	    }*/
 	
 }

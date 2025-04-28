@@ -41,7 +41,7 @@ public class MailDto {
 				.mailTitle(mail_title)
 				.mailContent(mail_content)
 				.mailSentTime(mail_sent_time)
-				.mailStatus(mail_status)
+				//.mailStatus(mail_status)
 				.build();
 	}
 	
