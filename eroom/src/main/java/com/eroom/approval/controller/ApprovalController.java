@@ -15,11 +15,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eroom.approval.dto.ApprovalDto;
 import com.eroom.approval.dto.ApprovalFormatDto;
@@ -31,6 +34,8 @@ import com.eroom.approval.entity.ApprovalLine;
 import com.eroom.approval.service.ApprovalFormatService;
 import com.eroom.approval.service.ApprovalLineService;
 import com.eroom.approval.service.ApprovalService;
+import com.eroom.drive.dto.DriveDto;
+import com.eroom.drive.service.DriveService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
@@ -38,7 +43,12 @@ import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.employee.service.StructureService;
 import com.eroom.security.EmployeeDetails;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 
@@ -51,6 +61,8 @@ public class ApprovalController {
 	private final ApprovalFormatService approvalFormatService;
 	private final StructureService structureService;
 	private final EmployeeService employeeService;
+	private final DriveService driveService;
+	
 	
 	// 내가 올린 결재 리스트 조회
 	@GetMapping("/approval/myRequestedApprovals")
@@ -59,34 +71,34 @@ public class ApprovalController {
 		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 		Employee employee = employeeDetails.getEmployee();
 		model.addAttribute("employee", employee);
-		// 관리자용 전체(visible Y) 결재 보기
-		if (employee.getEmployeeName().contains("admin")) {
-			List<Approval> temp = approvalService.findAllApprovalsVisibleY("Y");
-			List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
-			Map<Long, List<ApprovalLineDto>> approvalLineMap = new HashMap<Long, List<ApprovalLineDto>>();
-			for (Approval approval : temp) {
-				// approval 리스트의 approval_no를 사용해서 approval_line 리스트 조회
-				List<ApprovalLine> temp2 = approvalLineService.getApprovalLineByApprovalNo(approval.getApprovalNo());
-				List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
-				for (ApprovalLine approvalLine : temp2) {
-					ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
-					approvalLineDtoList.add(approvalLineDto);
-				}
-				// approval_line 리스트를 approval_no를 키로 하는 맵에 저장
-				approvalLineMap.put(approval.getApprovalNo(), approvalLineDtoList);
-				
-				
-				ApprovalDto dto = new ApprovalDto();
-				dto = dto.toDto(approval);
-				resultList.add(dto);
-			}
-			model.addAttribute("approvalLineMap", approvalLineMap);
-			model.addAttribute("resultList", resultList);
-			
-			
-			return "/approval/myRequestedApprovals";
-			
-		}
+		// 관리자용 전체(visible Y) 결재 보기 - 회의시 필요없는 기능으로 판단. 필요할 수 있으니 주석으로 남겨두기
+//		if (employee.getEmployeeName().contains("admin")) {
+//			List<Approval> temp = approvalService.findAllApprovalsVisibleY("Y");
+//			List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
+//			Map<Long, List<ApprovalLineDto>> approvalLineMap = new HashMap<Long, List<ApprovalLineDto>>();
+//			for (Approval approval : temp) {
+//				// approval 리스트의 approval_no를 사용해서 approval_line 리스트 조회
+//				List<ApprovalLine> temp2 = approvalLineService.getApprovalLineByApprovalNo(approval.getApprovalNo());
+//				List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
+//				for (ApprovalLine approvalLine : temp2) {
+//					ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
+//					approvalLineDtoList.add(approvalLineDto);
+//				}
+//				// approval_line 리스트를 approval_no를 키로 하는 맵에 저장
+//				approvalLineMap.put(approval.getApprovalNo(), approvalLineDtoList);
+//				
+//				
+//				ApprovalDto dto = new ApprovalDto();
+//				dto = dto.toDto(approval);
+//				resultList.add(dto);
+//			}
+//			model.addAttribute("approvalLineMap", approvalLineMap);
+//			model.addAttribute("resultList", resultList);
+//			
+//			
+//			return "/approval/myRequestedApprovals";
+//			
+//		}
 		
 		
 		// 내가 올린 approval 리스트 조회
@@ -115,10 +127,10 @@ public class ApprovalController {
 		
 		return "/approval/myRequestedApprovals";
 	}
-	// 결재 생성 페이지 진입
-	@GetMapping({"/approval/create", "/approval/{approvalNo}/edit"})
+	// 재기안 재결재
+	@GetMapping({"approval/create", "/approval/{approvalNo}/edit"})
 	public String selectApprovalCreate(Model model, Authentication authentication, @PathVariable(value = "approvalNo", required = false) Long approvalNo) {
-		// 새로운 결재인지 수정하는 결재인지 확인
+		// 새로운 결재인지 수정하는 결재(재기안, 재결재 기능)인지 확인
 		if(approvalNo != null) {
 			// 수정하는 결재인 경우
 			model.addAttribute("mode", "edit");
@@ -138,6 +150,9 @@ public class ApprovalController {
 				approvalLineDtoList.add(approvalLineDto);
 			}
 			model.addAttribute("approvalLineList", approvalLineDtoList);
+//			파일 조회 - 해당 결재글이 드라이브의 param1에 들어있어야함.
+			List<DriveDto> driveList = driveService.findApprovalDriveFiles(approvalNo);
+			model.addAttribute("driveList", driveList);
 		} else {
 			// 새로운 결재인 경우
 			model.addAttribute("mode", "create");
@@ -236,10 +251,28 @@ public class ApprovalController {
 		
 	}
 	
+//	기존 방식
+//	public Map<String, String> createApproval(@RequestBody ApprovalRequestDto dto, Authentication authentication) {
+	//	파일 추가 버전
 	// 결재 생성 Create
 	@PostMapping("/approval/create")
 	@ResponseBody
-	public Map<String, String> createApproval(@RequestBody ApprovalRequestDto dto, Authentication authentication) {
+	public Map<String, String> createApproval(
+		    @RequestPart("title") String title,
+		    @RequestPart("format_no") String formatNo,
+		    @RequestPart(value = "editApprovalNo", required = false) String editApprovalNo,
+		    @RequestPart("writer") String writerJson,
+		    @RequestPart("content") String contentJson,
+		    @RequestPart("approverIds") String approverIdsJson,
+		    @RequestPart("approverSteps") String approverStepsJson,
+		    @RequestPart("agreerIds") String agreerIdsJson,
+		    @RequestPart("agreerSteps") String agreerStepsJson,
+		    @RequestPart("refererIds") String refererIdsJson,
+		    @RequestPart("refererSteps") String refererStepsJson,
+		    @RequestPart(value = "approvalAttachFileIds", required = false) String approvalAttachFileIdsJson,
+		    @RequestPart(value = "files", required = false) List<MultipartFile> files,
+		    Authentication authentication
+		) throws JsonMappingException, JsonProcessingException {
 		Map<String, String> map = new HashMap<String, String>();
 
 		// 로그인한 사용자 정보 가져오기
@@ -247,6 +280,39 @@ public class ApprovalController {
 		Employee employee = employeeDetails.getEmployee();
 		Long employeeNo = employee.getEmployeeNo();
 		
+//		파일 추가하면서 추가한 부분
+		// JSON String을 파싱해서 실제 객체로 변환해야 함
+	    ObjectMapper mapper = new ObjectMapper();
+
+	    Map<String, String> content = mapper.readValue(contentJson, new TypeReference<Map<String, String>>() {});
+	    List<Long> approverIds = mapper.readValue(approverIdsJson, new TypeReference<List<Long>>() {});
+	    List<Integer> approverSteps = mapper.readValue(approverStepsJson, new TypeReference<List<Integer>>() {});
+	    List<Long> agreerIds = mapper.readValue(agreerIdsJson, new TypeReference<List<Long>>() {});
+	    List<Integer> agreerSteps = mapper.readValue(agreerStepsJson, new TypeReference<List<Integer>>() {});
+	    List<Long> refererIds = mapper.readValue(refererIdsJson, new TypeReference<List<Long>>() {});
+	    List<Integer> refererSteps = mapper.readValue(refererStepsJson, new TypeReference<List<Integer>>() {});
+	    List<Long> approvalAttachFileIds = mapper.readValue(approvalAttachFileIdsJson, new TypeReference<List<Long>>() {});
+	    
+	    Long parsedEditApprovalNo = (editApprovalNo == null || editApprovalNo.isEmpty()) 
+                ? null 
+                : Long.valueOf(editApprovalNo);
+	    
+	    ApprovalRequestDto dto = ApprovalRequestDto.builder()
+	    						.title(title)
+	    						.format_no(Long.valueOf(formatNo))
+	    						.editApprovalNo(parsedEditApprovalNo)
+	    						.writer(new EmployeeDto().toDto(employee))
+	    						.content(content)
+	    						.approverIds(approverIds)
+	    						.approverSteps(approverSteps)
+	    						.agreerIds(agreerIds)
+	    						.agreerSteps(agreerSteps)
+	    						.refererIds(refererIds)
+	    						.refererSteps(refererSteps)
+	    						.approvalAttachFileIds(approvalAttachFileIds)
+	    						.files(files)
+	    						.build();
+//		파일 추가하면서 추가한 부분
 		int result = approvalService.createApproval(dto, employeeNo);
 		
 		
@@ -261,9 +327,15 @@ public class ApprovalController {
 	}
 	
 	@GetMapping("/approval/{approvalNo}/detail")
-	public String selectApprovalDetail(@PathVariable("approvalNo") Long approvalNo, Model model, Authentication authentication) {
-		
-		
+	public String selectApprovalDetail(@PathVariable("approvalNo") Long approvalNo, Model model, Authentication authentication, HttpServletRequest request) {
+//		String uri = request.getRequestURI();
+//		if(uri.endsWith("/detail")) {
+//			// 상세 페이지 처리 로직
+//			System.out.println("상세 페이지 처리 로직");
+//		} else if(uri.endsWith("/pdf")) {
+//			// pdf 처리 로직
+//			System.out.println("pdf 처리 로직");
+//		}
 		
 		// 선택한 결재 번호로 결재 정보 조회
 		Approval approval = approvalService.selectApprovalByApprovalNo(approvalNo);
@@ -302,10 +374,24 @@ public class ApprovalController {
 	        return "redirect:/error/403";
 	    }
 		
+		String strTemp = String.valueOf(approvalDto.getApproval_no());
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < 8 - strTemp.length(); i++) {
+			sb.append("0");
+		}
+		sb.append(strTemp);
+		String approvalNoFormatted = "FL007-" + sb.toString();
+		model.addAttribute("approvalNoFormatted", approvalNoFormatted);
+		
+//		파일 조회 - 해당 결재글이 드라이브의 param1에 들어있어야함.
+		List<DriveDto> driveList = driveService.findApprovalDriveFiles(approvalNo);
+		model.addAttribute("driveList", driveList);
+//		파일 조회 - 해당 결재글이 드라이브의 param1에 들어있어야함.
+		
 		return "/approval/detail";
 	}
 	
-	@PostMapping("/approval/{approvalNo}/delete")
+	@DeleteMapping("/approval/{approvalNo}/delete")
 	@ResponseBody
 	public Map<String, String> deleteApproval(@PathVariable("approvalNo") Long approvalNo, Model model,
 			Authentication authentication) {
@@ -489,7 +575,7 @@ public class ApprovalController {
 								}
 							}
 						}
-						// 모든 합의자가 status = A, 나의 결재 차례인 경우에만 approval을 담아서 보내기
+						// 모든 합의자가 status = A, 나의 결재 차례 이후인 경우에만 approval을 담아서 보내기
 						if(count == 0) {
 							if(bool && !approval.getApprovalStatus().equals("F")) {
 								temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
@@ -506,6 +592,9 @@ public class ApprovalController {
 			}
 		}
 		// 결재 리스트옹 - 내가 결재 순서인 approval들을 Dto로 변환
+//		List<Approval> orderByDESCRegDate = new ArrayList<Approval>();
+//		orderByDESCRegDate = resultApprovalList.sort(null)
+		resultApprovalList.sort((a1, a2) -> a2.getApprovalRegDate().compareTo(a1.getApprovalRegDate()));
 		for (Approval t : resultApprovalList) {
 			ApprovalDto dto = new ApprovalDto();
 			dto = dto.toDto(t);
@@ -517,6 +606,7 @@ public class ApprovalController {
 		return "/approval/receivedApprovals";
 	}
 
+	// 합의 결재
 	@GetMapping("/approval/agreementApprovals")
 	public String selectAgreementApprovalsList(Model model, Authentication authentication) {
 		// 로그인한 사용자 정보 가져오기
@@ -564,6 +654,7 @@ public class ApprovalController {
 			}
 		}
 		// 결재 리스트옹 - 내가 합의자인 approval들을 Dto로 변환
+		resultApprovalList.sort((a1, a2) -> a2.getApprovalRegDate().compareTo(a1.getApprovalRegDate()));
 		for (Approval t : resultApprovalList) {
 			ApprovalDto dto = new ApprovalDto();
 			dto = dto.toDto(t);
@@ -574,6 +665,7 @@ public class ApprovalController {
 		
 		return "/approval/agreementApprovals";
 	}
+	// 참조 결재
 	@GetMapping("/approval/referencedApprovals")
 	public String selectReferencedApprovalsList(Model model, Authentication authentication) {
 		// 로그인한 사용자 정보 가져오기
@@ -621,6 +713,7 @@ public class ApprovalController {
 			}
 		}
 		// 결재 리스트옹 - 내가 참조자인 approval들을 Dto로 변환
+		resultApprovalList.sort((a1, a2) -> a2.getApprovalRegDate().compareTo(a1.getApprovalRegDate()));
 		for (Approval t : resultApprovalList) {
 			ApprovalDto dto = new ApprovalDto();
 			dto = dto.toDto(t);
@@ -631,6 +724,7 @@ public class ApprovalController {
 		
 		return "/approval/referencedApprovals";
 	}
+	// 회수 결재
 	@GetMapping("/approval/fallBackApprovals")
 	public String selectWithdrawnApprovalsList(Model model, Authentication authentication) {
 		// 로그인한 사용자 정보 가져오기
@@ -772,6 +866,57 @@ public class ApprovalController {
 //
 //	    return "/approval/receivedApprovals";
 //	}
-	
+	@GetMapping("/pdf/test/test")
+	public String testPdftest(Model model, Authentication authentication) {
+		Long approvalNo = 42L;
+		// 선택한 결재 번호로 결재 정보 조회
+				Approval approval = approvalService.selectApprovalByApprovalNo(approvalNo);
+				// 결재 정보가 없으면 404 에러 페이지로 이동
+				if (approval == null) {
+				    return "redirect:/error/404";
+				}
+				ApprovalDto approvalDto = new ApprovalDto().toDto(approval);
+				model.addAttribute("approval", approvalDto);
+				
+				// 로그인한 사용자 정보 조회
+				EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+				Employee employee = employeeDetails.getEmployee();
+				model.addAttribute("employee", employee);
+				
+				// 결재 라인 정보 조회
+				List<ApprovalLine> temp = approvalLineService.getApprovalLineByApprovalNo(approvalNo);
+				List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
+				for (ApprovalLine approvalLine : temp) {
+					ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
+					approvalLineDtoList.add(approvalLineDto);
+				}
+				model.addAttribute("approvalLineList", approvalLineDtoList);
+				
+				// 권한 리스트 조회
+				Set<Long> authorityList = new HashSet<Long>();
+				for(ApprovalLine t : temp) {
+					// 결재자, 합의자, 참조자 중 결재라인에 있는 사람들
+					authorityList.add(t.getEmployee().getEmployeeNo());
+				}
+				// 기안자
+				authorityList.add(approval.getEmployee().getEmployeeNo());
+				
+				// 결재 관련 인원 + 관리자만 접근 가능
+				if (!authorityList.contains(employee.getEmployeeNo()) && !employee.getEmployeeName().contains("admin")) {
+			        return "redirect:/error/403";
+			    }
+				
+				String strTemp = String.valueOf(approvalDto.getApproval_no());
+				StringBuilder sb = new StringBuilder();
+				for(int i = 0; i < 8 - strTemp.length(); i++) {
+					sb.append("0");
+				}
+				sb.append(strTemp);
+				String approvalNoFormatted = "FL007-" + sb.toString();
+				model.addAttribute("approvalNoFormatted", approvalNoFormatted);
+				List<DriveDto> driveList = driveService.findApprovalDriveFiles(approvalNo);
+				model.addAttribute("driveList", driveList);
+		return "approval/templatePdf/detailPdfTemplate";
+	}
 
 }

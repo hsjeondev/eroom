@@ -1,6 +1,7 @@
 package com.eroom.employee.repository;
 
 import java.util.List;
+
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -40,6 +41,17 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 	//Vehicle Reservation에서 예약자 이름을 가져옴
 	Employee findByEmployeeNo(Long long1);
 	
+	// structureNo로 직원 조회
+	List<Employee> findByStructure_StructureNo(Long structureNo);
 	
+	// 여러 팀 리스트로 직원 조회
+	List<Employee> findByStructure_StructureNoIn(List<Long> structureNos);
+	
+	// 이름 중복 체크
+	boolean existsByEmployeeName(String employeeName);
+	
+	// 사번 최대값 가져오기
+	@Query("SELECT MAX(e.employeeNo) FROM Employee e")
+	Long findMaxEmployeeNo();
 
 }

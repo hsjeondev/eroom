@@ -7,10 +7,6 @@
           <colgroup><col style="width: 25%;" /><col style="width: 75%;" /></colgroup>
           <tbody>
             <tr>
-              <th class="bg-light">휴가 종류</th>
-              <td th:text="*{approval_content['vacationType']}"></td>
-            </tr>
-            <tr>
               <th class="bg-light">휴가 기간</th>
               <td th:text="|*{approval_content['vacationStart']} ~ *{approval_content['vacationEnd']}|"></td>
             </tr>

@@ -105,6 +105,40 @@
 				</div>
 			</div>
 		</div>
+		
+		<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			  const modal = document.getElementById("addEventModal");
+
+			  if (modal) {
+			    modal.addEventListener("show.bs.modal", function () {
+			      const form = document.forms["addEventForm"];
+			      if (!form) return;
+
+			      // form의 모든 입력 필드 초기화
+			      form.reset();
+
+			      // 커스텀으로 초기화할 게 있다면 여기 추가
+			      // hidden input은 유지하고 싶으면 예외 처리 가능!
+			      form.querySelectorAll("input[type='text'], input[type='datetime-local']").forEach(input => {
+			        input.value = "";
+			      });
+
+			      // 예: 설명 칸 초기화
+			      const calendarContent = document.getElementById("calendarContent");
+			      if (calendarContent) calendarContent.value = "";
+
+			      // 예: 장소 초기화
+			      const calendarLocation = document.getElementById("calendarLocation");
+			      if (calendarLocation) calendarLocation.value = "";
+
+			      // 시작/종료시간 초기화
+			      document.getElementById("calendarStartTime").value = "";
+			      document.getElementById("calendarEndTime").value = "";
+			    });
+			  }
+			});
+		</script>
 
 
 

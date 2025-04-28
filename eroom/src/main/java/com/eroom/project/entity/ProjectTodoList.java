@@ -1,4 +1,4 @@
-package com.eroom.chat.entity;
+package com.eroom.project.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,23 +12,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(name="chat_attach_mapping")
-@Builder
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatAttachMapping {
+@Getter
+@Setter
+@Builder
+@Entity
+@Table(name="project_todo_list")
+public class ProjectTodoList {
 
 	@Id
+	@Column(name="project_todo_list_no")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="chat_attach_mapping_no")
-	private Long chatAttachMappingNo; // 파일매핑번호
+	private Long projectTodoListNo;
 	
-	// 첨부파일번호 FK
+	@Column(name="project_no")
+	private Long projectNo;
 	
-	// 메시지번호 FK
+	@Column(name="list_name")
+	private String listName;
 	
+	@Column(name="list_sequence")
+	private int listSequence;
 	
+	@Column(name="list_color")
+	private String listColor;
 }

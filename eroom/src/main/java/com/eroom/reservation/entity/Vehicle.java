@@ -5,11 +5,16 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.eroom.employee.entity.Employee;
+import com.eroom.facility.entity.Facility;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -64,5 +69,15 @@ public class Vehicle {
 	@UpdateTimestamp
 	@Column(insertable = false, name = "reservation_mod_date")
 	private LocalDateTime reservationModDate;
+	
+	@ManyToOne
+	@JoinColumn(name = "facility_no", insertable = false, updatable = false)
+	private Facility facility;
+
+	@ManyToOne
+	@JoinColumn(name = "employee_no", insertable = false, updatable = false)
+	private Employee employee;
+	
+
 	
 }

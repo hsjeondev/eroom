@@ -74,4 +74,10 @@ public class Drive {
 	@Builder.Default
 	@Column(name="drive_delete_yn")
 	private String driveDeleteYn = "Y"; // 삭제여부
+	
+	@Column(name = "drive_description")
+	private String driveDescription; // 파일 설명
+	
+	@Column(name = "param1")
+	private Long param1;
 }
