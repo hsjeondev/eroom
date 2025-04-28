@@ -41,6 +41,6 @@ public class ApprovalSignatureDto {
 				.approvalSignatureName(approval_signature_name)
 				.approvalSignaturePath(approval_signature_path)
 				.approvalSignatureModDate(approval_signature_mod_date)
-				.build();
+				.build(); 
 	}
 }
