@@ -29,6 +29,7 @@ public class MeetingRoomDto {
 	private LocalDateTime reservation_start;
 	private LocalDateTime reservation_end;
 	private String visible_yn="Y";
+	private Long resourceId;
 	private String meetingRoomName;
 	private List<String> participantNames;
 	private String reserverName;
@@ -90,6 +91,7 @@ public class MeetingRoomDto {
 
 	    event.put("separator", this.separator_code != null ? this.separator_code : "");
 	    event.put("type", "meetingroom");
+	    event.put("resourceId", this.facility_no);
 
 	    return event;
 	}
