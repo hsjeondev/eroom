@@ -1,6 +1,7 @@
 package com.eroom.approval.controller;
 
-import java.io.IOException;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +29,8 @@ import com.eroom.approval.entity.Approval;
 import com.eroom.approval.entity.ApprovalLine;
 import com.eroom.approval.service.ApprovalLineService;
 import com.eroom.approval.service.ApprovalService;
+import com.eroom.drive.dto.DriveDto;
+import com.eroom.drive.service.DriveService;
 import com.eroom.employee.entity.Employee;
 import com.eroom.security.EmployeeDetails;
 
@@ -40,6 +43,7 @@ public class ApprovalPdfController {
 	private final TemplateEngine templateEngine;
 	private final ApprovalService approvalService;
 	private final ApprovalLineService approvalLineService;
+	private final DriveService driveService;
 	
 	@GetMapping("/approval/{approvalNo}/pdf")
 	public ResponseEntity<byte[]> generateApprovalPdf(Authentication authentication, @PathVariable("approvalNo") Long approvalNo) {
@@ -95,6 +99,11 @@ public class ApprovalPdfController {
 		sb.append(strTemp);
 		String approvalNoFormatted = "FL-007-" + sb.toString();
 		context.setVariable("approvalNoFormatted", approvalNoFormatted);
+		
+//		파일 조회 - 해당 결재글이 드라이브의 param1에 들어있어야함.
+		List<DriveDto> driveList = driveService.findApprovalDriveFiles(approvalNo);
+		context.setVariable("driveList", driveList);
+//		파일 조회 - 해당 결재글이 드라이브의 param1에 들어있어야함.
 //		----------------------------------------------------------------
 		
 		

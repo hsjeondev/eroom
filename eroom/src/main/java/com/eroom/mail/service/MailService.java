@@ -321,7 +321,7 @@ public class MailService {
 		                drive.setUploader(Employee.builder().employeeNo(mailDto.getEmployee_no()).build());
 		                drive.setParam1(mailSaver.getMailNo()); // 메일 참조 연결
 		                drive.setSeparatorCode("FL002");
-		                drive.setDriveDeleteYn("N");
+		                drive.setVisibleYn("Y");
 		                // DB에 저장
 		                driveRepository.save(drive);
 		                

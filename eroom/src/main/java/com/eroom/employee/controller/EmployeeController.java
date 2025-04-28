@@ -11,6 +11,7 @@ import com.eroom.chat.service.ChatroomService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.service.EmployeeService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -41,4 +42,15 @@ public class EmployeeController {
 		}
 
 	}
+	
+	@GetMapping("/session/employeeNo")
+	@ResponseBody
+	public Long getEmployeeNo(HttpSession session) {
+	    Object employeeNo = session.getAttribute("employeeNo");
+	    if (employeeNo != null) {
+	        return Long.parseLong(employeeNo.toString());
+	    }
+	    return null;
+	}
+
 }
