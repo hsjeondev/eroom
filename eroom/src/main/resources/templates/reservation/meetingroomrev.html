@@ -5,6 +5,10 @@
 <head>
 <meta charset="UTF-8">
 <title>회의실 목록</title>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/resource-common@6.1.10/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/resource-timegrid@6.1.10/index.global.min.js"></script>
+
 <style>
 .fc-event-main::after {
   display: none !important;
@@ -664,22 +668,12 @@
 			    	      }
 			    	    }
 			    	  ],
-			    	  resources: async function (fetchInfo, successCallback, failureCallback) {
-			    		  try {
-			    		    const res = await fetch('/meetingroom/resources');  // ← 서버에 회의실 리스트 요청
-			    		    const rooms = await res.json();
-
-			    		    const mappedRooms = rooms.map(room => ({
-			    		      id: room.facilityNo,            // 자원 ID (회의실 번호)
-			    		      title: room.facilityName        // 화면에 보이는 회의실 이름
-			    		    }));
-
-			    		    successCallback(mappedRooms);     // 성공 시 자원 설정
-			    		  } catch (error) {
-			    		    console.error('회의실 resources 불러오기 실패', error);
-			    		    failureCallback(error);           // 실패 시 캘린더 렌더링 오류 막기
-			    		  }
-			    		},	  
+			    	  dayMaxEvents: true,
+			    	  eventOverlap: true,        // ✅ 겹치는 예약 허용 (기본 true라 따로 설정 안 해도 됨)
+			    	  allDaySlot: false,          // ✅ 하루 종일 칸 없애고 시간별로만
+			    	  slotMinTime: '08:00:00',    // ✅ 캘린더 시작 시간 (필요하면 수정)
+			    	  slotMaxTime: '22:00:00',    // ✅ 캘린더 끝나는 시간 (필요하면 수정)
+			 
 			      eventDisplay: 'block',
 			      dayCellContent: function (info) {
 			        return info.date.getDate();
