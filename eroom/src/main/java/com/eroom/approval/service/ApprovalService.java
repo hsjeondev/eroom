@@ -270,7 +270,6 @@ public class ApprovalService {
 								CompanyCalendarDto companyCalendarDto = CompanyCalendarDto.builder()
 										.employee_no(approvalEmployee.getEmployeeNo())
 										.company_creator(approvalEmployee.getEmployeeId())
-										.company_location("-")
 										.separator("A001")
 										.visibleYn("Y")
 										.build();
