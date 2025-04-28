@@ -288,32 +288,42 @@
 	    const deadlineValue = deadlineInput.value;
 	    const deadlineDate = new Date(deadlineValue);
 	    const now = new Date();
+	    const itemInputs = form.querySelectorAll('input[name="items"]');
 
 	    // 1. 제목 입력 여부 확인
 	    if (!title) {
-	      showValidationAlert("제출 확인", "제목을 입력해주세요.");
+	      showValidationAlert("제목 확인", "제목을 입력해주세요.");
 	      return;
 	    }
 
 	    // 2. 항목 입력 유효성 검사 (기본 + 추가 항목 포함)
-	    const itemInputs = form.querySelectorAll('input[name="items"]');
-	    const nonEmptyItems = Array.from(itemInputs).filter(input => input.value.trim() !== '');
-
-	    if (nonEmptyItems.length < 2) {
-	      showValidationAlert("제출 확인", "항목은 최소 2개 이상 입력해주세요.");
-	      return;
-	    }
+		let validItemCount = 0;
+		let hasEmptyItem = false;
+		itemInputs.forEach(function (input) {
+		  const value = input.value.trim();
+		  if (value === '') {
+		    hasEmptyItem = true;
+		  } else {
+		    validItemCount++;
+		  }
+		});
+		
+		// 항목이 2개 이상이면서 모두 값이 채워져 있어야 통과
+		if (validItemCount < 2 || hasEmptyItem) {
+		  showValidationAlert("항목 확인", "모든 항목을 입력해주세요.");
+		  return;
+		}
 
 	    // 3. 마감일이 현재 시간 이후인지 확인
 	    if (!deadlineValue || deadlineDate <= now) {
-	      showValidationAlert("제출 확인", "올바른 마감일을 선택해주세요.");
+	      showValidationAlert("마감일 확인", "올바른 마감일을 선택해주세요.");
 	      return;
 	    }
 
 	    // 4. 참여 팀이 최소 1개 이상 선택되었는지 확인
 	    const teamCheckboxes = form.querySelectorAll('input[name="selectedTeamIds"]:checked');
 	    if (teamCheckboxes.length === 0) {
-	      showValidationAlert("제출 확인", "투표 참여 팀을 하나 이상 선택해주세요.");
+	      showValidationAlert("투표자 확인", "투표 참여 팀을 하나 이상 선택해주세요.");
 	      return;
 	    }
 
