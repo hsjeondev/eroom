@@ -96,5 +96,9 @@ public class SurveyVoteService {
 
         return result;
     }
+    
+    public int getVoterCount(Long surveyNo) {
+        return surveyVoteRepository.countDistinctVotersBySurveyNo(surveyNo);
+    }
 
 }

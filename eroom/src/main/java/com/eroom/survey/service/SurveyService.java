@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eroom.survey.dto.SurveyDto;
 import com.eroom.survey.dto.SurveyItemDto;
@@ -41,12 +42,12 @@ public class SurveyService {
 	}
 
 	public List<Survey> findAllSurvey() {
-		return surveyRepository.findAll();
+		return surveyRepository.findAllVisibleSurvey();
 	}
 	
 	// 응답자 수 조회
 	public List<SurveyDto> findAllSurveyWithVoterCount() {
-	    List<Survey> surveys = surveyRepository.findAll();
+	    List<Survey> surveys = surveyRepository.findAllVisibleSurvey();
 	    List<SurveyDto> dtoList = new ArrayList<>();
 
 	    for (Survey survey : surveys) {
@@ -57,6 +58,11 @@ public class SurveyService {
 	    }
 
 	    return dtoList;
+	}
+	
+	@Transactional
+	public int deleteSurvey(Long surveyNo) {
+	    return surveyRepository.updateVisible(surveyNo);
 	}
 
 }

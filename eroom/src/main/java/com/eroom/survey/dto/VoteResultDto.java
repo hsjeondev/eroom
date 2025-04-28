@@ -17,7 +17,7 @@ import lombok.Setter;
 @Builder
 public class VoteResultDto {
     private Long itemNo;
-    private String name;
+    private String item;
     private int count;
     private List<String> voters;
     private String voted;
@@ -25,7 +25,7 @@ public class VoteResultDto {
     public static VoteResultDto of(SurveyItem item, int count, List<String> voters, String voted) {
         return VoteResultDto.builder()
                 .itemNo(item.getItemNo())
-                .name(item.getItem())
+                .item(item.getItem())
                 .count(count)
                 .voters(voters)
                 .voted(voted)

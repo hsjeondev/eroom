@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +21,7 @@ import com.eroom.security.EmployeeDetails;
 import com.eroom.survey.dto.SurveyDto;
 import com.eroom.survey.dto.SurveyItemDto;
 import com.eroom.survey.dto.VoteRequest;
+import com.eroom.survey.dto.VoteResultDto;
 import com.eroom.survey.service.SurveyItemService;
 import com.eroom.survey.service.SurveyService;
 import com.eroom.survey.service.SurveyVoteService;
@@ -113,10 +113,8 @@ public class SurveyController {
 
 	@GetMapping("/detail")
 	@ResponseBody
-	public List<SurveyItemDto> surveyDetail(@RequestParam("id") Long surveyNo,
-	                                        @AuthenticationPrincipal EmployeeDetails userDetails) {
-	    Long voterId = userDetails.getEmployee().getEmployeeNo();
-	    return surveyItemService.findVotedItem(surveyNo, voterId);
+	public List<VoteResultDto> surveyDetail(@RequestParam("id") Long surveyNo) {
+	    return surveyVoteService.findVoteResults(surveyNo);
 	}
 
 	@PostMapping("/vote")
@@ -139,6 +137,38 @@ public class SurveyController {
 	        response.put("message", "예상치 못한 오류가 발생했습니다.");
 	    }
 
+	    return response;
+	}
+	
+	@GetMapping("/voter-count")
+	@ResponseBody
+	public Map<String, Integer> getVoterCount(@RequestParam("id") Long surveyId) {
+		int count = surveyVoteService.getVoterCount(surveyId);
+
+		Map<String, Integer> result = new HashMap<>();
+		result.put("voterCount", count);
+		return result;
+	}
+	
+	@PostMapping("/delete")
+	@ResponseBody
+	public Map<String, Object> deleteSurvey(@RequestParam("id") Long surveyNo) {
+	    Map<String, Object> response = new HashMap<>();
+
+	    try {
+	        int result = surveyService.deleteSurvey(surveyNo);
+	        if (result > 0) {
+	            response.put("success", true);
+	            response.put("message", "삭제되었습니다.");
+	        } else {
+	            response.put("success", false);
+	            response.put("message", "삭제 실패했습니다.");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        response.put("success", false);
+	        response.put("message", "오류가 발생했습니다.");
+	    }
 	    return response;
 	}
 

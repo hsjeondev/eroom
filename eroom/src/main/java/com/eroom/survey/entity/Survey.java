@@ -44,5 +44,8 @@ public class Survey {
 	
 	@Column(name="reg_date")
 	private LocalDateTime regDate;
+	
+	@Column(name = "survey_visible_yn")
+	private String visible = "Y";
 
 }
