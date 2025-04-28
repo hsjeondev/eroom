@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.eroom.approval.entity.ApprovalAlarm;
+import com.eroom.approval.entity.ApprovalSignature;
 import com.eroom.attendance.entity.Attendance;
 import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.chat.entity.ChatMessage;
@@ -137,4 +138,8 @@ public class Employee {
 	// 결재 알람 테이블
 	@OneToMany(mappedBy = "receiver")
 	private List<ApprovalAlarm> approvalAlarms; 
+	
+	@OneToOne(mappedBy = "employee")
+	@ToString.Exclude
+	private ApprovalSignature approvalSignature;
 }
