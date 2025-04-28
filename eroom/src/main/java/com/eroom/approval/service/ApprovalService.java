@@ -164,6 +164,12 @@ public class ApprovalService {
 						.approvalLineStep(dto.getApproverSteps().get(i)) // 결재자 순서 step 1,2,3...
 						.build();
 					approvalLineRepository.save(approvalLine);
+					if(dto.getAgreerIds().isEmpty() && i == 0) {
+						message = "[결재] 결재 요청이 도착했습니다. 승인 또는 반려해주세요.";
+				        if(approvalResultNo != null) {
+				        	approvalWebSocketHandler.sendApprovalNotification(dto.getApproverIds().get(i), message, approvalResult);
+				        }
+					}
 			}
 			
 			
@@ -255,9 +261,9 @@ public class ApprovalService {
 					String message = "";
 					// 웹소켓 알림 기능. 기안자의 EmployeeNo를 보내준다.
 					if(endApproval.getApprovalStatus().equals("A")) {
-						message = approval.getApprovalFormat().getApprovalFormatTitle() + "의 결재가 완료 되었습니다!";
+						message = "[결재] " + approval.getApprovalFormat().getApprovalFormatTitle() + "의 결재가 완료 되었습니다!";
 					} else if(endApproval.getApprovalStatus().equals("D")) {
-						message = approval.getApprovalFormat().getApprovalFormatTitle() + "의 결재가 반려 되었습니다!";
+						message = "[결재] " + approval.getApprovalFormat().getApprovalFormatTitle() + "의 결재가 반려 되었습니다!";
 					}
 			        approvalWebSocketHandler.sendApprovalNotification(endApproval.getEmployee().getEmployeeNo(), message, endApproval);
 					// 연차 관련 결재인가 판단

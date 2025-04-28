@@ -9,6 +9,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.eroom.approval.entity.Approval;
+import com.eroom.approval.entity.ApprovalAlarm;
 import com.eroom.approval.service.ApprovalAlarmService;
 
 import lombok.RequiredArgsConstructor;
@@ -68,6 +69,7 @@ public class ApprovalWebSocketHandler extends TextWebSocketHandler {
         }
     }
     
+    // 알람 저장용
     private void saveNotificationToDatabase(Long receiverNo, String message, Approval approval) {
     	approvalAlarmService.alarmSaveMethod(receiverNo, message, approval);
     }
