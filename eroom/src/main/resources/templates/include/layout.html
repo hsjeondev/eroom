@@ -75,17 +75,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	fetch('/session/employeeNo')
 	  .then(response => response.json())
 	  .then(employeeNo => {   // 여기 data ❌ employeeNo ⭕
-	    console.log(employeeNo);  // 그냥 숫자 찍힘
 
-<<<<<<< HEAD
-        var navbarVerticalStyle = window.config.config.phoenixNavbarVerticalStyle;
-        var navbarVertical = document.querySelector('.navbar-vertical');
-        if (navbarVertical && navbarVerticalStyle === 'darker') {
-          navbarVertical.setAttribute('data-navbar-appearance', 'darker');
-        }
-      </script>
-
-=======
 	    const isApprovalPage = location.pathname.startsWith('/approval');
 
 	    if (employeeNo && isApprovalPage) {
@@ -103,6 +93,11 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	    console.error('employeeNo 조회 실패:', error);
 	  });
 	</script>
+	
+	
+	
+	
+	
 	<script th:src="@{/vendors/popper/popper.min.js}"></script>
 	<script th:src="@{/vendors/bootstrap/bootstrap.min.js}"></script>
 	<script th:src="@{/vendors/anchorjs/anchor.min.js}"></script>

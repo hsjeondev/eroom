@@ -32,29 +32,33 @@ public class ProjectTodoElementDto {
     private String todo_title;
 
     private String emergency;
+    
+    private int element_sequence;
 
     
     public ProjectTodoElementDto toDto(ProjectTodoElement projectTodoElement) {
         return ProjectTodoElementDto
                 .builder()
-                .todo_no(projectTodoElement.getTodo_no())
+                .todo_no(projectTodoElement.getTodoNo())
                 .project_todo_list_no(projectTodoElement.getProjectTodoList().getProjectTodoListNo())
                 .projectTodolist(projectTodoElement.getProjectTodoList())
                 .employee_no(projectTodoElement.getEmployee().getEmployeeNo())
                 .employee(projectTodoElement.getEmployee())
-                .todo_title(projectTodoElement.getTodo_title())
+                .todo_title(projectTodoElement.getTodoTitle())
                 .emergency(projectTodoElement.getEmergency())
+                .element_sequence(projectTodoElement.getElementSequence())
                 .build();
     }
 
     public ProjectTodoElement toEntity(ProjectTodoList projectTodoList, Employee employee) {
         return ProjectTodoElement
                 .builder()
-                .todo_no(todo_no)
+                .todoNo(todo_no)
                 .projectTodoList(projectTodoList)
                 .employee(employee)
-                .todo_title(todo_title)
+                .todoTitle(todo_title)
                 .emergency(emergency)
+                .elementSequence(element_sequence)
                 .build();
     }
 }

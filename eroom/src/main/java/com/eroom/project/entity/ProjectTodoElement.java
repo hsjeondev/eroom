@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,7 +29,7 @@ public class ProjectTodoElement {
 	@Id
 	@Column(name="todo_no")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long todo_no;
+	private Long todoNo;
 	
 	@ManyToOne
 	@JoinColumn(name="project_todo_list_no")
@@ -39,8 +40,11 @@ public class ProjectTodoElement {
 	private Employee employee;
 	
 	@Column(name="todo_title")
-	private String todo_title;
+	private String todoTitle;
 	
 	@Column(name="emergency")
-	private String emergency; 
+	private String emergency;
+	
+	@Column(name="element_sequence")
+	private int elementSequence;
 }

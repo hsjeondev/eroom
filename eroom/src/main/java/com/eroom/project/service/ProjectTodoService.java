@@ -6,8 +6,13 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eroom.employee.entity.Employee;
+import com.eroom.employee.repository.EmployeeRepository;
+import com.eroom.project.dto.ProjectTodoElementDto;
 import com.eroom.project.dto.ProjectTodoListDto;
+import com.eroom.project.entity.ProjectTodoElement;
 import com.eroom.project.entity.ProjectTodoList;
+import com.eroom.project.repository.ProjectTodoElementRepository;
 import com.eroom.project.repository.ProjectTodoListRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -17,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 public class ProjectTodoService {
 	
 	private final ProjectTodoListRepository projectTodoListRepository;
+	private final ProjectTodoElementRepository projectTodoElementRepository;
+	private final EmployeeRepository employeeRepository;
 	
 	public List<ProjectTodoListDto> findByProjectNo(Long projectNo) {
 	    
@@ -108,6 +115,84 @@ public class ProjectTodoService {
 		
 		return result;
 	}
+
+	@Transactional
+	public int updateElementPosition(Long listNo, Long todoNo, int newIndex) {
+		int result = 0;
+		
+	    try {
+	    	// 1. todoNo로 TodoElement 조회
+		    ProjectTodoElement element = projectTodoElementRepository.findById(todoNo)
+		        .orElseThrow(() -> new IllegalArgumentException("할 일 항목을 찾을 수 없습니다."));
+
+		    // 2. listNo로 TodoList 조회
+		    ProjectTodoList newList = projectTodoListRepository.findById(listNo)
+		        .orElseThrow(() -> new IllegalArgumentException("리스트를 찾을 수 없습니다."));
+
+		    // 3. 해당 list의 element 목록 가져오기 (순서 있는 상태)
+		    List<ProjectTodoElement> elements = projectTodoElementRepository.findByProjectTodoListOrderByElementSequenceAsc(newList);
+
+		    // 4. 현재 요소를 리스트에서 빼고
+		    elements.removeIf(e -> e.getTodoNo().equals(todoNo));
+
+		    // 5. newIndex에 끼워넣기
+		    elements.add(newIndex, element);
+
+		    // 6. 리스트와 시퀀스를 새로 세팅
+		    for (int i = 0; i < elements.size(); i++) {
+		        ProjectTodoElement e = elements.get(i);
+		        e.setProjectTodoList(newList); // 리스트가 이동했을 수도 있어서
+		        e.setElementSequence(i);
+		    }
+		    
+		    // 7. 한번에 저장
+		    projectTodoElementRepository.saveAll(elements);
+		    
+		    result = 1;
+	    } catch(Exception e) {
+	    	e.printStackTrace();
+	    }
+	    
+	    return result;
+	}
+	
+	public int createTodoElement(ProjectTodoElementDto dto) {
+	    int result = 0;
+
+	    try {
+	        // 1. 반드시 ProjectTodoList Entity 조회
+	        ProjectTodoList projectTodoList = projectTodoListRepository.findById(dto.getProject_todo_list_no())
+	            .orElseThrow(() -> new IllegalArgumentException("ProjectTodoList not found"));
+
+	        // 2. employee도 Entity로 조회
+	        Employee employee = employeeRepository.findById(dto.getEmployee_no())
+	            .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+
+	        // 3. element_sequence 구하기
+	        Integer maxSequence = projectTodoElementRepository.findMaxElementSequence(projectTodoList.getProjectTodoListNo());
+	        int newSequence = (maxSequence != null) ? maxSequence + 1 : 1;
+
+	        // 4. entity 빌더로 생성
+	        ProjectTodoElement projectElement = ProjectTodoElement.builder()
+	            .projectTodoList(projectTodoList)
+	            .todoTitle(dto.getTodo_title())
+	            .employee(employee)
+	            .elementSequence(newSequence)
+	            .emergency(dto.getEmergency())
+	            .build();
+
+	        // 5. 저장
+	        projectTodoElementRepository.save(projectElement);
+
+	        result = 1;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return result;
+	}
+
+
 
 
 	

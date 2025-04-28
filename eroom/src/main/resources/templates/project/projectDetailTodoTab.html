@@ -24,6 +24,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		      border-radius: 0.25rem;
 		      flex-shrink: 0;
 		    }
+		  body.sortable-dragging {
+		    cursor: grabbing !important;
+		  }
+		    
 		  </style>
     
 		<div class="d-flex align-items-center gap-2">
@@ -55,12 +59,12 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	        
         <div class="kanban-container scrollbar" data-kanban-container="data-kanban-container">
 		  <!-- projectTodoList의 각 요소마다 이 블록이 반복됩니다 -->
-		  <div th:each="list : ${projectTodoList}" class="kanban-column scrollbar">
+		  <div th:each="list : ${projectTodoList}" class="kanban-column scrollbar" th:attr="data-list-no=${list.project_todo_list_no}">
 		    <!-- 컬럼 헤더 -->
 		    <div class="kanban-column-header px-4 hover-actions-trigger">
 		      <div
-  class="d-flex align-items-center border-bottom border-3 py-3"
-  th:style="'border-bottom-color:' + ${list.list_color} + ' !important'">
+  				class="d-flex align-items-center border-bottom border-3 py-3"
+  				th:style="'border-bottom-color:' + ${list.list_color} + ' !important'">
 		        <h5 class="mb-0 kanban-column-title">
 		          <!-- 리스트 이름 -->
 		          <span th:text="${list.list_name}">Review</span>
@@ -178,159 +182,111 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		      </div>
 		    </div>
 		
-		    <!-- Review 아이템 공간(예시) -->
-		    <div class="kanban-items-container" data-sortable="data-sortable">
-		      <div class="sortable-item-wrapper border-bottom border-translucent px-2 py-2">
-		        <div class="card sortable-item hover-actions-trigger">
-		          <div class="card-body py-3 px-3">
-		            <div class="kanban-status mb-1 position-relative lh-1">
-		              <svg class="svg-inline--fa fa-circle me-2 d-inline-block text-danger "
-		                   style="min-width: 1rem;transform-origin: 0.5em 0.6875em;"
-		                   data-fa-transform="shrink-1 down-3" aria-hidden="true" focusable="false"
-		                   data-prefix="fas" data-icon="circle" role="img"
-		                   xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
-		                   data-fa-i2svg="">
-		                <g transform="translate(256 256)">
-		                  <g transform="translate(0, 96)  scale(0.9375, 0.9375)  rotate(0 0 0)">
-		                    <path fill="currentColor"
-		                          d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"
-		                          transform="translate(-256 -256)"></path>
-		                  </g>
-		                </g>
-		              </svg>
-		              <span class="badge badge-phoenix fs-10 badge-phoenix-danger">
-		                <span>긴급</span>
-		              </span>
-		              <button class="btn btn-sm btn-phoenix-default kanban-item-dropdown-btn hover-actions"
-		                      type="button" data-boundary="viewport" data-bs-toggle="dropdown"
-		                      aria-haspopup="true" aria-expanded="false">
-		                <svg class="svg-inline--fa fa-ellipsis fa-rotate-90" data-fa-transform="shrink-2"
-		                     aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis"
-		                     role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
-		                     data-fa-i2svg="" style="transform-origin: 0.4375em 0.5em;">
-		                  <g transform="translate(224 256)">
-		                    <g transform="translate(0, 0)  scale(0.875, 0.875)  rotate(0 0 0)">
-		                      <path fill="currentColor"
-		                            d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160
-		                               0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56
-		                               56 0 1 1 0 112 56 56 0 1 1 0-112z"
-		                            transform="translate(-224 -256)"></path>
-		                    </g>
-		                  </g>
-		                </svg>
-		              </button>
-		              <div class="dropdown-menu dropdown-menu-end py-2" style="width: 15rem;">
-		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
-		                   href="#!"><span>Move</span>
-		                  <svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true"
-		                       focusable="false" data-prefix="fas" data-icon="angle-right" role="img"
-		                       xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"
-		                       data-fa-i2svg="">
-		                    <path fill="currentColor"
-		                          d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5
-		                             12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256
-		                             73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5
-		                             45.3 0l160 160z"></path>
-		                  </svg>
-		                </a>
-		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
-		                   href="#!"><span>Duplicate</span></a>
-		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
-		                   href="#!"><span>Jump to top</span></a>
-		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
-		                   href="#!"><span>Jump to bottom</span></a>
-		                <hr class="my-2">
-		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
-		                   href="#!"><span>Print/Download</span></a>
-		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
-		                   href="#!"><span>Share</span>
-		                  <svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true"
-		                       focusable="false" data-prefix="fas" data-icon="angle-right" role="img"
-		                       xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"
-		                       data-fa-i2svg="">
-		                    <path fill="currentColor"
-		                          d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5
-		                             12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256
-		                             73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5
-		                             45.3 0l160 160z"></path>
-		                  </svg>
-		                </a>
-		                <hr class="my-2">
-		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
-		                   href="#!"><span>Move to archive</span>
-		                  <svg class="svg-inline--fa fa-angle-right fs-10" aria-hidden="true"
-		                       focusable="false" data-prefix="fas" data-icon="angle-right" role="img"
-		                       xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"
-		                       data-fa-i2svg="">
-		                    <path fill="currentColor"
-		                          d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5
-		                             12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256
-		                             73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5
-		                             45.3 0l160 160z"></path>
-		                  </svg>
-		                </a>
-		                <a class="dropdown-item d-flex flex-between-center border-1 border-translucent text-danger"
-		                   href="#!"><span>Delete</span></a>
-		              </div>
-		            </div>
-		            <p class="mb-0 stretched-link" data-bs-toggle="modal"
-		               data-bs-target="#KanbanItemDetailsModal">
-		              Create a fresh visual identity for Phoenix with a new logo design
-		            </p>
-		            <br>
-		            <div class="d-flex mt-2 align-items-center justify-content-between">
-		            <p class="mb-0 text-body-tertiary text-opacity-85 fs-9 lh-1">담당자 : </p>
-		              <p class="mb-0 text-body-tertiary text-opacity-85 fs-9 lh-1">
-		                <svg class="svg-inline--fa fa-square-check fs-9 me-2 d-inline-block"
-		                     style="min-width: 1rem;" aria-hidden="true" focusable="false"
-		                     data-prefix="fas" data-icon="square-check" role="img"
-		                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
-		                     data-fa-i2svg="">
-		                  <path fill="currentColor"
-		                        d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64
-		                           64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM337
-		                           209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6
-		                           0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4 9.4 24.6 9.4
-		                           33.9 0s9.4-24.6 0-33.9z"></path>
-		                </svg>
-		                0/0
-		              </p>
-		            </div>
-		          </div>
-		        </div>
-		      </div>
-		    </div>
+				    <!-- Review 아이템 공간(예시) -->
+				    <div class="kanban-items-container" data-sortable="data-sortable">
+					  <div th:each="element : ${list.projectTodoElements}" 
+					       class="sortable-item-wrapper border-bottom border-translucent px-2 py-2" th:attr="data-todo-no=${element.todo_no}">
+					       
+					    <div class="card sortable-item hover-actions-trigger">
+					      <div class="card-body py-3 px-3">
+					
+					        <!-- 긴급 여부 있을 때만 보여줌 -->
+					        <div class="kanban-status mb-1 position-relative lh-1" 
+					     th:if="${element.emergency == 'Y'}">
+					  <svg class="svg-inline--fa fa-circle me-2 d-inline-block text-danger"
+					       style="width: 1rem; height: 1rem; min-width: 1rem;" 
+					       aria-hidden="true" focusable="false"
+					       data-prefix="fas" data-icon="circle" role="img"
+					       xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+					    <path fill="currentColor"
+					          d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
+					  </svg>
+					
+					  <span class="badge badge-phoenix fs-10 badge-phoenix-danger">
+					    <span>긴급</span>
+					  </span>
+					</div>
+		
+		
+			        <!-- 드롭다운 버튼 (긴급 여부와 상관없이 항상 존재) -->
+			        <button class="btn btn-sm btn-phoenix-default kanban-item-dropdown-btn hover-actions"
+			                type="button" data-boundary="viewport" data-bs-toggle="dropdown"
+			                aria-haspopup="true" aria-expanded="false">
+			          <i class="fa-solid fa-ellipsis fa-rotate-90"></i>
+			        </button>
+			
+			        <div class="dropdown-menu dropdown-menu-end py-2" style="width: 15rem;">
+			          <a class="dropdown-item d-flex flex-between-center" href="#!"><span>Move</span><i class="fa-solid fa-angle-right fs-10"></i></a>
+			          <a class="dropdown-item d-flex flex-between-center" href="#!"><span>Duplicate</span></a>
+			          <a class="dropdown-item d-flex flex-between-center" href="#!"><span>Jump to top</span></a>
+			          <a class="dropdown-item d-flex flex-between-center" href="#!"><span>Jump to bottom</span></a>
+			          <hr class="my-2">
+			          <a class="dropdown-item d-flex flex-between-center" href="#!"><span>Print/Download</span></a>
+			          <a class="dropdown-item d-flex flex-between-center" href="#!"><span>Share</span><i class="fa-solid fa-angle-right fs-10"></i></a>
+			          <hr class="my-2">
+			          <a class="dropdown-item d-flex flex-between-center" href="#!"><span>Move to archive</span><i class="fa-solid fa-angle-right fs-10"></i></a>
+			          <a class="dropdown-item d-flex flex-between-center text-danger" href="#!"><span>Delete</span></a>
+			        </div>
+			
+			        <!-- 카드 제목 -->
+			        <p class="mb-0 stretched-link" data-bs-toggle="modal" data-bs-target="#KanbanItemDetailsModal"
+			           th:text="${element.todo_title}">할 일 제목</p>
+			
+			        <br>
+	
+			        <!-- 담당자, 완료 체크 -->
+			        <div class="d-flex mt-2 align-items-center justify-content-between">
+					  <p class="mb-0 text-body-tertiary text-opacity-85 fs-9 lh-1">
+					    담당자 :
+					    <span th:text="${element.employee != null ? element.employee.employeeName : '미정'}">홍길동</span>
+					  </p>
+					
+					  <p class="mb-0 text-body-tertiary text-opacity-85 fs-9 lh-1 d-flex align-items-center">
+					    <span class="d-inline-flex align-items-center justify-content-center" style="width: 1rem; height: 1rem;">
+					      <svg class="svg-inline--fa fa-square-check text-body-tertiary" 
+					           xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" 
+					           width="100%" height="100%" aria-hidden="true" focusable="false">
+					        <path fill="currentColor" d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64
+					                                     64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM337
+					                                     209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6
+					                                     0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4 9.4 24.6 9.4
+					                                     33.9 0s9.4-24.6 0-33.9z"/>
+					      </svg>
+					    </span>
+					    <span class="ms-1">0/0</span>
+					  </p>
+					</div>
+
+
+			      </div>
+			    </div>
+			
+			  </div>
+			</div>
+
 		
 		    <!-- 새 아이템 추가 -->
-		    <div class="py-3 px-4 kanban-add-task">
-		      <button class="btn bg-sm bg-body-tertiary me-2 px-0 w-100 h-100" data-bs-toggle="modal"
-		              data-bs-target="#kanbanAddTask">
-		        <svg class="svg-inline--fa fa-plus text-white dark__text-gray-400"
-		             data-fa-transform="grow-4 down-1" aria-hidden="true" focusable="false"
-		             data-prefix="fas" data-icon="plus" role="img"
-		             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
-		             data-fa-i2svg="" style="transform-origin: 0.4375em 0.5625em;">
-		          <g transform="translate(224 256)">
-		            <g transform="translate(0, 32)  scale(1.25, 1.25)  rotate(0 0 0)">
-		              <path fill="currentColor"
-		                    d="M256 80c0-17.7-14.3-32-32-32s-32
-		                       14.3-32 32V224H48c-17.7 0-32 14.3-32
-		                       32s14.3 32 32 32H192V432c0
-		                       17.7 14.3 32 32 32s32-14.3
-		                       32-32V288H400c17.7 0 32-14.3
-		                       32-32s-14.3-32-32-32H256V80z"
-		                    transform="translate(-224 -256)"></path>
-		            </g>
-		          </g>
-		        </svg>
-		      </button>
-		      
-		    </div>
+		    <div class="py-3 px-4 kanban-add-task" data-bs-target="#kanbanAddTask">
+			  <button class="btn bg-sm bg-body-tertiary me-2 px-0 w-100 h-100" data-bs-toggle="modal"
+			          data-bs-target="#kanbanAddTask" th:attr="data-list-no=${list.project_todo_list_no}, data-list-name=${list.list_name}">
+			    <svg class="svg-inline--fa fa-plus text-white dark__text-gray-400" 
+			         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" 
+			         width="1rem" height="1rem" aria-hidden="true" focusable="false">
+			      <path fill="currentColor" d="M256 80c0-17.7-14.3-32-32-32s-32
+			          14.3-32 32V224H48c-17.7 0-32 14.3-32
+			          32s14.3 32 32 32H192V432c0
+			          17.7 14.3 32 32 32s32-14.3
+			          32-32V288H400c17.7 0 32-14.3
+			          32-32s-14.3-32-32-32H256V80z"/>
+			    </svg>
+			  </button>
+			</div>
+
 		  </div>
   
 		  <div class="kanban-column scrollbar position-relative bg-transparent">
 		     <div class="d-flex h-100 flex-center fw-bold bg-body-hover"><a class="text-decoration-none stretched-link text-body-secondary" href="#!" data-bs-toggle="modal" 
-      data-bs-target="#addEventModal">
+      			data-bs-target="#addEventModal">
 		        <div class="circle-btn bg-body-secondary mx-auto"><svg class="svg-inline--fa fa-plus" data-fa-transform="shrink-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style="transform-origin: 0.4375em 0.5em;"><g transform="translate(224 256)"><g transform="translate(0, 0)  scale(0.875, 0.875)  rotate(0 0 0)"><path fill="currentColor" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" transform="translate(-224 -256)"></path></g></g></svg></div><span>새로운 리스트 생성</span>
 		     </a></div>
 		  </div>
@@ -359,7 +315,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		            <label for="calendarTitle" class="form-label">리스트 이름</label>
 		            <input name="list_name" type="text" class="form-control form-control-sm"
 		                   id="calendarTitle"
-		                   placeholder="일정 제목" autocomplete="off" />
+		                   placeholder="리스트 이름" autocomplete="off" />
 		          </div>
 		
 		          <!-- 색상 선택 -->
@@ -453,6 +409,73 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		    </div>
 		  </div>
 		</div>
+		
+		<!-- 할 일 추가 모달 -->
+		<div class="modal fade" id="kanbanAddTask" tabindex="-1" aria-labelledby="kanbanAddTaskLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+		    <div class="modal-content border border-secondary">
+		      <form id="createTodoForm" name="createTodoElement">
+		        <!-- 모달 헤더 -->
+		        <div class="modal-header bg-light">
+		          <h5 class="modal-title" id="kanbanAddTaskLabel">할 일 추가</h5>
+		          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+		        </div>
+		
+		        <!-- 모달 바디 -->
+		        <div class="modal-body px-4 py-3">
+		          
+		          <!-- 1. 리스트 선택 -->
+		          <div class="mb-3">
+		            <label for="listSelect" class="form-label fw-semibold">리스트</label>
+		            <select class="form-select" id="listSelect" name="project_todo_list_no" required>
+		              <option value="" disabled selected>리스트 선택</option>
+		              <option th:each="projectTodo : ${projectTodoList}"
+		                      th:value="${projectTodo.project_todo_list_no}"
+		                      th:text="${projectTodo.list_name}">
+		              </option>
+		            </select>
+		          </div>
+		
+		          <!-- 2. 할 일 제목 입력 -->
+		          <div class="mb-3">
+		            <label for="todoTitle" class="form-label fw-semibold">할 일 제목</label>
+		            <input type="text" class="form-control" id="todoTitle" name="todo_title" placeholder="할 일 제목을 입력하세요" required>
+		          </div>
+		
+		          <!-- 3. 담당자 선택 -->
+		          <div class="mb-3">
+		            <label for="employeeSelect" class="form-label fw-semibold">담당자</label>
+		            <select class="form-select" id="employeeSelect" name="employee_no" required>
+		              <option value="" disabled selected>담당자 선택</option>
+		              <option th:each="member : ${project.project_members}"
+		                      th:value="${member.project_member.employeeNo}"
+		                      th:text="${member.project_member.employeeName}">
+		              </option>
+		            </select>
+		          </div>
+
+		          <!-- 4. 긴급 여부 체크 -->
+		          <div class="form-check mb-3">
+		            <input class="form-check-input" type="checkbox" value="Y" id="emergencyCheck" name="emergency">
+		            <label class="form-check-label" for="emergencyCheck">
+		              긴급 여부
+		            </label>
+		          </div>
+		
+		        </div>
+		
+		        <!-- 모달 푸터 -->
+		        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+		          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+		          <button type="submit" class="btn btn-primary" id="createTodoBtn">등록</button>
+		        </div>
+
+		      </form>
+		    </div>
+		  </div>
+		</div>
+
+
 	
 		<script>
 		  const form = document.addTodoList;
@@ -509,9 +532,102 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		      alert("리스트 생성 중 오류가 발생하였습니다.");
 		    });
 		  });
+		  
+		  const kanbanAddTaskModal = document.getElementById('kanbanAddTask');
+
+		  kanbanAddTaskModal.addEventListener('show.bs.modal', function (event) {
+		    const button = event.relatedTarget; // 모달을 연 버튼
+		    const listNo = button.getAttribute('data-list-no');
+
+		    const listSelect = document.getElementById('listSelect');
+
+		    if (listNo && listSelect) {
+		      // 1. 기본 선택된 disabled 옵션을 비활성화 해준다
+		      const defaultOption = listSelect.querySelector('option[disabled][selected]');
+		      if (defaultOption) {
+		        defaultOption.removeAttribute('selected');
+		      }
+
+		      // 2. 원하는 리스트 번호에 selected 추가
+		      const targetOption = listSelect.querySelector(`option[value="${listNo}"]`);
+		      if (targetOption) {
+		        targetOption.selected = true;
+		      }
+		    }
+		  });
+		  
+		// 모든 모달에 대해 공통으로 처리
+		  const modals = ['addEventModal', 'kanbanAddTask'];
+
+		  modals.forEach(id => {
+		    const modalElement = document.getElementById(id);
+		    modalElement.addEventListener('hidden.bs.modal', function() {
+		      
+		      // 1. 이 모달 안의 모든 form을 찾아서
+		      modalElement.querySelectorAll('form').forEach(form => {
+		        form.reset(); // 폼 초기화
+		      });
+		      
+		      // 2. select 초기화 (disabled+selected 다시 달기)
+		      modalElement.querySelectorAll('select').forEach(select => {
+		        const options = select.options;
+		        if (options.length > 0) {
+		          // 첫 번째 옵션을 다시 선택
+		          for (let i = 0; i < options.length; i++) {
+		            if (options[i].disabled) {
+		              options[i].selected = true;
+		            } else {
+		              options[i].selected = false;
+		            }
+		          }
+		        }
+		      });
+
+		    });
+		  });
+
+			const elementform = document.createTodoElement;
+			elementform.addEventListener("submit", e => {
+				e.preventDefault();
+				
+				let vali_check = true;
+			    let vali_text = '';
+			
+			    if (vali_check && elementform.employee_no) {
+			    	if (!elementform.employee_no.value) {
+			    		vali_text = "담당자를 선택해주세요.";
+			    	    vali_check = false;
+			    	}
+			    }
+			    
+			    if (!vali_check) {
+					alert(vali_text);
+				    return;
+				}
+			    
+			    const elementpayload = new FormData(elementform);
+			    fetch("/projectTodo/createTodoElement", {
+			      method: "post",
+			      headers: {
+			        [document.querySelector('meta[name="_csrf_header"]').content]:
+			          document.querySelector('meta[name="_csrf"]').content
+			      },
+			      body: elementpayload
+			    })
+			    .then(res => res.json())
+			    .then(data => {
+			      alert(data.res_msg);
+			      if (data.res_code === "200") {
+			    	  location.reload();
+			      }
+			    })
+			    .catch(() => {
+			      alert("리스트 생성 중 오류가 발생하였습니다.");
+			    });
+			    
+			})
+
 		</script>
-
-
 
     </main>
   </body>
