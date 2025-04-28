@@ -110,6 +110,7 @@ public class ProjectController {
 		ProjectDto project = projectService.findByProjectNo(project_no);
 		List<ProjectTodoListDto> projectTodoList = projectTodoService.findByProjectNo(project_no);
 		
+		System.out.println("projectTodoList" + projectTodoList);
 		model.addAttribute("project", project);
 		model.addAttribute("projectTodoList", projectTodoList);
 		

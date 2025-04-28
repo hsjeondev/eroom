@@ -3,18 +3,13 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{/include/layout}">
-
-<!-- Dropzone 스타일 & 스크립트 -->
-<link href="/vendors/dropzone/dropzone.css" rel="stylesheet" />
-
 <body>
 <main class="main" id="top" layout:fragment="content">
-
-  <!-- 헤더 및 업로드 버튼 -->
   <div class="mb-3">
-    <h3 class="fw-bold mb-2">개인 드라이브</h3>
+    <h3 class="fw-bold mb-2" th:text="${userName} + '님 드라이브'">사용자 이름님 드라이브</h3>
     <button class="btn btn-primary btn-sm" type="button" id="toggle-upload-btn">파일 업로드</button>
   </div>
+
 
   <!-- Dropzone 업로드 영역 -->
   <div id="upload-zone" class="mb-3" style="display: none;">
@@ -32,44 +27,46 @@
 
   <!-- 드라이브 세부정보 카드 -->
   <div class="card p-3 mb-4" style="width: 100%; font-size: 0.8rem;">
-    <div class="d-flex justify-content-between align-items-center">
-      <h6 class="fw-bold mb-0">드라이브 세부정보</h6>
-      <button class="btn btn-sm p-0 text-primary" type="button" data-bs-toggle="collapse"
-              data-bs-target="#storageDetailCollapse" aria-expanded="false" aria-controls="storageDetailCollapse">
-        <i class="fas fa-chevron-down"></i>
-      </button>
-    </div>
-    <div class="progress mt-2 mb-1" style="height: 6px;">
-      <div class="progress-bar bg-primary" style="width: 92%"></div>
-    </div>
-    <p class="mb-2 text-muted"><strong>45.8 GB</strong> / 50 GB 사용 중 (92%)</p>
-    <div class="collapse" id="storageDetailCollapse">
-      <ul class="list-unstyled mb-0 mt-2">
-        <li class="d-flex justify-content-between align-items-center mb-1">
-          <span><i class="fas fa-file-pdf text-primary me-1"></i> Images</span>
-          <span class="badge bg-light text-dark">22k</span>
-        </li>
-        <li class="d-flex justify-content-between align-items-center mb-1">
-          <span><i class="fas fa-video text-success me-1"></i> Videos</span>
-          <span class="badge bg-light text-dark">534</span>
-        </li>
-        <li class="d-flex justify-content-between align-items-center mb-1">
-          <span><i class="fas fa-music text-danger me-1"></i> Audio</span>
-          <span class="badge bg-light text-dark">55</span>
-        </li>
-        <li class="d-flex justify-content-between align-items-center mb-1">
-          <span><i class="fas fa-file-alt text-warning me-1"></i> Docs</span>
-          <span class="badge bg-light text-dark">65k</span>
-        </li>
-        <li class="d-flex justify-content-between align-items-center">
-          <span><i class="fas fa-folder text-info me-1"></i> Others</span>
-          <span class="badge bg-light text-dark">12k</span>
-        </li>
-      </ul>
-    </div>
+  <div class="d-flex justify-content-between align-items-center">
+    <h6 class="fw-bold mb-0">드라이브 세부정보</h6>
+    <button class="btn btn-sm p-0 text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#storageDetailCollapse" aria-expanded="false" aria-controls="storageDetailCollapse">
+      <i class="fas fa-chevron-down"></i>
+    </button>
   </div>
+
+  <div class="progress mt-2 mb-1" style="height: 6px;">
+    <div class="progress-bar bg-primary" style="width: 92%"></div>
+  </div>
+  <p class="mb-2 text-muted"><strong>45.8 GB</strong> / 50 GB 사용 중 (92%)</p>
+
+  <div class="collapse" id="storageDetailCollapse">
+    <ul class="list-unstyled mb-0 mt-2">
+      <li class="d-flex justify-content-between align-items-center mb-1">
+        <span><i class="fas fa-file-pdf text-primary me-1"></i> Images</span>
+        <span class="badge bg-light text-dark">22k</span>
+      </li>
+      <li class="d-flex justify-content-between align-items-center mb-1">
+        <span><i class="fas fa-video text-success me-1"></i> Videos</span>
+        <span class="badge bg-light text-dark">534</span>
+      </li>
+      <li class="d-flex justify-content-between align-items-center mb-1">
+        <span><i class="fas fa-music text-danger me-1"></i> Audio</span>
+        <span class="badge bg-light text-dark">55</span>
+      </li>
+      <li class="d-flex justify-content-between align-items-center mb-1">
+        <span><i class="fas fa-file-alt text-warning me-1"></i> Docs</span>
+        <span class="badge bg-light text-dark">65k</span>
+      </li>
+      <li class="d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-folder text-info me-1"></i> Others</span>
+        <span class="badge bg-light text-dark">12k</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
   <!-- 검색,정렬,페이징  -->
-  <div id="tableExample3" data-list='{"valueNames":["filename","filesize","description","writer","date","download"],"page":5,"pagination":true}'>
+  <div id="tableExample3" data-list='{"valueNames":["filename","filesize","description","writer","date","download"],"page":7,"pagination":true}'>
   <!-- 검색창  -->  
   <div class="search-box mb-3 mx-auto">
       <form class="position-relative">
@@ -188,22 +185,21 @@
         <button class="page-link pe-0" data-list-pagination="next" disabled><i class="fas fa-chevron-right"></i></button>
       </div>
     </div>
-</div>
+  </div>
+
   <!-- 스크립트 -->
   <script>
   document.addEventListener('DOMContentLoaded', function () {
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.row-checkbox');
 
-	  // 업로드 영역이 존재할 때만 Dropzone 초기화
-	  if (document.getElementById('dropzone-multiple')) {
-	    initDropzone();
-	  }
-
-	  // 리스트가 존재할 때만 List.js 초기화
-	  if (document.querySelector('[data-list]')) {
-	    initListJs();
-	  }
-
-	});
+    selectAll.addEventListener('change', function () {
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAll.checked;
+      });
+    });
+    initDropzone();
+  });
 
 	// ✅ Dropzone 초기화 함수
 	function initDropzone() {
@@ -277,23 +273,6 @@
 	    }
 	  });
 	}
-
-	// List.js 초기화 함수
-	function initListJs() {
-	  try {
-	    const lists = document.querySelectorAll('[data-list]');
-	    lists.forEach(el => {
-	      const tbody = el.querySelector('tbody.list');  // tbody.list 찾기
-	      if (tbody && tbody.children.length > 0) {      // 자식 tr이 있을 때만
-	        new List(el.id, JSON.parse(el.getAttribute('data-list')));
-	      }
-	    });
-	  } catch (error) {
-	    console.error('리스트 초기화 중 오류 발생', error);
-	  }
-	}
-
-
   document.querySelectorAll('a[data-bs-target="#editFileModal"]').forEach(button => {
 	  button.addEventListener('click', function () {
 	    const driveAttachNo = this.getAttribute('data-id');
@@ -462,11 +441,7 @@
         });
     }
 });
-
   </script>
-
-<!-- 부트스트랩 js  -->
-<script src="/vendors/dropzone/dropzone-min.js"></script>
 
 </main>
 </body>

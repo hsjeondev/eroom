@@ -77,7 +77,6 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	fetch('/session/employeeNo')
 	  .then(response => response.json())
 	  .then(employeeNo => {   // 여기 data ❌ employeeNo ⭕
-	    console.log(employeeNo);  // 그냥 숫자 찍힘
 
 	    const isApprovalPage = location.pathname.startsWith('/approval');
 
