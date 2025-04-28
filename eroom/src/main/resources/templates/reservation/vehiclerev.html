@@ -717,73 +717,68 @@
 			    	    console.error("모달이 없습니다.");
 			    	  }
 			    	},
-			      eventDidMount: function(info) {
-			    	  const el = info.el;
-			    	  const isHoliday = info.event.extendedProps.type === "holiday";
+			    	eventDidMount: function(info) {
+			    		  const el = info.el;
+			    		  const isHoliday = info.event.extendedProps.type === "holiday";
 
-			    	  // 공휴일일 경우
-			    	  if (isHoliday) {
-			    	    el.style.setProperty("background-color", "#FFF8B3", "important"); // 연노랑
-			    	    el.style.setProperty("border", "1px solid #F5E79E", "important");
-			    	    el.style.setProperty("color", "#4B4B4B", "important");
-			    	    el.style.setProperty("pointer-events", "none", "important"); // 클릭 막기
-			    	    el.style.setProperty("opacity", "1", "important");
+			    		  if (isHoliday) {
+			    		    // ✅ 공휴일 스타일
+			    		    el.style.setProperty("background-color", "#FFF8B3", "important");
+			    		    el.style.setProperty("border", "1px solid #F5E79E", "important");
+			    		    el.style.setProperty("color", "#4B4B4B", "important");
+			    		    el.style.setProperty("pointer-events", "none", "important"); 
+			    		    el.style.setProperty("opacity", "1", "important");
 
-			    	    // 공통 스타일 적용 
-			    	    el.style.setProperty("font-size", "10px", "important");
-			    	    el.style.setProperty("font-weight", "400", "important");
-			    	    el.style.setProperty("padding", "0 2px", "important");
-			    	    el.style.setProperty("margin", "1px 0", "important");
-			    	    el.style.setProperty("border-radius", "2px", "important");
-			    	    el.style.setProperty("height", "auto", "important");
-			    	    el.style.setProperty("white-space", "nowrap", "important");
-			    	    el.style.setProperty("overflow", "hidden", "important");
-			    	    el.style.setProperty("text-overflow", "ellipsis", "important");
+			    		    el.style.setProperty("font-size", "10px", "important");
+			    		    el.style.setProperty("font-weight", "400", "important");
+			    		    el.style.setProperty("padding", "0 2px", "important");
+			    		    el.style.setProperty("margin", "1px 0", "important");
+			    		    el.style.setProperty("border-radius", "2px", "important");
+			    		    el.style.setProperty("height", "auto", "important");
+			    		    el.style.setProperty("white-space", "nowrap", "important");
+			    		    el.style.setProperty("overflow", "hidden", "important");
+			    		    el.style.setProperty("text-overflow", "ellipsis", "important");
 
-			    	    const eventMain = el.querySelector(".fc-event-main");
-			    	    if (eventMain) {
-			    	      eventMain.style.setProperty("white-space", "nowrap", "important");
-			    	      eventMain.style.setProperty("overflow", "hidden", "important");
-			    	      eventMain.style.setProperty("text-overflow", "ellipsis", "important");
-			    	      eventMain.style.setProperty("font-size", "9px", "important");
-			    	    }
+			    		    const eventMain = el.querySelector(".fc-event-main");
+			    		    if (eventMain) {
+			    		      eventMain.style.setProperty("white-space", "nowrap", "important");
+			    		      eventMain.style.setProperty("overflow", "hidden", "important");
+			    		      eventMain.style.setProperty("text-overflow", "ellipsis", "important");
+			    		      eventMain.style.setProperty("font-size", "9px", "important");
+			    		    }
 
-			    	    return;
-			    	  }
+			    		    return; // 💬 공휴일이면 여기서 끝냄
+			    		  }
 
-			    	  //일반 이벤트 스타일 (초슬림 공통 적용)
-						el.style.setProperty("background-color", "#C8C8C8", "important"); 
-						el.style.setProperty("border", "2px solid #666666", "important"); 
-						el.style.setProperty("color", "#000000", "important"); 
-						el.style.setProperty("font-size", "12px", "important");
-						el.style.setProperty("font-weight", "800", "important");
-						el.style.setProperty("letter-spacing", "0.5px", "important");
-						el.style.setProperty("padding", "6px 10px", "important");
-						el.style.setProperty("margin", "2px 0", "important");
-						el.style.setProperty("border-radius", "8px", "important");
-						el.style.setProperty("box-shadow", "0 3px 6px rgba(0, 0, 0, 0.2)", "important");
-						el.style.setProperty("white-space", "nowrap", "important");
-						el.style.setProperty("overflow", "hidden", "important");
-						el.style.setProperty("text-overflow", "ellipsis", "important");
-						
-						// ⭐⭐ 추가 ⭐⭐
-						el.style.setProperty("display", "flex", "important"); 
-						el.style.setProperty("align-items", "center", "important"); 
-						el.style.setProperty("justify-content", "flex-start", "important");
-						
-						// 안쪽 fc-event-main
-						const eventMain = el.querySelector(".fc-event-main");
-						if (eventMain) {
-						  eventMain.style.setProperty("text-align", "left", "important");
-						  eventMain.style.setProperty("padding-left", "6px", "important");
-						  eventMain.style.setProperty("white-space", "nowrap", "important");
-						  eventMain.style.setProperty("overflow", "hidden", "important");
-						  eventMain.style.setProperty("text-overflow", "ellipsis", "important");
-						  eventMain.style.setProperty("font-size", "12px", "important");
-						  eventMain.style.setProperty("font-weight", "700", "important");
-						  
-						}
-			      	}
+			    		  // ✅ 일반 이벤트 스타일
+			    		  el.style.setProperty("background-color", "#C8C8C8", "important");
+			    		  el.style.setProperty("border", "2px solid #666666", "important");
+			    		  el.style.setProperty("color", "#000000", "important");
+			    		  el.style.setProperty("font-size", "12px", "important");
+			    		  el.style.setProperty("font-weight", "800", "important");
+			    		  el.style.setProperty("letter-spacing", "0.5px", "important");
+			    		  el.style.setProperty("padding", "6px 10px", "important");
+			    		  el.style.setProperty("margin", "2px 0", "important");
+			    		  el.style.setProperty("border-radius", "8px", "important");
+			    		  el.style.setProperty("box-shadow", "0 3px 6px rgba(0, 0, 0, 0.2)", "important");
+			    		  el.style.setProperty("white-space", "nowrap", "important");
+			    		  el.style.setProperty("overflow", "hidden", "important");
+			    		  el.style.setProperty("text-overflow", "ellipsis", "important");
+			    		  el.style.setProperty("display", "flex", "important");
+			    		  el.style.setProperty("align-items", "center", "important");
+			    		  el.style.setProperty("justify-content", "flex-start", "important");
+
+			    		  const eventMain = el.querySelector(".fc-event-main");
+			    		  if (eventMain) {
+			    		    eventMain.style.setProperty("text-align", "left", "important");
+			    		    eventMain.style.setProperty("padding-left", "6px", "important");
+			    		    eventMain.style.setProperty("white-space", "nowrap", "important");
+			    		    eventMain.style.setProperty("overflow", "hidden", "important");
+			    		    eventMain.style.setProperty("text-overflow", "ellipsis", "important");
+			    		    eventMain.style.setProperty("font-size", "12px", "important");
+			    		    eventMain.style.setProperty("font-weight", "700", "important");
+			    		  }
+			    		}
 			  	});
 			  
 			  //수정 모달에 값 채워넣기 + resvationNo 기준

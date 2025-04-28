@@ -168,21 +168,7 @@ public class MeetingRoomService {
         return dtoList;
     }
     
-    //회의실 이름 가져오기 
-    public List<Map<String, Object>> getMeetingRoomResources() {
-        List<Facility> facilities = facilityRepository.findBySeparatorCode("F001");
 
-        List<Map<String, Object>> resourceList = new ArrayList<>();
-
-        for (Facility facility : facilities) {
-            Map<String, Object> resource = new HashMap<>();
-            resource.put("id", facility.getFacilityNo());       // FullCalendar가 요구하는 id
-            resource.put("title", facility.getFacilityName());  // FullCalendar가 요구하는 title
-            resourceList.add(resource);
-        }
-
-        return resourceList;
-    }
 	
 		
 }
