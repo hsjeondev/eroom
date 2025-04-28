@@ -72,8 +72,8 @@ public class Drive {
 	private String driveEditor; // 수정자
 	
 	@Builder.Default
-	@Column(name="drive_delete_yn")
-	private String driveDeleteYn = "Y"; // 삭제여부
+	@Column(name="visible_yn")
+	private String visibleYn = "Y"; // 사용여부
 	
 	@Column(name = "drive_description")
 	private String driveDescription; // 파일 설명

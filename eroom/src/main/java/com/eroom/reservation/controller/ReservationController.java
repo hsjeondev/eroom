@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +29,7 @@ import com.eroom.reservation.service.VehicleService;
 
 import lombok.RequiredArgsConstructor;
 
+
 @Controller
 @RequiredArgsConstructor
 public class ReservationController {
@@ -36,6 +38,8 @@ public class ReservationController {
 	private final VehicleService vehicleService;
 	private final EmployeeService employeeService;
 	private final MeetingRoomService meetingRoomService;
+	@Value("${tmap.key}")
+	private String tmapKey;
 
 	// ========================화면 전환 =============================
 	@GetMapping("/reservation/sleep")
@@ -53,6 +57,7 @@ public class ReservationController {
 		//오늘 예약 현황
 		List<VehicleDto> todayReservations = vehicleService.getTodayReservations();
 		model.addAttribute("todayReservations",todayReservations);
+		model.addAttribute("tmapKey", tmapKey);		
 		return "reservation/vehiclerev";
 	}
 
