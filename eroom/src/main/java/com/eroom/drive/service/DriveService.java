@@ -179,7 +179,7 @@ public class DriveService {
 		        String ext = oriName.substring(oriName.lastIndexOf("."));
 		        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
 
-		        String path = fileDir + "personal/" + newName;
+		        String path = fileDir + "approval/" + newName;
 		        File savedFile = new File(path);
 		        if (!savedFile.getParentFile().exists()) {
 		            savedFile.getParentFile().mkdirs();
@@ -212,7 +212,7 @@ public class DriveService {
 	// ------------------------- 결재 파일 리스트 조회 --------------------------
 	// 결재 번호(param1)로 조회
 	public List<DriveDto> findApprovalDriveFiles(Long param1) {
-	    List<Drive> drives = driveRepository.findByParam1AndVisibleYnAndSeparatorCode(param1, "N", "Fl007");
+	    List<Drive> drives = driveRepository.findByParam1AndVisibleYnAndSeparatorCode(param1, "Y", "Fl007");
 	    List<DriveDto> result = new ArrayList<>();
 
 	    for (Drive drive : drives) {
@@ -226,7 +226,7 @@ public class DriveService {
 		int result = 0;
 		try {
 			for(Long l : approvalAttachFileIds) {
-				Drive oldDrive = driveRepository.findByDriveAttachNoAndVisibleYnAndSeparatorCode(l, "N", "FL007");
+				Drive oldDrive = driveRepository.findByDriveAttachNoAndVisibleYnAndSeparatorCode(l, "Y", "FL007");
 				// 영속성 없는 객체 생성
 	            Drive newDrive = new Drive();
 	            
