@@ -178,7 +178,7 @@ public class ProjectTodoService {
 	            .todoTitle(dto.getTodo_title())
 	            .employee(employee)
 	            .elementSequence(newSequence)
-	            .emergency(dto.getEmergency())
+	            .emergency(dto.getEmergency() == null ? "N" : dto.getEmergency())
 	            .build();
 
 	        // 5. 저장
