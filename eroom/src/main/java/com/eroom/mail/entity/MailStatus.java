@@ -36,10 +36,10 @@ public class MailStatus {
 	private String mailStatusImportantYn;
 	
 	@Column(name="mail_status_deleted_time")
-	private LocalDateTime mailSstatusDeletedTime;
+	private LocalDateTime mailStatusDeletedTime;
 	
 	@Column(name="maill_status_visible_yn")
-	private String maillStatusVisible_yn;
+	private String maillStatusVisibleYn;
 	
 	@OneToOne(mappedBy = "mailStatus")
     private Mail mail; // 연관된 Mail 엔티티

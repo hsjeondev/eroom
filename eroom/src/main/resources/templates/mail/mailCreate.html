@@ -112,7 +112,7 @@
 					    badge.innerHTML = `
 					      ${employeeName}
 					      <button type="button" class="btn-close btn-close-white btn-sm ms-2" style="font-size: 0.6rem;" onclick="removeParticipant('${employeeNo}')"></button>
-					      <input type="hidden" name="receiverNos" value="${employeeNo}">
+					      <input type="hidden" name="receiver_no" value="${employeeNo}">
 					    `;
 					    document.getElementById('selectedEmployeeList').appendChild(badge);
 					    select.selectedIndex = 0;
@@ -231,7 +231,7 @@
                     	    badge.innerHTML = `
                     	      ${employeeName}
                     	      <button type="button" class="btn-close btn-close-white btn-sm ms-2" style="font-size: 0.6rem;" onclick="removeCcParticipant('${employeeNo}')"></button>
-                    	      <input type="hidden" name="ccNos" value="${employeeNo}">
+                    	      <input type="hidden" name="cc_no" value="${employeeNo}">
                     	    `;
                     	    document.getElementById('selectedCcList').appendChild(badge);
                     	  });

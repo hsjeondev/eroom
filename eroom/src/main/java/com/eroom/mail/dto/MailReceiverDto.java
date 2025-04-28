@@ -22,18 +22,21 @@ public class MailReceiverDto {
 
 	// mail_receiver PK값
 	private Long mail_receiver_no;
+	
 	// type 원래 to, cc 했다가 그냥 to 넣어서 "발신자-수신자" 로만
+	// 사용 여부로 수정 예정
 	private String mail_recervier_type;
 	
 	// 읽음 여부
+	@Builder.Default
 	private String mail_receiver_read_yn="N";
 	// 삭제 여부
-	private String mail_receiver_deleted_yn="N";
+	//private String mail_receiver_deleted_yn="N";
 	// 중요 여부
-	private String mail_receiver_important_yn="N";
+	//private String mail_receiver_important_yn="N";
 	
 	private Mail mail;
-	
+	private Employee receiver;
 	
 	// 메일 번호
 	private Long mail_no;
@@ -51,16 +54,23 @@ public class MailReceiverDto {
 //				.mailReceiverImportantYn(mail_receiver_important_yn)
 //				.build();
 //	}
-	public MailReceiver toEntity(Mail mail, Employee receiver) {
-	    return MailReceiver.builder()
-	        .mail(mail)
-	        .receiver(receiver)
-	        .mailReceiverType(mail_recervier_type)
-	        .mailReceiverReadYn(mail_receiver_read_yn)
-	        .mailReceiverDeletedYn(mail_receiver_deleted_yn)
-	        .mailReceiverImportantYn(mail_receiver_important_yn)
-	        .build();
+//	public MailReceiver toEntity(Mail mail, Employee receiver) {
+//	    return MailReceiver.builder()
+//	        .mail(mail)
+//	        .receiver(receiver)
+//	        .mailReceiverType(mail_recervier_type)
+//	        //.mailReceiverReadYn(mail_receiver_read_yn)
+//	        //.mailReceiverDeletedYn(mail_receiver_deleted_yn)
+//	        //.mailReceiverImportantYn(mail_receiver_important_yn)
+//	        .build();
+//	}
+	public MailReceiver toEntity() {
+		return MailReceiver.builder()
+			.mail(Mail.builder().mailNo(mail_no).build())
+			.receiver(Employee.builder().employeeNo(employee_no).build())
+			//.receiver(Employee.builder().employeeNo(employee_no).build())
+			.mailReceiverReadYn(mail_receiver_read_yn)
+			.build();
 	}
-	
 	
 }

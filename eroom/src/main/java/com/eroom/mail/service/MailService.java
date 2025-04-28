@@ -17,10 +17,13 @@ import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.mail.dto.MailDto;
 import com.eroom.mail.dto.MailReceiverDto;
+import com.eroom.mail.dto.MailStatusDto;
 import com.eroom.mail.entity.Mail;
 import com.eroom.mail.entity.MailReceiver;
+import com.eroom.mail.entity.MailStatus;
 import com.eroom.mail.repository.MailReceiverRepository;
 import com.eroom.mail.repository.MailRepository;
+import com.eroom.mail.repository.MailStatusRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +34,7 @@ public class MailService {
 	private final MailRepository mailRepository;
 	private final MailReceiverRepository mailReceiverRepository;
 	private final EmployeeRepository employeeRepository;
+	private final MailStatusRepository mailStatusRepository;
 	
 	private final DriveRepository driveRepository;
 	@Value("${ffupload.location}")
@@ -53,7 +57,7 @@ public class MailService {
 	    }
 	    return result;
 	}
-	
+	/*
 	// 휴지통 N > Y 업데이트 
 	public void moveToTrash(Long employeeNo, Long id) {
 	    mailReceiverRepository.updateDeletedYnAndTime(employeeNo, id);
@@ -71,7 +75,7 @@ public class MailService {
 	    mailReceiverRepository.updateReadYn(employeeNo,id); // 읽음 처리
 		return mailRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("메일을 찾을 수 없습니다."));
 	}
-	
+	*/
 	// 다운로드 파일 정보 
 	public Drive findAttachmentById(Long driveId) {
 	    return driveRepository.findById(driveId)
@@ -84,6 +88,7 @@ public class MailService {
 	}
 	
 	// 휴지통 조회하는곳
+	/*테이블 바뀐 뒤 주석 처리
 	public List<MailReceiver> getTrashMailsByEmployee(Long employeeNo, String sortOrder) {
 	    List<MailReceiver> resultList;
 
@@ -97,7 +102,7 @@ public class MailService {
 
 	    return filterOnlyDeletedMails(resultList);
 	}
-	
+	*/
 	
 	public List<Mail> findOnlyDraftMailsBySender(Long employeeNo, String sortOrder) {
 	    List<Mail> resultList = null;
@@ -149,6 +154,7 @@ public class MailService {
 	}
 	
 	// 휴지통 여부 로직 메소드
+	/*테이블 바뀐 뒤 주석 처리
 	public List<MailReceiver> filterNotDeletedMails(List<MailReceiver> mails) {
 	    List<MailReceiver> result = new ArrayList<>();
 	    for (MailReceiver mail : mails) {
@@ -170,11 +176,13 @@ public class MailService {
 	    }
 	    return result;
 	}
+	*/
 	
 	// 받은 메일 조회
 	/*public List<MailReceiver> getReceivedMailsByEmployee(Long employeeNo) {
         return mailReceiverRepository.findByEmployeeNo(employeeNo);
     }*/
+	/*테이블 바뀐 뒤 주석 처리
 	public List<MailReceiver> getReceivedMailsByEmployee(Long employeeNo, String sortOrder) {
 			List<MailReceiver> resultList = null;
 		
@@ -187,7 +195,7 @@ public class MailService {
 		
 		return filterNotDeletedMails(resultList);
 	}
-	
+	*/
     // 본인 메일 조회
 //	public List<Mail> findMailsBySender(Long employeeNo) {
 //	    return mailRepository.findBySenderEmployeeNo(employeeNo);
@@ -245,11 +253,11 @@ public class MailService {
 		return list;
 	}
 	
-	// 임시 저장
+	// 임시 저장 폐기 예정
 	public int saveMail(MailDto mailDto, String mailStatus) {
 		int result = 0;
 		try {
-			mailDto.setMail_status(mailStatus);
+			//mailDto.setMail_status(mailStatus);
 			Mail mailEntity = mailDto.toEntity();
 			Mail mailSaver = mailRepository.save(mailEntity);
 			result = 1;
@@ -260,45 +268,69 @@ public class MailService {
 	}
 	
 	// 메일 생성
+	// 메일 발송
 	@Transactional
 	public int createMail(MailDto mailDto,List<MultipartFile> mailFiles ) {
 		int result = 0;
 		try {
-			// 보낸 메일 저장
+			// 보낸 메일 저장 ( mail에 제목, 내용 저장)
 			Mail mailEntity = mailDto.toEntity();
 			Mail mailSaver = mailRepository.save(mailEntity);
+			 
 			
 			
-			
-			// 수신자
-			 List<Long> receiverNos = mailDto.getReceiverNos();
+			// 수신자 ( mail_receiver 받는 사람 mail_no값으로 저장 )
+			 List<Long> receiverNos = mailDto.getReceiver_no();
+			 if (receiverNos != null && !receiverNos.isEmpty()) {
 		        for (Long receiverNo : receiverNos) {
 		            // FK 관계 맞춰줌
 		            Employee receiver = employeeRepository.findById(receiverNo).orElseThrow(() -> 
 		                new IllegalArgumentException("존재하지 않는 사원 번호: " + receiverNo));
 		            
 		            MailReceiverDto mailReceiverDto = new MailReceiverDto();
+		            // 수신자(받는 사람) no 넣기
 		            mailReceiverDto.setEmployee_no(receiverNo);
-		            mailReceiverDto.setMail_recervier_type("To");
+		            mailReceiverDto.setReceiver(receiver);
+		            //mailReceiverDto.setMail_recervier_type("To");
+		            // mail_no값 넣기
 		            mailReceiverDto.setMail_no(mailSaver.getMailNo());
 
-		            MailReceiver mailReceiver = mailReceiverDto.toEntity(mailSaver, receiver);
+		            MailReceiver mailReceiver = mailReceiverDto.toEntity();
 		            mailReceiverRepository.save(mailReceiver);
-
+		            
+		            // 메일 상태 
+		            MailStatusDto mailStatusDto = new MailStatusDto();
+		            mailStatusDto.setMail_no(mailSaver.getMailNo());
+		            
+		            MailStatus mailStatus = mailStatusDto.toEntity();
+		            mailStatusRepository.save(mailStatus);
 		        }
-		        // 참조자
-		        List<Long> ccNos = mailDto.getCcNos(); // 참조자 리스트
-		        if (ccNos != null) {
+			 }
+		        // 참조자 ( 수신자랑 같은 방향으로 저장 )
+		        List<Long> ccNos = mailDto.getCc_no(); // 참조자 리스트
+		        if (ccNos != null && ccNos.isEmpty()) {
 		            for (Long ccNo : ccNos) {
 		                Employee ccReceiver = employeeRepository.findById(ccNo).orElseThrow(() ->
 		                    new IllegalArgumentException("존재하지 않는 사원 번호: " + ccNo));
 
 		                MailReceiverDto ccReceiverDto = new MailReceiverDto();
+		                // 참조자 ( 수신자랑 같은 로직으로함)
 		                ccReceiverDto.setEmployee_no(ccNo);
+		                ccReceiverDto.setReceiver(ccReceiver);;
+		                // 수신자 동일
 		                ccReceiverDto.setMail_no(mailSaver.getMailNo());
-		                ccReceiverDto.setMail_recervier_type("Cc");
-		                MailReceiver mailReceiver = ccReceiverDto.toEntity(mailSaver, ccReceiver);
+		                //ccReceiverDto.setMail_recervier_type("Cc");
+		                
+		                
+		                MailReceiver mailReceiver = ccReceiverDto.toEntity();
 		                mailReceiverRepository.save(mailReceiver);
+		                
+		                // 메일 상태
+		                MailStatusDto mailStatusDto = new MailStatusDto();
+			            mailStatusDto.setMail_no(mailSaver.getMailNo());
+			            
+			            MailStatus mailStatus = mailStatusDto.toEntity();
+			            mailStatusRepository.save(mailStatus);
 		            }
 		        }
 		        // 파일
@@ -339,8 +371,8 @@ public class MailService {
 		                
 		            }
 		        }
-		     // 본인
-		        
+		     // 본인 ( 폐기 )
+		        /*
 				Employee sender = employeeRepository.findById(mailDto.getEmployee_no())
 		                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사원 번호: " + mailDto.getEmployee_no()));
 
@@ -350,7 +382,7 @@ public class MailService {
 		        selfReceiverDto.setMail_recervier_type("Me");
 		        MailReceiver selfReceiver = selfReceiverDto.toEntity(mailSaver, sender);
 		        mailReceiverRepository.save(selfReceiver);
-		        
+		        */
 
 			result =1;
 		}catch (Exception e) {

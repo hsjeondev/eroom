@@ -57,6 +57,7 @@ public class MailController {
 	 */
 	
 	// 받은 메일
+	/*
 	@GetMapping("/mail/receiverTo")
 	public String selectReceiverToAll(Model model, 
 									@AuthenticationPrincipal EmployeeDetails employeeDetails,
@@ -70,6 +71,7 @@ public class MailController {
 	    model.addAttribute("receivedMails", received);
 	    return "mail/mailReceiverTo";
 	}
+	*/
 	// 본인 조회 다시 receiver "Me"
 	
 	// 04/17 본인것만 조회되게 
@@ -145,6 +147,7 @@ public class MailController {
 	}
 	
 	// 휴지통에서 삭제하는 로직
+	/* 테이블 바뀐 뒤 주석 처리
 	@PostMapping("/mail/delete/{id}")
 	public String deleteMail(@PathVariable("id") Long id,
 	                         @RequestParam("redirectUrl") String redirectUrl,
@@ -165,8 +168,9 @@ public class MailController {
 		mailService.moveToTrash(employeeNo,id);
 		return "redirect:" + redirectUrl;
 	}
-	
+	*/
 	// 휴지통 조회할곳
+	/*
 	@GetMapping("/mail/trash")
 	public String selectTrashMailAll(Model model, 
 	    @AuthenticationPrincipal EmployeeDetails employeeDetails,
@@ -179,7 +183,7 @@ public class MailController {
 	    model.addAttribute("trashMailList", trashMailList);
 	    return "mail/mailTrash";
 	}
-	
+	*/
 	// 디테일 파일 다운로드
 	/*@GetMapping("/mail/download/{attachmentId}")
 	@ResponseBody
@@ -244,6 +248,7 @@ public class MailController {
 	}
 	
 	// 디테일 ( 파일 불러오기 성공 )
+	/* 테이블 바뀐 뒤 주석 처리
 	@GetMapping("/mail/detail/{id}")
 	public String selectMailOne(@PathVariable("id") Long id,
 								Model model,
@@ -258,7 +263,7 @@ public class MailController {
 		
 		return "mail/mailDetail";
 	}
-	
+	*/
 	
 	// 메일 작성 페이지
 	@GetMapping("/mail/mailCreate")
@@ -301,6 +306,7 @@ public class MailController {
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "메일 등록중 오류가 발생하였습니다.");
 		
+		// 받는 사람, 제목, 내용, 파일 정보 보내줌
 		  int result = mailService.createMail(mailDto, mailFiles); 
 		  
 		  if(result>0) {

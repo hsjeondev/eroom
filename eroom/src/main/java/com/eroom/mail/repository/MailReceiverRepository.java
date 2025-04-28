@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eroom.mail.entity.MailReceiver;
 
 public interface MailReceiverRepository extends JpaRepository<MailReceiver, Long>{
-
+/*테이블 바뀐 뒤 주석 처리
 	@Query("SELECT mr FROM MailReceiver mr JOIN FETCH mr.mail m WHERE mr.receiver.employeeNo = :empNo")
 	List<MailReceiver> findByEmployeeNo(@Param("empNo") Long empNo);
 	
@@ -31,16 +31,6 @@ public interface MailReceiverRepository extends JpaRepository<MailReceiver, Long
 	@Query("UPDATE MailReceiver mr SET mr.mailReceiverReadYn = 'Y' WHERE mr.mail.mailNo = :mailNo AND mr.receiver.employeeNo = :employeeNo")
 	void updateReadYn(@Param("employeeNo") Long employeeNo,@Param("mailNo") Long mailNo);
 	
-	// 휴지통 처리
-	/*
-	 * @Transactional
-	 * 
-	 * @Modifying
-	 * 
-	 * @Query("UPDATE MailReceiver mr SET mr.mailReceiverDeletedYn = 'Y' WHERE mr.receiver.employeeNo = :employeeNo AND mr.mail.mailNo = :mailNo"
-	 * ) void updateDeletedYn(@Param("employeeNo") Long employeeNo, @Param("mailNo")
-	 * Long mailNo);
-	 */
 	@Transactional
 	@Modifying
 	@Query("UPDATE MailReceiver mr SET mr.mailReceiverDeletedYn = 'Y', mr.mailReceiverDeletedTime = CURRENT_TIMESTAMP " +
@@ -52,6 +42,16 @@ public interface MailReceiverRepository extends JpaRepository<MailReceiver, Long
     @Transactional
     @Query("DELETE FROM MailReceiver mr WHERE mr.mailReceiverNo = :mailReceiverNo AND mr.receiver.employeeNo = :employeeNo")
     void deleteByIdAndEmployeeNo(@Param("mailReceiverNo") Long mailReceiverNo, @Param("employeeNo") Long employeeNo);
+	*/
 	
-	
+	// 휴지통 처리
+	/*
+	 * @Transactional
+	 * 
+	 * @Modifying
+	 * 
+	 * @Query("UPDATE MailReceiver mr SET mr.mailReceiverDeletedYn = 'Y' WHERE mr.receiver.employeeNo = :employeeNo AND mr.mail.mailNo = :mailNo"
+	 * ) void updateDeletedYn(@Param("employeeNo") Long employeeNo, @Param("mailNo")
+	 * Long mailNo);
+	 */
 }
