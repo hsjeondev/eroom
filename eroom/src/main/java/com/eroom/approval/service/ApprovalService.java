@@ -63,7 +63,7 @@ public class ApprovalService {
 				Approval temp = approvalRepository.findById(dto.getEditApprovalNo()).orElse(null);
 				if(temp != null) {
 					ApprovalDto approvalDto = new ApprovalDto().toDto(temp);
-					// 결재 상태가 반려일 경우 visible N으로 변경
+					// 새로 올리는 결재인 경우다. 그러니까 이전 결재 상태가 회수일 경우 visible N으로 변경
 					if(temp.getApprovalStatus().equals("F")) {
 						approvalDto.setApproval_visible_yn("N");
 					} else {
@@ -113,8 +113,10 @@ public class ApprovalService {
 			
 			
 			ApprovalLine approvalLine = null;
-
+			Long approvalResultNo = approvalResult.getApprovalNo();
+			String message = "";
 			// 3. 참조자 저장
+			// 없는 경우 예외처리
 			for (int i = 0; i < dto.getRefererIds().size(); i++) {
 				
 						approvalLine = ApprovalLine.builder()
@@ -124,9 +126,17 @@ public class ApprovalService {
 						.approvalLineStep(-1) // 참조자 고정값 -1
 						.build();
 					approvalLineRepository.save(approvalLine);
+					
+					// 새 결재글 생성시 참조자들에게 알림
+					// 웹소켓 알림 기능. 알림 받는 사람의 EmployeeNo를 보내준다.
+					message = "[결재] 참조 알림이 도착했습니다.";
+			        if(approvalResultNo != null) {
+			        	approvalWebSocketHandler.sendApprovalNotification(dto.getRefererIds().get(i), message, approvalResult);
+			        }
 			}
 
 			// 2. 합의자 저장
+			// 없는 경우 예외처리
 			for (int i = 0; i < dto.getAgreerIds().size(); i++) {
 				
 				approvalLine = ApprovalLine.builder()
@@ -136,6 +146,13 @@ public class ApprovalService {
 						.approvalLineStep(0) // 합의자 고정값 0
 						.build();
 					approvalLineRepository.save(approvalLine);
+					
+					// 새 결재글 생성시 합의자들에게 알림
+					// 웹소켓 알림 기능. 알림 받는 사람의 EmployeeNo를 보내준다.
+					message = "[결재] 합의 요청이 도착했습니다. 확인해주세요.";
+			        if(approvalResultNo != null) {
+			        	approvalWebSocketHandler.sendApprovalNotification(dto.getAgreerIds().get(i), message, approvalResult);
+			        }
 			}
 			// 1. 결재자 저장
 			for (int i = 0; i < dto.getApproverIds().size(); i++) {
@@ -266,7 +283,7 @@ public class ApprovalService {
 								String approvalEmployeeTeam = approvalEmployee.getStructure().getCodeName();
 								String approvalEmployeeName = approvalEmployee.getEmployeeName();
 								String approvalEmployeePosition = approvalEmployee.getEmployeePosition();
-								String calendarTitleEmployeeInfo = approvalEmployeeTeam + " " + approvalEmployeeName + " " + approvalEmployeePosition + " ";
+								String calendarTitleEmployeeInfo = approvalEmployeeName + " " + approvalEmployeePosition + " ";
 								CompanyCalendarDto companyCalendarDto = CompanyCalendarDto.builder()
 										.employee_no(approvalEmployee.getEmployeeNo())
 										.company_creator(approvalEmployee.getEmployeeId())
@@ -289,8 +306,8 @@ public class ApprovalService {
 									// 연차 정보 캘린더 기입
 									vacationStart += " 09:00:00";
 									vacationEnd += " 18:00:00";
-									companyCalendarDto.setCompany_content("연차");
-									companyCalendarDto.setCompany_title(calendarTitleEmployeeInfo + " 연차");
+									companyCalendarDto.setCompany_title(calendarTitleEmployeeInfo +  " 연차");
+									companyCalendarDto.setCompany_content(approvalEmployeeName + "님의 연차입니다. 참고부탁드립니다.");
 									
 								} else if(approval.getApprovalFormat().getApprovalFormatNo() == 8) {
 									// 반차의 경우
@@ -303,13 +320,13 @@ public class ApprovalService {
 									if("am".equals(delimeter)) {
 										vacationStart = vacation + " 09:00:00";
 										vacationEnd = vacation + " 12:00:00";
-										companyCalendarDto.setCompany_content("오전 반차");
 										companyCalendarDto.setCompany_title(calendarTitleEmployeeInfo + " 반차(오전)");
+										companyCalendarDto.setCompany_content("["+approvalEmployeeTeam+"] " + approvalEmployeeName + "님의 오전 반차입니다. 참고부탁드립니다.");
 									} else if("pm".equals(delimeter)) {
 										vacationStart = vacation + " 12:00:00";
 										vacationEnd = vacation + " 18:00:00";
-										companyCalendarDto.setCompany_content("오후 반차");
 										companyCalendarDto.setCompany_title(calendarTitleEmployeeInfo + " 반차(오후)");
+										companyCalendarDto.setCompany_content("["+approvalEmployeeTeam+"] " + approvalEmployeeName + "님의 오후 반차입니다. 참고부탁드립니다.");
 									}
 									
 									
