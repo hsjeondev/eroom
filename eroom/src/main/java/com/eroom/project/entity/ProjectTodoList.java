@@ -1,10 +1,14 @@
 package com.eroom.project.entity;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,4 +41,8 @@ public class ProjectTodoList {
 	
 	@Column(name="list_color")
 	private String listColor;
+	
+	@OneToMany(mappedBy = "projectTodoList")
+	@OrderBy("elementSequence ASC")
+    private List<ProjectTodoElement> projectTodoElements;
 }

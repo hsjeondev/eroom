@@ -15,6 +15,8 @@ import com.eroom.drive.entity.Drive;
 public interface DriveRepository extends JpaRepository<Drive, Long>{
 	// 개인 드라이브 파일 리스트 조회
 	List<Drive> findByUploader_EmployeeNoAndVisibleYn(Long employeeNo, String visibleYn);
+	// 팀 드라이브 파일 리스트 조회
+	List<Drive> findBySeparatorCodeAndVisibleYn(String separatorCode, String visibleYn);
 	// 개인 드라이브 파일 상세 조회
 	Drive findByDriveAttachNo(Long driveAttachNo);
 	// 개인 드라이브 파일 삭제
@@ -40,6 +42,7 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
 	List<Drive> findByParam1AndVisibleYnAndSeparatorCode(Long param1, String visibleYn, String separatorCode);
 	// driveAttachNo와 Drive_delete_yn N을 기준으로 조회
 	Drive findByDriveAttachNoAndVisibleYnAndSeparatorCode(Long driveAttachNo, String visibleYn, String separatorCode);
+	
 
 	// 메일 파일 조회
 	//List<Drive> findBySeparatorCodeAndParam1AndDriveDeleteYn(String separatorCode, Long param1, String driveDeleteYn);

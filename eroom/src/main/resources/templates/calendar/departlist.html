@@ -3,6 +3,7 @@
 <head>
   <title>부서 캘린더</title>
 </head>
+
 <body>
   <main class="main" id="top" layout:fragment="content">
     <div class="row g-0 mb-4 align-items-center">
@@ -100,7 +101,12 @@
     let departmentSource = null;
 
     document.addEventListener('DOMContentLoaded', function () {
-      const calendarEl = document.getElementById('appCalendar');
+    	  const calendarEl = document.getElementById('appCalendar');
+
+    	  const style = document.createElement('style');
+    	  style.innerHTML = `.fc-event-main::after { display: none !important; }`;
+    	  document.head.appendChild(style);
+      
 
       calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
@@ -217,63 +223,76 @@
 		        console.error('modalButton not found');
 		    }
 		},
-        eventDidMount: function (info) {		 		
-		 		  const el = info.el;
-		 		  const separator = info.event.extendedProps.separator || "";
-		 		  const type = info.event.extendedProps.type;
+		eventDidMount: function (info) {		 		
+			  const el = info.el;
 
-		 		  // 공휴일일 경우 스타일 적용
-		 		  if (type === "holiday") {
-		 		    el.style.setProperty("background-color", "#FFF8B3", "important"); // 연노랑
-		 		    el.style.setProperty("border", "1px solid #F5E79E", "important");
-		 		    el.style.setProperty("color", "#4B4B4B", "important");
-		 		    el.style.setProperty("pointer-events", "none", "important"); // 클릭 막기
-		 		    el.style.setProperty("opacity", "1", "important");
-		 		    return;
-		 		  }
+			  // ⭐ 점(•) 없애기
+			  el.classList.remove('fc-daygrid-dot-event');
 
-		 		  //  팀/부서 색상 매핑
-		 		  const departmentColorMap = {
-		 				  "D001": "#E0BBE4", // 연보라
-		 				  "D002": "#A2D2FF", // 시원한 연하늘 파랑
-		 				  "D003": "#B5E48C", // 부드러운 연두
-		 				  "D004": "#FF8C94"  // 부드러운 로즈 핑크
-		 		  };
+			  const separator = info.event.extendedProps.separator || "";
+			  const type = info.event.extendedProps.type;
 
-		 		  const teamToDepartmentMap = {
-		 		    "T001": "D001", "T002": "D002", "T003": "D002", "T004": "D002",
-		 		    "T005": "D003", "T006": "D003", "T007": "D004", "T008": "D004"
-		 		  };
+			  // 공휴일일 경우 스타일 적용
+			  if (type === "holiday") {
+			    el.style.setProperty("background-color", "#FFF8B3", "important");
+			    el.style.setProperty("border", "1px solid #F5E79E", "important");
+			    el.style.setProperty("color", "#4B4B4B", "important");
+			    el.style.setProperty("pointer-events", "none", "important");
+			    el.style.setProperty("opacity", "1", "important");
+			    return;
+			  }
 
-		 		  // 기존 switch-case 우선 적용
-		 		  let backgroundColor, borderColor, textColor;
+			  // 팀/부서 색상 매핑
+			  const departmentColorMap = {
+			    "D001": "#E0BBE4",
+			    "D002": "#A2D2FF",
+			    "D003": "#B5E48C",
+			    "D004": "#FF8C94"
+			  };
 
-		 		  switch (separator) {
-		 		    case "E001":
-		 		      backgroundColor = "#C1F0E3";
-		 		      borderColor = "#A3E4A0";
-		 		      textColor = "#1A3C1A";
-		 		      break;
-		 		    case "A001":
-		 		      backgroundColor = "#F8D7DA";
-		 		      borderColor = "#F5C6CB";
-		 		      textColor = "#721C24";
-		 		      break;
-		 		    default:
-		 		      // 팀에 따른 부서 색상 적용
-		 		      const deptCode = teamToDepartmentMap[separator] || null;
-		 		      const deptColor = departmentColorMap[deptCode] || "#CCCCCC";
+			  const teamToDepartmentMap = {
+			    "T001": "D001", "T002": "D002", "T003": "D002", "T004": "D002",
+			    "T005": "D003", "T006": "D003", "T007": "D004", "T008": "D004"
+			  };
 
-		 		      backgroundColor = deptColor;
-		 		      borderColor = deptColor;
-		 		      textColor = "#000000";
-		 		      break;
-		 		  }
+			  let backgroundColor, borderColor, textColor;
 
-		 		  el.style.setProperty("background-color", backgroundColor, "important");
-		 		  el.style.setProperty("border-color", borderColor, "important");
-		 		  el.style.setProperty("color", textColor, "important");
-		  }
+			  switch (separator) {
+			    case "E001":
+			      backgroundColor = "#C1F0E3";
+			      borderColor = "#A3E4A0";
+			      textColor = "#1A3C1A";
+			      break;
+			    case "A001":
+			      backgroundColor = "#F8D7DA";
+			      borderColor = "#F5C6CB";
+			      textColor = "#721C24";
+			      break;
+			    default:
+			      const deptCode = teamToDepartmentMap[separator] || null;
+			      const deptColor = departmentColorMap[deptCode] || "#CCCCCC";
+			      backgroundColor = deptColor;
+			      borderColor = deptColor;
+			      textColor = "#000000";
+			      break;
+			  }
+
+			  el.style.setProperty("background-color", backgroundColor, "important");
+			  el.style.setProperty("border-color", borderColor, "important");
+			  el.style.setProperty("color", textColor, "important");
+
+			  const eventMain = el.querySelector(".fc-event-main");
+			  if (eventMain) {
+			    eventMain.style.setProperty("background", "none", "important");
+			    eventMain.style.setProperty("padding", "0", "important");
+			    eventMain.style.setProperty("margin", "0", "important");
+			    eventMain.style.setProperty("font-size", "14px", "important");
+			    eventMain.style.setProperty("font-weight", "500", "important");
+			    eventMain.style.setProperty("text-align", "left", "important");
+			    eventMain.style.setProperty("display", "block", "important");
+			  }
+			}
+
 		 	
       });
 

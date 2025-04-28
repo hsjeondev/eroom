@@ -5,6 +5,11 @@
 
 <head>
 <title>회사 캘린더</title>
+<style>
+.fc-event-main::after {
+  display: none !important;
+}
+</style>
 </head>
 <body>
 
@@ -664,84 +669,114 @@
 
 		<!-- 일정 등록 -->
 		<script>
-		  function format(date) {
-		    const pad = (n) => n.toString().padStart(2, '0');
-		    const yyyy = date.getFullYear();
-		    const MM = pad(date.getMonth() + 1);
-		    const dd = pad(date.getDate());
-		    const HH = pad(date.getHours());
-		    const mm = pad(date.getMinutes());
-		    return `${yyyy}-${MM}-${dd}T${HH}:${mm}`;
-		  }
+		function format(date) {
+		  const pad = (n) => n.toString().padStart(2, '0');
+		  const yyyy = date.getFullYear();
+		  const MM = pad(date.getMonth() + 1);
+		  const dd = pad(date.getDate());
+		  const HH = pad(date.getHours());
+		  const mm = pad(date.getMinutes());
+		  return `${yyyy}-${MM}-${dd}T${HH}:${mm}`;
+		}
 		
-		  function setDefaultTime() {
-		    const startInput = document.getElementById("calendarStartTime");
-		    const endInput = document.getElementById("calendarEndTime");
+		function setDefaultTime() {
+		  const startInput = document.getElementById("calendarStartTime");
+		  const endInput = document.getElementById("calendarEndTime");
 		
-		    if (!startInput || !endInput) return;
+		  if (!startInput || !endInput) return;
 		
-		    const now = new Date();
-		    const startTime = new Date(now);
-		    const endTime = new Date(now);
-		    endTime.setHours(endTime.getHours() + 1);
+		  const now = new Date();
+		  const startTime = new Date(now);
+		  const endTime = new Date(now);
+		  endTime.setHours(endTime.getHours() + 1);
 		
-		    startInput.value = format(startTime);
-		    endInput.value = format(endTime);
+		  startInput.value = format(startTime);
+		  endInput.value = format(endTime);
+		  endInput.min = startInput.value;
+		}
+		
+		function setMinEndTime() {
+		  const startInput = document.getElementById("calendarStartTime");
+		  const endInput = document.getElementById("calendarEndTime");
+		
+		  if (startInput && endInput) {
 		    endInput.min = startInput.value;
-		  }
-		
-		  function setMinEndTime() {
-		    const startInput = document.getElementById("calendarStartTime");
-		    const endInput = document.getElementById("calendarEndTime");
-		
-		    if (startInput && endInput) {
-		      endInput.min = startInput.value;
-		      if (endInput.value < startInput.value) {
-		        endInput.value = startInput.value;
-		      }
+		    if (endInput.value < startInput.value) {
+		      endInput.value = startInput.value;
 		    }
 		  }
+		}
 		
-		  document.addEventListener("DOMContentLoaded", function () {
-		    const startInput = document.getElementById("calendarStartTime");
-		    if (startInput) {
-		      startInput.addEventListener("change", setMinEndTime);
+		document.addEventListener("DOMContentLoaded", function () {
+		  const startInput = document.getElementById("calendarStartTime");
+		  const form = document.addEventForm;
+		  const modal = document.getElementById("addEventModal"); // ⭐ 모달 요소 찾기
+		
+		  const submitBtn = form.querySelector('button[type="submit"]'); // ⭐ 등록 버튼 찾기
+		
+		  if (startInput) {
+		    startInput.addEventListener("change", setMinEndTime);
+		  }
+		
+		  // 페이지 로드될 때 기본 시간 설정
+		  setDefaultTime();
+		
+		  form.addEventListener("submit", async function (e) {
+		    e.preventDefault();
+		
+		    submitBtn.disabled = true; // ⭐ 버튼 비활성화
+		
+		    const startTimeValue = Date.parse(form.calendar_start_time.value);
+		    const endTimeValue = Date.parse(form.calendar_end_time.value);
+		
+		    if (!form.company_title.value) {
+		      alert("제목을 입력해주세요!");
+		      submitBtn.disabled = false;
+		      return;
 		    }
 		
-		    // 페이지 로드될 때 기본 시간 설정 (현재 + 1시간)
-		    setDefaultTime();
+		    if (startTimeValue > endTimeValue) {
+		      alert("종료시간은 시작시간 이후여야 합니다!");
+		      submitBtn.disabled = false;
+		      return;
+		    }
 		
-		    const form = document.addEventForm;
-		    form.addEventListener("submit", function (e) {
-		      e.preventDefault();
+		    const payload = new FormData(form);
 		
-		      const startTime = new Date(form.calendar_start_time.value);
-		      const endTime = new Date(form.calendar_end_time.value);
-		
-		      if (!form.company_title.value) {
-		        alert("제목을 입력해주세요!");
-		        return;
-		      }
-		
-		      const payload = new FormData(form);
-		      fetch("/companycalendar/add", {
-		        method: "post",
+		    try {
+		      const response = await fetch("/companycalendar/add", {
+		        method: "POST",
 		        headers: {
 		          'header': document.querySelector('meta[name="_csrf_header"]').content,
 		          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
 		        },
 		        body: payload
-		      })
-		        .then(response => response.json())
-		        .then(data => {
-		          alert(data.res_msg);
-		          if (data.res_code == 200) {
-		            location.reload();
-		          }
-		        });
-		    });
+		      });
+		
+		      const data = await response.json();
+		      if (data.res_code == 200) {
+		        alert(data.res_msg);
+		        location.reload();
+		      } else {
+		        alert(data.res_msg);
+		        submitBtn.disabled = false;
+		      }
+		    } catch (error) {
+		      console.error("등록 중 오류 발생:", error);
+		      alert("일정 등록에 실패했습니다.");
+		      submitBtn.disabled = false;
+		    }
 		  });
+		
+		  // 모달 열릴 때마다 현재시간 세팅
+		  if (modal) {
+		    modal.addEventListener("show.bs.modal", function () {
+		      setDefaultTime();
+		    });
+		  }
+		});
 		</script>
+
 
 
 
