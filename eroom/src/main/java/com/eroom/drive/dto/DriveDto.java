@@ -36,7 +36,7 @@ public class DriveDto {
     private LocalDateTime driveRegDate; // 등록일
     private LocalDateTime driveModDate; // 수정일
     private String driveEditor; //  수정자
-    private String driveDeleteYn; // 삭제여부 
+    private String visibleYn; // 사용여부
     private String driveDescription; // 파일 설명
     private List<MultipartFile> driveFiles; // 업로드 파일들
     private List<String> driveDescriptions; // 파일 설명들
@@ -58,7 +58,7 @@ public class DriveDto {
 				.driveRegDate(entity.getDriveRegDate())
 				.driveModDate(entity.getDriveModDate())
 				.driveEditor(entity.getDriveEditor())
-				.driveDeleteYn(entity.getDriveDeleteYn())
+				.visibleYn(entity.getVisibleYn())
 				.driveDescription(entity.getDriveDescription())
 				.param1(entity.getParam1())
 				.build();
@@ -75,7 +75,7 @@ public class DriveDto {
 				.drivePath(drivePath)
 				.downloadCount(downloadCount)
 				.driveEditor(driveEditor)
-				.driveDeleteYn(driveDeleteYn)
+				.visibleYn(visibleYn)
 				.driveDescription(driveDescription)
 				.param1(param1)
 				.build();

@@ -76,7 +76,7 @@ public class DriveService {
 		                .drivePath("drive/personal/" + newName)
 		                .driveDescription(description)
 		                .downloadCount(0L)
-		                .driveDeleteYn("N")
+		                .visibleYn("Y")
 		                .build();
 		        
 		        driveRepository.save(drive);
@@ -90,7 +90,7 @@ public class DriveService {
 	}
 	// ------------------------- 개인 드라이브 파일 리스트 조회 --------------------------
 	public List<DriveDto> findPersonalDriveFiles(Long employeeNo) {
-	    List<Drive> drives = driveRepository.findByUploader_EmployeeNoAndDriveDeleteYn(employeeNo, "N");
+	    List<Drive> drives = driveRepository.findByUploader_EmployeeNoAndVisibleYn(employeeNo, "Y");
 	    List<DriveDto> result = new ArrayList<>();
 
 	    for (Drive drive : drives) {
@@ -111,7 +111,7 @@ public class DriveService {
 	        if (file != null && !file.isEmpty()) {
 	            String ext = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
 	            String newName = UUID.randomUUID().toString().replace("-", "") + ext;
-	            String path = fileDir + "personal/" + newName;
+	            String path = fileDir + "drive/personal/" + newName;
 	            File newFile = new File(path);
 	            if (!newFile.getParentFile().exists()) newFile.getParentFile().mkdirs();
 	            file.transferTo(newFile);
@@ -196,7 +196,7 @@ public class DriveService {
 		                .driveSize(file.getSize())
 		                .drivePath(path)
 		                .downloadCount(0L)
-		                .driveDeleteYn("N")
+		                .visibleYn("Y")
 		                .param1(driverDto.getParam1())
 		                .build();
 		        
@@ -212,7 +212,7 @@ public class DriveService {
 	// ------------------------- 결재 파일 리스트 조회 --------------------------
 	// 결재 번호(param1)로 조회
 	public List<DriveDto> findApprovalDriveFiles(Long param1) {
-	    List<Drive> drives = driveRepository.findByParam1AndDriveDeleteYnAndSeparatorCode(param1, "N", "Fl007");
+	    List<Drive> drives = driveRepository.findByParam1AndVisibleYnAndSeparatorCode(param1, "N", "Fl007");
 	    List<DriveDto> result = new ArrayList<>();
 
 	    for (Drive drive : drives) {
@@ -226,7 +226,7 @@ public class DriveService {
 		int result = 0;
 		try {
 			for(Long l : approvalAttachFileIds) {
-				Drive oldDrive = driveRepository.findByDriveAttachNoAndDriveDeleteYnAndSeparatorCode(l, "N", "FL007");
+				Drive oldDrive = driveRepository.findByDriveAttachNoAndVisibleYnAndSeparatorCode(l, "N", "FL007");
 				// 영속성 없는 객체 생성
 	            Drive newDrive = new Drive();
 	            
@@ -239,7 +239,7 @@ public class DriveService {
 	            newDrive.setDrivePath(oldDrive.getDrivePath());
 	            newDrive.setDriveDescription(oldDrive.getDriveDescription());
 	            newDrive.setDownloadCount(0L);
-	            newDrive.setDriveDeleteYn("N");
+	            newDrive.setVisibleYn("Y");
 	            newDrive.setParam1(approvalNo);
 
 	            driveRepository.save(newDrive);
