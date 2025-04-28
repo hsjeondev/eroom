@@ -91,6 +91,7 @@ public class DriveController {
 		Long employeeNo = user.getEmployee().getEmployeeNo();
 	    List<DriveDto> fileList = driveService.findPersonalDriveFiles(employeeNo);
 	    model.addAttribute("fileList", fileList);
+	    model.addAttribute("userName", user.getEmployee().getEmployeeName());
 		return "drive/personal";
 	}
 	// ------------------------------------------ 파일 업로드 ------------------------------------------
