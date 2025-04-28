@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -30,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.eroom.drive.dto.DriveDto;
 import com.eroom.drive.entity.Drive;
+import com.eroom.drive.repository.DriveRepository;
 import com.eroom.drive.service.DriveService;
 import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.StructureService;
@@ -44,6 +46,8 @@ public class DriveController {
 
 	private final DriveService driveService;
 	private final StructureService structureService;
+	private final DriveRepository driveRepository;
+	
 	// 파일 저장 경로 
 		 @Value("${ffupload.location}")
 		 private String fileDir;
@@ -301,6 +305,46 @@ public class DriveController {
 
 	    return ResponseEntity.ok(resultMap);
 	}
+	// 팀 드라이브 파일 삭제
+	@DeleteMapping("/delete/team/{attachNo}")
+	@ResponseBody
+	public Map<String, String> deleteTeamDriveFile(@PathVariable("attachNo") Long driveAttachNo,
+	                                               @AuthenticationPrincipal EmployeeDetails user) {
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "삭제 실패");
+
+	    // 현재 로그인한 사용자의 팀 정보 가져오기
+	    String separatorCode = user.getEmployee().getStructure().getSeparatorCode(); // 로그인한 사용자의 팀 정보
+	    Optional<Drive> optionalDrive = driveRepository.findById(driveAttachNo);
+
+	    if (optionalDrive.isPresent()) {
+	        Drive drive = optionalDrive.get();
+
+	        // 파일의 separatorCode(팀 코드)와 로그인한 사용자의 팀 코드가 동일한지 확인
+	        if (!drive.getSeparatorCode().equals(separatorCode)) {
+	            resultMap.put("res_msg", "팀 소속이 아니므로 삭제할 수 없습니다.");
+	            return resultMap;  // 다른 팀의 파일은 삭제할 수 없음
+	        }
+
+	        // 파일 삭제 로직
+	        int deleteResult = driveService.deleteDriveFile(driveAttachNo);
+	        if (deleteResult > 0) {
+	            resultMap.put("res_code", "200");
+	            resultMap.put("res_msg", "삭제 성공");
+	        } else {
+	            resultMap.put("res_msg", "삭제 실패");
+	        }
+	    } else {
+	        resultMap.put("res_msg", "해당 파일을 찾을 수 없습니다.");
+	    }
+
+	    return resultMap;
+	}
+
+
+
+	
 	
 	// 결재 파일 다운로드 - 개인 다운로드 기능 그대로 가져왔는데 개인 다운로드 기능 변화 없으면 병합 필요(결재의 detail.html a태그 링크만 바꾸면 됨)
 	@GetMapping("/download/approval/{driveAttachNo}")
