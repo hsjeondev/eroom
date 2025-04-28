@@ -358,8 +358,8 @@
 			</div>
 
 
-			<!-- 등록을 위한 fetch -->
-			<script>
+					<!-- 등록을 위한 fetch -->
+					<script>
 				
 						document.addEventListener("DOMContentLoaded", function () {
 							  const form = document.addEventForm;
@@ -888,6 +888,7 @@
 		  const companyLat = 37.477902;
 		  const companyLng = 126.886443;
 		  const TMAP_APP_KEY = /*[[${tmapKey}]]*/ "";
+		  let postcodePopupOpened = false;
 		
 		  function getDistanceFromTmap(address) {
 		    const geocoder = new kakao.maps.services.Geocoder();
@@ -930,25 +931,24 @@
 		    });
 		  }
 		
-		  function onAddressSelected(distance, time) {
-		    const distanceStr = `🚗 ${(distance / 1000).toFixed(2)}km 거리`;
-		    const timeStr = `⏰ ${(time / 60).toFixed(1)}분 소요 예상`;
-		
-		    document.getElementById("distanceInfoBox").style.display = "block";
-		    document.getElementById("distanceText").innerText = distanceStr;
-		    document.getElementById("durationText").innerText = timeStr;
-		  }
-		
 		  window.openPostcode = function() {
-		    new daum.Postcode({
-		      oncomplete: function (data) {
-		        const address = data.address;
-		        document.getElementById("calendarLocation").value = address;
-		        document.activeElement.blur();
-		        getDistanceFromTmap(address);
-		      }
-		    }).open();
-		  }
+			    if (postcodePopupOpened) {
+			      return; // 이미 열려있으면 아무것도 안 함
+			    }
+			    postcodePopupOpened = true; // 팝업 여는 중 상태로 바꿈
+
+			    new daum.Postcode({
+			      oncomplete: function (data) {
+			        const address = data.address;
+			        document.getElementById("calendarLocation").value = address;
+			        document.activeElement.blur();
+			        getDistanceFromTmap(address);
+			      },
+			      onclose: function() { 
+			        postcodePopupOpened = false; // 팝업 닫힐 때 다시 열 수 있게
+			      }
+			    }).open();
+			  }
 		</script>
 		
 		
