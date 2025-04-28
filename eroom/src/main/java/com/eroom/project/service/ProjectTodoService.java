@@ -19,25 +19,21 @@ public class ProjectTodoService {
 	private final ProjectTodoListRepository projectTodoListRepository;
 	
 	public List<ProjectTodoListDto> findByProjectNo(Long projectNo) {
-		
-		List<ProjectTodoList> list = projectTodoListRepository
-		        .findByProjectNoOrderByListSequenceAsc(projectNo);
+	    
+	    List<ProjectTodoList> list = projectTodoListRepository
+	            .findWithElementsByProjectNo(projectNo);
 
 	    List<ProjectTodoListDto> dtolist = new ArrayList<>();
 
 	    for (ProjectTodoList projectTodoList : list) {
-	        ProjectTodoListDto dto = ProjectTodoListDto.builder()
-	            .project_todo_list_no(projectTodoList.getProjectTodoListNo())
-	            .project_no(projectTodoList.getProjectNo())
-	            .list_name(projectTodoList.getListName())
-	            .list_sequence(projectTodoList.getListSequence())
-	            .list_color(projectTodoList.getListColor())
-	            .build();
+	        ProjectTodoListDto dto = new ProjectTodoListDto().toDto(projectTodoList);
 	        dtolist.add(dto);
 	    }
 
 	    return dtolist;
 	}
+
+
 	
 	@Transactional()
 	public int addList(Long projectNo, String listName, String listColor, String position, String standardListId) {

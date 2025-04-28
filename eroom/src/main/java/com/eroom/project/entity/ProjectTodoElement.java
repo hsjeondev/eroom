@@ -1,13 +1,14 @@
 package com.eroom.project.entity;
 
-import java.util.List;
+import com.eroom.employee.entity.Employee;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,26 +22,25 @@ import lombok.Setter;
 @Setter
 @Builder
 @Entity
-@Table(name="project_todo_list")
-public class ProjectTodoList {
+@Table(name="project_todo_element")
+public class ProjectTodoElement {
 
 	@Id
-	@Column(name="project_todo_list_no")
+	@Column(name="todo_no")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long projectTodoListNo;
+	private Long todo_no;
 	
-	@Column(name="project_no")
-	private Long projectNo;
+	@ManyToOne
+	@JoinColumn(name="project_todo_list_no")
+	private ProjectTodoList projectTodoList;
 	
-	@Column(name="list_name")
-	private String listName;
+	@ManyToOne
+	@JoinColumn(name="employee_no")
+	private Employee employee;
 	
-	@Column(name="list_sequence")
-	private int listSequence;
+	@Column(name="todo_title")
+	private String todo_title;
 	
-	@Column(name="list_color")
-	private String listColor;
-	
-	@OneToMany(mappedBy = "projectTodoList")
-    private List<ProjectTodoElement> projectTodoElements;
+	@Column(name="emergency")
+	private String emergency; 
 }
