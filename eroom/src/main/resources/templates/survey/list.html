@@ -277,21 +277,26 @@
 	
 	
 	// 설문 등록 유효성 검사
+	
+	let focusTarget = null; // 포커스를 위한 변수
+	
 	document.addEventListener("DOMContentLoaded", function () {
 	  const form = document.getElementById('create-survey-form');
 
 	  form.addEventListener('submit', function (e) {
 	    e.preventDefault();
 	    
-	    const title = form.querySelector('input[name="surveyTitle"]').value.trim();
+	    const titleInput = form.querySelector('input[name="surveyTitle"]');
+	    const title = titleInput.value.trim();
+	    const itemInputs = form.querySelectorAll('input[name="items"]');
 	    const deadlineInput = form.querySelector('input[name="deadline"]');
 	    const deadlineValue = deadlineInput.value;
 	    const deadlineDate = new Date(deadlineValue);
 	    const now = new Date();
-	    const itemInputs = form.querySelectorAll('input[name="items"]');
 
 	    // 1. 제목 입력 여부 확인
 	    if (!title) {
+	      focusTarget = titleInput;
 	      showValidationAlert("제목 확인", "제목을 입력해주세요.");
 	      return;
 	    }
@@ -299,23 +304,30 @@
 	    // 2. 항목 입력 유효성 검사 (기본 + 추가 항목 포함)
 		let validItemCount = 0;
 		let hasEmptyItem = false;
+		let firstEmptyInput = null;
+		
 		itemInputs.forEach(function (input) {
 		  const value = input.value.trim();
 		  if (value === '') {
 		    hasEmptyItem = true;
+		    if (!firstEmptyInput) {
+		      firstEmptyInput = input;
+		    }
 		  } else {
 		    validItemCount++;
 		  }
 		});
-		
+
 		// 항목이 2개 이상이면서 모두 값이 채워져 있어야 통과
 		if (validItemCount < 2 || hasEmptyItem) {
+		  focusTarget = firstEmptyInput || itemInputs[0];
 		  showValidationAlert("항목 확인", "모든 항목을 입력해주세요.");
 		  return;
 		}
 
 	    // 3. 마감일이 현재 시간 이후인지 확인
 	    if (!deadlineValue || deadlineDate <= now) {
+		  focusTarget = deadlineInput;
 	      showValidationAlert("마감일 확인", "올바른 마감일을 선택해주세요.");
 	      return;
 	    }
@@ -348,6 +360,14 @@
 	  titleEl.textContent = title;
 	  messageEl.innerHTML = message;
 	  modal.show();
+	  
+	  modalEl.addEventListener('hidden.bs.modal', function onClose() {
+	    modalEl.removeEventListener('hidden.bs.modal', onClose);
+	    if (focusTarget) {
+	      focusTarget.focus();
+	      focusTarget = null; 
+	    }
+	  });
 	}
 	
 	
@@ -759,13 +779,14 @@
 
 	</script>
 
+
+
 	<!-- 설문 생성 닫기 확인창 -->
 	<div class="modal fade" id="confirmCloseModal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-sm">
 			<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
 				<div class="modal-header border-0">
 					<h5 class="modal-title text-dark">정말 닫을까요?</h5>
-					<button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="닫기"></button>
 				</div>
 				<div class="modal-body text-center">
 					<p class="mb-0 text-body">
@@ -779,13 +800,15 @@
 			</div>
 		</div>
 	</div>
+	
+	
+	
 	<!-- 유효성 검사 확인창 -->
 	<div class="modal fade" id="validationModal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-sm">
 			<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
 				<div class="modal-header border-0">
 					<h5 class="modal-title text-dark" id="validationModalTitle"></h5>
-					<button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="닫기"></button>
 				</div>
 				<div class="modal-body text-center">
 					<p class="mb-0 text-body" id="validationModalMessage"></p>
@@ -796,6 +819,9 @@
 			</div>
 		</div>
 	</div>
+	
+	
+	
 	<!-- 투표 권한 확인창 -->
 	<div class="modal fade" id="voteAuthorityModal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-sm">
@@ -812,5 +838,8 @@
 			</div>
 		</div>
 	</div>
+	
+	
+	
 </th:block>
 </html>
