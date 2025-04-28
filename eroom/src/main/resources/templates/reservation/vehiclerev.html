@@ -210,6 +210,8 @@
 											onclick="openPostcode()">주소 검색</button>
 									</div>
 								</div>
+						
+								
 
 								<div id="distanceInfoBox" class="mt-2" style="display: none;">
 									<div class="text-center px-2 py-1 rounded"
@@ -882,11 +884,10 @@
 			});
 		</script>
 		
-		<!-- 카카오 TMAP -->
-		<script>
-	      const companyLat = 37.477902;
+		<script th:inline="javascript">
+		  const companyLat = 37.477902;
 		  const companyLng = 126.886443;
-		  const TMAP_APP_KEY = "";
+		  const TMAP_APP_KEY = /*[[${tmapKey}]]*/ "";
 		
 		  function getDistanceFromTmap(address) {
 		    const geocoder = new kakao.maps.services.Geocoder();
@@ -913,33 +914,32 @@
 		        })
 		        .then(res => res.json())
 		        .then(data => {
-		          const distance = data.features[0].properties.totalDistance;
-		          const time = data.features[0].properties.totalTime;
-		          
-		          onAddressSelected(distance, time);
-		          
+		          const distance = data?.features?.[0]?.properties?.totalDistance;
+		          const time = data?.features?.[0]?.properties?.totalTime;
+		          console.log("🔥 fetch 결과:", data);
+		
+		          if (distance != null && time != null) {
+		            onAddressSelected(distance, time);
+		          } else {
+		            alert("거리 계산 실패 😭");
+		          }
 		        });
 		      } else {
 		        alert("주소 좌표 못 찾았어 😭");
 		      }
 		    });
 		  }
-		  
-		  function onAddressSelected(distance, time) {
-				// 거리/시간 표시용 텍스트
-				const distanceStr = `🚗 ${(distance / 1000).toFixed(2)}km 거리`;
-				const timeStr = `⏰ ${(time / 60).toFixed(1)}분 소요 예상`;
-
-				// 숨겨졌던 div 보이게 하기
-				document.getElementById("distanceInfoBox").style.display = "block";
-
-				// 텍스트 채워주기
-				document.getElementById("distanceText").innerText = distanceStr;
-				document.getElementById("durationText").innerText = timeStr;
-			}
 		
-		  // 전역 함수 등록
-		  function openPostcode() {
+		  function onAddressSelected(distance, time) {
+		    const distanceStr = `🚗 ${(distance / 1000).toFixed(2)}km 거리`;
+		    const timeStr = `⏰ ${(time / 60).toFixed(1)}분 소요 예상`;
+		
+		    document.getElementById("distanceInfoBox").style.display = "block";
+		    document.getElementById("distanceText").innerText = distanceStr;
+		    document.getElementById("durationText").innerText = timeStr;
+		  }
+		
+		  window.openPostcode = function() {
 		    new daum.Postcode({
 		      oncomplete: function (data) {
 		        const address = data.address;
@@ -950,6 +950,9 @@
 		    }).open();
 		  }
 		</script>
+		
+		
+
 
 
 
