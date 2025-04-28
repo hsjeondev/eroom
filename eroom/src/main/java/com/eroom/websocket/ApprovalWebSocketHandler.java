@@ -9,6 +9,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.eroom.approval.entity.Approval;
+import com.eroom.approval.entity.ApprovalAlarm;
 import com.eroom.approval.service.ApprovalAlarmService;
 
 import lombok.RequiredArgsConstructor;
@@ -52,23 +53,24 @@ public class ApprovalWebSocketHandler extends TextWebSocketHandler {
     }
 
     // ApprovalService에서 호출할 메소드
-    public void sendApprovalNotification(Long approvalCreatorEmployeeNo, String message, Approval endApproval) {
-        WebSocketSession session = sessions.get(approvalCreatorEmployeeNo);
-        saveNotificationToDatabase(approvalCreatorEmployeeNo, message, endApproval);
+    public void sendApprovalNotification(Long receiverNo, String message, Approval approval) {
+        WebSocketSession session = sessions.get(receiverNo);
 
         if (session != null && session.isOpen()) {
             try {
+            	saveNotificationToDatabase(receiverNo, message, approval);
                 session.sendMessage(new TextMessage(message));
-                log.info("알림 전송 성공: employeeNo={}", approvalCreatorEmployeeNo);
+                log.info("알림 전송 성공: employeeNo={}", receiverNo);
             } catch (Exception e) {
-                log.error("알림 전송 실패: employeeNo=" + approvalCreatorEmployeeNo, e);
+                log.error("알림 전송 실패: employeeNo=" + receiverNo, e);
             }
         } else {
-            log.warn("알림 전송 실패: 세션이 존재하지 않거나 닫힘. employeeNo={}", approvalCreatorEmployeeNo);
+            log.warn("알림 전송 실패: 세션이 존재하지 않거나 닫힘. employeeNo={}", receiverNo);
         }
     }
     
-    private void saveNotificationToDatabase(Long approvalCreatorEmployeeNo, String message, Approval endApproval) {
-    	approvalAlarmService.alarmSaveMethod(approvalCreatorEmployeeNo, message, endApproval);
+    // 알람 저장용
+    private void saveNotificationToDatabase(Long receiverNo, String message, Approval approval) {
+    	approvalAlarmService.alarmSaveMethod(receiverNo, message, approval);
     }
 }

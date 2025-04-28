@@ -29,6 +29,7 @@ import com.eroom.approval.dto.ApprovalFormatDto;
 import com.eroom.approval.dto.ApprovalLineDto;
 import com.eroom.approval.dto.ApprovalRequestDto;
 import com.eroom.approval.entity.Approval;
+import com.eroom.approval.entity.ApprovalAlarm;
 import com.eroom.approval.entity.ApprovalFormat;
 import com.eroom.approval.entity.ApprovalLine;
 import com.eroom.approval.service.ApprovalFormatService;
@@ -43,6 +44,7 @@ import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.employee.service.StructureService;
 import com.eroom.security.EmployeeDetails;
+import com.eroom.websocket.ApprovalWebSocketHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -62,6 +64,7 @@ public class ApprovalController {
 	private final StructureService structureService;
 	private final EmployeeService employeeService;
 	private final DriveService driveService;
+	private final ApprovalWebSocketHandler approvalWebSocketHandler;
 	
 	
 	// 내가 올린 결재 리스트 조회
@@ -542,7 +545,7 @@ public class ApprovalController {
 					Boolean bool = false;
 					Boolean stackBool = false;
 					int count = 0;
-					// step이 0인 사람(합의자) 중 결재 상태가 A인 사람이 한명이라도 있으면 stackBool = false처리
+					// step이 0인 사람(합의자) 중 결재 상태가 A 아닌 사람이 한명이라도 있으면 stackBool = false처리
 					for(int i = 0; i < temp.size(); i++) {
 						if(temp.get(i).getApprovalLineStep() != 0) {
 							continue;

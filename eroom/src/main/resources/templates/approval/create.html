@@ -65,7 +65,7 @@
 									<button type="button" class="btn-close btn-close-white position-absolute top-0 end-0" th:attr="data-idx=${stat.count}"
 										aria-label="Remove" style="scale: 0.8;">
 									</button>
-									<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="approverSteps" th:value="${stat.count}">
+									<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="approverSteps" th:value="${approveMember.approval_line_step}">
 								</div>
 							</div>
 						</div>
