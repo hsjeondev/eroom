@@ -4,6 +4,8 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -893,11 +895,39 @@ public class DriveController {
 
 	    return ResponseEntity.ok(resultMap);
 	}
+	// ------------------------- 드라이브 세부정보 카드 통계 -------------------------------
+	@GetMapping("/summary/personal")
+	@ResponseBody
+	public Map<String, Object> getPersonalDriveSummary(@AuthenticationPrincipal EmployeeDetails user) {
+	    Long employeeNo = user.getEmployee().getEmployeeNo();
+	    String separatorCode = "E001"; // 개인 드라이브 구분자
 
+	    List<Drive> drives = driveRepository.findByUploader_EmployeeNoAndSeparatorCodeAndVisibleYn(employeeNo, separatorCode, "Y");
 
+	    long totalFiles = 0;
+	    long totalDownloads = 0;
+	    long totalSizeKB = 0;
+	    LocalDateTime recentDate = null;
 
+	    for (Drive drive : drives) {
+	        totalFiles++;
+	        totalDownloads += drive.getDownloadCount();
+	        totalSizeKB += drive.getDriveSize(); // DB에 저장된 KB 단위 숫자
+	        if (recentDate == null || drive.getDriveRegDate().isAfter(recentDate)) {
+	            recentDate = drive.getDriveRegDate();
+	        }
+	    }
 
-	
+	    double totalUsedGB = totalSizeKB / 1024.0 / 1024.0; // KB → MB → GB
+
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("totalFiles", totalFiles);
+	    result.put("totalDownloads", totalDownloads);
+	    result.put("recentUploadDate", recentDate != null ? recentDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : "-");
+	    result.put("totalUsedGB", totalUsedGB); // 소수점 포함 GB
+
+	    return result;
+	}
 	
 	// 결재 파일 다운로드 - 개인 다운로드 기능 그대로 가져왔는데 개인 다운로드 기능 변화 없으면 병합 필요(결재의 detail.html a태그 링크만 바꾸면 됨)
 	@GetMapping("/download/approval/{driveAttachNo}")
