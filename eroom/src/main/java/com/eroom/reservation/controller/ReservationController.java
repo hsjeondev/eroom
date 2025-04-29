@@ -311,11 +311,7 @@ public class ReservationController {
 		return meetingRoomService.getMeetingRoomTimes(date,facilityNo);
 	}
 	
-	@GetMapping("/meetingroom/resources")
-	@ResponseBody
-	public List<Map<String, Object>> getMeetingRoomResources() {
-	    return meetingRoomService.getMeetingRoomResources();
-	}
+
 
 
 }

@@ -84,7 +84,7 @@
 				</div>
 
 				
-				<!-- 📅 오늘 예약 현황 -->
+				<!-- 오늘 예약 현황 -->
 				<div>
 					<h5 class="fw-bold">오늘 예약 현황</h5>
 					<div class="table-responsive">
@@ -181,7 +181,7 @@
 								    if (endTime) endTime.selectedIndex = 0;
 								  });
 								});
-										</script>
+							</script>
 
 
 							<!-- 등록 모달창 -->
@@ -457,131 +457,6 @@
 				</script>
 
 
-
-
-
-			<!-- 페이징 -->
-			<!-- 			<div class="d-flex justify-content-center mt-3">
-							<div class="d-flex">
-								<button class="page-link disabled" data-list-pagination="prev"
-									disabled>
-									<i class="fas fa-chevron-left"></i>
-								</button>
-								<ul class="mb-0 pagination">
-									<li class="active">
-										<button class="page" type="button" data-i="1" data-page="5">1</button>
-									</li>
-								</ul>
-								<button class="page-link pe-0" data-list-pagination="next"
-									disabled>
-									<i class="fas fa-chevron-right"></i>
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div> -->
-
-
-			<!-- 차량 예약 수정 모달 -->
-			<!-- 		<div class="modal fade" id="editVehicleModal" tabindex="-1">
-				<div class="modal-dialog modal-dialog-centered">
-					<div class="modal-content border border-translucent">
-						<form id="editVehicleForm" autocomplete="off"
-							name="editVehicleForm">
-							<div class="modal-header px-card border-0">
-								<h5 class="mb-0 text-body-highlight">차량 예약 수정</h5>
-								<button
-									class="btn-close position-absolute top-0 end-0 mt-2 me-2"
-									type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-							</div>
-
-							<div class="modal-body p-4"> -->
-			<!-- 숨겨진 값들 -->
-			<!-- 		<input type="hidden" name="reservation_no" id="editReservationNo" />
-							    <input type="hidden"name="employee_no" th:value="${#authentication.principal.employee.employeeNo}" />
-								<input type="hidden" name="facility_no" id="editFacilityNo" />
-								<input type="hidden" name="separator_code" value="F002" id="editSeparator"> 
-								<input type="hidden" name="reservation_creator" th:value="${#authentication.principal.employee.employeeId}" />
-								<input type="hidden" name="reservation_editor" th:value="${#authentication.principal.employee.employeeId}" /> -->
-
-			<!-- 장소 -->
-			<!-- 		<div class="mb-3">
-									<label for="editLocation" class="form-label">목적지</label> <input
-										type="text" class="form-control form-control-sm"
-										id="editLocation" name="reservation_location"
-										placeholder="목적지를 적어주세요" />
-								</div> -->
-
-			<!-- 날짜 선택 -->
-			<!-- 			<div class="row g-2 mb-3">
-									<div class="col">
-										<label class="form-label">시작 날짜</label> <input type="date"
-											id="editStartDate" class="form-control"
-											name="reservation_start_date" />
-									</div>
-									<div class="col">
-										<label class="form-label">종료 날짜</label> <input type="date"
-											id="editEndDate" class="form-control"
-											name="reservation_end_date" />
-									</div>
-								</div> -->
-
-			<!-- 시간 선택 -->
-			<!-- 				<div class="row g-2 mt-2">
-									<div class="col">
-										<label class="form-label">시작 시간</label> <select
-											id="editStartTime" class="form-select">
-											<option value="09:00">09:00</option>
-											<option value="10:00">10:00</option>
-											<option value="11:00">11:00</option>
-											<option value="12:00">12:00</option>
-											<option value="13:00">13:00</option>
-											<option value="14:00">14:00</option>
-											<option value="15:00">15:00</option>
-											<option value="16:00">16:00</option>
-											<option value="17:00">17:00</option>
-										</select>
-									</div>
-									<div class="col">
-										<label class="form-label">종료 시간</label> <select
-											id="editEndTime" class="form-select">
-											<option value="10:00">10:00</option>
-											<option value="11:00">11:00</option>
-											<option value="12:00">12:00</option>
-											<option value="13:00">13:00</option>
-											<option value="14:00">14:00</option>
-											<option value="15:00">15:00</option>
-											<option value="16:00">16:00</option>
-											<option value="17:00">17:00</option>
-											<option value="18:00">18:00</option>
-											<option value="19:00">19:00</option>
-											<option value="20:00">20:00</option>
-											<option value="21:00">21:00</option>
-											<option value="22:00">22:00</option>
-											<option value="23:00">23:00</option>
-										</select>
-									</div>
-								</div>
-
-								숨겨서 서버로 보낼 datetime-local 값
-								<input type="hidden" name="reservation_start"
-									id="editCalendarStartTime" /> <input type="hidden"
-									name="reservation_end" id="editCalendarEndTime" />
-							</div>
-
-							<div class="modal-footer border-0 px-4 pb-3">
-								<button class="btn btn-primary w-100" type="submit">수정
-									완료</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div> -->
-
-
-
-
 			<!-- 캘린더 (오른쪽) -->
 			<div class="col-md-6">
 				<div class="calendar-outline" id="appCalendar"
@@ -596,13 +471,17 @@
 			  const loginEmployeeId = document.getElementById("loginEmployeeId").value;
 			  //console.log(separator+"!!!!!!!!!!!!!!!");
 			  const calendar = new FullCalendar.Calendar(calendarEl, {
-			      initialView: 'timeGridWeek',
+			      initialView: 'listMonth',
 			      locale: 'ko',		      
 			      headerToolbar: {
 			        left: 'prev,next today',
 			        center: 'title',
 			        right: ''
 			      },
+			      validRange: {           
+				        start: new Date()      
+				      },
+				  noEventsContent: '예약이 없습니다',
 			      buttonText: {
 			    	    today: '오늘' 
 			    	  },
@@ -613,59 +492,19 @@
 			          moreLinkText: "더보기"		       
 			          }
 			      },
-			      eventSources: [ //구글 캘린더로 공휴일 불러오기, 예약 현황 불러오기
-			    	    {
-			    	    	events: function (fetchInfo, successCallback, failureCallback) {
-			    	    		  fetch('/resvehicle/list/' + separator)
-			    	    		    .then(response => response.json())
-			    	    		    .then(events => {
-			    	    		      const styledEvents = events.map(event => ({
-			    	    		        ...event,
-			    	    		        backgroundColor: "#FFC0CB", // 연한 핑크 (조금 더 채도 진하게)
-			    	    		        borderColor: "#FFA6C9",     // 테두리 좀 더 진하게
-			    	    		        textColor: "#5C1A1B"        // 글자는 짙은 브라운
-			    	    		      }));
-			    	    		      successCallback(styledEvents);
-			    	    		    })
-			    	    		    .catch(error => {
-			    	    		      console.error("차량 예약 불러오기 실패", error);
-			    	    		      failureCallback(error);
-			    	    		    });
-			    	      	}
-			    	    },
-			    	    	{
-				    	      events: function (fetchInfo, successCallback, failureCallback) {
-				    	        const apiKey = 'AIzaSyCjXiu1ShbhE0XenBtciLx8ezU-mcZI0R0';
-				    	        const calendarId = 'ko.south_korea%23holiday@group.v.calendar.google.com';
-				    	        const timeMin = new Date(fetchInfo.start).toISOString();
-				    	        const timeMax = new Date(fetchInfo.end).toISOString();
-				    	        const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${timeMin}&timeMax=${timeMax}&orderBy=startTime&singleEvents=true`;
-	
-				    	        fetch(url)
-				    	          .then(response => response.json())
-				    	          .then(data => {
-				    	            if (!data.items) {
-				    	              console.warn("공휴일 데이터 없음", data);
-				    	              return successCallback([]);
-				    	            }
-				    	            const holidays = data.items.map(item => ({
-				    	              title: item.summary,
-				    	              start: item.start.date,
-				    	              allDay: true,
-				    	              extendedProps: {
-				    	            	    type: 'holiday'
-				    	            	  }
-				    	              
-				    	            }));
-				    	            successCallback(holidays);
-				    	          })
-				    	          .catch(error => {
-				    	            console.error("공휴일 불러오기 실패", error);
-				    	            failureCallback(error);
-				    	          });
-				    	      }
-				    	    }
-				    	  ],
+			      eventSources: [
+			    	  {
+			    	    events: function (fetchInfo, successCallback, failureCallback) {
+			    	      fetch('/resvehicle/list/' + separator)
+			    	        .then(response => response.json())
+			    	        .then(events => successCallback(events))
+			    	        .catch(error => {
+			    	          console.error("차량 예약 불러오기 실패", error);
+			    	          failureCallback(error);
+			    	        });
+			    	    }
+			    	  }
+			    	],
 				    	  
 			      eventDisplay: 'block',
 			      dayCellContent: function (info) {
@@ -717,74 +556,51 @@
 			    	    console.error("모달이 없습니다.");
 			    	  }
 			    	},
-			      eventDidMount: function(info) {
-			    	  const el = info.el;
-			    	  const isHoliday = info.event.extendedProps.type === "holiday";
+			    	eventDidMount: function(info) {
+			    		  const el = info.el;
+			    		  const eventDate = new Date(info.event.start);
+			    		  const today = new Date();
 
-			    	  // 공휴일일 경우
-			    	  if (isHoliday) {
-			    	    el.style.setProperty("background-color", "#FFF8B3", "important"); // 연노랑
-			    	    el.style.setProperty("border", "1px solid #F5E79E", "important");
-			    	    el.style.setProperty("color", "#4B4B4B", "important");
-			    	    el.style.setProperty("pointer-events", "none", "important"); // 클릭 막기
-			    	    el.style.setProperty("opacity", "1", "important");
+			    		  const isToday = eventDate.getFullYear() === today.getFullYear() &&
+			    		                  eventDate.getMonth() === today.getMonth() &&
+			    		                  eventDate.getDate() === today.getDate();
 
-			    	    // 공통 스타일 적용 
-			    	    el.style.setProperty("font-size", "10px", "important");
-			    	    el.style.setProperty("font-weight", "400", "important");
-			    	    el.style.setProperty("padding", "0 2px", "important");
-			    	    el.style.setProperty("margin", "1px 0", "important");
-			    	    el.style.setProperty("border-radius", "2px", "important");
-			    	    el.style.setProperty("height", "auto", "important");
-			    	    el.style.setProperty("white-space", "nowrap", "important");
-			    	    el.style.setProperty("overflow", "hidden", "important");
-			    	    el.style.setProperty("text-overflow", "ellipsis", "important");
+			    		  // 기본 스타일 먼저 적용
+			    		  el.style.setProperty("background-color", "#F9F9F9", "important");
+			    		  el.style.setProperty("border", "1px solid #DDD", "important");
+			    		  el.style.setProperty("color", "#000", "important");
+			    		  el.style.setProperty("font-size", "12px", "important");
+			    		  el.style.setProperty("font-weight", "700", "important");
+			    		  el.style.setProperty("padding", "6px 10px", "important");
+			    		  el.style.setProperty("margin", "4px 0", "important");
+			    		  el.style.setProperty("border-radius", "6px", "important");
+			    		  el.style.setProperty("box-shadow", "0 2px 5px rgba(0,0,0,0.05)", "important");
+			    		  el.style.setProperty("transition", "background-color 0.2s ease", "important");
+			    		  el.style.setProperty("white-space", "nowrap", "important");
+			    		  el.style.setProperty("overflow", "hidden", "important");
+			    		  el.style.setProperty("text-overflow", "ellipsis", "important");
 
-			    	    const eventMain = el.querySelector(".fc-event-main");
-			    	    if (eventMain) {
-			    	      eventMain.style.setProperty("white-space", "nowrap", "important");
-			    	      eventMain.style.setProperty("overflow", "hidden", "important");
-			    	      eventMain.style.setProperty("text-overflow", "ellipsis", "important");
-			    	      eventMain.style.setProperty("font-size", "9px", "important");
-			    	    }
+			    		  // 오늘이면 스타일 덮어쓰기
+			    		  if (isToday) {
+			    		    el.style.setProperty("background-color", "#D6EBFF", "important");  
+			    		    el.style.setProperty("border", "2px solid #3399FF", "important");   
+			    		    el.style.setProperty("color", "#0D47A1", "important");              
+			    		    el.style.setProperty("font-weight", "bold", "important");      
+			    		  }
 
-			    	    return;
-			    	  }
-
-			    	  //일반 이벤트 스타일 (초슬림 공통 적용)
-						el.style.setProperty("background-color", "#C8C8C8", "important"); 
-						el.style.setProperty("border", "2px solid #666666", "important"); 
-						el.style.setProperty("color", "#000000", "important"); 
-						el.style.setProperty("font-size", "12px", "important");
-						el.style.setProperty("font-weight", "800", "important");
-						el.style.setProperty("letter-spacing", "0.5px", "important");
-						el.style.setProperty("padding", "6px 10px", "important");
-						el.style.setProperty("margin", "2px 0", "important");
-						el.style.setProperty("border-radius", "8px", "important");
-						el.style.setProperty("box-shadow", "0 3px 6px rgba(0, 0, 0, 0.2)", "important");
-						el.style.setProperty("white-space", "nowrap", "important");
-						el.style.setProperty("overflow", "hidden", "important");
-						el.style.setProperty("text-overflow", "ellipsis", "important");
-						
-						// ⭐⭐ 추가 ⭐⭐
-						el.style.setProperty("display", "flex", "important"); 
-						el.style.setProperty("align-items", "center", "important"); 
-						el.style.setProperty("justify-content", "flex-start", "important");
-						
-						// 안쪽 fc-event-main
-						const eventMain = el.querySelector(".fc-event-main");
-						if (eventMain) {
-						  eventMain.style.setProperty("text-align", "left", "important");
-						  eventMain.style.setProperty("padding-left", "6px", "important");
-						  eventMain.style.setProperty("white-space", "nowrap", "important");
-						  eventMain.style.setProperty("overflow", "hidden", "important");
-						  eventMain.style.setProperty("text-overflow", "ellipsis", "important");
-						  eventMain.style.setProperty("font-size", "12px", "important");
-						  eventMain.style.setProperty("font-weight", "700", "important");
-						  
-						}
-			      	}
-			  	});
+			    		  // hover 효과
+			    		  el.addEventListener("mouseenter", function() {
+			    		    el.style.backgroundColor = "#EEF6FF"; // hover 시 연파랑
+			    		  });
+			    		  el.addEventListener("mouseleave", function() {
+			    		    if (isToday) {
+			    		      el.style.backgroundColor = "#D6EBFF";  // 오늘이면 연파랑 복귀
+			    		    } else {
+			    		      el.style.backgroundColor = "#F9F9F9";  // 기본은 회색 복귀
+			    		    }
+			    		  });
+			    		}
+			  });
 			  
 			  //수정 모달에 값 채워넣기 + resvationNo 기준
 			/* document.getElementById("editVehicleBtn").addEventListener("click", function () {
