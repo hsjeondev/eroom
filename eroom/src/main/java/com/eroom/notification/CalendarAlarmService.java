@@ -61,6 +61,26 @@ public class CalendarAlarmService {
 		            calendarAlarmRepository.save(alarm);
 		        }
 		    }
-		}
+		  
+		  @Transactional
+		  public List<CalendarAlarmDto> getUnreadCompanyAlarms() {
+		      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		      EmployeeDetails user = (EmployeeDetails) auth.getPrincipal();
+		      Long employeeNo = user.getEmployeeNo();
+
+		      List<CalendarAlarm> alarms = calendarAlarmRepository.findByEmployeeNoAndAlarmReadYnAndSeparatorStartingWith(
+		              employeeNo, "N", "A"
+		      );
+
+		      List<CalendarAlarmDto> result = new ArrayList<>();
+		      for (CalendarAlarm alarm : alarms) {
+		          result.add(new CalendarAlarmDto().toDto(alarm));
+		      }
+
+		      return result;
+		  }
+	}
+
+
 	
 

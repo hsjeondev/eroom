@@ -24,6 +24,7 @@ public class CalendarAlarmDto {
 	private String alarm_read_yn = "N";
 	private LocalDateTime alarm_reg_date;
 	private String separator;
+	private String calendar_title;
 	
 	public CalendarAlarm toEntity() {
 		return CalendarAlarm.builder()

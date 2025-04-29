@@ -2,6 +2,9 @@
 <html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{/include/layout}">
+	<head>
+		<title>알림</title>
+	</head>
 <body>
 	<main class="main" id="top" layout:fragment="content">
 		<div class="content">
@@ -36,7 +39,7 @@
 							</p>
 							<p class="text-body-secondary fs-9 mb-0">
 								<i class="fas fa-clock me-1"></i> <span class="fw-bold"
-									th:text="|${#temporals.format(alarm.alarm_reg_date, 'hh:mm a')} ${#temporals.format(alarm.alarm_reg_date, 'yyyy-MM-dd')}|">
+									th:text="|${#temporals.format(alarm.alarm_reg_date, 'a h:mm')} / ${#temporals.format(alarm.alarm_reg_date, 'yyyy-MM-dd')}|">
 								</span>
 							</p>
 						</div>
@@ -87,7 +90,7 @@
 							</p>
 							<p class="text-body-secondary fs-9 mb-0">
 								<i class="fas fa-clock me-1"></i> <span class="fw-bold"
-									th:text="|${#temporals.format(alarm.alarm_reg_date, 'hh:mm a')} ${#temporals.format(alarm.alarm_reg_date, 'yyyy-MM-dd')}|">
+									th:text="|${#temporals.format(alarm.alarm_reg_date, 'a h:mm')} / ${#temporals.format(alarm.alarm_reg_date, 'yyyy-MM-dd')}|">
 								</span>
 							</p>
 						</div>
