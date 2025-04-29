@@ -8,14 +8,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,12 +27,13 @@ import com.eroom.approval.dto.ApprovalFormatDto;
 import com.eroom.approval.dto.ApprovalLineDto;
 import com.eroom.approval.dto.ApprovalRequestDto;
 import com.eroom.approval.entity.Approval;
-import com.eroom.approval.entity.ApprovalAlarm;
 import com.eroom.approval.entity.ApprovalFormat;
 import com.eroom.approval.entity.ApprovalLine;
+import com.eroom.approval.entity.ApprovalSignature;
 import com.eroom.approval.service.ApprovalFormatService;
 import com.eroom.approval.service.ApprovalLineService;
 import com.eroom.approval.service.ApprovalService;
+import com.eroom.approval.service.ApprovalSignatureService;
 import com.eroom.drive.dto.DriveDto;
 import com.eroom.drive.service.DriveService;
 import com.eroom.employee.dto.EmployeeDto;
@@ -65,6 +64,7 @@ public class ApprovalController {
 	private final EmployeeService employeeService;
 	private final DriveService driveService;
 	private final ApprovalWebSocketHandler approvalWebSocketHandler;
+	private final ApprovalSignatureService approvalSignatureService;
 	
 	
 	// 내가 올린 결재 리스트 조회
@@ -74,6 +74,8 @@ public class ApprovalController {
 		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 		Employee employee = employeeDetails.getEmployee();
 		model.addAttribute("employee", employee);
+		ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(employee);
+		model.addAttribute("approvalSignature", approvalSignature);
 		// 관리자용 전체(visible Y) 결재 보기 - 회의시 필요없는 기능으로 판단. 필요할 수 있으니 주석으로 남겨두기
 //		if (employee.getEmployeeName().contains("admin")) {
 //			List<Approval> temp = approvalService.findAllApprovalsVisibleY("Y");
@@ -359,6 +361,11 @@ public class ApprovalController {
 		List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
 		for (ApprovalLine approvalLine : temp) {
 			ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
+			ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(approvalLineDto.getEmployee());
+			if(approvalSignature != null) {
+				String encodedBase64 = approvalSignatureService.encodeToBase64(approvalSignature.getApprovalSignatureBlob());
+				approvalLineDto.setBase64URL(encodedBase64);
+			}
 			approvalLineDtoList.add(approvalLineDto);
 		}
 		model.addAttribute("approvalLineList", approvalLineDtoList);

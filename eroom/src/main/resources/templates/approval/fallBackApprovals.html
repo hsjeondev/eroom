@@ -24,20 +24,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 							
 								<!-- 결재서 작성 버튼 부분 -->
 								<div class="mb-3">
-									<a href="/approval/create"><button class="btn btn-primary me-4">
-										<!-- <svg class="svg-inline--fa fa-plus me-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
-											<path fill="currentColor" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"></path>
-										</svg> -->
-										<!-- <span class="fas fa-plus me-2"></span> Font Awesome fontawesome.com -->
+									<a href="/approval/create"><button class="btn btn-primary me-2">
 										결재서 작성
 										
 									</button></a>
-									<!-- <button class="btn btn-link text-body px-0">
-										<svg class="svg-inline--fa fa-file-export fs-9 me-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="file-export" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg="">
-											<path fill="currentColor" d="M0 64C0 28.7 28.7 0 64 0H224V128c0 17.7 14.3 32 32 32H384V288H216c-13.3 0-24 10.7-24 24s10.7 24 24 24H384V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64zM384 336V288H494.1l-39-39c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l39-39H384zm0-208H256V0L384 128z"></path>
-										</svg><span class="fa-solid fa-file-export fs-9 me-2"></span> Font Awesome fontawesome.com
-									Export 
-									</button> -->
+								    <button type="button" class="btn btn-primary" id="openSignature">
+								      서명 추가/수정
+								    </button>
+									
 								</div>
 								
 								<div class="d-flex mb-3">
@@ -45,7 +39,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 									<div class="search-box me-2">
 										<form class="position-relative">
 										  <input class="form-control search-input search" type="search" placeholder="Search by name" aria-label="Search">
-										  <svg class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+										  <svg style="height: 30%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
 										  	<path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
 										  </svg><!-- <span class="fas fa-search search-box-icon"></span> Font Awesome fontawesome.com -->
 										</form>
@@ -246,6 +240,160 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			</div><!-- pb-8 끝 -->
 			
 		</div> <!-- content 끝 -->
+		
+		
+		
+		
+		
+				    <!-- 모달 구조 -->
+    <div class="modal fade" id="signatureModal" tabindex="-1" aria-labelledby="signatureModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="signatureModalLabel">서명</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+          </div>
+          <div class="modal-body text-center">
+            <canvas id="signatureCanvas" width="400" height="200" style="border:1px solid #000; background:#fff;"></canvas>
+            <div class="mt-3">
+              <button type="button" class="btn btn-secondary" id="clearSignature">초기화</button>
+              <button type="button" class="btn btn-primary" id="saveSignature">저장</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+		
+		
+		
+		
+		    <!-- 모달 구조 -->
+    <div class="modal fade" id="signatureModal" tabindex="-1" aria-labelledby="signatureModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="signatureModalLabel">서명</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+          </div>
+          <div class="modal-body text-center">
+            <canvas id="signatureCanvas" width="400" height="200" style="border:1px solid #000; background:#fff;"></canvas>
+            <div class="mt-3">
+              <button type="button" class="btn btn-secondary" id="clearSignature">초기화</button>
+              <button type="button" class="btn btn-primary" id="saveSignature">저장</button>
+              <button th:if="${approvalSignature != null}" type="button" class="btn btn-primary" id="updateSignature">수정</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+		
+		
+		
+		
+		    <!-- 시그니처 모달 작동 스크립트 -->
+    <script th:inline="javascript">
+    window.addEventListener('load', function () {
+      let signaturePad;
+      const canvas = document.getElementById('signatureCanvas');
+      const clearBtn = document.getElementById('clearSignature');
+      const saveBtn = document.getElementById('saveSignature');
+      const updateBtn = document.getElementById('updateSignature');
+
+      function initSignaturePad() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = 400 * ratio;
+        canvas.height = 200 * ratio;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(ratio, ratio);
+
+        signaturePad = new SignaturePad(canvas, {
+          backgroundColor: 'rgb(255,255,255)',
+          penColor: 'black'
+        });
+      }
+
+      const signatureModal = document.getElementById('signatureModal');
+      signatureModal.addEventListener('shown.bs.modal', function () {
+        initSignaturePad();
+      });
+
+      document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'openSignature') {
+          const modal = new bootstrap.Modal(signatureModal);
+          modal.show();
+        }
+      });
+
+      clearBtn.addEventListener('click', function () {
+        if (signaturePad) {
+          signaturePad.clear();
+        }
+      });
+
+      saveBtn.addEventListener('click', function () {
+        if (signaturePad && !signaturePad.isEmpty()) {
+          const saveDataURL = signaturePad.toDataURL();
+          console.log('서명 데이터 URL:', saveDataURL);
+          
+          fetch('/approval/signature/create', {
+        	  method : 'POST',
+        	  headers : {
+      	        'Content-Type': 'application/json',
+    	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+    	        'header': document.querySelector('meta[name="_csrf_header"]').content
+        	  },
+        	  body : JSON.stringify({
+        		  signature_data_url : saveDataURL
+        	  })
+          })
+          .then(response => response.json())
+          .then(data => {
+        		  alert(data.res_msg);
+          })
+          
+          const modalInstance = bootstrap.Modal.getInstance(signatureModal);
+          modalInstance.hide();
+        } else {
+       		// 서명 미입력시.
+          alert('서명이 없습니다!');
+        }
+      });
+      
+      updateBtn.addEventListener('click', function () {
+        if (signaturePad && !signaturePad.isEmpty()) {
+          const updateDataURL = signaturePad.toDataURL();
+          console.log('서명 데이터 URL:', updateDataURL);
+          
+          fetch('/approval/signature/update', {
+        	  method : 'PUT',
+        	  headers : {
+      	        'Content-Type': 'application/json',
+    	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+    	        'header': document.querySelector('meta[name="_csrf_header"]').content
+        	  },
+        	  body : JSON.stringify({
+        		  signature_data_url : updateDataURL
+        	  })
+          })
+          .then(response => response.json())
+          .then(data => {
+        		  alert(data.res_msg);
+          })
+          
+          const modalInstance = bootstrap.Modal.getInstance(signatureModal);
+          modalInstance.hide();
+        } else {
+       		// 서명 미입력시.
+          alert('서명이 없습니다!');
+        }
+      });
+      
+      
+      
+    });
+    
+    
+    </script>
 	</main>
 </body>
 </html>

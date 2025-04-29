@@ -29,6 +29,7 @@ public class ApprovalLineDto {
 	private Employee employee; // 결재자
 	private String approval_line_deny_reason; // 결재 반려 사유
 	private int delimeter; // 결재 구분자
+	private String base64URL; // BLOB 데이터를 Base64로 변환해서 넣은 문자열
 	
 	public ApprovalLine toEntity() {
 		return ApprovalLine.builder()
