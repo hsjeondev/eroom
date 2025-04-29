@@ -71,7 +71,7 @@
 </div>
   
   </div>
-  <div id="tableExample3" data-list='{"valueNames":["filename","filesize","description","writer","date","download"],"page":5,"pagination":true}'>
+  <div id="tableExample3" data-list='{"valueNames":["filename","filesize","description","writer","date","download"],"page":10,"pagination":true}'>
     
     <!-- 검색창 -->
     <div class="search-box mb-3 mx-auto">
@@ -102,10 +102,10 @@
                   <i class="fas fa-ellipsis fs-10"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end py-2">
-                  <a class="dropdown-item" href="#!">일괄 다운로드</a>
+                  <a class="dropdown-item" href="#!" id="bulk-download">일괄 다운로드</a>
                   <th:block th:each="auth : ${user.employee.authorities}">
 	                  <div class="dropdown-divider"></div>
-						 <a class="dropdown-item text-danger" href="#!" th:if="${auth.authorityName == 'ROLE_ADMIN'}">일괄 삭제</a>
+						 <a class="dropdown-item text-danger" href="#!" id="bulk-delete" th:if="${auth.authorityName == 'ROLE_ADMIN'}">일괄 삭제</a>
 	                  </div>
 				  </th:block>
               </div>
@@ -149,7 +149,43 @@
         </tbody>
       </table>
     </div>
-
+	<!-- 파일수정 모달 -->
+	<div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <form id="editFileForm" enctype="multipart/form-data">
+	      <div class="modal-content">
+	        <div class="modal-header">
+	          <h5 class="modal-title" id="editFileModalLabel">파일 수정</h5>
+	          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+	        </div>
+	        <div class="modal-body">
+	          <input type="hidden" name="driveAttachNo" id="editDriveAttachNo">
+			<div class="mb-3">
+			  <label for="originalFileName" class="form-label">기존 파일명</label>
+			  <input class="form-control" type="text" id="originalFileName" readonly>
+			</div>
+	          <div class="mb-3">
+	            <label for="editDriveFile" class="form-label">새 파일 선택</label>
+	            <input class="form-control" type="file" id="editDriveFile" name="driveFile">
+	          </div>
+	
+	          <div class="mb-3">
+	            <label for="editDriveDescription" class="form-label">파일 설명</label>
+	            <input class="form-control" type="text" id="editDriveDescription" name="driveDescription">
+	          </div>
+	          
+	          <input type="hidden" id="userName" value="${user.employee.employeeName}">
+			  <input type="hidden" id="userStructureCode" value="${user.employee.structure.separatorCode}">
+			  
+	        </div>
+	        <div class="modal-footer">
+	          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+	          <button type="submit" class="btn btn-primary">수정 저장</button>
+	        </div>
+	      </div>
+	    </form>
+	  </div>
+	</div>
     <!-- 페이징? -->
     <div class="d-flex justify-content-between mt-3">
       <span class="d-none d-sm-inline-block" data-list-info="data-list-info">1 to 4 <span class="text-body-tertiary"> Items of </span>4</span>
@@ -246,6 +282,175 @@
   	    }
   	  });
   	}
+    document.querySelectorAll('a[data-bs-target="#editFileModal"]').forEach(button => {
+  	  button.addEventListener('click', function () {
+  	    const driveAttachNo = this.getAttribute('data-id');
+  	    const driveDescription = this.getAttribute('data-desc') || "";
+  	    const driveOriName = this.getAttribute('data-name') || "";
+
+  	    const driveEditor = document.getElementById("userName") ? document.getElementById("userName").value : '';  // 수정자의 이름
+  	     
+  	    document.getElementById('editDriveAttachNo').value = driveAttachNo;
+  	    document.getElementById('editDriveDescription').value = driveDescription;
+  	    document.getElementById('originalFileName').value = driveOriName;
+  	  	document.getElementById('userName').value = driveEditor; 
+  	  });
+  	});
+    document.getElementById("editFileForm").addEventListener("submit", function (e) {
+  	  e.preventDefault();
+  	  const formData = new FormData(this);
+  	  const attachNo = formData.get("driveAttachNo");
+
+  	  fetch(`/drive/update/company/${attachNo}`, {
+  	    method: "POST",
+  	    headers : {
+  	      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+  	      'header': document.querySelector('meta[name="_csrf_header"]').content
+  		},
+  	    body: formData
+  	  })
+  	  .then(response => response.json())
+  	  .then(data => {
+  	    if (data.res_code === "200") {
+  	      alert("수정 완료!");
+  	      location.reload();
+  	    } else {
+  	      alert("수정 실패: " + data.res_msg);
+  	    }
+  	  })
+  	  .catch(err => {
+  	    alert("오류 발생");
+  	    console.error(err);
+  	  });
+  	});
+    // 파일 삭제
+    document.addEventListener('DOMContentLoaded', function () {
+  	    const deleteButtons = document.querySelectorAll('.delete-file');
+  	    
+  	    deleteButtons.forEach(button => {
+  	        button.addEventListener('click', function () {
+  	            const attachNo = this.getAttribute('data-id');
+  	            console.log("삭제 파일 번호 : "+attachNo); 
+  	            const confirmation = confirm('정말로 이 파일을 삭제하시겠습니까?');  
+  	            
+  	            if (confirmation) {
+  	                // DELETE 요청 보내기
+  	                fetch(`/drive/delete/company/${attachNo}`, {
+  	                    method: 'DELETE',
+  	                    headers: {
+  	                        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+  	                        'header': document.querySelector('meta[name="_csrf_header"]').content
+  	                    }
+  	                })
+  	                .then(response => response.json())
+  	                .then(data => {
+  	                    if (data.res_code === '200') {
+  	                        alert('파일이 성공적으로 삭제되었습니다.');
+  	                        location.reload(); // 페이지 리로드로 업데이트된 상태 표시
+  	                    } else {
+  	                        alert('파일 삭제에 실패하였습니다. 다시 시도해 주세요.');
+  	                    }
+  	                })
+  	                .catch(err => {
+  	                    alert('오류가 발생했습니다.');
+  	                    console.error(err);
+  	                });
+  	            }
+  	        });
+  	    });
+  	});
+    // 체크된 파일 일괄 다운로드
+       document.addEventListener('DOMContentLoaded', function () {
+	    const selectAllCheckbox = document.getElementById('select-all');
+	    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+	
+	    if (selectAllCheckbox) {
+	      selectAllCheckbox.addEventListener('change', function () {
+	        rowCheckboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+	      });
+	    }
+      const bulkDownloadBtn = document.getElementById('bulk-download');
+      if (bulkDownloadBtn) {
+        bulkDownloadBtn.addEventListener('click', function () {
+          const checkboxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+
+          if (checkboxes.length === 0) {
+            alert('다운로드할 파일을 선택하세요.');
+            return;
+          }
+
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = '/drive/download/company/bulk';
+          form.style.display = 'none';
+  	
+          // CSRF 토큰 추가 (form submit 시 필요)
+          const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+          const csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = '_csrf';
+          csrfInput.value = csrfToken;
+          form.appendChild(csrfInput);
+          
+          checkboxes.forEach(cb => {
+            const row = cb.closest('tr');
+            const id = row.getAttribute('data-id');
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'fileIds';
+            input.value = id;
+            form.appendChild(input);
+          });
+
+          document.body.appendChild(form);
+          form.submit();
+        });
+      }
+    });
+    // 일괄 삭제
+   	document.addEventListener('DOMContentLoaded', function () {
+       const bulkDeleteBtn = document.getElementById('bulk-delete');
+       if (bulkDeleteBtn) {
+           bulkDeleteBtn.addEventListener('click', function () {
+               const checkboxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+
+               if (checkboxes.length === 0) {
+                   alert('삭제할 파일을 선택하세요.');
+                   return;
+               }
+
+               const confirmation = confirm('정말로 선택한 파일을 삭제하시겠습니까?');
+               if (!confirmation) return;
+
+               // 체크된 파일들의 ID를 추출
+               const ids = checkboxes.map(cb => cb.closest('tr').querySelector('.delete-file').getAttribute('data-id'));
+
+               // JSON 형태로 요청 보내기
+               fetch('/drive/delete/company/bulk', {
+                   method: 'POST',
+                   headers: {
+                       'Content-Type': 'application/json',
+                       'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content, 
+                       'header': document.querySelector('meta[name="_csrf_header"]').content,
+                   },
+                   body: JSON.stringify({ fileIds: ids }),  // fileIds를 JSON으로 보냄
+               })
+               .then(response => response.json())
+               .then(data => {
+                   if (data.res_code === '200') {
+                       alert('파일이 성공적으로 삭제되었습니다.');
+                       location.reload();  // 삭제 후 페이지 리로드
+                   } else {
+                       alert('파일 삭제에 실패하였습니다. 다시 시도해 주세요.');
+                   }
+               })
+               .catch(err => {
+                   alert('오류가 발생했습니다.');
+                   console.error(err);
+               });
+           });
+       }
+   });
   </script>
 
 </main>

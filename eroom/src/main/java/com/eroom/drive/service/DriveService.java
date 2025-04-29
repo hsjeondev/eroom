@@ -427,6 +427,50 @@ public class DriveService {
 	        return false;
 	    }
 	}
+	// ------------------------- 회사 드라이브 파일 수정 --------------------------
+	@Transactional
+	public boolean updateCompanyDriveFile(Long attachNo, MultipartFile file, String description, String separatorCode, String driveEditor, Long currentEmployeeNo) {
+	    try {
+	        Optional<Drive> optionalDrive = driveRepository.findById(attachNo);
+	        if (optionalDrive.isEmpty()) return false;
+
+	        Drive drive = optionalDrive.get();
+
+	        // 1. 회사 코드 확인
+	        if (!"A001".equals(drive.getSeparatorCode())) {
+	            return false; // 회사 파일이 아니면 수정 불가
+	        }
+
+	        // 2. 파일 교체
+	        if (file != null && !file.isEmpty()) {
+	            String ext = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+	            String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+	            String path = fileDir + "drive/company/" + newName;
+	            File newFile = new File(path);
+	            if (!newFile.getParentFile().exists()) newFile.getParentFile().mkdirs();
+	            file.transferTo(newFile);
+
+	            drive.setDriveOriName(file.getOriginalFilename());
+	            drive.setDriveNewName(newName);
+	            drive.setDriveType(ext);
+	            drive.setDriveSize(file.getSize());
+	            drive.setDrivePath("drive/company/" + newName);
+	        }
+
+	        // 3. 설명 수정
+	        drive.setDriveDescription(description);
+
+	        // 4. 수정 정보 업데이트
+	        drive.setDriveModDate(LocalDateTime.now());
+	        drive.setDriveEditor(driveEditor);
+
+	        driveRepository.save(drive);
+	        return true;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
 
 
 
