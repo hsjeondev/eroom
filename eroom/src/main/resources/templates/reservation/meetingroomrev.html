@@ -274,157 +274,140 @@
 							</div>
 						</div>
 						
-							<script>
-								document.addEventListener("DOMContentLoaded", function () {
-								  const modal = document.getElementById("addEventModal");
-								  const facilityInput = document.getElementById("modalFacilityNo");
-								
-								  if (!modal) return;
-								
-								  modal.addEventListener("show.bs.modal", function (event) {
-								    const button = event.relatedTarget;
-								    const facilityNo = button.getAttribute("data-facility-no");
-								    const facilityName = button.getAttribute("data-facility-name");
-								    
-								    console.log(facilityName);
-								    console.log(facilityNo);
-								
-								    facilityInput.value = facilityNo;
-								    document.getElementById("selectedFacilityName").textContent = facilityName || "차량명이 없습니다";
-								  });
-								
-								  // 예약 form submit 처리
-								  const form = document.forms["addEventForm"];
-								  if (!form) return;
-								
-								  const submitBtn = form.querySelector('button[type="submit"]');
-								
-								  form.addEventListener("submit", async function (e) {
-								    e.preventDefault();
-								
-								    submitBtn.disabled = true; // 버튼 비활성화
-								    
-								    const selectedParticipants = [...document.querySelectorAll("#selectedParticipants span")]
-								    .map(span => span.dataset.employeeNo);
-
-								  if (selectedParticipants.length > 0) {
-								    selectedParticipants.forEach(id => {
-								      payload.append("participants", id);
-								    });
-								  }
-								
-								    const payload = new FormData(form);
-								
-								    try {
-								      const response = await fetch('/reservation/meetingroom/reserve', {
-								        method: 'POST',
-								        headers: {
-								          'header': document.querySelector('meta[name="_csrf_header"]').content,
-								          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-								        },
-								        body: payload
-								      });
-								
-								      const data = await response.json();
-								      if (data.res_code == "200") {
-								        alert(data.res_msg);
-								        location.reload();
-								      } else {
-								        alert(data.res_msg);
-								        submitBtn.disabled = false; // 실패하면 다시 활성화
-								      }
-								    } catch (error) {
-								      alert("예약 중 오류 발생 😭");
-								      submitBtn.disabled = false; // 에러나도 다시 활성화
-								    }
-								  });
-								});
-						</script>
-
-					  
-					  <script>
-							  // 예약 등록
-							  document.addEventListener("DOMContentLoaded", function () {
-							   const form = document.addEventForm;
-							   console.log("form:", form);
-							   const modal = document.getElementById("addEventModal");
-							   const facilityInput = document.getElementById("modalFacilityNo");
-							   const today = new Date().toISOString().split("T")[0];
-							   form.reservation_start_date.min = today;
-							   form.reservation_end_date.min = today;
-							   form.addEventListener("submit", function (e) {
-								  e.preventDefault();
-								  
-								
-								  const participantBadges = document.querySelectorAll('#selectedParticipants .badge');
-								  const participantIds = Array.from(participantBadges).map(badge => badge.dataset.id);
-								
-								  if (participantIds.length === 0) {
-								    alert("참여자를 1명 이상 선택해주세요!");
-								    return;
-								  }
-								
-								  const startDate = form.reservation_start_date.value;
-								  const endDate = form.reservation_end_date.value;
-								  const startTime = form.startTime.value;
-								  const endTime = form.endTime.value;
-								
-								
-								
-								  if (!startDate || !endDate || !startTime || !endTime) {
-								    alert("날짜와 시간을 모두 선택해주세요!");
-								    return;
-								  }
-								
-								  const fullStart = `${startDate}T${startTime}`;
-								  const fullEnd = `${endDate}T${endTime}`;
-								
-								  if (fullStart >= fullEnd) {
-								    alert("종료일시는 시작일시보다 늦어야 합니다!");
-								    return;
-								  }
-								
-								  // 중복 시간 검사
-								  const startHour = parseInt(startTime.split(":")[0]);
-								  const endHour = parseInt(endTime.split(":")[0]);
-								
-								  const bookedHours = [...form.startTime.options]
-								    .filter(opt => opt.disabled)
-								    .map(opt => parseInt(opt.value.split(":")[0]));
-								
-								  for (let hour = startHour; hour < endHour; hour++) {
-								    if (bookedHours.includes(hour)) {
-								      alert("선택한 시간 범위에 이미 예약된 시간이 포함되어 있습니다!");
-								      return;
-								    }
-								  }
-								
-								  form.calendarStartTime.value = fullStart;
-								  form.calendarEndTime.value = fullEnd;
-								
-								  const payload = new FormData(form);
-								  participantIds.forEach(id => payload.append("participants", id));
-								
-								  fetch('/reservation/meetingroom/reserve', {
-								    method: 'POST',
-								    headers: {
-								      'header': document.querySelector('meta[name="_csrf_header"]').content,
-								      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-								    },
-								    body: payload
-								  })
-								    .then(response => response.json())
-								    .then(data => {
-								      alert(data.res_msg);
-								      if (data.res_code == 200) {
-								        location.reload();
-								      }
-								    });
-								});
+						
+						<script>
+							document.addEventListener("DOMContentLoaded", function () {
+							  const modal = document.getElementById("addEventModal");
+							  const form = document.forms["addEventForm"];
+							  const facilityInput = document.getElementById("modalFacilityNo");
+							  const submitBtn = form.querySelector('button[type="submit"]');
+							
+							  if (!modal || !form) return;
+							
+							  // 모달 열릴 때 초기화
+							  modal.addEventListener("show.bs.modal", function (event) {
+							    form.reset();
+							    const selectedParticipants = document.getElementById('selectedParticipants');
+							    if (selectedParticipants) selectedParticipants.innerHTML = '';
+							
+							    const startDate = document.getElementById('startDate');
+							    const endDate = document.getElementById('endDate');
+							    const startTime = document.getElementById('startTime');
+							    const endTime = document.getElementById('endTime');
+							    const calendarStartTime = document.getElementById('calendarStartTime');
+							    const calendarEndTime = document.getElementById('calendarEndTime');
+							
+							    const today = new Date().toISOString().split("T")[0]; // ✨ 오늘 날짜 구하기
+							
+							    if (startDate) {
+							      startDate.value = today;    // ✨ 시작날짜 기본값 세팅
+							      startDate.min = today;      // ✨ 과거 선택 금지
+							    }
+							    if (endDate) {
+							      endDate.value = today;      // ✨ 종료날짜 기본값 세팅
+							      endDate.min = today;        // ✨ 과거 선택 금지
+							    }
+							    if (startTime) startTime.selectedIndex = 0;
+							    if (endTime) endTime.selectedIndex = 0;
+							    if (calendarStartTime) calendarStartTime.value = '';
+							    if (calendarEndTime) calendarEndTime.value = '';
+							
+							    const button = event.relatedTarget;
+							    const facilityNo = button.getAttribute("data-facility-no");
+							    const facilityName = button.getAttribute("data-facility-name");
+							
+							    facilityInput.value = facilityNo;
+							    document.getElementById("selectedFacilityName").textContent = facilityName || "차량명이 없습니다";
 							  });
 							
+							  // submit 처리
+							  form.addEventListener("submit", function (e) {
+							    e.preventDefault();
+							    submitBtn.disabled = true;
+							
+							    const today = new Date().toISOString().split("T")[0];
+							    form.reservation_start_date.min = today;
+							    form.reservation_end_date.min = today;
+							
+							    const participantBadges = document.querySelectorAll('#selectedParticipants .badge');
+							    const participantIds = Array.from(participantBadges).map(badge => badge.dataset.id);
+							
+							    if (participantIds.length === 0) {
+							      alert("참여자를 1명 이상 선택해주세요!");
+							      submitBtn.disabled = false;
+							      return;
+							    }
+							
+							    const startDate = form.reservation_start_date.value;
+							    const endDate = form.reservation_end_date.value;
+							    const startTime = form.startTime.value;
+							    const endTime = form.endTime.value;
+							
+							    if (!startDate || !endDate || !startTime || !endTime) {
+							      alert("날짜와 시간을 모두 선택해주세요!");
+							      submitBtn.disabled = false;
+							      return;
+							    }
+							
+							    const fullStart = `${startDate}T${startTime}`;
+							    const fullEnd = `${endDate}T${endTime}`;
+							
+							    if (fullStart >= fullEnd) {
+							      alert("종료일시는 시작일시보다 늦어야 합니다!");
+							      submitBtn.disabled = false;
+							      return;
+							    }
+							
+							    // 중복 시간 검사
+							    const startHour = parseInt(startTime.split(":")[0]);
+							    const endHour = parseInt(endTime.split(":")[0]);
+							    const bookedHours = [...form.startTime.options]
+							      .filter(opt => opt.disabled)
+							      .map(opt => parseInt(opt.value.split(":")[0]));
+							
+							    for (let hour = startHour; hour < endHour; hour++) {
+							      if (bookedHours.includes(hour)) {
+							        alert("선택한 시간 범위에 이미 예약된 시간이 포함되어 있습니다!");
+							        submitBtn.disabled = false;
+							        return;
+							      }
+							    }
+							
+							    form.calendarStartTime.value = fullStart;
+							    form.calendarEndTime.value = fullEnd;
+							
+							    const payload = new FormData(form);
+							    participantIds.forEach(id => payload.append("participants", id));
+							
+							    fetch('/reservation/meetingroom/reserve', {
+							      method: 'POST',
+							      headers: {
+							        'header': document.querySelector('meta[name="_csrf_header"]').content,
+							        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+							      },
+							      body: payload
+							    })
+							    .then(response => response.json())
+							    .then(data => {
+							      alert(data.res_msg);
+							      if (data.res_code == "200") {
+							        location.reload();
+							      } else {
+							        submitBtn.disabled = false;
+							      }
+							    })
+							    .catch(error => {
+							      console.error(error);
+							      alert("요청 처리 중 오류 발생 😭");
+							      submitBtn.disabled = false;
+							    });
+							  });
+							});
 							</script>
 
+
+					  
+					
 
 
 						<script>
@@ -585,205 +568,156 @@
 		
 		<!-- 캘린더 script -->
 		<script>
-		document.addEventListener('DOMContentLoaded', function () {
+			document.addEventListener('DOMContentLoaded', function () {
 			  const calendarEl = document.getElementById('appCalendar');
 			  const separator = document.getElementById('separator').value;
 			  const loginEmployeeId = document.getElementById("loginEmployeeId").value;
-			  //console.log(separator+"!!!!!!!!!!!!!!!");
+			
 			  const calendar = new FullCalendar.Calendar(calendarEl, {
-			      initialView: 'listMonth',
-			      locale: 'ko',		      
-			      headerToolbar: {
-			        left: 'prev,next today',
-			        center: 'title',
-			        right: ''
+			    initialView: 'listMonth',
+			    locale: 'ko',
+			    headerToolbar: {
+			      left: 'prev,next today',
+			      center: 'title',
+			      right: ''
+			    },
+			    buttonText: {
+			      today: '오늘'
+			    },
+			    noEventsContent: '예약이 없습니다',
+			    validRange: {           
+			        start: new Date()      
 			      },
-			      buttonText: {
-			    	    today: '오늘' 
-			    	  },
-			      dayMaxEventRows: true,
-			      views: {
-			        dayGridMonth: {
-			          dayMaxEventRows: 3,
-			          moreLinkText: "더보기"		       
-			          }
-			      },
-			      eventSources: [ //구글 캘린더로 공휴일 불러오기, 예약 현황 불러오기
-			  	    {
-			    	      events: function (fetchInfo, successCallback, failureCallback) {
-			    	        fetch('/meetingroom/list/' + separator)
-			    	          .then(response => response.json())
-			    	          .then(events => successCallback(events))
-			    	          .catch(error => {
-			    	            console.error("회의실 예약 불러오기 싪패", error);
-			    	            failureCallback(error);
-			    	          });
-			    	      }
-			    	    },
-			    	    
-			    	    {
-			    	      events: function (fetchInfo, successCallback, failureCallback) {
-			    	        const apiKey = 'AIzaSyCjXiu1ShbhE0XenBtciLx8ezU-mcZI0R0';
-			    	        const calendarId = 'ko.south_korea%23holiday@group.v.calendar.google.com';
-			    	        const timeMin = new Date(fetchInfo.start).toISOString();
-			    	        const timeMax = new Date(fetchInfo.end).toISOString();
-			    	        const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${timeMin}&timeMax=${timeMax}&orderBy=startTime&singleEvents=true`;
-
-			    	        fetch(url)
-			    	          .then(response => response.json())
-			    	          .then(data => {
-			    	            if (!data.items) {
-			    	              console.warn("공휴일 데이터 없음", data);
-			    	              return successCallback([]);
-			    	            }
-			    	            const holidays = data.items.map(item => ({
-			    	              title: item.summary,
-			    	              start: item.start.date,
-			    	              allDay: true,
-			    	              extendedProps: {
-			    	            	    type: 'holiday'
-			    	            	  }
-			    	              
-			    	            }));
-			    	            successCallback(holidays);
-			    	          })
-			    	          .catch(error => {
-			    	            console.error("공휴일 불러오기 실패", error);
-			    	            failureCallback(error);
-			    	          });
-			    	      }
-			    	    }
-			    	  ],
-			      eventDisplay: 'block',
-			      dayCellContent: function (info) {
-			        return info.date.getDate();
-			      },
-			      eventClick: function(info) {
-			    	  const event = info.event;
-
-			    	  // 날짜 포맷 옵션
-			    	  const options = {
-			    	    year: 'numeric',
-			    	    month: 'long',
-			    	    day: 'numeric',
-			    	    weekday: 'short',
-			    	    hour: '2-digit',
-			    	    minute: '2-digit',
-			    	    hour12: false
-			    	  };
-			    	  const isOwner = loginEmployeeId === event.extendedProps.reservationCreator;
-			    	  document.getElementById("deleteVehicleBtn").style.display = isOwner ? 'inline-block' : 'none';
-
-			    	  // 상세 모달 값 채우기
-			    	  document.getElementById("detailReservationNo").value = event.extendedProps.reservation_no || '';
-			    	  document.getElementById("detailVehicleName").textContent = event.extendedProps.meetingRoomName || '';
-			    	  document.getElementById("detailReserverName").textContent = event.extendedProps.reserverName || '';
-			    	  document.getElementById("detailLocation").textContent = 
-			    		  (event.extendedProps.participantNames || []).join(', ') || '없음';
-
-			    	  // 날짜 형식 정리해서 표시
-			    	  document.getElementById("detailStartTime").textContent =
-			    	    new Intl.DateTimeFormat('ko-KR', options).format(new Date(event.start));
-
-			    	  document.getElementById("detailEndTime").textContent =
-			    	    new Intl.DateTimeFormat('ko-KR', options).format(new Date(event.end));
-			    	  
-			    	  // 모달 열기
-			    	  const modalElement = document.getElementById('vehicleDetailModal');
-			    	  if (modalElement) {
-			    	    const modal = new bootstrap.Modal(modalElement);
-			    	    modal.show();
-			    	  } else {
-			    	    console.error("모달이 없습니다.");
-			    	  }
-			      },
-			    	  
-			      eventDidMount: function(info) {
+			    dayMaxEventRows: true,
+			    views: {
+			      dayGridMonth: {
+			        dayMaxEventRows: 3,
+			        moreLinkText: "더보기"
+			      }
+			    },
+			    eventSources: [
+			      {
+			        events: function (fetchInfo, successCallback, failureCallback) {
+			          fetch('/meetingroom/list/' + separator)
+			            .then(response => response.json())
+			            .then(events => successCallback(events))
+			            .catch(error => {
+			              console.error("회의실 예약 불러오기 실패", error);
+			              failureCallback(error);
+			            });
+			        }
+			      }
+			    ],
+			    eventDisplay: 'block',
+			    dayCellContent: function (info) {
+			      return info.date.getDate();
+			    },
+			    eventClick: function(info) {
+			      const event = info.event;
+			      const options = {
+			        year: 'numeric', month: 'long', day: 'numeric', weekday: 'short',
+			        hour: '2-digit', minute: '2-digit', hour12: false
+			      };
+			
+			      const isOwner = loginEmployeeId === event.extendedProps.reservationCreator;
+			      document.getElementById("deleteVehicleBtn").style.display = isOwner ? 'inline-block' : 'none';
+			
+			      document.getElementById("detailReservationNo").value = event.extendedProps.reservation_no || '';
+			      document.getElementById("detailVehicleName").textContent = event.extendedProps.meetingRoomName || '';
+			      document.getElementById("detailReserverName").textContent = event.extendedProps.reserverName || '';
+			      document.getElementById("detailLocation").textContent =
+			        (event.extendedProps.participantNames || []).join(', ') || '없음';
+			
+			      document.getElementById("detailStartTime").textContent =
+			        new Intl.DateTimeFormat('ko-KR', options).format(new Date(event.start));
+			      document.getElementById("detailEndTime").textContent =
+			        new Intl.DateTimeFormat('ko-KR', options).format(new Date(event.end));
+			
+			      const modalElement = document.getElementById('vehicleDetailModal');
+			      if (modalElement) {
+			        const modal = new bootstrap.Modal(modalElement);
+			        modal.show();
+			      } else {
+			        console.error("모달이 없습니다.");
+			      }
+			    },
+			    eventDidMount: function(info) {
 			    	  const el = info.el;
-			    	  const isHoliday = info.event.extendedProps.type === "holiday";
+			    	  const eventDate = new Date(info.event.start);
+			    	  const today = new Date();
 
-			    	  if (isHoliday) {
-			    	    el.style.setProperty("background-color", "#FFF8B3", "important");
-			    	    el.style.setProperty("border", "1px solid #F5E79E", "important");
-			    	    el.style.setProperty("color", "#4B4B4B", "important");
-			    	    el.style.setProperty("pointer-events", "none", "important");
-			    	    el.style.setProperty("opacity", "1", "important");
-			    	    el.style.setProperty("font-size", "10px", "important");
-			    	    el.style.setProperty("font-weight", "400", "important");
-			    	    el.style.setProperty("padding", "6px 10px", "important");
-			    	    el.style.setProperty("margin", "4px 0", "important");
-			    	    el.style.setProperty("border-radius", "6px", "important");
-			    	    el.style.setProperty("box-shadow", "0 2px 5px rgba(0,0,0,0.05)", "important");
-			    	    el.style.setProperty("transition", "background-color 0.2s ease", "important");
-			    	    el.style.setProperty("white-space", "nowrap", "important");
-			    	    el.style.setProperty("overflow", "hidden", "important");
-			    	    el.style.setProperty("text-overflow", "ellipsis", "important");
-			    	  } else {
-			    	    el.style.setProperty("background-color", "#F9F9F9", "important");
-			    	    el.style.setProperty("border", "1px solid #DDD", "important");
-			    	    el.style.setProperty("color", "#000", "important");
-			    	    el.style.setProperty("font-size", "12px", "important");
-			    	    el.style.setProperty("font-weight", "700", "important");
-			    	    el.style.setProperty("padding", "6px 10px", "important");
-			    	    el.style.setProperty("margin", "4px 0", "important");
-			    	    el.style.setProperty("border-radius", "6px", "important");
-			    	    el.style.setProperty("box-shadow", "0 2px 5px rgba(0,0,0,0.05)", "important");
-			    	    el.style.setProperty("transition", "background-color 0.2s ease", "important");
-			    	    el.style.setProperty("white-space", "nowrap", "important");
-			    	    el.style.setProperty("overflow", "hidden", "important");
-			    	    el.style.setProperty("text-overflow", "ellipsis", "important");
+			    	  const isToday = eventDate.getFullYear() === today.getFullYear() &&
+			    	                  eventDate.getMonth() === today.getMonth() &&
+			    	                  eventDate.getDate() === today.getDate();
+
+			    	  // 기본 스타일 먼저 적용
+			    	  el.style.setProperty("background-color", "#F9F9F9", "important");
+			    	  el.style.setProperty("border", "1px solid #DDD", "important");
+			    	  el.style.setProperty("color", "#000", "important");
+			    	  el.style.setProperty("font-size", "12px", "important");
+			    	  el.style.setProperty("font-weight", "700", "important");
+			    	  el.style.setProperty("padding", "6px 10px", "important");
+			    	  el.style.setProperty("margin", "4px 0", "important");
+			    	  el.style.setProperty("border-radius", "6px", "important");
+			    	  el.style.setProperty("box-shadow", "0 2px 5px rgba(0,0,0,0.05)", "important");
+			    	  el.style.setProperty("transition", "background-color 0.2s ease", "important");
+			    	  el.style.setProperty("white-space", "nowrap", "important");
+			    	  el.style.setProperty("overflow", "hidden", "important");
+			    	  el.style.setProperty("text-overflow", "ellipsis", "important");
+
+			    	  // 오늘이면 스타일 덮어쓰기
+			    	  if (isToday) {
+			    		  el.style.setProperty("background-color", "#D6EBFF", "important");  
+			    		  el.style.setProperty("border", "2px solid #3399FF", "important");   
+			    		  el.style.setProperty("color", "#0D47A1", "important");              
+			    		  el.style.setProperty("font-weight", "bold", "important");      
 			    	  }
 
-			    	  // 👉 hover 효과도 JS로 직접 줄게
+			    	  // hover 효과
 			    	  el.addEventListener("mouseenter", function() {
-			    	    el.style.backgroundColor = "#EEF6FF";  // hover 시 살짝 파란빛
+			    	    el.style.backgroundColor = "#EEF6FF";
 			    	  });
 			    	  el.addEventListener("mouseleave", function() {
-			    	    if (isHoliday) {
-			    	      el.style.backgroundColor = "#FFF8B3";  // 공휴일은 다시 연노랑
+			    	    if (isToday) {
+			    	      el.style.backgroundColor = "#D6EBFF";  // 오늘은 다시 연녹색 복귀
 			    	    } else {
-			    	      el.style.backgroundColor = "#F9F9F9";  // 일반은 회색 배경
+			    	      el.style.backgroundColor = "#F9F9F9";  // 기본은 회색 복귀
 			    	    }
 			    	  });
 			    	}
 			  });
-			  	//예약 삭제
-			  	document.getElementById("deleteVehicleBtn").addEventListener("click", function () {
-				    const reservationNo = document.getElementById("detailReservationNo").value;
-					//console.log(reservationNo+"삭제를 위한!!!!!!!!!!!!!!");
-				    
-				    const confirmDelete = confirm("회의실 예약을 취소하시겠습니까?");
-				    if (!confirmDelete) return;
-
-				    fetch('/meetingroom/delete/'+reservationNo, {
-				      method: "post",
-				      headers: {
-				        'header': document.querySelector('meta[name="_csrf_header"]').content,
-				        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-				      }
-				    })
-				    .then(response => response.json())
-				    .then(data => {
-				      alert(data.res_msg);
-				      if (data.res_code == 200) {
-				        location.reload();
-				      }
-				    })
-				    .catch(error => {
-				      console.error("삭제 중 오류:", error);
-				      alert("삭제에 실패했습니다.");
-				    });
-				  });
-			  
-			  
-			  	// setTimeout 사용
-				/* <head>에 있는 FullCalendar CSS 파일이 아직 로드 중이라
-				캘린더는 그려졌지만 스타일이 적용되지 않은 상태로 나와버림. */
+			
+			  document.getElementById("deleteVehicleBtn").addEventListener("click", function () {
+			    const reservationNo = document.getElementById("detailReservationNo").value;
+			    const confirmDelete = confirm("회의실 예약을 취소하시겠습니까?");
+			    if (!confirmDelete) return;
+			
+			    fetch('/meetingroom/delete/' + reservationNo, {
+			      method: "post",
+			      headers: {
+			        'header': document.querySelector('meta[name="_csrf_header"]').content,
+			        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			      }
+			    })
+			    .then(response => response.json())
+			    .then(data => {
+			      alert(data.res_msg);
+			      if (data.res_code == 200) {
+			        location.reload();
+			      }
+			    })
+			    .catch(error => {
+			      console.error("삭제 중 오류:", error);
+			      alert("삭제에 실패했습니다.");
+			    });
+			  });
+			
 			  setTimeout(() => {
 			    calendar.render();
-			  }, 0); 
+			  }, 0);
 			});
-		</script>
+			</script>
+
 	</main>
 </body>
 </html>
