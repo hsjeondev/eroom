@@ -4,6 +4,7 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -58,11 +59,18 @@ public class DriveController {
 	
 	
 	// ------------------------------------------ 드라이브 메인 ------------------------------------------
-	// 회사 드라이브 
-	@GetMapping("/company")
-	public String selectDriveCompany() {
-		return "drive/company";
-	}
+	// 회사 드라이브
+	 @GetMapping("/company")
+	 public String selectDriveCompany(Model model, @AuthenticationPrincipal EmployeeDetails user) {
+	     List<DriveDto> fileList = driveService.findCompanyDriveFiles(); // 회사 드라이브 조회
+	     
+	     model.addAttribute("fileList", fileList);
+	     model.addAttribute("pageTitle", "회사 드라이브");
+	     model.addAttribute("user", user);
+	     
+	     return "drive/company";
+	 }
+
 	// 부서 드라이브
 	@GetMapping("/department")
 	public String selectDriveDepartment(@AuthenticationPrincipal EmployeeDetails user, Model model) {
@@ -184,6 +192,32 @@ public class DriveController {
 		return resultMap;
 		
 	}
+	// 회사 드라이브 파일 업로드
+	@PostMapping("/upload/company")
+	@ResponseBody
+	public Map<String, String> uploadCompanyDriveFiles(
+	        DriveDto driveDto,
+	        @RequestParam("driveDescriptions") List<String> driveDescriptions,
+	        @AuthenticationPrincipal EmployeeDetails user) {
+	    
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "업로드 실패");
+	    
+	    driveDto.setDriveDescriptions(driveDescriptions);
+
+	    driveDto.setSeparatorCode("A001");
+
+	    int result = driveService.uploadCompanyDriveFiles(driveDto, user.getEmployee().getEmployeeNo());
+
+	    if (result > 0) {
+	        resultMap.put("res_code", "200");
+	        resultMap.put("res_msg", "업로드 성공");
+	    }
+	    
+	    return resultMap;
+	}
+
 
 	// --------------------------------- 파일 수정 ------------------------------------------
 	// 개인 드라이브 파일 수정
@@ -227,6 +261,7 @@ public class DriveController {
 
 	    return result;
 	}	
+	// 부서 드라이브 파일 수정
 	@PostMapping("/update/department/{attachNo}")
 	@ResponseBody
 	public Map<String, String> editDepartmentDriveFile(@PathVariable("attachNo") Long attachNo,
@@ -243,6 +278,30 @@ public class DriveController {
 	    Long currentEmployeeNo = user.getEmployee().getEmployeeNo();
 	    
 	    boolean success = driveService.updateDepartmentDriveFile(attachNo, file, description, separatorCode, driveEditor,currentEmployeeNo);
+	    if (success) {
+	        result.put("res_code", "200");
+	        result.put("res_msg", "수정 완료");
+	    }
+
+	    return result;
+	}
+	// 회사 드라이브 파일 수정
+	@PostMapping("/update/company/{attachNo}")
+	@ResponseBody
+	public Map<String, String> editCompanyDriveFile(@PathVariable("attachNo") Long attachNo,
+	                                                @RequestParam(value = "driveFile", required = false) MultipartFile file,
+	                                                @RequestParam("driveDescription") String description,
+	                                                @AuthenticationPrincipal EmployeeDetails user) {
+	    Map<String, String> result = new HashMap<>();
+	    result.put("res_code", "500");
+	    result.put("res_msg", "수정 실패");
+
+	    String separatorCode = "A001";
+	    String driveEditor = user.getEmployee().getEmployeeName();
+	    Long currentEmployeeNo = user.getEmployee().getEmployeeNo();
+
+	    boolean success = driveService.updateCompanyDriveFile(attachNo, file, description, separatorCode, driveEditor, currentEmployeeNo);
+
 	    if (success) {
 	        result.put("res_code", "200");
 	        result.put("res_msg", "수정 완료");
@@ -333,6 +392,7 @@ public class DriveController {
 	        return ResponseEntity.badRequest().build();
 	    }
 	}
+	// 부서 드라이브 파일 다운로드
 	@GetMapping("/download/department/{driveAttachNo}")
 	public ResponseEntity<Object> downloadDepartmentDriveFile(@PathVariable("driveAttachNo") Long id,
 	                                                           @AuthenticationPrincipal EmployeeDetails user) {
@@ -367,8 +427,47 @@ public class DriveController {
 	        return ResponseEntity.badRequest().build();
 	    }
 	}
+	// 회사 드라이브 파일 다운로드
+	@GetMapping("/download/company/{driveAttachNo}")
+	public ResponseEntity<Object> downloadCompanyDriveFile(@PathVariable("driveAttachNo") Long id) {
+	    System.out.println("회사 드라이브 다운로드 시도: " + id);
+	    try {
+	        // DB에서 파일 정보 가져오기
+	        Drive drive = driveService.findByDriveAttachNo(id);
+	        if (drive == null) {
+	            System.out.println("해당 ID로 파일을 찾을 수 없음");
+	            return ResponseEntity.notFound().build();
+	        }
 
+	        // separatorCode가 회사(A001)인지 체크
+	        if (!"A001".equals(drive.getSeparatorCode())) {
+	            System.out.println("회사 파일이 아님");
+	            return ResponseEntity.status(403).body("회사 파일만 다운로드할 수 있습니다.");
+	        }
 
+	        // 실제 파일 경로
+	        Path filePath = Paths.get(fileDir + drive.getDrivePath());
+	        System.out.println("파일 경로: " + filePath.toString());
+	        if (!Files.exists(filePath)) {
+	            return ResponseEntity.notFound().build();
+	        }
+
+	        // 파일명 한글 깨짐 방지
+	        String encodedFileName = URLEncoder.encode(drive.getDriveOriName(), "UTF-8").replaceAll("\\+", "%20");
+
+	        // 응답 생성
+	        Resource resource = new InputStreamResource(Files.newInputStream(filePath));
+	        return ResponseEntity.ok()
+	                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+	                .contentType(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM)
+	                .body(resource);
+
+	    } catch (Exception e) {
+	        System.out.println("회사 드라이브 파일 다운로드 중 예외 발생: " + e.getMessage());
+	        e.printStackTrace();
+	        return ResponseEntity.badRequest().build();
+	    }
+	}
 	
 	// 개인 파일 일괄 다운로드
 	@PostMapping("/download/personal/bulk")
@@ -506,7 +605,51 @@ public class DriveController {
 	        return ResponseEntity.badRequest().build();
 	    }
 	}
+	// 회사 드라이브 파일 일괄 다운로드
+	@PostMapping("/download/company/bulk")
+	public ResponseEntity<Resource> bulkDownloadCompany(@RequestParam("fileIds") List<Long> fileIds) {
+	    try {
+	        Path zipPath = Files.createTempFile("department-bulk-download-", ".zip");
+	        Set<String> entryNames = new HashSet<>();
 
+	        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(zipPath))) {
+	            for (Long id : fileIds) {
+	                Drive drive = driveService.findByDriveAttachNo(id);  // id로 파일 찾기
+	                if (drive == null) continue;
+
+	                Path filePath = Paths.get(fileDir + drive.getDrivePath());  // 실제 파일 경로
+	                if (!Files.exists(filePath)) continue;
+
+	                String zipEntryName = drive.getDriveOriName();  // Zip 안에 보이는 파일명
+	                if (entryNames.contains(zipEntryName)) {
+	                    int count = 1;
+	                    String originalName = zipEntryName;
+	                    while (entryNames.contains(zipEntryName)) {
+	                        zipEntryName = originalName.replaceFirst("(\\.[^.]+)$", "(" + count + ")$1");
+	                        count++;
+	                    }
+	                }
+	                entryNames.add(zipEntryName);
+
+	                zos.putNextEntry(new ZipEntry(zipEntryName));
+	                Files.copy(filePath, zos);
+	                zos.closeEntry();
+	            }
+	        }
+
+	        Resource resource = new InputStreamResource(Files.newInputStream(zipPath));
+
+	        return ResponseEntity.ok()
+	                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"department-bulk-download.zip\"")
+	                .contentType(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM)
+	                .contentLength(Files.size(zipPath))
+	                .body(resource);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.badRequest().build();
+	    }
+	}
 	
 	// -------------------------------------------- 파일 삭제 ------------------------------------------
 	// 개인 드라이브 파일 삭제
@@ -598,6 +741,39 @@ public class DriveController {
 
 	    return resultMap;
 	}
+	// 회사 드라이브 파일 삭제
+	@DeleteMapping("/delete/company/{attachNo}")
+	@ResponseBody
+	public Map<String, String> deleteCompanyDriveFile(@PathVariable("attachNo") Long driveAttachNo) {
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "삭제 실패");
+
+	    Optional<Drive> optionalDrive = driveRepository.findById(driveAttachNo);
+
+	    if (optionalDrive.isPresent()) {
+	        Drive drive = optionalDrive.get();
+	        
+	        // 파일의 separatorCode가 "A001" (회사코드) 인지 체크
+	        if (!"A001".equals(drive.getSeparatorCode())) {
+	            resultMap.put("res_msg", "회사 드라이브 파일이 아닙니다.");
+	            return resultMap;
+	        }
+
+	        // 삭제 시도
+	        int deleteResult = driveService.deleteDriveFile(driveAttachNo);
+	        if (deleteResult > 0) {
+	            resultMap.put("res_code", "200");
+	            resultMap.put("res_msg", "삭제 성공");
+	        } else {
+	            resultMap.put("res_msg", "삭제 실패");
+	        }
+	    } else {
+	        resultMap.put("res_msg", "해당 파일을 찾을 수 없습니다.");
+	    }
+
+	    return resultMap;
+	}
 
 	
 	
@@ -632,7 +808,6 @@ public class DriveController {
 	@Transactional
 	public ResponseEntity<Map<String, String>> bulkDeleteTeam(@RequestBody Map<String, List<Long>> requestData,
 	                                                          @AuthenticationPrincipal EmployeeDetails user) {
-	    // JSON에서 fileIds를 추출
 	    List<Long> fileIds = requestData.get("fileIds");
 
 	    Map<String, String> resultMap = new HashMap<>();
@@ -647,20 +822,25 @@ public class DriveController {
 	    // 로그인한 사용자의 팀 separatorCode
 	    String mySeparatorCode = user.getEmployee().getStructure().getSeparatorCode();
 
-	    // 삭제 가능한 파일만 필터링
-	    List<Long> deletableFileIds = fileIds.stream()
-	            .filter(id -> {
-	                Optional<Drive> optionalDrive = driveRepository.findById(id);
-	                return optionalDrive.isPresent() && mySeparatorCode.equals(optionalDrive.get().getSeparatorCode());
-	            })
-	            .toList();
+	    // 삭제 가능한 파일만 골라 담기
+	    List<Long> deletableFileIds = new ArrayList<>();
+
+	    for (Long id : fileIds) {
+	        Optional<Drive> optionalDrive = driveRepository.findById(id);
+	        if (optionalDrive.isPresent()) {
+	            Drive drive = optionalDrive.get();
+	            if (mySeparatorCode.equals(drive.getSeparatorCode())) {
+	                deletableFileIds.add(id);
+	            }
+	        }
+	    }
 
 	    if (deletableFileIds.isEmpty()) {
 	        resultMap.put("res_msg", "삭제 가능한 파일이 없습니다.");
 	        return ResponseEntity.ok(resultMap);
 	    }
 
-	    // 실제 파일 삭제 서비스 호출
+	    // 실제 파일 삭제
 	    int result = driveService.bulkDeleteDriveFiles(deletableFileIds);
 
 	    if (result > 0) {
@@ -670,6 +850,50 @@ public class DriveController {
 
 	    return ResponseEntity.ok(resultMap);
 	}
+
+	// 회사 드라이브 파일 일괄 삭제
+	@PostMapping("/delete/company/bulk")
+	@ResponseBody
+	@Transactional
+	public ResponseEntity<Map<String, String>> bulkDeleteCompany(@RequestBody Map<String, List<Long>> requestData) {
+	    List<Long> fileIds = requestData.get("fileIds");
+
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "삭제 실패");
+
+	    if (fileIds == null || fileIds.isEmpty()) {
+	        resultMap.put("res_msg", "삭제할 파일이 없습니다.");
+	        return ResponseEntity.ok(resultMap);
+	    }
+
+	    List<Long> deletableFileIds = new ArrayList<>();
+
+	    for (Long id : fileIds) {
+	        Optional<Drive> optionalDrive = driveRepository.findById(id);
+	        if (optionalDrive.isPresent()) {
+	            Drive drive = optionalDrive.get();
+	            if ("A001".equals(drive.getSeparatorCode())) {
+	                deletableFileIds.add(id);
+	            }
+	        }
+	    }
+
+	    if (deletableFileIds.isEmpty()) {
+	        resultMap.put("res_msg", "삭제 가능한 파일이 없습니다.");
+	        return ResponseEntity.ok(resultMap);
+	    }
+
+	    int result = driveService.bulkDeleteDriveFiles(deletableFileIds);
+
+	    if (result > 0) {
+	        resultMap.put("res_code", "200");
+	        resultMap.put("res_msg", "삭제 성공");
+	    }
+
+	    return ResponseEntity.ok(resultMap);
+	}
+
 
 
 

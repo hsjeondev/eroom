@@ -200,9 +200,61 @@ public class DriveService {
 		}
 		return result;
 	}
+	// ------------------------- 회사 드라이브 파일 업로드 --------------------------
+	public int uploadCompanyDriveFiles(DriveDto driverDto, Long employeeNo) {
+	    int result = 0;
+	    driverDto.setSeparatorCode("A001");
+
+	    List<String> descriptions = driverDto.getDriveDescriptions(); // 추가된 설명 리스트 가져오기
+	    List<MultipartFile> files = driverDto.getDriveFiles();
+
+	    for (int i = 0; i < files.size(); i++) {
+	        MultipartFile file = files.get(i);
+	        try {
+	            System.out.println("파일 처리 시작: " + file.getOriginalFilename());
+
+	            String oriName = file.getOriginalFilename();
+	            String ext = oriName.substring(oriName.lastIndexOf("."));
+	            String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+
+	            String path = fileDir + "drive/company/" + newName;
+	            File savedFile = new File(path);
+	            if (!savedFile.getParentFile().exists()) {
+	                savedFile.getParentFile().mkdirs();
+	            }
+	            file.transferTo(savedFile);
+
+	            // 파일 설명 추가
+	            String description = (descriptions != null && descriptions.size() > i) ? descriptions.get(i) : null;
+
+	            Drive drive = Drive.builder()
+	                    .uploader(Employee.builder().employeeNo(employeeNo).build())
+	                    .separatorCode(driverDto.getSeparatorCode())
+	                    .driveOriName(oriName)
+	                    .driveNewName(newName)
+	                    .driveType(ext)
+	                    .driveSize(file.getSize())
+	                    .drivePath("drive/company/" + newName)
+	                    .driveDescription(description)
+	                    .downloadCount(0L)
+	                    .visibleYn("Y")
+	                    .build();
+
+	            driveRepository.save(drive);
+	            result++;
+	        } catch (Exception e) {
+	            System.out.println("업로드 실패 파일명: " + file.getOriginalFilename());
+	            e.printStackTrace();
+	        }
+	    }
+	    return result;
+	}
+
+	
+	
 	// ------------------------- 개인 드라이브 파일 리스트 조회 --------------------------
 	public List<DriveDto> findPersonalDriveFiles(Long employeeNo) {
-	    List<Drive> drives = driveRepository.findByUploader_EmployeeNoAndVisibleYn(employeeNo, "Y");
+	    List<Drive> drives = driveRepository.findByUploader_EmployeeNoAndSeparatorCodeAndVisibleYn(employeeNo, "E001", "Y");
 	    List<DriveDto> result = new ArrayList<>();
 
 	    for (Drive drive : drives) {
@@ -211,9 +263,7 @@ public class DriveService {
 
 	    return result;
 	}
-	
 
-	
 	// ------------------------- 팀 드라이브 파일 리스트 조회 -------------------------- 
 	public List<DriveDto> findTeamDriveFiles(String separatorCode) {
 		List<Drive> drives = driveRepository.findBySeparatorCodeAndVisibleYn(separatorCode, "Y");
@@ -237,7 +287,18 @@ public class DriveService {
 
 	    return result;
 	}
-
+	// ------------------------- 회사 드라이브 파일 리스트 조회 --------------------------
+	public List<DriveDto> findCompanyDriveFiles() {
+	    String companySeparatorCode = "A001";
+	    List<Drive> drives = driveRepository.findBySeparatorCodeAndVisibleYn(companySeparatorCode, "Y");
+	    List<DriveDto> result = new ArrayList<>();
+	    
+	    for (Drive drive : drives) {
+	        result.add(DriveDto.toDto(drive));
+	    }
+	    
+	    return result;
+	}
 
 	
 	
@@ -361,6 +422,50 @@ public class DriveService {
 	        driveRepository.save(drive);
 	        return true;
 
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+	// ------------------------- 회사 드라이브 파일 수정 --------------------------
+	@Transactional
+	public boolean updateCompanyDriveFile(Long attachNo, MultipartFile file, String description, String separatorCode, String driveEditor, Long currentEmployeeNo) {
+	    try {
+	        Optional<Drive> optionalDrive = driveRepository.findById(attachNo);
+	        if (optionalDrive.isEmpty()) return false;
+
+	        Drive drive = optionalDrive.get();
+
+	        // 1. 회사 코드 확인
+	        if (!"A001".equals(drive.getSeparatorCode())) {
+	            return false; // 회사 파일이 아니면 수정 불가
+	        }
+
+	        // 2. 파일 교체
+	        if (file != null && !file.isEmpty()) {
+	            String ext = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+	            String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+	            String path = fileDir + "drive/company/" + newName;
+	            File newFile = new File(path);
+	            if (!newFile.getParentFile().exists()) newFile.getParentFile().mkdirs();
+	            file.transferTo(newFile);
+
+	            drive.setDriveOriName(file.getOriginalFilename());
+	            drive.setDriveNewName(newName);
+	            drive.setDriveType(ext);
+	            drive.setDriveSize(file.getSize());
+	            drive.setDrivePath("drive/company/" + newName);
+	        }
+
+	        // 3. 설명 수정
+	        drive.setDriveDescription(description);
+
+	        // 4. 수정 정보 업데이트
+	        drive.setDriveModDate(LocalDateTime.now());
+	        drive.setDriveEditor(driveEditor);
+
+	        driveRepository.save(drive);
+	        return true;
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        return false;
