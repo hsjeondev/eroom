@@ -23,6 +23,7 @@ public class EmployeeUpdateDto {
 	private String employee_name; // 이름
 	private String employee_position; // 직급
 	private String employee_birth; // 생년월일
+	private String employee_pw; // 생년월일 재암호화 한 비밀번호
 	private LocalDateTime employee_hire_date; // 입사일
 	private LocalDateTime employee_end_date; // 퇴사일
 	private String employee_employment_yn; // 재직여부

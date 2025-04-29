@@ -206,26 +206,44 @@ public class EmployeeService {
 	public void updateEmployee(EmployeeUpdateDto dto) {
 		// employee 가져오기
 		Employee employee = employeeRepository.findById(dto.getEmployee_no()).orElse(null);
-		
-		// employee 수정
-		employee.setEmployeeName(dto.getEmployee_name());
-		employee.setEmployeePosition(dto.getEmployee_position());
-		employee.setEmployeeBirth(dto.getEmployee_birth());
-		employee.setEmployeeHireDate(dto.getEmployee_hire_date());
-		employee.setEmployeeEndDate(dto.getEmployee_end_date());
-		employee.setEmployeeEmploymentYn(dto.getEmployee_employment_yn());
-		
-		// 부서 팀 변경
+
+		// 이름 수정 
+		if(dto.getEmployee_name() != null && !dto.getEmployee_name().equals(employee.getEmployeeName())) employee.setEmployeeName(dto.getEmployee_name());
+		// 직급 수정
+		if(dto.getEmployee_position() != null && !dto.getEmployee_position().equals(employee.getEmployeePosition())) employee.setEmployeePosition(dto.getEmployee_position());
+		// 부서 / 팀 변경
 		if(dto.getStructure_no() != null) {
-			Structure structure = structureRepository.findById(dto.getStructure_no()).orElse(null);
-			employee.setStructure(structure);
+			Long newStructureNo = dto.getStructure_no();
+			Long currentStructureNo = (employee.getStructure() != null) ? employee.getStructure().getStructureNo() : null;
+			
+			if(!newStructureNo.equals(currentStructureNo)) {
+				Structure structure = structureRepository.findById(newStructureNo).orElse(null);
+				employee.setStructure(structure);
+			}
 		}
+		// 생년월일 수정 -> 비밀번호도 재암호화 해서 수정 필요함
+		if(dto.getEmployee_birth() != null && !dto.getEmployee_birth().equals(employee.getEmployeeBirth())) {
+			employee.setEmployeeBirth(dto.getEmployee_birth()); // 생일 문자열 그대로 저장
+			// 생년월일이 수정된 경우에 비밀번호 다시 세팅
+			String birthNoDash = dto.getEmployee_birth().replaceAll("-", ""); // 하이픈 제거 
+			String newEncodedPw = passwordEncoder.encode(birthNoDash);
+			employee.setEmployeePw(newEncodedPw); // 암호화된 비밀번호로 재설정해줌
+		}
+		// 입사일 수정
+		if(dto.getEmployee_hire_date() != null && !dto.getEmployee_hire_date().equals(employee.getEmployeeHireDate())) employee.setEmployeeHireDate(dto.getEmployee_hire_date());
+		
+		// 퇴사일 수정
+		if(dto.getEmployee_end_date() != null && !dto.getEmployee_end_date().equals(employee.getEmployeeEndDate())) employee.setEmployeeEndDate(dto.getEmployee_end_date());
+		
+		// 재직여부 수정
+		if(dto.getEmployee_employment_yn() != null) employee.setEmployeeEmploymentYn(dto.getEmployee_employment_yn());
 		
 		employeeRepository.save(employee);
 		
+		
 		// directory 수정
 		Directory directory = employee.getDirectory();
-		if(directory != null) {
+		if(directory != null && dto.getDirectory_phone() != null && !dto.getDirectory_phone().equals(directory.getDirectoryPhone())) {
 			directory.setDirectoryPhone(dto.getDirectory_phone());
 			employeeDirectoryRepository.save(directory);
 		}

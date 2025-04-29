@@ -748,7 +748,9 @@ document.addEventListener('DOMContentLoaded',function(){
 	}
 	
 	// ============ 회원 수정 ==============
-	
+	let originalData = {}; // 값을 저장할 변수
+		
+		
 	// 회원 수정 버튼 클릭시 fetch로 회원 정보 가져오기
 	document.querySelectorAll('.editEmployeeBtn').forEach(function(btn){
 		btn.addEventListener('click',function(e){
@@ -770,6 +772,19 @@ document.addEventListener('DOMContentLoaded',function(){
 						document.getElementById('editEmployeeBirth').value = data.employee_birth || ''; // 생년월일
 						document.getElementById('editEmployeeHireDate').value = data.employee_hire_date || ''; // 입사일
 						
+						//originalData 문자열로 저장 
+						originalData = {
+							employee_name : data.employee_name || '' ,
+							employee_position : data.employee_position || '',
+							department_no : data.department_no ? String(data.department_no) : '',
+							team_no : data.team_no ? String(data.team_no) : '',
+							directory_phone : data.directory_phone || '',
+							employee_birth : (data.employee_birth || '').replaceAll('-',''), // 생일은 - 제거해서 저장
+							employee_hire_date : data.employee_hire_date ? data.employee_hire_date.split('T')[0] : '',
+							employee_end_date : data.employee_end_date ? dadta.employee_end_date.split('T')[0] : '',
+							employee_employment_yn : data.employee_employment_yn || ''
+						};
+					
 						// 퇴사자일 경우 퇴사일, 재직여부 입력칸 열기
 						if(data.employee_employment_yn === 'N'){
 							document.getElementById('retiredFields').classList.remove('d-none'); // 퇴사자 폼 표시
@@ -851,11 +866,12 @@ document.addEventListener('DOMContentLoaded',function(){
 		}
 	});
 	
+
 	const hireDate = document.getElementById('editEmployeeHireDate').value;
 	const endDate = document.getElementById('editEmployeeEndDate').value;
 		// ================= 회원 수정 함수 =======================
 		function sendUpdateEmployee(){
-			
+			console.log("수정 함수 호출됨.")
 			const selectedPosition = document.getElementById('editEmployeePosition').value;
 			const customPosition = document.getElementById('editCustomPositionInput').value.trim();
 			
@@ -864,18 +880,66 @@ document.addEventListener('DOMContentLoaded',function(){
 				finalPosition = customPosition; // 직접 입력한 값으로 대체
 			}
 			
-			const payload = {
-					employee_no : editingEmployeeNo,
-					employee_name : document.getElementById('editEmployeeName').value,
-					employee_position : finalPosition,
-					department_no : document.getElementById('editDepartmentSelect').value,
-					team_no : document.getElementById('editTeamSelect').value,
-					directory_phone : document.getElementById('editDirectoryPhone').value,
-					employee_birth : document.getElementById('editEmployeeBirth').value,
-					employee_hire_date: hireDate ? `${hireDate}T00:00:00` : null,
-					employee_end_date: endDate ? `${endDate}T00:00:00` : null,
-					employee_employment_yn : document.getElementById('editEmployeeEmploymentYn').value
+			const departmentNo = document.getElementById('editDepartmentSelect').value;
+			const teamNo = document.getElementById('editTeamSelect').value;
+			const structureNo = teamNo || departmentNo; // 팀이 있으면 팀, 없으면 부서
+			
+			const currentData  = {
+					employee_name : document.getElementById('editEmployeeName').value.trim(),
+					employee_position : finalPosition.trim(),
+					// directory_phone : document.getElementById('editDirectoryPhone').value,
+					employee_birth : document.getElementById('editEmployeeBirth').value.replaceAll('-',''), // 하이픈 제거
+					employee_hire_date: document.getElementById('editEmployeeHireDate').value,
+					employee_end_date: document.getElementById('editEmployeeEndDate').value,
+					employee_employment_yn : document.getElementById('editEmployeeEmploymentYn') ? 
+							document.getElementById('editEmployeeEmploymentYn').value : originalData.employee_employment_yn, // input 없으면 원본값으로
+					structure_no : structureNo ? parseInt(structureNo) : null		
 			};
+			
+			const payload = {employee_no : editingEmployeeNo};
+			
+			// 연락처가 null이 아닌 경우에만 추가
+			const phoneValue = document.getElementById('editDirectoryPhone').value.trim(); // 연락처 요소
+			if(phoneValue){
+				currentData.directory_phone = phoneValue; // 빈 문자열이 아닌 경우에만 추가
+			}
+			// 재직여부, structure정보
+			if(!payload.hasOwnProperty('employee_employment_yn')){
+				payload.employee_employment_yn = currentData.employee_employment_yn;
+			}
+			if(!payload.hasOwnProperty('structure_no')){
+				payload.structure_no = currentData.structure_no;
+			}
+			
+			// 생년월일이 수정된 경우, employee_pw도 추가
+			if(payload.employee_birth){
+				payload.employee_pw = currentData.employee_birth;
+			}
+			
+			// 날짜 필드 변환
+			if(payload.employee_hire_date){
+				payload.employee_hire_date = payload.employee_hire_date + 'T00:00:00';
+			}
+			if(payload.employee_end_date){
+				payload.employee_end_date = payload.employee_end_date + 'T:00:00:00';
+			}
+			
+			for(const key in currentData){
+				// 수정된 값이면서 값이 비어있지 않은 경우만 payload에 추가
+				if(currentData[key] !== originalData[key] && currentData[key] !== '' && currentData[key] !== null && currentData[key] != undefined){
+					payload[key] = currentData[key];
+				}
+			}
+			
+			// 수정한게 하나도 없으면 경고
+			if(Object.keys(payload).length === 1){ // employee_no만 있을 경우
+				showAlert("변경된 내용이 없습니다.");
+				return;
+			}
+			
+
+			console.log("payload 확인");
+			console.log(payload);
 			
 			// 서버로 수정 요청 보내기
 			fetch('/admin/updateEmployee',{
