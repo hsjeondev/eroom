@@ -4,6 +4,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{/include/layout}">
+
  <body>
 	<main class="main" id="top" layout:fragment="content">
 	<!-- 여기에 요소 넣으면 됩니다. -->
@@ -228,9 +229,21 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						</div><!-- col-12 col-xl-6 -->
 						<!-- 카드1 끝 -->
 					
+    <!-- 서명하기 버튼 -->
+    <button type="button" class="btn btn-primary" id="openSignature">
+      서명하기
+    </button>
+
+
+
+
+
+
 					
+
 					
 					</div><!-- row g-3 list -->
+					
 				
 				<!-- 페이징 -->
 				<div class="row align-items-center justify-content-center py-2 pe-0 fs-9 mt-2">
@@ -246,6 +259,101 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			</div><!-- pb-8 끝 -->
 			
 		</div> <!-- content 끝 -->
+		
+		
+		    <!-- 모달 구조 -->
+    <div class="modal fade" id="signatureModal" tabindex="-1" aria-labelledby="signatureModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="signatureModalLabel">서명</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+          </div>
+          <div class="modal-body text-center">
+            <canvas id="signatureCanvas" width="400" height="200" style="border:1px solid #000; background:#fff;"></canvas>
+            <div class="mt-3">
+              <button type="button" class="btn btn-secondary" id="clearSignature">초기화</button>
+              <button type="button" class="btn btn-primary" id="saveSignature">저장</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+		
+		
+		
+		
+		    <!-- 시그니처 모달 작동 스크립트 -->
+    <script>
+    window.addEventListener('load', function () {
+      let signaturePad;
+      const canvas = document.getElementById('signatureCanvas');
+      const clearBtn = document.getElementById('clearSignature');
+      const saveBtn = document.getElementById('saveSignature');
+
+      function initSignaturePad() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = 400 * ratio;
+        canvas.height = 200 * ratio;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(ratio, ratio);
+
+        signaturePad = new SignaturePad(canvas, {
+          backgroundColor: 'rgb(255,255,255)',
+          penColor: 'black'
+        });
+      }
+
+      const signatureModal = document.getElementById('signatureModal');
+      signatureModal.addEventListener('shown.bs.modal', function () {
+        initSignaturePad();
+      });
+
+      document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'openSignature') {
+          console.log("모달 열리기");
+          const modal = new bootstrap.Modal(signatureModal);
+          modal.show();
+        }
+      });
+
+      clearBtn.addEventListener('click', function () {
+        if (signaturePad) {
+          signaturePad.clear();
+        }
+      });
+
+      saveBtn.addEventListener('click', function () {
+        if (signaturePad && !signaturePad.isEmpty()) {
+          const dataURL = signaturePad.toDataURL();
+          console.log('서명 데이터 URL:', dataURL);
+          const modalInstance = bootstrap.Modal.getInstance(signatureModal);
+          modalInstance.hide();
+        } else {
+          alert('서명이 없습니다!');
+        }
+      });
+    });
+    </script>
+		
+		
+		
+		
 	</main>
+	
+
+	
+
+
+
+
+
+
+
+
+
+
+
+	
 </body>
 </html>
