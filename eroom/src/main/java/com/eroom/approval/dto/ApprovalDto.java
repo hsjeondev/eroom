@@ -50,6 +50,7 @@ public class ApprovalDto {
 				.employee(employee)
 				.approvalFormat(approval_format)
 				.approvalVisibleYn(approval_visible_yn)
+				.approvalRegDate(approval_reg_date)
 				.build();
 	}
 	
@@ -63,6 +64,7 @@ public class ApprovalDto {
 				.reg_date(entity.getApprovalRegDate() != null ? entity.getApprovalRegDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
 				.completed_date(entity.getApprovalCompletedDate() != null ? entity.getApprovalCompletedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
 				.employee(entity.getEmployee())
+				.approval_reg_date(entity.getApprovalRegDate())
 				.approval_format(entity.getApprovalFormat())
 				.approval_visible_yn(entity.getApprovalVisibleYn())
 				.build();

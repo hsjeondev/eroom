@@ -68,8 +68,11 @@ public class ApprovalController {
 	
 	
 	// 내가 올린 결재 리스트 조회
+	// 비동기 방식을 사용해서 해당 RequestParam들 사용하지 않는 상태. 비동기 완료하면 없애자.
 	@GetMapping("/approval/myRequestedApprovals")
-	public String selectMyRequestedApprovalsList(Model model, Authentication authentication) {
+	public String selectMyRequestedApprovalsList(
+			Model model, Authentication authentication
+			) {
 		// 로그인한 사용자 정보 가져오기
 		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 		Employee employee = employeeDetails.getEmployee();
@@ -105,9 +108,19 @@ public class ApprovalController {
 //			
 //		}
 		
-		
+		// 결재 양식 리스트 조회
+		List<ApprovalFormat> approvalFormatEntityList = approvalFormatService.getApprovalFormatList();
+		List<ApprovalFormatDto> approvalFormatList = new ArrayList<ApprovalFormatDto>();
+		for (ApprovalFormat format : approvalFormatEntityList) {
+			ApprovalFormatDto dto = new ApprovalFormatDto();
+			dto = dto.toDto(format);
+			approvalFormatList.add(dto);
+		}
+		model.addAttribute("approvalFormatList", approvalFormatList);
 		// 내가 올린 approval 리스트 조회
 		List<Approval> temp = approvalService.getMyRequestedApprovals(employee.getEmployeeNo(), "Y");
+		
+		
 		List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
 		Map<Long, List<ApprovalLineDto>> approvalLineMap = new HashMap<Long, List<ApprovalLineDto>>();
 		for (Approval approval : temp) {
@@ -132,6 +145,74 @@ public class ApprovalController {
 		
 		return "/approval/myRequestedApprovals";
 	}
+	// 비동기 방식을 위한 메소드
+	@GetMapping("/approval/myRequestedApprovals/fragment")
+	public String getMyRequestedApprovalsFragment(
+			Model model, Authentication authentication,
+			@RequestParam(name = "formatNo",required = false) Long formatNo,
+			@RequestParam(name = "dateSort",required = false) String dateSort,
+			@RequestParam(name = "approvalStatus",required = false) String approvalStatus
+	) {
+		
+		// 로그인한 사용자 정보 가져오기
+		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+		Employee employee = employeeDetails.getEmployee();
+		model.addAttribute("employee", employee);
+		ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(employee);
+		model.addAttribute("approvalSignature", approvalSignature);
+		// 결재 양식 리스트 조회
+				List<ApprovalFormat> approvalFormatEntityList = approvalFormatService.getApprovalFormatList();
+				List<ApprovalFormatDto> approvalFormatList = new ArrayList<ApprovalFormatDto>();
+				for (ApprovalFormat format : approvalFormatEntityList) {
+					ApprovalFormatDto dto = new ApprovalFormatDto();
+					dto = dto.toDto(format);
+					approvalFormatList.add(dto);
+				}
+				model.addAttribute("approvalFormatList", approvalFormatList);
+				// 내가 올린 approval 리스트 조회
+				List<Approval> temp = approvalService.getMyRequestedApprovals(employee.getEmployeeNo(), "Y");
+				
+				
+				List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
+				Map<Long, List<ApprovalLineDto>> approvalLineMap = new HashMap<Long, List<ApprovalLineDto>>();
+				for (Approval approval : temp) {
+					if(formatNo != 0) {
+						if(!approval.getApprovalFormat().getApprovalFormatNo().equals(formatNo)) {
+							continue;
+						}
+					}
+					if(!approvalStatus.equals("0")) {
+						if(!approval.getApprovalStatus().equals(approvalStatus)) {
+							continue;
+						}
+					}
+					// approval 리스트의 approval_no를 사용해서 approval_line 리스트 조회
+					List<ApprovalLine> temp2 = approvalLineService.getApprovalLineByApprovalNo(approval.getApprovalNo());
+					List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
+					for (ApprovalLine approvalLine : temp2) {
+						ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
+						approvalLineDtoList.add(approvalLineDto);
+					}
+					// approval_line 리스트를 approval_no를 키로 하는 맵에 저장
+					approvalLineMap.put(approval.getApprovalNo(), approvalLineDtoList);
+					
+					
+					ApprovalDto dto = new ApprovalDto();
+					dto = dto.toDto(approval);
+					resultList.add(dto);
+				}
+				if(dateSort.equals("ASC")) {
+					resultList.sort((a1, a2) -> a1.getApproval_reg_date().compareTo(a2.getApproval_reg_date()));
+				} else {
+					resultList.sort((a1, a2) -> a2.getApproval_reg_date().compareTo(a1.getApproval_reg_date()));
+				}
+				model.addAttribute("approvalLineMap", approvalLineMap);
+				model.addAttribute("resultList", resultList);
+				
+				
+		return "approval/cardFragment :: cardFragment";
+	}
+	
 	// 재기안 재결재
 	@GetMapping({"approval/create", "/approval/{approvalNo}/edit"})
 	public String selectApprovalCreate(Model model, Authentication authentication, @PathVariable(value = "approvalNo", required = false) Long approvalNo) {
@@ -516,7 +597,7 @@ public class ApprovalController {
 	}
 	
 
-
+	// 요청 받은 결재(내가 결재라인)
 	@GetMapping("/approval/receivedApprovals")
 	public String selectReceivedApprovalsList(Model model, Authentication authentication) {
 		// 로그인한 사용자 정보 가져오기
@@ -532,6 +613,15 @@ public class ApprovalController {
 		Approval temp2 = null;
 		List<Approval> resultApprovalList = new ArrayList<Approval>();
 		List<ApprovalDto> resultApprovalListDto = new ArrayList<ApprovalDto>();
+		// 결재 양식 리스트 조회
+		List<ApprovalFormat> approvalFormatEntityList = approvalFormatService.getApprovalFormatList();
+		List<ApprovalFormatDto> approvalFormatList = new ArrayList<ApprovalFormatDto>();
+		for (ApprovalFormat format : approvalFormatEntityList) {
+			ApprovalFormatDto dto = new ApprovalFormatDto();
+			dto = dto.toDto(format);
+			approvalFormatList.add(dto);
+		}
+		model.addAttribute("approvalFormatList", approvalFormatList);
 		
 		for (ApprovalLine a : var1Entity) {
 			
@@ -617,6 +707,141 @@ public class ApprovalController {
 		
 		return "/approval/receivedApprovals";
 	}
+	
+	
+	
+	
+	
+	// 비동기 방식을 위한 메소드
+	@GetMapping("/approval/receivedApprovals/fragment")
+	public String getReceivedApprovalsApprovalsApprovalsFragment(
+			Model model, Authentication authentication,
+			@RequestParam(name = "formatNo",required = false) Long formatNo,
+			@RequestParam(name = "dateSort",required = false) String dateSort,
+			@RequestParam(name = "approvalStatus",required = false) String approvalStatus
+	) {
+		// 로그인한 사용자 정보 가져오기
+		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+		Employee employee = employeeDetails.getEmployee();
+		Long employeeNo = employee.getEmployeeNo();
+		model.addAttribute("employee", employee);
+		ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(employee);
+		model.addAttribute("approvalSignature", approvalSignature);
+		// 내가 결재 라인에 있는 approval 리스트 조회
+		List<ApprovalLine> var1Entity = approvalLineService.getApprovalLineByEmployeeNo(employeeNo);
+		Map<Long, List<ApprovalLineDto>> var1Map = new HashMap<Long, List<ApprovalLineDto>>();
+		Approval temp2 = null;
+		List<Approval> resultApprovalList = new ArrayList<Approval>();
+		List<ApprovalDto> resultApprovalListDto = new ArrayList<ApprovalDto>();
+		// 결재 양식 리스트 조회
+		List<ApprovalFormat> approvalFormatEntityList = approvalFormatService.getApprovalFormatList();
+		List<ApprovalFormatDto> approvalFormatList = new ArrayList<ApprovalFormatDto>();
+		for (ApprovalFormat format : approvalFormatEntityList) {
+			ApprovalFormatDto dto = new ApprovalFormatDto();
+			dto = dto.toDto(format);
+			approvalFormatList.add(dto);
+		}
+		model.addAttribute("approvalFormatList", approvalFormatList);
+		
+		for (ApprovalLine a : var1Entity) {
+			
+			
+			
+			// 결재라인용 - 내가 결재 라인에 있는 approval들의 결재번호로 approval 리스트 조회
+			List<Approval> approvalList = approvalService.getApprovalListByApprovalNo(a.getApproval().getApprovalNo(), "Y");
+			if (approvalList != null) {
+				// 결재라인용 - 결재라인에 있는 결재번호로 approval 리스트 entity -> Dto 변환
+				for (Approval approval : approvalList) {
+					List<ApprovalLine> var1 = approvalLineService.getApprovalLineByApprovalNo(approval.getApprovalNo());
+					List<ApprovalLineDto> tempDtoList = new ArrayList<>();
+				    for(int i = 0; i < var1.size(); i++) {
+				    	tempDtoList.add(new ApprovalLineDto().toDto(var1.get(i)));
+				    }
+				    var1Map.put(approval.getApprovalNo(), tempDtoList);
+					
+				    // 결재 리스트옹 - 내가 해당 결재의 현재 순번이 맞는 결재들만 보내기
+					List<ApprovalLine> temp = approval.getApprovalLines();
+					Boolean bool = false;
+					Boolean stackBool = false;
+					int count = 0;
+					// step이 0인 사람(합의자) 중 결재 상태가 A 아닌 사람이 한명이라도 있으면 stackBool = false처리
+					for(int i = 0; i < temp.size(); i++) {
+						if(temp.get(i).getApprovalLineStep() != 0) {
+							continue;
+						}
+						if(temp.get(i).getApprovalLineStep() == 0) {
+							count++;
+							if(!temp.get(i).getApprovalLineStatus().equals("A")) {
+								stackBool = false;
+								break;
+							} else if(temp.get(i).getApprovalLineStatus().equals("A")) {
+								stackBool = true;
+							}
+						}
+						
+						
+				    }
+					// 결재 라인에 있는 사람들 중~
+					for(int i = 0; i < temp.size(); i++) {
+						bool = false;
+						if(temp.get(i).getApprovalLineStep() >= 1) {
+							// 나보다 앞에서 결재 하는 사람의 status확인
+							if (i > 0) {
+								if(temp.get(i - 1).getApprovalLineStatus().equals("A") && temp.get(i).getEmployee().getEmployeeNo() == employeeNo) {
+									bool = true;
+								}
+							// 내가 제일 처음 결재자인 경우
+							} else if (i == 0) {
+								if(temp.get(i).getEmployee().getEmployeeNo() == employeeNo) {
+									bool = true;
+								}
+							}
+						}
+						// 모든 합의자가 status = A, 나의 결재 차례 이후인 경우에만 approval을 담아서 보내기
+						if(count == 0) {
+							if(bool && !approval.getApprovalStatus().equals("F")) {
+								temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
+								resultApprovalList.add(temp2);
+							}
+						} else {
+							if(bool && stackBool && !approval.getApprovalStatus().equals("F")) {
+								temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
+								resultApprovalList.add(temp2);
+							}
+						}
+					}
+				}
+			}
+		}
+		// 결재 리스트옹 - 내가 결재 순서인 approval들을 Dto로 변환
+//		List<Approval> orderByDESCRegDate = new ArrayList<Approval>();
+//		orderByDESCRegDate = resultApprovalList.sort(null)
+		for (Approval t : resultApprovalList) {
+			if(formatNo != 0) {
+				if(!t.getApprovalFormat().getApprovalFormatNo().equals(formatNo)) {
+					continue;
+				}
+			}
+			if(!approvalStatus.equals("0")) {
+				if(!t.getApprovalStatus().equals(approvalStatus)) {
+					continue;
+				}
+			}
+			
+			ApprovalDto dto = new ApprovalDto();
+			dto = dto.toDto(t);
+			resultApprovalListDto.add(dto);
+		}
+		if(dateSort.equals("ASC")) {
+			resultApprovalListDto.sort((a1, a2) -> a1.getApproval_reg_date().compareTo(a2.getApproval_reg_date()));
+		} else {
+			resultApprovalListDto.sort((a1, a2) -> a2.getApproval_reg_date().compareTo(a1.getApproval_reg_date()));
+		}
+		model.addAttribute("resultList", resultApprovalListDto);
+		model.addAttribute("approvalLineMap", var1Map);
+
+		return "approval/cardFragment :: cardFragment";
+	}
 
 	// 합의 결재
 	@GetMapping("/approval/agreementApprovals")
@@ -634,7 +859,15 @@ public class ApprovalController {
 		Approval temp2 = null;
 		List<Approval> resultApprovalList = new ArrayList<Approval>();
 		List<ApprovalDto> resultApprovalListDto = new ArrayList<ApprovalDto>();
-		
+		// 결재 양식 리스트 조회
+		List<ApprovalFormat> approvalFormatEntityList = approvalFormatService.getApprovalFormatList();
+		List<ApprovalFormatDto> approvalFormatList = new ArrayList<ApprovalFormatDto>();
+		for (ApprovalFormat format : approvalFormatEntityList) {
+			ApprovalFormatDto dto = new ApprovalFormatDto();
+			dto = dto.toDto(format);
+			approvalFormatList.add(dto);
+		}
+		model.addAttribute("approvalFormatList", approvalFormatList);
 		for (ApprovalLine a : var1Entity) {
 			
 			
@@ -679,6 +912,93 @@ public class ApprovalController {
 		
 		return "/approval/agreementApprovals";
 	}
+	// 비동기 방식을 위한 메소드
+	@GetMapping("/approval/agreementApprovals/fragment")
+	public String getMyAgreementApprovalsApprovalsFragment(
+			Model model, Authentication authentication,
+			@RequestParam(name = "formatNo",required = false) Long formatNo,
+			@RequestParam(name = "dateSort",required = false) String dateSort,
+			@RequestParam(name = "approvalStatus",required = false) String approvalStatus
+	) {
+		// 로그인한 사용자 정보 가져오기
+		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+		Employee employee = employeeDetails.getEmployee();
+		Long employeeNo = employee.getEmployeeNo();
+		model.addAttribute("employee", employee);
+		ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(employee);
+		model.addAttribute("approvalSignature", approvalSignature);
+		// 내가 결재 라인에 있는 approval 리스트 조회
+		List<ApprovalLine> var1Entity = approvalLineService.getApprovalLineByEmployeeNo(employeeNo);
+		Map<Long, List<ApprovalLineDto>> var1Map = new HashMap<Long, List<ApprovalLineDto>>();
+		Approval temp2 = null;
+		List<Approval> resultApprovalList = new ArrayList<Approval>();
+		List<ApprovalDto> resultApprovalListDto = new ArrayList<ApprovalDto>();
+		
+		for (ApprovalLine a : var1Entity) {
+			// 결재라인용 - 내가 결재 라인에 있는 approval들의 결재번호로 approval 리스트 조회
+			List<Approval> approvalList = approvalService.getApprovalListByApprovalNo(a.getApproval().getApprovalNo(), "Y");
+			if (approvalList != null) {
+				// 결재라인용 - 결재라인에 있는 결재번호로 approval 리스트 entity -> Dto 변환
+				for (Approval approval : approvalList) {
+					List<ApprovalLine> var1 = approvalLineService.getApprovalLineByApprovalNo(approval.getApprovalNo());
+					List<ApprovalLineDto> tempDtoList = new ArrayList<>();
+				    for(int i = 0; i < var1.size(); i++) {
+				    	tempDtoList.add(new ApprovalLineDto().toDto(var1.get(i)));
+				    }
+				    var1Map.put(approval.getApprovalNo(), tempDtoList);
+					
+				    // 결재 리스트옹 - 내가 해당 결재의 합의자인지 확인
+					List<ApprovalLine> temp = approval.getApprovalLines();
+					for(int i = 0; i < temp.size(); i++) {
+						Boolean bool = false;
+						if (temp.get(i).getApprovalLineStep() == 0 && temp.get(i).getEmployee().getEmployeeNo() == employeeNo) {
+							bool = true;
+						}
+						if(bool && !approval.getApprovalStatus().equals("F")) {
+							temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
+							resultApprovalList.add(temp2);
+						}
+						
+				    }
+				}
+			}
+		}
+		// 결재 리스트옹 - 내가 합의자인 approval들을 Dto로 변환
+		resultApprovalList.sort((a1, a2) -> a2.getApprovalRegDate().compareTo(a1.getApprovalRegDate()));
+		for (Approval t : resultApprovalList) {
+			if(formatNo != 0) {
+				if(!t.getApprovalFormat().getApprovalFormatNo().equals(formatNo)) {
+					continue;
+				}
+			}
+			if(!approvalStatus.equals("0")) {
+				if(!t.getApprovalStatus().equals(approvalStatus)) {
+					continue;
+				}
+			}
+			ApprovalDto dto = new ApprovalDto();
+			dto = dto.toDto(t);
+			resultApprovalListDto.add(dto);
+		}
+		
+		if(dateSort.equals("ASC")) {
+			resultApprovalListDto.sort((a1, a2) -> a1.getApproval_reg_date().compareTo(a2.getApproval_reg_date()));
+		} else {
+			resultApprovalListDto.sort((a1, a2) -> a2.getApproval_reg_date().compareTo(a1.getApproval_reg_date()));
+		}
+		model.addAttribute("resultList", resultApprovalListDto);
+		model.addAttribute("approvalLineMap", var1Map);
+		
+				
+				
+		return "approval/cardFragment :: cardFragment";
+	}
+	
+	
+	
+	
+	
+	
 	// 참조 결재
 	@GetMapping("/approval/referencedApprovals")
 	public String selectReferencedApprovalsList(Model model, Authentication authentication) {
@@ -695,6 +1015,15 @@ public class ApprovalController {
 		Approval temp2 = null;
 		List<Approval> resultApprovalList = new ArrayList<Approval>();
 		List<ApprovalDto> resultApprovalListDto = new ArrayList<ApprovalDto>();
+		// 결재 양식 리스트 조회
+		List<ApprovalFormat> approvalFormatEntityList = approvalFormatService.getApprovalFormatList();
+		List<ApprovalFormatDto> approvalFormatList = new ArrayList<ApprovalFormatDto>();
+		for (ApprovalFormat format : approvalFormatEntityList) {
+			ApprovalFormatDto dto = new ApprovalFormatDto();
+			dto = dto.toDto(format);
+			approvalFormatList.add(dto);
+		}
+		model.addAttribute("approvalFormatList", approvalFormatList);
 		
 		for (ApprovalLine a : var1Entity) {
 			
@@ -740,6 +1069,99 @@ public class ApprovalController {
 		
 		return "/approval/referencedApprovals";
 	}
+	
+	
+	// 비동기 방식을 위한 메소드
+	@GetMapping("/approval/referencedApprovals/fragment")
+	public String getMyreferencedApprovalsApprovalsFragment(
+			Model model, Authentication authentication,
+			@RequestParam(name = "formatNo",required = false) Long formatNo,
+			@RequestParam(name = "dateSort",required = false) String dateSort,
+			@RequestParam(name = "approvalStatus",required = false) String approvalStatus
+	) {
+		// 로그인한 사용자 정보 가져오기
+				EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+				Employee employee = employeeDetails.getEmployee();
+				Long employeeNo = employee.getEmployeeNo();
+				model.addAttribute("employee", employee);
+				ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(employee);
+				model.addAttribute("approvalSignature", approvalSignature);
+				// 내가 결재 라인에 있는 approval 리스트 조회
+				List<ApprovalLine> var1Entity = approvalLineService.getApprovalLineByEmployeeNo(employeeNo);
+				Map<Long, List<ApprovalLineDto>> var1Map = new HashMap<Long, List<ApprovalLineDto>>();
+				Approval temp2 = null;
+				List<Approval> resultApprovalList = new ArrayList<Approval>();
+				List<ApprovalDto> resultApprovalListDto = new ArrayList<ApprovalDto>();
+				// 결재 양식 리스트 조회
+				List<ApprovalFormat> approvalFormatEntityList = approvalFormatService.getApprovalFormatList();
+				List<ApprovalFormatDto> approvalFormatList = new ArrayList<ApprovalFormatDto>();
+				for (ApprovalFormat format : approvalFormatEntityList) {
+					ApprovalFormatDto dto = new ApprovalFormatDto();
+					dto = dto.toDto(format);
+					approvalFormatList.add(dto);
+				}
+				model.addAttribute("approvalFormatList", approvalFormatList);
+				
+				for (ApprovalLine a : var1Entity) {
+					
+					
+					
+					// 결재라인용 - 내가 결재 라인에 있는 approval들의 결재번호로 approval 리스트 조회
+					List<Approval> approvalList = approvalService.getApprovalListByApprovalNo(a.getApproval().getApprovalNo(), "Y");
+					if (approvalList != null) {
+						// 결재라인용 - 결재라인에 있는 결재번호로 approval 리스트 entity -> Dto 변환
+						for (Approval approval : approvalList) {
+							List<ApprovalLine> var1 = approvalLineService.getApprovalLineByApprovalNo(approval.getApprovalNo());
+							List<ApprovalLineDto> tempDtoList = new ArrayList<>();
+						    for(int i = 0; i < var1.size(); i++) {
+						    	tempDtoList.add(new ApprovalLineDto().toDto(var1.get(i)));
+						    }
+						    var1Map.put(approval.getApprovalNo(), tempDtoList);
+							
+						    // 결재 리스트옹 - 내가 해당 결재의 참조자인지 확인
+							List<ApprovalLine> temp = approval.getApprovalLines();
+							for(int i = 0; i < temp.size(); i++) {
+								Boolean bool = false;
+								if (temp.get(i).getApprovalLineStep() == -1 && temp.get(i).getEmployee().getEmployeeNo() == employeeNo) {
+									bool = true;
+								}
+								if(bool && !approval.getApprovalStatus().equals("F")) {
+									temp2 = approvalService.selectApprovalByApprovalNo(temp.get(i).getApproval().getApprovalNo());
+									resultApprovalList.add(temp2);
+								}
+								
+						    }
+						}
+					}
+				}
+				// 결재 리스트옹 - 내가 참조자인 approval들을 Dto로 변환
+				for (Approval t : resultApprovalList) {
+					if(formatNo != 0) {
+						if(!t.getApprovalFormat().getApprovalFormatNo().equals(formatNo)) {
+							continue;
+						}
+					}
+					if(!approvalStatus.equals("0")) {
+						if(!t.getApprovalStatus().equals(approvalStatus)) {
+							continue;
+						}
+					}
+					ApprovalDto dto = new ApprovalDto();
+					dto = dto.toDto(t);
+					resultApprovalListDto.add(dto);
+				}
+				if(dateSort.equals("ASC")) {
+					resultApprovalListDto.sort((a1, a2) -> a1.getApproval_reg_date().compareTo(a2.getApproval_reg_date()));
+				} else {
+					resultApprovalListDto.sort((a1, a2) -> a2.getApproval_reg_date().compareTo(a1.getApproval_reg_date()));
+				}
+				model.addAttribute("resultList", resultApprovalListDto);
+				model.addAttribute("approvalLineMap", var1Map);
+		
+				
+				
+		return "approval/cardFragment :: cardFragment";
+	}
 	// 회수 결재
 	@GetMapping("/approval/fallBackApprovals")
 	public String selectWithdrawnApprovalsList(Model model, Authentication authentication) {
@@ -749,6 +1171,15 @@ public class ApprovalController {
 		model.addAttribute("employee", employee);
 		ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(employee);
 		model.addAttribute("approvalSignature", approvalSignature);
+		// 결재 양식 리스트 조회
+		List<ApprovalFormat> approvalFormatEntityList = approvalFormatService.getApprovalFormatList();
+		List<ApprovalFormatDto> approvalFormatList = new ArrayList<ApprovalFormatDto>();
+		for (ApprovalFormat format : approvalFormatEntityList) {
+			ApprovalFormatDto dto = new ApprovalFormatDto();
+			dto = dto.toDto(format);
+			approvalFormatList.add(dto);
+		}
+		model.addAttribute("approvalFormatList", approvalFormatList);
 		// 내가 올린 approval 리스트 조회
 		List<Approval> temp = approvalService.getMyRequestedApprovals(employee.getEmployeeNo(), "Y");
 		List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
@@ -775,6 +1206,67 @@ public class ApprovalController {
 		
 		
 		return "/approval/fallBackApprovals";
+	}
+	// 비동기 방식을 위한 메소드
+	@GetMapping("/approval/fallBackApprovals/fragment")
+	public String getFallBackApprovalsApprovalsFragment(
+			Model model, Authentication authentication,
+			@RequestParam(name = "formatNo",required = false) Long formatNo,
+			@RequestParam(name = "dateSort",required = false) String dateSort
+	) {
+			// 로그인한 사용자 정보 가져오기
+			EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+			Employee employee = employeeDetails.getEmployee();
+			model.addAttribute("employee", employee);
+			ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(employee);
+			model.addAttribute("approvalSignature", approvalSignature);
+			// 결재 양식 리스트 조회
+			List<ApprovalFormat> approvalFormatEntityList = approvalFormatService.getApprovalFormatList();
+			List<ApprovalFormatDto> approvalFormatList = new ArrayList<ApprovalFormatDto>();
+			for (ApprovalFormat format : approvalFormatEntityList) {
+				ApprovalFormatDto dto = new ApprovalFormatDto();
+				dto = dto.toDto(format);
+				approvalFormatList.add(dto);
+			}
+			model.addAttribute("approvalFormatList", approvalFormatList);
+			
+			// 내가 올린 approval 리스트 조회
+			List<Approval> temp = approvalService.getMyRequestedApprovals(employee.getEmployeeNo(), "Y");
+			List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
+			Map<Long, List<ApprovalLineDto>> approvalLineMap = new HashMap<Long, List<ApprovalLineDto>>();
+			for (Approval approval : temp) {
+				// approval 리스트의 approval_no를 사용해서 approval_line 리스트 조회
+				List<ApprovalLine> temp2 = approvalLineService.getApprovalLineByApprovalNo(approval.getApprovalNo());
+				List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
+				for (ApprovalLine approvalLine : temp2) {
+					ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
+					approvalLineDtoList.add(approvalLineDto);
+				}
+				// approval_line 리스트를 approval_no를 키로 하는 맵에 저장
+				approvalLineMap.put(approval.getApprovalNo(), approvalLineDtoList);
+				
+				if (approval.getApprovalStatus().equals("F")) {
+					if(formatNo != 0) {
+						if(!approval.getApprovalFormat().getApprovalFormatNo().equals(formatNo)) {
+							continue;
+						}
+					}
+					ApprovalDto dto = new ApprovalDto();
+					dto = dto.toDto(approval);
+					resultList.add(dto);
+				}
+			}
+		
+
+			if(dateSort.equals("ASC")) {
+				resultList.sort((a1, a2) -> a1.getApproval_reg_date().compareTo(a2.getApproval_reg_date()));
+			} else {
+				resultList.sort((a1, a2) -> a2.getApproval_reg_date().compareTo(a1.getApproval_reg_date()));
+			}
+			model.addAttribute("approvalLineMap", approvalLineMap);
+			model.addAttribute("resultList", resultList);
+				
+		return "approval/cardFragment :: cardFragment";
 	}
 	
 
