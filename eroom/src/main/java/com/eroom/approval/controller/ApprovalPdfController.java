@@ -27,8 +27,10 @@ import com.eroom.approval.dto.ApprovalDto;
 import com.eroom.approval.dto.ApprovalLineDto;
 import com.eroom.approval.entity.Approval;
 import com.eroom.approval.entity.ApprovalLine;
+import com.eroom.approval.entity.ApprovalSignature;
 import com.eroom.approval.service.ApprovalLineService;
 import com.eroom.approval.service.ApprovalService;
+import com.eroom.approval.service.ApprovalSignatureService;
 import com.eroom.drive.dto.DriveDto;
 import com.eroom.drive.service.DriveService;
 import com.eroom.employee.entity.Employee;
@@ -44,6 +46,7 @@ public class ApprovalPdfController {
 	private final ApprovalService approvalService;
 	private final ApprovalLineService approvalLineService;
 	private final DriveService driveService;
+	private final ApprovalSignatureService approvalSignatureService;
 	
 	@GetMapping("/approval/{approvalNo}/pdf")
 	public ResponseEntity<byte[]> generateApprovalPdf(Authentication authentication, @PathVariable("approvalNo") Long approvalNo) {
@@ -73,8 +76,13 @@ public class ApprovalPdfController {
 		List<ApprovalLineDto> approvalLineDtoList = new ArrayList<ApprovalLineDto>();
 		for (ApprovalLine approvalLine : temp) {
 			ApprovalLineDto approvalLineDto = new ApprovalLineDto().toDto(approvalLine);
+			ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(approvalLineDto.getEmployee());
+			if(approvalSignature != null) {
+				String encodedBase64 = approvalSignatureService.encodeToBase64(approvalSignature.getApprovalSignatureBlob());
+				approvalLineDto.setBase64URL(encodedBase64);
+			}
 			approvalLineDtoList.add(approvalLineDto);
-		}
+		} 
 		context.setVariable("approvalLineList", approvalLineDtoList);
 		
 		// 권한 리스트 조회

@@ -138,7 +138,6 @@ public class Employee {
 	@OneToMany(mappedBy = "receiver")
 	private List<ApprovalAlarm> approvalAlarms; 
 	
-	@OneToOne(mappedBy = "employee")
-	@ToString.Exclude
-	private ApprovalSignature approvalSignature;
+	@OneToMany(mappedBy = "employee")
+	private List<ApprovalSignature> approvalSignatures;
 }
