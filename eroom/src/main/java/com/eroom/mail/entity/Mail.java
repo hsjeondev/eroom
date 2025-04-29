@@ -47,6 +47,9 @@ public class Mail {
 	@Column(name="mail_sent_time")
 	private LocalDateTime mailSentTime;
 	
+	
+	@Column(name="mail_visible_yn")
+	private String mailVisibleYn;
 
 	@OneToMany(mappedBy = "mail")
 	private List<MailReceiver> receivers; // 수신자 목록
@@ -57,11 +60,11 @@ public class Mail {
 	@JoinColumn(name = "employee_no")  // mail 테이블에 외래키 컬럼 생성됨
 	private Employee sender;
 	
-	@OneToOne
-    @JoinColumn(name = "mail_status_no")
-    private MailStatus mailStatus;
+//	@OneToOne
+//    @JoinColumn(name = "mail_status_no")
+//    private MailStatus mailStatus;
 
-	@OneToOne(mappedBy = "mail")
-	@JoinColumn(name = "mail_draft_no")
-    private MailDraft mailDraft;
+//	@OneToOne(mappedBy = "mail")
+//	@JoinColumn(name = "mail_draft_no")
+//    private MailDraft mailDraft;
 }

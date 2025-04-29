@@ -31,8 +31,11 @@ public class MailReceiver {
 	private Long mailReceiverNo;
 	
 	// 사용 여부로 쓸 컬럼
-	@Column(name="mail_receiver_type")
-	private String mailReceiverType;
+//	@Column(name="mail_receiver_type")
+//	private String mailReceiverType;
+	
+	@Column(name="mail_receiver_visible_yn")
+	private String mailReceiverVisibleYn;
 	
 	@Column(name="mail_receiver_read_yn")
 	private String mailReceiverReadYn;

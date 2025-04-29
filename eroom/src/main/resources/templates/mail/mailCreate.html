@@ -134,124 +134,6 @@
 						}
 					</script>
 
-                      <!-- <div class="col-4">
-                        <input class="form-control" type="email" name="cc" placeholder="참조" />
-                      </div>
-                      <div class="col-4">
-                        <input class="form-control" type="email" placeholder="BCC" />
-                      </div> -->
-                      <div class="col-4">
-                      	<input class="form-control" type="text" id="ccInput" placeholder="참조자" readonly data-bs-toggle="modal" data-bs-target="#ccModal" />
-                      </div>
-                      <!-- 참조자 모달 -->
-                      <div class="modal fade" id="ccModal" tabindex="-1" aria-labelledby="ccModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-md">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="ccModalLabel">참조자 선택</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-      </div>
-      <div class="modal-body">
-        <!-- 소속 선택 -->
-        <label for="ccDeptSelect" class="form-label">소속</label>
-        <select class="form-select" id="ccDeptSelect">
-          <option selected disabled>-- 소속 선택 --</option>
-          <option th:each="dept : ${departments}"
-                  th:value="${dept.separator_code}"
-                  th:text="${dept.separator_name}"></option>
-        </select>
-
-        <!-- 참조자 선택 -->
-        <label for="ccEmployeeSelect" class="form-label mt-3">참조자 선택</label>
-        <div class="d-flex">
-          <select class="form-select me-2" id="ccEmployeeSelect">
-            <option selected>-- 참조자 선택 --</option>
-            <!-- JS로 채워짐 -->
-          </select>
-          <button type="button" class="btn btn-primary" id="addCcBtn" onclick="addCcParticipant()">추가</button>
-        </div>
-
-        <!-- 선택된 참조자 표시 -->
-        <div class="mt-3">
-          <strong>선택된 참조자</strong>
-          <ul id="selectedCcList" class="list-unstyled mt-2"></ul>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-        <button type="button" class="btn btn-primary" id="confirmCcSelectionBtn" data-bs-dismiss="modal">선택</button>
-      </div>
-    </div>
-  </div>
-</div>
-                      <!-- 참조자 모달 -->
-                      <script>
-                      document.getElementById("ccDeptSelect").addEventListener("change", function () {
-                    	  const separatorCode = this.value;
-
-                    	  // 참조자 목록을 로드하는 API 호출
-                    	  fetch("/search-employees?separator_code=" + separatorCode)
-                    	    .then(response => response.json())
-                    	    .then(data => {
-                    	      const ccEmployeeSelect = document.getElementById("ccEmployeeSelect");
-                    	      ccEmployeeSelect.innerHTML = '<option selected disabled>-- 참조자 선택 --</option>'; // 초기화
-
-                    	      data.forEach(emp => {
-                    	        const option = document.createElement("option");
-                    	        option.value = emp.employee_no;
-                    	        option.textContent = emp.employee_name;
-                    	        ccEmployeeSelect.appendChild(option);
-                    	      });
-                    	    })
-                    	    .catch(error => console.error("직원 불러오기 실패", error));
-                    	});
-
-                    	function addCcParticipant() {
-                    	  const select = document.getElementById('ccEmployeeSelect');
-                    	  const selectedOptions = Array.from(select.selectedOptions);
-
-                    	  if (selectedOptions.length === 0) {
-                    	    alert('참조자를 선택해주세요.');
-                    	    return;
-                    	  }
-
-                    	  selectedOptions.forEach(option => {
-                    	    const employeeNo = option.value;
-                    	    const employeeName = option.text;
-
-                    	    if (document.getElementById('cc-' + employeeNo)) {
-                    	      alert('이미 추가된 참조자입니다.');
-                    	      return;
-                    	    }
-
-                    	    // 배지 생성
-                    	    const badge = document.createElement('span');
-                    	    badge.className = 'badge bg-secondary text-white me-2 mb-2';
-                    	    badge.id = 'cc-' + employeeNo;
-                    	    badge.innerHTML = `
-                    	      ${employeeName}
-                    	      <button type="button" class="btn-close btn-close-white btn-sm ms-2" style="font-size: 0.6rem;" onclick="removeCcParticipant('${employeeNo}')"></button>
-                    	      <input type="hidden" name="cc_no" value="${employeeNo}">
-                    	    `;
-                    	    document.getElementById('selectedCcList').appendChild(badge);
-                    	  });
-                    	  updateCcInput();
-                    	}
-
-                    	function removeCcParticipant(employeeNo) {
-                    	  const badge = document.getElementById('cc-' + employeeNo);
-                    	  if (badge) {
-                    	    badge.remove();
-                    	    updateCcInput();
-                    	  }
-                    	}
-
-                    	function updateCcInput() {
-                    	  const badges = document.querySelectorAll('#selectedCcList .badge');
-                    	  const names = Array.from(badges).map(badge => badge.childNodes[0].textContent.trim());
-                    	  document.getElementById('ccInput').value = names.join(', ');
-                    	}
-                      </script>
                       <div class="col-12">
                         <input class="form-control" type="text" name="mail_title" id="mail_title" placeholder="제목" />
                       </div>
@@ -268,8 +150,8 @@
                         <input class="d-none" id="emailPhotos" type="file" accept="image/*" /> -->
                       </div>
                       <div class="d-flex">
-                        <button class="btn btn-link text-body fs-10 text-decoration-none" type="button" id="tempSaveBtn">임시저장</button>
-                        <button class="btn btn-primary fs-10" type="submit">발송<span class="fa-solid fa-paper-plane ms-1"></span></button>
+                        <button class="btn btn-link text-body fs-10 text-decoration-none" type="button" id="draftBtn">임시저장</button>
+                        <button class="btn btn-primary fs-10" type="button" id="sendBtn">발송<span class="fa-solid fa-paper-plane ms-1"></span></button>
                       </div>
                     </div>
                   </form>
@@ -302,54 +184,16 @@
                     }
                 }
             };
-            // 로직 조금 이상함
-           /*  window.addEventListener("beforeunload", function (e) {
-                if (document.getElementById("mail_title").value.trim() !== "" ||
-                    tinymce.get("mail_content").getContent({ format: 'text' }).trim() !== "") {
-                    
-                    const confirmationMessage = "작성 중인 메일이 있습니다. 임시저장하시겠습니까?";
-                    e.preventDefault();
-                    e.returnValue = confirmationMessage;
-
-                    // 실제 저장은 서버와 통신 불가하므로, 이 때는 SessionStorage에 저장하거나,
-                    // confirm 후 저장은 사용자 동작에만 위임됨
-                    return confirmationMessage;
-                }
-            }); */
-            /* window.onpageshow = function(event) {
-                // 뒤로가기 시에도 이 코드 실행됨
-                if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
-                    const draftData = sessionStorage.getItem("mail_draft");
-                    if (draftData) {
-                        const draft = JSON.parse(draftData);
-                        if (confirm("이전에 임시 저장된 메일이 있습니다. 불러올까요?")) {
-                            document.getElementById("mail_title").value = draft.title;
-
-                            // 이미 TinyMCE가 존재한다면 직접 접근해서 설정
-                            if (tinymce.get("mail_content")) {
-                                tinymce.get("mail_content").setContent(draft.content);
-                            } else {
-                                // 혹시 아직 안 만들어졌으면 기다렸다가 넣기
-                                tinymce.init({
-                                    selector: "#mail_content",
-                                    setup: function(editor) {
-                                        editor.on("init", function() {
-                                            editor.setContent(draft.content);
-                                        });
-                                    }
-                                });
-                            }
-                        }
-                    }
-                }
-            }; */
-            
-            document.getElementById("tempSaveBtn").addEventListener("click", function () {
+            document.getElementById("draftBtn").addEventListener("click", function () {
                 if (confirm("작성 중인 메일을 임시저장하시겠습니까?")) {
                     tinymce.triggerSave();
                     const form = document.mail_create_form;
                     const payload = new FormData(form);
-                    payload.append("mail_status", "Y");
+                    payload.append("mail_draft_yn", "Y");
+                    
+                    selectedFiles.forEach(file => {
+                        payload.append("mail_files", file);
+                    });
 
                     fetch("/mail/draft", { 
                         method: "POST",
@@ -363,12 +207,44 @@
                     .then(data => {
                         alert(data.res_msg || "임시저장 완료");
                         if (data.res_code == 200) {
-                            location.href ='/mail/draft';
+                           // 수정해야함 지금은 그냥 보낸 메일로감
+                           //location.href ='/mail/draft';
+                           location.href = '/mail/sent';
                         }
                     });
                 }
             });
-            
+            document.getElementById("sendBtn").addEventListener("click", function () {
+                if (confirm("메일을 발송하시겠습니까?")) {
+                    tinymce.triggerSave();
+                    const form = document.mail_create_form;
+                    const payload = new FormData(form);
+                    payload.append("mail_draft_yn", "N"); // 발송할 때는 mail_status = N
+
+                    selectedFiles.forEach(file => {
+                        payload.append("mail_files", file);
+                    });
+
+                    fetch("/mail/create", {
+                        method: "POST",
+                        headers: {
+                            'header': document.querySelector('meta[name="_csrf_header"]').content,
+                            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+                        },
+                        body: payload
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.res_msg || "발송 완료");
+                        if (data.res_code == 200) {
+
+                            location.href = '/mail/sent';
+                        }
+                    });
+                }
+            });
+            	// 메일 구조 바뀌기전 
+            	/*
             	const form = document.mail_create_form;
             	form.addEventListener('submit', (e)=>{
     				 e.preventDefault();
@@ -393,6 +269,7 @@
 						}
 					});
             	})
+            	*/
             	
             	const selectedFiles = [];
 

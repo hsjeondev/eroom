@@ -132,7 +132,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                   		<span class="fs-9 line-clamp-1 text-body-emphasis mailTitle"  th:text="${draftMail.mailTitle}"></span>
                   		<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"  th:utext="${draftMail.mailContent}"></span>
                     </a> -->
-                    <a th:href="@{/mail/draft/{id}(id=${draftMail.mailNo})}">test</a>
+                    <!-- <a th:href="@{/mail/draft/{id}(id=${draftMail.mailNo})}">test</a> -->
+                    <a th:href="@{/mail/mailCreate(mailNo=${draftMail.mailNo})}">임시 저장 메일 제목</a>
                   </div>
                 </div>
 					</div>

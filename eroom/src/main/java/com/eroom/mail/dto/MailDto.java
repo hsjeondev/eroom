@@ -26,6 +26,8 @@ public class MailDto {
 	private LocalDateTime mail_sent_time;
 	//private String mail_status="N";
 	
+	@Builder.Default
+	private String mail_visible_yn="Y";
 	// directory 데이터로 바꿀 예정
 	private Long employee_no;
 	// 받는 사람 나중에 List로 바꿀 예정
@@ -41,6 +43,7 @@ public class MailDto {
 				.mailTitle(mail_title)
 				.mailContent(mail_content)
 				.mailSentTime(mail_sent_time)
+				.mailVisibleYn(mail_content)
 				//.mailStatus(mail_status)
 				.build();
 	}

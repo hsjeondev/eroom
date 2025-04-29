@@ -33,7 +33,7 @@ import com.eroom.employee.entity.Employee;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.mail.dto.MailDto;
 import com.eroom.mail.entity.Mail;
-import com.eroom.mail.entity.MailReceiver;
+import com.eroom.mail.entity.MailDraft;
 import com.eroom.mail.service.MailService;
 import com.eroom.security.EmployeeDetails;
 
@@ -91,13 +91,19 @@ public class MailController {
 	  
 	  return "mail/mailSent"; // 뷰 파일 이름 
 	  }
-	// 임시 저장 조회할곳
-		/*@GetMapping("/mail/draft")
+	// 임시 저장 
+		@GetMapping("/mail/draft")
 		public String selectDraftMailAll(Model model,
-										@A) {
+										@AuthenticationPrincipal EmployeeDetails employeeDetails,
+										@RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder) {
+			Long employeeNo =employeeDetails.getEmployee().getEmployeeNo();
 			
-			return "mail/mailDraft";
-		}*/
+			List<Mail> draftMailList = mailService.findDraftsByEmployee(employeeNo, sortOrder);
+		    model.addAttribute("draftMailList", draftMailList);
+		    
+		    return "mail/mailDraft";
+		}
+	  /* 테이블 교체 오류 수정중
 		@GetMapping("/mail/draft")
 		public String getDraftMails(Model model,
 		                            @AuthenticationPrincipal EmployeeDetails employeeDetails,
@@ -112,6 +118,7 @@ public class MailController {
 
 		    return "mail/mailDraft"; // 뷰 파일 이름
 		}
+		*/
 	
 	
 	
@@ -267,12 +274,16 @@ public class MailController {
 	
 	// 메일 작성 페이지
 	@GetMapping("/mail/mailCreate")
-	public String createMailView(Model model) {
+	public String createMailView(Model model,
+			@RequestParam(name = "mailNo", required = false) Long mailNo) {
 		List<Employee> employeeList = mailService.selectEmployeeAll();
 		List<SeparatorDto> departments = employeeService.findDistinctStructureNames(); // 부서/팀 리스트 가져오기
 		model.addAttribute("employeeList",employeeList);
-		
 		model.addAttribute("departments", departments); // 부서 드롭다운용
+		
+		if(mailNo != null) {
+			
+		}
 		return "mail/mailCreate";
 	}
 	
@@ -281,11 +292,12 @@ public class MailController {
 	@PostMapping("/mail/draft") // 임시저장
 	@ResponseBody
 	public Map<String, String> saveDraft(MailDto mailDto,
-										@RequestParam(name="mail_status") String mailStatus) {
+										@RequestParam(name="mail_files") List<MultipartFile> mailFiles,
+										@RequestParam(name="mail_draft_yn") String mailDraftYn) {
 		Map<String, String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "임시저장중 오류가 발생하였습니다.");
-		int result = mailService.saveMail(mailDto, mailStatus);
+		int result = mailService.createMail(mailDto,mailFiles ,mailDraftYn);
 		if(result >0) {
 			resultMap.put("res_code", "200");
 			resultMap.put("res_msg", "임시저장 되었습니다.");	
@@ -301,13 +313,14 @@ public class MailController {
 	@PostMapping("/mail/create")
 	@ResponseBody
 	public Map<String, String> createMailApi(MailDto mailDto,
-											 @RequestParam(name="mail_files") List<MultipartFile> mailFiles) {
+											 @RequestParam(name="mail_files") List<MultipartFile> mailFiles,
+											 @RequestParam(name="mail_draft_yn") String mailDraftYn) {
 		Map<String, String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "메일 등록중 오류가 발생하였습니다.");
 		
 		// 받는 사람, 제목, 내용, 파일 정보 보내줌
-		  int result = mailService.createMail(mailDto, mailFiles); 
+		  int result = mailService.createMail(mailDto, mailFiles, mailDraftYn); 
 		  
 		  if(result>0) {
 		  resultMap.put("res_code", "200"); resultMap.put("res_msg", "메일이 발송되었습니다."); 

@@ -2,6 +2,7 @@ package com.eroom.mail.dto;
 
 import java.time.LocalDateTime;
 
+import com.eroom.employee.entity.Employee;
 import com.eroom.mail.entity.Mail;
 import com.eroom.mail.entity.MailStatus;
 
@@ -27,12 +28,13 @@ public class MailStatusDto {
     @Builder.Default
     private String mail_status_visible_yn="Y";
     
-    private Mail mail;
+    private Long employee_no;
     private Long mail_no;
     public MailStatus toEntity() {
     	MailStatus mailStatus = MailStatus.builder()
     							.mailStatusNo(mail_status_no)
     							.mail(Mail.builder().mailNo(mail_no).build())
+    							.employee(Employee.builder().employeeNo(employee_no).build())
     							.mailStatusDeletedYn(mail_status_deleted_yn)
     							.mailStatusImportantYn(mail_status_important_yn)
     							.maillStatusVisibleYn(mail_status_visible_yn)
