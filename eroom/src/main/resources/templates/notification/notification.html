@@ -1,12 +1,151 @@
 <!DOCTYPE html>
-<html 
-lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
-	  xmlns:th="http://www.thymeleaf.org"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{/include/layout}">
-  <body>
-    <main class="main" id="top" layout:fragment="content">
-		 <h1>알림</h1>
-    </main>
-  </body>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/include/layout}">
+	<head>
+		<title>알림</title>
+	</head>
+<body>
+	<main class="main" id="top" layout:fragment="content">
+		<div class="content">
+
+			<!-- 오늘 알림 -->
+			<h5 class="text-body-emphasis mb-3">오늘</h5>
+			<div class="mx-n4 mx-lg-n6 mb-5 border-bottom">
+				<div th:each="alarm : ${calendaralarm}"
+					th:if="${#temporals.format(alarm.alarm_reg_date, 'yyyy-MM-dd')} == ${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+					class="d-flex align-items-center justify-content-between py-3 px-lg-6 px-4 notification-card border-top"
+					th:classappend="${alarm.alarm_read_yn == 'N'} ? ' unread' : ' read'">
+
+					<div class="d-flex">
+						<div class="avatar avatar-xl me-3">
+							<img class="rounded-circle"
+								src="/assets/img/team/default-profile.webp" alt="">
+						</div>
+						<div class="me-3 flex-1 mt-2">
+							<h4 class="fs-9 text-body-emphasis"
+								th:text="${(alarm.separator != null and alarm.separator.startsWith('A')) ? '회사 일정 공지' : 
+              (alarm.separator != null and alarm.separator.startsWith('T')) ? '팀 일정 공지' : '기타 공지'}">
+							</h4>
+							<p class="fs-9 text-body-highlight">
+								<span class="me-2"><i
+									class="fas fa-bullhorn text-primary"></i></span> <span
+									class="fw-bold text-dark"
+									th:text="${alarm.separator.startsWith('A') ? '🧾 새로운 회사 일정 등록' : '👥 새로운 팀 일정 등록'}">
+								</span> <span
+									class="ms-2 text-body-tertiary text-opacity-85 fw-bold fs-10 time-ago"
+									th:attr="data-time=${#temporals.format(alarm.alarm_reg_date, 'yyyy-MM-dd''T''HH:mm:ss')}">
+								</span>
+							</p>
+							<p class="text-body-secondary fs-9 mb-0">
+								<i class="fas fa-clock me-1"></i> <span class="fw-bold"
+									th:text="|${#temporals.format(alarm.alarm_reg_date, 'a h:mm')} / ${#temporals.format(alarm.alarm_reg_date, 'yyyy-MM-dd')}|">
+								</span>
+							</p>
+						</div>
+					</div>
+
+					<div class="dropdown">
+						<button
+							class="btn fs-10 btn-sm dropdown-toggle dropdown-caret-none transition-none notification-dropdown-toggle"
+							type="button" data-bs-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false">
+							<i class="fas fa-ellipsis-h fs-10 text-body"></i>
+						</button>
+						<div class="dropdown-menu dropdown-menu-end py-2">
+							<a class="dropdown-item" href="#!">읽지 않음으로 표시</a>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			<!-- 어제 알림 -->
+			<h5 class="text-semibold text-body-emphasis mb-3">어제</h5>
+			<div class="mx-n4 mx-lg-n6 mb-9 border-bottom">
+				<div th:each="alarm : ${calendaralarm}"
+					th:if="${#temporals.format(alarm.alarm_reg_date, 'yyyy-MM-dd')} == ${#temporals.format(#temporals.createNow().minusDays(1), 'yyyy-MM-dd')}"
+					class="d-flex align-items-center justify-content-between py-3 px-lg-6 px-4 notification-card border-top"
+					th:classappend="${alarm.alarm_read_yn == 'N'} ? ' unread' : ' read'">
+
+					<div class="d-flex">
+						<div class="avatar avatar-xl me-3">
+							<img class="rounded-circle"
+								src="/assets/img/team/default-profile.webp" alt="">
+						</div>
+						<div class="me-3 flex-1 mt-2">
+							<h4 class="fs-9 text-body-emphasis"
+								th:text="${(alarm.separator != null and alarm.separator.startsWith('A')) ? '회사 일정 공지' : 
+              (alarm.separator != null and alarm.separator.startsWith('T')) ? '팀 일정 공지' : '기타 공지'}">
+							</h4>
+							<p class="fs-9 text-body-highlight">
+								<span class="me-2"><i
+									class="fas fa-bullhorn text-primary"></i></span> <span
+									class="fw-bold text-dark"
+									th:text="${alarm.separator.startsWith('A') ? '🧾 새로운 회사 일정 등록' : '👥 새로운 팀 일정 등록'}">
+								</span> <span
+									class="ms-2 text-body-tertiary text-opacity-85 fw-bold fs-10 time-ago"
+									th:attr="data-time=${#temporals.format(alarm.alarm_reg_date, 'yyyy-MM-dd''T''HH:mm:ss')}">
+								</span>
+							</p>
+							<p class="text-body-secondary fs-9 mb-0">
+								<i class="fas fa-clock me-1"></i> <span class="fw-bold"
+									th:text="|${#temporals.format(alarm.alarm_reg_date, 'a h:mm')} / ${#temporals.format(alarm.alarm_reg_date, 'yyyy-MM-dd')}|">
+								</span>
+							</p>
+						</div>
+					</div>
+
+					<div class="dropdown">
+						<button
+							class="btn fs-10 btn-sm dropdown-toggle dropdown-caret-none transition-none notification-dropdown-toggle"
+							type="button" data-bs-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false">
+							<i class="fas fa-ellipsis-h fs-10 text-body"></i>
+						</button>
+						<div class="dropdown-menu dropdown-menu-end py-2">
+							<a class="dropdown-item" href="#!">읽지 않음으로 표시</a>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- 시간 "방금전/1시간전" 스크립트 -->
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+				const timeElements = document.querySelectorAll('.time-ago');
+				timeElements.forEach(function(el) {
+					const timeString = el.getAttribute('data-time');
+					const eventTime = new Date(timeString);
+					const now = new Date();
+					const diffMs = now - eventTime;
+					const diffSec = Math.floor(diffMs / 1000);
+					const diffMin = Math.floor(diffSec / 60);
+					const diffHour = Math.floor(diffMin / 60);
+					const diffDay = Math.floor(diffHour / 24);
+
+					let displayText = '';
+
+					if (diffSec < 60) {
+						displayText = '방금 전';
+					} else if (diffMin < 60) {
+						displayText = diffMin + '분 전';
+					} else if (diffHour < 24) {
+						displayText = diffHour + '시간 전';
+					} else if (diffDay === 1) {
+						displayText = '어제';
+					} else {
+						displayText = diffDay + '일 전';
+					}
+
+					el.textContent = displayText;
+				});
+			});
+		</script>
+
+	</main>
+</body>
 </html>
