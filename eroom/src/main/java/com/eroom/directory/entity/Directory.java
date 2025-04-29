@@ -55,7 +55,7 @@ public class Directory {
 	private String directoryEditor; // 수정자
 	@Column(name = "visible_yn")
 	private String visibleYn; // 사용여부
-	@Column(name = "directory_reg_date")
+	@Column(name = "directory_reg_date", insertable = false, updatable = false)
 	private LocalDateTime directoryRegDate; // 생성시간
 	@Column(name = "directory_mod_date")
 	private LocalDateTime directoryModDate; // 수정시간

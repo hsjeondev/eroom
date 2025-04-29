@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eroom.admin.dto.CreateEmployeeDto;
 import com.eroom.directory.entity.Directory;
-import com.eroom.directory.repository.EmployeeDirectoryRepository;
+import com.eroom.directory.repository.DirectoryRepository;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.EmployeeUpdateDto;
 import com.eroom.employee.dto.SeparatorDto;
@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class EmployeeService {
 	private final EmployeeRepository employeeRepository;
 	private final StructureRepository structureRepository;
-	private final EmployeeDirectoryRepository employeeDirectoryRepository;
+	private final DirectoryRepository employeeDirectoryRepository;
 	private final SeparatorRepository separatorRepository;
 	private final PasswordEncoder passwordEncoder;
 	

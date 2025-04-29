@@ -22,6 +22,7 @@ import com.eroom.employee.service.EmployeeService;
 import com.eroom.project.dto.GithubPullRequestDto;
 import com.eroom.project.dto.ProjectDto;
 import com.eroom.project.dto.ProjectMemberDto;
+import com.eroom.project.dto.ProjectTodoElementDto;
 import com.eroom.project.dto.ProjectTodoListDto;
 import com.eroom.project.service.ProjectService;
 import com.eroom.project.service.ProjectTodoService;
@@ -106,16 +107,39 @@ public class ProjectController {
 	
 	@GetMapping("/detail/{project_no}/todo")
 	public String detailProjectTodoView(@PathVariable("project_no") Long project_no, Model model) {
-		
-		ProjectDto project = projectService.findByProjectNo(project_no);
-		List<ProjectTodoListDto> projectTodoList = projectTodoService.findByProjectNo(project_no);
-		
-		System.out.println("projectTodoList" + projectTodoList);
-		model.addAttribute("project", project);
-		model.addAttribute("projectTodoList", projectTodoList);
-		
-		return "project/projectDetailTodoTab";
+	    
+	    ProjectDto project = projectService.findByProjectNo(project_no);
+	    List<ProjectTodoListDto> projectTodoList = projectTodoService.findByProjectNo(project_no);
+	    
+	    // ✅ 여기 수정: for문으로 돌린다
+	    for (ProjectTodoListDto list : projectTodoList) {
+	        for (ProjectTodoElementDto element : list.getProjectTodoElements()) {
+	            int totalCount = 0;
+	            int completedCount = 0;
+	            
+	            if (element.getTodo_element_details() != null) {
+	                for (var detail : element.getTodo_element_details()) {
+	                    if ("Y".equals(detail.getVisible_yn())) { // visible_yn = 'Y' 인 경우만
+	                        totalCount++;
+	                        if ("Y".equals(detail.getStatus())) { // visible_yn이면서 status = 'Y' 인 경우
+	                            completedCount++;
+	                        }
+	                    }
+	                }
+	            }
+
+	            element.setTotalCount(totalCount);
+	            element.setCompletedCount(completedCount);
+	        }
+	    }
+	    
+	    model.addAttribute("project", project);
+	    model.addAttribute("projectTodoList", projectTodoList);
+	    
+	    return "project/projectDetailTodoTab";
 	}
+
+
 	
 	@GetMapping("/detail/{project_no}/files")
 	public String detailProjectFilesView(@PathVariable("project_no") Long project_no, Model model) {

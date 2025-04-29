@@ -25,7 +25,7 @@ import com.eroom.attendance.entity.AnnualLeave;
 import com.eroom.attendance.service.AttendanceService;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
-import com.eroom.directory.service.EmployeeDirectoryService;
+import com.eroom.directory.service.DirectoryService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.EmployeeUpdateDto;
 import com.eroom.employee.dto.StructureDto;
@@ -44,7 +44,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminController {
 	
 	private final EmployeeService employeeService;
-	private final EmployeeDirectoryService employeeDirectoryService;
+	private final DirectoryService employeeDirectoryService;
 	private final StructureService structureService;
 	private final AttendanceService attendanceService;
 	

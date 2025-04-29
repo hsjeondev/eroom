@@ -74,13 +74,27 @@ public class DirectoryDto {
 				.separator(Separator.builder().separatorCode(separator_code).build())
 				.build();
 	}
+	public Directory toEntity2() {
+		return Directory.builder()
+				.directoryNo(directory_no)
+				.directoryEmail(directory_email)
+				.directoryPhone(directory_phone)
+				.directoryName(directory_name)
+				.directoryCompanyName(directory_company_name)
+				.directoryCreator(directory_creator)
+				.directoryEditor(directory_editor)
+				.visibleYn(visible_yn)
+				.directoryPosition(directory_position)
+				.directoryDepartment(directory_department)
+				.directoryTeam(directory_team)
+				.directoryRegDate(directory_reg_date)
+				.directoryModDate(directory_mod_date)
+				.separator(Separator.builder().separatorCode(separator_code).build())
+				.build();
+	}
 	
 	public DirectoryDto toDto(Directory entity) {
 	    Employee emp = entity.getEmployee();
-	    
-		if (emp == null) {
-			return null;
-		}
 		
 	    return DirectoryDto.builder()
 	            .directory_no(entity.getDirectoryNo())
@@ -96,16 +110,48 @@ public class DirectoryDto {
 				.directory_team(entity.getDirectoryTeam())
 				.directory_reg_date(entity.getDirectoryRegDate())
 				.directory_mod_date(entity.getDirectoryModDate())
-				.employee_no(entity.getEmployee().getEmployeeNo())
+				.employee_no(entity.getEmployee().getEmployeeNo() != null ? entity.getEmployee().getEmployeeNo() : null)
 				.employee_name(entity.getEmployee().getEmployeeName())
 				.employee_position(entity.getEmployee().getEmployeePosition())
 				.code_name(entity.getSeparator().getSeparatorName())
 				.separator_code(entity.getSeparator().getSeparatorCode())
-				.employee(entity.getEmployee())
+				.employee(entity.getEmployee() != null ? entity.getEmployee() : new Employee())
 				.formatted_hire_date(emp.getEmployeeHireDate() != null ? emp.getEmployeeHireDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
 				.formatted_end_date(emp.getEmployeeEndDate() != null ? emp.getEmployeeEndDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
 	            .build();
 	}
+	public DirectoryDto toDto2(Directory entity) {
+	    Employee emp = entity.getEmployee();
+	    Separator separator = entity.getSeparator();
+
+	    return DirectoryDto.builder()
+	            .directory_no(entity.getDirectoryNo())
+	            .directory_email(entity.getDirectoryEmail())
+	            .directory_phone(entity.getDirectoryPhone())
+	            .directory_name(entity.getDirectoryName())
+	            .directory_company_name(entity.getDirectoryCompanyName())
+	            .directory_creator(entity.getDirectoryCreator())
+	            .directory_editor(entity.getDirectoryEditor())
+	            .visible_yn(entity.getVisibleYn())
+	            .directory_department(entity.getDirectoryDepartment())
+	            .directory_position(entity.getDirectoryPosition())
+	            .directory_team(entity.getDirectoryTeam())
+	            .directory_reg_date(entity.getDirectoryRegDate())
+	            .directory_mod_date(entity.getDirectoryModDate())
+	            
+	            .employee_no(emp != null ? emp.getEmployeeNo() : null)
+	            .employee_name(emp != null ? emp.getEmployeeName() : null)
+	            .employee_position(emp != null ? emp.getEmployeePosition() : null)
+	            .employee(emp != null ? emp : new Employee())
+	            
+	            .code_name(separator != null ? separator.getSeparatorName() : null)
+	            .separator_code(separator != null ? separator.getSeparatorCode() : null)
+	            
+	            .formatted_hire_date(emp != null && emp.getEmployeeHireDate() != null ? emp.getEmployeeHireDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
+	            .formatted_end_date(emp != null && emp.getEmployeeEndDate() != null ? emp.getEmployeeEndDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
+	            .build();
+	}
+
 	
 	
 }
