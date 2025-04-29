@@ -58,11 +58,18 @@ public class DriveController {
 	
 	
 	// ------------------------------------------ 드라이브 메인 ------------------------------------------
-	// 회사 드라이브 
-	@GetMapping("/company")
-	public String selectDriveCompany() {
-		return "drive/company";
-	}
+	// 회사 드라이브
+	 @GetMapping("/company")
+	 public String selectDriveCompany(Model model, @AuthenticationPrincipal EmployeeDetails user) {
+	     List<DriveDto> fileList = driveService.findCompanyDriveFiles(); // 회사 드라이브 조회
+	     
+	     model.addAttribute("fileList", fileList);
+	     model.addAttribute("pageTitle", "회사 드라이브");
+	     model.addAttribute("user", user);
+	     
+	     return "drive/company";
+	 }
+
 	// 부서 드라이브
 	@GetMapping("/department")
 	public String selectDriveDepartment(@AuthenticationPrincipal EmployeeDetails user, Model model) {
@@ -184,6 +191,33 @@ public class DriveController {
 		return resultMap;
 		
 	}
+	// 회사 드라이브 파일 업로드
+	// 회사 드라이브 파일 업로드
+	@PostMapping("/upload/company")
+	@ResponseBody
+	public Map<String, String> uploadCompanyDriveFiles(
+	        DriveDto driveDto,
+	        @RequestParam("driveDescriptions") List<String> driveDescriptions,
+	        @AuthenticationPrincipal EmployeeDetails user) {
+	    
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "업로드 실패");
+	    
+	    driveDto.setDriveDescriptions(driveDescriptions);
+
+	    driveDto.setSeparatorCode("A001");
+
+	    int result = driveService.uploadCompanyDriveFiles(driveDto, user.getEmployee().getEmployeeNo());
+
+	    if (result > 0) {
+	        resultMap.put("res_code", "200");
+	        resultMap.put("res_msg", "업로드 성공");
+	    }
+	    
+	    return resultMap;
+	}
+
 
 	// --------------------------------- 파일 수정 ------------------------------------------
 	// 개인 드라이브 파일 수정
