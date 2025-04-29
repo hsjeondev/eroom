@@ -41,29 +41,22 @@
 
   <div class="collapse" id="storageDetailCollapse">
     <ul class="list-unstyled mb-0 mt-2">
-      <li class="d-flex justify-content-between align-items-center mb-1">
-        <span><i class="fas fa-file-pdf text-primary me-1"></i> Images</span>
-        <span class="badge bg-light text-dark">22k</span>
-      </li>
-      <li class="d-flex justify-content-between align-items-center mb-1">
-        <span><i class="fas fa-video text-success me-1"></i> Videos</span>
-        <span class="badge bg-light text-dark">534</span>
-      </li>
-      <li class="d-flex justify-content-between align-items-center mb-1">
-        <span><i class="fas fa-music text-danger me-1"></i> Audio</span>
-        <span class="badge bg-light text-dark">55</span>
-      </li>
-      <li class="d-flex justify-content-between align-items-center mb-1">
-        <span><i class="fas fa-file-alt text-warning me-1"></i> Docs</span>
-        <span class="badge bg-light text-dark">65k</span>
-      </li>
-      <li class="d-flex justify-content-between align-items-center">
-        <span><i class="fas fa-folder text-info me-1"></i> Others</span>
-        <span class="badge bg-light text-dark">12k</span>
-      </li>
+        <li class="d-flex justify-content-between align-items-center mb-1">
+            <span>업로드된 파일 수</span>
+            <span class="badge bg-light text-dark" th:text="${uploadedFileCount}">500개</span>
+        </li>
+        <li class="d-flex justify-content-between align-items-center mb-1">
+            <span>다운로드 횟수</span>
+            <span class="badge bg-light text-dark" th:text="${downloadCount}">2000회</span>
+        </li>
+        <li class="d-flex justify-content-between align-items-center mb-1">
+            <span>최근 삭제된 파일</span>
+            <span class="badge bg-light text-dark" th:text="${deletedFileCount}">3개</span>
+        </li>
     </ul>
-  </div>
 </div>
+</div>
+
 
   <!-- 검색,정렬,페이징  -->
   <div id="tableExample3" data-list='{"valueNames":["filename","filesize","description","writer","date","download"],"page":7,"pagination":true}'>
