@@ -419,24 +419,44 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
   </div>
 </div>
 
-<!-- unsaved 변경사항 경고 모달 -->
-<div class="modal fade" id="unsavedAlertModal" tabindex="-1" aria-labelledby="unsavedAlertModalLabel" aria-hidden="true">
+<!-- 생성용 unsaved 모달 -->
+<div class="modal fade" id="unsavedCreateModal" tabindex="-1" aria-labelledby="unsavedCreateModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border border-secondary">
       <div class="modal-header bg-light">
-        <h5 class="modal-title" id="unsavedAlertModalLabel">주의</h5>
+        <h5 class="modal-title" id="unsavedCreateModalLabel">주의</h5>
         <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
       </div>
       <div class="modal-body">
-        입력한 정보가 모두 사라집니다.<br>계속 닫으시겠습니까?
+        작성 중인 회원 생성 정보가 모두 사라집니다.<br>계속 닫으시겠습니까?
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">취소</button>
-        <button type="button" class="btn btn-primary" id="confirmCloseBtn">계속 닫기</button>
+        <button type="button" class="btn btn-primary" id="confirmCreateCloseBtn">계속 닫기</button>
       </div>
     </div>
   </div>
 </div>
+
+<!-- 수정용 unsaved 모달 -->
+<div class="modal fade" id="unsavedEditModal" tabindex="-1" aria-labelledby="unsavedEditModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border border-secondary">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="unsavedEditModalLabel">주의</h5>
+        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        작성 중인 회원 수정 정보가 모두 사라집니다.<br>계속 닫으시겠습니까?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmEditCloseBtn">계속 닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded',function(){
 	// 요소 가져오기
@@ -462,8 +482,13 @@ document.addEventListener('DOMContentLoaded',function(){
 	const editModalElement = document.getElementById('editEmployeeModal');
 	const editModal = bootstrap.Modal.getInstance(editModalElement) || new bootstrap.Modal(editModalElement);
 	
-	const unsavedModalElement = document.getElementById('unsavedAlertModal');
-	const unsavedModal = bootstrap.Modal.getInstance(unsavedModalElement) || new bootstrap.Modal(unsavedModalElement);
+	const unsavedCreateModalElement = document.getElementById('unsavedCreateModal');
+	const unsavedCreateModal = bootstrap.Modal.getInstance(unsavedCreateModalElement) || new bootstrap.Modal(unsavedCreateModalElement);
+
+	const unsavedEditModalElement = document.getElementById('unsavedEditModal');
+	const unsavedEditModal = bootstrap.Modal.getInstance(unsavedEditModalElement) || new bootstrap.Modal(unsavedEditModalElement);
+	// const unsavedModalElement = document.getElementById('unsavedAlertModal');
+	// const unsavedModal = bootstrap.Modal.getInstance(unsavedModalElement) || new bootstrap.Modal(unsavedModalElement);
 
 	const confirmSaveModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
 	const alertModal = new bootstrap.Modal(document.getElementById('alertMessageModal'));	
@@ -662,7 +687,7 @@ document.addEventListener('DOMContentLoaded',function(){
 		confirmSaveModal.show();
 	});
 	
-	// confirmSaveModal의 확인 버튼
+	// confirmSaveModal의 확인 버튼 ============================================= 확인필요
 	document.getElementById('confirmSaveBtn').addEventListener('click', function (e) {
 		e.preventDefault();
 		confirmSaveModal.hide();
@@ -674,39 +699,67 @@ document.addEventListener('DOMContentLoaded',function(){
 		}
 	});
 	
-	// 모달 닫기 방지 (회원 생성 모달)
+	// 모달 닫기 방지 (회원 생성 모달) =========================이거 수정중 모달 따로 나누기 
 	createModalElement.addEventListener('hide.bs.modal', function (e) {
 		if (isFormEdited) {
 			e.preventDefault();
-			unsavedModal.show();
+			unsavedCreateModal.show();
 		}
 	});
+	
+	// 생성용 경고 모달 닫기 버튼
+	document.getElementById('confirmCreateCloseBtn').addEventListener('click', function () {
+		isFormEdited = false;
+		unsavedCreateModal.hide();
+		unsavedCreateModalElement.addEventListener('hidden.bs.modal', function handler() {
+			createModal.hide();
+			unsavedCreateModalElement.removeEventListener('hidden.bs.modal', handler);
+		});
+	});
+	
+	// 모달 닫은 뒤 입력값 초기화
+	createModalElement.addEventListener('hidden.bs.modal', function () {
+		// 입력값 초기화
+		createForm.reset();
+	
+		// 커스텀 포지션 필드 숨기기
+		customPositionInput.classList.add('d-none');
+		customPositionInput.required = false;
+	
+		// 중복확인 메시지 숨기기
+		nameCheckMsg.classList.add('d-none');
+		nameCheckMsg.textContent = '';
+		nameCheckMsg.className = 'form-text';
+	
+		// 팀 select 초기화
+		teamSelect.innerHTML = '<option value="">팀 선택</option>';
+	
+		// 중복 확인 상태 초기화
+		isNameChecked = false;
+	
+		// 수정 감지 플래그 초기화
+		isFormEdited = false;
+	});	
 	
 	// 모달 닫기 방지 (회원 수정 모달)
 	editModalElement.addEventListener('hide.bs.modal', function (e) {
 		const isConfirmVisible = document.getElementById('confirmSaveModal').classList.contains('show');
-
 		if (isEditFormEdited && !isConfirmVisible) {
-			e.preventDefault(); // 모달 닫힘 막기
-			unsavedModal.show();
+			e.preventDefault();
+			unsavedEditModal.show();
 		}
 	});
-	
-	// unsavedModal에서 계속 닫기 버튼
-	document.getElementById('confirmCloseBtn').addEventListener('click', function () {
-		isFormEdited = false;
+	// 수정용 모달 계속 닫기
+	document.getElementById('confirmEditCloseBtn').addEventListener('click', function () {
 		isEditFormEdited = false;
-		unsavedModal.hide();
-
-		unsavedModalElement.addEventListener('hidden.bs.modal', function handler() {
-			if (currentMode === 'create') {
-				createModal.hide();
-			} else {
-				editModal.hide();
-			}
-			unsavedModalElement.removeEventListener('hidden.bs.modal', handler);
+		unsavedEditModal.hide();
+		unsavedEditModalElement.addEventListener('hidden.bs.modal', function handler() {
+			editModal.hide();
+			unsavedEditModalElement.removeEventListener('hidden.bs.modal', handler);
 		});
 	});
+	
+
 	
 	// =================== 회원 생성 함수 =========================
 	function sendCreateEmployee(){
@@ -780,7 +833,7 @@ document.addEventListener('DOMContentLoaded',function(){
 							team_no : data.team_no ? String(data.team_no) : '',
 							directory_phone : data.directory_phone || '',
 							employee_birth : (data.employee_birth || '').replaceAll('-',''), // 생일은 - 제거해서 저장
-							employee_hire_date : data.employee_hire_date ? data.employee_hire_date.split('T')[0] : '',
+							employee_hire_date : data.employee_hire_date ? data.employee_hire_date.substring(0,10) : '',
 							employee_end_date : data.employee_end_date ? data.employee_end_date.split('T')[0] : '',
 							employee_employment_yn : data.employee_employment_yn || ''
 						};
@@ -853,7 +906,7 @@ document.addEventListener('DOMContentLoaded',function(){
 		});
 	});
 	
-	editModalElement.addEventListener('hide.bs.modal',function(e){
+/* 	editModalElement.addEventListener('hide.bs.modal',function(e){
 		if(isEditFormEdited){
 			e.preventDefault();
 			unsavedModal.show();
@@ -864,7 +917,7 @@ document.addEventListener('DOMContentLoaded',function(){
 				unsavedModalElement.removeEventListener('hidden.bs.modal',handler);
 			});
 		}
-	});
+	}); */
 	
 
 	const hireDate = document.getElementById('editEmployeeHireDate').value;
@@ -917,11 +970,17 @@ document.addEventListener('DOMContentLoaded',function(){
 			}
 			
 			// 날짜 필드 변환
-			if(payload.employee_hire_date){
-				payload.employee_hire_date = payload.employee_hire_date + 'T00:00:00';
+			//if(payload.employee_hire_date){
+			//	payload.employee_hire_date = payload.employee_hire_date + 'T00:00:00';
+			//}
+			if(currentData.employee_hire_date){
+				payload.employee_hire_date = currentData.employee_hire_date;
 			}
-			if(payload.employee_end_date){
-				payload.employee_end_date = payload.employee_end_date + 'T:00:00:00';
+			//if(currentData.employee_end_date !== originalData.employee_end_date){
+			//	payload.employee_end_date = currentData.employee_end_date ? currentData.employee_end_date + 'T00:00:00' : null;
+			//}
+			if(currentData.employee_end_date){
+				payload.employee_end_date = currentData.employee_end_date;
 			}
 			
 			for(const key in currentData){

@@ -1,6 +1,8 @@
 package com.eroom.employee.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -233,15 +235,24 @@ public class EmployeeService {
 			employee.setEmployeePw(newEncodedPw); // 암호화된 비밀번호로 재설정해줌
 		}
 		// 입사일 수정
-		if(dto.getEmployee_hire_date() != null && !dto.getEmployee_hire_date().equals(employee.getEmployeeHireDate())) employee.setEmployeeHireDate(dto.getEmployee_hire_date());
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		
-		// 퇴사일 수정
-		if(dto.getEmployee_end_date() == null || dto.getEmployee_end_date().toString().trim().isEmpty()) {
-			employee.setEmployeeEndDate(null);
-		}else if(!dto.getEmployee_end_date().equals(employee.getEmployeeEndDate())) {
-			employee.setEmployeeEndDate(dto.getEmployee_end_date());
+		//if(dto.getEmployee_hire_date() != null && !dto.getEmployee_hire_date().equals(employee.getEmployeeHireDate())) employee.setEmployeeHireDate(dto.getEmployee_hire_date());
+		if(dto.getEmployee_hire_date() != null && !dto.getEmployee_hire_date().isEmpty()) {
+			LocalDate hireDate = LocalDate.parse(dto.getEmployee_hire_date(),formatter);
+			if(!hireDate.atStartOfDay().equals(employee.getEmployeeHireDate())) {
+				employee.setEmployeeHireDate(hireDate.atStartOfDay());
+			}
 		}
-		
+		// 퇴사일 수정
+		if(dto.getEmployee_end_date() == null || dto.getEmployee_end_date().isEmpty()) {
+			employee.setEmployeeEndDate(null);
+		}else {
+			LocalDate endDate = LocalDate.parse(dto.getEmployee_end_date(),formatter);
+			if(!endDate.atStartOfDay().equals(employee.getEmployeeEndDate())) {
+				employee.setEmployeeEndDate(endDate.atStartOfDay());
+			}
+		}
 		// 재직여부 수정
 		if(dto.getEmployee_employment_yn() != null) employee.setEmployeeEmploymentYn(dto.getEmployee_employment_yn());
 		
