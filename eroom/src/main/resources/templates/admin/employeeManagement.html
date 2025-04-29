@@ -781,14 +781,14 @@ document.addEventListener('DOMContentLoaded',function(){
 							directory_phone : data.directory_phone || '',
 							employee_birth : (data.employee_birth || '').replaceAll('-',''), // 생일은 - 제거해서 저장
 							employee_hire_date : data.employee_hire_date ? data.employee_hire_date.split('T')[0] : '',
-							employee_end_date : data.employee_end_date ? dadta.employee_end_date.split('T')[0] : '',
+							employee_end_date : data.employee_end_date ? data.employee_end_date.split('T')[0] : '',
 							employee_employment_yn : data.employee_employment_yn || ''
 						};
 					
 						// 퇴사자일 경우 퇴사일, 재직여부 입력칸 열기
 						if(data.employee_employment_yn === 'N'){
 							document.getElementById('retiredFields').classList.remove('d-none'); // 퇴사자 폼 표시
-							document.getElementById('editEmployeeEndDate').value = data.employee_end_date ? data.employee_end_date : '';
+							document.getElementById('editEmployeeEndDate').value = data.employee_end_date ? data.employee_end_date.split('T')[0] : '';
 							document.getElementById('editEmployeeEmploymentYn').value = 'N';
 						}else{
 							document.getElementById('retiredFields').classList.add('d-none'); // 퇴사자 폼 숨기기

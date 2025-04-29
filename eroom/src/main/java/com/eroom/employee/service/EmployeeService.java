@@ -236,7 +236,11 @@ public class EmployeeService {
 		if(dto.getEmployee_hire_date() != null && !dto.getEmployee_hire_date().equals(employee.getEmployeeHireDate())) employee.setEmployeeHireDate(dto.getEmployee_hire_date());
 		
 		// 퇴사일 수정
-		if(dto.getEmployee_end_date() != null && !dto.getEmployee_end_date().equals(employee.getEmployeeEndDate())) employee.setEmployeeEndDate(dto.getEmployee_end_date());
+		if(dto.getEmployee_end_date() == null || dto.getEmployee_end_date().toString().trim().isEmpty()) {
+			employee.setEmployeeEndDate(null);
+		}else if(!dto.getEmployee_end_date().equals(employee.getEmployeeEndDate())) {
+			employee.setEmployeeEndDate(dto.getEmployee_end_date());
+		}
 		
 		// 재직여부 수정
 		if(dto.getEmployee_employment_yn() != null) employee.setEmployeeEmploymentYn(dto.getEmployee_employment_yn());
@@ -259,6 +263,15 @@ public class EmployeeService {
 				updated = true;
 			}
 			
+			// visible_yn 퇴사자 : N / 재직자 : Y
+			String employmentYn = dto.getEmployee_employment_yn();
+			if(employmentYn != null) {
+				String visibleYn = employmentYn.equals("Y") ? "Y" : "N";
+				if(!visibleYn.equals(directory.getVisibleYn())) {
+					directory.setVisibleYn(visibleYn);
+					updated = true;
+				}
+			}
 			if(updated) {
 				// 수정일자 갱신
 				directory.setDirectoryModDate(LocalDateTime.now());
