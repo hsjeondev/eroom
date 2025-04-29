@@ -50,6 +50,30 @@ public class MailService {
 	    String plainText = content.replaceAll("<[^>]*>", ""); // HTML 태그 제거
 	    return plainText.length() > 30 ? plainText.substring(0, 30) + "..." : plainText;
 	}
+	
+	
+	
+	
+	// 메일no로 임시 저장 조회
+	public List<MailDraft> findReceiversByMailNo(Long mailNo) {
+	    return mailDraftRepository.findByMailNoInMail(mailNo);
+	}
+	
+	
+	
+	
+	// 메일no로 메일 정보 조회
+	public Mail findMailByMailNo(Long mailNo) {
+	    return mailRepository.findById(mailNo)
+	            .orElseThrow(() -> new RuntimeException("메일을 찾을 수 없습니다."));
+	}
+	
+	
+	
+	
+	
+	
+	
 	//폐기 예정
 //	private List<MailReceiver> filterOnlyToStatusMails(List<MailReceiver> mails) {
 //	    List<MailReceiver> result = new ArrayList<>();
@@ -308,11 +332,9 @@ public class MailService {
 		                new IllegalArgumentException("존재하지 않는 사원 번호: " + receiverNo));
 		            
 		            MailReceiverDto mailReceiverDto = new MailReceiverDto();
-		            // 수신자(받는 사람) no 넣기
+		            
 		            mailReceiverDto.setEmployee_no(receiver.getEmployeeNo());
-		            //mailReceiverDto.setReceiver(receiver.getEmployeNo);
-		            //mailReceiverDto.setMail_recervier_type("To");
-		            // mail_no값 넣기
+		            
 		            mailReceiverDto.setMail_no(mailSaver.getMailNo());
 
 		            MailReceiver mailReceiver = mailReceiverDto.toEntity();
@@ -327,21 +349,39 @@ public class MailService {
 		        }
 			 }
 			}
-			if(mailDraftYn.equals("Y")) {
-				if (mailDraftYn.equals("Y")) {
-				    if (receiverNos != null && !receiverNos.isEmpty()) {
-				        for (Long receiverNo : receiverNos) {
-				            MailDraftDto mailDraftDto = new MailDraftDto();
-				            mailDraftDto.setMail_no(mailSaver.getMailNo()); // 메일 번호
-				            mailDraftDto.setEmployee_no(receiverNo); // 수신자
-				            mailDraftDto.setMail_draft_time(LocalDateTime.now()); // 현재 시간
+			
+			if (mailDraftYn.equals("Y")) {
+			    // 기존 임시 저장된 메일 찾기
+			    List<MailDraft> existingDraft = mailDraftRepository.findByMailNo(mailDto.getMail_no());
 
-				            MailDraft mailDraft = mailDraftDto.toEntity();
-				            mailDraftRepository.save(mailDraft);
-				        }
-				    }
-				}
+			    if (existingDraft != null && !existingDraft.isEmpty()) {
+			        // 기존 임시 저장된 메일이 있으면 업데이트
+			        for (MailDraft existing : existingDraft) {
+			            // 수신자 번호 리스트를 돌며 업데이트
+			            for (Long receiverNo : receiverNos) {
+			                if (existing.getEmployee().getEmployeeNo().equals(receiverNo)) {
+			                    // 이미 존재하는 수신자는 업데이트만 해주기
+			                    existing.setMailDraftTime((LocalDateTime.now())); // 예: 시간 업데이트
+			                    mailDraftRepository.save(existing); // 업데이트 저장
+			                }
+			            }
+			        }
+			    } else {
+			        // 기존에 저장된 메일이 없으면 새로 저장
+			        if (receiverNos != null && !receiverNos.isEmpty()) {
+			            for (Long receiverNo : receiverNos) {
+			                MailDraftDto mailDraftDto = new MailDraftDto();
+			                mailDraftDto.setMail_no(mailSaver.getMailNo()); // 메일 번호
+			                mailDraftDto.setEmployee_no(receiverNo); // 수신자
+			                mailDraftDto.setMail_draft_time(LocalDateTime.now()); // 현재 시간
+
+			                MailDraft mailDraft = mailDraftDto.toEntity();
+			                mailDraftRepository.save(mailDraft); // 새로 저장
+			            }
+			        }
+			    }
 			}
+			
 		        // 참조자 ( 수신자랑 같은 방향으로 저장 )
 //		        List<Long> ccNos = mailDto.getCc_no(); // 참조자 리스트
 //		        if (ccNos != null && ccNos.isEmpty()) {

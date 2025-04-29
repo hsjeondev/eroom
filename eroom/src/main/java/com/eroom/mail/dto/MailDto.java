@@ -43,7 +43,7 @@ public class MailDto {
 				.mailTitle(mail_title)
 				.mailContent(mail_content)
 				.mailSentTime(mail_sent_time)
-				.mailVisibleYn(mail_content)
+				.mailVisibleYn(mail_visible_yn)
 				//.mailStatus(mail_status)
 				.build();
 	}

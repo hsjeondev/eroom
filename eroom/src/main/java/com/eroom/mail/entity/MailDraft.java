@@ -35,6 +35,8 @@ public class MailDraft {
 	
 	@Column(name="mail_draft_time")
 	private LocalDateTime mailDraftTime;
+	@Column(name="mail_draft_visible_yn")
+	private String mailDraftVisibleYn;
 	
 	@OneToOne
     @JoinColumn(name = "mail_no")  // mail 테이블과 연결되는 외래키

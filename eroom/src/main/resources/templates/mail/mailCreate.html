@@ -19,6 +19,7 @@
                   <!-- 본인 히든 처리 -->
                   <input type="hidden" name="employee_no"
 								th:value="${#authentication.principal.employee.employeeNo}" />
+						<input type="hidden" name="mail_no" th:value="${mail != null} ? ${mail.mailNo} : ''" />
                     <div class="row g-3 mb-2">
 	                    <div class="col-4">
 	                   		<input class="form-control" type="text" name="receiver" placeholder="받는 사람" id="receiverInput" readonly data-bs-toggle="modal" data-bs-target="#orgModal" />
@@ -135,11 +136,16 @@
 					</script>
 
                       <div class="col-12">
-                        <input class="form-control" type="text" name="mail_title" id="mail_title" placeholder="제목" />
+                        <!-- <input class="form-control" type="text" name="mail_title" id="mail_title" placeholder="제목" /> -->
+                      	<input class="form-control" type="text" name="mail_title" id="mail_title"
+							placeholder="제목" th:value="${mail != null} ? ${mail.mailTitle} : ''"/>
                       </div>
                     </div>
                     <div class="mb-3 flex-1">
-                      <textarea class="tinymce email-textarea" name="mail_content" id="mail_content" data-tinymce='{"height":"100%"}'></textarea>
+                      <!-- <textarea class="tinymce email-textarea" name="mail_content" id="mail_content" data-tinymce='{"height":"100%"}'></textarea> -->
+                      <textarea class="tinymce email-textarea" name="mail_content" id="mail_content"
+          					data-tinymce='{"height":"100%"}' th:text="${mail != null} ? ${mail.mailContent} : ''"
+         				 	></textarea>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
                       <div class="d-flex">
@@ -321,6 +327,12 @@
 				    selectedFiles.splice(index, 1);
 				    renderFilePreview();
 				}
+				
+				
+				
+				
+				
+				
             </script>
             
 </main>

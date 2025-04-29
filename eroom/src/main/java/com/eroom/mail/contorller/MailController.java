@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.eroom.drive.entity.Drive;
+import com.eroom.drive.service.DriveService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
@@ -45,6 +46,7 @@ public class MailController {
 
 	private final MailService mailService;
 	private final EmployeeService employeeService;
+	private final DriveService driveService;
 	@Value("${ffupload.location}")
 	 private String fileDir;
 	/* 테스트로 만들어 놓은거
@@ -274,8 +276,9 @@ public class MailController {
 	
 	// 메일 작성 페이지
 	@GetMapping("/mail/mailCreate")
-	public String createMailView(Model model,
-			@RequestParam(name = "mailNo", required = false) Long mailNo) {
+	public String createMailView(Model model
+			,@RequestParam(name = "mailNo", required = false) Long mailNo
+			) {
 		List<Employee> employeeList = mailService.selectEmployeeAll();
 		List<SeparatorDto> departments = employeeService.findDistinctStructureNames(); // 부서/팀 리스트 가져오기
 		model.addAttribute("employeeList",employeeList);
@@ -283,12 +286,51 @@ public class MailController {
 		
 		if(mailNo != null) {
 			
+			 Mail mail = mailService.findMailByMailNo(mailNo);
+
+		        // (2) mail_draft 테이블에서 수신자 리스트 불러오기
+		        List<MailDraft> draft = mailService.findReceiversByMailNo(mailNo);
+
+		        // (3) drive 테이블에서 첨부파일 리스트 불러오기
+		        //List<Drive> attachedFiles = driveService.findFilesByMailNo(mailNo);
+
+		        // (4) 모델에 담기
+		        // mail 정보 2개 들어갔음
+		        model.addAttribute("mail", mail);
+		        model.addAttribute("draft", draft);
+		       // model.addAttribute("attachedFiles", attachedFiles);
 		}
 		return "mail/mailCreate";
 	}
 	
+	// 임시 저장 눌렀을때 ( 메일 작성 페이지처럼 보이게 폐기 예정
+//	@GetMapping("/mail/draft/update")
+//	public String updateMailDraft(Model model,
+//								@RequestParam("mailNo") Long mailNo) {
+//		List<Employee> employeeList = mailService.selectEmployeeAll();
+//		List<SeparatorDto> departments = employeeService.findDistinctStructureNames(); // 부서/팀 리스트 가져오기
+//		model.addAttribute("employeeList",employeeList);
+//		model.addAttribute("departments", departments); // 부서 드롭다운용
+//		if(mailNo != null) {
+//		
+//		 Mail mail = mailService.findMailByMailNo(mailNo);
+//
+//	        // (2) mail_draft 테이블에서 수신자 리스트 불러오기
+//	        List<MailDraft> draft = mailService.findReceiversByMailNo(mailNo);
+//
+//	        // (3) drive 테이블에서 첨부파일 리스트 불러오기
+//	        //List<Drive> attachedFiles = driveService.findFilesByMailNo(mailNo);
+//
+//	        // (4) 모델에 담기
+//	        // mail 정보 2개 들어갔음
+//	        model.addAttribute("mail", mail);
+//	        model.addAttribute("draft", draft);
+//		}
+//		
+//		return "mail/mailDraftUpdate";
+//	}
+	
 	// 메일 임시저장 
-
 	@PostMapping("/mail/draft") // 임시저장
 	@ResponseBody
 	public Map<String, String> saveDraft(MailDto mailDto,
@@ -297,7 +339,10 @@ public class MailController {
 		Map<String, String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "임시저장중 오류가 발생하였습니다.");
-		int result = mailService.createMail(mailDto,mailFiles ,mailDraftYn);
+		int result = 0;
+		
+			result = mailService.createMail(mailDto,mailFiles ,mailDraftYn);
+		
 		if(result >0) {
 			resultMap.put("res_code", "200");
 			resultMap.put("res_msg", "임시저장 되었습니다.");	
@@ -314,17 +359,20 @@ public class MailController {
 	@ResponseBody
 	public Map<String, String> createMailApi(MailDto mailDto,
 											 @RequestParam(name="mail_files") List<MultipartFile> mailFiles,
-											 @RequestParam(name="mail_draft_yn") String mailDraftYn) {
+											 @RequestParam(name="mail_draft_yn") String mailDraftYn
+											 ) {
 		Map<String, String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "메일 등록중 오류가 발생하였습니다.");
-		
+		int result = 0;
 		// 받는 사람, 제목, 내용, 파일 정보 보내줌
-		  int result = mailService.createMail(mailDto, mailFiles, mailDraftYn); 
-		  
-		  if(result>0) {
-		  resultMap.put("res_code", "200"); resultMap.put("res_msg", "메일이 발송되었습니다."); 
-		  }
+		
+			//result = mailService.createMailUpdate(mailDto, mailFiles, mailDraftYn, mailNo);
+			result = mailService.createMail(mailDto, mailFiles, mailDraftYn); 
+		
+		 if(result>0) {
+			 resultMap.put("res_code", "200"); resultMap.put("res_msg", "메일이 발송되었습니다."); 
+		 }
 		 
 		return resultMap;
 	}
