@@ -1,12 +1,90 @@
 <!DOCTYPE html>
 <html 
 lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
-	  xmlns:th="http://www.thymeleaf.org"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{/include/layout}">
+xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+layout:decorate="~{/include/layout}">
   <body>
     <main class="main" id="top" layout:fragment="content">
-		 <h1>알림</h1>
+
+      <div class="content">
+
+			<h5 class="text-body-emphasis mb-3">오늘</h5>
+
+			<div class="mx-n4 mx-lg-n6 mb-5 border-bottom">
+				<div
+					class="d-flex align-items-center justify-content-between py-3 px-lg-6 px-4 notification-card border-top read">
+					<div class="d-flex">
+						<div class="avatar avatar-xl me-3">
+							<img class="rounded-circle" src="../assets/img/team/30.webp" alt="">
+						</div>
+						<div class="me-3 flex-1 mt-2">
+							<h4 class="fs-9 text-body-emphasis">홍길동</h4>
+							<p class="fs-9 text-body-highlight">
+								<span class="me-1">💬</span>댓글에 멘션했습니다 <span class="fw-bold">"정말
+									멋진 작업이에요! 🎉"</span> <span
+									class="ms-2 text-body-tertiary text-opacity-85 fw-bold fs-10">방금
+									전</span>
+							</p>
+							<p class="text-body-secondary fs-9 mb-0">
+								<i class="fas fa-clock me-1"></i><span class="fw-bold">10:41
+									AM </span>May 1, 2025
+							</p>
+						</div>
+					</div>
+					<div class="dropdown">
+						<button
+							class="btn fs-10 btn-sm dropdown-toggle dropdown-caret-none transition-none notification-dropdown-toggle"
+							type="button" data-bs-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false">
+							<i class="fas fa-ellipsis-h fs-10 text-body"></i>
+						</button>
+						<div class="dropdown-menu dropdown-menu-end py-2">
+							<a class="dropdown-item" href="#!">Mark as unread</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<h5 class="text-semibold text-body-emphasis mb-3">어제</h5>
+
+			<div class="mx-n4 mx-lg-n6 mb-9 border-bottom">
+				<div
+					class="d-flex align-items-center justify-content-between py-3 px-lg-6 px-4 notification-card border-top unread">
+					<div class="d-flex">
+						<div class="avatar avatar-xl me-3">
+							<img class="rounded-circle" src="../assets/img/team/30.webp" alt="">
+						</div>
+						<div class="me-3 flex-1 mt-2">
+							<h4 class="fs-9 text-body-emphasis">김영희</h4>
+							<p class="fs-9 text-body-highlight">
+								<span class="me-1">📅</span>새 일정을 만들었습니다 <span class="fw-bold">"회의실
+									예약"</span> <span
+									class="ms-2 text-body-tertiary text-opacity-85 fw-bold fs-10">1일
+									전</span>
+							</p>
+							<p class="text-body-secondary fs-9 mb-0">
+								<i class="fas fa-clock me-1"></i><span class="fw-bold">3:00
+									PM </span>April 30, 2025
+							</p>
+						</div>
+					</div>
+					<div class="dropdown">
+						<button
+							class="btn fs-10 btn-sm dropdown-toggle dropdown-caret-none transition-none notification-dropdown-toggle"
+							type="button" data-bs-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false">
+							<i class="fas fa-ellipsis-h fs-10 text-body"></i>
+						</button>
+						<div class="dropdown-menu dropdown-menu-end py-2">
+							<a class="dropdown-item" href="#!">Mark as unread</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
     </main>
   </body>
 </html>
