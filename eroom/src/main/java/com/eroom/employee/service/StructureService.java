@@ -51,4 +51,16 @@ public class StructureService {
 	public Structure getStructureById(Long structureNo) {
 		return structureRepository.findById(structureNo).orElse(null);
 	}
+	// 특정 부서 separatorCode로 하위 팀 separatorCodes를 조회
+	public List<String> findChildSeparatorCodes(String departmentSeparatorCode) {
+	    List<Structure> teams = structureRepository.findByParentCode(departmentSeparatorCode);
+	    List<String> codes = new ArrayList<>();
+	    for (Structure team : teams) {
+	        if ("Y".equals(team.getVisibleYn())) { // visibleYn이 'Y'인 팀만
+	            codes.add(team.getSeparatorCode());
+	        }
+	    }
+	    return codes;
+	}
+
 }
