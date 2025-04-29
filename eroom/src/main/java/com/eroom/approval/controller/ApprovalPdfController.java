@@ -82,7 +82,7 @@ public class ApprovalPdfController {
 				approvalLineDto.setBase64URL(encodedBase64);
 			}
 			approvalLineDtoList.add(approvalLineDto);
-		}
+		} 
 		context.setVariable("approvalLineList", approvalLineDtoList);
 		
 		// 권한 리스트 조회
