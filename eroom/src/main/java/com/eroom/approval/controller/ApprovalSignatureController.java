@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,22 +35,47 @@ public class ApprovalSignatureController {
 		Map<String, String> map = new HashMap<String, String>();
 		
 		map.put("res_code", "500");
-		map.put("res_msg", "등록 실패");
+		map.put("res_msg", "저장된 서명이 있습니다.");
 		
 		dto.setEmployee_no(employeeNo);
 		int result = approvalSignatureService.createSignature(dto);
 		
 		if(result > 0) {
 			map.put("res_code", "200");
-			map.put("res_msg", "등록 성공");
+			map.put("res_msg", "서명 저장 성공");
 		}
 		
 		return map;
 	}
 	
-	@PutMapping("/approval/signature/update")
+//	@PutMapping("/approval/signature/update")
+//	@ResponseBody
+//	public Map<String, String> updateSignature(@RequestBody ApprovalSignatureDto dto, Authentication authentication){
+//		EmployeeDetails employeeDetails = (EmployeeDetails)authentication.getPrincipal();
+//		Employee employee = employeeDetails.getEmployee();
+//		Long employeeNo = employee.getEmployeeNo();
+//		
+//		
+//		Map<String, String> map = new HashMap<String, String>();
+//		
+//		map.put("res_code", "500");
+//		map.put("res_msg", "서명 저장 실패");
+//		map.put("memo", "수정 실패");
+//		
+//		dto.setEmployee_no(employeeNo);
+//		int result = approvalSignatureService.updateSignature(dto);
+//		
+//		if(result > 0) {
+//			map.put("res_code", "200");
+//			map.put("res_msg", "서명 저장 성공");
+//			map.put("memo", "수정 성공");
+//		}
+//		
+//		return map;
+//	}
+	@PutMapping("/approval/signature/delete")
 	@ResponseBody
-	public Map<String, String> updateSignature(@RequestBody ApprovalSignatureDto dto, Authentication authentication){
+	public Map<String, String> deleteSignature(Authentication authentication){
 		EmployeeDetails employeeDetails = (EmployeeDetails)authentication.getPrincipal();
 		Employee employee = employeeDetails.getEmployee();
 		Long employeeNo = employee.getEmployeeNo();
@@ -58,14 +84,12 @@ public class ApprovalSignatureController {
 		Map<String, String> map = new HashMap<String, String>();
 		
 		map.put("res_code", "500");
-		map.put("res_msg", "수정 실패");
-		
-		dto.setEmployee_no(employeeNo);
-		int result = approvalSignatureService.updateSignature(dto);
+		map.put("res_msg", "서명 삭제 실패");
+		int result = approvalSignatureService.deleteSignature(employeeNo);
 		
 		if(result > 0) {
 			map.put("res_code", "200");
-			map.put("res_msg", "수정 성공");
+			map.put("res_msg", "서명 삭제 성공");
 		}
 		
 		return map;

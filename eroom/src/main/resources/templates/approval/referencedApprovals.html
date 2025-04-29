@@ -29,7 +29,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 										
 									</button></a>
 								    <button type="button" class="btn btn-primary" id="openSignature">
-								      서명 추가/수정
+								      서명 관리
 								    </button>
 									
 								</div>
@@ -268,7 +268,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		
 		
 		
-		    <!-- 모달 구조 -->
+		    <!-- 시그니처패드 모달 구조 -->
     <div class="modal fade" id="signatureModal" tabindex="-1" aria-labelledby="signatureModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -282,6 +282,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
               <button type="button" class="btn btn-secondary" id="clearSignature">초기화</button>
               <button type="button" class="btn btn-primary" id="saveSignature">저장</button>
               <button th:if="${approvalSignature != null}" type="button" class="btn btn-primary" id="updateSignature">수정</button>
+              <button th:if="${approvalSignature != null}" type="button" class="btn btn-primary" id="deleteSignature">삭제</button>
             </div>
           </div>
         </div>
@@ -299,6 +300,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
       const clearBtn = document.getElementById('clearSignature');
       const saveBtn = document.getElementById('saveSignature');
       const updateBtn = document.getElementById('updateSignature');
+      const deleteBtn = document.getElementById('deleteSignature');
 
       function initSignaturePad() {
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
@@ -387,6 +389,24 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
        		// 서명 미입력시.
           alert('서명이 없습니다!');
         }
+      });
+      
+      deleteBtn.addEventListener('click', function(){
+    	  fetch('/approval/signature/delete', {
+    		  method : 'PUT',
+        	  headers : {
+      	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+      	        'header': document.querySelector('meta[name="_csrf_header"]').content
+          	  }
+    	  })
+    	  .then(response => response.json())
+    	  .then(data => {
+    		  alert(data.res_msg);
+    	  })
+    	  .catch(error => {
+    	        console.error('삭제 중 오류 발생:', error);
+    	        alert('삭제 실패');
+    	  });
       });
       
       

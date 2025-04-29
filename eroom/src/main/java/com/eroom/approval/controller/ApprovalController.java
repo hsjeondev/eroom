@@ -524,6 +524,8 @@ public class ApprovalController {
 		Employee employee = employeeDetails.getEmployee();
 		Long employeeNo = employee.getEmployeeNo();
 		model.addAttribute("employee", employee);
+		ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(employee);
+		model.addAttribute("approvalSignature", approvalSignature);
 		// 내가 결재 라인에 있는 approval 리스트 조회
 		List<ApprovalLine> var1Entity = approvalLineService.getApprovalLineByEmployeeNo(employeeNo);
 		Map<Long, List<ApprovalLineDto>> var1Map = new HashMap<Long, List<ApprovalLineDto>>();
@@ -624,6 +626,8 @@ public class ApprovalController {
 		Employee employee = employeeDetails.getEmployee();
 		Long employeeNo = employee.getEmployeeNo();
 		model.addAttribute("employee", employee);
+		ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(employee);
+		model.addAttribute("approvalSignature", approvalSignature);
 		// 내가 결재 라인에 있는 approval 리스트 조회
 		List<ApprovalLine> var1Entity = approvalLineService.getApprovalLineByEmployeeNo(employeeNo);
 		Map<Long, List<ApprovalLineDto>> var1Map = new HashMap<Long, List<ApprovalLineDto>>();
@@ -683,6 +687,8 @@ public class ApprovalController {
 		Employee employee = employeeDetails.getEmployee();
 		Long employeeNo = employee.getEmployeeNo();
 		model.addAttribute("employee", employee);
+		ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(employee);
+		model.addAttribute("approvalSignature", approvalSignature);
 		// 내가 결재 라인에 있는 approval 리스트 조회
 		List<ApprovalLine> var1Entity = approvalLineService.getApprovalLineByEmployeeNo(employeeNo);
 		Map<Long, List<ApprovalLineDto>> var1Map = new HashMap<Long, List<ApprovalLineDto>>();
@@ -741,6 +747,8 @@ public class ApprovalController {
 		EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 		Employee employee = employeeDetails.getEmployee();
 		model.addAttribute("employee", employee);
+		ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(employee);
+		model.addAttribute("approvalSignature", approvalSignature);
 		// 내가 올린 approval 리스트 조회
 		List<Approval> temp = approvalService.getMyRequestedApprovals(employee.getEmployeeNo(), "Y");
 		List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();

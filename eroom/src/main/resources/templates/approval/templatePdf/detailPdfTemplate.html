@@ -167,9 +167,18 @@ ul li {
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td th:each="line : ${approvalLineList}" th:if="${line.approval_line_step >= 1}"><span th:if="${line.approval_line_status == 'A'}" th:text="승인">서명</span> <span th:if="${line.approval_line_status == 'S'}" th:text="대기">대기</span> <span th:if="${line.approval_line_status == 'D'}" th:text="반려">반려</span></td>
-							</tr>
+			              <tr>
+			                <td style="padding: 0; text-align: center; vertical-align: middle; height: 50px;" th:each="line : ${approvalLineList}" th:if="${line.approval_line_step >= 1}">
+			                  <span th:if="${line.approval_line_status == 'A'}">
+			                  	<img th:if="${line.base64URL != null}"
+			                  		th:src="|data:image/png;base64,${line.base64URL}|"
+			                  		style="display: block; width: 100%; height: 100%; object-fit: contain;" alt="서명 이미지"/>
+			               		<span th:if="${line.base64URL == null}">승인</span>
+			                  </span>
+			                  <span th:if="${line.approval_line_status == 'S'}" th:text="대기">대기</span>
+			                  <span th:if="${line.approval_line_status == 'D'}" th:text="반려">반려</span>
+			                </td>
+			              </tr>
 						</tbody>
 					</table>
 					<div th:if="${#lists.size(approvalLineList.?[approval_line_step >= 1]) == 0}" class="text-center text-secondary small border py-3 rounded">결재자가 없습니다.</div>
@@ -186,9 +195,18 @@ ul li {
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td th:each="line : ${approvalLineList}" th:if="${line.approval_line_step == 0}"><span th:if="${line.approval_line_status == 'A'}" th:text="합의">서명</span> <span th:if="${line.approval_line_status == 'S'}" th:text="대기">대기</span> <span th:if="${line.approval_line_status == 'D'}" th:text="반려">반려</span></td>
-							</tr>
+			              <tr>
+			                <td style="padding: 0; text-align: center; vertical-align: middle; height: 50px;" th:each="line : ${approvalLineList}" th:if="${line.approval_line_step == 0}">
+			                  <span th:if="${line.approval_line_status == 'A'}">
+			                  	<img th:if="${line.base64URL != null}"
+			                  		th:src="|data:image/png;base64,${line.base64URL}|"
+			                  		style="display: block; width: 100%; height: 100%; object-fit: contain;" alt="서명 이미지"/>
+			               		<span th:if="${line.base64URL == null}">합의</span>
+			                  </span>
+			                  <span th:if="${line.approval_line_status == 'S'}" th:text="대기">대기</span>
+			                  <span th:if="${line.approval_line_status == 'D'}" th:text="반려">반려</span>
+			                </td>
+			              </tr>
 						</tbody>
 					</table>
 					<div th:if="${#lists.size(approvalLineList.?[approval_line_step == 0]) == 0}" class="text-center text-secondary small border py-3 rounded">합의자가 없습니다.</div>
@@ -268,7 +286,7 @@ ul li {
 			</table>
 			<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/business_trip_report :: business_trip_report}"></div>
 		</div>
-		<!-- 휴가신청서 -->
+		<!-- 연차신청서 -->
 		<div th:if="${approval.approval_format.approvalFormatNo == 7}">
 			<table class="table table-bordered text-center align-middle mb-0">
 				<tr>
@@ -277,6 +295,20 @@ ul li {
 			</table>
 			<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/leave_request :: leave_request}"></div>
 		</div>
+		<!-- 반차신청서 -->
+		<div th:if="${approval.approval_format.approvalFormatNo == 8}">
+			<table class="table table-bordered text-center align-middle mb-0">
+				<tr>
+					<th class="fw-bold fs-7" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+				</tr>
+			</table>
+			<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/leave_half_request :: leave_half_request}"></div>
+		</div>
+		
+		
+		
+		
+		
 
 		<div class="footer-text" th:text="${approval.approval_reg_date}">2025-04-24</div>
 
