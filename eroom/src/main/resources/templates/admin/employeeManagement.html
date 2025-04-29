@@ -374,7 +374,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
         <!-- 푸터 -->
         <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
           <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
-          <button type="submit" class="btn btn-primary" id="saveEditEmployeeBtn">저장</button>
+          <button type="button" class="btn btn-primary" id="saveEditEmployeeBtn">저장</button>
         </div>
 
       </form>
@@ -652,15 +652,13 @@ document.addEventListener('DOMContentLoaded',function(){
 	
 	// saveEditEmployeeBtn 클릭 시 (회원 수정 요청 전 확인 모달 띄우기)
 	saveEditEmployeeBtn.addEventListener('click', function () {
-		// 수정폼 데이터가 다 들어온 경우에만 저장 모드로
 		const editEmployeeName = document.getElementById('editEmployeeName').value;
-		
-		if(!editEmployeeName.trim()){
+		if (!editEmployeeName.trim()) {
 			showAlert("수정할 회원 정보를 먼저 불러오세요.");
 			return;
 		}
+
 		currentMode = 'edit';
-		isFormEdited = true;
 		confirmSaveModal.show();
 	});
 	
@@ -686,8 +684,10 @@ document.addEventListener('DOMContentLoaded',function(){
 	
 	// 모달 닫기 방지 (회원 수정 모달)
 	editModalElement.addEventListener('hide.bs.modal', function (e) {
-		if (isEditFormEdited) {
-			e.preventDefault();
+		const isConfirmVisible = document.getElementById('confirmSaveModal').classList.contains('show');
+
+		if (isEditFormEdited && !isConfirmVisible) {
+			e.preventDefault(); // 모달 닫힘 막기
 			unsavedModal.show();
 		}
 	});
@@ -954,7 +954,9 @@ document.addEventListener('DOMContentLoaded',function(){
 			.then(response => response.json())
 			.then(data => {
 				if(data.res_code == 200){
-					showAlert('회원 정보가 수정되었습니다.',function(){
+					showAlert(data.res_msg,function(){
+						isEditFormEdited = false;
+						editModal.hide();
 						location.reload();
 					});
 				}else{

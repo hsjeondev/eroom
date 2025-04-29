@@ -1,5 +1,6 @@
 package com.eroom.employee.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -207,6 +208,8 @@ public class EmployeeService {
 		// employee 가져오기
 		Employee employee = employeeRepository.findById(dto.getEmployee_no()).orElse(null);
 
+		// employee 수정 전 정보 백업
+		String originalEmployeeName = employee.getEmployeeName();
 		// 이름 수정 
 		if(dto.getEmployee_name() != null && !dto.getEmployee_name().equals(employee.getEmployeeName())) employee.setEmployeeName(dto.getEmployee_name());
 		// 직급 수정
@@ -243,9 +246,31 @@ public class EmployeeService {
 		
 		// directory 수정
 		Directory directory = employee.getDirectory();
-		if(directory != null && dto.getDirectory_phone() != null && !dto.getDirectory_phone().equals(directory.getDirectoryPhone())) {
-			directory.setDirectoryPhone(dto.getDirectory_phone());
-			employeeDirectoryRepository.save(directory);
+		if(directory != null) {
+			boolean updated = false;
+			// 이름이 바뀐 경우 주소록에도 이름 변경
+			if(dto.getEmployee_name() != null && !dto.getEmployee_name().equals(originalEmployeeName)) {
+				directory.setDirectoryName(dto.getEmployee_name());
+				updated = true;
+			}
+			// 연락처가 바뀐 경우
+			if(dto.getDirectory_phone() != null && !dto.getDirectory_phone().equals(directory.getDirectoryPhone())) {
+				directory.setDirectoryPhone(dto.getDirectory_phone());
+				updated = true;
+			}
+			
+			if(updated) {
+				// 수정일자 갱신
+				directory.setDirectoryModDate(LocalDateTime.now());
+				
+				// 현재 로그인 사용자 정보를 editor로 저장
+				EmployeeDetails employeeDetail = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+				String editorName = employeeDetail.getEmployee().getEmployeeName();
+				directory.setDirectoryEditor(editorName);
+
+				employeeDirectoryRepository.save(directory);
+			}
+			
 		}
 	}
 	
