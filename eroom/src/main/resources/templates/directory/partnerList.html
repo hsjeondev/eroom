@@ -24,17 +24,15 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 <!-- 검색창 + 추가 버튼 영역 -->
 <div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
   <!-- 검색창 (가운데 정렬) -->
-  <div class="d-flex justify-content-center">
-    <form class="position-relative" style="width: 300px;">
+  <div class="search-box">
       <input class="form-control search-input search form-control-sm" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
       <svg class="svg-inline--fa fa-magnifying-glass search-box-icon position-absolute top-50 end-0 translate-middle-y me-2"
         aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img"
-        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="pointer-events: none;">
+        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 40%;">
         <path fill="currentColor"
           d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z">
         </path>
       </svg>
-    </form>
   </div>
 
   <!-- 추가 버튼 (오른쪽 고정) -->
@@ -63,15 +61,15 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
         <tbody class="list align-middle">
 
 		<!-- 외부업체 인원 1 -->
-		<tr>
-			<td class="no">1</td>
-			<td class="name">정재익</td>
-			<td class="hiredate">에이스솔루션</td>
-			<td class="email">aceleft@acesol.co.kr</td>
-			<td class="phone">010-2345-6789</td>
-			<td class="department">기술지원부</td>
-			<td class="team">현장대응팀</td>
-			<td class="position">이사</td>
+		<tr th:each="list, listStatus : ${resultList}" th:if="${not #lists.isEmpty(resultList)}">
+			<td class="no" th:text="${listStatus.count}">1</td>
+			<td class="name" th:text="${list.directory_name}">정재익</td>
+			<td class="companyName" th:text="${list.directory_company_name}">에이스솔루션</td>
+			<td class="email" th:text="${list.directory_email}">aceleft@acesol.co.kr</td>
+			<td class="phone" th:text="${list.directory_phone}">010-1234-5678</td>
+			<td class="department" th:text="${list.directory_department}">기술지원부</td>
+			<td class="team" th:text="${list.directory_team}">현장대응팀</td>
+			<td class="position" th:text="${list.directory_position}">이사</td>
 			<td class="align-middle text-end pe-0">
 				<div class="btn-reveal-trigger position-static">
 					<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
@@ -85,32 +83,6 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				</div>
 			</td>
 		</tr>
-		<!-- 외부업체 인원 2 -->
-		<tr>
-			<td class="no">2</td>
-			<td class="name">황정현</td>
-			<td class="hiredate">넥스트링크</td>
-			<td class="email">hjh@nextlink.kr</td>
-			<td class="phone">010-9876-5432</td>
-			<td class="department">서비스운영부</td>
-			<td class="team">QA팀</td>
-			<td class="position">차장</td>
-			<td class="align-middle text-end pe-0">
-				<div class="btn-reveal-trigger position-static">
-					<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-						<i class="fas fa-ellipsis fs-10"></i>
-					</button>
-					<div class="dropdown-menu dropdown-menu-end py-2">
-						<a class="dropdown-item" href="#!">수정</a>
-						<div class="dropdown-divider"></div>
-						<a class="dropdown-item text-danger" href="#!">삭제</a>
-					</div>
-				</div>
-			</td>
-		</tr>
-
-
-
         </tbody>
       </table>
     </div>
@@ -138,7 +110,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
       <!-- 헤더 -->
       <div class="modal-header">
-        <h5 class="modal-title" id="addPartnerDirectoryModalLabel">회의실 추가</h5>
+        <h5 class="modal-title" id="addPartnerDirectoryModalLabel">협력업체 인원 추가</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
@@ -146,32 +118,32 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
       <div class="modal-body">
         <form id="addPartnerDirectoryForm">
           <div class="mb-3">
-            <label for="roomName" class="form-label">이름</label>
+            <label for="name" class="form-label">이름</label>
             <input type="text" class="form-control form-control-sm" id="name" placeholder="예: 홍길동">
           </div>
           <div class="mb-3">
-            <label for="roomLocation" class="form-label">회사명</label>
+            <label for="companyName" class="form-label">회사명</label>
             <input type="text" class="form-control form-control-sm" id="companyName" placeholder="예: 이룸컴퍼니">
           </div>
           <div class="mb-3">
-            <label for="roomCapacity" class="form-label">이메일</label>
-            <input type="number" class="form-control form-control-sm" id="email" placeholder="예: example@exp.co.kr">
+            <label for="email" class="form-label">이메일</label>
+            <input type="email" class="form-control form-control-sm" id="email" placeholder="예: example@exp.co.kr">
           </div>
           <div class="mb-3">
-            <label for="roomCapacity" class="form-label">전화번호</label>
-            <input type="number" class="form-control form-control-sm" id="phone" placeholder="예: 010-1234-5678">
+            <label for="phone" class="form-label">전화번호</label>
+            <input type="text" class="form-control form-control-sm" id="phone" placeholder="예: 010-1234-5678">
           </div>
           <div class="mb-3">
-            <label for="roomCapacity" class="form-label">부서명</label>
-            <input type="number" class="form-control form-control-sm" id="department" placeholder="예: OO부">
+            <label for="department" class="form-label">부서명</label>
+            <input type="text" class="form-control form-control-sm" id="department" placeholder="예: OO부">
           </div>
           <div class="mb-3">
-            <label for="roomCapacity" class="form-label">팀명</label>
-            <input type="number" class="form-control form-control-sm" id="team" placeholder="예: OO팀">
+            <label for="team" class="form-label">팀명</label>
+            <input type="text" class="form-control form-control-sm" id="team" placeholder="예: OO팀">
           </div>
           <div class="mb-3">
-            <label for="roomCapacity" class="form-label">직급</label>
-            <input type="number" class="form-control form-control-sm" id="job" placeholder="예: 부장">
+            <label for="position" class="form-label">직급</label>
+            <input type="text" class="form-control form-control-sm" id="position" placeholder="예: 부장">
           </div>
         </form>
       </div>
@@ -179,11 +151,72 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
       <!-- 푸터 -->
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
-        <button type="submit" class="btn btn-primary btn-sm" form="addMeetingroomForm">등록</button>
+        <button type="submit" class="btn btn-primary btn-sm" id="submitBtn">등록</button>
       </div>
     </div>
   </div>
 </div>
+<script>
+document.getElementById("submitBtn").addEventListener('click', function(e){
+    e.preventDefault(); // 기본 제출 막기
+    let formData = {};
+
+    const fields = [
+        { id: "name", message: "이름을 입력해주세요." },
+        { id: "companyName", message: "회사명을 입력해주세요." },
+        { id: "email", message: "이메일을 입력해주세요." },
+        { id: "phone", message: "전화번호를 입력해주세요." },
+        { id: "department", message: "부서명을 입력해주세요." },
+        { id: "team", message: "팀명을 입력해주세요." },
+        { id: "position", message: "직급을 입력해주세요." }
+    ];
+
+    let isValid = true;
+
+    fields.forEach(field => {
+        const input = document.getElementById(field.id);
+        const value = input.value.trim();
+
+        if (!value) {
+            if (isValid) {
+                alert(field.message);
+                input.focus();
+            }
+            input.style.border = "1px solid red";
+            isValid = false;
+        } else {
+            input.style.border = ""; // 정상 입력되었으면 원래대로 복구
+            formData[field.id] = value;
+        }
+    });
+
+    if (isValid) {
+    	
+    	fetch('/directory/partner/create', {
+		    method: 'POST',
+		    headers: {
+		      'Content-Type': 'application/json',
+		      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+		      'header': document.querySelector('meta[name="_csrf_header"]').content
+		    },
+		    body: JSON.stringify(formData)
+		  })
+		  .then(res => res.json())
+		  .then(data => {
+		      alert(data.res_msg);
+		      location.href = '/directory/partner';
+		      alert(data.res_msg);
+		  })
+		  .catch(err => {
+		    console.error(err);
+		    alert("요청 중 오류가 발생했습니다.");
+		  });
+    	
+    	
+    }
+});
+</script>
+
 
 
     </main>
