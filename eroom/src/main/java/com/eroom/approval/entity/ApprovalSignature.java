@@ -1,7 +1,11 @@
 package com.eroom.approval.entity;
 
 
+import java.sql.Blob;
 import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.eroom.employee.entity.Employee;
 
@@ -11,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -29,7 +34,7 @@ import lombok.ToString;
 @Builder
 
 @Entity
-@Table(name="Approval_signature")
+@Table(name="approval_signature")
 public class ApprovalSignature {
 	@Id
 	@Column(name="approval_signature_no")
@@ -40,11 +45,12 @@ public class ApprovalSignature {
 	private Employee employee;
 	@Column(name = "approval_signature_name")
 	private String approvalSignatureName; // 결재 서명 이름
-	@Column(name = "approval_signature_path")
-	private String approvalSignaturePath; // 결재 서명 경로
+	@Lob
+	@Column(name = "approval_signature_blob")
+	private byte[] approvalSignatureBlob; // 결재 서명 이미지 바이너리저장
 	@Column(name = "approval_signature_reg_date", insertable = false, updatable = false)
 	private LocalDateTime approvalSignatureRegDate; // 결재 서명 등록일
-	@Column(name = "approval_signature_mod_date")
+	@Column(name = "approval_signature_mod_date", insertable = false, updatable = false)
 	private LocalDateTime approvalSignatureModDate; // 결재 서명 수정일
 	
 }
