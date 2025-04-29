@@ -1,17 +1,23 @@
 package com.eroom.project.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
+import com.eroom.project.dto.EditTodoDetailRequest;
 import com.eroom.project.dto.ProjectTodoElementDto;
 import com.eroom.project.dto.ProjectTodoListDto;
 import com.eroom.project.entity.ProjectTodoElement;
+import com.eroom.project.entity.ProjectTodoElementDetail;
 import com.eroom.project.entity.ProjectTodoList;
+import com.eroom.project.repository.ProjectTodoElementDetailRepository;
 import com.eroom.project.repository.ProjectTodoElementRepository;
 import com.eroom.project.repository.ProjectTodoListRepository;
 
@@ -24,6 +30,94 @@ public class ProjectTodoService {
 	private final ProjectTodoListRepository projectTodoListRepository;
 	private final ProjectTodoElementRepository projectTodoElementRepository;
 	private final EmployeeRepository employeeRepository;
+	private final ProjectTodoElementDetailRepository projectTodoElementDetailRepository;
+	
+
+
+
+	
+	@Transactional
+	public void editTodoElementDetails(EditTodoDetailRequest request) {
+	    
+	    Long todoElementNo = request.getTodoElementNo();
+	    Long projectNo = request.getProjectNo();
+	    List<EditTodoDetailRequest.DetailDto> details = request.getDetails();
+
+	    if (todoElementNo == null || projectNo == null || details == null) {
+	        throw new IllegalArgumentException("요청 데이터가 불완전합니다.");
+	    }
+
+	    // 1. 현재 todoElement에 연결된 세부 할 일들 다 가져온다 (visibleYn = 'Y'인 것만)
+	    List<ProjectTodoElementDetail> existingDetails = projectTodoElementDetailRepository
+	            .findByProjectTodoElement_TodoNoAndVisibleYn(todoElementNo, "Y");
+
+	    // 2. 기존 세부 할 일 map으로 만들어놓자 (key: detailNo, value: 엔티티)
+	    Map<Long, ProjectTodoElementDetail> existingDetailMap = existingDetails.stream()
+	        .collect(Collectors.toMap(ProjectTodoElementDetail::getTodoDetailNo, detail -> detail));
+
+	    // 3. 새로 받은 요청을 하나하나 비교해서 처리
+	    for (EditTodoDetailRequest.DetailDto incomingDetail : details) {
+	        Long detailNo = incomingDetail.getTodoDetailNo();
+	        String todoContent = incomingDetail.getTodoContent();
+
+	        if (detailNo != null) {
+	            // 3-1. 기존 detail 수정 (내용 업데이트)
+	            ProjectTodoElementDetail existing = existingDetailMap.remove(detailNo);
+	            if (existing != null) {
+	                existing.setTodoContent(todoContent);
+	                projectTodoElementDetailRepository.save(existing);
+	            }
+	        } else {
+	            // 3-2. 새로 추가되는 detail (Insert)
+	            ProjectTodoElementDetail newDetail = ProjectTodoElementDetail.builder()
+	                .projectNo(projectNo)
+	                .projectTodoElement(ProjectTodoElement.builder().todoNo(todoElementNo).build())  // FK 연결
+	                .todoContent(todoContent)
+	                .status("N") // 기본값: 미완료
+	                .visibleYn("Y")
+	                .build();
+	            projectTodoElementDetailRepository.save(newDetail);
+	        }
+	    }
+
+	    // 4. 요청에 없는 detail은 삭제 처리 (visibleYn = 'N')
+	    for (ProjectTodoElementDetail remaining : existingDetailMap.values()) {
+	        remaining.setVisibleYn("N");
+	        projectTodoElementDetailRepository.save(remaining);
+	    }
+	}
+
+
+
+	
+	public Map<String, Object> updateElementDetailStatus(Long todoDetailNo, String status) {
+	    Map<String, Object> result = new HashMap<>();
+
+	    try {
+	        ProjectTodoElementDetail projectTodoElementDetail = projectTodoElementDetailRepository.findById(todoDetailNo).orElse(null);
+
+	        if (projectTodoElementDetail != null) {
+	            projectTodoElementDetail.setStatus(status);
+	            projectTodoElementDetailRepository.save(projectTodoElementDetail);
+
+	            Long todoElementNo = projectTodoElementDetail.getProjectTodoElement().getTodoNo();
+
+	            // ✅ visibleYn = 'Y' 조건 추가해서 카운트
+	            int totalCount = projectTodoElementDetailRepository.countByProjectTodoElement_TodoNoAndVisibleYn(todoElementNo, "Y");
+	            int completedCount = projectTodoElementDetailRepository.countByProjectTodoElement_TodoNoAndStatusAndVisibleYn(todoElementNo, "Y", "Y");
+
+	            result.put("todo_element_no", todoElementNo);
+	            result.put("progress_text", completedCount + "/" + totalCount);
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return result;
+	}
+
+
 	
 	public List<ProjectTodoListDto> findByProjectNo(Long projectNo) {
 	    
@@ -192,8 +286,23 @@ public class ProjectTodoService {
 	    return result;
 	}
 
+	public ProjectTodoElementDto findTodoElement(Long todoElementNo) {
+		ProjectTodoElement projectTodoElement = projectTodoElementRepository.findById(todoElementNo).orElse(null);
+		ProjectTodoElementDto projectTodoElementDto = null;
+		
+		if(projectTodoElement != null) {
+			projectTodoElementDto = new ProjectTodoElementDto().toDto(projectTodoElement);
+		}
+		
+		return projectTodoElementDto;
+	}
 
+	public int countVisibleDetails(Long todoElementNo) {
+	    return projectTodoElementDetailRepository.countByProjectTodoElement_TodoNoAndVisibleYn(todoElementNo, "Y");
+	}
 
-
+	public int countVisibleCompletedDetails(Long todoElementNo) {
+	    return projectTodoElementDetailRepository.countByProjectTodoElement_TodoNoAndStatusAndVisibleYn(todoElementNo, "Y", "Y");
+	}
 	
 }
