@@ -55,6 +55,27 @@
 	    <span><i class="fas fa-calendar-alt text-warning me-1"></i> 최근 업로드 일자</span>
 	    <span class="badge bg-light text-dark" id="recentUploadDate" style="font-size: 1rem;">-</span>
 	  </li>
+	  <li class="mt-3 fw-bold">파일 유형별 용량</li>
+	  <li class="d-flex justify-content-between align-items-center mb-1">
+	    <span><i class="fas fa-file-archive text-secondary me-1"></i> ZIP 파일</span>
+	    <span class="badge bg-light text-dark" id="sizeZip">-</span>
+	  </li>
+	  <li class="d-flex justify-content-between align-items-center mb-1">
+	    <span><i class="fas fa-file-image text-secondary me-1"></i> 이미지 파일</span>
+	    <span class="badge bg-light text-dark" id="sizeImage">-</span>
+	  </li>
+	  <li class="d-flex justify-content-between align-items-center mb-1">
+	    <span><i class="fas fa-file-word text-secondary me-1"></i> 문서 파일</span>
+	    <span class="badge bg-light text-dark" id="sizeWord">-</span>
+	  </li>
+	  <li class="d-flex justify-content-between align-items-center mb-1">
+	    <span><i class="fas fa-file-excel text-secondary me-1"></i> 엑셀 파일</span>
+	    <span class="badge bg-light text-dark" id="sizeExcel">-</span>
+	  </li>
+	  <li class="d-flex justify-content-between align-items-center mb-1">
+	    <span><i class="fas fa-question-circle text-secondary me-1"></i> 기타</span>
+	    <span class="badge bg-light text-dark" id="sizeEtc">-</span>
+	  </li>
 	</ul>
 </div>
 </div>
@@ -231,7 +252,7 @@
 	        uploadMultiple: true,
 	        clickable: "#dropzone-multiple .dz-message",
 	        acceptedFiles: ".jpg,.png,.pdf,.xlsx,.docx,.zip",
-	        maxFilesize: 10,
+	        maxFilesize: 200,
 	        previewTemplate: `
 	        	<div class="card shadow-sm mb-2 p-2 border d-flex flex-row align-items-center" style="width: 100%; max-width: 720px;">
 	            <div class="me-2" style="width: 48px; height: 48px;">
@@ -472,25 +493,35 @@
     }
 });
 	document.addEventListener('DOMContentLoaded', function () {
-	    fetch('/drive/summary/personal')
-	        .then(response => response.json())
-	        .then(data => {
-	            document.getElementById('totalFiles').innerText = data.totalFiles + '개';
-	            document.getElementById('totalDownloads').innerText = data.totalDownloads + '회';
-	            document.getElementById('recentUploadDate').innerText = data.recentUploadDate;
+		  fetch('/drive/summary/personal')
+		    .then(response => response.json())
+		    .then(data => {
+		      document.getElementById('totalFiles').innerText = data.totalFiles + '개';
+		      document.getElementById('totalDownloads').innerText = data.totalDownloads + '회';
+		      document.getElementById('recentUploadDate').innerText = data.recentUploadDate;
 
-	            const usedGB = parseFloat(data.totalUsedGB);
-	            const totalGB = 50;
-	            const percent = Math.round((usedGB / totalGB) * 100);
+		      const usedGB = parseFloat(data.totalUsedGB);
+		      const totalGB = 50;
+		      const percent = Math.round((usedGB / totalGB) * 100);
 
-	            const usageText = `${usedGB.toFixed(3)} GB / ${totalGB} GB 사용 중 (${percent}%)`;
-	            document.querySelector('.card p.text-muted strong').parentElement.innerHTML =
-	              `<strong>${usedGB.toFixed(3)} GB</strong> / ${totalGB} GB 사용 중 (${percent}%)`;
+		      document.getElementById('usedGB').innerText = `${usedGB.toFixed(3)} GB`;
+		      document.getElementById('usagePercent').innerText = `${percent}%`;
+		      document.querySelector('.progress-bar').style.width = `${percent}%`;
 
-	            document.querySelector('.progress-bar').style.width = `${percent}%`;
-	        })
-	        .catch(error => console.error('개인 요약 정보 불러오기 실패:', error));
-	});
+		      const kbToMb = kb => (kb / 1024).toFixed(1) + ' MB';
+		      const typeSizeMap = data.fileTypeUsage || {};
+		      
+		      // 파일 유형별 용량 표시
+		      document.getElementById('sizeZip').innerText = ((typeSizeMap.zip || 0) / 1024).toFixed(3) + ' MB';
+		      document.getElementById('sizeImage').innerText = ((typeSizeMap.image || 0) / 1024).toFixed(3) + ' MB';
+		      document.getElementById('sizeWord').innerText = ((typeSizeMap.docx || 0) / 1024).toFixed(3) + ' MB';
+		      document.getElementById('sizeExcel').innerText = ((typeSizeMap.xlsx || 0) / 1024).toFixed(3) + ' MB';
+		      document.getElementById('sizeEtc').innerText = ((typeSizeMap.etc || 0) / 1024).toFixed(3) + ' MB';
+
+		    })
+		    .catch(error => console.error('개인 요약 정보 불러오기 실패:', error));
+		});
+
 
   </script>
 
