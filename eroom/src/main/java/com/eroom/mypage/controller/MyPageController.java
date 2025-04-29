@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.eroom.attendance.entity.Attendance;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
-import com.eroom.directory.service.EmployeeDirectoryService;
+import com.eroom.directory.service.DirectoryService;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.StructureService;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MyPageController {
 	private final StructureService structureService;
-	private final EmployeeDirectoryService employeeDirectoryService;
+	private final DirectoryService employeeDirectoryService;
 	// 마이페이지
 	@GetMapping("/list")
 	public String myPageView(Model model, Authentication authentication) {
