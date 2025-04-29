@@ -34,8 +34,14 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
 	@Transactional
 	@Query("UPDATE Drive d SET d.downloadCount = d.downloadCount + 1 WHERE d.driveAttachNo = :id")
 	void updateDownloadCount(@Param("id") Long id);
+    
+	// 
+	@Query("SELECT e.employeeNo FROM Employee e WHERE e.structure.separatorCode IN :separatorCodes")
+	List<Long> findEmployeeNosByTeamSeparatorCodes(@Param("separatorCodes") List<String> separatorCodes);
+
 	
-	
+
+
 	
 	// ------- 결재 관련해서 생성한 JPA
 	// param1과 Drive_delete_yn N을 기준으로 조회
