@@ -103,19 +103,20 @@ public class CalendarController {
 	//회사 캘린더 등록
 	@PostMapping("/companycalendar/add")
 	@ResponseBody
-	public Map<String,String> addCompanyCalendarApi(CompanyCalendarDto param){
-		Map<String,String> resultMap = new HashMap<String,String>();
-		resultMap.put("res_code", "500");
-		resultMap.put("res_msg", "일정 등록을 실패하였습니다");
-		System.out.println(param);
-		
-		CompanyCalendarDto cdto = companyService.addCompanyCalendar(param);
-		if(cdto != null) {
-			resultMap.put("res_code", "200");
-			resultMap.put("res_msg", "일정을 등록하였습니다!");
-		}
-		
-		return resultMap;
+	public Map<String,String> addCompanyCalendarApi(CompanyCalendarDto param) {
+	    Map<String,String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "일정 등록을 실패하였습니다");
+
+	    System.out.println(param);
+
+	    CompanyCalendarDto cdto = companyService.addCompanyCalendar(param);
+	    if (cdto != null) {
+	        resultMap.put("res_code", "200");
+	        resultMap.put("res_msg", "일정을 등록하였습니다!");
+	    }
+
+	    return resultMap;
 	}
 	
 	//팀(해당직원의 팀) 캘린더 등록

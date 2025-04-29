@@ -10,21 +10,38 @@ import org.springframework.stereotype.Service;
 import com.eroom.calendar.dto.CompanyCalendarDto;
 import com.eroom.calendar.entity.CompanyCalendar;
 import com.eroom.calendar.repository.CompanyCalendarRepository;
+import com.eroom.notification.CalendarAlarmService;
+import com.eroom.websocket.CompanyAlarmSocketHandler;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class CompanyCalendarService {
 	private final CompanyCalendarRepository companyRepository;
+	private final CalendarAlarmService calendarAlarmService;	
+	private final CompanyAlarmSocketHandler companyAlarmSocketHandler; 
+
+
 	
-	//회사 캘린더 일정 등록
-	public CompanyCalendarDto addCompanyCalendar(CompanyCalendarDto dto) {
-		CompanyCalendar param = dto.toEntity();
-		CompanyCalendar result = companyRepository.save(param);
-		return new CompanyCalendarDto().toDto(result);
-		
-	}
+
+	
+	    @Transactional
+	    public CompanyCalendarDto addCompanyCalendar(CompanyCalendarDto dto) {
+	        // 1. 일정 저장
+	        CompanyCalendar param = dto.toEntity();
+	        CompanyCalendar result = companyRepository.save(param);
+
+	        // 2. 알람 보내기 요청
+	        calendarAlarmService.createCompanyCalendarAlarms(result);
+
+	        // 3. WebSocket으로 알림 뿌리기
+	        companyAlarmSocketHandler.broadcast("새로운 회사 일정이 등록되었습니다!");
+
+	        // 4. 결과 반환
+	        return new CompanyCalendarDto().toDto(result);
+	    }
 	
 	//회사 목록 일정 조회
 	public List<CompanyCalendarDto> getCompanyList(String separator) {

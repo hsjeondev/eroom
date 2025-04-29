@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.eroom.employee.entity.Authority;
 import com.eroom.employee.entity.Employee;
 
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -92,5 +91,9 @@ private static final long serialVersionUID = 1L;
 	@Override
 	public boolean isEnabled() {
 		return true;
+	}
+
+	public Long getEmployeeNo() {
+	   return employee.getEmployeeNo();
 	}
 }

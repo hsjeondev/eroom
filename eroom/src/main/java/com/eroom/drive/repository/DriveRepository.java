@@ -14,7 +14,7 @@ import com.eroom.drive.entity.Drive;
 @Repository
 public interface DriveRepository extends JpaRepository<Drive, Long>{
 	// 개인 드라이브 파일 리스트 조회
-	List<Drive> findByUploader_EmployeeNoAndVisibleYn(Long employeeNo, String visibleYn);
+	List<Drive> findByUploader_EmployeeNoAndSeparatorCodeAndVisibleYn(Long employeeNo, String separatorCode,String visibleYn);
 	// 팀 드라이브 파일 리스트 조회
 	List<Drive> findBySeparatorCodeAndVisibleYn(String separatorCode, String visibleYn);
 	// 개인 드라이브 파일 상세 조회
@@ -35,11 +35,19 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
 	@Query("UPDATE Drive d SET d.downloadCount = d.downloadCount + 1 WHERE d.driveAttachNo = :id")
 	void updateDownloadCount(@Param("id") Long id);
     
-	// 
+	
 	@Query("SELECT e.employeeNo FROM Employee e WHERE e.structure.separatorCode IN :separatorCodes")
 	List<Long> findEmployeeNosByTeamSeparatorCodes(@Param("separatorCodes") List<String> separatorCodes);
-
 	
+	// 개인 드라이브 파일 수 조회
+	@Query("SELECT SUM(d.driveSize) FROM Drive d WHERE d.uploader.employeeNo = :employeeNo AND d.separatorCode = :separatorCode AND d.visibleYn = 'Y'")
+	Long sumDriveSizeByUploaderAndSeparatorCode(@Param("employeeNo") Long employeeNo, @Param("separatorCode") String separatorCode);
+	
+	@Query("SELECT COUNT(d) FROM Drive d WHERE d.uploader.employeeNo = :employeeNo AND d.separatorCode = :separatorCode AND d.visibleYn = 'Y'") 
+	Long countDriveFilesByUploaderAndSeparatorCode(@Param("employeeNo") Long employeeNo, @Param("separatorCode") String separatorCode); 
+	// 개인 드라이브 파일 사용량 조회
+	@Query("SELECT SUM(d.driveSize) FROM Drive d WHERE d.uploader.employeeNo = :employeeNo AND d.visibleYn = 'Y'")
+	Long getTotalDriveSizeByEmployeeNo(@Param("employeeNo") Long employeeNo);
 
 
 	
