@@ -14,7 +14,7 @@ import com.eroom.drive.entity.Drive;
 @Repository
 public interface DriveRepository extends JpaRepository<Drive, Long>{
 	// 개인 드라이브 파일 리스트 조회
-	List<Drive> findByUploader_EmployeeNoAndVisibleYn(Long employeeNo, String visibleYn);
+	List<Drive> findByUploader_EmployeeNoAndSeparatorCodeAndVisibleYn(Long employeeNo, String separatorCode,String visibleYn);
 	// 팀 드라이브 파일 리스트 조회
 	List<Drive> findBySeparatorCodeAndVisibleYn(String separatorCode, String visibleYn);
 	// 개인 드라이브 파일 상세 조회

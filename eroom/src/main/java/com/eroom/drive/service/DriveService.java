@@ -254,7 +254,7 @@ public class DriveService {
 	
 	// ------------------------- 개인 드라이브 파일 리스트 조회 --------------------------
 	public List<DriveDto> findPersonalDriveFiles(Long employeeNo) {
-	    List<Drive> drives = driveRepository.findByUploader_EmployeeNoAndVisibleYn(employeeNo, "Y");
+	    List<Drive> drives = driveRepository.findByUploader_EmployeeNoAndSeparatorCodeAndVisibleYn(employeeNo, "E001", "Y");
 	    List<DriveDto> result = new ArrayList<>();
 
 	    for (Drive drive : drives) {
@@ -263,9 +263,7 @@ public class DriveService {
 
 	    return result;
 	}
-	
 
-	
 	// ------------------------- 팀 드라이브 파일 리스트 조회 -------------------------- 
 	public List<DriveDto> findTeamDriveFiles(String separatorCode) {
 		List<Drive> drives = driveRepository.findBySeparatorCodeAndVisibleYn(separatorCode, "Y");
