@@ -157,8 +157,24 @@
             </li>
             <li class="nav-item d-lg-none"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#searchBoxModal"><span data-feather="search" style="height:19px;width:19px;margin-bottom: 2px;"></span></a></li>
             <li class="nav-item dropdown">
-              <a class="nav-link" href="#" style="min-width: 2.25rem" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-auto-close="outside"><span class="d-block" style="height:20px;width:20px;"><span data-feather="bell" style="height:20px;width:20px;"></span></span></a>
-
+            <a class="nav-link" href="#" style="min-width: 2.25rem" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-auto-close="outside">
+			  <span id="notificationIconWrapper" style="position: relative; display: inline-block;">
+			    <span class="d-block" style="height:20px;width:20px;">
+			      <span data-feather="bell" style="height:20px;width:20px;"></span>
+			    </span>
+			    <span id="notificationDot" style="
+			      display: none;
+			      position: absolute;
+			      top: 0;
+			      right: 0;
+			      width: 8px;
+			      height: 8px;
+			      background-color: red;
+			      border-radius: 50%;
+			      border: 1px solid white;">
+			    </span>
+			  </span>
+			</a>						   
               <div class="dropdown-menu dropdown-menu-end notification-dropdown-menu py-0 shadow border navbar-dropdown-caret" id="navbarDropdownNotfication" aria-labelledby="navbarDropdownNotfication">
                 <div class="card position-relative border-0">
                   <div class="card-header p-2">
