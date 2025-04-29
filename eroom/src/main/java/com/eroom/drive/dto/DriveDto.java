@@ -41,6 +41,7 @@ public class DriveDto {
     private List<MultipartFile> driveFiles; // 업로드 파일들
     private List<String> driveDescriptions; // 파일 설명들
     private Long param1; // 매개변수1
+    private String uploaderTeamName; // 업로더 팀 이름
     
     // Entity -> DTO
 	public static DriveDto toDto(Drive entity) {
@@ -61,6 +62,7 @@ public class DriveDto {
 				.visibleYn(entity.getVisibleYn())
 				.driveDescription(entity.getDriveDescription())
 				.param1(entity.getParam1())
+				.uploaderTeamName(entity.getUploader().getStructure().getCodeName())
 				.build();
 	}
 	// DTO -> Entity
