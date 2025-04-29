@@ -20,6 +20,8 @@ public class EroomApplication implements WebMvcConfigurer {
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/upload/**")
 		.addResourceLocations("file:///" + fileDir);
+		 registry.addResourceHandler("/**")
+         .addResourceLocations("classpath:/static/");
 	}
 	
 }
