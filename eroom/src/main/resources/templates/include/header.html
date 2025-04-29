@@ -304,71 +304,115 @@
             </li>
           </ul>
         </div>
-        <script>
-        document.getElementById("notificationBell").addEventListener("click", function () {
-        	  fetch("/notification/data")
-        	    .then(response => response.json())
-        	    .then(data => {
-        	    	
-        	      const container = document.getElementById("notificationListContainer");
-        	      container.innerHTML = "";
-
-        	      if (data.length === 0) {
-        	        container.innerHTML = '<div class="p-3 text-center text-muted">새로운 알림이 없습니다.</div>';
-        	        return;
-        	      }
-
-        	      data.forEach(notification => {
-        	        const separator = notification.separator || "";
-        	        let message = "";
-
-        	        if (separator.startsWith('A')) {
-        	          message = "새로운 회사 일정이 등록되었습니다.";
-        	        } else {
-        	          message = "새로운 팀 일정이 등록되었습니다.";
-        	        }
-        	        
-        	        const time = notification.alarm_reg_date
-        	        ? (() => {
-        	            const date = new Date(notification.alarm_reg_date);
-        	            
-        	            const hours = date.getHours();
-        	            const minutes = date.getMinutes().toString().padStart(2, '0');
-        	            const period = hours >= 12 ? '오후' : '오전';
-        	            const hour12 = hours % 12 === 0 ? 12 : hours % 12;
-
-        	            const datePart = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-        	            
-        	            return `${period} ${hour12}:${minutes} / ${datePart}`;
-        	          })()
-        	        : "시간 정보 없음";
-
-        	        const html = `
-        	          <div class="px-2 px-sm-3 py-3 notification-card border-bottom">
-        	            <div class="d-flex align-items-center">
-        	              <div class="avatar avatar-m me-3">
-        	                <img class="rounded-circle" src="/assets/img/team/40x40/avatar.webp" alt="profile">
-        	              </div>
-        	              <div class="flex-1">
-        	                
-        	                <p class="fs-9 text-body-highlight mb-2">${message}</p>
-        	                <p class="fs-10 text-body-tertiary">
-        	                  <i class="fas fa-clock"></i> ${time}
-        	                </p>
-        	              </div>
-        	            </div>
-        	          </div>
-        	        `;
-        	        container.insertAdjacentHTML("beforeend", html);
-        	      });
-
-        	      document.getElementById("notificationDot").style.display = "none"; // 빨간 점 없애기
-        	    })
-        	    .catch(error => {
-        	      console.error("알림 불러오기 실패:", error);
-        	    });
-        	});
+    		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+			
+			  // 알림 목록 불러오기
+			  document.getElementById("notificationBell").addEventListener("click", function () {
+			    fetch("/notification/data")
+			      .then(response => response.json())
+			      .then(data => {
+			        const container = document.getElementById("notificationListContainer");
+			        container.innerHTML = "";
+			
+			        if (data.length === 0) {
+			          container.innerHTML = '<div class="p-3 text-center text-muted">새로운 알림이 없습니다.</div>';
+			          return;
+			        }
+			
+			        // 최신순 정렬
+			        data.sort((a, b) => new Date(b.alarm_reg_date) - new Date(a.alarm_reg_date));
+			
+			        data.forEach(notification => {
+			          const separator = notification.separator || "";
+			          let message = "";
+			
+			          if (separator.startsWith('A')) {
+			            message = "새로운 회사 일정이 등록되었습니다.";
+			          } else {
+			            message = "새로운 팀 일정이 등록되었습니다.";
+			          }
+			
+			          const time = notification.alarm_reg_date
+			            ? (() => {
+			                const date = new Date(notification.alarm_reg_date);
+			                const hours = date.getHours();
+			                const minutes = date.getMinutes().toString().padStart(2, '0');
+			                const period = hours >= 12 ? '오후' : '오전';
+			                const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+			                const datePart = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+			                return `${period} ${hour12}:${minutes} / ${datePart}`;
+			              })()
+			            : "시간 정보 없음";
+			
+			          const isUnread = notification.alarm_read_yn === "N"; // 읽지 않은 알림 여부
+			
+			          const style = isUnread 
+			            ? "background-color: #ffffff; font-weight: bold;"  // 읽지 않은 알림 스타일
+			            : "background-color: #f8f9fa; opacity: 0.7;";       // 읽은 알림 스타일
+			
+			          const html = `
+			            <div class="px-2 px-sm-3 py-3 notification-card border-bottom"
+			                 data-alarm-id="${notification.alarm_id}"
+			                 style="${style}">
+			              <div class="d-flex align-items-center">
+			                <div class="avatar avatar-m me-3">
+			                  <img class="rounded-circle" src="/assets/img/team/40x40/avatar.webp" alt="profile">
+			                </div>
+			                <div class="flex-1">
+			                  <p class="fs-9 text-body-highlight mb-2">${message}</p>
+			                  <p class="fs-10 text-body-tertiary">
+			                    <i class="fas fa-clock"></i> ${time}
+			                  </p>
+			                </div>
+			              </div>
+			            </div>
+			          `;
+			          container.insertAdjacentHTML("beforeend", html);
+			        });
+			
+			        // 종 눌렀으면 빨간점 없애기
+			        const notificationDot = document.getElementById("notificationDot");
+			        if (notificationDot) {
+			          notificationDot.style.display = "none";
+			        }
+			      })
+			      .catch(error => {
+			        console.error("알림 불러오기 실패:", error);
+			      });
+			  });
+			
+			  //  알림 클릭하면 읽음 처리 + calendar 이동
+			  const notificationListContainer = document.getElementById("notificationListContainer");
+			  if (notificationListContainer) {
+			    notificationListContainer.addEventListener("click", function (e) {
+			      const alarmItem = e.target.closest('[data-alarm-id]');
+			      if (alarmItem) {
+			        const alarmId = alarmItem.getAttribute('data-alarm-id');
+			        if (alarmId) {
+			          fetch(`/notification/read/${alarmId}`, {
+			            method: 'PATCH',
+			            headers: {
+			              'Content-Type': 'application/json',
+			              [document.querySelector('meta[name="_csrf_header"]').content]: document.querySelector('meta[name="_csrf"]').content
+			            }
+			          })
+			          .then(response => {
+			            if (response.ok) {
+			              window.location.href = "/calendar"; // 읽음 성공하면 캘린더로 이동
+			            } else {
+			              console.error('읽음 처리 실패');
+			            }
+			          })
+			          .catch(error => console.error('읽음 처리 에러:', error));
+			        }
+			      }
+			    });
+			  }
+			
+			});
 			</script>
+
       </nav>
 </th:block>
 </html>

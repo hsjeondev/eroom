@@ -79,6 +79,24 @@ public class CalendarAlarmService {
 
 		      return result;
 		  }
+		  
+		  @Transactional
+		  public void markAsRead(Long alarmId) {
+		      CalendarAlarm target = calendarAlarmRepository.findById(alarmId).orElse(null);
+
+		      if (target != null && "N".equals(target.getAlarmReadYn())) {
+		          CalendarAlarm updated = CalendarAlarm.builder()
+		              .alarmId(target.getAlarmId())
+		              .calendarNo(target.getCalendarNo())
+		              .employeeNo(target.getEmployeeNo())
+		              .separator(target.getSeparator())
+		              .alarmReadYn("Y") // 'N'을 'Y'로 변경
+		              .alarmRegDate(target.getAlarmRegDate())
+		              .build();
+
+		          calendarAlarmRepository.save(updated);
+		      }
+		  }
 	}
 
 

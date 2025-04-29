@@ -1,10 +1,14 @@
 package com.eroom.notification.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.notification.CalendarAlarmService;
@@ -33,4 +37,23 @@ public class NotificationController {
 	    public List<CalendarAlarmDto> getNotificationData() {
 	        return calendarAlarmService.getUnreadCompanyAlarms();
 	    }
+	  
+	  @PatchMapping("/notification/read/{alarmId}")
+	  @ResponseBody
+	  public Map<String, String> readNotification(@PathVariable("alarmId") Long alarmId) {
+	      Map<String, String> result = new HashMap<>();
+	      result.put("res_code", "500");
+	      result.put("res_msg", "읽음 처리 실패");
+
+	      try {
+	          calendarAlarmService.markAsRead(alarmId);
+	          result.put("res_code", "200");
+	          result.put("res_msg", "읽음 처리 성공");
+	      } catch (Exception e) {
+	          e.printStackTrace(); // 서버 콘솔에 에러 출력
+	      }
+
+	      return result;
+	  }
+
 }

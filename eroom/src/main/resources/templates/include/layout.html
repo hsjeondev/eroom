@@ -133,6 +133,23 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 		    });
 		  }
 		});
+		
+		document.addEventListener('DOMContentLoaded', function () {
+			  const notificationDot = document.getElementById('notificationDot');
+			  
+			  if (notificationDot) {
+			    fetch("/notification/data")
+			      .then(response => response.json())
+			      .then(data => {
+			        if (data.length > 0) {
+			          notificationDot.style.display = "block";  // 읽지 않은 알림 있으면 빨간 점 켜기
+			        } else {
+			          notificationDot.style.display = "none";   // 없으면 빨간 점 끄기
+			        }
+			      })
+			      .catch(error => console.error('초기 알림 조회 실패:', error));
+			  }
+			});
 		</script>
 	
 	
