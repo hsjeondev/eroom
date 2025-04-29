@@ -3,7 +3,9 @@ package com.eroom.drive.service;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -495,7 +497,27 @@ public class DriveService {
 	    }
 	    return drive;
 	}
+	// ------------------------- 드라이브 세부정보 카드 통계 -------------------------------
+	// 개인 드라이브 요약 정보
+	public Map<String, Object> getPersonalDriveSummary(Long employeeNo) {
+	    Map<String, Object> result = new HashMap<>();
+	    
+	    String separatorCode = "E001";
+	    
+	    Long totalSize = driveRepository.sumDriveSizeByUploaderAndSeparatorCode(employeeNo, separatorCode);
+	    Long fileCount = driveRepository.countDriveFilesByUploaderAndSeparatorCode(employeeNo, separatorCode);
 
+	    result.put("totalSize", totalSize); // bytes
+	    result.put("fileCount", fileCount);
+
+	    return result;
+	}
+	// 개인 드라이브 파일 사용량
+	public Long getTotalSizeForPersonalDrive(Long employeeNo) {
+	    return driveRepository.getTotalDriveSizeByEmployeeNo(employeeNo);
+	}
+
+	
 	
 	// ------------------------- 결재 파일 업로드 --------------------------
 	public int uploadApprovalAttachFiles(DriveDto driverDto, Long employeeNo) {
