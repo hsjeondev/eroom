@@ -129,22 +129,21 @@ public class ProjectTodoService {
 	    int result = 0;
 
 	    try {
-	        // 1. 수정할 대상 리스트 조회
 	        ProjectTodoList target = projectTodoListRepository.findById(projectTodoListNo).orElse(null);
 	        if (target == null) return 0;
 
-	        // 2. 이름과 색상만 수정
 	        target.setListName(listName);
 	        target.setListColor(listColor);
 
-	        // 3. 기준 리스트/위치가 없는 경우 → 위치 변경 없이 저장만
 	        if (position == null || standardListId == null) {
 	            projectTodoListRepository.save(target);
 	            return 1;
 	        }
 
-	        // 4. 전체 리스트 조회
-	        List<ProjectTodoList> todoList = projectTodoListRepository.findByProjectNoOrderByListSequenceAsc(projectNo);
+	        // ✅ 수정된 부분: visibleYn = 'Y' 조건 추가
+	        List<ProjectTodoList> todoList = projectTodoListRepository
+	                .findByProjectNoAndVisibleYnOrderByListSequenceAsc(projectNo, "Y");
+
 	        Long stdId = Long.valueOf(standardListId);
 	        int stdSeq = -1;
 
@@ -156,37 +155,25 @@ public class ProjectTodoService {
 	        }
 
 	        int oldSeq = target.getListSequence();
-
-	        // 5. 새 시퀀스 계산 (뒤로 이동 시 보정 포함)
 	        int stdPos = Integer.parseInt(position);
-	        int newSeq;
+	        int newSeq = (stdPos == 1) ? stdSeq : (stdSeq < oldSeq ? stdSeq + 1 : stdSeq);
 
-	        if (stdPos == 1) {
-	            newSeq = stdSeq;
-	        } else {
-	            newSeq = (stdSeq < oldSeq) ? stdSeq + 1 : stdSeq;
-	        }
-
-	        // 이동이 없는 경우 → 이름/색상만 저장
 	        if (newSeq == oldSeq) {
 	            projectTodoListRepository.save(target);
 	            return 1;
 	        }
 
-	        // 6. 다른 리스트들 시퀀스 조정
 	        for (ProjectTodoList item : todoList) {
 	            if (item.getProjectTodoListNo().equals(projectTodoListNo)) continue;
 
 	            int seq = item.getListSequence();
 
 	            if (newSeq < oldSeq) {
-	                // 앞으로 이동: newSeq <= seq < oldSeq → seq + 1
 	                if (seq >= newSeq && seq < oldSeq) {
 	                    item.setListSequence(seq + 1);
 	                    projectTodoListRepository.save(item);
 	                }
 	            } else {
-	                // 뒤로 이동: oldSeq < seq <= newSeq → seq - 1
 	                if (seq > oldSeq && seq <= newSeq) {
 	                    item.setListSequence(seq - 1);
 	                    projectTodoListRepository.save(item);
@@ -194,7 +181,6 @@ public class ProjectTodoService {
 	            }
 	        }
 
-	        // 7. 대상 리스트 새 시퀀스 설정 및 저장
 	        target.setListSequence(newSeq);
 	        projectTodoListRepository.save(target);
 
@@ -205,6 +191,8 @@ public class ProjectTodoService {
 
 	    return result;
 	}
+
+
 
 
 
