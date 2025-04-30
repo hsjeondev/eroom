@@ -14,6 +14,7 @@ public interface MailRepository extends JpaRepository<Mail, Long>{
 //	List<Mail> findBySenderEmployeeNo(Long employeeNo);
 	// 최신순
 	//List<Mail> findBySenderEmployeeNoOrderByMailSentTimeDesc(Long employeeNo);
+	/*
 	@Query("SELECT m FROM Mail m " +
 		       "WHERE m.sender.employeeNo = :employeeNo " +
 		       "AND m.mailNo NOT IN (SELECT d.mail.mailNo FROM MailDraft d) " +
@@ -26,7 +27,21 @@ public interface MailRepository extends JpaRepository<Mail, Long>{
 		       "AND m.mailNo NOT IN (SELECT d.mail.mailNo FROM MailDraft d) " +
 		       "ORDER BY m.mailSentTime ASC")
 		List<Mail> findSentMailsOldest(@Param("employeeNo") Long employeeNo);
-	
+	*/
+	@Query("SELECT m FROM Mail m " +
+		       "WHERE m.sender.employeeNo = :employeeNo " +
+		       "AND m.mailVisibleYn = 'Y' " +
+		       "AND m.mailNo NOT IN (SELECT d.mail.mailNo FROM MailDraft d) " +
+		       "ORDER BY m.mailSentTime DESC")
+		List<Mail> findSentMailsLatest(@Param("employeeNo") Long employeeNo);
+
+		// 오래된 순
+		@Query("SELECT m FROM Mail m " +
+		       "WHERE m.sender.employeeNo = :employeeNo " +
+		       "AND m.mailVisibleYn = 'Y' " +
+		       "AND m.mailNo NOT IN (SELECT d.mail.mailNo FROM MailDraft d) " +
+		       "ORDER BY m.mailSentTime ASC")
+		List<Mail> findSentMailsOldest(@Param("employeeNo") Long employeeNo);
 	 Optional<Mail> findById(Long mailNo);
 	
 	// 임시 보관함
