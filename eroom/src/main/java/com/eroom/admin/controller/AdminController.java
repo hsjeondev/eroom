@@ -318,7 +318,7 @@ public class AdminController {
 	    AttendanceDto dto = attendanceService.findAttendanceByNo(attendanceNo);
 	    return dto;
 	}
-	
+	// 회원 근태 정보 수정
 	@PostMapping("attendanceUpdate")
 	@ResponseBody
 	public Map<String, Object> updateAttendance(@RequestParam("attendance_no") Long attendanceNo,

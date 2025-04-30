@@ -163,7 +163,7 @@ public class EmployeeService {
 		
 		// 현재 로그인한 사용자 정보 가져오기
 		EmployeeDetails employeeDetail = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String creatorName = employeeDetail.getEmployee().getEmployeeName(); // 주소록 생성한 이름
+		String creatorName = employeeDetail.getEmployee().getEmployeeId(); // 주소록 생성한 아이디
 		
 		// 부서명, 팀명 설정
 		String departmentName = "-";
@@ -289,7 +289,7 @@ public class EmployeeService {
 				
 				// 현재 로그인 사용자 정보를 editor로 저장
 				EmployeeDetails employeeDetail = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-				String editorName = employeeDetail.getEmployee().getEmployeeName();
+				String editorName = employeeDetail.getEmployee().getEmployeeId();
 				directory.setDirectoryEditor(editorName);
 
 				employeeDirectoryRepository.save(directory);
