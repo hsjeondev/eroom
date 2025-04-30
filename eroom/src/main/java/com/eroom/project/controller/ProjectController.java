@@ -109,35 +109,49 @@ public class ProjectController {
 	public String detailProjectTodoView(@PathVariable("project_no") Long project_no, Model model) {
 	    
 	    ProjectDto project = projectService.findByProjectNo(project_no);
-	    List<ProjectTodoListDto> projectTodoList = projectTodoService.findByProjectNo(project_no);
-	    
-	    // ✅ 여기 수정: for문으로 돌린다
-	    for (ProjectTodoListDto list : projectTodoList) {
-	        for (ProjectTodoElementDto element : list.getProjectTodoElements()) {
-	            int totalCount = 0;
-	            int completedCount = 0;
-	            
-	            if (element.getTodo_element_details() != null) {
-	                for (var detail : element.getTodo_element_details()) {
-	                    if ("Y".equals(detail.getVisible_yn())) { // visible_yn = 'Y' 인 경우만
-	                        totalCount++;
-	                        if ("Y".equals(detail.getStatus())) { // visible_yn이면서 status = 'Y' 인 경우
-	                            completedCount++;
+	    List<ProjectTodoListDto> allLists = projectTodoService.findByProjectNoWithElementCount(project_no);
+
+	    List<ProjectTodoListDto> projectTodoList = new ArrayList<>();
+
+	    for (ProjectTodoListDto list : allLists) {
+	        if ("Y".equals(list.getVisible_yn())) {
+	            // 할 일 요소 중 visible_yn = "Y"인 것만 필터링
+	            List<ProjectTodoElementDto> visibleElements = new ArrayList<>();
+
+	            for (ProjectTodoElementDto element : list.getProjectTodoElements()) {
+	                if ("Y".equals(element.getVisible_yn())) {
+	                    int totalCount = 0;
+	                    int completedCount = 0;
+
+	                    if (element.getTodo_element_details() != null) {
+	                        for (var detail : element.getTodo_element_details()) {
+	                            if ("Y".equals(detail.getVisible_yn())) {
+	                                totalCount++;
+	                                if ("Y".equals(detail.getStatus())) {
+	                                    completedCount++;
+	                                }
+	                            }
 	                        }
 	                    }
+
+	                    element.setTotalCount(totalCount);
+	                    element.setCompletedCount(completedCount);
+	                    visibleElements.add(element);
 	                }
 	            }
 
-	            element.setTotalCount(totalCount);
-	            element.setCompletedCount(completedCount);
+	            list.setProjectTodoElements(visibleElements);
+	            projectTodoList.add(list);
 	        }
 	    }
-	    
+
 	    model.addAttribute("project", project);
 	    model.addAttribute("projectTodoList", projectTodoList);
-	    
+
 	    return "project/projectDetailTodoTab";
 	}
+
+
 
 
 	
