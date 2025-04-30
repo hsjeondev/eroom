@@ -16,6 +16,7 @@ public class WebSocketConfig implements WebSocketConfigurer{
 	private final ChatWebSocketHandler chatWebSocketHandler;
 	private final ApprovalWebSocketHandler approvalWebSocketHandler;
 	private final CompanyAlarmSocketHandler companyAlarmSocketHandler;
+	private final TeamAlarmSocketHandler teamAlarmSocketHandler;
 	
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -34,5 +35,11 @@ public class WebSocketConfig implements WebSocketConfigurer{
 		registry.addHandler(companyAlarmSocketHandler, "/ws/company")
         .addInterceptors(new CustomHandshakeInterceptor())
         .setAllowedOrigins("http://localhost:8080");
+		
+		 registry.addHandler(teamAlarmSocketHandler, "/ws/team")
+         .addInterceptors(new CustomHandshakeInterceptor())
+         .setAllowedOrigins("http://localhost:8080");
+		
+		
 	}
 }

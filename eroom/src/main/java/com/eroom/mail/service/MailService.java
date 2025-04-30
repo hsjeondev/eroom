@@ -50,9 +50,16 @@ public class MailService {
 	    String plainText = content.replaceAll("<[^>]*>", ""); // HTML 태그 제거
 	    return plainText.length() > 30 ? plainText.substring(0, 30) + "..." : plainText;
 	}
-	
-	
-	
+	// 답장 작성 페이지 이름 넘기려고 쓰는 메소드
+	public Employee getSenderInfoByMailNo(Long mailNo) {
+	    Long senderEmpNo = mailRepository.findSenderEmployeeNoByMailNo(mailNo);
+	    return employeeRepository.findById(senderEmpNo)
+	        .orElseThrow(() -> new RuntimeException("작성자 정보 없음"));
+	}
+	// 임시저장 파일 조회
+	public List<Drive> findFilesByMailNo(Long mailNo) {
+	    return driveRepository.findBySeparatorCodeAndParam1AndVisibleYn("FL002", mailNo, "Y");
+	}
 	
 	// 메일no로 임시 저장 조회
 	public List<MailDraft> findReceiversByMailNo(Long mailNo) {
@@ -95,14 +102,14 @@ public class MailService {
 	    mailReceiverRepository.deleteByIdAndEmployeeNo(employeeNo, mailReceiverNo);
 	}
 	
-	// 디테일 조회할때 읽음 컬럼 N => Y로 업데이트
+	// 디테일 조회할때 읽음 컬럼 N => Y로 업데이트*/
 	@Transactional
 	public Mail selectMailOne(Long employeeNo,Long id) {
 		
 	    mailReceiverRepository.updateReadYn(employeeNo,id); // 읽음 처리
 		return mailRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("메일을 찾을 수 없습니다."));
 	}
-	*/
+	
 	// 다운로드 파일 정보 
 	public Drive findAttachmentById(Long driveId) {
 	    return driveRepository.findById(driveId)
@@ -212,8 +219,9 @@ public class MailService {
 	// 받은 메일 조회
 	/*public List<MailReceiver> getReceivedMailsByEmployee(Long employeeNo) {
         return mailReceiverRepository.findByEmployeeNo(employeeNo);
-    }*/
-	/*테이블 바뀐 뒤 주석 처리
+    }
+    테이블 바뀐 뒤 주석 처리
+    */
 	public List<MailReceiver> getReceivedMailsByEmployee(Long employeeNo, String sortOrder) {
 			List<MailReceiver> resultList = null;
 		
@@ -224,9 +232,9 @@ public class MailService {
 		}
 		// 휴지통 Y여부 확인해서 걸러줌
 		
-		return filterNotDeletedMails(resultList);
+		return resultList;
 	}
-	*/
+	
     // 본인 메일 조회
 //	public List<Mail> findMailsBySender(Long employeeNo) {
 //	    return mailRepository.findBySenderEmployeeNo(employeeNo);
@@ -319,6 +327,7 @@ public class MailService {
 		try {
 			// 보낸 메일 저장 ( mail에 제목, 내용 저장)
 			Mail mailEntity = mailDto.toEntity();
+			mailEntity.setMailSentTime(LocalDateTime.now());
 			Mail mailSaver = mailRepository.save(mailEntity);
 			 
 			
@@ -352,7 +361,7 @@ public class MailService {
 			
 			if (mailDraftYn.equals("Y")) {
 			    // 기존 임시 저장된 메일 찾기
-			    List<MailDraft> existingDraft = mailDraftRepository.findByMailNo(mailDto.getMail_no());
+			    /*List<MailDraft> existingDraft = mailDraftRepository.findByMailNo(mailDto.getMail_no());
 
 			    if (existingDraft != null && !existingDraft.isEmpty()) {
 			        // 기존 임시 저장된 메일이 있으면 업데이트
@@ -366,21 +375,21 @@ public class MailService {
 			                }
 			            }
 			        }
-			    } else {
+			    } else {*/
 			        // 기존에 저장된 메일이 없으면 새로 저장
-			        if (receiverNos != null && !receiverNos.isEmpty()) {
-			            for (Long receiverNo : receiverNos) {
+			        /*if (receiverNos != null && !receiverNos.isEmpty()) {
+			            for (Long receiverNo : receiverNos) {*/
 			                MailDraftDto mailDraftDto = new MailDraftDto();
 			                mailDraftDto.setMail_no(mailSaver.getMailNo()); // 메일 번호
-			                mailDraftDto.setEmployee_no(receiverNo); // 수신자
+			                //mailDraftDto.setEmployee_no(receiverNo); // 수신자
 			                mailDraftDto.setMail_draft_time(LocalDateTime.now()); // 현재 시간
 
 			                MailDraft mailDraft = mailDraftDto.toEntity();
 			                mailDraftRepository.save(mailDraft); // 새로 저장
 			            }
-			        }
-			    }
-			}
+			       // }
+			   // }
+			//}
 			
 		        // 참조자 ( 수신자랑 같은 방향으로 저장 )
 //		        List<Long> ccNos = mailDto.getCc_no(); // 참조자 리스트

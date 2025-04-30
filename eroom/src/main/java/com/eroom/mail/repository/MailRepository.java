@@ -41,4 +41,8 @@ public interface MailRepository extends JpaRepository<Mail, Long>{
 		       "AND m.mailNo IN (SELECT d.mail.mailNo FROM MailDraft d WHERE d.mail.mailNo = m.mailNo) " + // 해당 메일이 임시 저장된 메일인지 확인
 		       "ORDER BY m.mailSentTime ASC")  // 오래된 순
 		List<Mail> findDraftMailsOldest(@Param("employeeNo") Long employeeNo);
+	 
+	// 답장 
+	 @Query("SELECT m.sender.employeeNo FROM Mail m WHERE m.mailNo = :mailNo")
+	 Long findSenderEmployeeNoByMailNo(@Param("mailNo") Long mailNo);
 }
