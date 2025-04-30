@@ -26,7 +26,9 @@ public class ApprovalSignatureDto {
 	private String approval_signature_name; // 결재 서명 이름
 //	private byte[] approval_signature_blob; // 결재 서명 이미지 바이너리저장
 	private String signature_data_url;      // 클라이언트 전송용 Base64 URL
+	private String approval_signature_visible_yn; // 사용여부
 	private Long employee_no;
+	
 
 	public ApprovalSignatureDto toDto(ApprovalSignature entity) {
 		// 이미지 바이트 배열을 Base64 문자열로 인코딩하고 data URL 형태로 조합
@@ -36,6 +38,7 @@ public class ApprovalSignatureDto {
 				.approval_signature_no(entity.getApprovalSignatureNo())
 				.approval_signature_name(entity.getApprovalSignatureName())
 				.signature_data_url(dataUrl)
+				.approval_signature_visible_yn(entity.getApprovalSignatureVisibleYn())
 				.build();
 	}
 	
@@ -50,6 +53,7 @@ public class ApprovalSignatureDto {
 				.approvalSignatureNo(approval_signature_no)
 				.approvalSignatureName(approval_signature_name)
 				.approvalSignatureBlob(blob)
+				.approvalSignatureVisibleYn(approval_signature_visible_yn)
 				.build(); 
 	}
 }

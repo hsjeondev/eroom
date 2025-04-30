@@ -40,7 +40,7 @@ public class ApprovalSignature {
 	@Column(name="approval_signature_no")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long approvalSignatureNo; // 결재 서명 번호
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name="employee_no")
 	private Employee employee;
 	@Column(name = "approval_signature_name")
@@ -52,5 +52,7 @@ public class ApprovalSignature {
 	private LocalDateTime approvalSignatureRegDate; // 결재 서명 등록일
 	@Column(name = "approval_signature_mod_date", insertable = false, updatable = false)
 	private LocalDateTime approvalSignatureModDate; // 결재 서명 수정일
+	@Column(name = "approval_signature_visible_yn")
+	private String approvalSignatureVisibleYn; // 사용 여부
 	
 }

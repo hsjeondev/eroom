@@ -1,5 +1,7 @@
 package com.eroom.project.entity;
 
+import java.util.List;
+
 import com.eroom.employee.entity.Employee;
 
 import jakarta.persistence.Column;
@@ -9,13 +11,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -47,4 +49,8 @@ public class ProjectTodoElement {
 	
 	@Column(name="element_sequence")
 	private int elementSequence;
+	
+	@OneToMany(mappedBy = "projectTodoElement")
+	private List<ProjectTodoElementDetail> todoElementDetails;
+
 }

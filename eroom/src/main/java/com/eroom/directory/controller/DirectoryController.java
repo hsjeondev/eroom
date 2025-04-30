@@ -5,15 +5,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
-import com.eroom.directory.service.EmployeeDirectoryService;
+import com.eroom.directory.service.DirectoryService;
+import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.StructureService;
+import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,14 +28,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DirectoryController {
 	
-	private final EmployeeDirectoryService employeeDirectoryService;
+	private final DirectoryService directoryService;
 	private final StructureService structureService;
 	
 
 	@GetMapping("/directory/employee")
-	public String selectDirectoryEmployeeList(Model model) {
+	public String selectDirectoryEmployeeList(@RequestParam(name="deptId",required=false) Long deptId, @RequestParam(name="teamId",required=false) Long teamId,Model model) {
 		List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
-		List<Directory> temp = employeeDirectoryService.selectDirectoryEmployeeAllBySeparatorCode();
+		List<Directory> temp = directoryService.selectDirectoryEmployeeAllBySeparatorCode();
 		
 		// 직원 리스트를 가져와서 DTO로 변환
 		for(Directory t : temp) {
@@ -77,18 +84,41 @@ public class DirectoryController {
 	}
 	@GetMapping("/directory/partner")
 	public String selectDirectoryPartnerList(Model model) {
-//		List<EmployeeDirectoryDto> resultList = new ArrayList<EmployeeDirectoryDto>();
-//		List<EmployeeDirectory> temp = employeeDirectoryService.selectDirectoryAll();
-//		
-//		for(EmployeeDirectory t : temp) {
-//			EmployeeDirectoryDto dto = new EmployeeDirectoryDto();
-//			resultList.add(dto.toDto(t));
-//		}
-//		
-//		model.addAttribute("resultList", resultList);
+		List<DirectoryDto> resultList = new ArrayList<DirectoryDto>();
+		List<Directory> temp = directoryService.selectDirectoryPartner();
+		
+		for(Directory t : temp) {
+			DirectoryDto dto = new DirectoryDto();
+			resultList.add(dto.toDto2(t));
+//			System.out.println(t.getDirectoryNo() + ": 디렉토리넘버!");
+		}
+		model.addAttribute("resultList", resultList);
 		
 		return "directory/partnerList";
-//		return "directory/sample";
+	}
+	
+	@PostMapping("/directory/partner/create")
+	@ResponseBody
+	public Map<String, String> createPartner(@RequestBody Map<String, String> formData, Authentication authentication){
+		EmployeeDetails employeeDetail = (EmployeeDetails)authentication.getPrincipal();
+		Employee employee = employeeDetail.getEmployee();
+				
+		
+		
+		Map<String, String> map = new HashMap<String, String>();
+
+	    
+	    map.put("res_code", "500");
+	    map.put("res_msg", "협력업체 인원 추가를 실패했습니다.");
+	    
+	    int result = directoryService.createPartner(formData, employee);
+		
+	    if(result > 0) {
+	    	map.put("res_code", "200");
+	    	map.put("res_msg", "협력업체 인원 추가가 완료되었습니다.");
+	    }
+		
+		return map;
 	}
 	
 }

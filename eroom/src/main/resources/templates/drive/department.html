@@ -69,7 +69,7 @@
   
   </div>
 
-  <div id="tableExample3" data-list='{"valueNames":["filename","filesize","description","writer","date","download"],"page":5,"pagination":true}'>
+  <div id="tableExample3" data-list='{"valueNames":["filename","filesize","description","writer","date","download"],"page":10,"pagination":true}'>
     
     <!-- 검색창 -->
     <div class="search-box mb-3 mx-auto">
@@ -109,7 +109,22 @@
         <tbody class="list">
 			<tr th:each="file : ${fileList}" th:attr="data-id=${file.driveAttachNo}">
             <td class="align-middle ps-3"><input class="form-check-input row-checkbox" type="checkbox" /></td>
-            <td class="align-middle"><img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" width="24" height="24" alt="파일" /></td>
+            <td>
+			  <img th:if="${file.driveType == '.pdf'}"
+			       th:src="@{/assets/img/icons/pdf.png}" width="24" height="24" />
+			  <img th:if="${file.driveType == '.jpg'}"
+			       th:src="@{/assets/img/icons/jpg.png}" width="24" height="24" />
+			  <img th:if="${file.driveType == '.png'}"
+			       th:src="@{/assets/img/icons/png.png}" width="24" height="24" />
+			  <img th:if="${file.driveType == '.docx'}"
+			       th:src="@{/assets/img/icons/word.png}" width="24" height="24" />
+			  <img th:if="${file.driveType == '.xlsx'}"
+			       th:src="@{/assets/img/icons/excel.png}" width="24" height="24" />
+			  <img th:if="${file.driveType == '.zip'}"
+			       th:src="@{/assets/img/icons/zip.com.png}" width="24" height="24" />
+			  <img th:if="${file.driveType != '.pdf' and file.driveType != '.jpg' and file.driveType != '.png' and file.driveType != '.docx' and file.driveType != '.xlsx' and file.driveType != '.zip'}"
+			       th:src="@{/assets/img/icons/file.png}" width="24" height="24" />
+			</td>
             <td class="align-middle filename" th:text="${file.driveOriName}">파일명</td>
             <td class="align-middle filesize" th:text="${#numbers.formatDecimal(file.driveSize / 1024.0, 0, 1)} + ' KB'">크기</td>
             <td class="align-middle description" th:text="${file.driveDescription} ?: '-'">-</td>
@@ -141,6 +156,7 @@
         </tbody>
       </table>
     </div>
+    <!-- 파일수정 모달 -->
 	<div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true">
 	  <div class="modal-dialog">
 	    <form id="editFileForm" enctype="multipart/form-data">
@@ -223,24 +239,44 @@
   	        acceptedFiles: ".jpg,.png,.pdf,.xlsx,.docx,.zip",
   	        maxFilesize: 10,
   	        previewTemplate: `
-  	          <div class="card shadow-sm mb-2 p-2 border d-flex flex-row align-items-center" style="width: 100%; max-width: 720px;">
-  	            <img data-dz-thumbnail style="width: 48px; height: 48px; object-fit: cover;" class="rounded me-2" />
-  	            <div class="flex-grow-1">
-  	              <div class="fw-bold text-truncate" data-dz-name></div>
-  	              <small class="text-muted" data-dz-size></small>
-  	              <input type="text" class="form-control form-control-sm mt-1" name="driveDescriptions" placeholder="파일 설명 입력" />
-  	            </div>
-  	            <button data-dz-remove class="btn btn-sm btn-outline-danger ms-2" title="삭제">
-  	              <i class="fas fa-times"></i>
-  	            </button>
-  	          </div>
-  	        `
+	        	<div class="card shadow-sm mb-2 p-2 border d-flex flex-row align-items-center" style="width: 100%; max-width: 720px;">
+	            <div class="me-2" style="width: 48px; height: 48px;">
+	              <img data-dz-thumbnail 
+	                   style="width: 100%; height: 100%; object-fit: cover;" 
+	                   class="rounded file-icon" />
+	            </div>
+	            <div class="flex-grow-1">
+	              <div class="fw-bold text-truncate" data-dz-name></div>
+	              <small class="text-muted" data-dz-size></small>
+	              <input type="text" class="form-control form-control-sm mt-1" name="driveDescriptions" placeholder="파일 설명 입력" />
+	            </div>
+	            <button data-dz-remove class="btn btn-sm btn-outline-danger ms-2" title="삭제">
+	              <i class="fas fa-times"></i>
+	            </button>
+	          </div>
+	        `
   	      });
 
   	      document.getElementById("upload-confirm-btn").addEventListener("click", function () {
   	        dz.processQueue();
   	      });
+  	      dz.on("addedfile", function (file) {
+	    	  const ext = file.name.split('.').pop().toLowerCase();
+	    	  const iconMap = {
+	    	    pdf: "/assets/img/icons/pdf.png",
+	    	    docx: "/assets/img/icons/word.png",
+	    	    xlsx: "/assets/img/icons/excel.png",
+	    	    zip: "/assets/img/icons/zip.com.png"
+	    	  };
 
+	    	  if (!file.type.startsWith("image/") && iconMap[ext]) {
+	    	    const previewEl = file.previewElement;
+	    	    const imgEl = previewEl.querySelector(".file-icon");
+	    	    if (imgEl) {
+	    	      imgEl.src = iconMap[ext];
+	    	    }
+	    	  }
+	    	});
   	      dz.on("sending", function (file, xhr, formData) {
   	        document.getElementById("upload-confirm-btn").disabled = true;
   	        const previews = document.querySelectorAll('.dz-preview');
