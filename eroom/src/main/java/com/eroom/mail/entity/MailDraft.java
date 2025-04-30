@@ -42,8 +42,8 @@ public class MailDraft {
     @JoinColumn(name = "mail_no")  // mail 테이블과 연결되는 외래키
     private Mail mail;
 	
-	@ManyToOne
-    @JoinColumn(name = "employee_no")  // employee 테이블의 employee_no 컬럼 참조
-    private Employee employee;  // 초안을 저장한 작성자
+//	@ManyToOne
+//    @JoinColumn(name = "employee_no")  // employee 테이블의 employee_no 컬럼 참조
+//    private Employee employee;  // 초안을 저장한 작성자
 	
 }

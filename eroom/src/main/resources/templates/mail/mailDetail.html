@@ -58,7 +58,7 @@
                     </div>
                     <div class="row pb-11 border-bottom mb-4 gx-0 gy-2 border-translucent">
 					    <div th:each="attachment : ${attachments}" class="col-auto me-3">
-					        <a class="text-decoration-none d-flex align-items-center" th:href="@{'/mail/download/' + ${attachment.driveAttachNo}}">
+					        <a class="text-decoration-none d-flex align-items-center" th:href="@{'/mail/file/download/' + ${attachment.driveAttachNo}}">
 					            <!-- 파일 아이콘 -->
 					            <div class="btn-icon btn-icon-xl border rounded-3 text-body-quaternary text-opacity-75 flex-column me-2">
 					                <span class="fa-solid fa-file fs-8 mb-1"></span>
@@ -76,7 +76,10 @@
                     <div class="d-flex justify-content-between">
                       <button class="btn btn-phoenix-secondary me-1 text-nowrap px-2 px-sm-4">전달<span class="fa-solid fa-reply ms-2 fs-10"></span></button>
                       <button class="btn btn-phoenix-secondary me-1 text-nowrap px-2 px-sm-4">Reply All<span class="fa-solid fa-reply-all ms-2 fs-10"></span></button>
-                      <button class="btn btn-phoenix-secondary ms-auto text-nowrap px-2 px-sm-4">답장<span class="fa-solid fa-share ms-2 fs-10"></span></button>
+                      <a class="btn btn-phoenix-secondary ms-auto text-nowrap px-2 px-sm-4" 
+					        th:href="@{/mail/mailCreateReply/{id}(id=${mail.mailNo})}">답장
+					    <span class="fa-solid fa-share ms-2 fs-10"></span>
+					</a>
                     </div>
                   </div>
                 </div>

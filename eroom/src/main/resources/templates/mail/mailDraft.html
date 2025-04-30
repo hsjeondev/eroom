@@ -84,7 +84,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                     <div class="col-auto">
                     	 <div class="text-body-emphasis fw-bold inbox-link fs-9 senderName">
                     	 	<!-- 붉은 글씨  -->
-                    	 	<span >임시저장됨</span>
+                    	 	<span style="color: #d9534f; font-weight: bold;">임시저장됨</span>
+                    	 	<span th:text="${draftMail.mailTitle}"></span>
                     	 	<!-- <span th:with="size=${#lists.size(draftMail.receivers)}">
                     	 	<span th:if="${size == 1}" th:text="${draftMail.receivers[0].receiver.employeeName}"></span>
 					        <span th:if="${size > 1}">
@@ -133,7 +134,9 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                   		<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"  th:utext="${draftMail.mailContent}"></span>
                     </a> -->
                     <!-- <a th:href="@{/mail/draft/{id}(id=${draftMail.mailNo})}">test</a> -->
-                    <a th:href="@{/mail/mailCreate(mailNo=${draftMail.mailNo})}">임시 저장 메일 제목</a>
+                    <a class="d-block inbox-link" th:href="@{/mail/mailCreateDraft/{id}(id=${draftMail.mailNo})}">
+                    	<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"  th:utext="${draftMail.mailContent}"></span>
+                    </a>
                   </div>
                 </div>
 					</div>
