@@ -693,7 +693,9 @@
 		    const chatroomNo = target.dataset.roomNo;
 		    const isGroup = target.dataset.group === "Y";
 		    const chatroomNameEl = target.querySelector('.name');
-		    const chatroomName = chatroomNameEl ? chatroomNameEl.innerText.trim() : "채팅방";
+		    const chatroomName = chatroomNameEl
+		    ? chatroomNameEl.innerText.trim()
+		    : target.innerText?.trim() || "채팅방"; 
 		    lastSelectedChatroomName = chatroomName;
 			// 기본 채팅 영역 숨기기
 		    const defaultArea = document.getElementById("default-chat-area");
