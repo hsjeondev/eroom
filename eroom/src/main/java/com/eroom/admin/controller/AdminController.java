@@ -318,7 +318,7 @@ public class AdminController {
 	    AttendanceDto dto = attendanceService.findAttendanceByNo(attendanceNo);
 	    return dto;
 	}
-	
+	// 회원 근태 정보 수정
 	@PostMapping("attendanceUpdate")
 	@ResponseBody
 	public Map<String, Object> updateAttendance(@RequestParam("attendance_no") Long attendanceNo,
@@ -405,6 +405,23 @@ public class AdminController {
 			resultMap.put("res_msg", "회원 정보 수정 중 오류가 발생했습니다.");
 		}
 		
+		return resultMap;
+	}
+	
+	// 회원 삭제 
+	@PostMapping("/deleteEmployee")
+	@ResponseBody
+	public Map<String,Object> deleteEmployee(@RequestBody EmployeeUpdateDto dto){
+		Map<String,Object> resultMap = new HashMap<>();
+		try {
+			employeeService.deleteEmployee(dto);
+			resultMap.put("res_code", 200);
+			resultMap.put("res_msg", "회원이 정상적으로 퇴사 처리되었습니다.");
+		}catch(Exception e) {
+			e.printStackTrace();
+			resultMap.put("res_code", 500);
+			resultMap.put("res_msg", "회원 퇴사 처리 중 오류가 발생했습니다.");
+		}
 		return resultMap;
 	}
 	

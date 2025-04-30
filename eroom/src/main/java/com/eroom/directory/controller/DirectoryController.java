@@ -33,7 +33,11 @@ public class DirectoryController {
 	
 
 	@GetMapping("/directory/employee")
-	public String selectDirectoryEmployeeList(@RequestParam(name="deptId",required=false) Long deptId, @RequestParam(name="teamId",required=false) Long teamId,Model model) {
+	public String selectDirectoryEmployeeList(@RequestParam(name="deptId",required=false) Long deptId, @RequestParam(name="teamId",required=false) Long teamId,Model model, Authentication authentication) {
+//		EmployeeDetails employeeDetail = (EmployeeDetails)authentication.getPrincipal();
+//		Employee employee = employeeDetail.getEmployee();
+//		model.addAttribute("employee", employee);
+		
 		List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
 		List<Directory> temp = directoryService.selectDirectoryEmployeeAllBySeparatorCode();
 		
@@ -82,6 +86,11 @@ public class DirectoryController {
 		
 		return "directory/employeeList";
 	}
+
+	
+	
+	
+	
 	@GetMapping("/directory/partner")
 	public String selectDirectoryPartnerList(Model model) {
 		List<DirectoryDto> resultList = new ArrayList<DirectoryDto>();
