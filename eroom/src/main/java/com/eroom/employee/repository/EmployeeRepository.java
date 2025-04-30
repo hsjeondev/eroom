@@ -53,5 +53,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 	// 사번 최대값 가져오기
 	@Query("SELECT MAX(e.employeeNo) FROM Employee e")
 	Long findMaxEmployeeNo();
+	
+	
 
 }
