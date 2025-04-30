@@ -20,7 +20,7 @@ import com.eroom.attendance.entity.AnnualLeave;
 import com.eroom.attendance.service.AttendanceService;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
-import com.eroom.directory.service.EmployeeDirectoryService;
+import com.eroom.directory.service.DirectoryService;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.StructureService;
@@ -35,7 +35,7 @@ public class AttendanceController {
 	
 	private final AttendanceService attendanceService;
 	private final StructureService structureService;
-	private final EmployeeDirectoryService employeeDirectoryService;
+	private final DirectoryService employeeDirectoryService;
 	
 	// 근태 페이지 목록
 	@GetMapping("/list")
