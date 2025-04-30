@@ -187,7 +187,8 @@ td.name p {
 									            data-team=${member.team_name}, 
 									            data-phone=${member.directory_phone}, 
 									            data-email=${member.directory_email}, 
-									            data-position=${member.employee_position}">
+									            data-position=${member.employee_position},
+									            data-targetEmpNo=${member.employee_no}">
 																			
 
 												<div class="avatar avatar-m me-2">
@@ -437,17 +438,35 @@ td.name p {
 				<script>
 					document.addEventListener('DOMContentLoaded', function () {
 					  const modal = document.getElementById('profileModal');
-					
+					  
+					  
 					  modal.addEventListener('show.bs.modal', function (event) {
 					    const trigger = event.relatedTarget; // 클릭한 <a> 요소
-					
+						
+					    const targetEmpNo = trigger.getAttribute('data-targetEmpNo') || null;
 					    const name = trigger.getAttribute('data-name') || '이름없음';
 					    const dept = trigger.getAttribute('data-dept') || '-';
 					    const team = trigger.getAttribute('data-team') || '-';
 					    const phone = trigger.getAttribute('data-phone') || '-';
 					    const email = trigger.getAttribute('data-email') || '-';
 					    const position = trigger.getAttribute('data-position') || '-';
-					
+						
+					    // 사원 메모 조회 (AJAX GET)
+					    if (targetEmpNo) {
+					      fetch(`/directoryMemo/${targetEmpNo}`)
+					        .then(res => res.json())
+					        .then(data => {
+					          if (data.res_code === '200') {
+					            modal.querySelector('#memo').value = data.memo || '';
+					          } else {
+					            modal.querySelector('#memo').value = '';
+					          }
+					        })
+					        .catch(() => {
+					          modal.querySelector('#memo').value = '';
+					        });
+					    }
+					    
 					    // 모달 안의 요소에 값 넣기
 					    modal.querySelector('.profile-name').textContent = name;
 					    modal.querySelector('.profile-dept-team').textContent = `${dept} (${team})`;
