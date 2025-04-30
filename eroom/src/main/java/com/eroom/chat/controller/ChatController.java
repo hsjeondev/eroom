@@ -311,19 +311,21 @@ public class ChatController {
 	@ResponseBody
 	public Map<String, String> uploadChatDriveFiles(
 	        DriveDto driveDto,
-	        @RequestParam("files") List<MultipartFile> files,
+	        @RequestParam("driveFiles") List<MultipartFile> files,
 	        @RequestParam("chatroomNo") Long chatroomNo,
 	        @RequestParam("driveDescriptions") List<String> driveDescriptions,
 	        @AuthenticationPrincipal EmployeeDetails user) {
+		
 		System.out.println("🔥 업로드 요청 수신됨");
-	    System.out.println("files: " + files); // null or empty?
+		System.out.println("files: " + (files != null ? files.size() : "null"));
+		
 	    Map<String, String> resultMap = new HashMap<>();
 	    resultMap.put("res_code", "500");
 	    resultMap.put("res_msg", "업로드 실패");
 
 	    try {
-	    	driveDto.setFiles(files);
 	        // 필수 값 세팅
+	    	driveDto.setDriveFiles(files);
 	        driveDto.setSeparatorCode("FL003"); // 채팅 파일용 코드
 	        driveDto.setUploaderNo(user.getEmployee().getEmployeeNo()); // 업로더
 	        driveDto.setDriveDescriptions(driveDescriptions);

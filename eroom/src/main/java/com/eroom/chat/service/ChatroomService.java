@@ -176,6 +176,7 @@ public class ChatroomService {
 
 
 	// 채팅 파일 업로드
+	@Transactional
 	public int uploadChatFiles(DriveDto driveDto, Long employeeNo) {
 	    int result = 0;
 
@@ -208,9 +209,10 @@ public class ChatroomService {
 	            file.transferTo(savedFile);
 
 	            String description = (descriptions != null && descriptions.size() > i) ? descriptions.get(i) : null;
-
+	            Employee uploader = employeeRepository.findById(employeeNo)
+	            	    .orElseThrow(() -> new RuntimeException("업로더를 찾을 수 없습니다."));
 	            Drive drive = Drive.builder()
-	                .uploader(Employee.builder().employeeNo(employeeNo).build())
+	                .uploader(uploader)
 	                .separatorCode("FL003")
 	                .driveOriName(oriName)
 	                .driveNewName(newName)
@@ -222,6 +224,15 @@ public class ChatroomService {
 	                .downloadCount(0L)
 	                .visibleYn("Y")
 	                .build();
+	            System.out.println("▶ 저장할 드라이브:");
+	            System.out.println("  driveOriName = " + drive.getDriveOriName());
+	            System.out.println("  driveNewName = " + drive.getDriveNewName());
+	            System.out.println("  driveType = " + drive.getDriveType());
+	            System.out.println("  drivePath = " + drive.getDrivePath());
+	            System.out.println("  driveSize = " + drive.getDriveSize());
+	            System.out.println("  uploader = " + (drive.getUploader() != null ? drive.getUploader().getEmployeeNo() : "null"));
+	            System.out.println("  separatorCode = " + drive.getSeparatorCode());
+	            System.out.println("  param1 (chatroomNo) = " + drive.getParam1());
 
 	            driveRepository.save(drive);
 	            result++;

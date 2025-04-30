@@ -1208,7 +1208,7 @@ if (timePreview) {
         formData.append("chatroomNo", chatroomNo);
         formData.append("driveDescriptions", message || "");  // 메시지 -> 설명에 저장
         for (let file of fileInput.files) {
-            formData.append("files", file); 
+            formData.append("driveFiles", file); 
         }
 
         fetch("/chat/upload/chat", {
