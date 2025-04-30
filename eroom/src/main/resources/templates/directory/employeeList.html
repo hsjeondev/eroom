@@ -170,13 +170,25 @@ td.name p {
 										<th class="sort" data-sort="dept" style="width: 10%;">부서</th>
 										<th class="sort" data-sort="team" style="width: 10%;">팀</th>
 										<th class="sort" data-sort="date" style="width: 15%;">입사일</th>
-										<th style="width: 5%"></th>
+										<!-- <th style="width: 5%"></th> -->
 									</tr>
 								</thead>
 								<tbody class="list align-middle" id="customers-table-body">
 									<tr th:each="member, memberStatus : ${employeeList}">
 										<td class="no" th:text="${memberStatus.count}">1</td>
-										<td class="name"><a class="d-flex align-items-center text-body-emphasis ps-5" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
+										<td class="name">
+										<!-- <a class="d-flex align-items-center text-body-emphasis ps-5" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"> -->
+										<a class="d-flex align-items-center text-body-emphasis ps-5"
+									   href="#"
+									   data-bs-toggle="modal"
+									   data-bs-target="#profileModal"
+									   th:attr="data-name=${member.employee_name}, 
+									            data-dept=${member.department_name}, 
+									            data-team=${member.team_name}, 
+									            data-phone=${member.directory_phone}, 
+									            data-email=${member.directory_email}, 
+									            data-position=${member.employee_position}">
+																			
 
 												<div class="avatar avatar-m me-2">
 													<img class="rounded-circle" src="../../../assets/img/team/23.webp" alt="">
@@ -190,7 +202,7 @@ td.name p {
 										<td class="dept" th:text="${member.department_name != null ? member.department_name : '-'}">부서명</td>
 										<td class="team" th:text="${member.team_name != null ? member.team_name : '-'}">팀명</td>
 										<td class="date" th:if="${member.employee.employeeEmploymentYn == 'Y'}" th:text="${member.formatted_hire_date}">입사일</td>
-										<td class="text-end pe-0">
+										<!-- <td class="text-end pe-0">
 											<div class="btn-reveal-trigger position-static">
 												<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
 													<i class="fas fa-ellipsis fs-10"></i>
@@ -201,146 +213,9 @@ td.name p {
 													<a class="dropdown-item text-danger" href="#!">삭제</a>
 												</div>
 											</div>
-										</td>
+										</td> -->
 									</tr>
 
-									<!-- 
-									나머지 사원도 동일 형식으로 추가
-									<tr>
-										<td class="no">2</td>
-										<td class="name"><a class="d-flex align-items-center text-body-emphasis ps-5" href="#">
-												<div class="avatar avatar-m me-2">
-													<img class="rounded-circle" src="../../../assets/img/team/65.webp" alt="">
-												</div>
-												<p class="mb-0 fw-bold text-truncate">권용규</p>
-										</a></td>
-										<td class="mail"><a class="fw-semibold" href="mailto:annac34@gmail.com">kykdev2@gmail.com</a></td>
-										<td class="phone">01045687443</td>
-										<td class="job">주임</td>
-										<td class="dept">제품부</td>
-										<td class="team">기획팀</td>
-										<td class="date">2023.09.09</td>
-										<td class="text-end pe-0">
-											<div class="btn-reveal-trigger position-static">
-												<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-													<i class="fas fa-ellipsis fs-10"></i>
-												</button>
-												<div class="dropdown-menu dropdown-menu-end py-2">
-													<a class="dropdown-item" href="#!">수정</a>
-													<div class="dropdown-divider"></div>
-													<a class="dropdown-item text-danger" href="#!">삭제</a>
-												</div>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td class="no">3</td>
-										<td class="name"><a class="d-flex align-items-center text-body-emphasis ps-5" href="#">
-												<div class="avatar avatar-m me-2">
-													<img class="rounded-circle" src="../../../assets/img/team/4.webp" alt="">
-												</div>
-												<p class="mb-0 fw-bold text-truncate">이예준</p>
-										</a></td>
-										<td class="mail"><a class="fw-semibold" href="mailto:annac34@gmail.com">devlyj77@gmail.com</a></td>
-										<td class="phone">01098972216</td>
-										<td class="job">사원</td>
-										<td class="dept">영업부</td>
-										<td class="team">영업팀</td>
-										<td class="date">2024.07.18</td>
-										<td class="text-end pe-0">
-											<div class="btn-reveal-trigger position-static">
-												<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-													<i class="fas fa-ellipsis fs-10"></i>
-												</button>
-												<div class="dropdown-menu dropdown-menu-end py-2">
-													<a class="dropdown-item" href="#!">수정</a>
-													<div class="dropdown-divider"></div>
-													<a class="dropdown-item text-danger" href="#!">삭제</a>
-												</div>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td class="no">4</td>
-										<td class="name"><a class="d-flex align-items-center text-body-emphasis ps-5" href="#">
-												<div class="avatar avatar-m me-2">
-													<img class="rounded-circle" src="../../../assets/img/team/69.webp" alt="">
-												</div>
-												<p class="mb-0 fw-bold text-truncate">전홍식</p>
-										</a></td>
-										<td class="mail"><a class="fw-semibold" href="mailto:annac34@gmail.com">jhsdev98@gmail.com</a></td>
-										<td class="phone">01037825587</td>
-										<td class="job">과장</td>
-										<td class="dept">기술부</td>
-										<td class="team">개발팀</td>
-										<td class="date">2022.03.25</td>
-										<td class="text-end pe-0">
-											<div class="btn-reveal-trigger position-static">
-												<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-													<i class="fas fa-ellipsis fs-10"></i>
-												</button>
-												<div class="dropdown-menu dropdown-menu-end py-2">
-													<a class="dropdown-item" href="#!">수정</a>
-													<div class="dropdown-divider"></div>
-													<a class="dropdown-item text-danger" href="#!">삭제</a>
-												</div>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td class="no">5</td>
-										<td class="name"><a class="d-flex align-items-center text-body-emphasis ps-5" href="#">
-												<div class="avatar avatar-m me-2">
-													<img class="rounded-circle" src="../../../assets/img/team/26.webp" alt="">
-												</div>
-												<p class="mb-0 fw-bold text-truncate">조윤아</p>
-										</a></td>
-										<td class="mail"><a class="fw-semibold" href="mailto:annac34@gmail.com">862yuna@gmail.com</a></td>
-										<td class="phone">01027049297</td>
-										<td class="job">대리</td>
-										<td class="dept">제품부</td>
-										<td class="team">디자인팀</td>
-										<td class="date">2023.07.21</td>
-										<td class="text-end pe-0">
-											<div class="btn-reveal-trigger position-static">
-												<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-													<i class="fas fa-ellipsis fs-10"></i>
-												</button>
-												<div class="dropdown-menu dropdown-menu-end py-2">
-													<a class="dropdown-item" href="#!">수정</a>
-													<div class="dropdown-divider"></div>
-													<a class="dropdown-item text-danger" href="#!">삭제</a>
-												</div>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td class="no">6</td>
-										<td class="name"><a class="d-flex align-items-center text-body-emphasis ps-5" href="#">
-												<div class="avatar avatar-m me-2">
-													<img class="rounded-circle" src="../../../assets/img/team/3.webp" alt="">
-												</div>
-												<p class="mb-0 fw-bold text-truncate">조은성</p>
-										</a></td>
-										<td class="mail"><a class="fw-semibold" href="mailto:annac34@gmail.com">devces@gmail.com</a></td>
-										<td class="phone">01068879925</td>
-										<td class="job">과장</td>
-										<td class="dept">운영부</td>
-										<td class="team">영업지원팀</td>
-										<td class="date">2022.03.25</td>
-										<td class="text-end pe-0">
-											<div class="btn-reveal-trigger position-static">
-												<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-													<i class="fas fa-ellipsis fs-10"></i>
-												</button>
-												<div class="dropdown-menu dropdown-menu-end py-2">
-													<a class="dropdown-item" href="#!">수정</a>
-													<div class="dropdown-divider"></div>
-													<a class="dropdown-item text-danger" href="#!">삭제</a>
-												</div>
-											</div>
-										</td>
-									</tr> -->
 								</tbody>
 							</table>
 						</div>
@@ -375,24 +250,6 @@ td.name p {
 							</div>
 							<div class="modal-body px-4">
 								<form>
-									<!-- 
-									이름
-									<div class="mb-3">
-										<label for="name" class="form-label fw-semibold">이름</label> <input type="text" class="form-control form-control-sm" id="name" placeholder="홍길동">
-									</div>
-									전화번호
-									<div class="mb-3">
-										<label for="phone" class="form-label fw-semibold">전화번호</label> <input type="text" class="form-control form-control-sm" id="phone" placeholder="010-1234-5678">
-									</div>
-									이메일
-									<div class="mb-3">
-										<label for="email" class="form-label fw-semibold">이메일</label> <input type="text" class="form-control form-control-sm" id="email" placeholder="example@email.com">
-									</div>
-									생년월일
-									<div class="mb-3">
-										<label for="birth" class="form-label fw-semibold">생년월일</label> <input type="text" class="form-control form-control-sm" id="birth" placeholder="YYYYMMDD">
-									</div> -->
-
 									<!-- 부서 -->
 									<div class="mb-3">
 										<label for="dept" class="form-label fw-semibold">부서</label> <select class="form-select form-select-sm" id="dept">
@@ -406,30 +263,6 @@ td.name p {
 									<div class="mb-3">
 										<label for="teamName" class="form-label fw-semibold">팀명</label> <input type="text" class="form-control form-control-sm" id="teamName" placeholder="ㅇㅇ팀">
 									</div>
-
-									<!-- 
-									팀
-									<div class="mb-3">
-										<label for="team" class="form-label fw-semibold">팀</label> <select class="form-select form-select-sm" id="team">
-											<option selected>선택</option>
-											<option value="인사팀">인사팀</option>
-											<option value="개발팀">개발팀</option>
-											<option value="영업팀">영업팀</option>
-										</select>
-									</div> -->
-									<!-- 
-									직급
-									<div class="mb-3">
-										<label for="job" class="form-label fw-semibold">직급</label> <select class="form-select form-select-sm" id="job">
-											<option selected>선택</option>
-											<option value="사원">사원</option>
-											<option value="주임">주임</option>
-											<option value="대리">대리</option>
-											<option value="과장">과장</option>
-											<option value="차장">차장</option>
-											<option value="부장">부장</option>
-										</select>
-									</div> -->
 								</form>
 							</div>
 							<div class="modal-footer py-2">
@@ -440,7 +273,7 @@ td.name p {
 					</div>
 				</div>
 
-				<!-- ✅ Confirm Modal -->
+				<!--  Confirm Modal -->
 				<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
 					<div class="modal-dialog modal-dialog-centered">
 						<div class="modal-content border border-2 border-secondary-subtle shadow">
@@ -457,39 +290,6 @@ td.name p {
 					</div>
 				</div>
 
-				<!-- 
-				(이름 클릭시)회원 정보 모달
-				프로필 모달
-				<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
-					<div class="modal-dialog modal-dialog-centered">
-						<div class="modal-content p-4">
-
-							오른쪽 상단 아이콘
-							<a href="#" class="position-absolute top-0 end-0 mt-3 me-3 text-body-secondary"> <i class="fas fa-user-circle fa-lg"></i>
-							</a>
-
-							프로필 사진
-							<div class="text-center">
-								<img src="/assets/img/team/23.webp" alt="프로필" class="rounded-circle mb-3" style="width: 100px; height: 100px;">
-								<h5 class="fw-bold mb-1">전홍식</h5>
-								<p class="mb-1 text-muted">기술부 개발팀 부장</p>
-								<div class="d-flex justify-content-center align-items-center mb-3">
-									<i class="fas fa-phone me-2 text-muted"></i> <span class="text-muted">+1234567890</span>
-								</div>
-							</div>
-
-							<hr>
-
-							하단 버튼 영역
-							<div class="d-flex justify-content-around">
-								<a href="#" class="text-decoration-none text-center text-dark"> <i class="fas fa-envelope fa-lg mb-1"></i><br> <span class="small">메일 보내기</span>
-								</a> <a href="#" class="text-decoration-none text-center text-dark"> <i class="fas fa-comment-dots fa-lg mb-1"></i><br> <span class="small">1:1 채팅하기</span>
-								</a>
-							</div>
-
-						</div>
-					</div>
-				</div> -->
 				<!-- (이름 클릭시)회원 정보 모달 -->
 				<!-- 프로필 상세 모달 -->
 				<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
@@ -498,7 +298,9 @@ td.name p {
 
 							<!-- 닫기 & 별표 버튼 -->
 							<div class="position-absolute top-0 end-0 mt-2 me-2 d-flex gap-2">
-								<a href="#" class="text-warning" title="즐겨찾기"> <i class="fas fa-star"></i>
+								<a href="#" class="text-warning" title="즐겨찾기"> 
+								<i class="far fa-star"></i>
+								<i class="fas fa-star"></i>
 								</a>
 								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
@@ -506,23 +308,23 @@ td.name p {
 							<!-- 프로필 정보 -->
 							<div class="text-center mb-4">
 								<img src="/assets/img/team/23.webp" alt="프로필" class="rounded-circle mb-2" style="width: 100px; height: 100px;">
-								<h5 class="fw-bold mb-0">강성관</h5>
-								<p class="text-muted small mb-0">운영부 (경영지원팀)</p>
+								<h5 class="fw-bold mb-0 profile-name">강성관</h5>
+								<p class="text-muted small mb-0 profile-dept-team">운영부 (경영지원팀)</p>
 							</div>
 
 							<!-- 전화번호 / 이메일 / 직급 -->
 							<div class="border rounded p-3 mb-4 bg-light-subtle">
 								<div class="mb-2">
 									<label class="form-label fw-semibold mb-0">휴대전화번호</label>
-									<div class="ps-2">010-1234-1234</div>
+									<div class="ps-2 profile-phone">010-1234-1234</div>
 								</div>
 								<div class="mb-2">
 									<label class="form-label fw-semibold mb-0">이메일</label>
-									<div class="ps-2">goodee24@gmail.com</div>
+									<div class="ps-2 profile-email">goodee24@gmail.com</div>
 								</div>
 								<div>
 									<label class="form-label fw-semibold mb-0">직급</label>
-									<div class="ps-2">대표</div>
+									<div class="ps-2 profile-position">대표</div>
 								</div>
 							</div>
 
@@ -630,7 +432,32 @@ td.name p {
 						});
 					});
 				</script>
-
+				
+				<!-- 해당 사원의 이름을 클릭시 해당 사원의 데이터를 모달 안으로 전달해주는 JS -->
+				<script>
+					document.addEventListener('DOMContentLoaded', function () {
+					  const modal = document.getElementById('profileModal');
+					
+					  modal.addEventListener('show.bs.modal', function (event) {
+					    const trigger = event.relatedTarget; // 클릭한 <a> 요소
+					
+					    const name = trigger.getAttribute('data-name') || '이름없음';
+					    const dept = trigger.getAttribute('data-dept') || '-';
+					    const team = trigger.getAttribute('data-team') || '-';
+					    const phone = trigger.getAttribute('data-phone') || '-';
+					    const email = trigger.getAttribute('data-email') || '-';
+					    const position = trigger.getAttribute('data-position') || '-';
+					
+					    // 모달 안의 요소에 값 넣기
+					    modal.querySelector('.profile-name').textContent = name;
+					    modal.querySelector('.profile-dept-team').textContent = `${dept} (${team})`;
+					    modal.querySelector('.profile-phone').textContent = phone;
+					    modal.querySelector('.profile-email').textContent = email;
+					    modal.querySelector('.profile-position').textContent = position;
+					  });
+					});
+				</script>
+								
 
 
 
