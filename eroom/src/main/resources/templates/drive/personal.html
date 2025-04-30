@@ -38,7 +38,7 @@
     <div class="progress-bar bg-primary" style="width: 92%"></div>
   </div>
   <p class="mb-2 text-muted">
-  	<strong id="usedGB">0.0 GB</strong> / 50 GB 사용 중 (<span id="usagePercent">0%</span>)
+    <strong id="usedGB">-</strong> / <span id="totalCapacity">-</span> 사용 중 (<span id="usagePercent">0%</span>)
   </p>
 
   <div class="collapse" id="storageDetailCollapse">
@@ -496,31 +496,41 @@
 		  fetch('/drive/summary/personal')
 		    .then(response => response.json())
 		    .then(data => {
+		    	function formatFromKB(kb) {
+	    		  if (!kb || isNaN(kb)) return '0 KB'; // ← null, undefined, 0 방지
+
+	    		  const units = ['KB', 'MB', 'GB', 'TB'];
+	    		  const i = Math.floor(Math.log(kb) / Math.log(1024));
+	    		  const size = kb / Math.pow(1024, i);
+
+	    		  return `${size.toFixed(1)} ${units[i] || 'KB'}`; 
+	    		}
+
 		      document.getElementById('totalFiles').innerText = data.totalFiles + '개';
 		      document.getElementById('totalDownloads').innerText = data.totalDownloads + '회';
 		      document.getElementById('recentUploadDate').innerText = data.recentUploadDate;
 
-		      const usedGB = parseFloat(data.totalUsedGB);
-		      const totalGB = 50;
-		      const percent = Math.round((usedGB / totalGB) * 100);
-
-		      document.getElementById('usedGB').innerText = `${usedGB.toFixed(3)} GB`;
+		      const usedKB = data.totalUsedKB;
+		      const maxCapacityKB = 50 * 1024 * 1024; 
+		      const percent = Math.round((usedKB / maxCapacityKB) * 100);
+			
+		      document.getElementById('usedGB').innerText = formatFromKB(usedKB);
 		      document.getElementById('usagePercent').innerText = `${percent}%`;
 		      document.querySelector('.progress-bar').style.width = `${percent}%`;
+		      console.log("usedKB =", data.totalUsedKB);
 
-		      const kbToMb = kb => (kb / 1024).toFixed(1) + ' MB';
 		      const typeSizeMap = data.fileTypeUsage || {};
-		      
-		      // 파일 유형별 용량 표시
-		      document.getElementById('sizeZip').innerText = ((typeSizeMap.zip || 0) / 1024).toFixed(3) + ' MB';
-		      document.getElementById('sizeImage').innerText = ((typeSizeMap.image || 0) / 1024).toFixed(3) + ' MB';
-		      document.getElementById('sizeWord').innerText = ((typeSizeMap.docx || 0) / 1024).toFixed(3) + ' MB';
-		      document.getElementById('sizeExcel').innerText = ((typeSizeMap.xlsx || 0) / 1024).toFixed(3) + ' MB';
-		      document.getElementById('sizeEtc').innerText = ((typeSizeMap.etc || 0) / 1024).toFixed(3) + ' MB';
 
+		      document.getElementById('sizeZip').innerText = formatFromKB(typeSizeMap.zip || 0);
+		      document.getElementById('sizeImage').innerText = formatFromKB(typeSizeMap.image || 0);
+		      document.getElementById('sizeWord').innerText = formatFromKB(typeSizeMap.docx || 0);
+		      document.getElementById('sizeExcel').innerText = formatFromKB(typeSizeMap.xlsx || 0);
+		      document.getElementById('sizeEtc').innerText = formatFromKB(typeSizeMap.etc || 0);
+		      document.getElementById('totalCapacity').innerText = formatFromKB(maxCapacityKB);
 		    })
 		    .catch(error => console.error('개인 요약 정보 불러오기 실패:', error));
 		});
+
 
 
   </script>

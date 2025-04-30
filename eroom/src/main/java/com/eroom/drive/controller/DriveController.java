@@ -966,11 +966,196 @@ public class DriveController {
 	    result.put("recentUploadDate", recentDate != null ? recentDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : "-");
 	    result.put("totalUsedGB", totalUsedGB);
 	    result.put("fileTypeUsage", fileTypeUsage); 
+	    result.put("totalUsedKB", totalSizeKB);
+	    return result;
+	}
+	@GetMapping("/summary/department")
+	@ResponseBody
+	public Map<String, Object> getTeamDepartmentSummary(@AuthenticationPrincipal EmployeeDetails user) {
+	    String separatorCode = user.getEmployee().getStructure().getSeparatorCode();
+	    String driveCode = user.getEmployee().getStructure().getParentCode();
+	    List<Drive> drives = driveRepository.findByUploader_Structure_SeparatorCodeAndSeparatorCodeAndVisibleYn(separatorCode, driveCode, "Y");
+
+	    long totalFiles = 0;
+	    long totalDownloads = 0;
+	    long totalSizeKB = 0;
+	    LocalDateTime recentDate = null;
+
+	    Map<String, Long> fileTypeSizeMap = new HashMap<>();
+	    fileTypeSizeMap.put("pdf", 0L);
+	    fileTypeSizeMap.put("image", 0L);
+	    fileTypeSizeMap.put("docx", 0L);
+	    fileTypeSizeMap.put("xlsx", 0L);
+	    fileTypeSizeMap.put("zip", 0L);
+	    fileTypeSizeMap.put("etc", 0L);
+
+	    for (Drive drive : drives) {
+	        totalFiles++;
+	        totalDownloads += drive.getDownloadCount();
+	        totalSizeKB += drive.getDriveSize();
+
+	        String type = drive.getDriveType();
+	        if (type == null) type = "";
+	        type = type.startsWith(".") ? type.toLowerCase() : "." + type.toLowerCase();
+
+	        switch (type) {
+	            case ".pdf" -> fileTypeSizeMap.put("pdf", fileTypeSizeMap.get("pdf") + drive.getDriveSize());
+	            case ".jpg", ".png" -> fileTypeSizeMap.put("image", fileTypeSizeMap.get("image") + drive.getDriveSize());
+	            case ".docx" -> fileTypeSizeMap.put("docx", fileTypeSizeMap.get("docx") + drive.getDriveSize());
+	            case ".xlsx" -> fileTypeSizeMap.put("xlsx", fileTypeSizeMap.get("xlsx") + drive.getDriveSize());
+	            case ".zip" -> fileTypeSizeMap.put("zip", fileTypeSizeMap.get("zip") + drive.getDriveSize());
+	            default -> fileTypeSizeMap.put("etc", fileTypeSizeMap.get("etc") + drive.getDriveSize());
+	        }
+
+	        if (recentDate == null || drive.getDriveRegDate().isAfter(recentDate)) {
+	            recentDate = drive.getDriveRegDate();
+	        }
+	    }
+
+	    Map<String, Double> fileTypeUsage = new HashMap<>();
+	    for (Map.Entry<String, Long> entry : fileTypeSizeMap.entrySet()) {
+	        fileTypeUsage.put(entry.getKey(), entry.getValue() * 1.0); // KB 유지
+	    }
+
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("totalFiles", totalFiles);
+	    result.put("totalDownloads", totalDownloads);
+	    result.put("recentUploadDate", recentDate != null ? recentDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : "-");
+	    result.put("totalUsedKB", totalSizeKB);
+	    result.put("fileTypeUsage", fileTypeUsage);
 
 	    return result;
 	}
+	@GetMapping("/summary/team")
+	@ResponseBody
+	public Map<String, Object> getTeamDriveSummary(@AuthenticationPrincipal EmployeeDetails user) {
+	    String separatorCode = user.getEmployee().getStructure().getSeparatorCode();
+	    String driveCode = user.getEmployee().getStructure().getSeparatorCode();
+	    List<Drive> drives = driveRepository.findByUploader_Structure_SeparatorCodeAndSeparatorCodeAndVisibleYn(separatorCode, driveCode, "Y");
 
-	
+	    long totalFiles = 0;
+	    long totalDownloads = 0;
+	    long totalSizeKB = 0;
+	    LocalDateTime recentDate = null;
+
+	    Map<String, Long> fileTypeSizeMap = new HashMap<>();
+	    fileTypeSizeMap.put("pdf", 0L);
+	    fileTypeSizeMap.put("image", 0L);
+	    fileTypeSizeMap.put("docx", 0L);
+	    fileTypeSizeMap.put("xlsx", 0L);
+	    fileTypeSizeMap.put("zip", 0L);
+	    fileTypeSizeMap.put("etc", 0L);
+
+	    for (Drive drive : drives) {
+	        totalFiles++;
+	        totalDownloads += drive.getDownloadCount();
+	        totalSizeKB += drive.getDriveSize();
+
+	        String type = drive.getDriveType();
+	        if (type == null) type = "";
+	        type = type.startsWith(".") ? type.toLowerCase() : "." + type.toLowerCase();
+
+	        switch (type) {
+	            case ".pdf" -> fileTypeSizeMap.put("pdf", fileTypeSizeMap.get("pdf") + drive.getDriveSize());
+	            case ".jpg", ".png" -> fileTypeSizeMap.put("image", fileTypeSizeMap.get("image") + drive.getDriveSize());
+	            case ".docx" -> fileTypeSizeMap.put("docx", fileTypeSizeMap.get("docx") + drive.getDriveSize());
+	            case ".xlsx" -> fileTypeSizeMap.put("xlsx", fileTypeSizeMap.get("xlsx") + drive.getDriveSize());
+	            case ".zip" -> fileTypeSizeMap.put("zip", fileTypeSizeMap.get("zip") + drive.getDriveSize());
+	            default -> fileTypeSizeMap.put("etc", fileTypeSizeMap.get("etc") + drive.getDriveSize());
+	        }
+
+	        if (recentDate == null || drive.getDriveRegDate().isAfter(recentDate)) {
+	            recentDate = drive.getDriveRegDate();
+	        }
+	    }
+
+	    Map<String, Double> fileTypeUsage = new HashMap<>();
+	    for (Map.Entry<String, Long> entry : fileTypeSizeMap.entrySet()) {
+	        fileTypeUsage.put(entry.getKey(), entry.getValue() * 1.0); // KB 유지
+	    }
+
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("totalFiles", totalFiles);
+	    result.put("totalDownloads", totalDownloads);
+	    result.put("recentUploadDate", recentDate != null ? recentDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : "-");
+	    result.put("totalUsedKB", totalSizeKB);
+	    result.put("fileTypeUsage", fileTypeUsage);
+
+	    return result;
+	}
+	@GetMapping("/summary/company")
+	@ResponseBody
+	public Map<String, Object> getCompanyDriveSummary(@AuthenticationPrincipal EmployeeDetails user) {
+	    Long employeeNo = user.getEmployee().getEmployeeNo();
+	    String separatorCode = "A001";
+
+	    List<Drive> drives = driveRepository.findBySeparatorCodeAndVisibleYn("A001", "Y");
+
+	    long totalFiles = 0;
+	    long totalDownloads = 0;
+	    long totalSizeKB = 0;
+	    LocalDateTime recentDate = null;
+
+	    // 파일 타입별 크기 (KB단위로 모은다)
+	    Map<String, Long> fileTypeSizeMap = new HashMap<>();
+	    fileTypeSizeMap.put("pdf", 0L);
+	    fileTypeSizeMap.put("image", 0L); // jpg, png
+	    fileTypeSizeMap.put("docx", 0L);
+	    fileTypeSizeMap.put("xlsx", 0L);
+	    fileTypeSizeMap.put("zip", 0L);
+	    fileTypeSizeMap.put("etc", 0L);
+
+	    for (Drive drive : drives) {
+	        totalFiles++;
+	        totalDownloads += drive.getDownloadCount();
+	        totalSizeKB += drive.getDriveSize(); // KB 단위 저장
+
+	        String type = drive.getDriveType();
+	        if (type == null) type = "";
+	        type = type.startsWith(".") ? type.toLowerCase() : "." + type.toLowerCase();
+	        
+	        switch (type.toLowerCase()) {
+	            case ".pdf":
+	                fileTypeSizeMap.put("pdf", fileTypeSizeMap.get("pdf") + drive.getDriveSize());
+	                break;
+	            case ".jpg":
+	            case ".png":
+	                fileTypeSizeMap.put("image", fileTypeSizeMap.get("image") + drive.getDriveSize());
+	                break;
+	            case ".docx":
+	                fileTypeSizeMap.put("docx", fileTypeSizeMap.get("docx") + drive.getDriveSize());
+	                break;
+	            case ".xlsx":
+	                fileTypeSizeMap.put("xlsx", fileTypeSizeMap.get("xlsx") + drive.getDriveSize());
+	                break;
+	            case ".zip":
+	                fileTypeSizeMap.put("zip", fileTypeSizeMap.get("zip") + drive.getDriveSize());
+	                break;
+	            default:
+	                fileTypeSizeMap.put("etc", fileTypeSizeMap.get("etc") + drive.getDriveSize());
+	        }
+	        if (recentDate == null || drive.getDriveRegDate().isAfter(recentDate)) {
+	            recentDate = drive.getDriveRegDate();
+	        }
+	    }
+
+	    double totalUsedGB = totalSizeKB / 1024.0 / 1024.0; // KB → MB → GB
+
+	    // 파일 타입별 GB 변환
+	    Map<String, Double> fileTypeUsage = new HashMap<>();
+	    for (Map.Entry<String, Long> entry : fileTypeSizeMap.entrySet()) {
+	        fileTypeUsage.put(entry.getKey(), entry.getValue() / 1024.0 / 1024.0); // KB → GB
+	    }
+
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("totalFiles", totalFiles);
+	    result.put("totalDownloads", totalDownloads);
+	    result.put("recentUploadDate", recentDate != null ? recentDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : "-");
+	    result.put("totalUsedGB", totalUsedGB);
+	    result.put("fileTypeUsage", fileTypeUsage); 
+	    result.put("totalUsedKB", totalSizeKB);
+	    return result;
+	}
 	// 결재 파일 다운로드 - 개인 다운로드 기능 그대로 가져왔는데 개인 다운로드 기능 변화 없으면 병합 필요(결재의 detail.html a태그 링크만 바꾸면 됨)
 	@GetMapping("/download/approval/{driveAttachNo}")
 	public ResponseEntity<Object> approvalFileDownload(@PathVariable("driveAttachNo") Long id) {
