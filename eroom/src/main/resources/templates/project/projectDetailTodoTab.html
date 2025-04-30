@@ -69,7 +69,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		          <!-- 리스트 이름 -->
 		          <span th:text="${list.list_name}">Review</span>
 		          <!-- 태스크 개수 -->
-		          <span class="kanban-title-badge" >4</span>
+		          <span class="kanban-title-badge" th:text="${list.todoElementCount}">4</span>
 		        </h5>
 		        <div class="hover-actions-trigger">
 		          <button class="btn btn-sm btn-phoenix-default kanban-header-dropdown-btn hover-actions"
@@ -88,9 +88,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		          <div class="dropdown-menu dropdown-menu-end py-2" style="width: 15rem;">
 		            
 		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined"
-		               href="#!"><span>리스트 수정</span></a>
+		            	th:onclick="|findListOne(${list.project_todo_list_no}, ${project.project_no})|"
+		               ><span>리스트 수정</span></a>
 		            <a class="dropdown-item d-flex flex-between-center border-1 border-translucent undefined text-danger"
-		               href="#!"><span>리스트 삭제</span></a>
+		               th:onclick="|deleteListOne(${list.project_todo_list_no})|"><span>리스트 삭제</span></a>
 		          </div>
 		        </div>
 		        <span class="uil uil-left-arrow-to-left fs-8 ms-auto kanban-collapse-icon"
@@ -132,7 +133,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			        </button>
 			
 			        <div class="dropdown-menu dropdown-menu-end py-2" style="width: 5rem;">
-			          <a class="dropdown-item d-flex flex-between-center text-danger" href="#!"><span>할 일 삭제</span></a>
+			          <a class="dropdown-item d-flex flex-between-center text-danger" th:onclick="|deleteTodoElement(${element.todo_no});|"><span>할 일 삭제</span></a>
 			        </div>
 			        <!-- 카드 제목 -->
 			        <p class="mb-0 stretched-link" data-bs-toggle="modal" data-bs-target="#KanbanItemDetailsModal"
@@ -198,8 +199,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		  </div>
 		</div>
         
-		<!-- 모달 창 -->
-		<!-- 모달 창 (기존 부분 그대로 유지) -->
+		<!-- 리스트 추가 모달 -->
 		<div class="modal fade" id="addEventModal" tabindex="-1">
 		  <div class="modal-dialog modal-dialog-centered">
 		    <div class="modal-content border border-translucent">
@@ -316,6 +316,122 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		  </div>
 		</div>
 		
+		<!-- 리스트 수정 모달 -->
+		<div class="modal fade" id="updateListModal" tabindex="-1">
+		  <div class="modal-dialog modal-dialog-centered">
+		    <div class="modal-content border border-translucent">
+		      <form name="updateTodoList">
+		      <input type="hidden" name="project_no" th:value="${project.project_no}">
+		      <input type="hidden" name="project_todo_list_no" />
+		        <!-- 헤더 -->
+		        <div class="modal-header px-card border-0">
+		          <div class="w-100 d-flex justify-content-between align-items-start">
+		            <h5 class="mb-0 lh-sm text-body-highlight">리스트 수정</h5>
+		            <button class="btn p-1 fs-10 text-body" type="button"
+		                    data-bs-dismiss="modal" aria-label="Close">닫기</button>
+		          </div>
+		        </div>
+		
+		        <!-- 바디 -->
+		        <div class="modal-body p-card pt-3">
+		          <!-- 리스트 이름 -->
+		          <div class="mb-3">
+		            <label for="calendarTitle" class="form-label">리스트 이름</label>
+		            <input name="list_name" type="text" class="form-control form-control-sm"
+		                   id="calendarTitle"
+		                   placeholder="리스트 이름" autocomplete="off" />
+		          </div>
+		
+		          <!-- 색상 선택 -->
+		          <div class="mb-3">
+					  <label class="form-label">색상</label>
+					  <div class="d-flex flex-wrap gap-2">
+					    <!-- 10가지 색상 예시 -->
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #e74c3c;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#e74c3c" checked>
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #2ecc71;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#2ecc71">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #3498db;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#3498db">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #f1c40f;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#f1c40f">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #9b59b6;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#9b59b6">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #e67e22;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#e67e22">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #1abc9c;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#1abc9c">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #34495e;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#34495e">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #7f8c8d;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#7f8c8d">
+					    </label>
+					    <label class="form-check form-check-inline color-swatch">
+					      <span class="swatch" style="background-color: #e84393;"></span>
+					      <input class="form-check-input" type="radio"
+					             name="list_color" value="#e84393">
+					    </label>
+					  </div>
+					</div>
+
+		
+		          <!-- 순서 입력 (Input Group 사용) -->
+					<div class="mb-3" 
+					     th:if="${not #lists.isEmpty(projectTodoList)}">
+					  <label class="form-label">삽입 위치</label>
+					  <div class="input-group input-group-sm">
+					    <!-- 앞/뒤 선택 -->
+					    <select name="position" class="form-select">
+					      <option value="0" selected disabled>위치</option>
+					      <option value="1">앞에 추가</option>
+					      <option value="-1">뒤에 추가</option>
+					    </select>
+					
+					    <!-- 기준이 되는 순서 선택 -->
+					    <select name="standard_list_name" class="form-select">
+						  <option value="0" disabled selected>기준 순서 선택</option>
+						  <!-- JS에서 여기에 option을 동적으로 추가할 예정 -->
+						</select>
+
+					  </div>
+					</div>
+		        </div>
+		
+		        <!-- 푸터 -->
+		        <div class="modal-footer border-0">
+		          <button type="submit" class="btn btn-primary px-4">리스트 수정</button>
+		        </div>
+		      </form>
+		    </div>
+		  </div>
+		</div>
+		
 		<!-- 할 일 추가 모달 -->
 		<div class="modal fade" id="kanbanAddTask" tabindex="-1" aria-labelledby="kanbanAddTaskLabel" aria-hidden="true">
 		  <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
@@ -381,13 +497,82 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		  </div>
 		</div>
 		
-		<div class="modal fade" id="KanbanItemDetailsModal" tabindex="-1" aria-hidden="true">
+		<!-- 할 일 수정 모달 -->
+		<div class="modal fade" id="kanbanUpdateTask" tabindex="-1" aria-labelledby="kanbanUpdateTaskLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+		    <div class="modal-content border border-secondary">
+		      <form id="updateTodoForm" name="updateTodoElement">
+		      <input type="hidden" id="updateTodoNo" name="todo_no">
+		        <!-- 모달 헤더 -->
+		        <div class="modal-header bg-light">
+		          <h5 class="modal-title" id="kanbanUpdateTaskLabel">할 일 수정</h5>
+		          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+		        </div>
+		
+		        <!-- 모달 바디 -->
+		        <div class="modal-body px-4 py-3">
+		          
+		          <!-- 1. 리스트 선택 -->
+		          <div class="mb-3">
+		            <label for="updateListSelect" class="form-label fw-semibold">리스트</label>
+		            <select class="form-select" id="updateListSelect" name="project_todo_list_no" required>
+		              <option value="" disabled selected>리스트 선택</option>
+		              <option th:each="projectTodo : ${projectTodoList}"
+		                      th:value="${projectTodo.project_todo_list_no}"
+		                      th:text="${projectTodo.list_name}">
+		              </option>
+		            </select>
+		          </div>
+		
+		          <!-- 2. 할 일 제목 입력 -->
+		          <div class="mb-3">
+		            <label for="updateTodoTitle" class="form-label fw-semibold">할 일 제목</label>
+		            <input type="text" class="form-control" id="updateTodoTitle" name="todo_title" placeholder="할 일 제목을 입력하세요" required>
+		          </div>
+		
+		          <!-- 3. 담당자 선택 -->
+		          <div class="mb-3">
+		            <label for="updateEmployeeSelect" class="form-label fw-semibold">담당자</label>
+		            <select class="form-select" id="updateEmployeeSelect" name="employee_no" required>
+		              <option value="" disabled selected>담당자 선택</option>
+		              <option th:each="member : ${project.project_members}"
+		                      th:value="${member.project_member.employeeNo}"
+		                      th:text="${member.project_member.employeeName}">
+		              </option>
+		            </select>
+		          </div>
+		
+		          <!-- 4. 긴급 여부 체크 -->
+		          <div class="form-check mb-3">
+		            <input class="form-check-input" type="checkbox" value="Y" id="updateEmergencyCheck" name="emergency">
+		            <label class="form-check-label" for="updateEmergencyCheck">
+		              긴급 여부
+		            </label>
+		          </div>
+		
+		        </div>
+		
+		        <!-- 모달 푸터 -->
+		        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+		          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+		          <button type="submit" class="btn btn-primary" id="updateTodoBtn">수정</button>
+		        </div>
+		
+		      </form>
+		    </div>
+		  </div>
+		</div>
+
+		<!-- 할 일 보여주는 모달 -->
+		<div class="modal fade" id="KanbanItemDetailsModal" tabindex="0" aria-hidden="true">
 		  <div class="modal-dialog modal-dialog-centered" style="width: 90%; max-width: 600px;">
 		    <div class="modal-content overflow-hidden">
 		      <div class="modal-body p-0">
 		        <div class="row gy-4 py-0 gx-0">
 		          <div class="col-lg-12 col-12">
 		            <div class="row mt-0 gy-4 pb-3 gx-0 px-3">
+		            <input type="hidden" id="todoElementNo" name="todo_element_no">
+		            
 		
 		              <!-- 제목 -->
 		              <div class="col-4 col-sm-3">
@@ -449,7 +634,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		        <button class="btn p-1" type="button" data-bs-dismiss="modal" aria-label="Close">
 		          <span class="fas fa-times fs-10 me-1" data-fa-transform="up-1"></span>닫기
 		        </button>
-		        <button class="btn btn-phoenix-primary px-6" type="button" data-bs-target="#kanbanAddTask" data-bs-toggle="modal">
+		        <button class="btn btn-phoenix-primary px-6" type="button" id="updateTodoButton">
 		          할 일 수정<span class="fas fa-edit ms-2" data-fa-transform="shrink-3"></span>
 		        </button>
 		      </div>
@@ -630,6 +815,13 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		        if (data.res_code === "200") {
 		            const todo = data.res_data;
 		            console.log(todo); // 디버깅용
+		            
+		         	// todoElementNo 숨겨진 필드에 세팅
+		            const todoNoInput = document.getElementById('todoElementNo');
+		            if (todoNoInput) {
+		                todoNoInput.value = todo.todoNo ?? todo.todo_no ?? '';
+		            }
+
 		
 		            // 제목 세팅
 		            const titleElem = document.getElementById('todoElementTitle');
@@ -951,7 +1143,305 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			    alert("세부 할 일 저장 중 오류 발생");
 			  });
 			}
+		</script>
+		
+		<script>
+		const findListOne = function(projectTodoListNo, projectNo) {
+			  fetch("/projectTodo/findProjectTodoListOne", {
+			    method: "POST",
+			    headers: {
+			      "Content-Type": "application/json",
+			      [document.querySelector('meta[name="_csrf_header"]').content]:
+			        document.querySelector('meta[name="_csrf"]').content
+			    },
+			    body: JSON.stringify({ projectTodoListNo, projectNo })
+			  })
+			    .then(res => res.json())
+			    .then(data => {
+			      console.log(data);
+			      if (data.res_code === "200") {
+			        const list = data.res_data;
+			        const allLists = data.res_project_todo_list;
 
+			        const modalElement = document.getElementById("updateListModal");
+
+			        // 리스트 이름 input 채우기
+			        modalElement.querySelector('input[name="list_name"]').value = list.list_name;
+			        modalElement.querySelector('input[name="project_todo_list_no"]').value = list.project_todo_list_no;
+
+			        // 색상 라디오 버튼 체크
+			        const colorRadios = modalElement.querySelectorAll('input[name="list_color"]');
+			        colorRadios.forEach(radio => {
+			          radio.checked = (radio.value === list.list_color);
+			        });
+
+			        // 위치 select
+			        const positionSelect = modalElement.querySelector('select[name="position"]');
+			        if (list.position === "before") {
+			          positionSelect.value = "1";
+			        } else if (list.position === "after") {
+			          positionSelect.value = "-1";
+			        }
+
+			        // 기준 리스트 select (JS 렌더링)
+			        const standardSelect = modalElement.querySelector('select[name="standard_list_name"]');
+			        standardSelect.innerHTML = '<option value="0" disabled selected>기준 순서 선택</option>';
+
+			        allLists.forEach(item => {
+			        	  // 현재 리스트는 제외 (숫자 비교로 변환)
+			        	  if (Number(item.project_todo_list_no) !== Number(list.project_todo_list_no)) {
+			        	    const option = document.createElement('option');
+			        	    option.value = item.project_todo_list_no;
+			        	    option.textContent = `${item.list_name}`;
+			        	    standardSelect.appendChild(option);
+			        	  }
+			        	});
+
+
+			        // 선택 값 세팅
+			        standardSelect.value = list.relative_project_todo_list_no;
+
+			        // 모달 띄우기
+			        const modal = new bootstrap.Modal(modalElement);
+			        modal.show();
+			      } else {
+			        alert("리스트 정보를 불러오지 못했습니다.");
+			      }
+			    })
+			    .catch(error => {
+			      alert("오류 발생: " + error);
+			    });
+			};
+			
+			const updateForm = document.updateTodoList;
+
+			updateForm.addEventListener('submit', function(e) {
+			  e.preventDefault();
+
+			  let vali_check = true;
+			  let vali_text = '';
+
+			  // 1) 리스트 이름 검증
+			  if (!updateForm.list_name.value.trim()) {
+			    vali_text = "리스트 이름을 입력해주세요.";
+			    vali_check = false;
+			  }
+
+			  // 2) position 필드가 있을 때만 검증
+			  if (vali_check && updateForm.position) {
+			    if (updateForm.position.value === '0') {
+			      vali_text = "위치를 선택해주세요.";
+			      vali_check = false;
+			    }
+			  }
+
+			  // 3) 기준 리스트 선택 여부
+			  if (vali_check && updateForm.standard_list_name) {
+			    if (updateForm.standard_list_name.value === '0') {
+			      vali_text = "기준 리스트를 선택해주세요.";
+			      vali_check = false;
+			    }
+			  }
+
+			  if (!vali_check) {
+			    alert(vali_text);
+			    return;
+			  }
+
+			  // 검증 통과하면 전송
+			  const payload = new FormData(updateForm);
+			  fetch("/projectTodo/updateList", {
+			    method: "post",
+			    headers: {
+			      [document.querySelector('meta[name="_csrf_header"]').content]:
+			        document.querySelector('meta[name="_csrf"]').content
+			    },
+			    body: payload
+			  })
+			  .then(res => res.json())
+			  .then(data => {
+			    alert(data.res_msg);
+			    if (data.res_code === "200") location.reload();
+			  })
+			  .catch(() => {
+			    alert("리스트 수정 중 오류가 발생하였습니다.");
+			  });
+			});
+			
+			const deleteListOne = function(projectTodoListNo) {
+				fetch("/projectTodo/deleteList", {
+					method:"post",
+					headers: {
+						"Content-Type": "application/json",
+					      [document.querySelector('meta[name="_csrf_header"]').content]:
+					        document.querySelector('meta[name="_csrf"]').content
+					    },
+					body : JSON.stringify({ projectTodoListNo })
+				})
+				.then(res => res.json())
+				.then(data => {
+					alert(data.res_msg);
+					if(data.res_code == "200") {
+						location.reload();
+					}
+				})
+				.catch(error => {
+					alert(error);
+				})
+			}
+			
+			 const updateTodoElement = function () {
+				  const todoElementNo = document.getElementById('todoElementNo').value;
+
+				  if (!todoElementNo) {
+				    alert("할 일 번호가 없습니다.");
+				    return;
+				  }
+
+				  console.log("수정할 todo 번호:", todoElementNo);
+
+				  // 이후 fetch나 FormData로 활용
+			}
+
+			 const updateButton = document.getElementById("updateTodoButton");
+
+			 if (updateButton) {
+			   updateButton.addEventListener("click", function () {
+			     const todoElementNo = document.getElementById("todoElementNo").value;
+
+			     if (!todoElementNo) {
+			       alert("할 일 번호가 없습니다.");
+			       return;
+			     }
+			     
+			     // 1. 기존 모달 닫기
+			     const currentModal = bootstrap.Modal.getInstance(document.getElementById("KanbanItemDetailsModal"));
+			     if (currentModal) {
+			       currentModal.hide();
+			     }
+
+			     console.log("수정할 todo 번호:", todoElementNo);
+
+			     fetch("/projectTodo/findTodoElementOne", {
+			       method: "POST",
+			       headers: {
+			         "Content-Type": "application/json",
+			         [document.querySelector('meta[name="_csrf_header"]').content]:
+			           document.querySelector('meta[name="_csrf"]').content
+			       },
+			       body: JSON.stringify({ todoElementNo: todoElementNo })
+			     })
+			       .then(res => res.json())
+			       .then(data => {
+			         if (data.res_code === "200") {
+			           const todo = data.res_data;
+			           console.log("가져온 수정 데이터:", todo);
+			           
+			           let hiddenInputTodo = document.querySelector('#updateTodoForm input[name="todo_no"]');
+			           if (!hiddenInputTodo) {
+			        	   hiddenInputTodo = document.createElement("input");
+			        	   hiddenInputTodo.type = "hidden";
+			        	   hiddenInputTodo.name = "todo_no"; // 👈 이걸로 통일
+			        	   hiddenInputTodo.value = todo.todo_no;
+			             document.getElementById("updateTodoForm").appendChild(hiddenInputTodo);
+			           } else {
+			        	   hiddenInputTodo.value = todo.todo_no;
+			           }
+
+
+			           // 1. 리스트 선택
+			           const listSelect = document.getElementById("updateListSelect");
+			           if (listSelect) listSelect.value = todo.project_todo_list_no;
+
+			           // 2. 제목
+			           const titleInput = document.getElementById("updateTodoTitle");
+			           if (titleInput) titleInput.value = todo.todo_title;
+
+			           // 3. 담당자
+			           const employeeSelect = document.getElementById("updateEmployeeSelect");
+					   if (employeeSelect) employeeSelect.value = Number(todo.employee_no);
+
+
+			           // 4. 긴급 여부
+			           const emergencyCheck = document.getElementById("updateEmergencyCheck");
+			           if (emergencyCheck) emergencyCheck.checked = (todo.emergency === "Y");
+
+			           // 5. 히든 필드에 todo 번호 저장 (form 전송에 필요)
+			           let hiddenInput = document.querySelector('#updateTodoForm input[name="todo_element_no"]');
+			           if (!hiddenInput) {
+			             hiddenInput = document.createElement("input");
+			             hiddenInput.type = "hidden";
+			             hiddenInput.name = "todo_element_no";
+			             hiddenInput.value = todo.todo_no;
+			             document.getElementById("updateTodoForm").appendChild(hiddenInput);
+			           } else {
+			             hiddenInput.value = todo.todo_no;
+			           }
+
+			           // 6. 모달 띄우기
+			           const modal = new bootstrap.Modal(document.getElementById("kanbanUpdateTask"));
+			           modal.show();
+			         } else {
+			           alert("할 일 정보를 불러오지 못했습니다.");
+			         }
+			       })
+			       .catch(err => {
+			         console.error("에러 발생:", err);
+			         alert("할 일 정보를 가져오는 중 오류가 발생했습니다.");
+			       });
+			   });
+			 }
+			 
+			 const updateTodoform = document.updateTodoElement;
+
+			 updateTodoform.addEventListener("submit", function(e) {
+			   e.preventDefault();
+
+			   const payload = new FormData(updateTodoform);
+
+			   fetch("/projectTodo/updateTodoElement", {
+			     method: "POST",
+			     headers: {
+			       [document.querySelector('meta[name="_csrf_header"]').content]:
+			         document.querySelector('meta[name="_csrf"]').content
+			     },
+			     body: payload
+			   })
+			     .then(res => res.json())
+			     .then(data => {
+			       alert(data.res_msg);
+			       if (data.res_code === "200") {
+			         // 모달 닫기
+			         location.reload(); // 또는 데이터 갱신만
+			       }
+			     })
+			     .catch(() => {
+			       alert("할 일 수정 중 오류가 발생하였습니다.");
+			     });
+			 });
+
+			 
+			 function deleteTodoElement(todoNo) {
+				 fetch("/projectTodo/deleteTodoElement", {
+				     method: "POST",
+				     headers: {
+				    	"Content-Type": "application/json",
+				       [document.querySelector('meta[name="_csrf_header"]').content]:
+				         document.querySelector('meta[name="_csrf"]').content
+				     },
+				     body: JSON.stringify({ todoNo: todoNo })
+				   })
+				     .then(res => res.json())
+				     .then(data => {
+				       alert(data.res_msg);
+				       if (data.res_code === "200") {
+				         location.reload();
+				       }
+				     })
+				     .catch(() => {
+				       alert("할 일 수정 중 오류가 발생하였습니다.");
+				     });
+			 }
 
 
 
