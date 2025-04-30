@@ -42,7 +42,7 @@ public class DriveDto {
     private List<String> driveDescriptions; // 파일 설명들
     private Long param1; // 매개변수1
     private String uploaderTeamName; // 업로더 팀 이름
-    
+    private List<MultipartFile> files;
     // Entity -> DTO
 	public static DriveDto toDto(Drive entity) {
 		return DriveDto.builder()
