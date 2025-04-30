@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="corporate_card_request">
+  <form th:object="${approval}">
+      <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle mb-0">
+          <colgroup>
+            <col style="width: 20%;" />
+            <col style="width: 30%;" />
+            <col style="width: 20%;" />
+            <col style="width: 30%;" />
+          </colgroup>
+          <tbody>
+            <tr>
+              <th class="bg-light">사용일자</th>
+              <td th:text="*{approval_content['useDate']}"></td>
+              <th class="bg-light">수령방식</th>
+              <td>
+                <span th:if="*{approval_content['receiveType']} == 'offline'">수령(오프라인)</span>
+                <span th:if="*{approval_content['receiveType']} == 'online'">미수령(온라인)</span>
+              </td>
+            </tr>
+            <tr>
+              <th class="bg-light">신청매수</th>
+              <td th:text="|*{approval_content['count']} 매|"></td>
+              <th class="bg-light">사용금액</th>
+              <td th:text="|*{approval_content['amount']} 원|"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">사용처</th>
+              <td th:text="*{approval_content['usagePlace']}"></td>
+              <th class="bg-light">사용목적</th>
+              <td th:text="*{approval_content['usagePurpose']}"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">카드종류</th>
+              <td th:text="*{approval_content['cardType']}"></td>
+              <th class="bg-light">카드번호</th>
+              <td th:text="*{approval_content['cardNumber']}"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">반납예정일</th>
+              <td th:text="*{approval_content['returnDate']}"></td>
+              <th class="bg-light">반납확인</th>
+              <td th:text="*{approval_content['returnConfirm']}"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  </form>
+</th:block>
+</html>

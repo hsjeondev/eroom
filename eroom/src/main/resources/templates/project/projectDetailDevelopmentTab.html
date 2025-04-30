@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{/include/layout}">
+  <body>
+<main class="main" id="top" layout:fragment="content">
+	<!-- 상단 타이틀 및 탭은 기존 그대로 유지 -->
+	<div class="d-flex align-items-center gap-2">
+		<a th:href="@{/project/all}" class="text-decoration-none text-dark me-2">
+			<i class="uil uil-angle-left-b fs-4"></i>
+		</a>
+		<h1 class="text-primary mb-0 fs-4" th:text="${project.project_name}">프로젝트 디테일</h1>
+		<span class="badge badge-phoenix fs-10 badge-phoenix-success" th:text="${project.proceed}">completed</span>
+	</div>
+	<br>
+
+	<ul class="nav nav-phoenix-pills mt-3" role="tablist">
+		<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/main(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/main')} ? ' active' : ''">메인</a></li>
+		<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/developmentTab(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/developmentTab')} ? ' active' : ''">개발</a></li>
+		<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/todo(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/todo')} ? ' active' : ''">할 일</a></li>
+		<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/files(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/files')} ? ' active' : ''">파일</a></li>
+		<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/minutes(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/minutes')} ? ' active' : ''">회의록</a></li>
+	</ul>
+	<br>
+
+	<div class="row g-4">
+		<!-- 좌측 PR 목록 -->
+		<div class="col-md-8">
+			<div class="card shadow-sm">
+				<div class="card-header bg-light fw-bold">Pull Requests</div>
+				<div class="card-body p-3">
+					<div th:if="${pullRequests != null and !pullRequests.isEmpty()}">
+						<table class="table table-hover align-middle">
+							<thead class="table-light">
+								<tr>
+									<th>#</th>
+									<th>제목</th>
+									<th>작성자</th>
+									<th>브랜치</th>
+									<th>상태</th>
+									<th>링크</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="pr : ${pullRequests}" th:attr="data-pr-number=${pr.number}" class="pr-row" style="cursor:pointer;">
+									<td th:text="${pr.number}"></td>
+									<td th:text="${pr.title}"></td>
+									<td th:text="${pr.author}"></td>
+									<td th:text="${pr.headBranch} + ' → ' + ${pr.baseBranch}"></td>
+									<td th:text="${pr.state}"></td>
+									<td><a th:href="${pr.htmlUrl}" target="_blank">보기</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 우측 품질 분석 결과 -->
+		<div class="col-md-4">
+			<div class="card shadow-sm">
+				<div class="card-header bg-light fw-bold">PR 품질 분석 결과</div>
+				<div class="card-body p-3">
+					<table class="table table-bordered align-middle">
+						<thead class="table-light">
+							<tr>
+								<th>지표</th>
+								<th>값</th>
+								<th>상태</th>
+							</tr>
+						</thead>
+						<tbody id="sonar-result-body">
+							<tr>
+								<td colspan="3" class="text-muted text-center">좌측 PR을 선택하세요.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 분석 결과 Ajax 처리 스크립트 -->
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			document.querySelectorAll(".pr-row").forEach(row => {
+				row.addEventListener("click", function () {
+					const prNumber = this.dataset.prNumber;
+
+					fetch("/api/sonar/quality/pr/" + prNumber)
+						.then(res => res.json())
+						.then(data => {
+							const tbody = document.getElementById("sonar-result-body");
+							tbody.innerHTML = "";
+
+							if (!Array.isArray(data) || data.length === 0) {
+								tbody.innerHTML = '<tr><td colspan="3" class="text-muted text-center">분석 결과가 없습니다.</td></tr>';
+								return;
+							}
+
+							data.forEach(item => {
+								const tr = document.createElement("tr");
+
+								const metric = document.createElement("td");
+								metric.textContent = translateMetric(item.metric);
+
+								const value = document.createElement("td");
+								value.textContent = item.value;
+
+								const status = document.createElement("td");
+								status.textContent = getStatus(item.metric, item.value);
+								status.classList.add(
+									status.textContent === "양호" ? "text-success" :
+									status.textContent === "주의" ? "text-danger" : "text-secondary"
+								);
+
+								tr.appendChild(metric);
+								tr.appendChild(value);
+								tr.appendChild(status);
+								tbody.appendChild(tr);
+							});
+						})
+						.catch(err => {
+							console.error("분석 결과 조회 실패", err);
+							document.getElementById("sonar-result-body").innerHTML =
+								'<tr><td colspan="3" class="text-danger text-center">데이터를 불러올 수 없습니다.</td></tr>';
+						});
+				});
+			});
+
+			function translateMetric(metric) {
+				const map = {
+					"coverage": "테스트 커버리지",
+					"bugs": "버그 수",
+					"code_smells": "코드 스멜",
+					"duplicated_lines_density": "중복 코드율",
+					"vulnerabilities": "보안 취약점",
+					"complexity": "복잡도",
+					"cognitive_complexity": "인지 복잡도",
+					"ncloc": "코드 라인 수"
+				};
+				return map[metric] || metric;
+			}
+
+			function getStatus(metric, value) {
+				if (["bugs", "vulnerabilities", "code_smells"].includes(metric)) {
+					return value === "0" ? "양호" : "주의";
+				}
+				if (metric === "coverage") {
+					return parseFloat(value) >= 80 ? "양호" : "주의";
+				}
+				if (metric === "duplicated_lines_density") {
+					return parseFloat(value) <= 10 ? "양호" : "주의";
+				}
+				if (["complexity", "cognitive_complexity", "ncloc"].includes(metric)) {
+					return "정보";
+				}
+				return "확인 필요";
+			}
+		});
+	</script>
+</main>
+  </body>
+</html>

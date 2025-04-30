@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{/include/layout}">
+ <body>
+	<main class="main" id="top" layout:fragment="content">
+	<!-- 여기에 요소 넣으면 됩니다. -->
+		<div class="content">
+		<!-- <nav class="mb-3" aria-label="breadcrumb">
+			<ol class="breadcrumb mb-0">
+				<li class="breadcrumb-item"><a href="#!">Page 1</a></li>
+				<li class="breadcrumb-item"><a href="#!">Page 2</a></li>
+				<li class="breadcrumb-item active">Default</li>
+			</ol>
+		</nav> -->
+			<div class="pb-8">
+				<h4 class="mb-4">참조된 결재</h4>
+				<div id="reports" data-list="{&quot;valueNames&quot;:[&quot;title&quot;,&quot;text&quot;,&quot;priority&quot;,&quot;reportsby&quot;,&quot;reports&quot;,&quot;date&quot;],&quot;page&quot;:10,&quot;pagination&quot;:true}">
+					<div class="row g-3 justify-content-between mb-2">
+						<div class="col-12">
+							<div class="d-md-flex justify-content-between">
+							
+								<!-- 결재서 작성 버튼 부분 -->
+								<div class="mb-3">
+									<a href="/approval/create"><button class="btn btn-primary me-2">
+										결재서 작성
+										
+									</button></a>
+								    <button type="button" class="btn btn-primary" id="openSignature">
+								      서명 관리
+								    </button>
+									
+								</div>
+								
+								<div class="d-flex mb-3">
+									<!-- 검색창 -->
+									<div class="search-box me-2">
+										<form class="position-relative">
+										  <input class="form-control search-input search" type="search" placeholder="Search by name" aria-label="Search">
+										  <svg style="height: 30%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+										  	<path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+										  </svg><!-- <span class="fas fa-search search-box-icon"></span> Font Awesome fontawesome.com -->
+										</form>
+									</div>
+									<!-- 필터 버튼  -->
+									<button class="btn px-3 btn-phoenix-secondary" type="button" data-bs-toggle="modal" data-bs-target="#reportsFilterModal" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+										<svg class="svg-inline--fa fa-filter text-primary" data-fa-transform="down-3" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="filter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.6875em;">
+											<g transform="translate(256 256)">
+												<g transform="translate(0, 96)  scale(1, 1)  rotate(0 0 0)">
+													<path fill="currentColor" d="M3.9 54.9C10.5 40.9 24.5 32 40 32H472c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9V448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6V320.9L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z" transform="translate(-256 -256)"></path>
+												</g>
+											</g>
+										</svg><!-- <span class="fa-solid fa-filter text-primary" data-fa-transform="down-3"></span> Font Awesome fontawesome.com -->
+									</button>
+									<!-- 필터 모달 -->
+									<div class="modal fade" id="reportsFilterModal" tabindex="-1">
+										<div class="modal-dialog modal-dialog-centered">
+											<div class="modal-content border border-translucent">
+												<form id="addEventForm" autocomplete="off">
+													<div class="modal-header justify-content-between border-translucent p-4">
+														<h5 class="modal-title text-body-highlight fs-6 lh-sm">Filter</h5>
+														<button class="btn p-1 text-danger" type="button" data-bs-dismiss="modal" aria-label="Close"><svg class="svg-inline--fa fa-xmark fs-9" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"></path></svg><!-- <span class="fas fa-times fs-9"> 				</span> Font Awesome fontawesome.com --></button>
+													</div>
+													<div class="modal-body pt-4 pb-2 px-4">
+														<div class="mb-3">
+															<label class="fw-bold mb-2 text-body-highlight" for="formatNo">결재양식</label>
+															<select class="form-select" id="formatNo">
+																<option th:value="0">전체 보기</option>
+																<option 
+																		th:each="formList : ${approvalFormatList}"
+																		th:value="${formList.approval_format_no}"
+					          											th:text="${formList.approval_format_title}">
+			          											</option>
+															</select>
+														</div>
+														<div class="mb-3">
+															<label class="fw-bold mb-2 text-body-highlight" for="dateSort">날짜</label>
+															<select class="form-select" id="dateSort">
+																<option value="DESC">최신순</option>
+																<option value="ASC">오래된순</option>
+															</select>
+														</div>
+														<div class="mb-3">
+															<label class="fw-bold mb-2 text-body-highlight" for="approvalStatus">진행여부</label>
+															<select class="form-select" id="approvalStatus">
+																<option th:value="0">전체 보기</option>
+																<option th:value="A">승인</option>
+																<option th:value="S">진행</option>
+																<option th:value="D">반려</option>
+																<option th:value="F">회수</option>
+															</select>
+														</div>
+													</div>
+												<div class="modal-footer d-flex justify-content-end align-items-center px-4 pb-4 border-0 pt-3">
+												  <button id="filterBtn" class="btn btn-sm btn-primary px-9 fs-10 my-0" type="button">확인</button>
+												  </div>
+												</form>
+											</div>
+										</div>
+									</div>
+									
+									
+								</div> <!-- d-flex mb-3 끝  -->
+							</div> <!-- d-md-flex justify-content-between 끝 -->
+						</div> <!-- col-12 끝 -->
+					</div><!-- row g-3 justify-content-between mb-2 끝 -->
+					
+					
+					<!-- <div th:each="t : ${test}" th:text="${t.approvalTitle}"></div>
+					<div th:each="t : ${test}" th:text="${t.approvalNo}"></div> -->
+					<div class="row g-3 list" id="reportsList">
+						
+						<!-- 카드1 thymeleaf 사용중 -->
+						<div class="col-12 col-xl-6" th:each="list, listStatus : ${resultList}">
+							<div class="card h-100">
+								<div class="card-body">
+									<!-- 결재문서 이름/ 진행상태 / 작성자 이름 칸 -->
+									<div class="border-bottom border-translucent">
+										<div class="d-flex align-items-start mb-1">
+											<div class="d-sm-flex align-items-center ps-2"><a class="fw-bold fs-7 lh-sm title line-clamp-1 me-sm-4" th:text="${list.approval_title}" th:href="@{/approval/{no}/detail(no=${list.approval_no})}">결재 제목</a>
+												<div class="d-flex align-items-center">
+												
+													<!-- 빨간색 -->
+													<span th:if="${list.approval_status == 'D'}">
+														<svg class="svg-inline--fa fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
+															<g transform="translate(256 256)">
+																<g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
+																	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+																</g>
+															</g>
+														</svg><span class="fw-bold fs-9 text-body lh-2">반려</span>
+													</span>
+													
+													<!-- 초록색 -->
+													<span th:if="${list.approval_status == 'A'}">
+														<svg class="svg-inline--fa fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
+														  <g transform="translate(256 256)">
+															  <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
+															  	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+															  </g>
+														  </g>
+													  	</svg><span class="fw-bold fs-9 text-body lh-2">승인</span>
+													</span>
+													
+													<!-- 파란색 -->
+													<span th:if="${list.approval_status == 'S'}">
+														<svg class="svg-inline--fa fa-circle me-1 text-info" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
+												            <g transform="translate(256 256)">
+													            <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
+													            	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+													            </g>
+												            </g>
+											            </svg><span class="fw-bold fs-9 text-body lh-2">진행</span>
+										            </span>
+													
+													<!-- 주황색 -->
+													<span th:if="${list.approval_status == 'F'}">
+														<svg class="svg-inline--fa fa-circle me-1 text-warning" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
+												            <g transform="translate(256 256)">
+													            <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
+													            	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
+													            </g>
+												            </g>
+											            </svg>
+														<span class="fw-bold fs-9 text-body lh-2">대기</span>
+													</span>
+												</div>
+											</div>
+										</div>
+										<!-- 작성자 -->
+											<br>
+										<p class="fs-9 fw-semibold text-body ms-4 text mb-4 ps-2" th:text="|작성자 : ${list.employee.employeeName}|">
+											작성자
+										</p>
+									</div>
+									<!-- 결재자, 참조자, 합의자 + 날짜 칸 -->
+									<div class="row g-1 g-sm-3 mt-2 lh-1">
+										<div class="col-12 col-sm-auto flex-1 text-truncate">
+											<a class="fw-semibold fs-9">
+												결재자 : 
+											</a>
+											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step >= 1}"  th:text="|${member.employee.employeeName} |">결재자목록</span>
+											<br>
+											<a class="fw-semibold fs-9">
+												합의자 : 
+											</a>
+											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == 0}"  th:text="|${member.employee.employeeName} |">합의자목록</span>
+											<br>
+											<a class="fw-semibold fs-9">
+												참조자 : 
+											</a>
+											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == -1}"  th:text="|${member.employee.employeeName} |">참조자목록</span>
+										</div>
+										
+										<!-- 결재양식  -->
+										<div class="col-12 col-sm-auto">
+											<br>
+											<br>
+										  <div class="d-flex align-items-center">
+										  	<!-- 문서 아이콘 -> fs-20 숫자로 사이즈 조절 -->
+										    <span class="uil uil-clipboard-alt fs-20 text-body-secondary me-2" ></span>
+										    <p class="mb-0 fs-9 fw-semibold text-body-tertiary reports" th:text="${list.approval_format.approvalFormatTitle}">[양식명]</p>
+										  </div>
+										</div>
+										<!-- 날짜 -->
+										<div class="col-12 col-sm-auto">
+											<br>
+											<br>
+											<div class="d-flex align-items-center"><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock me-2" style="stroke-width:2;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+												<p class="mb-0 fs-9 fw-semibold text-body-tertiary date" th:text="${list.reg_date}">2025.04.10</p>
+											</div>
+										</div>
+									</div>
+								</div> <!-- card-body -->
+							</div><!-- card h-100 끝 -->
+						</div><!-- col-12 col-xl-6 -->
+						<!-- 카드1 끝 -->
+					
+					
+					
+					</div><!-- row g-3 list -->
+				
+				<!-- 페이징 -->
+				<div class="row align-items-center justify-content-center py-2 pe-0 fs-9 mt-2">
+					<div class="col-auto d-flex">
+						<button class="page-link disabled" data-list-pagination="prev" disabled=""><svg class="svg-inline--fa fa-chevron-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"></path></svg><!-- <span class="fas fa-chevron-left"></span> Font Awesome fontawesome.com --></button>
+							<ul class="mb-0 pagination"><li class="active"><button class="page" type="button" data-i="1" data-page="10">1</button></li><li><button class="page" type="button" data-i="2" data-page="10">2</button></li></ul>
+						<button class="page-link pe-0" data-list-pagination="next"><svg class="svg-inline--fa fa-chevron-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"></path></svg><!-- <span class="fas fa-chevron-right"></span> Font Awesome fontawesome.com --></button>
+					</div>
+				  </div>
+				
+				</div> <!-- reports 끝 -->
+			
+			</div><!-- pb-8 끝 -->
+			
+		</div> <!-- content 끝 -->
+		
+		
+		
+		
+		
+		    <!-- 시그니처패드 모달 구조 -->
+    <div class="modal fade" id="signatureModal" tabindex="-1" aria-labelledby="signatureModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="signatureModalLabel">서명</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+          </div>
+          <div class="modal-body text-center">
+            <canvas id="signatureCanvas" width="400" height="200" style="border:1px solid #000; background:#fff;"></canvas>
+            <div class="mt-3">
+              <button type="button" class="btn btn-secondary" id="clearSignature">패드 초기화</button>
+              <button type="button" class="btn btn-primary" id="saveSignature">저장</button>
+              <button th:if="${approvalSignature != null}" type="button" class="btn btn-danger" id="deleteSignature">저장된 서명 삭제</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+		
+		
+		
+		
+		    <!-- 시그니처패드 모달 구조 -->
+    <div class="modal fade" id="signatureModal" tabindex="-1" aria-labelledby="signatureModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="signatureModalLabel">서명</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+          </div>
+          <div class="modal-body text-center">
+            <canvas id="signatureCanvas" width="400" height="200" style="border:1px solid #000; background:#fff;"></canvas>
+            <div class="mt-3">
+              <button type="button" class="btn btn-secondary" id="clearSignature">초기화</button>
+              <button type="button" class="btn btn-primary" id="saveSignature">저장</button>
+              <button th:if="${approvalSignature != null}" type="button" class="btn btn-primary" id="updateSignature">수정</button>
+              <button th:if="${approvalSignature != null}" type="button" class="btn btn-primary" id="deleteSignature">삭제</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+		
+		
+		
+		
+		    <!-- 시그니처 모달 작동 스크립트 -->
+    <script th:inline="javascript">
+    window.addEventListener('load', function () {
+      let signaturePad;
+      const canvas = document.getElementById('signatureCanvas');
+      const clearBtn = document.getElementById('clearSignature');
+      const saveBtn = document.getElementById('saveSignature');
+      const updateBtn = document.getElementById('updateSignature');
+      const deleteBtn = document.getElementById('deleteSignature');
+
+      function initSignaturePad() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = 400 * ratio;
+        canvas.height = 200 * ratio;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(ratio, ratio);
+
+        signaturePad = new SignaturePad(canvas, {
+          backgroundColor: 'rgb(255,255,255)',
+          penColor: 'black'
+        });
+      }
+
+      const signatureModal = document.getElementById('signatureModal');
+      signatureModal.addEventListener('shown.bs.modal', function () {
+        initSignaturePad();
+      });
+
+      document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'openSignature') {
+          const modal = new bootstrap.Modal(signatureModal);
+          modal.show();
+        }
+      });
+
+      clearBtn.addEventListener('click', function () {
+        if (signaturePad) {
+          signaturePad.clear();
+        }
+      });
+
+      saveBtn.addEventListener('click', function () {
+        if (signaturePad && !signaturePad.isEmpty()) {
+          const saveDataURL = signaturePad.toDataURL();
+          console.log('서명 데이터 URL:', saveDataURL);
+          
+          fetch('/approval/signature/create', {
+        	  method : 'POST',
+        	  headers : {
+      	        'Content-Type': 'application/json',
+    	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+    	        'header': document.querySelector('meta[name="_csrf_header"]').content
+        	  },
+        	  body : JSON.stringify({
+        		  signature_data_url : saveDataURL
+        	  })
+          })
+          .then(response => response.json())
+          .then(data => {
+        		  alert(data.res_msg);
+          })
+          
+          const modalInstance = bootstrap.Modal.getInstance(signatureModal);
+          modalInstance.hide();
+        } else {
+       		// 서명 미입력시.
+          alert('서명이 없습니다!');
+        }
+      });
+      
+      updateBtn.addEventListener('click', function () {
+        if (signaturePad && !signaturePad.isEmpty()) {
+          const updateDataURL = signaturePad.toDataURL();
+          console.log('서명 데이터 URL:', updateDataURL);
+          
+          fetch('/approval/signature/update', {
+        	  method : 'PUT',
+        	  headers : {
+      	        'Content-Type': 'application/json',
+    	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+    	        'header': document.querySelector('meta[name="_csrf_header"]').content
+        	  },
+        	  body : JSON.stringify({
+        		  signature_data_url : updateDataURL
+        	  })
+          })
+          .then(response => response.json())
+          .then(data => {
+        		  alert(data.res_msg);
+          })
+          
+          const modalInstance = bootstrap.Modal.getInstance(signatureModal);
+          modalInstance.hide();
+        } else {
+       		// 서명 미입력시.
+          alert('서명이 없습니다!');
+        }
+      });
+      
+      deleteBtn.addEventListener('click', function(){
+    	  fetch('/approval/signature/delete', {
+    		  method : 'PUT',
+        	  headers : {
+      	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+      	        'header': document.querySelector('meta[name="_csrf_header"]').content
+          	  }
+    	  })
+    	  .then(response => response.json())
+    	  .then(data => {
+    		  alert(data.res_msg);
+    	  })
+    	  .catch(error => {
+    	        console.error('삭제 중 오류 발생:', error);
+    	        alert('삭제 실패');
+    	  });
+      });
+      
+      
+      
+    });
+    
+    
+    </script>
+    
+        </script>
+    <!-- 검색 기능 함수 따로 빼기. 원래 태그 수정 필요없음 -->
+	<script>
+	  function bindSearch() {
+	    const searchInput = document.querySelector('.search-input');
+	    if (!searchInput) return;
+	
+	    // 기존 이벤트 리스너 제거 (중복 방지용)
+	    const newSearchInput = searchInput.cloneNode(true);
+	    searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+	
+	    newSearchInput.addEventListener('input', function () {
+	      const keyword = this.value.toLowerCase();
+	      const cards = document.querySelectorAll('#reportsList > .col-12.col-xl-6');
+	
+	      cards.forEach(card => {
+	        const text = card.innerText.toLowerCase();
+	        if (text.includes(keyword)) {
+	          card.style.display = 'block';
+	        } else {
+	          card.style.display = 'none';
+	        }
+	      });
+	    });
+	  }
+	</script>
+
+    <!-- 필터 모달 값 비동기로 적용하기 -->
+    <script>
+    document.getElementById("filterBtn").addEventListener("click", function () {
+    	  const formatNo = document.getElementById("formatNo").value;
+    	  const status = document.getElementById("approvalStatus").value;
+    	  const dateSort = document.getElementById("dateSort").value;
+
+    	  const query = new URLSearchParams();
+    	  if (formatNo) query.append("formatNo", formatNo);
+    	  if (status) query.append("approvalStatus", status);
+    	  if (dateSort) query.append("dateSort", dateSort);
+
+    	  fetch("/approval/referencedApprovals/fragment?" + query.toString())
+    	    .then(response => {
+    	      if (!response.ok) throw new Error("서버 오류 발생");
+    	      return response.text();
+    	    })
+    	    .then(html => {
+    	      document.getElementById("reportsList").innerHTML = html;
+        	  // 모달 닫기
+    	      const filterModal = bootstrap.Modal.getInstance(document.getElementById('reportsFilterModal'));
+    	      if (filterModal) {
+    	        filterModal.hide();
+    	      }
+    	      // 검색창 초기화
+    	      const searchInput = document.querySelector('.search-input');
+    	      if (searchInput) {
+    	        searchInput.value = '';
+    	      }
+				
+    	      bindSearch()
+    	    })
+    	    .catch(error => {
+    	      alert("필터링 실패: " + error.message);
+    	    });
+    	});
+
+	</script>
+	</main>
+</body>
+</html>

@@ -36,9 +36,10 @@ public class WebSecurityConfig {
 	SecurityFilterChain filterChain(HttpSecurity http, UserDetailsService customUserDetailsService) throws Exception {
 		http.userDetailsService(customUserDetailsService)
 			.authorizeHttpRequests(requests -> requests
-					.requestMatchers("/**").permitAll()
-					// .requestMatchers("/admin/**").hasRole("ADMIN") admin은 필요할 때 주석 해제
-					// .anyRequest().authenticated() // 모든 요청에 대한 인증 권한 필요할 때 주석 해제
+//					.anyRequest().permitAll()
+					.requestMatchers("/login", "/assets/**", "/vendors/**").permitAll()
+					.requestMatchers("/admin/**").hasRole("ADMIN") // admin은 필요할 때 주석 해제
+					.anyRequest().authenticated() // 모든 요청에 대한 인증 권한 필요할 때 주석 해제
 					)
 			.formLogin(login -> login.loginPage("/login")
 									.successHandler(new MyLoginSuccessHandler())

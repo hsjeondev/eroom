@@ -1,0 +1,59 @@
+package com.eroom.project.entity;
+
+import java.util.List;
+
+import com.eroom.employee.entity.Employee;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
+@Entity
+@Table(name="project_todo_element")
+public class ProjectTodoElement {
+
+	@Id
+	@Column(name="todo_no")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long todoNo;
+	
+	@ManyToOne
+	@JoinColumn(name="project_todo_list_no")
+	private ProjectTodoList projectTodoList;
+	
+	@ManyToOne
+	@JoinColumn(name="employee_no")
+	private Employee employee;
+	
+	@Column(name="todo_title")
+	private String todoTitle;
+	
+	@Column(name="emergency")
+	private String emergency;
+	
+	@Column(name="element_sequence")
+	private int elementSequence;
+	
+	@OneToMany(mappedBy = "projectTodoElement")
+	private List<ProjectTodoElementDetail> todoElementDetails;
+	
+	@Column(name="visible_yn")
+	private String visibleYn;
+
+}

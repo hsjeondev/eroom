@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="ko-KR" dir="ltr" data-navigation-type="default"
+	data-navbar-horizontal-shape="default"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/include/layout}">
+<style>
+/* 기본 상태: 오른쪽 영역은 투명하고 오른쪽으로 약간 이동한 상태 */
+.tab-pane {
+	opacity: 0;
+	transform: translateX(50px);
+	transition: opacity 0.3s ease, transform 0.3s ease;
+	pointer-events: none;
+}
+
+/* 활성화된 상태: 클릭 시 'active' 클래스가 추가되어 나타남 */
+.tab-pane.active {
+	opacity: 1;
+	transform: translateX(0);
+	pointer-events: auto;
+}
+
+.unread .name {
+	font-weight: bold;
+	color: #007bff; /* 읽지 않은 채팅방은 파란색 */
+}
+
+.read .name {
+	color: #6c757d; /* 읽은 채팅방은 회색 */
+}
+</style>
+<body>
+	<main class="main" id="top" layout:fragment="content">
+
+		<input type="hidden" id="myEmployeeNo"
+			th:value="${#authentication.principal.employee.employeeNo}">
+		<div class="chat d-flex phoenix-offcanvas-container pt-1 mt-n1 mb-9">
+			<!-- 왼쪽 채팅 목록 영역 -->
+			<div
+				class="card p-3 p-xl-1 mt-xl-n1 chat-sidebar me-3 phoenix-offcanvas phoenix-offcanvas-start"
+				id="chat-sidebar">
+				<button class="btn d-none d-sm-block d-xl-none mb-2"
+					data-bs-toggle="modal" data-bs-target="#chatSearchBoxModal">
+					<span
+						class="fa-solid fa-magnifying-glass text-body-tertiary text-opacity-85 fs-7"></span>
+				</button>
+				<div class="d-none d-sm-block d-xl-none mb-5">
+					<button class="btn w-100 mx-auto" type="button"
+						data-bs-toggle="dropdown" data-boundary="window"
+						aria-haspopup="true" aria-expanded="false"
+						data-bs-reference="parent">
+						<span
+							class="fa-solid fa-bars text-body-tertiary text-opacity-85 fs-7"></span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-end p-0">
+						<li><a class="dropdown-item" href="#!">All</a></li>
+						<li><a class="dropdown-item" href="#!">Read</a></li>
+						<li><a class="dropdown-item" href="#!">Unread</a></li>
+					</ul>
+				</div>
+				<!-- 새 채팅방 만들기 버튼 -->
+				<div class="d-grid gap-2 mb-3">
+					<button class="btn btn-outline-primary" data-bs-toggle="modal"
+						data-bs-target="#createChatModal">+ 새 채팅방 만들기</button>
+				</div>
+				<!-- 검색 입력란 -->
+				<div class="form-icon-container mb-4 d-sm-none d-xl-block">
+					<input class="form-control form-icon-input search" type="text"
+						placeholder="이름을 입력하세요" /> <span
+						class="fas fa-user text-body fs-9 form-icon"></span>
+				</div>
+				<!-- 탭 메뉴 (전체, 읽지않음, 읽음) -->
+				<ul class="nav nav-phoenix-pills mb-5 d-sm-none d-xl-flex"
+					id="contactListTab" data-chat-thread-tab="data-chat-thread-tab"
+					role="tablist">
+					<li class="nav-item" role="presentation"><a
+						class="nav-link cursor-pointer active" data-bs-toggle="tab"
+						data-chat-thread-list="all" role="tab" aria-selected="true">전체</a>
+					</li>
+					<li class="nav-item" role="presentation"><a
+						class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab"
+						data-chat-thread-list="read" aria-selected="false">읽지않음</a></li>
+					<li class="nav-item" role="presentation"><a
+						class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab"
+						data-chat-thread-list="unread" aria-selected="false">읽음</a></li>
+				</ul>
+				<!-- 채팅 목록 -->
+				<div class="scrollbar">
+					<div class="tab-content" id="contactListTabContent">
+						<div data-chat-thread-tab-content="data-chat-thread-tab-content">
+							<ul class="nav chat-thread-tab flex-column list chat_list">
+								<!-- 채팅방이 없을 경우 -->
+								<div th:if="${#lists.isEmpty(chatroomList)}">
+									<p class="text-center text-muted mt-4">참여 중인 채팅방이 없습니다.</p>
+								</div>
+								<!-- 채팅방 목록 -->
+								<li th:if="${!#lists.isEmpty(chatroomList)}"
+								    th:each="chatroom : ${chatroomList}"
+								    th:attr="data-room-no=${chatroom.chatroomNo}, data-group=${chatroom.chatIsGroupYn}, data-chat-thread='data-chat-thread'"
+								    th:classappend="${chatroom.unreadCount > 0} ? 'unread' : 'read'"
+								    class="nav-item read mb-1 item" role="presentation">
+									<a
+									class="nav-link d-flex align-items-center justify-content-center p-2"
+									th:href="'#chatroom-' + ${chatroom.chatroomNo}"
+									th:attr="data-room-no=${chatroom.chatroomNo}, data-group=${chatroom.chatIsGroupYn}"
+									data-bs-toggle="tab" data-chat-thread="data-chat-thread"
+									role="tab" aria-selected="true"> <!-- 아바타 이미지 -->
+										<div
+											class="avatar avatar-xl status-online position-relative me-2 me-sm-0 me-xl-2">
+											<img
+												class="rounded-circle border border-2 border-light-subtle"
+												src="../assets/img/team/20.webp" alt="" />
+										</div>
+										<div class="flex-1 d-sm-none d-xl-block">
+											<div
+												class="d-flex justify-content-between align-items-center">
+												<h5 th:text="${chatroom.chatroomName}"
+													class="text-body fw-normal name text-nowrap">채팅방 이름</h5>
+												<div th:if="${chatroom.unreadCount > 0}"
+													class="badge bg-danger text-white ms-2"
+													th:text="${chatroom.unreadCount}"></div>
+												<p
+													th:text="${#temporals.format(chatroom.lastMessageRegDate, 'yy.MM.dd')}"
+													class="fs-10 text-body-tertiary text-opacity-85 mb-0 text-nowrap">마지막
+													메시지 시간</p>
+											</div>
+											<div class="d-flex justify-content-between">
+												<p th:text="${chatroom.chatLastMessage}"
+													class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">
+													마지막메시지</p>
+											</div>
+										</div>
+								</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 채팅방 생성 모달 -->
+			<div class="modal fade" id="createChatModal" tabindex="-1"
+				aria-labelledby="createChatModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3>새 채팅방 만들기</h3>
+							<button type="button" class="btn-close" data-bs-dismiss="modal"
+								aria-label="닫기"></button>
+						</div>
+						<form id="createChatForm">
+							<input type="hidden" th:name="${_csrf.parameterName}"
+								th:value="${_csrf.token}" />
+							<div class="modal-body">
+								<!-- 채팅 종류 선택 -->
+								<div class="mb-3">
+									<label class="form-label">채팅 종류</label>
+									<div id="chatTypeGroup">
+										<input type="radio" name="chatIsGroupYn" value="N" checked>
+										1:1 채팅 <input type="radio" name="chatIsGroupYn" value="Y">
+										그룹 채팅
+									</div>
+								</div>
+								<div class="mb-3" id="chatroomNameBox">
+									<label class="form-label">채팅방 이름</label> <input type="text"
+										id="chatroomName" name="chatroomName" class="form-control"
+										placeholder="예: 개발팀 채팅방" readonly>
+								</div>
+								<!-- 소속 선택 -->
+								<div class="mb-3">
+									<label class="form-label">소속</label> <select
+										class="form-select" id="departmentSelect">
+										<option disabled selected>-- 소속 선택 --</option>
+										<option th:each="dept : ${structureList}"
+											th:value="${dept.separator_code}"
+											th:text="${dept.separator_name}"
+											th:selected="${dept.separator_name == param.department}">
+										</option>
+									</select>
+								</div>
+								<!-- 참여자 선택 -->
+								<div class="mb-3">
+									<label class="form-label">참여자 선택</label>
+									<div class="d-flex">
+										<select id="employeeSelect" class="form-select me-2"
+											style="flex: 1;">
+											<option disabled selected>-- 참여자 선택 --</option>
+										</select>
+										<button type="button" class="btn btn-outline-primary"
+											onclick="addParticipant()">추가</button>
+									</div>
+								</div>
+								<!-- 선택된 참여자 표시 -->
+								<div class="mb-3">
+									<label class="form-label">선택된 참여자</label>
+									<div id="selectedParticipants">
+										<!-- badge 형태로 추가 -->
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary"
+									data-bs-dismiss="modal">취소</button>
+								<button type="submit" class="btn btn-primary">생성</button>
+							</div>
+							<div>
+								<input type="hidden" name="creater"
+									th:value="${#authentication.principal.employee.employeeNo}">
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<!-- 오른쪽 채팅 영역 (선택 전 기본 화면) -->
+			<div class="card tab-content flex-1 phoenix-offcanvas-container"
+				id="chat-content">
+
+				<div class="tab-pane h-100 fade active show" id="tab-thread-1"
+					role="tabpanel" aria-labelledby="tab-thread-1">
+					<div class="d-flex flex-column h-100">
+						<div id="default-chat-area"
+							class="d-flex flex-column justify-content-center align-items-center h-100">
+							<h4 class="text-body-secondary mb-2">채팅방을 선택해주세요.</h4>
+							<a href="#" class="fw-bold text-primary text-decoration-none"
+								data-bs-toggle="modal" data-bs-target="#createChatModal"> 새
+								채팅방 만들기 </a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 채팅방 상세 모달 -->
+			<div class="modal fade" id="chatroomDetailModal" tabindex="-1"
+				aria-labelledby="chatroomDetailModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-lg modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-body">
+							<div class="text-center mb-3">
+								<img src="../assets/img/team/20.webp" class="rounded-circle"
+									width="80" />
+								<h5 id="modalChatroomName" class="mt-2">채팅방 이름</h5>
+							</div>
+							<div id="group-only-options">
+								<input type="hidden" th:name="${_csrf.parameterName}"
+									th:value="${_csrf.token}" />
+								<ul class="list-unstyled mb-4">
+								  <li data-action="rename" class="cursor-pointer">채팅방 이름 변경</li>
+								  <li data-action="add" class="cursor-pointer">참여자 추가하기</li>
+								  <li data-action="delete" class="cursor-pointer">채팅방 삭제</li>
+								</ul>
+
+							</div>
+							<div id="participantListBox" class="mb-4">
+								<h6
+									class="fw-semibold border-bottom border-translucent pb-2 mb-2">참여자</h6>
+								<ul id="participantList" class="list-unstyled mb-0">
+									<!-- 참여자 이름들이 여기에 채워질거야 -->
+								</ul>
+							</div>
+							<!-- 부트스트랩 상세보기 파일  -->
+							<div class="mb-5">
+								<div class="d-flex">
+									<svg class="svg-inline--fa fa-folder me-3 fs-9"
+										aria-hidden="true" focusable="false" data-prefix="fas"
+										data-icon="folder" role="img"
+										xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+										data-fa-i2svg="">
+										<path fill="currentColor"
+											d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"></path></svg>
+									<!-- <span class="fa-solid fa-folder me-3 fs-9"></span> Font Awesome fontawesome.com -->
+									<div class="flex-1">
+										<h6
+											class="fw-semibold border-bottom border-translucent pb-2 mb-0">
+											<font style="vertical-align: inherit;"><font
+												style="vertical-align: inherit;">공유 파일</font></font>
+										</h6>
+										<div class="mb-2">
+											<div
+												class="border-bottom border-translucent d-flex align-items-center justify-content-between">
+												<a
+													class="text-decoration-none d-flex align-items-center py-3"
+													href="#!">
+													<div
+														class="btn-icon btn-icon-lg border rounded-3 text-body-quaternary flex-column me-2">
+														<svg class="svg-inline--fa fa-file-zipper fs-8 mb-1"
+															aria-hidden="true" focusable="false" data-prefix="fas"
+															data-icon="file-zipper" role="img"
+															xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"
+															data-fa-i2svg="">
+															<path fill="currentColor"
+																d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM96 48c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16zm0 64c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16zm0 64c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16zm-6.3 71.8c3.7-14 16.4-23.8 30.9-23.8h14.8c14.5 0 27.2 9.7 30.9 23.8l23.5 88.2c1.4 5.4 2.1 10.9 2.1 16.4c0 35.2-28.8 63.7-64 63.7s-64-28.5-64-63.7c0-5.5 .7-11.1 2.1-16.4l23.5-88.2zM112 336c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H112z"></path></svg>
+														<!-- <span class="fs-8 mb-1 fa-solid fa-file-zipper"></span> Font Awesome fontawesome.com -->
+														<p class="mb-0 fs-10 fw-bold lh-1">
+															<font style="vertical-align: inherit;"><font
+																style="vertical-align: inherit;">지퍼</font></font>
+														</p>
+													</div>
+													<div class="flex-1">
+														<h6 class="text-body line-clamp-1">
+															<font style="vertical-align: inherit;"><font
+																style="vertical-align: inherit;">페데리코_고다르프_디자인.zip</font></font>
+														</h6>
+														<div class="d-flex align-items-center lh-1">
+															<p class="fs-10 mb-0 text-body-tertiary fw-semibold">
+																<font style="vertical-align: inherit;"><font
+																	style="vertical-align: inherit;">53.34MB</font></font>
+															</p>
+															<svg
+																class="svg-inline--fa fa-circle text-body-quaternary fs-10"
+																data-fa-transform="shrink-12" aria-hidden="true"
+																focusable="false" data-prefix="fas" data-icon="circle"
+																role="img" xmlns="http://www.w3.org/2000/svg"
+																viewBox="0 0 512 512" data-fa-i2svg=""
+																style="transform-origin: 0.5em 0.5em;">
+																<g transform="translate(256 256)">
+																<g
+																	transform="translate(0, 0)  scale(0.25, 0.25)  rotate(0 0 0)">
+																<path fill="currentColor"
+																	d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"
+																	transform="translate(-256 -256)"></path></g></g></svg>
+															<!-- <span class="fa-solid fa-circle text-body-quaternary fs-10" data-fa-transform="shrink-12"></span> Font Awesome fontawesome.com -->
+															<p class="fs-10 mb-0 text-body-tertiary fw-semibold">
+																<font style="vertical-align: inherit;"><font
+																	style="vertical-align: inherit;">2011년 12월 8일</font></font>
+															</p>
+														</div>
+													</div>
+												</a>
+												<button class="btn p-0">
+													<svg
+														class="svg-inline--fa fa-circle-down fs-8 text-body-tertiary"
+														aria-hidden="true" focusable="false" data-prefix="far"
+														data-icon="circle-down" role="img"
+														xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+														data-fa-i2svg="">
+														<path fill="currentColor"
+															d="M256 464a208 208 0 1 1 0-416 208 208 0 1 1 0 416zM256 0a256 256 0 1 0 0 512A256 256 0 1 0 256 0zM376.9 294.6c4.5-4.2 7.1-10.1 7.1-16.3c0-12.3-10-22.3-22.3-22.3H304V160c0-17.7-14.3-32-32-32l-32 0c-17.7 0-32 14.3-32 32v96H150.3C138 256 128 266 128 278.3c0 6.2 2.6 12.1 7.1 16.3l107.1 99.9c3.8 3.5 8.7 5.5 13.8 5.5s10.1-2 13.8-5.5l107.1-99.9z"></path></svg>
+													<!-- <span class="fa-regular fa-arrow-alt-circle-down fs-8 text-body-tertiary"></span> Font Awesome fontawesome.com -->
+												</button>
+											</div>
+											<div
+												class="border-bottom border-translucent d-flex align-items-center justify-content-between">
+												<a
+													class="text-decoration-none d-flex align-items-center py-3"
+													href="#!">
+													<div
+														class="btn-icon btn-icon-lg border rounded-3 text-body-quaternary flex-column me-2">
+														<svg class="svg-inline--fa fa-file-code fs-8 mb-1"
+															aria-hidden="true" focusable="false" data-prefix="fas"
+															data-icon="file-code" role="img"
+															xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"
+															data-fa-i2svg="">
+															<path fill="currentColor"
+																d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM153 289l-31 31 31 31c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L71 337c-9.4-9.4-9.4-24.6 0-33.9l48-48c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9zM265 255l48 48c9.4 9.4 9.4 24.6 0 33.9l-48 48c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l31-31-31-31c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0z"></path></svg>
+														<!-- <span class="fs-8 mb-1 fa-solid fa-file-code"></span> Font Awesome fontawesome.com -->
+														<p class="mb-0 fs-10 fw-bold lh-1">
+															<font style="vertical-align: inherit;"><font
+																style="vertical-align: inherit;">박쥐</font></font>
+														</p>
+													</div>
+													<div class="flex-1">
+														<h6 class="text-body line-clamp-1">
+															<font style="vertical-align: inherit;"><font
+																style="vertical-align: inherit;">Restart_lyf.bat</font></font>
+														</h6>
+														<div class="d-flex align-items-center lh-1">
+															<p class="fs-10 mb-0 text-body-tertiary fw-semibold">
+																<font style="vertical-align: inherit;"><font
+																	style="vertical-align: inherit;">11.13KB</font></font>
+															</p>
+															<svg
+																class="svg-inline--fa fa-circle text-body-quaternary fs-10"
+																data-fa-transform="shrink-12" aria-hidden="true"
+																focusable="false" data-prefix="fas" data-icon="circle"
+																role="img" xmlns="http://www.w3.org/2000/svg"
+																viewBox="0 0 512 512" data-fa-i2svg=""
+																style="transform-origin: 0.5em 0.5em;">
+																<g transform="translate(256 256)">
+																<g
+																	transform="translate(0, 0)  scale(0.25, 0.25)  rotate(0 0 0)">
+																<path fill="currentColor"
+																	d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"
+																	transform="translate(-256 -256)"></path></g></g></svg>
+															<!-- <span class="fa-solid fa-circle text-body-quaternary fs-10" data-fa-transform="shrink-12"></span> Font Awesome fontawesome.com -->
+															<p class="fs-10 mb-0 text-body-tertiary fw-semibold">
+																<font style="vertical-align: inherit;"><font
+																	style="vertical-align: inherit;">2011년 12월 2일</font></font>
+															</p>
+														</div>
+													</div>
+												</a>
+												<button class="btn p-0">
+													<svg
+														class="svg-inline--fa fa-circle-down fs-8 text-body-tertiary"
+														aria-hidden="true" focusable="false" data-prefix="far"
+														data-icon="circle-down" role="img"
+														xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+														data-fa-i2svg="">
+														<path fill="currentColor"
+															d="M256 464a208 208 0 1 1 0-416 208 208 0 1 1 0 416zM256 0a256 256 0 1 0 0 512A256 256 0 1 0 256 0zM376.9 294.6c4.5-4.2 7.1-10.1 7.1-16.3c0-12.3-10-22.3-22.3-22.3H304V160c0-17.7-14.3-32-32-32l-32 0c-17.7 0-32 14.3-32 32v96H150.3C138 256 128 266 128 278.3c0 6.2 2.6 12.1 7.1 16.3l107.1 99.9c3.8 3.5 8.7 5.5 13.8 5.5s10.1-2 13.8-5.5l107.1-99.9z"></path></svg>
+													<!-- <span class="fa-regular fa-arrow-alt-circle-down fs-8 text-body-tertiary"></span> Font Awesome fontawesome.com -->
+												</button>
+											</div>
+											<div
+												class="border-bottom border-translucent d-flex align-items-center justify-content-between">
+												<a
+													class="text-decoration-none d-flex align-items-center py-3"
+													href="#!">
+													<div
+														class="btn-icon btn-icon-lg border rounded-3 text-body-quaternary flex-column me-2">
+														<svg class="svg-inline--fa fa-file-lines fs-8 mb-1"
+															aria-hidden="true" focusable="false" data-prefix="fas"
+															data-icon="file-lines" role="img"
+															xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"
+															data-fa-i2svg="">
+															<path fill="currentColor"
+																d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM112 256H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16z"></path></svg>
+														<!-- <span class="fs-8 mb-1 fa-solid fa-file-lines"></span> Font Awesome fontawesome.com -->
+														<p class="mb-0 fs-10 fw-bold lh-1">
+															<font style="vertical-align: inherit;"><font
+																style="vertical-align: inherit;">텍스트</font></font>
+														</p>
+													</div>
+													<div class="flex-1">
+														<h6 class="text-body line-clamp-1">
+															<font style="vertical-align: inherit;"><font
+																style="vertical-align: inherit;">가짜 lorem ipsum
+																	fr fr.txt</font></font>
+														</h6>
+														<div class="d-flex align-items-center lh-1">
+															<p class="fs-10 mb-0 text-body-tertiary fw-semibold">
+																<font style="vertical-align: inherit;"><font
+																	style="vertical-align: inherit;">11.13KB</font></font>
+															</p>
+															<svg
+																class="svg-inline--fa fa-circle text-body-quaternary fs-10"
+																data-fa-transform="shrink-12" aria-hidden="true"
+																focusable="false" data-prefix="fas" data-icon="circle"
+																role="img" xmlns="http://www.w3.org/2000/svg"
+																viewBox="0 0 512 512" data-fa-i2svg=""
+																style="transform-origin: 0.5em 0.5em;">
+																<g transform="translate(256 256)">
+																<g
+																	transform="translate(0, 0)  scale(0.25, 0.25)  rotate(0 0 0)">
+																<path fill="currentColor"
+																	d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"
+																	transform="translate(-256 -256)"></path></g></g></svg>
+															<!-- <span class="fa-solid fa-circle text-body-quaternary fs-10" data-fa-transform="shrink-12"></span> Font Awesome fontawesome.com -->
+															<p class="fs-10 mb-0 text-body-tertiary fw-semibold">
+																<font style="vertical-align: inherit;"><font
+																	style="vertical-align: inherit;">2011년 12월 2일</font></font>
+															</p>
+														</div>
+													</div>
+												</a>
+												<button class="btn p-0">
+													<svg
+														class="svg-inline--fa fa-circle-down fs-8 text-body-tertiary"
+														aria-hidden="true" focusable="false" data-prefix="far"
+														data-icon="circle-down" role="img"
+														xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+														data-fa-i2svg="">
+														<path fill="currentColor"
+															d="M256 464a208 208 0 1 1 0-416 208 208 0 1 1 0 416zM256 0a256 256 0 1 0 0 512A256 256 0 1 0 256 0zM376.9 294.6c4.5-4.2 7.1-10.1 7.1-16.3c0-12.3-10-22.3-22.3-22.3H304V160c0-17.7-14.3-32-32-32l-32 0c-17.7 0-32 14.3-32 32v96H150.3C138 256 128 266 128 278.3c0 6.2 2.6 12.1 7.1 16.3l107.1 99.9c3.8 3.5 8.7 5.5 13.8 5.5s10.1-2 13.8-5.5l107.1-99.9z"></path></svg>
+													<!-- <span class="fa-regular fa-arrow-alt-circle-down fs-8 text-body-tertiary"></span> Font Awesome fontawesome.com -->
+												</button>
+											</div>
+											<div
+												class="border-bottom border-translucent d-flex align-items-center justify-content-between">
+												<a
+													class="text-decoration-none d-flex align-items-center py-3"
+													href="#!">
+													<div
+														class="btn-icon btn-icon-lg border rounded-3 text-body-quaternary flex-column me-2">
+														<svg
+															class="svg-inline--fa fa-file-circle-exclamation fs-8 mb-1"
+															aria-hidden="true" focusable="false" data-prefix="fas"
+															data-icon="file-circle-exclamation" role="img"
+															xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"
+															data-fa-i2svg="">
+															<path fill="currentColor"
+																d="M0 64C0 28.7 28.7 0 64 0H224V128c0 17.7 14.3 32 32 32H384v38.6C310.1 219.5 256 287.4 256 368c0 59.1 29.1 111.3 73.7 143.3c-3.2 .5-6.4 .7-9.7 .7H64c-35.3 0-64-28.7-64-64V64zm384 64H256V0L384 128zm48 96a144 144 0 1 1 0 288 144 144 0 1 1 0-288zm0 240a24 24 0 1 0 0-48 24 24 0 1 0 0 48zm0-192c-8.8 0-16 7.2-16 16v80c0 8.8 7.2 16 16 16s16-7.2 16-16V288c0-8.8-7.2-16-16-16z"></path></svg>
+														<!-- <span class="fs-8 mb-1 fa-solid fa-file-circle-exclamation"></span> Font Awesome fontawesome.com -->
+														<p class="mb-0 fs-10 fw-bold lh-1">
+															<font style="vertical-align: inherit;"><font
+																style="vertical-align: inherit;">미친</font></font>
+														</p>
+													</div>
+													<div class="flex-1">
+														<h6 class="text-body line-clamp-1">
+															<font style="vertical-align: inherit;"><font
+																style="vertical-align: inherit;">지원되지 않는 파일
+																	형식입니다.mad</font></font>
+														</h6>
+														<div class="d-flex align-items-center lh-1">
+															<p class="fs-10 mb-0 text-body-tertiary fw-semibold">
+																<font style="vertical-align: inherit;"><font
+																	style="vertical-align: inherit;">11.13KB</font></font>
+															</p>
+															<svg
+																class="svg-inline--fa fa-circle text-body-quaternary fs-10"
+																data-fa-transform="shrink-12" aria-hidden="true"
+																focusable="false" data-prefix="fas" data-icon="circle"
+																role="img" xmlns="http://www.w3.org/2000/svg"
+																viewBox="0 0 512 512" data-fa-i2svg=""
+																style="transform-origin: 0.5em 0.5em;">
+																<g transform="translate(256 256)">
+																<g
+																	transform="translate(0, 0)  scale(0.25, 0.25)  rotate(0 0 0)">
+																<path fill="currentColor"
+																	d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"
+																	transform="translate(-256 -256)"></path></g></g></svg>
+															<!-- <span class="fa-solid fa-circle text-body-quaternary fs-10" data-fa-transform="shrink-12"></span> Font Awesome fontawesome.com -->
+															<p class="fs-10 mb-0 text-body-tertiary fw-semibold">
+																<font style="vertical-align: inherit;"><font
+																	style="vertical-align: inherit;">2011년 12월 2일</font></font>
+															</p>
+														</div>
+													</div>
+												</a>
+												<button class="btn p-0">
+													<svg
+														class="svg-inline--fa fa-circle-down fs-8 text-body-tertiary"
+														aria-hidden="true" focusable="false" data-prefix="far"
+														data-icon="circle-down" role="img"
+														xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+														data-fa-i2svg="">
+														<path fill="currentColor"
+															d="M256 464a208 208 0 1 1 0-416 208 208 0 1 1 0 416zM256 0a256 256 0 1 0 0 512A256 256 0 1 0 256 0zM376.9 294.6c4.5-4.2 7.1-10.1 7.1-16.3c0-12.3-10-22.3-22.3-22.3H304V160c0-17.7-14.3-32-32-32l-32 0c-17.7 0-32 14.3-32 32v96H150.3C138 256 128 266 128 278.3c0 6.2 2.6 12.1 7.1 16.3l107.1 99.9c3.8 3.5 8.7 5.5 13.8 5.5s10.1-2 13.8-5.5l107.1-99.9z"></path></svg>
+													<!-- <span class="fa-regular fa-arrow-alt-circle-down fs-8 text-body-tertiary"></span> Font Awesome fontawesome.com -->
+												</button>
+											</div>
+										</div>
+										<a class="btn btn-link fs-10 p-0" href="#!"><font
+											style="vertical-align: inherit;"><font
+												style="vertical-align: inherit;">19개 더 보기</font></font> <svg
+												class="svg-inline--fa fa-chevron-down ms-1"
+												aria-hidden="true" focusable="false" data-prefix="fas"
+												data-icon="chevron-down" role="img"
+												xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+												data-fa-i2svg="">
+												<path fill="currentColor"
+													d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg>
+											<!-- <span class="fa-solid fa-chevron-down ms-1"></span> Font Awesome fontawesome.com --></a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-outline-secondary"
+								data-bs-dismiss="modal">닫기</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+		<script>
+	 	let socket = null; 
+		let currentReceiverNo = null;
+		let isCreateMode = true; // 기본은 생성 모드
+		let lastSelectedChatroomName = null;
+
+		document.addEventListener("DOMContentLoaded", () => {
+		  bindModalReset(); // 모달 초기화
+		  bindChatroomPanelEvents(); // 채팅방 클릭 이벤트
+		  bindChatroomRename(); // 채팅방 이름 변경
+		  bindParticipantAddButton(); // 참여자 추가 버튼 클릭 이벤트
+		  bindChatroomCreate(); // 채팅방 생성 버튼 클릭 이벤트
+		  bindDepartmentChange(); // 소속 선택시 직원 목록 로딩
+		  bindParticipantAdd(); // 참여자 추가
+		  bindChatTypeChange(); // 채팅 종류 변경시
+		  bindChatroomDelete(); // 채팅방 삭제
+		  connectWebSocket(); // 웹소켓 연결
+		  bindFilePreview(); // 채팅 파일 
+		});
+		
+		// 모달 초기화 (열릴 때 기본 리셋)
+		function bindModalReset() {
+		  const modal = document.getElementById("createChatModal");
+		  if (!modal) return;
+		
+		  modal.addEventListener("shown.bs.modal", () => {
+		    document.getElementById("chatroomName").value = "";
+		    document.getElementById("chatroomName").readOnly = true;
+		    document.getElementById("selectedParticipants").innerHTML = "";
+		    document.getElementById("departmentSelect").selectedIndex = 0;
+		    const empSelect = document.getElementById("employeeSelect");
+		    empSelect.innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
+		
+		    document.getElementById("chatroomNameBox").style.display = isCreateMode ? "block" : "none";
+		    document.getElementById("chatTypeGroup").style.display = isCreateMode ? "block" : "none";
+		
+		    [...document.querySelectorAll('input[name="participantIds"]')].forEach(el => el.remove());
+		  });
+		}
+		
+		// 소속 선택시 직원 목록 로딩
+		function bindDepartmentChange() {
+		  const departmentSelect = document.getElementById("departmentSelect");
+		  if (!departmentSelect) return;
+		
+		  departmentSelect.addEventListener("change", function () {
+		    const deptId = this.value;
+		    fetch('/chat/employes?separator_code=' + encodeURIComponent(deptId))
+		      .then(response => response.json())
+		      .then(data => {
+		        const select = document.getElementById('employeeSelect');
+		        select.innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
+		        data.forEach(emp => {
+		          const option = document.createElement('option');
+		          option.value = emp.employee_no;
+		          option.text = emp.employee_name;
+		          select.appendChild(option);
+		        });
+		      })
+		      .catch(error => console.error('직원 로딩 실패:', error));
+		  });
+		}
+		
+		// 참여자 추가
+		function bindParticipantAdd() {
+		  const btn = document.querySelector("button[onclick='addParticipant()']");
+		  if (!btn) return;
+		  btn.addEventListener("click", () => {
+		    const isGroupChat = document.querySelector('input[name="chatIsGroupYn"]:checked')?.value === 'Y';
+		    const select = document.getElementById('employeeSelect');
+		    const selectedOptions = Array.from(select.selectedOptions);
+		
+		    if (selectedOptions.length === 0) {
+		      alert('참여자를 선택해주세요.');
+		      return;
+		    }
+		    const currentCount = document.querySelectorAll('#selectedParticipants .badge').length;
+		    if(isCreateMode && !isGroupChat && (currentCount + selectedOptions.length > 1)) {
+	    	  alert('1:1 채팅은 한 명만 선택할 수 있습니다.');
+	    	  return;
+	    	}
+		
+		    selectedOptions.forEach(option => {
+		      const participantId = option.value;
+		      const participantName = option.text;
+		      if (document.getElementById('participant-' + participantId)) {
+		        alert('이미 추가된 참여자입니다.');
+		        return;
+		      }
+		      const badge = document.createElement('span');
+		      badge.className = 'badge badge-phoenix badge-phoenix-secondary me-2 mb-2';
+		      badge.id = 'participant-' + participantId;
+		      badge.dataset.id = participantId;
+		      badge.innerHTML = `
+		        ${participantName}
+		        <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="this.parentElement.remove();"></button>
+		      `;
+		      document.getElementById('selectedParticipants').appendChild(badge);
+		
+		      if (!isGroupChat) {
+		        document.getElementById("chatroomName").value = participantName;
+		      }
+		    });
+		    select.selectedIndex = -1;
+		  });
+		}
+		
+		// 채팅 종류 변경시
+		function bindChatTypeChange() {
+		  const radios = document.querySelectorAll('input[name="chatIsGroupYn"]');
+		  if (!radios) return;
+		
+		  radios.forEach(radio => {
+		    radio.addEventListener("change", () => {
+		      const isGroup = document.querySelector('input[name="chatIsGroupYn"]:checked').value === 'Y';
+		      const chatroomNameInput = document.getElementById("chatroomName");
+		      if (isGroup) {
+		        chatroomNameInput.value = "";
+		        chatroomNameInput.readOnly = false;
+		      } else {
+		        chatroomNameInput.value = "";
+		        chatroomNameInput.readOnly = true;
+		        document.getElementById("selectedParticipants").innerHTML = "";
+		        document.getElementById("employeeSelect").selectedIndex = 0;
+		      }
+		    });
+		  });
+		}
+		
+		// 채팅방 목록 클릭
+		function bindChatroomPanelEvents() {
+		  document.addEventListener("click", function (e) {
+			const target = e.target.closest('[data-room-no]');
+
+		    if (!target) return;
+		
+		    const chatroomNo = target.dataset.roomNo;
+		    const isGroup = target.dataset.group === "Y";
+		    const chatroomNameEl = target.querySelector('.name');
+		    const chatroomName = chatroomNameEl
+		    ? chatroomNameEl.innerText.trim()
+		    : target.innerText?.trim() || "채팅방"; 
+		    lastSelectedChatroomName = chatroomName;
+			// 기본 채팅 영역 숨기기
+		    const defaultArea = document.getElementById("default-chat-area");
+		    if (defaultArea) defaultArea.style.display = "none";
+			// 채팅창 오른쪽 영역 보이기
+		    const chatContent = document.getElementById("chat-content");
+		    const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+		    
+		    chatContent.innerHTML = `
+		    	  <div class="tab-pane h-100 fade show active d-flex flex-column">
+		    	    <div class="d-flex align-items-center justify-content-between px-4 pt-3">
+		    	      <h4 class="mb-0 chatroom-title cursor-pointer text-primary"
+		    	          data-group="${isGroup ? 'Y' : 'N'}" data-room-no="${chatroomNo}">
+		    	        ${lastSelectedChatroomName || "채팅방"}
+		    	      </h4>
+		    	    </div>
+		    	    <div class="flex-grow-1 overflow-auto p-4">
+		    	      <div class="chat-history">
+		    	        <hr>
+		    	        <p>채팅 내용이 여기에 표시됩니다</p>
+		    	      </div>
+		    	    </div>
+		    	    <div class="chat-footer border-top p-3 d-flex align-items-center bg-white">
+		    	      <button class="btn btn-light me-2"><i class="fas fa-smile"></i></button>
+		    	      <label for="chatFileInput" class="btn btn-light me-2">
+		    	        <i class="fa-solid fa-paperclip"></i>
+		    	      </label>
+		    	      <input type="file" id="chatFileInput" name="files" style="display: none;" multiple>
+		    	      <div id="chatFilePreview" class="d-flex flex-wrap gap-2"></div>
+		    	      <input class="form-control me-2" type="text" placeholder="메시지를 입력하세요..." id="messageInput">
+		    	      <button class="btn btn-primary" onclick="sendMessage()">보내기</button>
+		    	    </div>
+		    	  </div>
+		    	`;
+		    	bindFilePreview();
+		    // 수신자 employeeNo 가져오기
+		    if (!isGroup) {
+			    fetch('/chat/receiver?chatroomNo=' + chatroomNo)
+			    .then(response => response.json())
+			    .then(data => {
+			        console.log("받아온 수신자 번호 : ", data.receiverNo);
+			        // 기존의 hidden input 제거
+			        const oldInput = document.getElementById("receiverNo");
+			        if (oldInput) {
+			            oldInput.remove();
+			        }
+			        // 새로운 hidden input 생성
+			        const receiverInput = document.createElement("input");
+			        receiverInput.type = "hidden";
+			        receiverInput.id = "receiverNo";
+			        receiverInput.value = data.receiverNo;
+			        document.body.appendChild(receiverInput);
+			    })
+			    .catch(error => {
+			        console.error('수신자 불러오기 실패:', error);
+			    });
+			    
+		    }else{
+		    	// 그룹 채팅일 경우 receiverNo 제거
+		    	const receiverInput = document.getElementById("receiverNo");
+		        if (receiverInput) {
+		            receiverInput.remove();
+		        }
+		    }
+		    fetch('/chat/read', {
+		    	  method: 'POST',
+		    	  headers: {
+		    	    'Content-Type': 'application/json',
+		    	    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+		    	  },
+		    	  body: JSON.stringify({
+		    	    chatroomNo: chatroomNo,
+		    	    senderNo: document.getElementById("myEmployeeNo").value
+		    	  })
+		    	})
+		    	.then(res => res.json())
+		    	.then(result => {
+		    	  console.log('✅ 읽음 처리 완료:', result);
+		    	  const sidebarItem = document.querySelector(`[data-room-no="${chatroomNo}"]`);
+		    	  if (sidebarItem) {
+		    	    sidebarItem.classList.remove('unread');
+		    	    sidebarItem.classList.add('read');
+		    	    const badge = sidebarItem.querySelector('.badge');
+		    	    if (badge) badge.remove();
+		    	  }
+		    	})
+		    	.catch(error => {
+		    	  console.error('❌ 읽음 처리 실패:', error);
+		    	});
+
+		    
+		    // 채팅 이력 불러오기
+		    loadChatroomDetail(chatroomNo);
+		  });
+
+		  document.addEventListener("click", function (e) {
+		    const target = e.target.closest(".chatroom-title");
+		    if (!target) return;
+		
+		    document.getElementById("modalChatroomName").innerText = target.innerText;
+		    document.getElementById("modalChatroomName").dataset.roomNo = target.dataset.roomNo;
+		
+		    const groupOptions = document.getElementById("group-only-options");
+		    if (groupOptions) groupOptions.style.display = target.dataset.group === "Y" ? "block" : "none";
+		    
+			// 참여자 목록 불러오기
+		    const chatroomNo = target.dataset.roomNo;
+		    fetch('/chat/participants?chatroomNo=' + encodeURIComponent(chatroomNo))
+		      .then(response => response.json())
+		      .then(data => {
+		        const participantList = document.getElementById('participantList');
+		        participantList.innerHTML = ''; // 초기화
+		        data.forEach(name => {
+		          const li = document.createElement('li');
+		          li.textContent = name;
+		          participantList.appendChild(li);
+		        });
+		      })
+		      .catch(error => {
+		        console.error('참여자 불러오기 실패:', error);
+		      });
+		    
+		    const modal = new bootstrap.Modal(document.getElementById("chatroomDetailModal"));
+		    modal.show();
+		  });
+		}
+		
+		// 채팅방 이름 변경
+		function bindChatroomRename() {
+		  const detailModal = document.getElementById("chatroomDetailModal");
+		  if (!detailModal) return;
+		
+		  detailModal.addEventListener("click", function (e) {
+			  const li = e.target.closest("li");
+			  if (!li || li.dataset.action !== "rename") return;
+
+			  const nameEl = document.getElementById("modalChatroomName");
+			  const chatroomNo = nameEl.dataset.roomNo;
+			  const currentName = nameEl.innerText;
+			  const newName = prompt("새 채팅방 이름을 입력하세요:", currentName);
+			  if (!newName || newName.trim() === "" || newName === currentName) return;
+
+			  fetch('/chat/rename', {
+			    method: 'POST',
+			    headers: {
+			      'Content-Type': 'application/json',
+			      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			    },
+			    body: JSON.stringify({ chatroomNo, chatroomName: newName })
+			  })
+			  .then(res => res.json())
+			  .then(data => {
+			    if (data.res_code === "200") {
+			      alert("채팅방 이름이 변경되었습니다.");
+			      nameEl.innerText = newName;
+			      const titleEl = document.querySelector(".chatroom-title");
+			      if (titleEl) titleEl.innerText = newName;
+			      const sideNameEl = document.querySelector(`[data-room-no="${chatroomNo}"] .name`);
+			      if (sideNameEl) sideNameEl.innerText = newName;
+			      lastSelectedChatroomName = newName;
+			    } else {
+			      alert("변경 실패: " + data.res_msg);
+			    }
+			  })
+			  .catch(err => {
+			    console.error("요청 실패:", err);
+			    alert("서버 오류가 발생했습니다.");
+			  });
+			});
+
+
+		}
+		
+		// 채팅방 생성/참여자 추가 submit
+		function bindChatroomCreate() {
+		  const form = document.getElementById("createChatForm");
+		  if (!form) return;
+		
+		  form.addEventListener("submit", function (e) {
+		    e.preventDefault();
+		
+		    if (isCreateMode) {
+		      const isGroupChat = document.querySelector('input[name="chatIsGroupYn"]:checked').value === 'Y';
+		      const chatroomName = document.getElementById("chatroomName").value.trim();
+		      if (isGroupChat && chatroomName === "") {
+		        alert("채팅방 제목을 입력해주세요.");
+		        return;
+		      }
+		    }
+		
+		    [...form.querySelectorAll('input[name="participantIds"]')].forEach(el => el.remove());
+		    const selectedIds = [...document.querySelectorAll('#selectedParticipants span[data-id]')].map(span => span.dataset.id);
+		    if (selectedIds.length === 0) {
+		      alert("참여자를 선택해주세요.");
+		      return;
+		    }
+		    selectedIds.forEach(id => {
+		      const hidden = document.createElement('input');
+		      hidden.type = 'hidden';
+		      hidden.name = 'participantIds';
+		      hidden.value = id;
+		      form.appendChild(hidden);
+		    });
+		
+		    const formData = new FormData(form);
+		    const url = isCreateMode ? '/chat/create' : '/chat/addParticipants';
+		    fetch(url, {
+		      method: 'POST',
+		      body: formData
+		    })
+		    .then(res => res.json())
+		    .then(data => {
+		      if (data.res_code === "200") {
+		        alert(data.res_msg);
+		        bootstrap.Modal.getInstance(document.getElementById("createChatModal"))?.hide();
+		        location.href = "/chat/list";
+		      } else {
+		        alert("오류: " + data.res_msg);
+		      }
+		    })
+		    .catch(err => {
+		      console.error("요청 실패:", err);
+		      alert("서버 오류가 발생했습니다.");
+		    });
+		  });
+		}
+		
+		// 참여자 추가하기 버튼
+		function bindParticipantAddButton() {
+		  const detailModal = document.getElementById("chatroomDetailModal");
+		  if (!detailModal) return;
+		
+		  detailModal.addEventListener("click", function (e) {
+		    const li = e.target.closest("li");
+		    if (!li || !li.textContent.includes("참여자 추가하기")) return;
+		
+		    const chatroomNo = document.getElementById("modalChatroomName").dataset.roomNo;
+		    if (chatroomNo) {
+		      const detailModalInstance = bootstrap.Modal.getInstance(detailModal);
+		      detailModalInstance.hide();
+		      setTimeout(() => {
+		        openParticipantAddModal(chatroomNo);
+		      }, 300);
+		    }
+		  });
+		}
+		// 채팅방 삭제
+		function bindChatroomDelete() {
+          const detailModal = document.getElementById("chatroomDetailModal");
+          if (!detailModal) return;
+        
+          detailModal.addEventListener("click", function (e) {
+            const li = e.target.closest("li");
+            if (!li || !li.textContent.includes("채팅방 삭제")) return;
+        
+            const chatroomNo = document.getElementById("modalChatroomName").dataset.roomNo;
+            if (chatroomNo) {
+              if (confirm("정말로 채팅방을 삭제하시겠습니까?")) {
+                fetch('/chat/delete', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+                  },
+                  body: JSON.stringify({ chatroomNo })
+                })
+                .then(res => res.json())
+                .then(data => {
+                  if (data.res_code === "200") {
+                    alert(data.res_msg);
+                    location.href = "/chat/list";
+                  } else {
+                    alert("삭제 실패: " + data.res_msg);
+                  }
+                })
+                .catch(err => {
+                  console.error("요청 실패:", err);
+                  alert("서버 오류가 발생했습니다.");
+                });
+              }
+            }
+          });
+        }
+		
+		// 참여자 추가 모달 열기
+		function openParticipantAddModal(chatroomNo) {
+		  isCreateMode = false;
+		  const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("createChatModal"));
+		  modal.show();
+		  document.querySelector("#createChatModal h3").innerText = "참여자 추가하기";
+		  document.getElementById("chatroomNameBox").style.display = "none";
+		  document.getElementById("chatTypeGroup").style.display = "none";
+		
+		  let chatroomInput = document.getElementById("chatroomNoInput");
+		  if (!chatroomInput) {
+		    chatroomInput = document.createElement('input');
+		    chatroomInput.type = 'hidden';
+		    chatroomInput.name = 'chatroomNo';
+		    chatroomInput.id = 'chatroomNoInput';
+		    document.getElementById("createChatForm").appendChild(chatroomInput);
+		  }
+		  chatroomInput.value = chatroomNo;
+		
+		  modal._element.addEventListener("hidden.bs.modal", () => {
+		    isCreateMode = true;
+		    document.querySelector("#createChatModal h3").innerText = "새 채팅방 만들기";
+		    document.getElementById("chatroomNameBox").style.display = "block";
+		    document.getElementById("chatTypeGroup").style.display = "block";
+		  }, { once: true });
+		}
+		
+		
+		function connectWebSocket() {
+		  const senderNo = document.getElementById("myEmployeeNo").value; 
+		  function getFormattedDate() {
+			  const now = new Date();
+			  return now.getFullYear().toString().slice(2) + '.' +
+			         String(now.getMonth() + 1).padStart(2, '0') + '.' +
+			         String(now.getDate()).padStart(2, '0');
+			}
+		  if (socket) {
+		    socket.onmessage = null;   // 기존 소켓의 메시지 리스너를 끊는다
+		    socket.onclose = null;     // (선택) 기존 소켓의 종료 리스너도 끊는다
+		    socket.onerror = null;     // (선택) 기존 소켓의 에러 리스너도 끊는다
+		    socket.close();            // 기존 소켓 연결 닫는다
+		  }
+
+		  socket = new WebSocket("ws://localhost:8080/ws/chat?senderNo=" + senderNo);
+		  
+		  socket.onopen = function() {
+			 console.log('WebSocket 연결 성공');
+		  };
+		  // 메시지 수신
+		 socket.onmessage = function(event) {
+		  const data = JSON.parse(event.data);
+		  const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+		  const currentChatroomNo = document.querySelector(".chatroom-title")?.dataset.roomNo;
+		  const chatHistory = document.querySelector(".chat-history");
+		  const sidebarItem = document.querySelector(`[data-room-no="${data.chatroomNo}"]`);
+		
+		  const isMyMessage = data.senderMember == myEmployeeNo;
+		
+		  if (!sidebarItem) return;
+		
+		  // 다른 채팅방일 경우 사이드바에 알림 뱃지 갱신
+		  if (!currentChatroomNo || Number(currentChatroomNo) !== Number(data.chatroomNo)) {
+		    sidebarItem.classList.add('unread');
+		    sidebarItem.classList.remove('read');
+		
+		    const badge = sidebarItem.querySelector('.badge');
+		    if (badge) {
+		      badge.innerText = (parseInt(badge.innerText) || 0) + 1;
+		    } else {
+		      const newBadge = document.createElement("div");
+		      newBadge.className = "badge bg-danger text-white ms-2";
+		      newBadge.innerText = "1";
+		      const container = sidebarItem.querySelector('.d-flex.justify-content-between');
+		      if (container) container.appendChild(newBadge);
+		    }
+		
+		    const messagePreview = sidebarItem.querySelector('.message');
+		    if (messagePreview) messagePreview.innerText = data.chatMessageContent;
+		
+		    const timePreview = sidebarItem.querySelector('.text-body-tertiary');
+		    if (timePreview) timePreview.innerText = getFormattedDate();
+		
+		    return;
+		  }
+		
+		  // 현재 열린 채팅방일 경우 채팅 내용 렌더링
+		  if (!chatHistory) return;
+		
+		  const wrapper = document.createElement("div");
+		  wrapper.className = "mb-3";
+		
+		  const nameLine = document.createElement("div");
+		  nameLine.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-1`;
+		  nameLine.innerHTML = `<div class="small text-muted">${isMyMessage ? '나' : data.senderName}</div>`;
+		
+		  const messageLine = document.createElement("div");
+		  messageLine.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
+		
+		  const messageBubble = document.createElement("div");
+		  messageBubble.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
+		  messageBubble.style.maxWidth = "70%";
+		  messageBubble.innerText = data.chatMessageContent;
+		
+		  messageLine.appendChild(messageBubble);
+		  wrapper.appendChild(nameLine);
+		  wrapper.appendChild(messageLine);
+		  chatHistory.appendChild(wrapper);
+		
+		  const scrollArea = document.querySelector(".flex-grow-1.overflow-auto");
+		  if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
+		};
+
+
+
+
+
+
+  // 현재 열린 방이 없거나, 다른 방이면 읽지 않음 처리
+	  if (data.senderMember != myEmployeeNo) {
+	  fetch('/chat/unreadCount?chatroomNo=' + data.chatroomNo)
+	    .then(response => response.json())
+	    .then(result => {
+	      sidebarItem.classList.add('unread');
+	      sidebarItem.classList.remove('read');;
+	
+	     let badge = sidebarItem.querySelector('.badge');
+	     if (badge) {
+	       badge.innerText = result.count;
+	     } else {
+	       badge = document.createElement('div');
+	       badge.className = 'badge bg-danger text-white ms-2';
+	       badge.innerText = result.count;
+	       const flexBox = sidebarItem.querySelector('.d-flex.justify-content-between');
+	       if (flexBox) {
+	         flexBox.appendChild(badge);
+	       }
+	     }
+	   })
+	   .catch(error => {
+	     console.error('뱃지 업데이트 실패:', error);
+	   });
+
+
+// 미리보기 텍스트와 시간은 업데이트해주자 (내 메시지도 포함)
+const messagePreview = sidebarItem.querySelector('.message');
+if (messagePreview) {
+  messagePreview.innerText = data.chatMessageContent;
+}
+
+const timePreview = sidebarItem.querySelector('.text-body-tertiary');
+if (timePreview) {
+  const now = new Date();
+  const formatted = now.getFullYear().toString().slice(2) + '.' +
+                    String(now.getMonth() + 1).padStart(2, '0') + '.' +
+                    String(now.getDate()).padStart(2, '0');
+  timePreview.innerText = formatted;
+}
+
+  // 같은 방이면 채팅 추가
+  if (!chatHistory) {
+    console.error("❌ chat-history 없음");
+    return;
+  }
+
+  const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+  const isMyMessage = data.senderMember == myEmployeeNo;
+
+  const wrapperDiv = document.createElement("div");
+  wrapperDiv.className = "mb-3";
+
+  const nameDiv = document.createElement("div");
+  nameDiv.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-1`;
+  nameDiv.innerHTML = `<div class="small text-muted">${isMyMessage ? '나' : data.senderName}</div>`;
+
+  const messageOuterDiv = document.createElement("div");
+  messageOuterDiv.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
+
+  const messageInnerDiv = document.createElement("div");
+  messageInnerDiv.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
+  messageInnerDiv.style.maxWidth = "70%";
+  messageInnerDiv.innerText = data.chatMessageContent;
+
+  messageOuterDiv.appendChild(messageInnerDiv);
+  wrapperDiv.appendChild(nameDiv);
+  wrapperDiv.appendChild(messageOuterDiv);
+  chatHistory.appendChild(wrapperDiv);
+
+  const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
+  if (chatArea) {
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+};
+
+
+
+
+		  socket.onclose = function(event) {
+		    console.log('❌ WebSocket 연결 종료:', event);
+		  };
+
+		  socket.onerror = function(error) {
+		    console.error('🚨 WebSocket 오류 발생:', error);
+		  };
+		}
+		// 메시지 보내기
+		function sendMessage() {
+    const messageInput = document.getElementById("messageInput");
+    const message = messageInput.value.trim();
+    const fileInput = document.getElementById("chatFileInput");
+
+    if (!message && fileInput.files.length === 0) {
+        alert("메시지나 파일을 입력해주세요.");
+        return;
+    }
+
+    const chatroomNo = document.querySelector(".chatroom-title").dataset.roomNo;
+    const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+    const receiverValue = document.getElementById("receiverNo")?.value;
+    const receiverNo = receiverValue && receiverValue !== "undefined" && receiverValue !== "null" ? Number(receiverValue) : null;
+    const isGroupChat = document.querySelector('.chatroom-title')?.dataset.group === 'Y';
+
+    // 🔁 1. 파일이 있는 경우 Ajax로 업로드 먼저
+    if (fileInput.files.length > 0) {
+        const formData = new FormData();
+        formData.append("chatroomNo", chatroomNo);
+        formData.append("driveDescriptions", message || "");  // 메시지 -> 설명에 저장
+        for (let file of fileInput.files) {
+            formData.append("files", file); 
+        }
+
+        fetch("/chat/upload/chat", {
+            method: "POST",
+            headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("파일 업로드 결과:", data);
+            if (data.res_code === "200") {
+                fileInput.value = "";
+                document.getElementById("chatFilePreview").innerHTML = "";
+            } else {
+                alert("파일 업로드 실패: " + data.res_msg);
+            }
+        })
+        .catch(err => {
+            console.error("파일 업로드 오류:", err);
+        });
+    }
+
+    // 🔁 2. 메시지 있는 경우 WebSocket으로 전송
+    if (message) {
+        const chatData = {
+            chatMessageContent: message,
+            senderMember: Number(myEmployeeNo),
+            chatroomNo: Number(chatroomNo),
+            receiverMember: isGroupChat ? null : receiverNo
+        };
+        socket.send(JSON.stringify(chatData));
+        messageInput.value = "";
+    }
+}
+
+
+
+		
+		function loadChatroomDetail(chatroomNo) {
+			  fetch('/chat/roomDetail?roomNo=' + chatroomNo)
+			    .then(response => response.json())
+			    .then(data => {
+			      const chatHistory = document.querySelector(".chat-history");
+			      if (!chatHistory) return;
+			      
+			      chatHistory.innerHTML = "<hr>"; // 초기화
+
+			      if (data.messageList && data.messageList.length > 0) {
+			        const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+					
+			        data.messageList.forEach(msg => {
+			          const isMyMessage = (msg.senderMember == myEmployeeNo);
+			          const messageDiv = document.createElement("div");
+			          messageDiv.className = "mb-2";
+			          messageDiv.innerHTML = `
+			            <div class="d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'}">
+			              <div class="p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}" style="max-width: 70%;">
+			                ${msg.chatMessageContent}
+			              </div>
+			            </div>
+			          `;
+			          chatHistory.appendChild(messageDiv);
+			        });
+
+			        // 스크롤 맨 밑으로
+			        const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
+			        if (chatArea) {
+			          chatArea.scrollTop = chatArea.scrollHeight;
+			        }
+			      }
+			    })
+			    .catch(error => {
+			      console.error("채팅방 상세 조회 실패:", error);
+			    });
+			}
+		function bindFilePreview() {
+			  const fileInput = document.getElementById("chatFileInput");
+			  console.log("📁 파일 미리보기 바인딩됨");
+			  if (!fileInput) return;
+			  
+			  fileInput.addEventListener("change", function (e) {
+			    const previewArea = document.getElementById("chatFilePreview");
+			    previewArea.innerHTML = "";
+
+			    [...e.target.files].forEach(file => {
+			      const ext = file.name.split('.').pop().toLowerCase();
+			      const isImage = file.type.startsWith("image/");
+			      const iconMap = {
+			        pdf: "/assets/img/icons/pdf.png",
+			        docx: "/assets/img/icons/word.png",
+			        xlsx: "/assets/img/icons/excel.png",
+			        zip: "/assets/img/icons/zip.png"
+			      };
+
+			      const wrapper = document.createElement("div");
+			      wrapper.className = "border p-2 rounded d-flex align-items-center gap-2";
+			      wrapper.style.maxWidth = "200px";
+
+			      const thumb = document.createElement("img");
+			      thumb.style.width = "32px";
+			      thumb.style.height = "32px";
+			      thumb.style.objectFit = "cover";
+			      thumb.className = "rounded";
+
+			      if (isImage) {
+			        thumb.src = URL.createObjectURL(file);
+			      } else if (iconMap[ext]) {
+			        thumb.src = iconMap[ext];
+			      } else {
+			        thumb.src = "/assets/img/icons/file.png";
+			      }
+
+			      const name = document.createElement("div");
+			      name.className = "small text-truncate";
+			      name.innerText = file.name;
+
+			      wrapper.appendChild(thumb);
+			      wrapper.appendChild(name);
+			      previewArea.appendChild(wrapper);
+			    });
+			  });
+			}
+
+
+		
+		</script>
+
+	</main>
+</body>
+</html>

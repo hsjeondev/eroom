@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      th:with="isPdfMode=${param.mode} == 'pdf'"
+      layout:decorate="~{/include/layout}"
+      th:remove="${isPdfMode} ? 'tag' : 'none'">
+
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+  <title>결재 상세</title>
+</head>
+<body class="bg-light">
+  <main class="main" id="top" layout:fragment="content">
+    <div class="container bg-white rounded shadow-sm p-4 mt-4" style="max-width: 1000px;">
+
+      <!-- 상단 제목 + 목록 버튼 -->
+      <div class="d-flex mb-3">
+        <span class="fw-bold fs-6">결재서 상세</span>
+        <button class="btn btn-light btn-sm me-2" id="topdf" type="button">pdf만들기</button>
+        <button type="button" class="btn btn-light btn-sm" onclick="history.back()">목록으로</button>
+      </div>
+
+      <!-- 기본 정보 + 결재선 테이블 병렬 정렬 -->
+<div class="card shadow-sm p-3 rounded-2xl mb-4">
+  <div class="row align-items-start">
+    <!-- 기본 정보 -->
+    <div class="col-lg-5">
+    <div class="text-center fs-6 fw-bold" th:text="${approval.approval_title}">결재 제목</div>
+      <table class="table table-bordered text-dark mb-0 text-center align-items-center align-middle">
+      	<!-- <thead>
+      		<tr>
+      			<th th:text="${approval.approval_title}" class="align-middle text-center" style="height: 50px;" colspan="4">제목위치</th>
+   			</tr>
+      	</thead> -->
+        <tbody>
+          <tr>
+            <th class="table-light text-center" style="width: 150px;">서류번호</th>
+            <td th:text="${approvalNoFormatted}">서류번호</td>
+          </tr>
+          <tr>
+            <th class="table-light text-center" style="width: 150px;">신청일</th>
+            <td th:text="${approval.reg_date}">신청일</td>
+          </tr>
+          <tr>
+            <th class="table-light text-center" style="width: 150px;">완료일</th>
+            <td th:text="${approval.completed_date}">완료일</td>
+          </tr>
+          <tr>
+            <th class="table-light text-center">신청자</th>
+            <td th:text="${approval.employee.employeeName}">신청자</td>
+          </tr>
+          <tr>
+            <th class="table-light text-center">부서</th>
+            <td th:text="${approval.employee.structure.codeName}">부서명</td>
+          </tr>
+          <tr>
+            <th class="table-light text-center">직급</th>
+            <td th:text="${approval.employee.employeePosition}">직급</td>
+          </tr>
+          <!-- <tr>
+            <th class="table-light text-center">제목</th>
+            <td colspan="3" th:text="${approval.approval_title}">제목</td>
+          </tr> -->
+          <!-- <tr>
+            <th class="table-light text-center">양식 종류</th>
+            <td colspan="3" th:text="${approval.approval_format.approvalFormatTitle}">양식 종류</td>
+          </tr> -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 결재선 -->
+    <div class="col-lg-7 ps-lg-2 d-flex flex-column align-items-end">
+      <div class="ps-lg-2">
+        <!-- 결재라인 -->
+        <div class="mb-3">
+          <div class="fw-bold text-dark border-bottom pb-1 mb-2">결재 라인</div>
+          <table class="table table-bordered text-center align-middle mb-0" th:if="${#lists.size(approvalLineList.?[approval_line_step >= 1]) > 0}">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 100px;" th:each="line : ${approvalLineList}" th:if="${line.approval_line_step >= 1}"
+                    th:utext="|${line.employee.employeePosition}<br>${line.employee.employeeName}|">
+                  직급<br>결재자
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 0; text-align: center; vertical-align: middle; height: 50px;" th:each="line : ${approvalLineList}" th:if="${line.approval_line_step >= 1}">
+                  <span th:if="${line.approval_line_status == 'A'}">
+                  	<img th:if="${line.base64URL != null}"
+                  		th:src="|data:image/png;base64,${line.base64URL}|"
+                  		style="display: block; width: 100%; height: 100%; object-fit: contain;" alt="서명 이미지"/>
+               		<span th:if="${line.base64URL == null}">승인</span>
+                  </span>
+                  <span th:if="${line.approval_line_status == 'S'}" th:text="대기">대기</span>
+                  <span th:if="${line.approval_line_status == 'D'}" th:text="반려">반려</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div th:if="${#lists.size(approvalLineList.?[approval_line_step >= 1]) == 0}" class="text-center text-secondary small border py-3 rounded">결재자가 없습니다.</div>
+        </div>
+
+        <!-- 합의라인 -->
+        <div class="mb-3">
+          <div class="fw-bold text-dark border-bottom pb-1 mb-2">합의 라인</div>
+          <table class="table table-bordered text-center align-middle mb-0" th:if="${#lists.size(approvalLineList.?[approval_line_step == 0]) > 0}">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 100px;" th:each="line : ${approvalLineList}" th:if="${line.approval_line_step == 0}" 
+                    th:utext="|${line.employee.employeePosition}<br>${line.employee.employeeName}|">직급<br>합의자</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 0; text-align: center; vertical-align: middle; height: 50px;" th:each="line : ${approvalLineList}" th:if="${line.approval_line_step == 0}">
+                  <span th:if="${line.approval_line_status == 'A'}">
+                  	<img th:if="${line.base64URL != null}"
+                  		th:src="|data:image/png;base64,${line.base64URL}|"
+                  		style="display: block; width: 100%; height: 100%; object-fit: contain;" alt="서명 이미지"/>
+               		<span th:if="${line.base64URL == null}">합의</span>
+                  </span>
+                  <span th:if="${line.approval_line_status == 'S'}" th:text="대기">대기</span>
+                  <span th:if="${line.approval_line_status == 'D'}" th:text="반려">반려</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div th:if="${#lists.size(approvalLineList.?[approval_line_step == 0]) == 0}" class="text-center text-secondary small border py-3 rounded">합의자가 없습니다.</div>
+        </div>
+
+		<!-- 참조자 -->
+		<div class="mb-2">
+		  <div class="fw-bold text-dark border-bottom pb-1 mb-2">참조 라인</div>
+		  <!-- 숨겨진 참조자 목록 -->
+		  <span id="referenceList" style="display:none;">
+		    <span th:each="line : ${approvalLineList}" th:if="${line.approval_line_step == -1}" th:text="${line.employee.employeeName + ', '}">참조자</span>
+		  </span>
+		  <!-- 참조자 표시 영역 -->
+		  <div class="text-end text-body-secondary small" th:if="${#lists.size(approvalLineList.?[approval_line_step == -1]) > 0}">
+		    <span>참조자: </span><span id="referenceDisplay"></span>
+		  </div>
+		  <!-- 참조자 없음 표시 -->
+		  <div class="text-center text-secondary small border py-3 rounded" th:if="${#lists.size(approvalLineList.?[approval_line_step == -1]) == 0}">
+		    참조자가 없습니다.
+		  </div>
+		</div>
+
+      </div>
+    </div>
+    
+  </div>
+  
+  <div class="my-2"></div>
+      <!-- 결재 내용 -->
+      <!-- 경조금 -->
+      <div th:if="${approval.approval_format.approvalFormatNo == 1}"  >
+      	<table class="table table-bordered text-center align-middle mb-0">
+      		<tr>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      		</tr>
+      	</table>
+      	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/congratulatory_payment :: congratulatory_payment}"></div>
+      </div>
+      <!-- 법인카드사용신청서 -->
+      <div th:if="${approval.approval_format.approvalFormatNo == 2}"  >
+      	<table class="table table-bordered text-center align-middle mb-0">
+      		<tr>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      		</tr>
+      	</table>
+      	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/corporate_card_request :: corporate_card_request}"></div>
+      </div>
+      <!-- 시말서 -->
+      <div th:if="${approval.approval_format.approvalFormatNo == 3}"  >
+      	<table class="table table-bordered text-center align-middle mb-0">
+      		<tr>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      		</tr>
+      	</table>
+      	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/written_apology :: written_apology}"></div>
+      </div>
+      <!-- 연장근무신청서 -->
+      <div th:if="${approval.approval_format.approvalFormatNo == 4}"  >
+      	<table class="table table-bordered text-center align-middle mb-0">
+      		<tr>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      		</tr>
+      	</table>
+      	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/overtime_work_request :: overtime_work_request}"></div>
+      </div>
+      <!-- 재직증명서 -->
+      <div th:if="${approval.approval_format.approvalFormatNo == 5}"  >
+      	<table class="table table-bordered text-center align-middle mb-0">
+      		<tr>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      		</tr>
+      	</table>
+      	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/certificate_of_employment :: certificate_of_employment}"></div>
+      </div>
+      <!-- 출장보고서 -->
+      <div th:if="${approval.approval_format.approvalFormatNo == 6}"  >
+      	<table class="table table-bordered text-center align-middle mb-0">
+      		<tr>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      		</tr>
+      	</table>
+      	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/business_trip_report :: business_trip_report}"></div>
+      </div>
+      <!-- 연차신청서 -->
+      <div th:if="${approval.approval_format.approvalFormatNo == 7}"  >
+      	<table class="table table-bordered text-center align-middle mb-0">
+      		<tr>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      		</tr>
+      	</table>
+      	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/leave_request :: leave_request}"></div>
+      </div>
+      <!-- 반차신청서 -->
+      <div th:if="${approval.approval_format.approvalFormatNo == 8}"  >
+      	<table class="table table-bordered text-center align-middle mb-0">
+      		<tr>
+      			<th class="fw-bold fs-7" style="background-color: #eff2f6;" th:text="${approval.approval_format.approvalFormatTitle}">결재 양식</th>
+      		</tr>
+      	</table>
+      	<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/templateFragment/leave_half_request :: leave_half_request}"></div>
+      </div>
+   </div>
+
+	<!-- 첨부 파일 -->
+	<div class="mt-4">
+		<h6 class="mb-2">첨부 파일</h6>
+		<ul class="ps-3">
+			<li th:each="approvalAttachFile : ${driveList}"><a th:href="@{'/drive/download/approval/' + ${approvalAttachFile.driveAttachNo}}" th:text="${approvalAttachFile.driveOriName}" class="text-primary text-decoration-underline" onmouseover="this.style.textDecoration='none'" onmouseout="this.style.textDecoration='underline'">첨부된 파일이 없습니다.</a></li>
+			<li th:if="${#lists.isEmpty(driveList)}" class="text-muted">첨부된 파일이 없습니다.</li>
+		</ul>
+	</div>
+
+			<!-- 승인/반려 버튼 -->
+      <div class="mt-4 text-end"  th:if="${line.approval_line_step >= 1 and line.employee.employeeNo == employee.employeeNo and line.approval_line_status == 'S'}" th:each="line : ${approvalLineList}">
+        <button data-approval-status="A" id="approvalApproveBtn" type="button" class="btn btn-primary me-2 approveDenyBtn">승인</button>
+        <button data-approval-status="D" id="approvalDenyBtn" type="button" class="btn btn-outline-danger approveDenyBtn">반려</button>
+      </div>
+      <!-- 합의/거절 버튼 -->
+      <div class="mt-4 text-end"  th:if="${line.approval_line_step == 0 and line.employee.employeeNo == employee.employeeNo and line.approval_line_status == 'S'}" th:each="line : ${approvalLineList}">
+        <button data-approval-status="A" id="agreementApproveBtn" type="button" class="btn btn-primary me-2 approveDenyBtn">합의</button>
+        <button data-approval-status="D" id="agreementDenyBtn" type="button" class="btn btn-outline-danger approveDenyBtn">반려</button>
+      </div>
+      <!-- 결재 삭제 버튼 -->
+      <div class="mt-4 text-end">
+        <button th:if="${(approval.employee.employeeNo == employee.employeeNo and approval.approval_status != 'D' and approval.approval_status != 'A') or employee.employeeName.contains('admin')}" id="deleteBtn" type="button" class="btn btn-outline-danger">삭제</button>
+        <button th:if="${approval.employee.employeeNo == employee.employeeNo and approval.approval_status == 'S'}" id="fallBackBtn" type="button" class="btn btn-outline-danger">회수</button>
+        <button th:if="${approval.employee.employeeNo == employee.employeeNo and approval.approval_status == 'F' or approval.employee.employeeNo == employee.employeeNo and approval.approval_status == 'A'}" id="rewriteBtn" type="button" class="btn btn-primary me-2 approveDenyBtn">재기안</button>
+      </div>
+    </div>
+    
+    
+	<!-- Step 3: JS로 콤마 제거하고 보여주기 -->
+	<script>
+	  const refList = document.getElementById("referenceList").innerText;
+	  const trimmed = refList.replace(/,\s*$/, ''); // 마지막 콤마 제거
+	  let temp01 = document.getElementById("referenceDisplay");
+	  if(temp01){
+		  document.getElementById("referenceDisplay").innerText = trimmed;
+	  }
+	</script>
+		
+    <!-- pdf 생성 버튼 -->
+	<script th:inline="javascript">
+		const approvalNoPdf = /*[[${approval.approval_no}]]*/ 0;
+	  document.getElementById("topdf").addEventListener("click", function() {
+	    // meta 태그에서 CSRF 토큰과 헤더명 읽기
+	    var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+	    var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+	
+	    // GET 요청일 경우, 쿼리 파라미터로 CSRF 토큰 전달 (예: headerName=token)
+	    // CSRF 토큰이 필요 없다면 Spring Security 설정에서 GET은 제외할 수도 있습니다.
+	    window.location.href = "/approval/" + approvalNoPdf + "/pdf?" 
+	        + encodeURIComponent(csrfHeader) + "=" + encodeURIComponent(csrfToken);
+	  });
+	</script>
+	<!-- 삭제 버튼 -->
+	<script th:inline="javascript">
+		let deleteBtn = document.getElementById("deleteBtn");
+		if(deleteBtn){
+			document.getElementById("deleteBtn").addEventListener("click", function(){
+				const deleteNo = /*[[${approval.approval_no}]]*/ 0;
+				if(confirm('결재를 삭제하시겠습니까?')){
+					fetch('/approval/' + deleteNo + '/delete',{
+						method : 'DELETE',
+						headers : {
+					      'Content-Type': 'application/json',
+					      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+					      'header': document.querySelector('meta[name="_csrf_header"]').content
+						}
+					})
+					.then(response => response.json())
+					.then(data =>{
+						alert(data.res_msg)
+						if(data.res_code == 200){
+							location.href='/approval/myRequestedApprovals';
+						}
+					})
+				} else{
+					
+				}
+			});
+		}
+	
+	</script>
+	<!-- 회수 버튼 -->
+	<script th:inline="javascript">
+		let fallBackBtn = document.getElementById("fallBackBtn");
+		if(fallBackBtn){
+			document.getElementById("fallBackBtn").addEventListener("click", function(){
+				const fallBackNo = /*[[${approval.approval_no}]]*/ 0;
+				if(confirm('결재를 회수하시겠습니까?')){
+					fetch('/approval/' + fallBackNo + '/fallBack',{
+						method : 'POST',
+						headers : {
+					      'Content-Type': 'application/json',
+					      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+					      'header': document.querySelector('meta[name="_csrf_header"]').content
+						}
+					})
+					.then(response => response.json())
+					.then(data =>{
+						alert(data.res_msg)
+						if(data.res_code == 200){
+							location.href='/approval/myRequestedApprovals';
+						}
+					})
+				} else{
+					
+				}
+			});
+		}
+	
+	</script>
+	
+	<!-- 승인,반려 버튼 -->
+	<script th:inline="javascript">
+		document.querySelectorAll(".approveDenyBtn").forEach(function(btn) {
+			btn.addEventListener("click", function () {
+				const approvalNo = /*[[${approval.approval_no}]]*/ 0;
+				const employeeNo = /*[[${employee.employeeNo}]]*/ 0;
+				const status = this.dataset.approvalStatus;
+	
+				let con1 = false;
+				let con2 = false;
+				let delimeter = -1;
+	
+				if (this.id === 'approvalApproveBtn' || this.id === 'approvalDenyBtn') {
+					const actionText1 = status === 'A' ? '승인' : (status === 'D' ? '반려' : '처리');
+					con1 = confirm(`결재를 ${actionText1}하시겠습니까?`);
+					delimeter = 1;
+				} else if (this.id === 'agreementApproveBtn' || this.id === 'agreementDenyBtn') {
+					const actionText2 = status === 'A' ? '합의' : (status === 'D' ? '반려' : '처리');
+					con2 = confirm(`결재를 ${actionText2}하시겠습니까?`);
+					delimeter = 0;
+				}
+			    
+				if(con1 == true || con2 == true){
+					fetch('/approvalLine/approveDenyAgreement', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+							'header': document.querySelector('meta[name="_csrf_header"]').content
+						},
+						body: JSON.stringify({
+							approval_no : approvalNo,
+							approval_line_status : status,
+							employee_no : employeeNo,
+							delimeter : delimeter
+						})
+					})
+					.then(response => response.json())
+					.then(data => {
+						alert(data.res_msg)
+						if (data.res_code == 200) {
+							location.reload();
+						}
+					});
+					
+				}
+				
+				
+			});
+		});
+
+	</script>
+    <!-- 재기안 버튼 -->
+    <script th:inline="javascript">
+    	const rewriteBtn = document.getElementById("rewriteBtn");
+    	if(rewriteBtn){
+	    	document.getElementById("rewriteBtn").addEventListener("click", function(){
+	    		const editNo = /*[[${approval.approval_no}]]*/ null;
+	    		location.href = '/approval/' + editNo + '/edit';
+	    	});
+    	}
+    </script>
+	</main>
+</body>
+</html>

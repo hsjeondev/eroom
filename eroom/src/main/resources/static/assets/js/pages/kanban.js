@@ -31,6 +31,47 @@
           window.bootstrap.Dropdown.getInstance(dropdownElement)?.hide();
         });
 
+		
+		  // 여기에 onEnd 추가
+		  itemInstance.option('onEnd', async e => {
+		    const movedElement = e.item;
+		    const newParentList = movedElement.closest('.kanban-column');
+		    const oldParentList = e.from.closest('.kanban-column');
+
+		    const listNo = newParentList.getAttribute('data-list-no');
+		    const todoNo = movedElement.getAttribute('data-todo-no');
+		    const newIndex = [...newParentList.querySelectorAll('[data-todo-no]')].indexOf(movedElement);
+
+		    const payload = {
+		      listNo,
+		      todoNo,
+		      newIndex
+		    };
+
+		    await fetch('/projectTodo/updateElement', {
+		      method: 'POST',
+		      headers: {
+		        'Content-Type': 'application/json',
+		        [document.querySelector('meta[name="_csrf_header"]').content]:
+		          document.querySelector('meta[name="_csrf"]').content
+		      },
+		      body: JSON.stringify(payload)
+		    });
+
+		    // ✅ count 갱신 함수
+		    const updateCount = (columnEl) => {
+		      const badge = columnEl.querySelector('.kanban-title-badge');
+		      const count = columnEl.querySelectorAll('[data-todo-no]').length;
+		      if (badge) badge.textContent = count;
+		    };
+
+		    updateCount(oldParentList);
+		    updateCount(newParentList);
+
+		    document.body.classList.remove('sortable-dragging');
+		  });
+
+		
         // return itemInstance;
       });
     }

@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
+<head>
+<meta charset="UTF-8">
+<title>회사 주소록</title>
+<style>
+.avatar img {
+	max-width: 32px;
+	height: auto;
+}
+
+td.name p {
+	max-width: 150px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.table-responsive table {
+	table-layout: fixed;
+	width: 100%;
+}
+
+.table td {
+	overflow: hidden;
+}
+
+.profile-wrapper {
+	position: relative;
+	width: 128px;
+	height: 128px;
+}
+
+.profile-wrapper img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.treeview-label-strong {
+  font-weight: bold;
+  text-decoration: underline;
+  color: #007bff;  /* 진한 파랑 계열 (Bootstrap의 primary 색상) */
+}
+</style>
+</head>
+<body>
+	<main class="main" id="top" layout:fragment="content">
+		<div class="d-flex justify-content-start align-items-center mb-5">
+			<i class="fas fa-user-tie text-secondary me-2"></i> <span class="fw-bold fs-7">회사 주소록</span>
+		</div>
+		<div class="mb-9" data-collapse-filemanager-sidebar="data-collapse-filemanager-sidebar">
+			<div class="row gx-4">
+
+				<!-- 트리구조 -->
+				<div class="col-auto file-manager-sidebar">
+					<div class="phoenix-offcanvas phoenix-offcanvas-fixed bg-body scrollbar overflow-x-hidden" id="fileManagerSideBar" data-breakpoint="lg">
+						<div class="d-flex flex-between-center">
+							<h5 class="mb-2">회사 주소록</h5>
+							<button class="btn p-0 fs-8 d-lg-none" data-phoenix-dismiss="offcanvas">
+								<span class="fa-solid fa-xmark" data-fa-transform="up-3"></span>
+							</button>
+						</div>
+						<ul class="mb-0 treeview" id="treeviewExample">
+							<li class="treeview-list-item"><a data-bs-toggle="collapse" href="#treeviewExample-1-1" role="button" aria-expanded="true">
+									<p class="treeview-text text-nowrap">
+										<span class="fa-solid fa-folder treeview-icon text-info-light"></span> <span class="treeview-label-text treeview-label-strong">이룸 컴퍼니</span>
+									</p>
+							</a>
+								<ul class="collapse treeview-list" id="treeviewExample-1-1" data-show="true">
+
+									<li th:each="dept, deptStatus : ${departmentList}" class="treeview-list-item"><a class="treeview-dept" th:attr="data-deptCodeName=${dept.codeName}" data-bs-toggle="collapse" th:href="'#treeview-dept-' + ${deptStatus.index}" role="button" aria-expanded="false">
+											<p class="treeview-text text-nowrap">
+												<span class="fa-solid fa-folder treeview-icon"></span> <span class="treeview-label-text" 
+																											th:text="${dept.codeName}"
+																											>부서명</span>
+
+											</p>
+									</a>
+
+										<ul class="collapse treeview-list" th:id="'treeview-dept-' + ${deptStatus.index}" data-show="false">
+											<li th:each="team, teamStatus : ${teamMap[dept.codeName]}" class="treeview-list-item">
+												<div class="treeview-item treeview-team" th:attr="data-teamCodeName=${team.codeName}">
+													<a class="flex-1 ps-2 ms-2" href="#!">
+														<p class="treeview-text text-nowrap">
+															<span class="treeview-icon fa-solid fa-file-lines"></span> <span class="treeview-label-text" 
+																															th:text="${team.codeName}"
+																															>팀명</span>
+														</p>
+													</a>
+												</div>
+											</li>
+										</ul></li>
+
+								</ul></li>
+
+						</ul>
+
+					</div>
+				</div>
+
+
+
+
+
+
+
+
+				<div class="col" id="employeeTable" data-list='{"valueNames":["no","mail","name","phone", "job", "dept", "team", "date"], "page": 10, "pagination": true}'>
+
+					<!-- 검색, 필터, 버튼 -->
+					<div class="mb-4">
+						<div class="row g-3">
+							<div class="col-auto">
+								<!-- 검색 -->
+								<div class="search-box">
+										<input class="form-control search-input search" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
+										<svg style="height: 40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+											<path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path></svg>
+										<!-- <span class="fas fa-search search-box-icon"></span> Font Awesome fontawesome.com -->
+								</div>
+							</div>
+
+							<!-- 부서/팀 필터 -->
+							<!-- 윤아님거 한번 봤는데 내 방식대로 해야할 필요가 있다.. 트리구조까지 짜려면 내가 쓴 방법으로 해야 좋음 + 트리구조와 select 동시 연동 생각하려면.. 내가 짜야 좋다. -->
+							<div class="col-auto scrollbar overflow-hidden-y flex-grow-1">
+								<div class="btn-group position-static" role="group">
+									<div class="btn-group position-static text-nowrap">
+										<button style="height: 37.55px;" class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+											부서<svg style="height: 70%;" class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+												<path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg>
+											<!-- <span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com -->
+										</button>
+										<ul class="dropdown-menu">
+											<li><a class="dropdown-item" href="#">영업부</a></li>
+											<li><a class="dropdown-item" href="#">운영부</a></li>
+											<li><a class="dropdown-item" href="#">기획부</a></li>
+										</ul>
+									</div>
+									<div class="btn-group position-static text-nowrap">
+										<button style="height: 37.55px;" class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+											팀<svg style="height: 70%;" class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+												<path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg>
+											<!-- <span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com -->
+										</button>
+										<ul class="dropdown-menu">
+											<li><a class="dropdown-item" href="#">인사팀</a></li>
+											<li><a class="dropdown-item" href="#">개발팀</a></li>
+											<li><a class="dropdown-item" href="#">영업팀</a></li>
+											<li></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+
+							<!-- 회원 생성 버튼 -->
+							<div class="col-auto">
+								<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDirectoryModal">부서/팀 추가</button>
+							</div>
+
+
+
+
+
+
+						</div>
+					</div>
+
+					<!-- 회원 목록 테이블 -->
+					<div class="bg-body-emphasis border-top border-bottom">
+					
+					<div id="employeeListInsert">
+						<div th:replace="~{directory/employeeListFragment :: employeeListFragment}"></div>
+					</div>	
+						
+						
+						
+						
+
+						<!-- 페이징 -->
+						<div class="row align-items-center justify-content-center py-2 pe-0 fs-9">
+							<div class="col-auto d-flex">
+								<button class="page-link disabled" data-list-pagination="prev" disabled>
+									<i class="fas fa-chevron-left"></i>
+								</button>
+								<ul class="mb-0 pagination">
+									<li class="active"><button class="page" type="button" data-i="1">1</button></li>
+									<li><button class="page" type="button" data-i="2">2</button></li>
+								</ul>
+								<button class="page-link" data-list-pagination="next">
+									<i class="fas fa-chevron-right"></i>
+								</button>
+							</div>
+						</div>
+						
+						
+						
+					</div>
+
+				</div>
+				<!-- employeeTable -->
+
+				<!-- 팀 추가 모달 -->
+				<div class="modal fade" id="addDirectoryModal" tabindex="-1" aria-labelledby="addDirectoryModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+						<div class="modal-content">
+							<div class="modal-header py-2">
+								<h5 class="modal-title fw-bold" id="addDirectoryModalLabel">부서/팀 추가</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+							</div>
+							<div class="modal-body px-4">
+								<form>
+									<!-- 부서 -->
+									<div class="mb-3">
+										<label for="dept" class="form-label fw-semibold">부서</label> <select class="form-select form-select-sm" id="dept">
+											<option selected>선택</option>
+											<option value="영업부">영업부</option>
+											<option value="운영부">운영부</option>
+											<option value="기술부">기술부</option>
+										</select>
+									</div>
+									<!-- 팀명 -->
+									<div class="mb-3">
+										<label for="teamName" class="form-label fw-semibold">팀명</label> <input type="text" class="form-control form-control-sm" id="teamName" placeholder="ㅇㅇ팀">
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer py-2">
+								<button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
+								<button type="submit" class="btn btn-primary btn-sm" onclick="showConfirm()">등록</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!--  Confirm Modal -->
+				<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content border border-2 border-secondary-subtle shadow">
+							<div class="modal-header">
+								<h5 class="modal-title fw-semibold">등록 확인</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">정말 등록하시겠습니까?</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
+								<button type="button" class="btn btn-primary btn-sm" id="confirmSubmitBtn">확인</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- (이름 클릭시)회원 정보 모달 -->
+				<!-- 프로필 상세 모달 -->
+				<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content p-4 position-relative">
+
+							<!-- 닫기 & 별표 버튼 -->
+							<div class="position-absolute top-0 end-0 mt-2 me-2 d-flex gap-2">
+								<a href="#" class="text-warning" title="즐겨찾기"> 
+								<i class="far fa-star"></i>
+								<i class="fas fa-star"></i>
+								</a>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+
+							<!-- 프로필 정보 -->
+							<div class="text-center mb-4">
+								<img src="/assets/img/team/23.webp" alt="프로필" class="rounded-circle mb-2" style="width: 100px; height: 100px;">
+								<h5 id="modalName" class="fw-bold mb-0 profile-name">강성관</h5>
+								<p class="text-muted small mb-0 profile-dept-team">운영부 (경영지원팀)</p>
+								<input id="modalDept" type="hidden" class="profile-dept">
+								<input id="modalTeam" type="hidden" class="profile-team">
+								<input id="modalDirectoryNo" type="hidden" class="profile-directoryNo">
+							</div>
+
+							<!-- 전화번호 / 이메일 / 직급 -->
+							<div class="border rounded p-3 mb-4 bg-light-subtle">
+								<div class="mb-2">
+									<label class="form-label fw-semibold mb-0">휴대전화번호</label>
+									<div id="modalPhone" class="ps-2 profile-phone">010-1234-1234</div>
+								</div>
+								<div class="mb-2">
+									<label class="form-label fw-semibold mb-0">이메일</label>
+									<div id="modalEmail" class="ps-2 profile-email">goodee24@gmail.com</div>
+								</div>
+								<div>
+									<label class="form-label fw-semibold mb-0">직급</label>
+									<div id="modalPosition" class="ps-2 profile-position">대표</div>
+								</div>
+							</div>
+
+							<!-- 메모 -->
+							<div class="mb-3">
+								<label for="memo" class="form-label fw-semibold">메모</label>
+								<textarea id="memo" class="form-control" rows="4" placeholder="이 메모는 본인에게만 보입니다."></textarea>
+							</div>
+
+							<!-- 저장 버튼 -->
+							<div class="d-grid mb-3">
+								<button id="profileModalSubmitBtn" type="button" class="btn btn-primary">메모 저장</button>
+							</div>
+
+							<!-- 하단 버튼 영역 -->
+							<div class="d-flex justify-content-between">
+								<a href="#" class="btn btn-outline-primary flex-fill me-2"> <i class="fas fa-paper-plane me-1"></i> 1:1 채팅하기
+								</a> <a href="#" class="btn btn-outline-secondary flex-fill"> <i class="fas fa-envelope me-1"></i> 이메일 보내기
+								</a>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+		</div>
+
+
+
+
+
+
+
+
+
+				<!-- 이거 어디다 쓰려고 가져왔던거지? -->
+				<!-- ✅ 알림 영역 -->
+				<div id="alertContainer" class="mt-3" style="display: none;"></div>
+
+				<script>
+					function showConfirm() {
+						const modal = new bootstrap.Modal(document
+								.getElementById('confirmModal'));
+						modal.show();
+					}
+
+					document
+							.getElementById('confirmSubmitBtn')
+							.addEventListener(
+									'click',
+									function() {
+										const confirmModal = bootstrap.Modal
+												.getInstance(document
+														.getElementById('confirmModal'));
+										confirmModal.hide();
+
+										// 비동기 처리나 유효성 검사 후 결과에 따라 성공/실패 처리
+										const isSuccess = Math.random() > 0.5; // 예시: 랜덤 성공/실패 처리
+										const alertContainer = document
+												.getElementById('alertContainer');
+
+										alertContainer.style.display = 'block';
+										alertContainer.innerHTML = isSuccess ? '<div class="alert alert-subtle-primary" role="alert">등록이 완료되었습니다!</div>'
+												: '<div class="alert alert-subtle-danger" role="alert">등록에 실패했습니다. 다시 시도해주세요.</div>';
+									});
+					
+				</script>
+				<!-- 기존 버전 트리 구조 -->
+				<!-- <script>
+				  document.addEventListener('DOMContentLoaded', function () {
+				    const tree = document.querySelector('#treeviewExample');
+				
+				    tree.addEventListener('click', function (e) {
+				      // 클릭된 li.treeview-list-item을 찾음
+				      const clickedLi = e.target.closest('li.treeview-list-item');
+				      if (!clickedLi) return;
+				
+				      // 아이콘 요소 추출
+				      const clickedIcon = clickedLi.querySelector('.treeview-icon');
+				      if (!clickedIcon) return;
+				
+				      // 기존 모든 아이콘에서 파란색 제거
+				      document.querySelectorAll('.treeview-icon.text-info-light')
+				        .forEach(el => el.classList.remove('text-info-light'));
+				
+				      // 클릭된 아이콘에 파란색 추가
+				      clickedIcon.classList.add('text-info-light');
+				
+				      // 상위 폴더들도 파란색 적용
+				      let currentLi = clickedLi.parentElement;
+				      while (currentLi && currentLi.classList.contains('treeview-list')) {
+				        const parentLi = currentLi.closest('li.treeview-list-item');
+				        const parentIcon = parentLi?.querySelector('.treeview-icon');
+				        if (parentIcon) parentIcon.classList.add('text-info-light');
+				        currentLi = parentLi?.parentElement;
+				      }
+				    });
+				  });
+				</script> -->
+				<!-- 글자 색상, 밑줄 추가한 트리구조 -->
+				<script>
+				  document.addEventListener('DOMContentLoaded', function () {
+				    const tree = document.querySelector('#treeviewExample');
+				
+				    tree.addEventListener('click', function (e) {
+				      const clickedLi = e.target.closest('li.treeview-list-item');
+				      if (!clickedLi) return;
+				
+				      const clickedIcon = clickedLi.querySelector('.treeview-icon');
+				      if (!clickedIcon) return;
+				
+				      // 기존 아이콘 강조 제거
+				      document.querySelectorAll('.treeview-icon.text-info-light')
+				        .forEach(el => el.classList.remove('text-info-light'));
+				
+				      clickedIcon.classList.add('text-info-light');
+				
+				      // 기존 텍스트 강조 제거
+				      document.querySelectorAll('.treeview-label-text')
+				        .forEach(el => el.classList.remove('treeview-label-strong'));
+				
+				      // 현재 클릭된 li 안의 텍스트 span에 강조 클래스 추가
+				      const clickedLabel = clickedLi.querySelector('.treeview-label-text');
+				      if (clickedLabel) clickedLabel.classList.add('treeview-label-strong');
+				
+				   	  // 상위 폴더의 아이콘과 글자에도 강조
+				      let currentLi = clickedLi.parentElement;
+				      while (currentLi && currentLi.classList.contains('treeview-list')) {
+				        const parentLi = currentLi.closest('li.treeview-list-item');
+				        if (!parentLi) break;
+				
+				        // 아이콘 강조
+				        const parentIcon = parentLi.querySelector('.treeview-icon');
+				        if (parentIcon) parentIcon.classList.add('text-info-light');
+				
+				        // 글자(span.treeview-label-text)도 강조
+				        const parentLabel = parentLi.querySelector('.treeview-label-text');
+				        if (parentLabel) parentLabel.classList.add('treeview-label-strong');
+				
+				        currentLi = parentLi.parentElement;
+				      }
+				    });
+				  });
+				</script>
+
+				
+				<!-- 해당 사원의 이름을 클릭시 해당 사원의 데이터를 모달 안으로 전달해주는 JS -->
+				<script>
+					document.addEventListener('DOMContentLoaded', function () {
+					  const modal = document.getElementById('profileModal');
+					  
+					  
+					  modal.addEventListener('show.bs.modal', function (event) {
+					    const trigger = event.relatedTarget; // 클릭한 <a> 요소
+						
+					    const targetEmpNo = trigger.getAttribute('data-targetEmpNo') || null;
+					    const name = trigger.getAttribute('data-name') || '이름없음';
+					    const dept = trigger.getAttribute('data-dept') || '-';
+					    const team = trigger.getAttribute('data-team') || '-';
+					    const phone = trigger.getAttribute('data-phone') || '-';
+					    const email = trigger.getAttribute('data-email') || '-';
+					    const position = trigger.getAttribute('data-position') || '-';
+					    const memberDirectoryNo = trigger.getAttribute('data-memberDirectoryNo') || '-';
+					    
+					    
+						
+					    // 사원 메모 조회 (AJAX GET)
+					    if (targetEmpNo) {
+					      fetch(`/directoryMemo/${targetEmpNo}`)
+					        .then(res => res.json())
+					        .then(data => {
+					          if (data.res_code === '200') {
+					            modal.querySelector('#memo').value = data.memo || '';
+					          } else {
+					            modal.querySelector('#memo').value = '';
+					          }
+					        })
+					        .catch(() => {
+					          modal.querySelector('#memo').value = '';
+					        });
+					    }
+					    
+					    // 모달 안의 요소에 값 넣기
+					    modal.querySelector('.profile-name').textContent = name;
+					    modal.querySelector('.profile-dept-team').textContent = `${dept} (${team})`;
+					    modal.querySelector('.profile-dept').value = dept;
+					    modal.querySelector('.profile-team').value = team;
+					    modal.querySelector('.profile-directoryNo').value = memberDirectoryNo;
+					    modal.querySelector('.profile-phone').textContent = phone;
+					    modal.querySelector('.profile-email').textContent = email;
+					    modal.querySelector('.profile-position').textContent = position;
+					    
+					    
+					  });
+					  
+					    // 모달 메모 저장 버튼 클릭 이벤트
+						  document.getElementById('profileModalSubmitBtn').addEventListener('click', function(){
+							  const memo = document.getElementById('memo').value;
+							  const modalDirectoryNo = document.getElementById('modalDirectoryNo').value;
+							  const modalTeam = document.getElementById('modalTeam').value;
+							  const modalDept = document.getElementById('modalDept').value;
+							  const modalName = document.getElementById('modalName').textContent;
+							  const modalPhone = document.getElementById('modalPhone').textContent;
+							  const modalEmail = document.getElementById('modalEmail').textContent;
+							  const modalPosition = document.getElementById('modalPosition').textContent;
+							  // 여기서 값들 새로 설정하고 해야할듯
+							  /* console.log(modalTeam);
+							  console.log(modalDept);
+							  console.log(modalName);
+							  console.log(modalPhone);
+							  console.log(modalName);
+							  console.log(modalEmail);
+							  console.log(modalPosition);
+							  console.log(memo); 
+							  console.log(modalDirectoryNo); */
+							  
+							  fetch('/directoryMemo/create',{
+								  method: 'POST',
+								  headers: {
+								    'Content-Type': 'application/json',
+								    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+								    'header': document.querySelector('meta[name="_csrf_header"]').content
+								  },
+								  body : JSON.stringify({
+									  directory_memo_content : memo,
+									  directory_no : modalDirectoryNo
+								  })
+							  })
+							  .then(res => res.json())
+							  .then(data => {
+								  console.log(data.res_code);
+								  // location.reload();
+							  })
+							  .catch(err =>{
+								  console.error(err);
+								  console.log('요청 중 오류가 발생했습니다.');
+							  })
+						  });
+					});
+				</script>
+				<!-- 트리구조 선택시 비동기 방식으로 직원 조회 -->
+				<script>
+				// 트리 - 부서 클릭시 작동
+				document.querySelectorAll('.treeview-dept').forEach(item => {
+				  item.addEventListener('click', function (e) {
+				    const deptEl = e.target.closest('.treeview-dept');
+				    if (!deptEl) return;
+				
+				    const deptCodeName = deptEl.getAttribute('data-deptCodeName');
+				    treeSelectEmployee(deptCodeName);
+				  });
+				});
+				// 트리 - 팀 클릭시 작동
+				document.querySelectorAll('.treeview-team').forEach(item => {
+				  item.addEventListener('click', function (e) {
+				    const teamEl = e.target.closest('.treeview-team');
+				    if (!teamEl) return;
+				
+				    const teamCodeName = teamEl.getAttribute('data-teamCodeName');
+				    treeSelectEmployee(teamCodeName);
+				  });
+				});
+				
+				const treeSelectEmployee = function(codeName){
+					//console.log(code);
+				  fetch(`/directory/employeeList?codeName=${codeName}`)
+					.then(response => response.text())
+					.then(html => {
+					  document.getElementById('employeeListInsert').innerHTML = html;
+					})
+					.catch(err => {
+					  console.error('직원 리스트 불러오기 실패:', err);
+					});
+				};
+				
+				</script>
+
+
+
+
+
+
+	</main>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="certificate_of_employment">
+  <form th:object="${approval}">
+      <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle mb-0">
+          <colgroup>
+  <col style="width: 20%;" />
+  <col style="width: 15%;" />
+  <col style="width: 25%;" />
+  <col style="width: 15%;" />
+  <col style="width: 25%;" />
+          </colgroup>
+          <tbody>
+            <tr>
+              <th class="bg-light align-middle" rowspan="3">인적사항</th>
+              <th class="bg-light ">성 명</th>
+              <td th:text="*{approval_content['name']}"></td>
+              <th class="bg-light">주민등록번호</th>
+              <td th:text="*{approval_content['rrn']}"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">주 소</th>
+              <td colspan="3" th:text="*{approval_content['address']}"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">소 속</th>
+              <td colspan="3" th:text="*{approval_content['organization']}"></td>
+            </tr>
+            <tr>
+              <th class="bg-light align-middle" rowspan="2">재직사항</th>
+              <th class="bg-light">직 위</th>
+              <td colspan="3" th:text="*{approval_content['position']}"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">재직기간</th>
+              <td colspan="3" th:text="|*{approval_content['workStartDate']} ~ *{approval_content['workEndDate']}|"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">발급용도</th>
+              <td colspan="4" th:text="*{approval_content['purpose']}"></td>
+            </tr>
+            <tr>
+              <td colspan="5" class="text-center py-4">
+                위와 같이 재직하고 있음을 증명합니다.
+                <div class="text-end mt-4">
+                  <span th:text="*{approval_content['issuedDate']}"></span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  </form>
+</th:block>
+</html>

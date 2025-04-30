@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="overtime_work_request">
+  <form th:object="${approval}">
+      <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle mb-0">
+          <colgroup><col style="width: 25%;" /><col style="width: 75%;" /></colgroup>
+          <tbody>
+            <tr>
+              <th class="bg-light">근무구분</th>
+              <td class="text-center">
+                <span th:if="*{approval_content['workType'] != null}" th:text="*{approval_content['workType']}"></span>
+              </td>
+            </tr>
+            <tr>
+              <th class="bg-light">근무일시</th>
+              <td th:text="|*{approval_content['workDate']} *{approval_content['startTime']} ~ *{approval_content['endTime']}|"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">근무시간</th>
+              <td th:text="|*{approval_content['workHour']} 시간|"></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="text-center text-muted">
+                <p class="mb-1">※ 주간 근무시간은 해당 주차 기준입니다.</p>
+                <p class="mb-1">정상근무시간 + 승인된 연장근무 총합으로 산정됩니다.</p>
+                <p class="mb-0">근태관리에서 시간이 조정될 수 있습니다.</p>
+              </td>
+            </tr>
+            <tr>
+              <th class="bg-light align-top">신청 사유</th>
+              <td th:text="*{approval_content['reason']}" style="white-space: pre-wrap;"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  </form>
+</th:block>
+</html>

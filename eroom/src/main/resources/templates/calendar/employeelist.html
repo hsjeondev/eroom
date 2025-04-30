@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/include/layout}">
+
+<head>
+<title>개인 캘린더</title>
+<style>
+.fc-event-main::after {
+  display: none !important;
+}
+</style>
+</head>
+<body>
+
+	<main class="main" id="top" layout:fragment="content">
+
+		<div class="row g-0 mb-4 align-items-center">
+			<div class="col-5 col-md-6">
+				<h4 class="mb-0 text-body-emphasis fw-bold fs-md-6">
+					개인일정
+				</h4>
+			</div>
+			<div class="col-7 col-md-6 d-flex justify-content-end">
+				<button class="btn btn-primary btn-sm" type="button"
+					data-bs-toggle="modal" data-bs-target="#addEventModal">
+					<span class="fas fa-plus pe-2 fs-10"></span>일정 등록
+				</button>
+			</div>
+		</div>
+
+		<!-- 일정 등록 모달 -->
+		<div class="modal fade" id="addEventModal" tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered" >
+				<div class="modal-content border border-translucent">
+					<form id="addEventForm" autocomplete="off" name="addEventForm">
+						<div class="modal-header px-card border-0">
+							<div
+								class="w-100 d-flex justify-content-between align-items-start">
+								<h5 class="mb-0 lh-sm text-body-highlight">일정 등록</h5>
+								<button class="btn p-1 fs-10 text-body" type="button"
+									data-bs-dismiss="modal" aria-label="Close">닫기</button>
+							</div>
+						</div>
+						<div class="mb-4"></div>
+						<div class="modal-body p-card py-0">
+
+							<!-- 숨겨진 값들 -->
+							<input type="hidden" name="employee_no"
+								th:value="${#authentication.principal.employee.employeeNo}" />
+							<input type="hidden" name="separator" value="E001" /> <input
+								type="hidden" name="calendar_creator"
+								th:value="${#authentication.principal.employee.employeeId}" />
+
+							<!-- 제목 / 장소 가로 배치 -->
+							<div class="row mb-2">
+								<div class="col-6">
+									<label class="form-label" for="calendarTitle">제목</label> <input
+										type="text" class="form-control form-control-sm"
+										id="calendarTitle" name="calendar_title" placeholder="일정 제목"
+										aria-label="일정 제목" />
+								</div>
+								<div class="col-6">
+									<label class="form-label" for="calendarLocation">장소</label> <input
+										type="text" class="form-control form-control-sm"
+										id="calendarLocation" name="calendar_location"
+										placeholder="일정 장소" aria-label="일정 장소" />
+								</div>
+							</div>
+
+							<div class="mb-4"></div>
+
+							<!-- 시작 시간 / 종료 시간 가로 배치 -->
+							<div class="row mb-3">
+								<div class="col-6">
+									<div class="mb-3">
+										<label class="form-label" for="calendarStartTime">시작시간</label> <input class="form-control" id="calendarStartTime"
+											type="datetime-local" name="calendar_start_time" />
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="mb-3">
+										<label class="form-label" for="calendarEndTime">종료시간</label> <input class="form-control" id="calendarEndTime"
+											type="datetime-local" name="calendar_end_time" required />
+									</div>
+								</div>
+							</div>
+
+							<!-- 설명 -->
+							<div class="input-group input-group-sm mb-3">
+								<span class="input-group-text">설명</span> <input type="text"
+									class="form-control" id="calendarContent"
+									name="calendar_content" placeholder="일정 설명" aria-label="일정 설명">
+							</div>
+
+							<!-- 버튼 -->
+							<div
+								class="modal-footer d-flex justify-content-between align-items-center border-0">
+								<span></span>
+								<button class="btn btn-primary px-4" type="submit">일정
+									등록</button>
+							</div>
+
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		
+		<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			  const modal = document.getElementById("addEventModal");
+
+			  if (modal) {
+			    modal.addEventListener("show.bs.modal", function () {
+			      const form = document.forms["addEventForm"];
+			      if (!form) return;
+
+			      // form의 모든 입력 필드 초기화
+			      form.reset();
+
+			      // 커스텀으로 초기화할 게 있다면 여기 추가
+			      // hidden input은 유지하고 싶으면 예외 처리 가능!
+			      form.querySelectorAll("input[type='text'], input[type='datetime-local']").forEach(input => {
+			        input.value = "";
+			      });
+
+			      // 예: 설명 칸 초기화
+			      const calendarContent = document.getElementById("calendarContent");
+			      if (calendarContent) calendarContent.value = "";
+
+			      // 예: 장소 초기화
+			      const calendarLocation = document.getElementById("calendarLocation");
+			      if (calendarLocation) calendarLocation.value = "";
+
+			      // 시작/종료시간 초기화
+			      document.getElementById("calendarStartTime").value = "";
+			      document.getElementById("calendarEndTime").value = "";
+			    });
+			  }
+			});
+		
+		</script>
+
+
+
+
+		<!-- 캘린더 위치 -->
+		<div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
+		
+		
+		
+		<!-- 일정 상세 조회 모달 -->
+		
+		<button class="btn btn-primary" type="button" data-bs-toggle="modal"
+    	data-bs-target="#tooltipModal" style="display: none;" id="modalButton"></button>
+
+		<!-- 모달 창 -->
+		<div class="modal fade" id="tooltipModal" tabindex="-1"
+			aria-labelledby="tooltipModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content border border-translucent">
+					<div class="modal-header px-card border-0 position-relative">
+						<h5 class="mb-0 lh-sm text-body-highlight" id="tooltipModalLabel">내
+							일정 상세조회</h5>
+						<button class="btn-close position-absolute top-0 end-0 mt-2 me-2"
+							type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body p-card py-0">
+						<input type="hidden" name="calendar_no" value="">
+						<div class="mb-3">
+							<strong>일정:</strong> <span id="eventTitle"></span>
+						</div>
+						<div class="mb-3">
+							<strong>시작 시간:</strong> <span id="eventDate"></span>
+						</div>
+						<div class="mb-3">
+							<strong>종료 시간:</strong> <span id="eventEndDate"></span>
+						</div>
+						<div class="mb-3">
+							<strong>장소:</strong> <span id="eventLocation"></span>
+						</div>
+						<div class="mb-3">
+							<strong>설명:</strong> <span id="eventDescription"></span>
+						</div>
+					</div>
+					<div
+						class="modal-footer d-flex justify-content-between align-items-center border-0">
+						<div class="d-flex">
+							<button class="btn btn-subtle-secondary me-1 mb-1" type="button"
+								id="editEventBtn">수정</button>
+							<button class="btn btn-outline-info me-1 mb-1" type="button"
+								id="deleteEventBtn">삭제</button>
+						</div>
+						<div>
+							<button class="btn btn-primary px-4" type="button"
+								data-bs-dismiss="modal">확인</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 일정 수정 모달 -->
+		<div class="modal fade" id="editEventModal" tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content border border-translucent">
+					<form id="editEventForm" autocomplete="off" name="editEventForm">
+						<div class="modal-header px-card border-0">
+							<div
+								class="w-100 d-flex justify-content-between align-items-start">
+								<h5 class="mb-0 lh-sm text-body-highlight">일정 수정</h5>
+								<button class="btn p-1 fs-10 text-body" type="button"
+									data-bs-dismiss="modal" aria-label="Close">닫기</button>
+							</div>
+						</div>
+						<div class="mb-4"></div>
+						<div class="modal-body p-card py-0">
+							<!-- 숨겨진 값들 -->
+							<input type="hidden" name="calendar_no" id="calendar_no" /> <input
+								type="hidden" name="employee_no"
+								th:value="${#authentication.principal.employee.employeeNo}" />
+							<input type="hidden" name="separator" value="E001" /> <input
+								type="hidden" name="calendar_editor"
+								th:value="${#authentication.principal.employee.employeeId}" />
+
+							<!-- 제목 / 장소 가로 배치 -->
+							<div class="row mb-2">
+								<div class="col-6">
+									<label class="form-label" for="calendarTitle">제목</label> <input
+										type="text" class="form-control form-control-sm"
+										id="calendarTitle" name="calendar_title" placeholder="일정 제목"
+										aria-label="일정 제목" />
+								</div>
+								<div class="col-6">
+									<label class="form-label" for="calendarLocation">장소</label> <input
+										type="text" class="form-control form-control-sm"
+										id="calendarLocation" name="calendar_location"
+										placeholder="일정 장소" aria-label="일정 장소" />
+								</div>
+							</div>
+
+							<div class="mb-4"></div>
+
+							<!-- 시작 시간 / 종료 시간 가로 배치 -->
+							<div class="row mb-3">
+								<div class="col-6">
+									<div class="mb-3">
+										<label class="form-label" for="editStartTime">시작시간</label>
+										<input class="form-control" id="editStartTime"
+											type="datetime-local" name="calendar_start_time" />
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="mb-3">
+										<label class="form-label" for="editEndTime">종료시간</label> <input
+											class="form-control" id="editEndTime"
+											type="datetime-local" name="calendar_end_time" />
+									</div>
+								</div>
+							</div>
+
+							<!-- 설명 -->
+							<div class="input-group input-group-sm mb-3">
+								<span class="input-group-text">설명</span> <input type="text"
+									class="form-control" id="calendarContent"
+									name="calendar_content" placeholder="일정 설명" aria-label="일정 설명" />
+							</div>
+
+							<!-- 버튼 -->
+							<div
+								class="modal-footer d-flex justify-content-between align-items-center border-0">
+								<span></span>
+								<button class="btn btn-primary px-4" type="submit"
+									id="saveEventButton">일정 수정</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<script>
+		document.addEventListener('DOMContentLoaded', function () {
+
+			
+		    const calendarEl = document.getElementById('appCalendar');
+		    
+		    const employeeNo = document.addEventForm.employee_no.value;
+		    let selectedCalendarNo = null;
+			
+		    
+		    //WEEKVIEW는 NO Monthview만 나오게 설정, 한국어 , 왼쪽 상단에 저번달,다음달로 가는 화살표, 가운데는 년도,월
+		    const calendar = new FullCalendar.Calendar(calendarEl, {
+		      initialView: 'dayGridMonth',
+		      locale: 'ko',
+		      headerToolbar: {
+		        left: 'prev,next today',
+		        center: 'title',
+		        right: ''
+		      },
+		      buttonText: {
+		    	    today: '오늘' 
+		    	  },
+		      eventDisplay: 'block',
+		      
+		    
+		      dayMaxEventRows: true,
+		      views: {
+		        dayGridMonth: {
+		          dayMaxEventRows: 3 , 
+		          moreLinkText: "더보기"
+		        }
+		      },
+		      
+		      dayCellContent: function (info) {
+		        return info.date.getDate();
+		      },
+		      
+		      //일정 등록이 안되어있는 날을 클릭하면 일정을 등록할수 있게 하는 event
+		
+		      
+		      eventSources: [ //구글 캘린더로 공휴일 불러오기, 그리고 해당 직원의 일정 불러오기
+		    	    {
+		    	      events: function (fetchInfo, successCallback, failureCallback) {
+		    	        fetch('/employeecalendar/list/' + employeeNo)
+		    	          .then(response => response.json())
+		    	          .then(events => successCallback(events))
+		    	          .catch(error => {
+		    	            console.error("내 일정 불러오기 실패", error);
+		    	            failureCallback(error);
+		    	          });
+		    	      }
+		    	    },
+		    	    {
+		    	      events: function (fetchInfo, successCallback, failureCallback) {
+		    	        const apiKey = 'AIzaSyCjXiu1ShbhE0XenBtciLx8ezU-mcZI0R0';
+		    	        const calendarId = 'ko.south_korea%23holiday@group.v.calendar.google.com';
+		    	        const timeMin = new Date(fetchInfo.start).toISOString();
+		    	        const timeMax = new Date(fetchInfo.end).toISOString();
+		    	        const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${timeMin}&timeMax=${timeMax}&orderBy=startTime&singleEvents=true`;
+
+		    	        fetch(url)
+		    	          .then(response => response.json())
+		    	          .then(data => {
+		    	            if (!data.items) {
+		    	              console.warn("공휴일 데이터 없음", data);
+		    	              return successCallback([]);
+		    	            }
+		    	            const holidays = data.items.map(item => ({
+		    	              title: item.summary,
+		    	              start: item.start.date,
+		    	              allDay: true,
+		    	              extendedProps: {
+		    	            	    type: 'holiday'
+		    	            	  }
+		    	              
+		    	            }));
+		    	            successCallback(holidays);
+		    	          })
+		    	          .catch(error => {
+		    	            console.error("공휴일 불러오기 실패", error);
+		    	            failureCallback(error);
+		    	          });
+		    	      }
+		    	    }
+		    	  ],
+		      
+			  
+		      
+		      //등록된 일정을 클릭하면 상세조회가 나오는 fullcalendar의 event
+			eventClick: function (info) {
+			  const calendarNo = info.event.extendedProps.calendar_no;
+			  console.log("제발 가져와 !!!!!!!!! " + calendarNo);
+			  
+			
+			  // 날짜 포맷팅 옵션
+			  const options = {
+			    year: 'numeric',
+			    month: 'long',
+			    day: 'numeric',
+			    weekday: 'short',
+			    hour: '2-digit',
+			    minute: '2-digit',
+			    hour12: true
+			  };
+			
+			  // 1. 일정, 시간, 장소, 설명을 가져옴
+			  const title = info.event.title || '';
+			  const start = info.event.start; // 한 번만 선언
+			  const end = info.event.end || '';
+			  const location = info.event.extendedProps.location || '';
+			  const description = info.event.extendedProps.description || '';
+			
+			  // 날짜 포맷팅
+			  const date = start ? new Intl.DateTimeFormat('ko-KR', options).format(start) : '';
+			  const endDate = end ? new Intl.DateTimeFormat('ko-KR', options).format(end) : '';
+			
+			  // 2. 각각 항목을 채우고, 값이 없으면 해당 항목을 숨깁니다
+			  const eventTitleElement = document.getElementById('eventTitle');
+			  if (eventTitleElement) {
+			    if (title) {
+			      eventTitleElement.textContent = title;
+			    } else {
+			      eventTitleElement.parentElement.style.display = 'none'; // 제목 숨기기
+			    }
+			  }
+			
+			  const eventDateElement = document.getElementById('eventDate');
+			  if (eventDateElement) {
+			    if (date) {
+			      eventDateElement.textContent = date;
+			    } else {
+			      eventDateElement.parentElement.style.display = 'none'; // 시작 시간 숨기기
+			    }
+			  }
+			
+			  const eventEndDateElement = document.getElementById('eventEndDate');
+			  if (eventEndDateElement) {
+			    if (endDate) {
+			      eventEndDateElement.textContent = endDate;
+			    } else {
+			      eventEndDateElement.parentElement.style.display = 'none'; // 종료 시간 숨기기
+			    }
+			  }
+			
+			  const eventLocationElement = document.getElementById('eventLocation');
+			  if (eventLocationElement) {
+			    if (location) {
+			      eventLocationElement.textContent = location;
+			    } else {
+			      eventLocationElement.parentElement.style.display = 'none'; // 장소 숨기기
+			    }
+			  }
+			
+			  const eventDescriptionElement = document.getElementById('eventDescription');
+			  if (eventDescriptionElement) {
+			    if (description) {
+			      eventDescriptionElement.textContent = description;
+			    } else {
+			      eventDescriptionElement.parentElement.style.display = 'none'; // 설명 숨기기
+			    }
+			  }
+		
+		    selectedCalendarNo = calendarNo;
+		
+		    const modalButton = document.getElementById('modalButton');
+		    if (modalButton) {
+		        modalButton.click(); // 모달 버튼 클릭하여 모달 열기
+		    } else {
+		        console.error('modalButton not found');
+		    }
+		},
+				
+		  //일정의 색상을 정해주는 event, E001 -> 개인 캘린더는 연한 연두색으로 지정
+		  eventDidMount: function (info) {
+			    const isHoliday = info.event.extendedProps?.type === 'holiday';
+			    if (isHoliday) {
+			        const el = info.el;
+			        el.style.setProperty("background-color", "#FFF8B3", "important"); // 연노랑
+			        el.style.setProperty("border", "1px solid #F5E79E", "important");
+			        el.style.setProperty("color", "#4B4B4B", "important");
+			        el.style.setProperty("pointer-events", "none", "important"); // 클릭 막기
+			        el.style.setProperty("opacity", "1", "important");
+			        return;
+			      }
+
+			    const separator = info.event.extendedProps.separator || "";
+			    let backgroundColor, borderColor, textColor;
+
+			    switch (separator) {
+			      case "E001":
+			        backgroundColor = "#C1F0E3";
+			        borderColor = "#A3E4A0";
+			        textColor = "#1A3C1A";
+			        break;
+			      case "A001":
+			        backgroundColor = "#F8D7DA";
+			        borderColor = "#F5C6CB";
+			        textColor = "#721C24";
+			        break;
+			    }
+
+			    const eventEl = info.el;
+			    eventEl.classList.remove('fc-daygrid-dot-event');
+			    eventEl.style.setProperty("background-color", backgroundColor, "important");
+			    eventEl.style.setProperty("border", `1px solid ${borderColor}`, "important");
+			    eventEl.style.setProperty("color", textColor, "important");
+			    eventEl.style.setProperty("border-radius", "8px", "important");
+			    eventEl.style.setProperty("padding", "4px 8px", "important");
+			    eventEl.style.setProperty("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.1)", "important");
+			    eventEl.style.setProperty("font-weight", "500", "important");
+			    eventEl.style.setProperty("font-size", "14px", "important");
+
+			    const eventMain = eventEl.querySelector(".fc-event-main");
+			    if (eventMain) {
+			      eventMain.style.setProperty("background-color", backgroundColor, "important");
+			      eventMain.style.setProperty("border-color", borderColor, "important");
+			      eventMain.style.setProperty("color", textColor, "important");
+			      eventMain.style.setProperty("border-radius", "8px", "important");
+			    }
+			  },
+			}); 
+		    
+		    // 수정 버튼 클릭
+		    // 수정 버튼을 클릭하면 -> calendarNo값으로 가져온 정보가 모달창에 들어감
+		   document.getElementById('editEventBtn').addEventListener('click', function () {
+			    console.log("수정 버튼 클릭");
+			
+			    const eventModal = bootstrap.Modal.getInstance(document.getElementById('tooltipModal'));
+			    eventModal.hide();
+			
+			    fetch('/employeecalendar/detail/' + selectedCalendarNo)
+			        .then(response => response.json())
+			        .then(data => {
+			            console.log("받아온 데이터:", data);
+			
+			            const form = document.forms["editEventForm"];
+			            form.calendar_no.value = data.calendar_no;
+			            form.calendar_title.value = data.calendar_title;
+			            form.calendar_location.value = data.calendar_location;
+			            form.calendar_start_time.value = data.calendar_start_time.slice(0, 16);
+			            form.calendar_end_time.value = data.calendar_end_time.slice(0, 16);
+			            form.calendar_content.value = data.calendar_content;
+			
+			            // ⭐ 시간 제어 로직 추가 ⭐
+			            const startEditInput = document.getElementById("editStartTime");
+			            const endEditInput = document.getElementById("editEndTime");
+			
+			            function setMinEndTime() {
+			                if (startEditInput && endEditInput) {
+			                    endEditInput.min = startEditInput.value;
+			
+			                    if (endEditInput.value < startEditInput.value) {
+			                        endEditInput.value = startEditInput.value;
+			                    }
+			                }
+			            }
+			
+			            // 이벤트 리스너 추가 
+			            if (startEditInput) {
+			                startEditInput.addEventListener("change", setMinEndTime);
+			                setMinEndTime(); 
+			            }
+			
+			            const editEventModal = new bootstrap.Modal(document.getElementById('editEventModal'));
+			            editEventModal.show();
+			        })
+			        .catch(error => {
+			            console.error('일정 상세 조회 실패:', error);
+			            alert('일정 데이터를 불러오지 못했습니다.');
+			        });
+			});
+		    
+		    //일정 수정한거를 저장
+			document.getElementById('saveEventButton').addEventListener('click', function(e) {
+			    e.preventDefault();
+			
+			    const updateForm = document.editEventForm;
+			    const updateData = new FormData(updateForm);
+			
+			    const startEditInput = document.getElementById("editStartTime");
+			    const endEditInput = document.getElementById("editEndTime");
+			
+			    // 유효성 검사만 남기자!
+			    const startTime = new Date(startEditInput.value);
+			    const endTime = new Date(endEditInput.value);
+			
+			    if (startTime > endTime) {
+			        endEditInput.setCustomValidity("종료시간은 시작시간 이후여야 합니다!");
+			        endEditInput.reportValidity();
+			        return;
+			    } else {
+			        endEditInput.setCustomValidity(""); // 정상일 때 초기화
+			    }
+			
+			    // 서버로 전송
+			    fetch("/employeecalendar/update/" + selectedCalendarNo, {
+			        method: "POST",
+			        headers: {
+			            'header': document.querySelector('meta[name="_csrf_header"]').content,
+			            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			        },
+			        body: updateData
+			    })
+			    .then(response => response.json())
+			    .then(data => {
+			        alert(data.res_msg);
+			        if (data.res_code == 200) {
+			            location.reload();
+			        }
+			    })
+			    .catch(error => {
+			        console.error("Error:", error);
+			        alert("이벤트 저장 중 오류가 발생했습니다.");
+			    });
+			});
+		  
+		    
+		    
+			//일정 삭제 -> 사용여부를 Y 에서 N 으로!
+			document.getElementById('deleteEventBtn').addEventListener('click',function(){
+			const calendarNo = selectedCalendarNo;
+			//console.log(calendarNo);
+			const perMission = confirm('해당 일정을 삭제하시겠습니까?');
+			//console.log(perMission);
+			if(!perMission){
+				return;
+			}else{
+				fetch('/employeecalendar/delete/'+calendarNo,{
+					method: 'post',
+					headers: {
+			            'header': document.querySelector('meta[name="_csrf_header"]').content,
+			            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			        }
+				})
+				.then(response => response.json())
+				.then(data => {
+					alert(data.res_msg);
+					if(data.res_code == 200) location.reload();
+				})
+			}
+			
+			});
+			
+		    
+			
+			calendar.render();
+		
+		})
+  	
+    </script>
+  	
+	
+	<!-- 일정 등록 -->
+		<script>
+		document.addEventListener("DOMContentLoaded", function () {
+		  const startInput = document.getElementById("calendarStartTime");
+		  const endInput = document.getElementById("calendarEndTime");
+		  const titleInput = document.getElementById("calendarTitle");
+		  const form = document.addEventForm;
+		  const modal = document.getElementById("addEventModal"); // 모달 찾기
+		
+		  const submitBtn = form.querySelector('button[type="submit"]'); // 등록 버튼
+		
+		  function setDefaultTimeValuesNow() {
+		    if (!startInput || !endInput) return;
+		
+		    const now = new Date();
+		    const pad = (n) => n.toString().padStart(2, '0');
+		    const format = (date) => {
+		      const yyyy = date.getFullYear();
+		      const MM = pad(date.getMonth() + 1);
+		      const dd = pad(date.getDate());
+		      const HH = pad(date.getHours());
+		      const mm = pad(date.getMinutes());
+		      return `${yyyy}-${MM}-${dd}T${HH}:${mm}`;
+		    };
+		
+		    const startTime = new Date(now);
+		    const endTime = new Date(now);
+		    endTime.setHours(endTime.getHours() + 1);
+		
+		    startInput.value = format(startTime);
+		    endInput.value = format(endTime);
+		
+		    endInput.min = startInput.value;
+		  }
+		
+		  function setMinEndTime() {
+		    if (startInput && endInput) {
+		      endInput.min = startInput.value;
+		
+		      if (endInput.value < startInput.value) {
+		        endInput.value = startInput.value;
+		      }
+		    }
+		  }
+		
+		  if (startInput) {
+		    startInput.addEventListener("change", setMinEndTime);
+		  }
+		
+		  form.addEventListener("submit", async function (e) {
+		    e.preventDefault();
+		
+		    submitBtn.disabled = true; // 버튼 비활성화
+		
+		    const startTimeValue = Date.parse(startInput.value);
+		    const endTimeValue = Date.parse(endInput.value);
+		
+		    if (!titleInput.value.trim()) {
+		      alert("제목을 입력해주세요!");
+		      submitBtn.disabled = false;
+		      return;
+		    }
+		
+		    if (startTimeValue > endTimeValue) {
+		      endInput.setCustomValidity("종료시간은 시작시간 이후여야 합니다!");
+		      endInput.reportValidity();
+		      submitBtn.disabled = false;
+		      return;
+		    } else {
+		      endInput.setCustomValidity("");
+		    }
+		
+		    const payload = new FormData(form);
+		
+		    try {
+		      const response = await fetch("/employeecalendar/add", {
+		        method: "POST",
+		        headers: {
+		          'header': document.querySelector('meta[name="_csrf_header"]').content,
+		          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+		        },
+		        body: payload
+		      });
+		
+		      const data = await response.json();
+		      alert(data.res_msg);
+		      if (data.res_code == 200) {
+		        location.reload();
+		      } else {
+		        submitBtn.disabled = false;
+		      }
+		    } catch (error) {
+		      console.error("등록 중 오류 발생:", error);
+		      alert("일정 등록에 실패했습니다.");
+		      submitBtn.disabled = false;
+		    }
+		  });
+		
+		  // 페이지 처음 들어올 때 기본값 세팅
+		  setDefaultTimeValuesNow();
+		
+		  // 모달 열릴 때마다 현재시간으로 세팅
+		  if (modal) {
+		    modal.addEventListener("show.bs.modal", function () {
+		      setDefaultTimeValuesNow();
+		    });
+		  }
+		});
+		</script>
+
+	
+		</main>
+	</body>
+</html>
