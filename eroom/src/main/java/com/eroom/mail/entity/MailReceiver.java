@@ -30,20 +30,24 @@ public class MailReceiver {
 	@Column(name="mail_receiver_no")
 	private Long mailReceiverNo;
 	
-	@Column(name="mail_receiver_type")
-	private String mailReceiverType;
+	// 사용 여부로 쓸 컬럼
+//	@Column(name="mail_receiver_type")
+//	private String mailReceiverType;
+	
+	@Column(name="mail_receiver_visible_yn")
+	private String mailReceiverVisibleYn;
 	
 	@Column(name="mail_receiver_read_yn")
 	private String mailReceiverReadYn;
 	
-	@Column(name="mail_receiver_deleted_yn")
-	private String mailReceiverDeletedYn;
-	
-	@Column(name="mail_receiver_important_yn")
-	private String mailReceiverImportantYn;
-	
-	@Column(name="mail_receiver_deleted_time")
-	private LocalDateTime mailReceiverDeletedTime;
+//	@Column(name="mail_receiver_deleted_yn")
+//	private String mailReceiverDeletedYn;
+//	
+//	@Column(name="mail_receiver_important_yn")
+//	private String mailReceiverImportantYn;
+//	
+//	@Column(name="mail_receiver_deleted_time")
+//	private LocalDateTime mailReceiverDeletedTime;
 	
 	@ManyToOne
 	@JoinColumn(name = "mail_no")  // FK 컬럼명 명시
