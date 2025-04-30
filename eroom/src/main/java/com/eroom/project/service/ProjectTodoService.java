@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -32,6 +33,238 @@ public class ProjectTodoService {
 	private final EmployeeRepository employeeRepository;
 	private final ProjectTodoElementDetailRepository projectTodoElementDetailRepository;
 	
+	@Transactional
+	public int softDeleteTodoElement(Long todoNo) {
+		int result = 0;
+	    try {
+	        ProjectTodoElement element = projectTodoElementRepository.findById(todoNo).orElse(null);
+	        if (element != null) {
+	        	element.setVisibleYn("N");
+		        projectTodoElementRepository.save(element);
+
+		        result = 1;
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    
+	    return result;
+	}
+
+	
+	@Transactional
+	public int updateTodoElement(Long todoNo, String todoTitle, Long listNo, Long employeeNo, String emergency) {
+		int result = 0;
+		
+	    try {
+	        ProjectTodoElement target = projectTodoElementRepository.findById(todoNo).orElse(null);
+	        
+	        if(target != null) {
+	        	target.setTodoTitle(todoTitle);
+
+		        // 리스트와 직원 정보도 수정
+		        ProjectTodoList todoList = projectTodoListRepository.findById(listNo).orElse(null);
+		        Employee employee = employeeRepository.findById(employeeNo).orElse(null);
+		        if (todoList != null) target.setProjectTodoList(todoList);
+		        if (employee != null) target.setEmployee(employee);
+
+		        // 긴급 여부 (null이면 "N" 처리)
+		        target.setEmergency("Y".equals(emergency) ? "Y" : "N");
+
+		        projectTodoElementRepository.save(target);
+		        result = 1;
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    
+	    return result;
+	}
+
+	
+	public Map<String, Object> findTodoElementOne(Long todoElementNo) {
+	    ProjectTodoElement entity = projectTodoElementRepository.findById(todoElementNo)
+	        .orElse(null);
+	    
+	    Map<String, Object> result = new HashMap<>();
+
+	    if (entity != null) {
+
+	    result.put("todo_no", entity.getTodoNo());
+	    result.put("project_todo_list_no", entity.getProjectTodoList().getProjectTodoListNo());
+	    result.put("employee_no", entity.getEmployee().getEmployeeNo());
+	    result.put("todo_title", entity.getTodoTitle());
+	    result.put("emergency", entity.getEmergency());
+	    
+	    }
+
+	    return result;
+	}
+
+
+	
+	public int deleteListOne(Long projectTodoListNo) {
+		int result = 0;
+		
+		try {
+			ProjectTodoList projectTodoList = projectTodoListRepository.findById(projectTodoListNo).orElse(null);
+			
+			if(projectTodoList != null) {
+				projectTodoList.setVisibleYn("N");
+				projectTodoListRepository.save(projectTodoList);
+			}
+			
+			result = 1;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		return result;
+	}
+	
+	@Transactional
+	public int updateList(Long projectTodoListNo, Long projectNo, String listName, String listColor,
+	                      String position, String standardListId) {
+	    int result = 0;
+
+	    try {
+	        ProjectTodoList target = projectTodoListRepository.findById(projectTodoListNo).orElse(null);
+	        if (target == null) return 0;
+
+	        target.setListName(listName);
+	        target.setListColor(listColor);
+
+	        if (position == null || standardListId == null) {
+	            projectTodoListRepository.save(target);
+	            return 1;
+	        }
+
+	        // ✅ 수정된 부분: visibleYn = 'Y' 조건 추가
+	        List<ProjectTodoList> todoList = projectTodoListRepository
+	                .findByProjectNoAndVisibleYnOrderByListSequenceAsc(projectNo, "Y");
+
+	        Long stdId = Long.valueOf(standardListId);
+	        int stdSeq = -1;
+
+	        for (ProjectTodoList item : todoList) {
+	            if (item.getProjectTodoListNo().equals(stdId)) {
+	                stdSeq = item.getListSequence();
+	                break;
+	            }
+	        }
+
+	        int oldSeq = target.getListSequence();
+	        int stdPos = Integer.parseInt(position);
+	        int newSeq = (stdPos == 1) ? stdSeq : (stdSeq < oldSeq ? stdSeq + 1 : stdSeq);
+
+	        if (newSeq == oldSeq) {
+	            projectTodoListRepository.save(target);
+	            return 1;
+	        }
+
+	        for (ProjectTodoList item : todoList) {
+	            if (item.getProjectTodoListNo().equals(projectTodoListNo)) continue;
+
+	            int seq = item.getListSequence();
+
+	            if (newSeq < oldSeq) {
+	                if (seq >= newSeq && seq < oldSeq) {
+	                    item.setListSequence(seq + 1);
+	                    projectTodoListRepository.save(item);
+	                }
+	            } else {
+	                if (seq > oldSeq && seq <= newSeq) {
+	                    item.setListSequence(seq - 1);
+	                    projectTodoListRepository.save(item);
+	                }
+	            }
+	        }
+
+	        target.setListSequence(newSeq);
+	        projectTodoListRepository.save(target);
+
+	        result = 1;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return result;
+	}
+
+
+
+
+
+
+	
+	
+	public Map<String, String> findProjectTodoListOne(Long projectTodoListNo) {
+	    Map<String, String> map = new HashMap<>();
+
+	    Optional<ProjectTodoList> optionalList = projectTodoListRepository.findById(projectTodoListNo);
+	    if (optionalList.isEmpty()) return map;
+
+	    ProjectTodoList projectTodoList = optionalList.get();
+
+	    map.put("project_todo_list_no", String.valueOf(projectTodoList.getProjectTodoListNo()));
+	    map.put("list_name", projectTodoList.getListName());
+	    map.put("list_color", projectTodoList.getListColor());
+
+	    int currentSeq = projectTodoList.getListSequence();
+	    Long projectNo = projectTodoList.getProjectNo();
+
+	    System.out.println("▶ projectNo: " + projectNo + ", currentSeq: " + currentSeq);
+
+	    if (currentSeq == 0) {
+	        // 처음이면 다음 리스트 중 가장 가까운 걸 찾음
+	        List<ProjectTodoList> nextList = projectTodoListRepository.findNextList(projectNo, currentSeq);
+	        System.out.println("🔍 다음 리스트 개수: " + nextList.size());
+
+	        if (!nextList.isEmpty()) {
+	            ProjectTodoList next = nextList.get(0);
+	            System.out.println("✅ 다음 리스트: " + next.getListName() + " (seq=" + next.getListSequence() + ")");
+	            map.put("position", "before");
+	            map.put("relative_project_todo_list_no", String.valueOf(next.getProjectTodoListNo()));
+	            map.put("relative_list_name", next.getListName());
+	        } else {
+	            System.out.println("❌ 다음 리스트 없음");
+	            map.put("position", "none");
+	        }
+	    } else {
+	        // 이전 리스트 먼저 시도
+	        List<ProjectTodoList> prevList = projectTodoListRepository.findPrevList(projectNo, currentSeq);
+	        System.out.println("🔍 이전 리스트 개수: " + prevList.size());
+
+	        if (!prevList.isEmpty()) {
+	            ProjectTodoList prev = prevList.get(0);
+	            System.out.println("✅ 이전 리스트: " + prev.getListName() + " (seq=" + prev.getListSequence() + ")");
+	            map.put("position", "after");
+	            map.put("relative_project_todo_list_no", String.valueOf(prev.getProjectTodoListNo()));
+	            map.put("relative_list_name", prev.getListName());
+	        } else {
+	            System.out.println("❗ 이전 리스트 없음 → 다음 리스트 시도");
+
+	            List<ProjectTodoList> nextList = projectTodoListRepository.findNextList(projectNo, currentSeq);
+	            System.out.println("🔍 다음 리스트 개수: " + nextList.size());
+
+	            if (!nextList.isEmpty()) {
+	                ProjectTodoList next = nextList.get(0);
+	                System.out.println("✅ 다음 리스트: " + next.getListName() + " (seq=" + next.getListSequence() + ")");
+	                map.put("position", "before");
+	                map.put("relative_project_todo_list_no", String.valueOf(next.getProjectTodoListNo()));
+	                map.put("relative_list_name", next.getListName());
+	            } else {
+	                System.out.println("❌ 앞뒤 리스트 모두 없음");
+	                map.put("position", "none");
+	            }
+	        }
+	    }
+
+	    return map;
+	}
+
+
 
 
 
@@ -133,10 +366,27 @@ public class ProjectTodoService {
 
 	    return dtolist;
 	}
+	
+	public List<ProjectTodoListDto> findByProjectNoWithElementCount(Long projectNo) {
+	    List<Object[]> results = projectTodoListRepository.findListWithElementCountByProjectNo(projectNo);
+	    List<ProjectTodoListDto> dtos = new ArrayList<>();
+
+	    for (Object[] row : results) {
+	        ProjectTodoList list = (ProjectTodoList) row[0];
+	        Long count = (Long) row[1];
+
+	        ProjectTodoListDto dto = new ProjectTodoListDto().toDto(list);
+	        dto.setTodoElementCount(count.intValue()); // count 필드 직접 세팅
+	        dtos.add(dto);
+	    }
+
+	    return dtos;
+	}
+
 
 
 	
-	@Transactional()
+	@Transactional
 	public int addList(Long projectNo, String listName, String listColor, String position, String standardListId) {
 		int result = 0;
 		
@@ -198,6 +448,7 @@ public class ProjectTodoService {
 				    .listName(listName)
 				    .listColor(listColor)
 				    .listSequence(newSeq)
+				    .visibleYn("Y")
 				    .build();
 				projectTodoListRepository.save(newItem);
 			}
@@ -273,6 +524,7 @@ public class ProjectTodoService {
 	            .employee(employee)
 	            .elementSequence(newSequence)
 	            .emergency(dto.getEmergency() == null ? "N" : dto.getEmergency())
+	            .visibleYn("Y")
 	            .build();
 
 	        // 5. 저장
