@@ -48,8 +48,12 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
 	// 개인 드라이브 파일 사용량 조회
 	@Query("SELECT SUM(d.driveSize) FROM Drive d WHERE d.uploader.employeeNo = :employeeNo AND d.visibleYn = 'Y'")
 	Long getTotalDriveSizeByEmployeeNo(@Param("employeeNo") Long employeeNo);
-
-
+	// 팀 드라이브 파일 사용량 조회
+	List<Drive> findByUploader_Structure_SeparatorCodeAndSeparatorCodeAndVisibleYn(
+		    String uploaderStructureCode,
+		    String separatorCode,
+		    String visibleYn
+		);
 	
 	// ------- 결재 관련해서 생성한 JPA
 	// param1과 Drive_delete_yn N을 기준으로 조회
