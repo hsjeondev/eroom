@@ -188,7 +188,8 @@ td.name p {
 									            data-phone=${member.directory_phone}, 
 									            data-email=${member.directory_email}, 
 									            data-position=${member.employee_position},
-									            data-targetEmpNo=${member.employee_no}">
+									            data-targetEmpNo=${member.employee_no},
+									            data-memberDirectoryNo=${member.directory_no}">
 																			
 
 												<div class="avatar avatar-m me-2">
@@ -309,23 +310,26 @@ td.name p {
 							<!-- 프로필 정보 -->
 							<div class="text-center mb-4">
 								<img src="/assets/img/team/23.webp" alt="프로필" class="rounded-circle mb-2" style="width: 100px; height: 100px;">
-								<h5 class="fw-bold mb-0 profile-name">강성관</h5>
+								<h5 id="modalName" class="fw-bold mb-0 profile-name">강성관</h5>
 								<p class="text-muted small mb-0 profile-dept-team">운영부 (경영지원팀)</p>
+								<input id="modalDept" type="hidden" class="profile-dept">
+								<input id="modalTeam" type="hidden" class="profile-team">
+								<input id="modalDirectoryNo" type="hidden" class="profile-directoryNo">
 							</div>
 
 							<!-- 전화번호 / 이메일 / 직급 -->
 							<div class="border rounded p-3 mb-4 bg-light-subtle">
 								<div class="mb-2">
 									<label class="form-label fw-semibold mb-0">휴대전화번호</label>
-									<div class="ps-2 profile-phone">010-1234-1234</div>
+									<div id="modalPhone" class="ps-2 profile-phone">010-1234-1234</div>
 								</div>
 								<div class="mb-2">
 									<label class="form-label fw-semibold mb-0">이메일</label>
-									<div class="ps-2 profile-email">goodee24@gmail.com</div>
+									<div id="modalEmail" class="ps-2 profile-email">goodee24@gmail.com</div>
 								</div>
 								<div>
 									<label class="form-label fw-semibold mb-0">직급</label>
-									<div class="ps-2 profile-position">대표</div>
+									<div id="modalPosition" class="ps-2 profile-position">대표</div>
 								</div>
 							</div>
 
@@ -337,7 +341,7 @@ td.name p {
 
 							<!-- 저장 버튼 -->
 							<div class="d-grid mb-3">
-								<button type="button" class="btn btn-primary">메모 저장</button>
+								<button id="profileModalSubmitBtn" type="button" class="btn btn-primary">메모 저장</button>
 							</div>
 
 							<!-- 하단 버튼 영역 -->
@@ -362,7 +366,7 @@ td.name p {
 
 
 
-
+				<!-- 이거 어디다 쓰려고 가져왔던거지? -->
 				<!-- ✅ 알림 영역 -->
 				<div id="alertContainer" class="mt-3" style="display: none;"></div>
 
@@ -450,6 +454,9 @@ td.name p {
 					    const phone = trigger.getAttribute('data-phone') || '-';
 					    const email = trigger.getAttribute('data-email') || '-';
 					    const position = trigger.getAttribute('data-position') || '-';
+					    const memberDirectoryNo = trigger.getAttribute('data-memberDirectoryNo') || '-';
+					    
+					    
 						
 					    // 사원 메모 조회 (AJAX GET)
 					    if (targetEmpNo) {
@@ -470,10 +477,59 @@ td.name p {
 					    // 모달 안의 요소에 값 넣기
 					    modal.querySelector('.profile-name').textContent = name;
 					    modal.querySelector('.profile-dept-team').textContent = `${dept} (${team})`;
+					    modal.querySelector('.profile-dept').value = dept;
+					    modal.querySelector('.profile-team').value = team;
+					    modal.querySelector('.profile-directoryNo').value = memberDirectoryNo;
 					    modal.querySelector('.profile-phone').textContent = phone;
 					    modal.querySelector('.profile-email').textContent = email;
 					    modal.querySelector('.profile-position').textContent = position;
+					    
+					    
 					  });
+					  
+					    // 모달 메모 저장 버튼 클릭 이벤트
+						  document.getElementById('profileModalSubmitBtn').addEventListener('click', function(){
+							  const memo = document.getElementById('memo').value;
+							  const modalDirectoryNo = document.getElementById('modalDirectoryNo').value;
+							  const modalTeam = document.getElementById('modalTeam').value;
+							  const modalDept = document.getElementById('modalDept').value;
+							  const modalName = document.getElementById('modalName').textContent;
+							  const modalPhone = document.getElementById('modalPhone').textContent;
+							  const modalEmail = document.getElementById('modalEmail').textContent;
+							  const modalPosition = document.getElementById('modalPosition').textContent;
+							  // 여기서 값들 새로 설정하고 해야할듯
+							  /* console.log(modalTeam);
+							  console.log(modalDept);
+							  console.log(modalName);
+							  console.log(modalPhone);
+							  console.log(modalName);
+							  console.log(modalEmail);
+							  console.log(modalPosition);
+							  console.log(memo); 
+							  console.log(modalDirectoryNo); */
+							  
+							  fetch('/directoryMemo/create',{
+								  method: 'POST',
+								  headers: {
+								    'Content-Type': 'application/json',
+								    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+								    'header': document.querySelector('meta[name="_csrf_header"]').content
+								  },
+								  body : JSON.stringify({
+									  directory_memo_content : memo,
+									  directory_no : modalDirectoryNo
+								  })
+							  })
+							  .then(res => res.json())
+							  .then(data => {
+								  console.log(data.res_code);
+								  // location.reload();
+							  })
+							  .catch(err =>{
+								  console.error(err);
+								  console.log('요청 중 오류가 발생했습니다.');
+							  })
+						  });
 					});
 				</script>
 								

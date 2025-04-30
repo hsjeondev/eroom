@@ -2,6 +2,8 @@ package com.eroom.directory.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.eroom.employee.entity.Employee;
 
 import jakarta.persistence.Column;
@@ -43,9 +45,10 @@ public class DirectoryMemo {
 	@Column(name = "visible_yn")
 	private String visibleYn;
 	
-	@Column(name = "directory_memo_reg_date")
+	@Column(name = "directory_memo_reg_date", insertable = false, updatable = false)
 	private LocalDateTime directoryMemoRegDate;
-	@Column(name = "directory_memo_mod_date")
+	@UpdateTimestamp
+	@Column(name = "directory_memo_mod_date", insertable = false)
 	private LocalDateTime directoryMemoModDate;
 	
 	@ManyToOne
