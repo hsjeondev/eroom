@@ -9,19 +9,30 @@ import org.springframework.stereotype.Service;
 import com.eroom.calendar.dto.TeamCalendarDto;
 import com.eroom.calendar.entity.TeamCalendar;
 import com.eroom.calendar.repository.TeamCalendarRepository;
+import com.eroom.notification.CalendarAlarmService;
+import com.eroom.websocket.TeamAlarmSocketHandler;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class TeamCalendarService {
 	private final TeamCalendarRepository teamRepository;
+	private final TeamAlarmSocketHandler teamAlarmSocketHandler;
+	private final CalendarAlarmService calendarAlarmService;
 	
-	//나의 팀 일정 등록
+	@Transactional
 	public TeamCalendarDto addTeamCalendar(TeamCalendarDto dto) {
-		TeamCalendar param = dto.toEntity();
-		TeamCalendar result =  teamRepository.save(param);
-		return new TeamCalendarDto().toDto(result);
+	    TeamCalendar saved = teamRepository.save(dto.toEntity());
+
+	    //알림 저장: 해당 팀원 전체에게 알림 insert
+	    calendarAlarmService.createTeamCalendarAlarms(saved);
+
+	    //웹소켓: 해당 팀에게만 메시지 전송
+	    teamAlarmSocketHandler.broadcastToTeam(saved.getSeparator(), "new");
+
+	    return new TeamCalendarDto().toDto(saved);
 	}
 	
 	//나의 팀 일정 목록 조회
