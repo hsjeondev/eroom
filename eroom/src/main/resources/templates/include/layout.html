@@ -96,6 +96,62 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	  });
 	</script>
 	
+	<!-- 회사 캘린더 등록시 header에 있는 종에 빨간점 표시 -->
+	<script>
+		// 회사 알림 웹소켓 연결
+		const companySocket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/company');
+		
+		companySocket.onopen = function() {
+		  console.log('회사 웹소켓 연결 성공');
+		};
+		
+		companySocket.onmessage = function(event) {
+		  console.log('회사 알림 도착:', event.data);
+		
+		  const notificationDot = document.getElementById('notificationDot');
+		  if (notificationDot) {
+		    notificationDot.style.display = 'block'; // 빨간 점 표시
+		  }
+		};
+		
+		companySocket.onclose = function() {
+		  console.log('회사 웹소켓 연결 종료');
+		};
+		
+		companySocket.onerror = function(error) {
+		  console.error('회사 웹소켓 에러 발생:', error);
+		};
+		
+		// 종 아이콘 클릭하면 빨간 점 없애기
+		document.addEventListener('DOMContentLoaded', function() {
+		  const notificationButton = document.querySelector('a.nav-link[role="button"][data-bs-toggle="dropdown"]');
+		  const notificationDot = document.getElementById('notificationDot');
+		
+		  if (notificationButton && notificationDot) {
+		    notificationButton.addEventListener('click', function() {
+		      notificationDot.style.display = 'none'; // 빨간 점 끄기
+		    });
+		  }
+		});
+		
+		document.addEventListener('DOMContentLoaded', function () {
+			  const notificationDot = document.getElementById('notificationDot');
+			  
+			  if (notificationDot) {
+			    fetch("/notification/data")
+			      .then(response => response.json())
+			      .then(data => {
+			        if (data.length > 0) {
+			          notificationDot.style.display = "block";  // 읽지 않은 알림 있으면 빨간 점 켜기
+			        } else {
+			          notificationDot.style.display = "none";   // 없으면 빨간 점 끄기
+			        }
+			      })
+			      .catch(error => console.error('초기 알림 조회 실패:', error));
+			  }
+			});
+		</script>
+	
 	
 	
 	

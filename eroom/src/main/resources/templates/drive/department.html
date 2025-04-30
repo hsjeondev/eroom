@@ -8,12 +8,26 @@
 <main class="main" id="top" layout:fragment="content">
 
   <div class="mb-3">
-    <h3 class="fw-bold mb-2">부서 드라이브</h3>
-    <button class="btn btn-primary" type="button">파일 올리기</button>
+    <h3 class="fw-bold mb-2" th:text="${departmentName} + ' 드라이브'">부서 드라이브</h3>
+    <button class="btn btn-primary" type="button" id="toggle-upload-btn">파일 올리기</button>
   </div>
-  <!-- 세부정보 부트스트랩  -->
-  <div>
-  <div class="card p-3 mb-4" style="width: 100%; font-size: 0.8rem;">
+  
+  <!-- 부트스트랩 드랍존 업로드 -->
+  <div id="upload-zone" class="mb-3" style="display: none;">
+    <form class="dropzone dropzone-multiple p-0" id="dropzone-multiple"
+          th:action="@{/drive/upload/department}" method="post" enctype="multipart/form-data">
+      <div class="dz-message" data-dz-message="data-dz-message">
+        <img class="me-2" src="/assets/img/icons/cloud-upload.svg" width="25" alt=""> 여기에 파일을 놓으세요
+      </div>
+      <div class="dz-preview dz-preview-multiple m-0 d-flex flex-column"></div>
+    </form>
+    <div class="text-end mt-2">
+	  <button type="submit" class="btn btn-primary btn-sm" id="upload-confirm-btn">추가하기</button>
+	</div>
+  </div>
+  
+ <!-- 드라이브 세부정보 카드 -->
+  <div class="card p-3 mb-4" style="width: 100%;">
   <div class="d-flex justify-content-between align-items-center">
     <h6 class="fw-bold mb-0">드라이브 세부정보</h6>
     <button class="btn btn-sm p-0 text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#storageDetailCollapse" aria-expanded="false" aria-controls="storageDetailCollapse">
@@ -24,37 +38,50 @@
   <div class="progress mt-2 mb-1" style="height: 6px;">
     <div class="progress-bar bg-primary" style="width: 92%"></div>
   </div>
-  <p class="mb-2 text-muted"><strong>45.8 GB</strong> / 50 GB 사용 중 (92%)</p>
+  <p class="mb-2 text-muted">
+    <strong id="usedGB">-</strong> / <span id="totalCapacity">-</span> 사용 중 (<span id="usagePercent">0%</span>)
+  </p>
 
   <div class="collapse" id="storageDetailCollapse">
-    <ul class="list-unstyled mb-0 mt-2">
-      <li class="d-flex justify-content-between align-items-center mb-1">
-        <span><i class="fas fa-file-pdf text-primary me-1"></i> Images</span>
-        <span class="badge bg-light text-dark">22k</span>
-      </li>
-      <li class="d-flex justify-content-between align-items-center mb-1">
-        <span><i class="fas fa-video text-success me-1"></i> Videos</span>
-        <span class="badge bg-light text-dark">534</span>
-      </li>
-      <li class="d-flex justify-content-between align-items-center mb-1">
-        <span><i class="fas fa-music text-danger me-1"></i> Audio</span>
-        <span class="badge bg-light text-dark">55</span>
-      </li>
-      <li class="d-flex justify-content-between align-items-center mb-1">
-        <span><i class="fas fa-file-alt text-warning me-1"></i> Docs</span>
-        <span class="badge bg-light text-dark">65k</span>
-      </li>
-      <li class="d-flex justify-content-between align-items-center">
-        <span><i class="fas fa-folder text-info me-1"></i> Others</span>
-        <span class="badge bg-light text-dark">12k</span>
-      </li>
-    </ul>
-  </div>
+    <ul class="list-unstyled mb-0 mt-2" style="font-size: 1rem;">
+	  <li class="d-flex justify-content-between align-items-center mb-1">
+	    <span><i class="fas fa-file text-primary me-1"></i> 전체 파일 수</span>
+	    <span class="badge bg-light text-dark" id="totalFiles" style="font-size: 1rem;">-</span>
+	  </li>
+	  <li class="d-flex justify-content-between align-items-center mb-1">
+	    <span><i class="fas fa-download text-success me-1"></i> 총 다운로드 수</span>
+	    <span class="badge bg-light text-dark" id="totalDownloads" style="font-size: 1rem;">-</span>
+	  </li>
+	  <li class="d-flex justify-content-between align-items-center mb-1">
+	    <span><i class="fas fa-calendar-alt text-warning me-1"></i> 최근 업로드 일자</span>
+	    <span class="badge bg-light text-dark" id="recentUploadDate" style="font-size: 1rem;">-</span>
+	  </li>
+	  <li class="mt-3 fw-bold">파일 유형별 용량</li>
+	  <li class="d-flex justify-content-between align-items-center mb-1">
+	    <span><i class="fas fa-file-archive text-secondary me-1"></i> ZIP 파일</span>
+	    <span class="badge bg-light text-dark" id="sizeZip">-</span>
+	  </li>
+	  <li class="d-flex justify-content-between align-items-center mb-1">
+	    <span><i class="fas fa-file-image text-secondary me-1"></i> 이미지 파일</span>
+	    <span class="badge bg-light text-dark" id="sizeImage">-</span>
+	  </li>
+	  <li class="d-flex justify-content-between align-items-center mb-1">
+	    <span><i class="fas fa-file-word text-secondary me-1"></i> 문서 파일</span>
+	    <span class="badge bg-light text-dark" id="sizeWord">-</span>
+	  </li>
+	  <li class="d-flex justify-content-between align-items-center mb-1">
+	    <span><i class="fas fa-file-excel text-secondary me-1"></i> 엑셀 파일</span>
+	    <span class="badge bg-light text-dark" id="sizeExcel">-</span>
+	  </li>
+	  <li class="d-flex justify-content-between align-items-center mb-1">
+	    <span><i class="fas fa-question-circle text-secondary me-1"></i> 기타</span>
+	    <span class="badge bg-light text-dark" id="sizeEtc">-</span>
+	  </li>
+	</ul>
 </div>
-  
-  </div>
+</div>
 
-  <div id="tableExample3" data-list='{"valueNames":["filename","filesize","description","writer","date","download"],"page":5,"pagination":true}'>
+  <div id="tableExample3" data-list='{"valueNames":["filename","filesize","description","writer","date","download"],"page":10,"pagination":true}'>
     
     <!-- 검색창 -->
     <div class="search-box mb-3 mx-auto">
@@ -85,128 +112,99 @@
                   <i class="fas fa-ellipsis fs-10"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end py-2">
-                  <a class="dropdown-item" href="#!">일괄 다운로드</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item text-danger" href="#!">일괄 삭제</a>
+                  <a class="dropdown-item" href="#!" id="bulk-download">일괄 다운로드</a>
                 </div>
               </div>
             </th>
           </tr>
         </thead>
         <tbody class="list">
-
-          <!-- 사람 1 -->
-          <tr>
+			<tr th:each="file : ${fileList}" th:attr="data-id=${file.driveAttachNo}">
             <td class="align-middle ps-3"><input class="form-check-input row-checkbox" type="checkbox" /></td>
-            <td class="align-middle">
-			  <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="파일" width="24" height="24" />
+            <td>
+			  <img th:if="${file.driveType == '.pdf'}"
+			       th:src="@{/assets/img/icons/pdf.png}" width="24" height="24" />
+			  <img th:if="${file.driveType == '.jpg'}"
+			       th:src="@{/assets/img/icons/jpg.png}" width="24" height="24" />
+			  <img th:if="${file.driveType == '.png'}"
+			       th:src="@{/assets/img/icons/png.png}" width="24" height="24" />
+			  <img th:if="${file.driveType == '.docx'}"
+			       th:src="@{/assets/img/icons/word.png}" width="24" height="24" />
+			  <img th:if="${file.driveType == '.xlsx'}"
+			       th:src="@{/assets/img/icons/excel.png}" width="24" height="24" />
+			  <img th:if="${file.driveType == '.zip'}"
+			       th:src="@{/assets/img/icons/zip.com.png}" width="24" height="24" />
+			  <img th:if="${file.driveType != '.pdf' and file.driveType != '.jpg' and file.driveType != '.png' and file.driveType != '.docx' and file.driveType != '.xlsx' and file.driveType != '.zip'}"
+			       th:src="@{/assets/img/icons/file.png}" width="24" height="24" />
 			</td>
-            <td class="align-middle filename">report_1Q.pdf</td>
-            <td class="align-middle filesize">890KB</td>
-            <td class="align-middle description">2025년 1분기 실적</td>
-            <td class="align-middle writer">홍길동</td>
-            <td class="align-middle date">2025-04-10</td>
-            <td class="align-middle download">132</td>
+            <td class="align-middle filename" th:text="${file.driveOriName}">파일명</td>
+            <td class="align-middle filesize" th:text="${#numbers.formatDecimal(file.driveSize / 1024.0, 0, 1)} + ' KB'">크기</td>
+            <td class="align-middle description" th:text="${file.driveDescription} ?: '-'">-</td>
+            <td class="align-middle writer" th:text="${file.uploaderName} + ' (' + ${file.uploaderTeamName} + ')'">작성자</td>
+            <td class="align-middle date" th:text="${#temporals.format(file.driveRegDate, 'yyyy-MM-dd')}">등록일</td>
+            <td class="align-middle download" th:text="${file.downloadCount}">횟수</td>
             <td class="align-middle text-end pe-0">
               <div class="btn-reveal-trigger position-static">
-                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown">
                   <i class="fas fa-ellipsis fs-10"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end py-2">
-                  <a class="dropdown-item" href="#!">파일 다운로드</a>
-                  <a class="dropdown-item" href="#!">파일 수정</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item text-danger" href="#!">파일 삭제</a>
+                  <a class="dropdown-item" th:href="@{'/drive/download/department/' + ${file.driveAttachNo}}">파일 다운로드</a>
+                  <th:block th:if="${file.uploaderNo == user.employee.employeeNo}">
+				    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editFileModal"
+				       th:attr="data-id=${file.driveAttachNo},data-name=${file.driveOriName},data-desc=${file.driveDescription}">
+				       파일 수정
+				    </a>
+				    <div class="dropdown-divider"></div>
+				    <a class="dropdown-item text-danger delete-file" href="#" th:data-id="${file.driveAttachNo}">파일 삭제</a>
+				  </th:block>
                 </div>
               </div>
             </td>
           </tr>
-
-          <!-- 사람 2 -->
-          <tr>
-            <td class="align-middle ps-3"><input class="form-check-input row-checkbox" type="checkbox" /></td>
-            <td class="align-middle">
-			  <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="파일" width="24" height="24" />
-			</td>
-            <td class="align-middle filename">presentation_q2.pptx</td>
-             <td class="align-middle filesize">846KB</td>
-            <td class="align-middle description">2분기 발표 자료</td>
-            <td class="align-middle writer">김민지</td>
-            <td class="align-middle date">2025-03-28</td>
-            <td class="align-middle download">89</td>
-            <td class="align-middle text-end pe-0">
-              <div class="btn-reveal-trigger position-static">
-                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-                  <i class="fas fa-ellipsis fs-10"></i>
-                </button>
-                <div class="dropdown-menu dropdown-menu-end py-2">
-                  <a class="dropdown-item" href="#!">파일 다운로드</a>
-                  <a class="dropdown-item" href="#!">파일 수정</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item text-danger" href="#!">파일 삭제</a>
-                </div>
-              </div>
-            </td>
+          <tr th:if="${#lists.isEmpty(fileList)}">
+            <td colspan="9" class="text-center text-muted py-4">업로드된 파일이 없습니다.</td>
           </tr>
-
-          <!-- 사람 3 -->
-          <tr>
-            <td class="align-middle ps-3"><input class="form-check-input row-checkbox" type="checkbox" /></td>
-            <td class="align-middle">
-			  <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="파일" width="24" height="24" />
-			</td>
-            <td class="align-middle filename">monthly_report.xlsx</td>
-             <td class="align-middle filesize">816KB</td>
-            <td class="align-middle description">3월 월간 보고서</td>
-            <td class="align-middle writer">박정우</td>
-            <td class="align-middle date">2025-04-01</td>
-            <td class="align-middle download">57</td>
-            <td class="align-middle text-end pe-0">
-              <div class="btn-reveal-trigger position-static">
-                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-                  <i class="fas fa-ellipsis fs-10"></i>
-                </button>
-                <div class="dropdown-menu dropdown-menu-end py-2">
-                  <a class="dropdown-item" href="#!">파일 다운로드</a>
-                  <a class="dropdown-item" href="#!">파일 수정</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item text-danger" href="#!">파일 삭제</a>
-                </div>
-              </div>
-            </td>
-          </tr>
-
-          <!-- 사람 4 -->
-          <tr>
-            <td class="align-middle ps-3"><input class="form-check-input row-checkbox" type="checkbox" /></td>
-            <td class="align-middle">
-			  <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="파일" width="24" height="24" />
-			</td>
-            <td class="align-middle filename">contract_final.docx</td>
-             <td class="align-middle filesize">500KB</td>
-            <td class="align-middle description">최종 계약서</td>
-            <td class="align-middle writer">이서연</td>
-            <td class="align-middle date">2025-04-05</td>
-            <td class="align-middle download">203</td>
-            <td class="align-middle text-end pe-0">
-              <div class="btn-reveal-trigger position-static">
-                <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-                  <i class="fas fa-ellipsis fs-10"></i>
-                </button>
-                <div class="dropdown-menu dropdown-menu-end py-2">
-                  <a class="dropdown-item" href="#!">파일 다운로드</a>
-                  <a class="dropdown-item" href="#!">파일 수정</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item text-danger" href="#!">파일 삭제</a>
-                </div>
-              </div>
-            </td>
-          </tr>
-
         </tbody>
       </table>
     </div>
-
+    <!-- 파일수정 모달 -->
+	<div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <form id="editFileForm" enctype="multipart/form-data">
+	      <div class="modal-content">
+	        <div class="modal-header">
+	          <h5 class="modal-title" id="editFileModalLabel">파일 수정</h5>
+	          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+	        </div>
+	        <div class="modal-body">
+	          <input type="hidden" name="driveAttachNo" id="editDriveAttachNo">
+			<div class="mb-3">
+			  <label for="originalFileName" class="form-label">기존 파일명</label>
+			  <input class="form-control" type="text" id="originalFileName" readonly>
+			</div>
+	          <div class="mb-3">
+	            <label for="editDriveFile" class="form-label">새 파일 선택</label>
+	            <input class="form-control" type="file" id="editDriveFile" name="driveFile">
+	          </div>
+	
+	          <div class="mb-3">
+	            <label for="editDriveDescription" class="form-label">파일 설명</label>
+	            <input class="form-control" type="text" id="editDriveDescription" name="driveDescription">
+	          </div>
+	          
+	          <input type="hidden" id="userName" value="${user.employee.employeeName}">
+			  <input type="hidden" id="userStructureCode" value="${user.employee.structure.separatorCode}">
+			  
+	        </div>
+	        <div class="modal-footer">
+	          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+	          <button type="submit" class="btn btn-primary">수정 저장</button>
+	        </div>
+	      </div>
+	    </form>
+	  </div>
+	</div>
     <!-- 페이징? -->
     <div class="d-flex justify-content-between mt-3">
       <span class="d-none d-sm-inline-block" data-list-info="data-list-info">1 to 4 <span class="text-body-tertiary"> Items of </span>4</span>
@@ -230,7 +228,265 @@
           checkbox.checked = selectAll.checked;
         });
       });
+      initDropzone();
     });
+    function initDropzone() {
+  	  let dropzoneInitialized = false;
+  	  const toggleBtn = document.getElementById('toggle-upload-btn');
+  	  const uploadZone = document.getElementById('upload-zone');
+  	  let dz = null;
+
+  	  toggleBtn.addEventListener('click', function () {
+  	    const open = uploadZone.style.display === 'block';
+  	    uploadZone.style.display = open ? 'none' : 'block';
+  	    toggleBtn.textContent = open ? '파일 업로드' : '업로드 닫기';
+
+  	    if (!dropzoneInitialized && !open) {
+  	      dz = new Dropzone("#dropzone-multiple", {
+  	        url: "/drive/upload/department",
+  	        autoProcessQueue: false,
+  	        paramName: "driveFiles",
+  	        uploadMultiple: true,
+  	        clickable: "#dropzone-multiple .dz-message",
+  	        acceptedFiles: ".jpg,.png,.pdf,.xlsx,.docx,.zip",
+  	        maxFilesize: 10,
+  	        previewTemplate: `
+	        	<div class="card shadow-sm mb-2 p-2 border d-flex flex-row align-items-center" style="width: 100%; max-width: 720px;">
+	            <div class="me-2" style="width: 48px; height: 48px;">
+	              <img data-dz-thumbnail 
+	                   style="width: 100%; height: 100%; object-fit: cover;" 
+	                   class="rounded file-icon" />
+	            </div>
+	            <div class="flex-grow-1">
+	              <div class="fw-bold text-truncate" data-dz-name></div>
+	              <small class="text-muted" data-dz-size></small>
+	              <input type="text" class="form-control form-control-sm mt-1" name="driveDescriptions" placeholder="파일 설명 입력" />
+	            </div>
+	            <button data-dz-remove class="btn btn-sm btn-outline-danger ms-2" title="삭제">
+	              <i class="fas fa-times"></i>
+	            </button>
+	          </div>
+	        `
+  	      });
+
+  	      document.getElementById("upload-confirm-btn").addEventListener("click", function () {
+  	        dz.processQueue();
+  	      });
+  	      dz.on("addedfile", function (file) {
+	    	  const ext = file.name.split('.').pop().toLowerCase();
+	    	  const iconMap = {
+	    	    pdf: "/assets/img/icons/pdf.png",
+	    	    docx: "/assets/img/icons/word.png",
+	    	    xlsx: "/assets/img/icons/excel.png",
+	    	    zip: "/assets/img/icons/zip.com.png"
+	    	  };
+
+	    	  if (!file.type.startsWith("image/") && iconMap[ext]) {
+	    	    const previewEl = file.previewElement;
+	    	    const imgEl = previewEl.querySelector(".file-icon");
+	    	    if (imgEl) {
+	    	      imgEl.src = iconMap[ext];
+	    	    }
+	    	  }
+	    	});
+  	      dz.on("sending", function (file, xhr, formData) {
+  	        document.getElementById("upload-confirm-btn").disabled = true;
+  	        const previews = document.querySelectorAll('.dz-preview');
+  	        previews.forEach(preview => {
+  	          const desc = preview.querySelector('input[name="driveDescriptions"]');
+  	          if (desc) {
+  	            formData.append("driveDescriptions", desc.value);
+  	          }
+  	        });
+  	      });
+
+  	      dz.on("queuecomplete", function () {
+  	        document.getElementById("upload-confirm-btn").disabled = false;
+  	      });
+
+  	      dz.on("successmultiple", function (files, responseText) {
+  	        try {
+  	          let response = typeof responseText === "string" ? JSON.parse(responseText) : responseText;
+  	          if (response.res_msg) {
+  	            alert(response.res_msg);
+  	          }
+  	        } catch (e) {
+  	          alert("서버 응답 처리 중 오류 발생");
+  	          console.error(e);
+  	        }
+  	        window.location.href = "/drive/department";
+  	      });
+
+  	      dropzoneInitialized = true;
+  	    }
+  	  });
+  	}
+    document.querySelectorAll('a[data-bs-target="#editFileModal"]').forEach(button => {
+    	  button.addEventListener('click', function () {
+    	    const driveAttachNo = this.getAttribute('data-id');
+    	    const driveDescription = this.getAttribute('data-desc') || "";
+    	    const driveOriName = this.getAttribute('data-name') || "";
+
+    	    const driveEditor = document.getElementById("userName") ? document.getElementById("userName").value : '';  // 수정자의 이름
+    	    const structureCode = document.getElementById("userStructureCode") ? document.getElementById("userStructureCode").value : '';  // 팀 코드
+   
+    	     
+    	    document.getElementById('editDriveAttachNo').value = driveAttachNo;
+    	    document.getElementById('editDriveDescription').value = driveDescription;
+    	    document.getElementById('originalFileName').value = driveOriName;
+    	  	document.getElementById('userName').value = driveEditor; 
+        	document.getElementById('userStructureCode').value = structureCode; 
+    	  });
+    	});
+      document.getElementById("editFileForm").addEventListener("submit", function (e) {
+    	  e.preventDefault();
+    	  const formData = new FormData(this);
+    	  const attachNo = formData.get("driveAttachNo");
+
+    	  fetch(`/drive/update/department/${attachNo}`, {
+    	    method: "POST",
+    	    headers : {
+    	      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+    	      'header': document.querySelector('meta[name="_csrf_header"]').content
+    		},
+    	    body: formData
+    	  })
+    	  .then(response => response.json())
+    	  .then(data => {
+    	    if (data.res_code === "200") {
+    	      alert("수정 완료!");
+    	      location.reload();
+    	    } else {
+    	      alert("수정 실패: " + data.res_msg);
+    	    }
+    	  })
+    	  .catch(err => {
+    	    alert("오류 발생");
+    	    console.error(err);
+    	  });
+    	});
+      // 파일 삭제
+      document.addEventListener('DOMContentLoaded', function () {
+    	    const deleteButtons = document.querySelectorAll('.delete-file');
+    	    
+    	    deleteButtons.forEach(button => {
+    	        button.addEventListener('click', function () {
+    	            const attachNo = this.getAttribute('data-id');
+    	            console.log("삭제 파일 번호 : "+attachNo); 
+    	            const confirmation = confirm('정말로 이 파일을 삭제하시겠습니까?');  
+    	            
+    	            if (confirmation) {
+    	                // DELETE 요청 보내기
+    	                fetch(`/drive/delete/department/${attachNo}`, {
+    	                    method: 'DELETE',
+    	                    headers: {
+    	                        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+    	                        'header': document.querySelector('meta[name="_csrf_header"]').content
+    	                    }
+    	                })
+    	                .then(response => response.json())
+    	                .then(data => {
+    	                    if (data.res_code === '200') {
+    	                        alert('파일이 성공적으로 삭제되었습니다.');
+    	                        location.reload(); // 페이지 리로드로 업데이트된 상태 표시
+    	                    } else {
+    	                        alert('파일 삭제에 실패하였습니다. 다시 시도해 주세요.');
+    	                    }
+    	                })
+    	                .catch(err => {
+    	                    alert('오류가 발생했습니다.');
+    	                    console.error(err);
+    	                });
+    	            }
+    	        });
+    	    });
+    	});
+   // 체크된 파일 일괄 다운로드
+       document.addEventListener('DOMContentLoaded', function () {
+	    const selectAllCheckbox = document.getElementById('select-all');
+	    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+	
+	    if (selectAllCheckbox) {
+	      selectAllCheckbox.addEventListener('change', function () {
+	        rowCheckboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+	      });
+	    }
+      const bulkDownloadBtn = document.getElementById('bulk-download');
+      if (bulkDownloadBtn) {
+        bulkDownloadBtn.addEventListener('click', function () {
+          const checkboxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+
+          if (checkboxes.length === 0) {
+            alert('다운로드할 파일을 선택하세요.');
+            return;
+          }
+
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = '/drive/download/department/bulk';
+          form.style.display = 'none';
+  	
+          // CSRF 토큰 추가 (form submit 시 필요)
+          const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+          const csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = '_csrf';
+          csrfInput.value = csrfToken;
+          form.appendChild(csrfInput);
+          
+          checkboxes.forEach(cb => {
+            const row = cb.closest('tr');
+            const id = row.getAttribute('data-id');
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'fileIds';
+            input.value = id;
+            form.appendChild(input);
+          });
+
+          document.body.appendChild(form);
+          form.submit();
+        });
+      }
+    });
+       document.addEventListener('DOMContentLoaded', function () {
+ 		  fetch('/drive/summary/department')
+ 		    .then(response => response.json())
+ 		    .then(data => {
+ 		    	function formatFromKB(kb) {
+ 	    		  if (!kb || isNaN(kb)) return '0 KB'; // ← null, undefined, 0 방지
+
+ 	    		  const units = ['KB', 'MB', 'GB', 'TB'];
+ 	    		  const i = Math.floor(Math.log(kb) / Math.log(1024));
+ 	    		  const size = kb / Math.pow(1024, i);
+
+ 	    		  return `${size.toFixed(1)} ${units[i] || 'KB'}`; 
+ 	    		}
+
+ 		      document.getElementById('totalFiles').innerText = data.totalFiles + '개';
+ 		      document.getElementById('totalDownloads').innerText = data.totalDownloads + '회';
+ 		      document.getElementById('recentUploadDate').innerText = data.recentUploadDate;
+
+ 		      const usedKB = data.totalUsedKB;
+ 		      const maxCapacityKB = 50 * 1024 * 1024; 
+ 		      const percent = Math.round((usedKB / maxCapacityKB) * 100);
+ 			
+ 		      document.getElementById('usedGB').innerText = formatFromKB(usedKB);
+ 		      document.getElementById('usagePercent').innerText = `${percent}%`;
+ 		      document.querySelector('.progress-bar').style.width = `${percent}%`;
+ 		      console.log("usedKB =", data.totalUsedKB);
+
+ 		      const typeSizeMap = data.fileTypeUsage || {};
+
+ 		      document.getElementById('sizeZip').innerText = formatFromKB(typeSizeMap.zip || 0);
+ 		      document.getElementById('sizeImage').innerText = formatFromKB(typeSizeMap.image || 0);
+ 		      document.getElementById('sizeWord').innerText = formatFromKB(typeSizeMap.docx || 0);
+ 		      document.getElementById('sizeExcel').innerText = formatFromKB(typeSizeMap.xlsx || 0);
+ 		      document.getElementById('sizeEtc').innerText = formatFromKB(typeSizeMap.etc || 0);
+ 		      document.getElementById('totalCapacity').innerText = formatFromKB(maxCapacityKB);
+ 		    })
+ 		    .catch(error => console.error('개인 요약 정보 불러오기 실패:', error));
+ 		});
   </script>
 
 </main>

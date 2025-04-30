@@ -37,8 +37,6 @@ public class DirectoryMemoDto {
 				.directoryMemoCreator(directory_memo_creator)
 				.directoryMemoEditor(directory_memo_editor)
 				.visibleYn(visible_yn)
-				.directoryMemoRegDate(directory_memo_reg_date)
-				.directoryMemoModDate(directory_memo_mod_date)
 				.directory(Directory.builder().directoryNo(directory_no).build())
 				.employee(Employee.builder().employeeNo(employee_no).build())
 				.build();

@@ -25,8 +25,9 @@ import com.eroom.attendance.entity.AnnualLeave;
 import com.eroom.attendance.service.AttendanceService;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
-import com.eroom.directory.service.EmployeeDirectoryService;
+import com.eroom.directory.service.DirectoryService;
 import com.eroom.employee.dto.EmployeeDto;
+import com.eroom.employee.dto.EmployeeUpdateDto;
 import com.eroom.employee.dto.StructureDto;
 import com.eroom.employee.dto.TeamDto;
 import com.eroom.employee.entity.Employee;
@@ -43,7 +44,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminController {
 	
 	private final EmployeeService employeeService;
-	private final EmployeeDirectoryService employeeDirectoryService;
+	private final DirectoryService employeeDirectoryService;
 	private final StructureService structureService;
 	private final AttendanceService attendanceService;
 	
@@ -317,7 +318,7 @@ public class AdminController {
 	    AttendanceDto dto = attendanceService.findAttendanceByNo(attendanceNo);
 	    return dto;
 	}
-	
+	// 회원 근태 정보 수정
 	@PostMapping("attendanceUpdate")
 	@ResponseBody
 	public Map<String, Object> updateAttendance(@RequestParam("attendance_no") Long attendanceNo,
@@ -343,12 +344,12 @@ public class AdminController {
 	@GetMapping("checkNameDuplicate")
 	@ResponseBody
 	public Map<String, Object> checkNameDuplicate(@RequestParam("name") String name){
-		Map<String,Object> result = new HashMap<>();
+		Map<String,Object> resultMap = new HashMap<>();
 		
 		boolean isDuplicate = employeeService.existsByEmployeeName(name);
 		
-		result.put("duplicate",isDuplicate);
-		return result;
+		resultMap.put("duplicate",isDuplicate);
+		return resultMap;
 	
 	}
 	
@@ -373,18 +374,150 @@ public class AdminController {
 	@PostMapping("/createEmployee")
 	@ResponseBody
 	public Map<String,Object> createEmployee(@RequestBody CreateEmployeeDto dto){
-		Map<String,Object> result = new HashMap<>();
+		Map<String,Object> resultMap = new HashMap<>();
 		
 		try {
 			employeeService.createEmployee(dto);
-			result.put("res_code", 200);
-			result.put("res_msg", "회원 등록이 완료되었습니다.");
+			resultMap.put("res_code", 200);
+			resultMap.put("res_msg", "회원 등록이 완료되었습니다.");
 		}catch(Exception e) {
 			e.printStackTrace();
-			result.put("res_code",500);
-			result.put("res_msg", "회원 등록에 실패했습니다.");
+			resultMap.put("res_code",500);
+			
+			resultMap.put("res_msg", "회원 등록에 실패했습니다.");
 		}
 		
-		return result;
+		return resultMap;
 	}
+	
+	// 회원 정보 수정
+	@PostMapping("/updateEmployee")
+	@ResponseBody
+	public Map<String,Object> updateEmployee(@RequestBody EmployeeUpdateDto dto){
+		Map<String,Object> resultMap = new HashMap<>();
+		try {
+			employeeService.updateEmployee(dto);
+			resultMap.put("res_code", 200);
+			resultMap.put("res_msg", "회원 정보가 성공적으로 수정되었습니다.");
+		}catch(Exception e) {
+			e.printStackTrace();
+			resultMap.put("res_code", 500);
+			resultMap.put("res_msg", "회원 정보 수정 중 오류가 발생했습니다.");
+		}
+		
+		return resultMap;
+	}
+	
+	// 회원 삭제 
+	@PostMapping("/deleteEmployee")
+	@ResponseBody
+	public Map<String,Object> deleteEmployee(@RequestBody EmployeeUpdateDto dto){
+		Map<String,Object> resultMap = new HashMap<>();
+		try {
+			employeeService.deleteEmployee(dto);
+			resultMap.put("res_code", 200);
+			resultMap.put("res_msg", "회원이 정상적으로 퇴사 처리되었습니다.");
+		}catch(Exception e) {
+			e.printStackTrace();
+			resultMap.put("res_code", 500);
+			resultMap.put("res_msg", "회원 퇴사 처리 중 오류가 발생했습니다.");
+		}
+		return resultMap;
+	}
+	
+	// 회원 정보 가져오기(employee,directory,structure)
+	@GetMapping("/getEmployeeDetail")
+	@ResponseBody
+	public Map<String, Object> getEmployeeDetail(@RequestParam("employeeNo") Long employeeNo){
+		Map<String,Object> resultMap = new HashMap<>();
+		
+		try {
+			// employeeNo로 사원 정보 조회
+			Employee employee = employeeService.findEmployeeByEmployeeNo(employeeNo);
+			
+			// 사원 정보가 없을 경우
+			if(employee == null) {
+				resultMap.put("res_code", 404);
+				resultMap.put("res_msg", "회원 정보를 찾을 수 없습니다.");
+				return resultMap;
+			}
+			resultMap.put("employee_name", employee.getEmployeeName());
+			resultMap.put("employee_position", employee.getEmployeePosition());
+			resultMap.put("employee_hire_date", employee.getEmployeeHireDate() != null? employee.getEmployeeHireDate().toLocalDate().toString() : "");
+			resultMap.put("employee_end_date", employee.getEmployeeEndDate() != null ? employee.getEmployeeEndDate().toLocalDate().toString() : "");
+			resultMap.put("employee_employment_yn", employee.getEmployeeEmploymentYn() != null ? employee.getEmployeeEmploymentYn() : "Y");
+			
+			// 생일 문자열 -> 날짜형태 변환
+			String birth = employee.getEmployeeBirth();
+			if(birth != null && birth.length() == 8) {
+				String formettedBirth = birth.substring(0,4) + "-" + birth.substring(4,6) + "-" + birth.substring(6,8);
+				resultMap.put("employee_birth", formettedBirth);
+			}else {
+				resultMap.put("employee_birth", "");
+			}
+			// 사원의 directory 정보 가져오기
+			Directory directory = employee.getDirectory();
+			if(directory != null) {
+				resultMap.put("directory_phone",directory.getDirectoryPhone());
+			}else {
+				resultMap.put("directory_phone", "");
+			}
+			
+			// 사원이 소속된 부서/팀 정보 가져오기
+			Structure structure = employee.getStructure();
+			if(structure != null) {
+				// 팀 번호 저장
+				resultMap.put("team_no", structure.getStructureNo());
+				// 상위 부서 찾기(부모 코드)
+				if(structure.getParentCode() != null) {
+					Structure parentDept = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(structure.getParentCode());
+					if(parentDept != null) {
+						resultMap.put("department_no", parentDept.getStructureNo());
+					}
+				}else {
+					// 부모 코드가 없으면 structure 자체가 부서
+					resultMap.put("department_no", structure.getStructureNo());
+				}
+				
+			}else {
+				resultMap.put("team_no", null);		
+				resultMap.put("department_no", null);		
+			}
+			
+			// 부서 리스트 보내기 (드롭다운용)
+			List<Structure> deptList = structureService.selectDepartmentAll();
+			List<Map<String,Object>> deptResultList = new ArrayList<>();
+			for(Structure dept : deptList) {
+				Map<String,Object> deptMap = new HashMap<>();
+				deptMap.put("structure_no", dept.getStructureNo());
+				deptMap.put("code_name", dept.getCodeName());
+				deptResultList.add(deptMap);
+			}
+			resultMap.put("department_list", deptResultList);
+			
+			// 팀 리스트
+			List<Structure> teamList = structureService.selectAllTeams();
+			List<Map<String,Object>> teamResultList = new ArrayList<>();
+			for(Structure team : teamList) {
+				Map<String,Object> teamMap = new HashMap<>();
+				teamMap.put("structure_no", team.getStructureNo());
+				teamMap.put("code_name", team.getCodeName());
+				teamResultList.add(teamMap);
+			}
+			resultMap.put("team_list", teamResultList);
+			
+			resultMap.put("res_code", 200);
+			resultMap.put("res_msg","회원 정보 조회 성공");
+			
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			resultMap.put("res_code", 500);
+			resultMap.put("res_msg", "회원 정보를 가져오는 중 오류가 발생했습니다.");
+		}
+		
+		return resultMap;
+	}
+	
+	
 }

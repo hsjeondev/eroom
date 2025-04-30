@@ -231,8 +231,16 @@
 
 			  const separator = info.event.extendedProps.separator || "";
 			  const type = info.event.extendedProps.type;
+			  const event = info.event;
+			  const teamName = event.extendedProps.teamName || '';
+			  const title = event.title;
 
-			  // 공휴일일 경우 스타일 적용
+			  // [팀명] 붙이기
+			  if (teamName && title && !title.startsWith(`[${teamName}]`)) {
+			    event.setProp("title", `[${teamName}] ${title}`);
+			  }
+
+			  // 공휴일 처리
 			  if (type === "holiday") {
 			    el.style.setProperty("background-color", "#FFF8B3", "important");
 			    el.style.setProperty("border", "1px solid #F5E79E", "important");
@@ -240,7 +248,7 @@
 			    el.style.setProperty("pointer-events", "none", "important");
 			    el.style.setProperty("opacity", "1", "important");
 
-			    // 통일 스타일
+			    // ⭐ 공통 통일 스타일
 			    el.style.setProperty("border-radius", "8px", "important");
 			    el.style.setProperty("padding", "6px 8px", "important");
 			    el.style.setProperty("box-shadow", "0 2px 5px rgba(0,0,0,0.1)", "important");
@@ -265,7 +273,9 @@
 			    "T005": "D003", "T006": "D003", "T007": "D004", "T008": "D004"
 			  };
 
-			  let backgroundColor, borderColor, textColor;
+			  let backgroundColor = "#DDDDDD";
+			  let borderColor = "#CCCCCC";
+			  let textColor = "#000000";
 
 			  switch (separator) {
 			    case "E001":
@@ -292,6 +302,7 @@
 			  el.style.setProperty("border", `1px solid ${borderColor}`, "important");
 			  el.style.setProperty("color", textColor, "important");
 
+			  // ⭐ 통일 스타일 추가
 			  el.style.setProperty("border-radius", "8px", "important");
 			  el.style.setProperty("padding", "6px 8px", "important");
 			  el.style.setProperty("box-shadow", "0 2px 5px rgba(0,0,0,0.1)", "important");
@@ -300,7 +311,10 @@
 			  el.style.setProperty("white-space", "nowrap", "important");
 			  el.style.setProperty("overflow", "hidden", "important");
 			  el.style.setProperty("text-overflow", "ellipsis", "important");
+			  el.style.setProperty("display", "flex", "important");
+			  el.style.setProperty("align-items", "center", "important");
 
+			  // fc-event-main 안쪽도 통일
 			  const eventMain = el.querySelector(".fc-event-main");
 			  if (eventMain) {
 			    eventMain.style.setProperty("background", "none", "important");
@@ -315,7 +329,6 @@
 			    eventMain.style.setProperty("text-overflow", "ellipsis", "important");
 			  }
 			}
-
 
 		 	
       });

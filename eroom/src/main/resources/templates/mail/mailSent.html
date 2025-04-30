@@ -18,7 +18,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mailCreate}">메일 쓰기</a>
               <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button>
             </div>
-            <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" href="../../apps/email/compose.html"> <span class="d-none d-sm-inline-block">Compose</span><span class="d-sm-none fas fa-plus"></span></a></div>
+            <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" th:href="@{mailCreate}"> <span class="d-none d-sm-inline-block">메일 쓰기</span><span class="d-sm-none fas fa-plus"></span></a></div>
 	            <div class="col-auto flex-1">
 	            <!-- 절반 검색 기능  -->
 	              <div class="search-box w-100">
@@ -90,15 +90,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                     	 받은 사람 : (OOO) 으로 바꿀 예정
                     	 </a> -->
                     	 <div class="text-body-emphasis fw-bold inbox-link fs-9 senderName">받는 사람:
-					        <!-- <span th:each="receiver : ${sentMail.receivers}" 
-					              th:text="${receiver.receiver.employeeName}"
-					              th:append="' '" /></span> --> 
-					              <!-- 이쪽 코드오류남 -->
-					              <!-- <span th:each="receiver : ${sentMail.receivers}" 
-								      class="badge bg-secondary me-1">
-								  <span th:text="${receiver.receiver.employeeName}"></span>
-								</span> -->
-								<!-- 이쪽 코드오류남 -->
+                    	 	<span th:with="size=${#lists.size(sentMail.receivers)}">
+                    	 	<span th:if="${size == 1}" th:text="${sentMail.receivers[0].receiver.employeeName}"></span>
+					        <span th:if="${size > 1}">
+						      <span th:text="${sentMail.receivers[0].receiver.employeeName}"></span>
+						      <span th:text="' 외 ' + (${size} - 1) + '명'"></span>
+						      
+						    </span>
+						    </span>
 					    </div>
                     </div>
                     <!-- 이메일 잘 나옴 -->
@@ -124,39 +123,33 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                   <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11">
                   	<!-- <a class="d-block inbox-link" th:href="@{/mail/detail}"> -->
                   	<a class="d-block inbox-link" th:href="@{/mail/detail/{id}(id=${sentMail.mailNo})}">
-                  		<span class="fs-9 line-clamp-1 text-body-emphasis mailTitle"  th:text="${sentMail.mailTitle}"></span>
-                  		<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"  th:utext="${sentMail.mailContent}"></span>
+                  		<span class="fs-9 line-clamp-1 text-body-emphasis mailTitle" th:text="${sentMail.mailTitle != null and !#strings.isEmpty(sentMail.mailTitle) ? sentMail.mailTitle : '(제목없음)'}"></span>
+                  		<!-- <span class="fs-9 line-clamp-1 text-body-emphasis mailTitle"  th:text="${sentMail.mailTitle}"></span> -->
+                  		<!-- <span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"  th:utext="${sentMail.mailContent}"></span> -->
+                   		<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent" th:utext="${sentMail.mailContent != null and !#strings.isEmpty(sentMail.mailContent) ? sentMail.mailContent : '(내용없음)'}"></span>
                     </a>
                   </div>
                 </div>
+					</div>
                 <!-- 페이징 -->
-					</div>
                      
-					<!-- <div class="d-flex flex-wrap align-items-center justify-content-between py-3 pe-0 fs-9 border-bottom border-translucent">
-		              <div class="d-flex">
-		                <p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info"></p><a class="fw-semibold" href="#!" data-list-view="*">전체 보기<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a><a class="fw-semibold d-none" href="#!" data-list-view="less">접기<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a>
-		              </div>
-		              <div class="d-flex">
-		                <button class="page-link" data-list-pagination="prev"><span class="fas fa-chevron-left"></span></button>
-		                <ul class="mb-0 pagination"></ul>
-		                <button class="page-link pe-0" data-list-pagination="next"><span class="fas fa-chevron-right"></span></button>
-		              </div>
-            		</div> -->
-            		<!-- <nav aria-label="Page navigation example">
-					  <ul class="pagination justify-content-center">
-					    <li class="page-item"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
-					    <li class="page-item"><a class="page-link" href="#">1</a></li>
-					    <li class="page-item"><a class="page-link" href="#">2</a></li>
-					    <li class="page-item"><a class="page-link" href="#">3</a></li>
-					    <li class="page-item active" aria-current="page"><a class="page-link" href="#">4</a></li>
-					    <li class="page-item"><a class="page-link" href="#">5</a></li>
-					    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-					  </ul>
-					</nav> -->
-					<!-- 페이징 손봐야함 -->
-					<div class="d-flex justify-content-center mt-4">
-					    <ul class="pagination mb-0"></ul>
-					</div>
+					<div class="d-flex justify-content-center mt-3">
+							<div class="d-flex">
+								<button class="page-link disabled" data-list-pagination="prev"
+									disabled>
+									<i class="fas fa-chevron-left"></i>
+								</button>
+								<ul class="mb-0 pagination">
+									<li class="active">
+										<button class="page" type="button" data-i="1" data-page="5">1</button>
+									</li>
+								</ul>
+								<button class="page-link pe-0" data-list-pagination="next"
+									disabled>
+									<i class="fas fa-chevron-right"></i>
+								</button>
+							</div>
+						</div>
                 </div>
                 </div>
     </main>

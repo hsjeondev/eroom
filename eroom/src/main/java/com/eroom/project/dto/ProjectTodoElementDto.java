@@ -1,7 +1,11 @@
 package com.eroom.project.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.eroom.employee.entity.Employee;
 import com.eroom.project.entity.ProjectTodoElement;
+import com.eroom.project.entity.ProjectTodoElementDetail;
 import com.eroom.project.entity.ProjectTodoList;
 
 import lombok.AllArgsConstructor;
@@ -34,11 +38,35 @@ public class ProjectTodoElementDto {
     private String emergency;
     
     private int element_sequence;
+    
+    private List<ProjectTodoElementDetailDto> todo_element_details;
+    
+    private int totalCount;
+    
+    private int completedCount;
+
 
     
     public ProjectTodoElementDto toDto(ProjectTodoElement projectTodoElement) {
-        return ProjectTodoElementDto
-                .builder()
+        List<ProjectTodoElementDetailDto> detailDtoList = null;
+        
+        
+        if (projectTodoElement.getTodoElementDetails() != null) {
+            detailDtoList = new ArrayList<>();
+            for (ProjectTodoElementDetail detail : projectTodoElement.getTodoElementDetails()) {
+                ProjectTodoElementDetailDto detailDto = ProjectTodoElementDetailDto.builder()
+                        .todo_detail_no(detail.getTodoDetailNo())
+                        .todo_element_no(detail.getProjectTodoElement() != null ? detail.getProjectTodoElement().getTodoNo() : null)
+                        .todo_content(detail.getTodoContent())
+                        .status(detail.getStatus())
+                        .project_no(detail.getProjectNo())
+                        .visible_yn(detail.getVisibleYn())
+                        .build();
+                detailDtoList.add(detailDto);
+            }
+        }
+
+        return ProjectTodoElementDto.builder()
                 .todo_no(projectTodoElement.getTodoNo())
                 .project_todo_list_no(projectTodoElement.getProjectTodoList().getProjectTodoListNo())
                 .projectTodolist(projectTodoElement.getProjectTodoList())
@@ -47,12 +75,13 @@ public class ProjectTodoElementDto {
                 .todo_title(projectTodoElement.getTodoTitle())
                 .emergency(projectTodoElement.getEmergency())
                 .element_sequence(projectTodoElement.getElementSequence())
+                .todo_element_details(detailDtoList)
                 .build();
     }
 
+
     public ProjectTodoElement toEntity(ProjectTodoList projectTodoList, Employee employee) {
-        return ProjectTodoElement
-                .builder()
+        ProjectTodoElement projectTodoElement = ProjectTodoElement.builder()
                 .todoNo(todo_no)
                 .projectTodoList(projectTodoList)
                 .employee(employee)
@@ -60,5 +89,24 @@ public class ProjectTodoElementDto {
                 .emergency(emergency)
                 .elementSequence(element_sequence)
                 .build();
+
+        if (todo_element_details != null) {
+            List<ProjectTodoElementDetail> details = new ArrayList<>();
+            for (ProjectTodoElementDetailDto detailDto : todo_element_details) {
+                ProjectTodoElementDetail detail = ProjectTodoElementDetail.builder()
+                        .todoDetailNo(detailDto.getTodo_detail_no())
+                        .projectTodoElement(projectTodoElement)
+                        .todoContent(detailDto.getTodo_content())
+                        .status(detailDto.getStatus())
+                        .projectNo(detailDto.getProject_no())
+                        .visibleYn(detailDto.getVisible_yn())
+                        .build();
+                details.add(detail);
+            }
+            projectTodoElement.setTodoElementDetails(details);
+        }
+
+        return projectTodoElement;
     }
+
 }

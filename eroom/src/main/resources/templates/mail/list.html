@@ -1,338 +1,340 @@
 <!DOCTYPE html>
-<html 
-	  xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{/include/layout}">
-  <body>
-  <h1>전체 메일</h1>
-   <main class="main" id="top" layout:fragment="content">
-   
-      <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
-            <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mail/create}">메일 쓰기</a>
-              <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button>
-            </div>
-            <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" href="../../apps/email/compose.html"> <span class="d-none d-sm-inline-block">Compose</span><span class="d-sm-none fas fa-plus"></span></a></div>
-            <div class="col-auto flex-1">
-              <div class="search-box w-100">
-                <form class="position-relative">
-                  <input class="form-control search-input search" type="search" placeholder="검색" aria-label="Search" />
-                  <span class="fas fa-search search-box-icon"></span>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
 
-                </form>
-              </div>
-            </div>
-       </div>
-       <div class="col-lg">
-              <div class="px-lg-1">
-                <div class="d-flex align-items-center flex-wrap position-sticky pb-2 bg-body z-2 email-toolbar inbox-toolbar">
-                  <div class="d-flex align-items-center flex-1 me-2">
-                    <button class="btn btn-sm p-0 me-2" type="button" onclick="location.reload()"><span class="text-primary fas fa-redo fs-10"></span></button>
-                    <p class="fw-semibold fs-10 text-body-tertiary text-opacity-85 mb-0 lh-sm text-nowrap">새로 고침</p>
-                  </div>
-                  <!-- <div class="d-flex">
-                    <p class="text-body-tertiary text-opacity-85 fs-9 fw-semibold mb-0 me-3">Showing : <span class="text-body">1-7 </span>of <span class="text-body">205</span></p>
-                    <button class="btn p-0 me-3" type="button"><span class="text-body-quaternary fa-solid fa-angle-left fs-10"></span></button>
-                    <button class="btn p-0" type="button"><span class="text-primary fa-solid fa-angle-right fs-10"></span></button>
-                  </div> -->
-                  <div class="d-flex">
-                  	<select class="form-control search-input search">
-                  		<option value="latest">최신순</option>
-                  		<option value="latest">오래된순</option>
-                  	</select>
-                  </div>
-                </div>
-                <div class="border-top border-translucent py-2 d-flex justify-content-between">
-                  <div class="form-check mb-0 fs-8">
-                    <input class="form-check-input" type="checkbox" data-bulk-select-row="data-bulk-select-row" />
-                  </div>
-                  <div>
-                    <button class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Archive"><span class="fas fa-archive fs-10"></span></button>
-                    <button class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete"><span class="fas fa-trash fs-10"></span></button>
-                    <button class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Star"><span class="fas fa-star fs-10"></span></button>
-                    <button class="btn p-0 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tags"><span class="fas fa-tag fs-10"></span></button>
-                  </div>
-                </div>
-                <!-- 첫번째 시작 -->
-                <div class="border-top border-translucent hover-actions-trigger py-3">
-                  <div class="row align-items-sm-center gx-2">
-                    <div class="col-auto">
-                      <div class="d-flex flex-column flex-sm-row">
-                        <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" />
-                        <button class="btn p-0"><span class="fas text-warning fa-star"></span></button>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="avatar avatar-s  rounded-circle">
-                        <img class="rounded-circle " src="../../assets/img/team/60.webp" alt="" />
+<script src="../../vendors/tinymce/tinymce.min.js"></script>
 
-                      </div>
-                    </div>
-                    <div class="col-auto"><a class="text-body-emphasis fw-bold inbox-link fs-9" href="../../apps/email/email-detail.html">보낸 사람</a></div>
-                    <div class="col-auto ms-auto">
-                      <div class="hover-actions end-0">
-                        <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
-                        <div class="dropdown-menu dropdown-menu-end py-2">
-                        <!-- <a class="dropdown-item" href="#!">Mark Unread</a> -->
-                        <a class="dropdown-item" href="#!">⭐중요 표시</a>
-                        <a class="dropdown-item" href="#!">🗑️휴지통</a>
-                        <!-- <a class="dropdown-item" href="#!">다운로드</a> -->
-                        <!-- <a class="dropdown-item" href="#!">Print</a> -->
-                        <!-- <a class="dropdown-item" href="#!">Report Spam</a> -->
-                        <!-- <a class="dropdown-item" href="#!">Report Phishing</a> -->
-                        <!-- <a class="dropdown-item" href="#!">Mute Jessica Ball</a> -->
-                        <!-- <a class="dropdown-item" href="#!">Block Jessica Ball</a> -->
-                        <a class="dropdown-item text-danger" href="#!">삭제</a></div>
-                      </div><span class="fs-10 fw-bold">보낸 시간</span>
-                    </div>
-                  </div>
-                  <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11"><a class="d-block inbox-link" th:href="@{mail/detail}"><span class="fs-9 line-clamp-1 text-body-emphasis">메일 제목</span>
-                      <p class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2">메일 내용</p>
-                    </a>
-                  </div>
-                </div>
-                <!-- 첫번째 끝 -->
-                
-                <!-- test -->
-                <div th:if="${#lists.isEmpty(resultList)}">
-                	<input type="text" value="내용이 없습니다.">
-                </div>
-                 <div class="border-top border-translucent hover-actions-trigger py-3"
-                 		th:if="${!#lists.isEmpty(resultList)}"
-                 		th:each="mail : ${resultList}">
-                  <div class="row align-items-sm-center gx-2">
-                    <div class="col-auto">
-                      <div class="d-flex flex-column flex-sm-row">
-                        <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" />
-                        <button class="btn p-0"><span class="fas text-warning fa-star"></span></button>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="avatar avatar-s  rounded-circle">
-                        <img class="rounded-circle " src="../../assets/img/team/60.webp" alt="" />
+</head>
+<body>
+<main class="main" id="top" layout:fragment="content">
+	<div class="col">
+              <div class="card email-content">
+                <div class="card-body">
+                  <form method="post" class="d-flex flex-column h-100"
+                  action="/mail/create" name="mail_create_form" enctype="multipart/form-data">
+                  <!-- 본인 히든 처리 -->
+                  <input type="hidden" name="employee_no"
+								th:value="${#authentication.principal.employee.employeeNo}" />
+                    <div class="row g-3 mb-2">
+	                    <div class="col-4">
+	                   		<input class="form-control" type="text" name="receiver" placeholder="받는 사람" id="receiverInput" readonly data-bs-toggle="modal" data-bs-target="#orgModal" />
+	                   </div>
+						<!-- 이메일 정보 서칭하는거 -->
+									<!-- <div th:each="employee : ${employeeList}">
+    <span th:text="${employee.directory != null && employee.directory.directoryEmail != null ? employee.directory.directoryEmail : '이메일 없음'}"></span>
+							</div> -->
+					<div class="modal fade" id="orgModal" tabindex="-1" aria-labelledby="orgModalLabel" aria-hidden="true">
+					  <div class="modal-dialog modal-md">
+					    <div class="modal-content">
+					      <div class="modal-header">
+					        <h5 class="modal-title" id="orgModalLabel">조직도에서 직원 선택</h5>
+					        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+					      </div>
+					      <div class="modal-body">
+					        <!-- 소속 선택 -->
+					        <label for="deptSelect" class="form-label">소속</label>
+					        <select class="form-select" id="deptSelect">
+							  <option selected disabled>-- 소속 선택 --</option>
+							  <option th:each="dept : ${departments}"
+							          th:value="${dept.separator_code}"
+							          th:text="${dept.separator_name}"></option>
+							</select>
+					
+					        <!-- 참여자 선택 -->
+					        <label for="employeeSelect" class="form-label mt-3">수신자 선택</label>
+					        <div class="d-flex">
+					          <select class="form-select me-2" id="employeeSelect">
+					            <option selected>-- 수신자 선택 --</option>
+					            <!-- JS로 채워짐 -->
+					          </select>
+					          <button type="button" class="btn btn-primary" id="addEmployeeBtn" onclick="addParticipant()">추가</button>
+					        </div>
+					
+					        <!-- 선택된 참여자 표시 -->
+					        <div class="mt-3">
+					          <strong>선택된 수신자</strong>
+					          <ul id="selectedEmployeeList" class="list-unstyled mt-2"></ul>
+					        </div>
+					      </div>
+					      <div class="modal-footer">
+					        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+					        <button type="button" class="btn btn-primary" id="confirmSelectionBtn" data-bs-dismiss="modal">선택</button>
+					      </div>
+					    </div>
+					  </div>
+					</div>
+					<!-- 나중에 밑에 두기  -->
+					<script>
+					document.getElementById("deptSelect").addEventListener("change", function () {
+						  const separatorCode = this.value;
 
-                      </div>
-                    </div>
-                    <div class="col-auto"><a class="text-body-emphasis fw-bold inbox-link fs-9" href="../../apps/email/email-detail.html">보낸 사람</a></div>
-                    <div class="col-auto ms-auto">
-                      <div class="hover-actions end-0">
-                        <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
-                        <div class="dropdown-menu dropdown-menu-end py-2">
-                        <!-- <a class="dropdown-item" href="#!">Mark Unread</a> -->
-                        <a class="dropdown-item" href="#!">⭐중요 표시</a>
-                        <a class="dropdown-item" href="#!">🗑️휴지통</a>
-                        <!-- <a class="dropdown-item" href="#!">다운로드</a> -->
-                        <!-- <a class="dropdown-item" href="#!">Print</a> -->
-                        <!-- <a class="dropdown-item" href="#!">Report Spam</a> -->
-                        <!-- <a class="dropdown-item" href="#!">Report Phishing</a> -->
-                        <!-- <a class="dropdown-item" href="#!">Mute Jessica Ball</a> -->
-                        <!-- <a class="dropdown-item" href="#!">Block Jessica Ball</a> -->
-                        <a class="dropdown-item text-danger" href="#!">삭제</a></div>
-                      </div>
-                      <span class="fs-10 fw-bold" 
-                      		th:text="${mail.mailSentTime}">
-                      </span>
-                    </div>
-                  </div>
-                  <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11">
-                  	<a class="d-block inbox-link" th:href="@{mail/detail}">
-                  		<span class="fs-9 line-clamp-1 text-body-emphasis" th:text="${mail.mailTitle}"></span>
-                    	<p class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2" th:text="${mail.mailContent}"></p>
-                    </a>
-                  </div>
-                </div>
-                
-                <!-- test -->
-                
-                <!-- 2번째 시작 -->
-                <div class="border-top border-translucent hover-actions-trigger py-3">
-                  <div class="row align-items-sm-center gx-2">
-                    <div class="col-auto">
-                      <div class="d-flex flex-column flex-sm-row">
-                        <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-2" data-bulk-select-row="data-bulk-select-row" />
-                        <button class="btn p-0"><span class="far text-body-quaternary fa-star"></span></button>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="avatar avatar-s  rounded-circle">
-                        <img class="rounded-circle " src="../../assets/img/team/58.webp" alt="" />
+						  fetch("/search-employees?separator_code=" + separatorCode)
+						    .then(response => response.json())
+						    .then(data => {
+						      const employeeSelect = document.getElementById("employeeSelect");
+						      employeeSelect.innerHTML = '<option selected disabled>-- 수신자 선택 --</option>'; // 초기화
 
-                      </div>
-                    </div>
-                    <div class="col-auto"><a class="text-body-emphasis fw-bold inbox-link fs-9" href="../../apps/email/email-detail.html">Danny Reid</a></div>
-                    <div class="col-auto ms-auto">
-                      <div class="hover-actions end-0">
-                        <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
-                        <div class="dropdown-menu dropdown-menu-end py-2"><a class="dropdown-item" href="#!">Mark Unread</a><a class="dropdown-item" href="#!">Mark Important</a><a class="dropdown-item" href="#!">Archive</a><a class="dropdown-item" href="#!">Download</a><a class="dropdown-item" href="#!">Print</a><a class="dropdown-item" href="#!">Report Spam</a><a class="dropdown-item" href="#!">Report Phishing</a><a class="dropdown-item" href="#!">Mute Jessica Ball</a><a class="dropdown-item" href="#!">Block Jessica Ball</a><a class="dropdown-item text-danger" href="#!">Delete</a></div>
-                      </div><span class="fs-10 fw-bold">3 M</span>
-                    </div>
-                  </div>
-                  <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11"><a class="d-block inbox-link" href="../../apps/email/email-detail.html"><span class="fs-9 line-clamp-1 text-body-emphasis">How to take the headache out of Order</span>
-                      <p class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2">Hello! As I've mentioned before, we have this huge order deals to ship within this month. Also, the financial report is attached to this email. Hopefully, you'll find it useful for the company.</p>
-                    </a><a class="d-inline-flex align-items-center border border-translucent rounded-pill px-3 py-1 me-2 mt-2 inbox-link" href="#!"><span class="fas fa-file-pdf text-warning fs-9"></span><span class="ms-2 fw-bold fs-10 text-body">Financial_Reports.pdf</span></a><a class="d-inline-flex align-items-center border border-translucent rounded-pill px-3 py-1 me-2 mt-2 inbox-link" href="#!"><span class="fas fa-file-zipper text-warning fs-9"></span><span class="ms-2 fw-bold fs-10 text-body">Frame20.zip</span></a>
-                  </div>
-                </div>
-                <!-- 2번째 시작 -->
-                
-                <div class="border-top border-translucent hover-actions-trigger py-3">
-                  <div class="row align-items-sm-center gx-2">
-                    <div class="col-auto">
-                      <div class="d-flex flex-column flex-sm-row">
-                        <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-3" data-bulk-select-row="data-bulk-select-row" />
-                        <button class="btn p-0"><span class="fas text-warning fa-star"></span></button>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="avatar avatar-s  rounded-circle">
-                        <img class="rounded-circle " src="../../assets/img/team/57.webp" alt="" />
+						      data.forEach(emp => {
+						        const option = document.createElement("option");
+						        option.value = emp.employee_no;
+						        option.textContent = emp.employee_name;
+						        employeeSelect.appendChild(option);
+						      });
+						    })
+						    .catch(error => console.error("직원 불러오기 실패", error));
+						});
+					function addParticipant() {
+					  const select = document.getElementById('employeeSelect');
+					  const selectedOptions = Array.from(select.selectedOptions);
+					
+					  if (selectedOptions.length === 0) {
+					    alert('수진자를 선택해주세요.');
+					    return;
+					  }
+					
+					  selectedOptions.forEach(option => {
+					    const employeeNo = option.value;
+					    const employeeName = option.text;
+					
+					    if (document.getElementById('receiver-' + employeeNo)) {
+					      alert('이미 추가된 수신자입니다.');
+					      return;
+					    }
+					
+					    // 배지 생성
+					    const badge = document.createElement('span');
+					    badge.className = 'badge bg-secondary text-white me-2 mb-2';
+					    badge.id = 'receiver-' + employeeNo;
+					    badge.innerHTML = `
+					      ${employeeName}
+					      <button type="button" class="btn-close btn-close-white btn-sm ms-2" style="font-size: 0.6rem;" onclick="removeParticipant('${employeeNo}')"></button>
+					      <input type="hidden" name="receiver_no" value="${employeeNo}">
+					    `;
+					    document.getElementById('selectedEmployeeList').appendChild(badge);
+					    select.selectedIndex = 0;
+					  });
+					  updateReceiverInput();
+					}
+					
+					function removeParticipant(employeeNo) {
+					  const badge = document.getElementById('receiver-' + employeeNo);
+					  if (badge) {
+					    badge.remove();
+					    updateReceiverInput();
+					  }
+					}
+					function updateReceiverInput() {
+						  const badges = document.querySelectorAll('#selectedEmployeeList .badge');
+						  const names = Array.from(badges).map(badge => badge.childNodes[0].textContent.trim());
+						  document.getElementById('receiverInput').value = names.join(', ');
+						}
+					</script>
 
+                      <div class="col-12">
+                        <!-- <input class="form-control" type="text" name="mail_title" id="mail_title" placeholder="제목" /> -->
+                      	<input class="form-control" type="text" name="mail_title" id="mail_title"
+							placeholder="제목" th:value="${mail != null} ? ${mail.mailTitle} : ''" />
                       </div>
                     </div>
-                    <div class="col-auto"><a class="text-body fw-semibold inbox-link fs-9" href="../../apps/email/email-detail.html">Harley Brown</a></div>
-                    <div class="col-auto ms-auto">
-                      <div class="hover-actions end-0">
-                        <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
-                        <div class="dropdown-menu dropdown-menu-end py-2"><a class="dropdown-item" href="#!">Mark Unread</a><a class="dropdown-item" href="#!">Mark Important</a><a class="dropdown-item" href="#!">Archive</a><a class="dropdown-item" href="#!">Download</a><a class="dropdown-item" href="#!">Print</a><a class="dropdown-item" href="#!">Report Spam</a><a class="dropdown-item" href="#!">Report Phishing</a><a class="dropdown-item" href="#!">Mute Jessica Ball</a><a class="dropdown-item" href="#!">Block Jessica Ball</a><a class="dropdown-item text-danger" href="#!">Delete</a></div>
-                      </div><span class="fs-10">5 M</span>
+                    <div class="mb-3 flex-1">
+                      <!-- <textarea class="tinymce email-textarea" name="mail_content" id="mail_content" data-tinymce='{"height":"100%"}'></textarea> -->
+                      <textarea class="tinymce email-textarea" name="mail_content" id="mail_content"
+          					data-tinymce='{"height":"100%"}'
+         				 	th:text="${mail != null} ? ${mail.mailContent} : ''"></textarea>
                     </div>
-                  </div>
-                  <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11"><a class="d-block inbox-link" href="../../apps/email/email-detail.html"><span class="fs-9 line-clamp-1 text-body-highlight">The Arnold Schwarzenegger of Order</span>
-                      <p class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2">I’ve come across your posts and found some favorable deals on your page. I’ve added a load of products to the cart and I don’t know the payment options you avail. Also, can you enlighten me about any discount or...</p>
-                    </a>
-                  </div>
-                </div>
-                <div class="border-top border-translucent hover-actions-trigger py-3">
-                  <div class="row align-items-sm-center gx-2">
-                    <div class="col-auto">
-                      <div class="d-flex flex-column flex-sm-row">
-                        <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-4" data-bulk-select-row="data-bulk-select-row" />
-                        <button class="btn p-0"><span class="far text-body-quaternary fa-star"></span></button>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="d-flex">
+                        <label class="btn btn-link py-0 px-2 text-body fs-9" for="emailAttachment"> <span class="fa-solid fa-paperclip"></span></label>
+                        <input class="d-none" id="emailAttachment" name="mail_files" type="file" multiple/>
+                        <div id="filePreview" class="mt-2"></div>
+                        <!-- <label class="btn btn-link py-0 px-2 text-body fs-9" for="emailPhotos"><span class="fa-solid fa-image"></span></label>
+                        <input class="d-none" id="emailPhotos" type="file" accept="image/*" /> -->
+                      </div>
+                      <div class="d-flex">
+                        <button class="btn btn-link text-body fs-10 text-decoration-none" type="button" id="draftBtn">임시저장</button>
+                        <button class="btn btn-primary fs-10" type="button" id="sendBtn">발송<span class="fa-solid fa-paper-plane ms-1"></span></button>
                       </div>
                     </div>
-                    <div class="col-auto">
-                      <div class="avatar avatar-s  rounded-circle">
-                        <img class="rounded-circle " src="../../assets/img/team/59.webp" alt="" />
-
-                      </div>
-                    </div>
-                    <div class="col-auto"><a class="text-body-emphasis fw-bold inbox-link fs-9" href="../../apps/email/email-detail.html">Hollie Stephens</a></div>
-                    <div class="col-auto ms-auto">
-                      <div class="hover-actions end-0">
-                        <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
-                        <div class="dropdown-menu dropdown-menu-end py-2"><a class="dropdown-item" href="#!">Mark Unread</a><a class="dropdown-item" href="#!">Mark Important</a><a class="dropdown-item" href="#!">Archive</a><a class="dropdown-item" href="#!">Download</a><a class="dropdown-item" href="#!">Print</a><a class="dropdown-item" href="#!">Report Spam</a><a class="dropdown-item" href="#!">Report Phishing</a><a class="dropdown-item" href="#!">Mute Jessica Ball</a><a class="dropdown-item" href="#!">Block Jessica Ball</a><a class="dropdown-item text-danger" href="#!">Delete</a></div>
-                      </div><span class="fs-10 fw-bold">8 M</span>
-                    </div>
-                  </div>
-                  <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11"><a class="d-block inbox-link" href="../../apps/email/email-detail.html"><span class="fs-9 line-clamp-1 text-body-emphasis">My order is not being taken</span>
-                      <p class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2">Hello. I’m knocking to let you know that I am trying to place some orders on your site. But my orders are not being taken, maybe it’s technical issues. Can you help me with it as I really need the products I am trying to...</p>
-                    </a>
-                  </div>
-                </div>
-                <div class="border-top border-translucent hover-actions-trigger py-3">
-                  <div class="row align-items-sm-center gx-2">
-                    <div class="col-auto">
-                      <div class="d-flex flex-column flex-sm-row">
-                        <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-5" data-bulk-select-row="data-bulk-select-row" />
-                        <button class="btn p-0"><span class="fas text-warning fa-star"></span></button>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="avatar avatar-s  rounded-circle">
-                        <img class="rounded-circle avatar-placeholder" src="../../assets/img/team/avatar.webp" alt="" />
-
-                      </div>
-                    </div>
-                    <div class="col-auto"><a class="text-body fw-semibold inbox-link fs-9" href="../../apps/email/email-detail.html">Natasha West</a></div>
-                    <div class="col-auto ms-auto">
-                      <div class="hover-actions end-0">
-                        <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
-                        <div class="dropdown-menu dropdown-menu-end py-2"><a class="dropdown-item" href="#!">Mark Unread</a><a class="dropdown-item" href="#!">Mark Important</a><a class="dropdown-item" href="#!">Archive</a><a class="dropdown-item" href="#!">Download</a><a class="dropdown-item" href="#!">Print</a><a class="dropdown-item" href="#!">Report Spam</a><a class="dropdown-item" href="#!">Report Phishing</a><a class="dropdown-item" href="#!">Mute Jessica Ball</a><a class="dropdown-item" href="#!">Block Jessica Ball</a><a class="dropdown-item text-danger" href="#!">Delete</a></div>
-                      </div><span class="fs-10">20 M</span>
-                    </div>
-                  </div>
-                  <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11"><a class="d-block inbox-link" href="../../apps/email/email-detail.html"><span class="fs-9 line-clamp-1 text-body-highlight">Shipment is missing</span>
-                      <p class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2">Greetings! I’ve got an email saying I was to get the products yesterday. But got a call instead saying the shipment was misplaced. Can you put some light on it? Really need the products.</p>
-                    </a>
-                  </div>
-                </div>
-                <div class="border-top border-translucent hover-actions-trigger py-3">
-                  <div class="row align-items-sm-center gx-2">
-                    <div class="col-auto">
-                      <div class="d-flex flex-column flex-sm-row">
-                        <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-6" data-bulk-select-row="data-bulk-select-row" />
-                        <button class="btn p-0"><span class="fas text-warning fa-star"></span></button>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="avatar avatar-s ">
-                        <div class="avatar-name rounded-circle"><span>R</span></div>
-                      </div>
-                    </div>
-                    <div class="col-auto"><a class="text-body fw-semibold inbox-link fs-9" href="../../apps/email/email-detail.html">Max Williamson</a></div>
-                    <div class="col-auto ms-auto">
-                      <div class="hover-actions end-0">
-                        <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
-                        <div class="dropdown-menu dropdown-menu-end py-2"><a class="dropdown-item" href="#!">Mark Unread</a><a class="dropdown-item" href="#!">Mark Important</a><a class="dropdown-item" href="#!">Archive</a><a class="dropdown-item" href="#!">Download</a><a class="dropdown-item" href="#!">Print</a><a class="dropdown-item" href="#!">Report Spam</a><a class="dropdown-item" href="#!">Report Phishing</a><a class="dropdown-item" href="#!">Mute Jessica Ball</a><a class="dropdown-item" href="#!">Block Jessica Ball</a><a class="dropdown-item text-danger" href="#!">Delete</a></div>
-                      </div><span class="fs-10">30 M</span>
-                    </div>
-                  </div>
-                  <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11"><a class="d-block inbox-link" href="../../apps/email/email-detail.html"><span class="fs-9 line-clamp-1 text-body-highlight">How can I order something urgently?</span>
-                      <p class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2">I saw your promotion on 25% sales. Do you avail emergency orders and urgent shipments? If you do, I need to place some orders. Please reply, thanks.</p>
-                    </a><a class="d-inline-flex align-items-center border border-translucent rounded-pill px-3 py-1 me-2 mt-2 inbox-link" href="#!"><span class="fa-solid fa-music text-primary fs-9"></span><span class="ms-2 fw-bold fs-10 text-body">syllabus</span></a>
-                  </div>
-                </div>
-                <div class="border-top border-translucent hover-actions-trigger pt-3">
-                  <div class="row align-items-sm-center gx-2">
-                    <div class="col-auto">
-                      <div class="d-flex flex-column flex-sm-row">
-                        <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-7" data-bulk-select-row="data-bulk-select-row" />
-                        <button class="btn p-0"><span class="far text-body-quaternary fa-star"></span></button>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="avatar avatar-s  rounded-circle">
-                        <img class="rounded-circle " src="../../assets/img/team/30.webp" alt="" />
-
-                      </div>
-                    </div>
-                    <div class="col-auto"><a class="text-body fw-semibold inbox-link fs-9" href="../../apps/email/email-detail.html">Ethan Hawkins</a></div>
-                    <div class="col-auto ms-auto">
-                      <div class="hover-actions end-0">
-                        <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
-                        <div class="dropdown-menu dropdown-menu-end py-2"><a class="dropdown-item" href="#!">Mark Unread</a><a class="dropdown-item" href="#!">Mark Important</a><a class="dropdown-item" href="#!">Archive</a><a class="dropdown-item" href="#!">Download</a><a class="dropdown-item" href="#!">Print</a><a class="dropdown-item" href="#!">Report Spam</a><a class="dropdown-item" href="#!">Report Phishing</a><a class="dropdown-item" href="#!">Mute Jessica Ball</a><a class="dropdown-item" href="#!">Block Jessica Ball</a><a class="dropdown-item text-danger" href="#!">Delete</a></div>
-                      </div><span class="fs-10">32 M</span>
-                    </div>
-                  </div>
-                  <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11"><a class="d-block inbox-link" href="../../apps/email/email-detail.html"><span class="fs-9 line-clamp-1 text-body-highlight">How the delicacy of the products will be handled??</span>
-                      <p class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2">Hello! I need to purchase some delicate products. Can you tell me how you handle the delicacy of the products to be shipped? I don’t want to get my hands on broken things, so. Thank you! </p>
-                    </a>
-                  </div>
+                  </form>
                 </div>
               </div>
             </div>
-            <div class="border-top border-translucent hover-actions-trigger pt-3">
-                  <div class="row justify-content-center">
-                    <div class="col-auto">
-                      <div class="d-flex justify-content-center">
-                        <h6 >페이징</h6>
-                      </div>
-                      </div>
-                      </div>
-                      
-                      </div>
+            <script>
+            window.onload = function () {
+                // 페이지 로드 시 임시 저장된 메일이 있는지 확인
+                const draftData = sessionStorage.getItem("mail_draft");
+                if (draftData) {
+                    const draft = JSON.parse(draftData);
+
+                    // 임시 저장된 메일의 제목을 입력 필드에 설정
+                    document.getElementById("mail_title").value = draft.title;
+
+                    // TinyMCE 내용 설정
+                    if (tinymce.get("mail_content")) {
+                        tinymce.get("mail_content").setContent(draft.content);
+                    } else {
+                        // TinyMCE가 아직 로드되지 않았다면, 로드된 후 내용을 설정
+                        tinymce.init({
+                            selector: "#mail_content",
+                            setup: function(editor) {
+                                editor.on("init", function() {
+                                    editor.setContent(draft.content);
+                                });
+                            }
+                        });
+                    }
+                }
+            };
+            document.getElementById("draftBtn").addEventListener("click", function () {
+                if (confirm("작성 중인 메일을 임시저장하시겠습니까?")) {
+                    tinymce.triggerSave();
+                    const form = document.mail_create_form;
+                    const payload = new FormData(form);
+                    payload.append("mail_draft_yn", "Y");
+                    
+                    selectedFiles.forEach(file => {
+                        payload.append("mail_files", file);
+                    });
+
+                    fetch("/mail/draft", { 
+                        method: "POST",
+                        headers: {
+                            'header': document.querySelector('meta[name="_csrf_header"]').content,
+                            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+                        },
+                        body: payload
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.res_msg || "임시저장 완료");
+                        if (data.res_code == 200) {
+                           // 수정해야함 지금은 그냥 보낸 메일로감
+                           //location.href ='/mail/draft';
+                           location.href = '/mail/sent';
+                        }
+                    });
+                }
+            });
+            document.getElementById("sendBtn").addEventListener("click", function () {
+                if (confirm("메일을 발송하시겠습니까?")) {
+                    tinymce.triggerSave();
+                    const form = document.mail_create_form;
+                    const payload = new FormData(form);
+                    payload.append("mail_draft_yn", "N"); // 발송할 때는 mail_status = N
+
+                    selectedFiles.forEach(file => {
+                        payload.append("mail_files", file);
+                    });
+
+                    fetch("/mail/create", {
+                        method: "POST",
+                        headers: {
+                            'header': document.querySelector('meta[name="_csrf_header"]').content,
+                            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+                        },
+                        body: payload
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.res_msg || "발송 완료");
+                        if (data.res_code == 200) {
+
+                            location.href = '/mail/sent';
+                        }
+                    });
+                }
+            });
+            	// 메일 구조 바뀌기전 
+            	/*
+            	const form = document.mail_create_form;
+            	form.addEventListener('submit', (e)=>{
+    				 e.preventDefault();
+    				 tinymce.triggerSave();
+    				const payload = new FormData(form);
+    				selectedFiles.forEach(file => {
+    			        payload.append("mail_files", file); // name="mail_files"와 동일해야 함
+    			    });
+    				fetch("/mail/create",{
+						method:'post',
+						headers : {
+							'header': document.querySelector('meta[name="_csrf_header"]').content,
+				            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+						},
+						body:payload
+					})
+					.then(response => response.json())
+					.then(data=>{
+						alert(data.res_msg);
+						if(data.res_code==200){
+							location.href='/mail/sent';
+						}
+					});
+            	})
+            	*/
+            	
+            	const selectedFiles = [];
+
+				document.getElementById('emailAttachment').addEventListener('change', function(event) {
+				    const fileList = Array.from(event.target.files);
+				    const previewContainer = document.getElementById('filePreview');
+				
+				    // 새로 선택된 파일들을 기존 배열에 추가
+				    fileList.forEach(file => {
+				        // 중복 방지 (같은 파일명+크기 조합)
+				        const exists = selectedFiles.some(f => f.name === file.name && f.size === file.size);
+				        if (!exists) selectedFiles.push(file);
+				    });
+				
+				    // 미리보기 다시 렌더링
+				    renderFilePreview();
+				    
+				    // input 초기화해서 같은 파일도 다시 선택 가능하게 만듦
+				    event.target.value = "";
+				});
+				
+				function renderFilePreview() {
+				    const previewContainer = document.getElementById('filePreview');
+				    previewContainer.innerHTML = '';
+				    if (selectedFiles.length === 0) {
+				        //previewContainer.innerHTML = '<small class="text-muted">선택된 파일이 없습니다.</small>';
+				        return;
+				    }
+				
+				    const ul = document.createElement('ul');
+				    ul.className = 'list-unstyled';
+				
+				    selectedFiles.forEach((file, index) => {
+				        const li = document.createElement('li');
+				        li.className = 'mb-1';
+				        li.innerHTML = `
+				        	  <span class="badge bg-light text-dark d-flex align-items-center justify-content-between px-2 py-1" style="font-size: 0.85rem; min-width: 180px;">
+				        	    ${file.name} <small>(${(file.size / 1024).toFixed(1)} KB)</small>
+				        	    <button type="button" class="btn btn-sm btn-outline-secondary ms-2 py-0 px-1" style="font-size: 0.7rem; line-height: 1;" onclick="removeSelectedFile(${index})">✕</button>
+				        	  </span>
+				        	`;
+				        ul.appendChild(li);
+				    });
+				
+				    previewContainer.appendChild(ul);
+				}
+				
+				function removeSelectedFile(index) {
+				    selectedFiles.splice(index, 1);
+				    renderFilePreview();
+				}
+				
+				
+				
+				
+				
+				
+            </script>
             
-            <!-- 하단바 -->
-      	<footer class="footer position-absolute">
-          <div class="row g-0 justify-content-between align-items-center h-100">
-            <div class="col-12 col-sm-auto text-center">
-              <p class="mb-0 mt-2 mt-sm-0 text-body">Thank you for creating with Phoenix<span class="d-none d-sm-inline-block"></span><span class="d-none d-sm-inline-block mx-1">|</span><br class="d-sm-none" />2025 &copy;<a class="mx-1" href="https://themewagon.com">Themewagon</a></p>
-            </div>
-            <div class="col-12 col-sm-auto text-center">
-              <p class="mb-0 text-body-tertiary text-opacity-85">v1.22.0</p>
-            </div>
-          </div>
-        </footer>
-       		<!-- 하단바 -->
-    </main>
-    
-  </body>
+</main>
+
+</body>
 </html>
