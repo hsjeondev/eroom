@@ -44,6 +44,8 @@ public class ProjectTodoElementDto {
     private int totalCount;
     
     private int completedCount;
+    
+    private String visible_yn;
 
 
     
@@ -76,6 +78,7 @@ public class ProjectTodoElementDto {
                 .emergency(projectTodoElement.getEmergency())
                 .element_sequence(projectTodoElement.getElementSequence())
                 .todo_element_details(detailDtoList)
+                .visible_yn(projectTodoElement.getVisibleYn())
                 .build();
     }
 
@@ -88,6 +91,7 @@ public class ProjectTodoElementDto {
                 .todoTitle(todo_title)
                 .emergency(emergency)
                 .elementSequence(element_sequence)
+                .visibleYn(visible_yn)
                 .build();
 
         if (todo_element_details != null) {

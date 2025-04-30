@@ -71,8 +71,11 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	<th:block layout:fragment="content"></th:block>
 	<!-- <th:block th:replace="~{include/footer :: footerLayout}"></th:block> -->
 	</div>
+	
 	</main>
 	<!-- 웹소켓 연결(현재 approval 페이지 들어갈때만 웹소켓 연결 해뒀음) -->
+	<input type="hidden" id="separator" name="separator" th:value="${#authentication.principal.employee.structure.separatorCode}" /> 
+	
 	<script>
 	fetch('/session/employeeNo')
 	  .then(response => response.json())
@@ -98,7 +101,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	
 	<!-- 회사 캘린더 등록시 header에 있는 종에 빨간점 표시 -->
 	<script>
-		// 회사 알림 웹소켓 연결
+	 	// ===== 회사 일정 웹소켓 연결 =====
 		const companySocket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/company');
 		
 		companySocket.onopen = function() {
@@ -122,6 +125,37 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 		  console.error('회사 웹소켓 에러 발생:', error);
 		};
 		
+		  // ===== 팀 일정 웹소켓 연결 =====
+		 document.addEventListener("DOMContentLoaded", function () {
+		  const teamCode = document.getElementById("separator")?.value;
+		
+		  if (teamCode) {
+		    const teamSocket = new WebSocket(
+		      (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/team?team=' + teamCode
+		    );
+		
+		    teamSocket.onopen = () => console.log('✅ 팀 웹소켓 연결 성공');
+		
+		    teamSocket.onmessage = (event) => {
+		      console.log('📢 팀 일정 알림:', event.data);
+		
+		      const notificationDot = document.getElementById('notificationDot');
+		      if (notificationDot) {
+		        notificationDot.style.display = 'block'; // ✅여기에서 빨간 점 표시
+		      }
+		
+		      if (typeof fetchTeamCalendarEvents === 'function') {
+		        fetchTeamCalendarEvents(); // 팀 캘린더 새로고침
+		      }
+		    };
+		
+		    teamSocket.onclose = () => console.log('팀 웹소켓 연결 종료');
+		    teamSocket.onerror = (error) => console.error('웹소켓 에러:', error);
+		  } else {
+		    console.warn('⚠teamCode 없음. 팀 웹소켓 연결 생략');
+		  }
+		});
+		
 		// 종 아이콘 클릭하면 빨간 점 없애기
 		document.addEventListener('DOMContentLoaded', function() {
 		  const notificationButton = document.querySelector('a.nav-link[role="button"][data-bs-toggle="dropdown"]');
@@ -133,6 +167,25 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 		    });
 		  }
 		});
+		
+		const teamCode = document.getElementById('separator').value;
+		console.log(teamCode);
+		document.addEventListener('DOMContentLoaded', function () {
+			  const notificationDot = document.getElementById('notificationDot');
+			  
+			  if (notificationDot) {
+			    fetch("/notification/data")
+			      .then(response => response.json())
+			      .then(data => {
+			        if (data.length > 0) {
+			          notificationDot.style.display = "block";  // 읽지 않은 알림 있으면 빨간 점 켜기
+			        } else {
+			          notificationDot.style.display = "none";   // 없으면 빨간 점 끄기
+			        }
+			      })
+			      .catch(error => console.error('초기 알림 조회 실패:', error));
+			  }
+			});
 		</script>
 	
 	
