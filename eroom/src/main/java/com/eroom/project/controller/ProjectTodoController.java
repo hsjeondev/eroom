@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.eroom.project.dto.EditTodoDetailRequest;
 import com.eroom.project.dto.ProjectTodoElementDetailDto;
 import com.eroom.project.dto.ProjectTodoElementDto;
+import com.eroom.project.dto.ProjectTodoListDto;
 import com.eroom.project.dto.TodoDetailResponseDto;
 import com.eroom.project.service.ProjectTodoService;
 
@@ -28,6 +29,153 @@ import lombok.RequiredArgsConstructor;
 public class ProjectTodoController {
 
 	private final ProjectTodoService projectTodoService;
+	
+	@PostMapping("/deleteTodoElement")
+	@ResponseBody
+	public Map<String, Object> deleteTodoElement(@RequestBody Map<String, Object> param) {
+	    Long todoNo = Long.valueOf(param.get("todoNo").toString());
+
+	    int result = projectTodoService.softDeleteTodoElement(todoNo);
+
+	    Map<String, Object> resultMap = new HashMap<>();
+	    if (result > 0) {
+	    	resultMap.put("res_code", "200");
+	    	resultMap.put("res_msg", "할 일이 성공적으로 삭제되었습니다.");
+	    } else {
+	    	resultMap.put("res_code", "500");
+	    	resultMap.put("res_msg", "할 일을 삭제하는 중 오류가 발생했습니다.");
+	    }
+
+	    return resultMap;
+	}
+
+	
+	@PostMapping("/updateTodoElement")
+	@ResponseBody
+	public Map<String, String> updateTodoElement(
+	    @RequestParam("todo_no") Long todoNo,
+	    @RequestParam("todo_title") String todoTitle,
+	    @RequestParam("project_todo_list_no") Long listNo,
+	    @RequestParam("employee_no") Long employeeNo,
+	    @RequestParam(value = "emergency", required = false) String emergency
+	) {
+	    Map<String, String> map = new HashMap<>();
+	    map.put("res_code", "500");
+	    map.put("res_msg", "수정 중 오류 발생");
+
+	    // service 호출 예시
+	    int result = projectTodoService.updateTodoElement(todoNo, todoTitle, listNo, employeeNo, emergency);
+
+	    if (result > 0) {
+	        map.put("res_code", "200");
+	        map.put("res_msg", "수정 완료");
+	    }
+
+	    return map;
+	}
+
+	
+	@PostMapping("/findTodoElementOne")
+	@ResponseBody
+	public Map<String, Object> findTodoElementOne(@RequestBody Map<String, Object> param) {
+	    Long todoElementNo = Long.valueOf(param.get("todoElementNo").toString());
+
+	    Map<String, Object> dataMap = projectTodoService.findTodoElementOne(todoElementNo);
+
+	    Map<String, Object> resultMap = new HashMap<>();
+	    if (!dataMap.isEmpty()) {
+	    	resultMap.put("res_code", "200");
+	    	resultMap.put("res_msg", "성공적으로 조회했습니다.");
+	    	resultMap.put("res_data", dataMap);
+	    } else {
+	    	resultMap.put("res_code", "500");
+	    	resultMap.put("res_msg", "할 일을 찾을 수 없습니다.");
+	    }
+
+	    return resultMap;
+	}
+
+	
+	@PostMapping("/deleteList")
+	@ResponseBody
+	public Map<String, String> deleteListOne(@RequestBody Map<String, Object> param) {
+		Long projectTodoListNo = Long.valueOf(param.get("projectTodoListNo").toString());
+		
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("res_code", "500");
+		map.put("res_msg", "리스트 삭제 중 오류가 발생하였습니다.");
+		
+		int result = projectTodoService.deleteListOne(projectTodoListNo);
+		
+		if(result > 0) {
+			map.put("res_code", "200");
+			map.put("res_msg", "리스트가 정상적으로 삭제 되었습니다.");
+		}
+		
+		return map;
+	}
+	
+	@PostMapping("/updateList")
+	@ResponseBody
+	public Map<String, String> updateList(
+	    @RequestParam("project_todo_list_no") Long projectTodoListNo,
+	    @RequestParam("project_no") Long projectNo,
+	    @RequestParam("list_name") String listName,
+	    @RequestParam("list_color") String listColor,
+	    @RequestParam(value = "position", required = false) String position,
+	    @RequestParam(value = "standard_list_name", required = false) String standardListId
+	) {
+	    Map<String, String> map = new HashMap<>();
+	    map.put("res_code", "500");
+	    map.put("res_msg", "리스트 수정 중 오류가 발생하였습니다.");
+
+	    int result = projectTodoService.updateList(projectTodoListNo, projectNo, listName, listColor, position, standardListId);
+
+	    if (result > 0) {
+	        map.put("res_code", "200");
+	        map.put("res_msg", "리스트가 정상적으로 수정되었습니다.");
+	    }
+
+	    return map;
+	}
+
+	
+	@PostMapping("/findProjectTodoListOne")
+	@ResponseBody
+	public Map<String, Object> findProjectTodoListOne(@RequestBody Map<String, Object> param) {
+		Long projectTodoListNo = Long.valueOf(param.get("projectTodoListNo").toString());
+		Long projectNo = Long.valueOf(param.get("projectNo").toString());
+		
+		Map<String, String> dataMap = projectTodoService.findProjectTodoListOne(projectTodoListNo);
+		
+		List<ProjectTodoListDto> projectTodoList = projectTodoService.findByProjectNo(projectNo);
+		
+		List<Map<String, Object>> simplifiedList = new ArrayList<>();
+
+		for (ProjectTodoListDto dto : projectTodoList) {
+		    Map<String, Object> item = new HashMap<>();
+		    item.put("project_todo_list_no", dto.getProject_todo_list_no());
+		    item.put("list_name", dto.getList_name());
+		    item.put("list_sequence", dto.getList_sequence());
+		    simplifiedList.add(item);
+		}
+
+
+		
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("res_code", "500");
+		resultMap.put("res_msg", "리스트 하나를 가져오는데 오류가 발생하였습니다.");
+		
+		if (!dataMap.isEmpty()) {
+		    resultMap.put("res_code", "200");
+		    resultMap.put("res_msg", "리스트 하나를 정상적으로 가져왔습니다.");
+		    resultMap.put("res_data", dataMap);
+		    resultMap.put("res_project_todo_list", simplifiedList);
+		}
+
+		
+		return resultMap;
+	}
 
 	@PostMapping("/addList")
 	@ResponseBody

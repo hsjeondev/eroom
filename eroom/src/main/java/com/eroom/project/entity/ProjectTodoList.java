@@ -45,4 +45,7 @@ public class ProjectTodoList {
 	@OneToMany(mappedBy = "projectTodoList")
 	@OrderBy("elementSequence ASC")
     private List<ProjectTodoElement> projectTodoElements;
+	
+	@Column(name="visible_yn")
+	private String visibleYn;
 }

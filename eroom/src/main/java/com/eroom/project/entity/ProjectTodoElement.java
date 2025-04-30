@@ -52,5 +52,8 @@ public class ProjectTodoElement {
 	
 	@OneToMany(mappedBy = "projectTodoElement")
 	private List<ProjectTodoElementDetail> todoElementDetails;
+	
+	@Column(name="visible_yn")
+	private String visibleYn;
 
 }

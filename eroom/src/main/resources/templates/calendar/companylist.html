@@ -323,21 +323,7 @@
 		        return info.date.getDate();
 		      },
 		      
-		      //일정 등록이 안되어있는 날을 클릭하면 일정을 등록할수 있게 하는 event
-		      dateClick: function (info) {
-		    	  
-		    	  if (employeePosition.trim() !== '관리자') {
-		    		  return;
-		    		}
-		      
-		        const dateStr = info.dateStr + "T09:00";
-		        document.getElementById('calendarStartTime').value = dateStr;
-		        document.getElementById('calendarEndTime').value = info.dateStr + "T18:00";
-
-		        const addEventModal = new bootstrap.Modal(document.getElementById('addEventModal'));
-		        addEventModal.show();
-		      },
-		      
+		    
 		      eventSources: [ //구글 캘린더로 공휴일 불러오기, 그리고 해당 직원의 일정 불러오기
 		    	    {
 		    	      events: function (fetchInfo, successCallback, failureCallback) {

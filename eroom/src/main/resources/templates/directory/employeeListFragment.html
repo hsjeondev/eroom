@@ -1,0 +1,63 @@
+						<div th:fragment="employeeListFragment" class="table-responsive">
+							<table class="table table-striped table-sm fs-9 mb-0 text-center">
+								<thead class="text-center align-middle">
+									<tr>
+										<th class="sort" data-sort="no" style="width: 5%;">번호</th>
+										<th class="sort" data-sort="name" style="width: 15%;">이름</th>
+										<th class="sort" data-sort="mail" style="width: 15%;">Email</th>
+										<th class="sort" data-sort="phone" style="width: 15%;">Phone</th>
+										<th class="sort" data-sort="job" style="width: 10%;">직급</th>
+										<th class="sort" data-sort="dept" style="width: 10%;">부서</th>
+										<th class="sort" data-sort="team" style="width: 10%;">팀</th>
+										<th class="sort" data-sort="date" style="width: 15%;">입사일</th>
+										<!-- <th style="width: 5%"></th> -->
+									</tr>
+								</thead>
+								<tbody class="list align-middle" id="customers-table-body">
+									<tr th:each="member, memberStatus : ${employeeList}">
+										<td class="no" th:text="${memberStatus.count}">1</td>
+										<td class="name">
+										<!-- <a class="d-flex align-items-center text-body-emphasis ps-5" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"> -->
+										<a class="d-flex align-items-center text-body-emphasis ps-5"
+									   href="#"
+									   data-bs-toggle="modal"
+									   data-bs-target="#profileModal"
+									   th:attr="data-name=${member.employee_name}, 
+									            data-dept=${member.department_name}, 
+									            data-team=${member.team_name}, 
+									            data-phone=${member.directory_phone}, 
+									            data-email=${member.directory_email}, 
+									            data-position=${member.employee_position},
+									            data-targetEmpNo=${member.employee_no},
+									            data-memberDirectoryNo=${member.directory_no}">
+																			
+
+												<div class="avatar avatar-m me-2">
+													<img class="rounded-circle" src="../../../assets/img/team/23.webp" alt="">
+												</div>
+												<p class="mb-0 fw-bold text-truncate" th:text="${member.employee_name}">이름없음</p>
+
+										</a></td>
+										<td class="mail"><a class="fw-semibold" href="/mail/mailCreate" th:text="${member.directory_email != null ? member.directory_email : '-'}"></a></td>
+										<td class="phone" th:text="${member.directory_phone}">-</td>
+										<td class="job" th:text="${member.employee_position}">-</td>
+										<td class="dept" th:text="${member.department_name != null ? member.department_name : '-'}">부서명</td>
+										<td class="team" th:text="${member.team_name != null ? member.team_name : '-'}">팀명</td>
+										<td class="date" th:if="${member.employee.employeeEmploymentYn == 'Y'}" th:text="${member.formatted_hire_date}">입사일</td>
+										<!-- <td class="text-end pe-0">
+											<div class="btn-reveal-trigger position-static">
+												<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+													<i class="fas fa-ellipsis fs-10"></i>
+												</button>
+												<div class="dropdown-menu dropdown-menu-end py-2">
+													<a class="dropdown-item" href="#!">수정</a>
+													<div class="dropdown-divider"></div>
+													<a class="dropdown-item text-danger" href="#!">삭제</a>
+												</div>
+											</div>
+										</td> -->
+									</tr>
+
+								</tbody>
+							</table>
+						</div>
