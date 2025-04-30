@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eroom.chat.dto.ChatMessageDto;
 import com.eroom.chat.dto.ChatroomDto;
@@ -26,13 +28,12 @@ import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.chat.repository.ChatAlarmRepository;
 import com.eroom.chat.service.ChatMessageService;
 import com.eroom.chat.service.ChatroomService;
+import com.eroom.drive.dto.DriveDto;
 import com.eroom.employee.dto.EmployeeDto;
-import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.security.EmployeeDetails;
-import com.eroom.websocket.ChatWebSocketHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -304,6 +305,42 @@ public class ChatController {
 	    Map<String, Integer> result = new HashMap<>();
 	    result.put("count", count);
 	    return result;
+	}
+	// 채팅 파일 업로드
+	@PostMapping("/upload/chat")
+	@ResponseBody
+	public Map<String, String> uploadChatDriveFiles(
+	        DriveDto driveDto,
+	        @RequestParam("files") List<MultipartFile> files,
+	        @RequestParam("chatroomNo") Long chatroomNo,
+	        @RequestParam("driveDescriptions") List<String> driveDescriptions,
+	        @AuthenticationPrincipal EmployeeDetails user) {
+		System.out.println("🔥 업로드 요청 수신됨");
+	    System.out.println("files: " + files); // null or empty?
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "업로드 실패");
+
+	    try {
+	    	driveDto.setFiles(files);
+	        // 필수 값 세팅
+	        driveDto.setSeparatorCode("FL003"); // 채팅 파일용 코드
+	        driveDto.setUploaderNo(user.getEmployee().getEmployeeNo()); // 업로더
+	        driveDto.setDriveDescriptions(driveDescriptions);
+	        driveDto.setParam1(chatroomNo); // param1에 채팅방 번호 귀속
+
+	        int result = chatroomService.uploadChatFiles(driveDto, user.getEmployee().getEmployeeNo());
+
+	        if (result > 0) {
+	            resultMap.put("res_code", "200");
+	            resultMap.put("res_msg", "업로드 성공");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        resultMap.put("res_msg", "예외 발생: " + e.getMessage());
+	    }
+
+	    return resultMap;
 	}
 
 
