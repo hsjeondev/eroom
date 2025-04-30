@@ -36,12 +36,11 @@
 		  itemInstance.option('onEnd', async e => {
 		    const movedElement = e.item;
 		    const newParentList = movedElement.closest('.kanban-column');
+		    const oldParentList = e.from.closest('.kanban-column');
+
 		    const listNo = newParentList.getAttribute('data-list-no');
-			console.log("listNo", listNo);
 		    const todoNo = movedElement.getAttribute('data-todo-no');
-			console.log("todoNo", todoNo);
 		    const newIndex = [...newParentList.querySelectorAll('[data-todo-no]')].indexOf(movedElement);
-			console.log("newIndex", newIndex);
 
 		    const payload = {
 		      listNo,
@@ -58,8 +57,20 @@
 		      },
 		      body: JSON.stringify(payload)
 		    });
-			document.body.classList.remove('sortable-dragging');
+
+		    // ✅ count 갱신 함수
+		    const updateCount = (columnEl) => {
+		      const badge = columnEl.querySelector('.kanban-title-badge');
+		      const count = columnEl.querySelectorAll('[data-todo-no]').length;
+		      if (badge) badge.textContent = count;
+		    };
+
+		    updateCount(oldParentList);
+		    updateCount(newParentList);
+
+		    document.body.classList.remove('sortable-dragging');
 		  });
+
 		
         // return itemInstance;
       });

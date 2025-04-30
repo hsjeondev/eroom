@@ -32,6 +32,10 @@ public class ProjectTodoListDto {
 	private String list_color;
 	
 	private List<ProjectTodoElementDto> projectTodoElements;
+	
+	private String visible_yn;
+	
+	private int todoElementCount;
 
 	
 	
@@ -42,6 +46,7 @@ public class ProjectTodoListDto {
 	            .list_name(projectTodoList.getListName())
 	            .list_sequence(projectTodoList.getListSequence())
 	            .list_color(projectTodoList.getListColor())
+	            .visible_yn(projectTodoList.getVisibleYn())
 	            .build();
 
 	    if (projectTodoList.getProjectTodoElements() != null) {
@@ -66,6 +71,7 @@ public class ProjectTodoListDto {
 				.listName(list_name)
 				.listSequence(list_sequence)
 				.listColor(list_color)
+				.visibleYn(visible_yn)
 				.build();
 				
 	}

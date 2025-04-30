@@ -90,6 +90,12 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					     th:text="${receiverMail.mail != null and receiverMail.mail.sender != null ? receiverMail.mail.sender.employeeName : '알 수 없음'}">
 					     보낸 사람
 					  </a>
+					  <!-- 조금 떨어져 있으면 좋겠음  -->
+					  <span>|</span>
+					  <span class="inbox-link fs-9"
+					  		th:classappend="${receiverMail.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
+					        th:text="${receiverMail.mail.mailTitle}">
+					  </span>
 					</div>
                     <div class="col-auto ms-auto">
                       <div class="hover-actions end-0">
@@ -119,10 +125,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					     th:href="@{/mail/detail/{id}(id=${receiverMail.mail.mailNo})}"
 					     th:data-receiver-id="${#authentication.principal.employee.employeeNo}">
 					     
-					     <span class="fs-9 line-clamp-1 mailTitle"
+					     <!-- <span class="fs-9 line-clamp-1 mailTitle"
 					           th:classappend="${receiverMail.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
 					           th:text="${receiverMail.mail.mailTitle}">
-					     </span>
+					     </span> -->
 					
 					     <span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"
 					           th:utext="${receiverMail.mail.mailContent}">

@@ -572,6 +572,7 @@
 		  bindChatTypeChange(); // 채팅 종류 변경시
 		  bindChatroomDelete(); // 채팅방 삭제
 		  connectWebSocket(); // 웹소켓 연결
+		  bindFilePreview(); // 채팅 파일 
 		});
 		
 		// 모달 초기화 (열릴 때 기본 리셋)
@@ -693,7 +694,9 @@
 		    const chatroomNo = target.dataset.roomNo;
 		    const isGroup = target.dataset.group === "Y";
 		    const chatroomNameEl = target.querySelector('.name');
-		    const chatroomName = chatroomNameEl ? chatroomNameEl.innerText.trim() : "채팅방";
+		    const chatroomName = chatroomNameEl
+		    ? chatroomNameEl.innerText.trim()
+		    : target.innerText?.trim() || "채팅방"; 
 		    lastSelectedChatroomName = chatroomName;
 			// 기본 채팅 영역 숨기기
 		    const defaultArea = document.getElementById("default-chat-area");
@@ -703,25 +706,32 @@
 		    const myEmployeeNo = document.getElementById("myEmployeeNo").value;
 		    
 		    chatContent.innerHTML = `
-		      <div class="tab-pane h-100 fade show active d-flex flex-column">
-		        <div class="d-flex align-items-center justify-content-between px-4 pt-3">
-		          <h4 class="mb-0 chatroom-title cursor-pointer text-primary" data-group="${isGroup ? 'Y' : 'N'}" data-room-no="${chatroomNo}">${lastSelectedChatroomName || "채팅방"}</h4>
-		        </div>
-		        <div class="flex-grow-1 overflow-auto p-4">
-		          <div class="chat-history">
-		            <hr>
-		            <p>채팅 내용이 여기에 표시됩니다</p>
-		          </div>
-		        </div>
-		        <div class="chat-footer border-top p-3 d-flex align-items-center bg-white">
-		          <button class="btn btn-light me-2"><i class="fas fa-smile"></i></button>
-		          <label for="fileInput" class="btn btn-light me-2"><i class="fa-solid fa-paperclip"></i></label>
-		          <input type="file" id="fileInput" style="display: none;">
-		          <input class="form-control me-2" type="text" placeholder="메시지를 입력하세요..." id="messageInput">
-		          <button class="btn btn-primary" onclick="sendMessage()">보내기</button>
-		        </div>
-		      </div>
-		    `;
+		    	  <div class="tab-pane h-100 fade show active d-flex flex-column">
+		    	    <div class="d-flex align-items-center justify-content-between px-4 pt-3">
+		    	      <h4 class="mb-0 chatroom-title cursor-pointer text-primary"
+		    	          data-group="${isGroup ? 'Y' : 'N'}" data-room-no="${chatroomNo}">
+		    	        ${lastSelectedChatroomName || "채팅방"}
+		    	      </h4>
+		    	    </div>
+		    	    <div class="flex-grow-1 overflow-auto p-4">
+		    	      <div class="chat-history">
+		    	        <hr>
+		    	        <p>채팅 내용이 여기에 표시됩니다</p>
+		    	      </div>
+		    	    </div>
+		    	    <div class="chat-footer border-top p-3 d-flex align-items-center bg-white">
+		    	      <button class="btn btn-light me-2"><i class="fas fa-smile"></i></button>
+		    	      <label for="chatFileInput" class="btn btn-light me-2">
+		    	        <i class="fa-solid fa-paperclip"></i>
+		    	      </label>
+		    	      <input type="file" id="chatFileInput" name="files" style="display: none;" multiple>
+		    	      <div id="chatFilePreview" class="d-flex flex-wrap gap-2"></div>
+		    	      <input class="form-control me-2" type="text" placeholder="메시지를 입력하세요..." id="messageInput">
+		    	      <button class="btn btn-primary" onclick="sendMessage()">보내기</button>
+		    	    </div>
+		    	  </div>
+		    	`;
+		    	bindFilePreview();
 		    // 수신자 employeeNo 가져오기
 		    if (!isGroup) {
 			    fetch('/chat/receiver?chatroomNo=' + chatroomNo)
@@ -1177,34 +1187,65 @@ if (timePreview) {
 		}
 		// 메시지 보내기
 		function sendMessage() {
-		    const messageInput = document.getElementById("messageInput");
-		    const message = messageInput.value.trim();
-		    
-		    if (!message) {
-		        alert("메시지를 입력해주세요.");
-		        return;
-		    }
-		    
-		    const isGroupChat = document.querySelector('.chatroom-title')?.dataset.group === 'Y';
-		    const receiverValue = document.getElementById("receiverNo")?.value;
-		    const receiverNo = receiverValue && receiverValue !== "undefined" && receiverValue !== "null" ? Number(receiverValue) : null;
-		
-		    if (!isGroupChat && (receiverNo === null || isNaN(receiverNo))) {
-		        alert("수신자 정보가 아직 설정되지 않았습니다. 잠시 후 다시 시도해주세요.");
-		        return;
-		    }
-		
-		    const chatData = {
-		        chatMessageContent: message,
-		        senderMember: Number(document.getElementById("myEmployeeNo").value),
-		        chatroomNo: Number(document.querySelector(".chatroom-title").dataset.roomNo),
-		        receiverMember: receiverNo // 그룹이면 null, 1:1이면 번호
-		    };
-		
-		    console.log("보내는 데이터:", chatData);
-		    socket.send(JSON.stringify(chatData));
-		    messageInput.value = ""; // 메시지 전송 후 입력창 비우기
-		}
+    const messageInput = document.getElementById("messageInput");
+    const message = messageInput.value.trim();
+    const fileInput = document.getElementById("chatFileInput");
+
+    if (!message && fileInput.files.length === 0) {
+        alert("메시지나 파일을 입력해주세요.");
+        return;
+    }
+
+    const chatroomNo = document.querySelector(".chatroom-title").dataset.roomNo;
+    const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+    const receiverValue = document.getElementById("receiverNo")?.value;
+    const receiverNo = receiverValue && receiverValue !== "undefined" && receiverValue !== "null" ? Number(receiverValue) : null;
+    const isGroupChat = document.querySelector('.chatroom-title')?.dataset.group === 'Y';
+
+    // 🔁 1. 파일이 있는 경우 Ajax로 업로드 먼저
+    if (fileInput.files.length > 0) {
+        const formData = new FormData();
+        formData.append("chatroomNo", chatroomNo);
+        formData.append("driveDescriptions", message || "");  // 메시지 -> 설명에 저장
+        for (let file of fileInput.files) {
+            formData.append("files", file); 
+        }
+
+        fetch("/chat/upload/chat", {
+            method: "POST",
+            headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("파일 업로드 결과:", data);
+            if (data.res_code === "200") {
+                fileInput.value = "";
+                document.getElementById("chatFilePreview").innerHTML = "";
+            } else {
+                alert("파일 업로드 실패: " + data.res_msg);
+            }
+        })
+        .catch(err => {
+            console.error("파일 업로드 오류:", err);
+        });
+    }
+
+    // 🔁 2. 메시지 있는 경우 WebSocket으로 전송
+    if (message) {
+        const chatData = {
+            chatMessageContent: message,
+            senderMember: Number(myEmployeeNo),
+            chatroomNo: Number(chatroomNo),
+            receiverMember: isGroupChat ? null : receiverNo
+        };
+        socket.send(JSON.stringify(chatData));
+        messageInput.value = "";
+    }
+}
+
 
 
 		
@@ -1245,7 +1286,55 @@ if (timePreview) {
 			      console.error("채팅방 상세 조회 실패:", error);
 			    });
 			}
-		
+		function bindFilePreview() {
+			  const fileInput = document.getElementById("chatFileInput");
+			  console.log("📁 파일 미리보기 바인딩됨");
+			  if (!fileInput) return;
+			  
+			  fileInput.addEventListener("change", function (e) {
+			    const previewArea = document.getElementById("chatFilePreview");
+			    previewArea.innerHTML = "";
+
+			    [...e.target.files].forEach(file => {
+			      const ext = file.name.split('.').pop().toLowerCase();
+			      const isImage = file.type.startsWith("image/");
+			      const iconMap = {
+			        pdf: "/assets/img/icons/pdf.png",
+			        docx: "/assets/img/icons/word.png",
+			        xlsx: "/assets/img/icons/excel.png",
+			        zip: "/assets/img/icons/zip.png"
+			      };
+
+			      const wrapper = document.createElement("div");
+			      wrapper.className = "border p-2 rounded d-flex align-items-center gap-2";
+			      wrapper.style.maxWidth = "200px";
+
+			      const thumb = document.createElement("img");
+			      thumb.style.width = "32px";
+			      thumb.style.height = "32px";
+			      thumb.style.objectFit = "cover";
+			      thumb.className = "rounded";
+
+			      if (isImage) {
+			        thumb.src = URL.createObjectURL(file);
+			      } else if (iconMap[ext]) {
+			        thumb.src = iconMap[ext];
+			      } else {
+			        thumb.src = "/assets/img/icons/file.png";
+			      }
+
+			      const name = document.createElement("div");
+			      name.className = "small text-truncate";
+			      name.innerText = file.name;
+
+			      wrapper.appendChild(thumb);
+			      wrapper.appendChild(name);
+			      previewArea.appendChild(wrapper);
+			    });
+			  });
+			}
+
+
 		
 		</script>
 

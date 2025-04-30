@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +36,7 @@ import com.eroom.employee.service.EmployeeService;
 import com.eroom.mail.dto.MailDto;
 import com.eroom.mail.entity.Mail;
 import com.eroom.mail.entity.MailDraft;
+import com.eroom.mail.entity.MailReceiver;
 import com.eroom.mail.service.MailService;
 import com.eroom.security.EmployeeDetails;
 
@@ -59,7 +61,7 @@ public class MailController {
 	 */
 	
 	// 받은 메일
-	/*
+	
 	@GetMapping("/mail/receiverTo")
 	public String selectReceiverToAll(Model model, 
 									@AuthenticationPrincipal EmployeeDetails employeeDetails,
@@ -73,7 +75,7 @@ public class MailController {
 	    model.addAttribute("receivedMails", received);
 	    return "mail/mailReceiverTo";
 	}
-	*/
+	
 	// 본인 조회 다시 receiver "Me"
 	
 	// 04/17 본인것만 조회되게 
@@ -220,7 +222,7 @@ public class MailController {
 	            .contentType(MediaType.APPLICATION_OCTET_STREAM)
 	            .body(resource);
 	}*/
-	@GetMapping("/mail/download/{driveAttachNo}")
+	@GetMapping("/mail/file/download/{driveAttachNo}")
 	public ResponseEntity<Object> fileDownload(@PathVariable("driveAttachNo") Long id) {
 	    try {
 	        // DB에서 파일 정보 가져오기
@@ -256,8 +258,8 @@ public class MailController {
 	    }
 	}
 	
-	// 디테일 ( 파일 불러오기 성공 )
-	/* 테이블 바뀐 뒤 주석 처리
+	// 디테일 ( 파일 불러오기 성공 ) 테이블 바뀐 뒤 주석 처리
+	
 	@GetMapping("/mail/detail/{id}")
 	public String selectMailOne(@PathVariable("id") Long id,
 								Model model,
@@ -272,7 +274,73 @@ public class MailController {
 		
 		return "mail/mailDetail";
 	}
-	*/
+	// 파일 숨기기
+	/*
+	 * @DeleteMapping("/delete/{attachNo}")
+	 */	
+	@PostMapping("/mail/hide/file/{attachNo}")
+	@ResponseBody
+	public Map<String, String> deleteDriveFile(@PathVariable("attachNo") Long driveAttachNo) {
+		Map<String, String> resultMap = new HashMap<String, String>();
+		resultMap.put("res_code", "500");
+		resultMap.put("res_msg", "삭제 실패");
+		System.out.println("Deleting file with attachNo: " + driveAttachNo);
+		int result = driveService.deleteDriveFile(driveAttachNo);
+
+		if (result > 0) {
+			resultMap.put("res_code", "200");
+			resultMap.put("res_msg", "삭제 성공");
+		}
+
+		return resultMap;
+	}
+	
+	// 임시 저장 페이지
+	@GetMapping("/mail/mailCreateDraft/{id}")
+	public String createMailDraftView(Model model,
+									@PathVariable("id") Long id) {
+		List<Employee> employeeList = mailService.selectEmployeeAll();
+		List<SeparatorDto> departments = employeeService.findDistinctStructureNames(); // 부서/팀 리스트 가져오기
+		model.addAttribute("employeeList",employeeList);
+		model.addAttribute("departments", departments); // 부서 드롭다운용
+		// 가져온 값은 mail_no값 이걸로 mail조회하여 보낸 사람 no값 찾기
+		Employee sender = mailService.getSenderInfoByMailNo(id);
+		if(id != null) {
+			
+			 Mail mail = mailService.findMailByMailNo(id);
+
+		        // (2) mail_draft 테이블에서 수신자 리스트 불러오기
+		        List<MailDraft> draft = mailService.findReceiversByMailNo(id);
+
+		        // (3) drive 테이블에서 첨부파일 리스트 불러오기
+		       // List<Drive> mailFiles = mailService.findFilesByMailNo(id);
+
+		        // (4) 모델에 담기
+		        // mail 정보 2개 들어갔음
+		        model.addAttribute("mail", mail);
+		        model.addAttribute("draft", draft);
+		       // model.addAttribute("mailFiles", mailFiles);
+		}
+		
+		model.addAttribute("sender", sender);
+		return "mail/mailCreateDraft";
+	}
+	
+	// 답장 페이지
+	@GetMapping("/mail/mailCreateReply/{id}")
+	public String createMailReplyView(Model model,
+										@PathVariable("id") Long id) {
+		List<Employee> employeeList = mailService.selectEmployeeAll();
+		List<SeparatorDto> departments = employeeService.findDistinctStructureNames(); // 부서/팀 리스트 가져오기
+		model.addAttribute("employeeList",employeeList);
+		model.addAttribute("departments", departments); // 부서 드롭다운용
+		// 가져온 값은 mail_no값 이걸로 mail조회하여 보낸 사람 no값 찾기
+		Employee sender = mailService.getSenderInfoByMailNo(id);
+		
+		
+		model.addAttribute("sender", sender);
+		return "mail/mailCreateReply";
+	}
 	
 	// 메일 작성 페이지
 	@GetMapping("/mail/mailCreate")
@@ -292,13 +360,13 @@ public class MailController {
 		        List<MailDraft> draft = mailService.findReceiversByMailNo(mailNo);
 
 		        // (3) drive 테이블에서 첨부파일 리스트 불러오기
-		        //List<Drive> attachedFiles = driveService.findFilesByMailNo(mailNo);
+		        List<Drive> mailFiles = mailService.findFilesByMailNo(mailNo);
 
 		        // (4) 모델에 담기
 		        // mail 정보 2개 들어갔음
 		        model.addAttribute("mail", mail);
 		        model.addAttribute("draft", draft);
-		       // model.addAttribute("attachedFiles", attachedFiles);
+		        model.addAttribute("mailFiles", mailFiles);
 		}
 		return "mail/mailCreate";
 	}
