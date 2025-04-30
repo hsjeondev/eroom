@@ -80,6 +80,7 @@ public class CalendarAlarmService {
 		      return result;
 		  }
 		  
+		  //목록에서 회사 일정 클릭하면 캘린더로 이동 -> 그리고 N을 Y로 변경
 		  @Transactional
 		  public void markAsRead(Long alarmId) {
 		      CalendarAlarm target = calendarAlarmRepository.findById(alarmId).orElse(null);
@@ -96,6 +97,12 @@ public class CalendarAlarmService {
 
 		          calendarAlarmRepository.save(updated);
 		      }
+		  }
+		  
+		  
+		  @Transactional
+		  public void markAllAsRead(Long employeeNo) {
+		      calendarAlarmRepository.updateAllToReadByEmployeeNo(employeeNo);
 		  }
 	}
 

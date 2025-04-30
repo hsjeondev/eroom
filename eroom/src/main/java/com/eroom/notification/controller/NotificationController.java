@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.notification.CalendarAlarmService;
 import com.eroom.notification.dto.CalendarAlarmDto;
+import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -55,5 +59,13 @@ public class NotificationController {
 
 	      return result;
 	  }
-
+	  
+	  //전체 읽음 처리
+	  @PatchMapping("/notification/readall")
+	  @ResponseBody
+	  public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal EmployeeDetails userDetails) {
+	      Long employeeNo = userDetails.getEmployee().getEmployeeNo();
+	      calendarAlarmService.markAllAsRead(employeeNo);
+	      return ResponseEntity.ok().build();
+	  }
 }
