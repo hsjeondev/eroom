@@ -5,7 +5,7 @@
 	  layout:decorate="~{/include/layout}">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>mailDetail</title>
 </head>
 <body>
 <main class="main" id="top" layout:fragment="content">
@@ -51,28 +51,28 @@
                     <!-- 내용 -->
                     </div>
                     <div class="d-flex align-items-center mb-5">
-                      <button class="btn btn-link text-body-highlight fs-8 text-decoration-none p-0" type="button"><span class="fa-solid fa-paperclip me-2"></span>2 첨부 파일 (하드코딩)</button>
+                      <button class="btn btn-link text-body-highlight fs-8 text-decoration-none p-0" type="button">
+				        <span class="fa-solid fa-paperclip me-2"></span>
+				        <span th:text="${#lists.size(attachments)} + ' 첨부 파일'"></span>
+				    </button>
                     </div>
                     <div class="row pb-11 border-bottom mb-4 gx-0 gy-2 border-translucent">
-                      <div class="col-auto me-3"><a class="text-decoration-none d-flex align-items-center" href="#!">
-                          <!-- 파일 -->
-                          <div class="btn-icon btn-icon-xl border rounded-3 text-body-quaternary text-opacity-75 flex-column me-2"><span class="fa-solid fa-file fs-8 mb-1"></span>
-                            <p class="mb-0 fs-10 fw-bold">PDF</p>
-                          </div>
-                           
-                          <div>
-                            <h6 class="text-body-highlight">workflow-data.pdf(하드코딩)</h6>
-                            <p class="fs-9 mb-0 text-body-tertiary lh-1">53.34 KB (하드코딩)</p>
-                          </div>
-                        </a></div>
-                      <div class="col-auto"><a class="text-decoration-none d-flex align-items-center" href="#!"><img class="rounded" src="../../assets/img/generic/41.png" alt="..." />
-                          <div class="ms-2">
-                            <h6 class="text-body-highlight">forest.jpg (하드코딩)</h6>
-                            <p class="fs-9 mb-0 text-body-tertiary">53.34 KB (하드코딩)</p>
-                          </div>
-                        </a></div>
-                        <!-- 파일 -->
-                    </div>
+					    <div th:each="attachment : ${attachments}" class="col-auto me-3">
+					        <a class="text-decoration-none d-flex align-items-center" th:href="@{'/mail/download/' + ${attachment.driveAttachNo}}">
+					            <!-- 파일 아이콘 -->
+					            <div class="btn-icon btn-icon-xl border rounded-3 text-body-quaternary text-opacity-75 flex-column me-2">
+					                <span class="fa-solid fa-file fs-8 mb-1"></span>
+					            </div>
+					            <div>
+					                <!-- 파일명과 크기 표시 -->
+					                <h6 class="text-body-highlight" th:text="${attachment.driveOriName}"></h6>
+					                 <p class="fs-9 mb-0 text-body-tertiary lh-1"
+									   th:text="${#numbers.formatInteger(attachment.driveSize / 1024, 1)} + ' KB'">
+									</p>
+					            </div>
+					        </a>
+					    </div>
+					</div>
                     <div class="d-flex justify-content-between">
                       <button class="btn btn-phoenix-secondary me-1 text-nowrap px-2 px-sm-4">전달<span class="fa-solid fa-reply ms-2 fs-10"></span></button>
                       <button class="btn btn-phoenix-secondary me-1 text-nowrap px-2 px-sm-4">Reply All<span class="fa-solid fa-reply-all ms-2 fs-10"></span></button>

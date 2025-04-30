@@ -24,14 +24,17 @@ public class MailDto {
 	private String mail_title;
 	private String mail_content;
 	private LocalDateTime mail_sent_time;
-	private String mail_status="N";
+	//private String mail_status="N";
 	
+	@Builder.Default
+	private String mail_visible_yn="Y";
 	// directory 데이터로 바꿀 예정
 	private Long employee_no;
 	// 받는 사람 나중에 List로 바꿀 예정
 	//private Employee receiver;
 	
-	private List<Long> receiverNos;
+	private List<Long> receiver_no; // 수신자 no값
+	private List<Long> cc_no;  // 참조자 no값
 	
 	public Mail toEntity() {
 		return Mail.builder()
@@ -40,7 +43,8 @@ public class MailDto {
 				.mailTitle(mail_title)
 				.mailContent(mail_content)
 				.mailSentTime(mail_sent_time)
-				.mailStatus(mail_status)
+				.mailVisibleYn(mail_visible_yn)
+				//.mailStatus(mail_status)
 				.build();
 	}
 	
