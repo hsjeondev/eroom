@@ -298,4 +298,11 @@ public class EmployeeService {
 		}
 	}
 	
+	// separatorCode로 회원 정보 조회
+//	public List<Employee> findEmployeesByStructureCode(String separatorCode) {
+//	    // 부서명으로 직원을 조회
+//		List<Employee> employees = employeeRepository.findByStructure_SeparatorCode(separatorCode);
+//		return employees;
+//	}
+	
 }
