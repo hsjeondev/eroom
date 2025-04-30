@@ -19,6 +19,7 @@
                   <!-- 본인 히든 처리 -->
                   <input type="hidden" name="employee_no"
 								th:value="${#authentication.principal.employee.employeeNo}" />
+						<input type="hidden" name="mail_no" th:value="${mail != null} ? ${mail.mailNo} : ''" />
                     <div class="row g-3 mb-2">
 	                    <div class="col-4">
 	                   		<input class="form-control" type="text" name="receiver" placeholder="받는 사람" id="receiverInput" readonly data-bs-toggle="modal" data-bs-target="#orgModal" />
@@ -164,31 +165,7 @@
               </div>
             </div>
             <script>
-            window.onload = function () {
-                // 페이지 로드 시 임시 저장된 메일이 있는지 확인
-                const draftData = sessionStorage.getItem("mail_draft");
-                if (draftData) {
-                    const draft = JSON.parse(draftData);
-
-                    // 임시 저장된 메일의 제목을 입력 필드에 설정
-                    document.getElementById("mail_title").value = draft.title;
-
-                    // TinyMCE 내용 설정
-                    if (tinymce.get("mail_content")) {
-                        tinymce.get("mail_content").setContent(draft.content);
-                    } else {
-                        // TinyMCE가 아직 로드되지 않았다면, 로드된 후 내용을 설정
-                        tinymce.init({
-                            selector: "#mail_content",
-                            setup: function(editor) {
-                                editor.on("init", function() {
-                                    editor.setContent(draft.content);
-                                });
-                            }
-                        });
-                    }
-                }
-            };
+            
             document.getElementById("draftBtn").addEventListener("click", function () {
                 if (confirm("작성 중인 메일을 임시저장하시겠습니까?")) {
                     tinymce.triggerSave();
@@ -200,7 +177,7 @@
                         payload.append("mail_files", file);
                     });
 
-                    fetch("/mail/draft", { 
+                    fetch("/mail/draft/update", { 
                         method: "POST",
                         headers: {
                             'header': document.querySelector('meta[name="_csrf_header"]').content,
@@ -230,7 +207,7 @@
                         payload.append("mail_files", file);
                     });
 
-                    fetch("/mail/create", {
+                    fetch("/mail/draft/create", {
                         method: "POST",
                         headers: {
                             'header': document.querySelector('meta[name="_csrf_header"]').content,
