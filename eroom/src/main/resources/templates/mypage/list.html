@@ -70,317 +70,317 @@
 <body>
 <main class="main" id="top" layout:fragment="content">
 <div class="mb-9">
-	<div class="row align-items-center justify-content-between g-3 mb-4">
-		<!-- 상단 제목 -->
-		<div class="d-flex justify-content-start">
-			<span class="fw-bold fs-6">마이페이지</span>
-		</div>
-	</div>	
+	<!-- 상단 제목 -->
+	<div class="d-flex justify-content-between align-items-center mb-2 position-relative">
+	  <span class="fw-bold fs-7">마이페이지</span>
+	</div>
 
-    <div class="row g-5">
-		<div class="col-12 col-md-4 col-xxl-4">
-			<div class="row g-3">
-				<div class="col-12">
-					<div class="card h-100">
-						<div class="card-body">
-							<div class="row align-items-center g-5 mb-3 text-center text-sm-start">
-								<div class="col-12 col-sm-auto mb-sm-2">
-									<div class="profile-wrapper" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
-										<img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
-										<div class="camera-overlay">
-											<svg class="svg-inline--fa fa-camera fs-4" aria-hidden="true" focusable="false"
-											  data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg"
-											  viewBox="0 0 512 512" style="width: 24px; height: 24px;">
-												  <path fill="currentColor"
-												    d="M149.1 64.3c7.8-14.3 22.9-23.1 39.4-23.1h134.9c16.5 0 31.6 8.9 39.4 23.1l14.9 27.4H464c26.5 0 48 21.5 48 48v272c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V139.7c0-26.5 21.5-48 48-48h86.1l14.9-27.4zM256 408c66.3 0 120-53.7 120-120s-53.7-120-120-120s-120 53.7-120 120s53.7 120 120 120zm0-48a72 72 0 1 0 0-144 72 72 0 1 0 0 144z">
-												  </path>
-											</svg>
-										</div>
-									</div>
-								</div>
-								 <!-- 프로필 상단 -->
-								<div class="col-12 col-sm-auto flex-1">
-									<!-- 이름 -->
-									<div class="d-flex">
-										<span class="fw-bold fs-7" th:text="${employee.employeeName}">이름</span>
-									</div>
-									<!-- 직급 -->
-									<p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p>
-								</div>
-							</div>
-						<!-- 하단 정보 -->
-							<div class="d-flex flex-between-center border-top border-dashed pt-4">
-								<div>
-									<h6>Following</h6>
-									<p class="fs-7 text-body-secondary mb-0">297</p>
-								</div>
-								<div>
-									<h6>Projects</h6>
-									<p class="fs-7 text-body-secondary mb-0">56</p>
-								</div>
-								<div>
-									<h6>Completion</h6>
-									<p class="fs-7 text-body-secondary mb-0">97</p>
-								</div>
-							</div>
-						</div><!-- card-body -->
-					</div><!-- card h-100 -->
-				</div><!-- col-12 -->
-				<!-- 주소록 정보 -->
-				<div class="col-12">
-					<div class="card h-100 position-relative">
-						<div class="card-body fs-9">
-							<div class="d-flex align-items-center mb-2">
-								<!-- <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span> -->
-								
-								<!--  수정 버튼 -->
-								<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
-								        data-bs-toggle="modal" data-bs-target="#editInfoModal">
-									<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
-									     focusable="false" data-prefix="fas" data-icon="pen" role="img"
-									     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-										<path fill="currentColor"
-									        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
-									</svg>
-								</button>
-							</div>
-						
-							<!-- 기본 정보 -->
-							<h5 class="text-body-secondary">사번</h5>
-							<p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
-
-							<h5 class="text-body-secondary">직급</h5>
-							<p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p>
-							
-							<h5 class="text-body-secondary">부서</h5>
-							<p class="text-body-secondary" th:text="${departmentName != null ? departmentName : '-'}">부서</p>
-							
-							<div class="mb-3">
-							  <h5 class="text-body-secondary">Email</h5>
-							  <a href="mailto:shatinon@jeemail.com" id="emailValue" th:text="${directory != null and directory.directory_email != null ? directory.directory_email : '-'}">Email</a>
-							</div>
-							
-							<h5 class="text-body-secondary">Phone</h5>
-							<p class="text-body-secondary" id="phoneValue" th:text="${directory != null and directory.directory_phone != null ? directory.directory_phone : '-'}">01000000000</p>
-							
-							<!-- <h5 class="text-body-secondary">주소</h5>
-							<p class="text-body-secondary" id="addressValue">서울특별시 금천구 가산디지털2로 95</p> -->
-						</div><!-- card-body -->
-					</div><!-- card h-100 -->
-				</div><!-- col-12 -->
-				<!-- 주소록 끝 -->
-							
-			</div> <!-- row g-3 프로필 & 주소록 끝 -->
-		</div> <!-- col-12 col-md-4 col-xxl-4 -->
-		<!-- 상단 우측 -->
-		<div class="col-12 col-md-8 col-xxl-8">
-			<div class="row g-4">
-				<!-- 우측: 정보 요약 카드 -->
-				<div class="col-md-12">
-				
-					<!-- 결재 & 프로젝트 활동 요약 카드 차트 -->
-					<div class="card p-4 mb-4 shadow-sm">
-						<h5 class="fw-bold mb-3">결재 및 프로젝트 활동 요약</h5>
-						<canvas id="approvalProjectChart" height="200"></canvas>
-					</div>				
-				
-					<!-- 최근 결재문서 -->
-					<div class="card p-3 mb-4">
-						<div class="d-flex justify-content-start">
-							<span class="fw-bold fs-8">결재 문서</span>
-						</div>
-						<!-- <h5 class="fw-bold mb-3">결재 문서 요약</h5> -->
-						<div class="row g-3">
-						  
-							<!-- 진행 중인 결재 문서 -->
-							<div class="col-md-6 position-relative">
-								<div class="d-flex justify-content-center align-items-center gap-2">
-									<i class="fas fa-circle fs-10 text-primary mt-n1"></i>
-									<span class="fw-bold fs-9">진행 중인 결재</span>
-								</div>
-								<!-- <h6 class="fw-bold mb-2">📌 진행 중인 결재</h6> -->
-								<div id="approvalPendingCarousel" class="carousel slide" data-bs-ride="carousel">
-									<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
-									<div class="carousel-indicators">
-									  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
-									  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
-									  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
-									</div>								
-									<div class="carousel-inner px-4">
-										<div class="carousel-item active">
-										  <div class="border rounded p-3 bg-primary-soft">
-										    <h6 class="mb-1">회의실 예약 요청</h6>
-										    <p class="text-muted mb-0">2025-04-14</p>
-										  </div>
-										</div>
-										<div class="carousel-item">
-										  <div class="border rounded p-3 bg-primary-soft">
-										    <h6 class="mb-1">출장 신청서</h6>
-										    <p class="text-muted mb-0">2025-04-13</p>
-										  </div>
-										</div>
-									</div>
-									<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
-									        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="prev"
-									        style="top: 60%; left: -10px; z-index: 2;">
-										<i class="fas fa-chevron-left fs-7"></i>
-									</button>
-									<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
-									        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="next"
-									        style="top: 60%; right: -10px; z-index: 2;">
-										<i class="fas fa-chevron-right fs-7"></i>
-									</button>
-								</div>
-							</div>
-						
-							<!-- 승인 완료된 결재 문서 -->
-							<div class="col-md-6 position-relative">
-								<div class="d-flex justify-content-center align-items-center gap-2">
-									<i class="fas fa-circle fs-10 text-success mt-n1"></i>
-									<span class="fw-bold fs-9">승인된 결재</span>
-								</div>
-								<!-- <h6 class="fw-bold mb-2">✅ 승인된 결재</h6> -->
-								<div id="approvalApprovedCarousel" class="carousel slide" data-bs-ride="carousel">
-									<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
-									<div class="carousel-indicators">
-									  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
-									  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
-									  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
-									</div>								
-									<div class="carousel-inner px-4">
-										<div class="carousel-item active">
-										  <div class="border rounded p-3 bg-success-soft">
-										    <h6 class="mb-1">연차 신청서</h6>
-										    <p class="text-muted mb-0">2025-04-10</p>
-										  </div>
-										</div>
-										<div class="carousel-item">
-										  <div class="border rounded p-3 bg-success-soft">
-										    <h6 class="mb-1">출장 보고서</h6>
-										    <p class="text-muted mb-0">2025-04-08</p>
-										  </div>
-										</div>
-									</div>
-									<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
-									        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="prev"
-									        style="top: 60%; left: -10px; z-index: 2;">
-										<i class="fas fa-chevron-left fs-7"></i>
-									</button>
-									<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
-									        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="next"
-									        style="top: 60%; right: -10px; z-index: 2;">
-										<i class="fas fa-chevron-right fs-7"></i>
-									</button>
-								</div>
-							</div>
-						
+	<div class="row g-3">
+	
+		<!-- 1열: 프로필 -->
+		<div class="col-md-4">
+		  <!-- 기존 프로필 카드 그대로 삽입 -->
+			<div class="card">
+				<div class="card-body d-flex align-items-center">
+					<div class="profile-wrapper me-3" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
+						<img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
+						<div class="camera-overlay">
+							<svg class="svg-inline--fa fa-camera fs-4" aria-hidden="true" focusable="false"
+							  data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg"
+							  viewBox="0 0 512 512" style="width: 24px; height: 24px;">
+								 <path fill="currentColor"
+								  d="M149.1 64.3c7.8-14.3 22.9-23.1 39.4-23.1h134.9c16.5 0 31.6 8.9 39.4 23.1l14.9 27.4H464c26.5 0 48 21.5 48 48v272c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V139.7c0-26.5 21.5-48 48-48h86.1l14.9-27.4zM256 408c66.3 0 120-53.7 120-120s-53.7-120-120-120s-120 53.7-120 120s53.7 120 120 120zm0-48a72 72 0 1 0 0-144 72 72 0 1 0 0 144z">
+								</path>
+							</svg>
 						</div>
 					</div>
-					<!-- 최근 결재문서 끝 -->
+					 <!-- 프로필 상단 -->
+					<div class="text-start">
+						<div class="fw-bold fs-7" th:text="${employee.employeeName}">이름</div>
+						<div class="text-body-secondary" th:text="${employee.employeePosition}">직급</div>
+					</div>
 					
-					<!-- 참여 프로젝트 -->
-					<!-- 참여 중인 프로젝트 슬라이드 형태 -->
-					<div class="card p-3 mb-4">
-						<div class="d-flex justify-content-start">
-							<span class="fw-bold fs-8">프로젝트</span>
+				</div><!-- card-body -->	
+				<!-- 하단 정보 -->
+				<div class="card-footer border-top border-dashed pt-3">
+					<div class="d-flex justify-content-around">
+						<div>
+							<div class="fw-bold fs-8 text-center">총 연차</div>
+							<div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annual_leave_total}">12</div>
 						</div>
-						<!-- <h5 class="fw-bold mb-3">나의 프로젝트</h5> -->
-						<div class="row g-3">
-							<!-- 참여 중인 프로젝트 -->
-							<div class="col-md-6 position-relative">
-								<div class="d-flex justify-content-center align-items-center gap-2">
-									<i class="fas fa-circle fs-10 text-primary mt-n1"></i>
-									<span class="fw-bold fs-9">진행 중인 프로젝트</span>
-								</div>
-								<!-- <h6 class="fw-bold mb-2">참여 중인 프로젝트</h6> -->
-								<div id="projectActiveCarousel" class="carousel slide" data-bs-ride="carousel">
-									<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
-									<div class="carousel-indicators">
-									  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
-									  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
-									  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
-									</div>
-									<!-- 예시 -->
-									<!-- <div class="carousel-indicators">
-									  <th:block th:each="slide, i : ${slideList}">
-									    <button type="button"
-									            th:data-bs-target="#myCarousel"
-									            th:data-bs-slide-to="${i.index}"
-									            th:classappend="${i.index == 0} ? 'active'"
-									            th:aria-label="'슬라이드 ' + ${i.index + 1}">
-									    </button>
-									  </th:block>
-									</div> -->
-									
-									<div class="carousel-inner px-4">
-										<div class="carousel-item active">
-										  <div class="border rounded p-3 bg-primary-soft">
-										    <h6 class="mb-1">Flowlog</h6>
-										    <p class="mb-0 text-muted">실시간 근태 차트 및 자동 연차 계산</p>
-										  </div>
-										</div>
-										<div class="carousel-item">
-										  <div class="border rounded p-3 bg-primary-soft">
-										    <h6 class="mb-1">click click</h6>
-										    <p class="mb-0 text-muted">회원가입/로그인, WebSocket</p>
-										  </div>
-										</div>
-									</div>
-									<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
-									        type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="prev"
-									        style="top: 60%; left: -10px; z-index: 2;">
-										<i class="fas fa-chevron-left fs-7"></i>
-									</button>
-									<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
-									        type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="next"
-									        style="top: 60%; right: -10px; z-index: 2;">
-										<i class="fas fa-chevron-right fs-7"></i>
-									</button>
-								</div>
-							</div>
-						
-							<!-- 완료한 프로젝트 -->
-							<div class="col-md-6 position-relative">
-								<div class="d-flex justify-content-center align-items-center gap-2">
-									<i class="fas fa-circle fs-10 text-success mt-n1"></i>
-									<span class="fw-bold fs-9">완료한 프로젝트</span>
-								</div>
-								<!-- <h6 class="fw-bold mb-2">완료한 프로젝트</h6> -->
-								<div id="projectDoneCarousel" class="carousel slide" data-bs-ride="carousel">
-									<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
-									<div class="carousel-indicators">
-									  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
-									  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
-									  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
-									</div>								
-									<div class="carousel-inner px-4">
-										<div class="carousel-item active">
-										  <div class="border rounded p-3 bg-success-soft">
-										    <h6 class="mb-1">Portfolio Page</h6>
-										    <p class="mb-0 text-muted">Notion 기반 포트폴리오</p>
-										  </div>
-										</div>
-										<div class="carousel-item">
-										  <div class="border rounded p-3 bg-success-soft">
-										    <h6 class="mb-1">KDT Diary</h6>
-										    <p class="mb-0 text-muted">Java 기반 할일관리 앱, 페이징</p>
-										  </div>
-									  </div>
-									</div>
-									<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
-									        type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="prev"
-									        style="top: 60%; left: -10px; z-index: 2;">
-										<i class="fas fa-chevron-left fs-7"></i>
-									</button>
-									<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
-									        type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="next"
-									        style="top: 60%; right: -10px; z-index: 2;">
-										<i class="fas fa-chevron-right fs-7"></i>
-									</button>
-								</div>
-							</div>
+						<div>
+							<div class="fw-bold fs-8 text-center">사용 연차</div>
+							<div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annual_leave_used}">2</div>
+						</div>
+						<div>
+							<div class="fw-bold fs-8 text-center">잔여 연차</div>
+							<div class="fs-7 text-body-primary text-center" th:text="${annualLeave.annual_leave_remain}">10</div>
 						</div>
 					</div>
+				</div>
+			</div><!-- card  -->		  
+		 <!-- ✅ profile-wrapper + Following/Projects/Completion 포함된 카드 -->
+		</div>			
+	
+	
+	    <!-- 2열: 차트 -->
+	    <div class="col-md-8">
+	      <!-- ✅ 차트 카드 -->
+	      <div class="card p-4 h-100 shadow-sm">
+	        <h5 class="fw-bold mb-3">결재 및 프로젝트 활동 요약</h5>
+	        <canvas id="approvalProjectChart" height="200"></canvas>
+	      </div>
+	    </div>	
+	
+	
+	    <!-- 3열: 주소록 -->
+	    <div class="col-md-4">
+	      <!-- ✅ 주소록 카드 (사번, 직급, 이메일 등) -->
+			<div class="card h-100 position-relative">
+				<div class="card-body fs-9">
+					<div class="d-flex align-items-center mb-2">
+						<!-- <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span> -->
+						
+						<!--  수정 버튼 -->
+						<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
+						        data-bs-toggle="modal" data-bs-target="#editInfoModal">
+							<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
+							     focusable="false" data-prefix="fas" data-icon="pen" role="img"
+							     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+								<path fill="currentColor"
+							        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
+							</svg>
+						</button>
+					</div>
+				
+					<!-- 기본 정보 -->
+					<h5 class="text-body-secondary">사번</h5>
+					<p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
+
+					<h5 class="text-body-secondary">직급</h5>
+					<p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p>
+					
+					<h5 class="text-body-secondary">부서</h5>
+					<p class="text-body-secondary" th:text="${departmentName != null ? departmentName : '-'}">부서</p>
+					
+					<div class="mb-3">
+					  <h5 class="text-body-secondary">Email</h5>
+					  <a href="mailto:shatinon@jeemail.com" id="emailValue" th:text="${directory != null and directory.directory_email != null ? directory.directory_email : '-'}">Email</a>
+					</div>
+					
+					<h5 class="text-body-secondary">Phone</h5>
+					<p class="text-body-secondary" id="phoneValue" th:text="${directory != null and directory.directory_phone != null ? directory.directory_phone : '-'}">01000000000</p>
+					
+					<!-- <h5 class="text-body-secondary">주소</h5>
+					<p class="text-body-secondary" id="addressValue">서울특별시 금천구 가산디지털2로 95</p> -->
+				</div><!-- card-body -->
+			</div><!-- card h-100 -->	      
+	      
+	    </div>	
+	
+	
+	    <!-- 4열: 결재 & 프로젝트 슬라이드 -->
+	    <div class="col-md-8">
+	      <!-- ✅ 결재 슬라이드 카드 -->
+			<div class="card p-3 mb-4">
+				<div class="d-flex justify-content-start">
+					<span class="fw-bold fs-8">결재 문서</span>
+				</div>
+				<!-- <h5 class="fw-bold mb-3">결재 문서 요약</h5> -->
+				<div class="row g-3">
+				  
+					<!-- 진행 중인 결재 문서 -->
+					<div class="col-md-6 position-relative">
+						<div class="d-flex justify-content-center align-items-center gap-2">
+							<i class="fas fa-circle fs-10 text-primary mt-n1"></i>
+							<span class="fw-bold fs-9">진행 중인 결재</span>
+						</div>
+						<!-- <h6 class="fw-bold mb-2">📌 진행 중인 결재</h6> -->
+						<div id="approvalPendingCarousel" class="carousel slide" data-bs-ride="carousel">
+							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+							<div class="carousel-indicators">
+							  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+							  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+							  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+							</div>								
+							<div class="carousel-inner px-4">
+								<div class="carousel-item active">
+								  <div class="border rounded p-3 bg-primary-soft">
+								    <h6 class="mb-1">회의실 예약 요청</h6>
+								    <p class="text-muted mb-0">2025-04-14</p>
+								  </div>
+								</div>
+								<div class="carousel-item">
+								  <div class="border rounded p-3 bg-primary-soft">
+								    <h6 class="mb-1">출장 신청서</h6>
+								    <p class="text-muted mb-0">2025-04-13</p>
+								  </div>
+								</div>
+							</div>
+							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="prev"
+							        style="top: 60%; left: -10px; z-index: 2;">
+								<i class="fas fa-chevron-left fs-7"></i>
+							</button>
+							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="next"
+							        style="top: 60%; right: -10px; z-index: 2;">
+								<i class="fas fa-chevron-right fs-7"></i>
+							</button>
+						</div>
+					</div>
+				
+					<!-- 승인 완료된 결재 문서 -->
+					<div class="col-md-6 position-relative">
+						<div class="d-flex justify-content-center align-items-center gap-2">
+							<i class="fas fa-circle fs-10 text-success mt-n1"></i>
+							<span class="fw-bold fs-9">승인된 결재</span>
+						</div>
+						<!-- <h6 class="fw-bold mb-2">✅ 승인된 결재</h6> -->
+						<div id="approvalApprovedCarousel" class="carousel slide" data-bs-ride="carousel">
+							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+							<div class="carousel-indicators">
+							  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+							  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+							  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+							</div>								
+							<div class="carousel-inner px-4">
+								<div class="carousel-item active">
+								  <div class="border rounded p-3 bg-success-soft">
+								    <h6 class="mb-1">연차 신청서</h6>
+								    <p class="text-muted mb-0">2025-04-10</p>
+								  </div>
+								</div>
+								<div class="carousel-item">
+								  <div class="border rounded p-3 bg-success-soft">
+								    <h6 class="mb-1">출장 보고서</h6>
+								    <p class="text-muted mb-0">2025-04-08</p>
+								  </div>
+								</div>
+							</div>
+							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="prev"
+							        style="top: 60%; left: -10px; z-index: 2;">
+								<i class="fas fa-chevron-left fs-7"></i>
+							</button>
+							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="next"
+							        style="top: 60%; right: -10px; z-index: 2;">
+								<i class="fas fa-chevron-right fs-7"></i>
+							</button>
+						</div>
+					</div>
+				
+				</div>
+			</div>
+			<!-- 최근 결재문서 끝 -->	      
+	      <!-- ✅ 프로젝트 슬라이드 카드 -->
+			<!-- 참여 중인 프로젝트 슬라이드 형태 -->
+			<div class="card p-3 mb-4">
+				<div class="d-flex justify-content-start">
+					<span class="fw-bold fs-8">프로젝트</span>
+				</div>
+				<!-- <h5 class="fw-bold mb-3">나의 프로젝트</h5> -->
+				<div class="row g-3">
+					<!-- 참여 중인 프로젝트 -->
+					<div class="col-md-6 position-relative">
+						<div class="d-flex justify-content-center align-items-center gap-2">
+							<i class="fas fa-circle fs-10 text-primary mt-n1"></i>
+							<span class="fw-bold fs-9">진행 중인 프로젝트</span>
+						</div>
+						<!-- <h6 class="fw-bold mb-2">참여 중인 프로젝트</h6> -->
+						<div id="projectActiveCarousel" class="carousel slide" data-bs-ride="carousel">
+							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+							<div class="carousel-indicators">
+							  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+							  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+							  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+							</div>
+							<!-- 예시 -->
+							<!-- <div class="carousel-indicators">
+							  <th:block th:each="slide, i : ${slideList}">
+							    <button type="button"
+							            th:data-bs-target="#myCarousel"
+							            th:data-bs-slide-to="${i.index}"
+							            th:classappend="${i.index == 0} ? 'active'"
+							            th:aria-label="'슬라이드 ' + ${i.index + 1}">
+							    </button>
+							  </th:block>
+							</div> -->
+							
+							<div class="carousel-inner px-4">
+								<div class="carousel-item active">
+								  <div class="border rounded p-3 bg-primary-soft">
+								    <h6 class="mb-1">Flowlog</h6>
+								    <p class="mb-0 text-muted">실시간 근태 차트 및 자동 연차 계산</p>
+								  </div>
+								</div>
+								<div class="carousel-item">
+								  <div class="border rounded p-3 bg-primary-soft">
+								    <h6 class="mb-1">click click</h6>
+								    <p class="mb-0 text-muted">회원가입/로그인, WebSocket</p>
+								  </div>
+								</div>
+							</div>
+							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="prev"
+							        style="top: 60%; left: -10px; z-index: 2;">
+								<i class="fas fa-chevron-left fs-7"></i>
+							</button>
+							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="next"
+							        style="top: 60%; right: -10px; z-index: 2;">
+								<i class="fas fa-chevron-right fs-7"></i>
+							</button>
+						</div>
+					</div>
+				
+					<!-- 완료한 프로젝트 -->
+					<div class="col-md-6 position-relative">
+						<div class="d-flex justify-content-center align-items-center gap-2">
+							<i class="fas fa-circle fs-10 text-success mt-n1"></i>
+							<span class="fw-bold fs-9">완료한 프로젝트</span>
+						</div>
+						<!-- <h6 class="fw-bold mb-2">완료한 프로젝트</h6> -->
+						<div id="projectDoneCarousel" class="carousel slide" data-bs-ride="carousel">
+							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+							<div class="carousel-indicators">
+							  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+							  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+							  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+							</div>								
+							<div class="carousel-inner px-4">
+								<div class="carousel-item active">
+								  <div class="border rounded p-3 bg-success-soft">
+								    <h6 class="mb-1">Portfolio Page</h6>
+								    <p class="mb-0 text-muted">Notion 기반 포트폴리오</p>
+								  </div>
+								</div>
+								<div class="carousel-item">
+								  <div class="border rounded p-3 bg-success-soft">
+								    <h6 class="mb-1">KDT Diary</h6>
+								    <p class="mb-0 text-muted">Java 기반 할일관리 앱, 페이징</p>
+								  </div>
+							  </div>
+							</div>
+							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="prev"
+							        style="top: 60%; left: -10px; z-index: 2;">
+								<i class="fas fa-chevron-left fs-7"></i>
+							</button>
+							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="next"
+							        style="top: 60%; right: -10px; z-index: 2;">
+								<i class="fas fa-chevron-right fs-7"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>	      
+	    </div>	
+	</div><!-- row g-3 -->
+	
+</div><!-- mb-9 --> 
 
 
 <!-- 					<div th:each="item, stat : ${carouselList}">
@@ -393,13 +393,6 @@
 					  </div>
 					</div> -->
 
-					<!-- 참여프로젝트 끝 -->
-				</div><!-- col-md-12 -->
-			<!-- 우측 정보 -->
-			</div><!-- row g-4 -->
-		</div><!-- col-12 col-md-8 col-xxl-8 -->
-	</div><!-- row g-5 -->	
-</div><!-- mb-9(상단 프로필+주소록, 결재/프로젝트 -->
 
 
 <div class="mb-9">
