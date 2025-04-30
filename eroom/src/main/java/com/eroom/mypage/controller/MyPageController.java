@@ -1,14 +1,14 @@
 package com.eroom.mypage.controller;
 
-import java.util.List;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.eroom.attendance.entity.Attendance;
+import com.eroom.attendance.dto.AnnualLeaveDto;
+import com.eroom.attendance.entity.AnnualLeave;
+import com.eroom.attendance.service.AttendanceService;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.DirectoryService;
@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class MyPageController {
 	private final StructureService structureService;
 	private final DirectoryService employeeDirectoryService;
+	private final AttendanceService attendanceService;
 	// 마이페이지
 	@GetMapping("/list")
 	public String myPageView(Model model, Authentication authentication) {
@@ -52,11 +53,25 @@ public class MyPageController {
         
         // 주소록 정보 조회
         Directory directory = employeeDirectoryService.selectDirectoryByEmployeeNo(employeeNo);
-//	    System.out.println("directory 정보 : " + directory);
+//        System.out.println("directory 정보 : " + directory);
         if(directory != null) {
         	DirectoryDto directoryDto = new DirectoryDto().toDto(directory);
         	model.addAttribute("directory", directoryDto);
         }
+        
+        
+        // 연차 정보 조회
+        AnnualLeave annualLeave = attendanceService.selectAnnualLeaveByEmployeeNo(employeeNo);
+        AnnualLeaveDto annualLeaveDto;
+        if (annualLeave != null) {
+        	annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
+		}else {
+			annualLeaveDto = new AnnualLeaveDto();
+			annualLeaveDto.setAnnual_leave_total(0.0);
+			annualLeaveDto.setAnnual_leave_used(0.0);
+			annualLeaveDto.setAnnual_leave_remain(0.0);
+		}
+        model.addAttribute("annualLeave",annualLeaveDto);
 
 		return "mypage/list";
 	}
