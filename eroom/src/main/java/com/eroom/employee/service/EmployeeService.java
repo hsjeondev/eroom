@@ -289,11 +289,41 @@ public class EmployeeService {
 				
 				// 현재 로그인 사용자 정보를 editor로 저장
 				EmployeeDetails employeeDetail = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-				String editorName = employeeDetail.getEmployee().getEmployeeId();
-				directory.setDirectoryEditor(editorName);
+				String editorId = employeeDetail.getEmployee().getEmployeeId();
+				directory.setDirectoryEditor(editorId);
 
 				employeeDirectoryRepository.save(directory);
 			}
+			
+		}
+	}
+	
+	// 회원 정보 삭제 (퇴사 처리)
+	@Transactional
+	public void deleteEmployee(EmployeeUpdateDto dto) {
+		Employee employee = employeeRepository.findById(dto.getEmployee_no()).orElse(null);
+		
+		// 퇴사 처리
+		if(dto.getEmployee_end_date() != null && !dto.getEmployee_end_date().isEmpty()) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			LocalDate endDate = LocalDate.parse(dto.getEmployee_end_date(),formatter);
+			employee.setEmployeeEndDate(endDate.atStartOfDay());
+		}
+		// 재직 여부 N 설정
+		employee.setEmployeeEmploymentYn("N");
+		employeeRepository.save(employee);
+		
+		Directory directory = employee.getDirectory();
+		if(directory != null) {
+			directory.setVisibleYn("N"); // 주소록 숨김 처리
+			directory.setDirectoryModDate(LocalDateTime.now()); // 수정 날짜 
+			
+			// directory_editor
+			EmployeeDetails employeeDetail = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			String editorId = employeeDetail.getEmployee().getEmployeeId();
+			directory.setDirectoryEditor(editorId);
+			
+			employeeDirectoryRepository.save(directory);
 			
 		}
 	}

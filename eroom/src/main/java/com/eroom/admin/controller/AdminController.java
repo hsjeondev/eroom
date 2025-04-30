@@ -408,6 +408,23 @@ public class AdminController {
 		return resultMap;
 	}
 	
+	// 회원 삭제 
+	@PostMapping("/deleteEmployee")
+	@ResponseBody
+	public Map<String,Object> deleteEmployee(@RequestBody EmployeeUpdateDto dto){
+		Map<String,Object> resultMap = new HashMap<>();
+		try {
+			employeeService.deleteEmployee(dto);
+			resultMap.put("res_code", 200);
+			resultMap.put("res_msg", "회원이 정상적으로 퇴사 처리되었습니다.");
+		}catch(Exception e) {
+			e.printStackTrace();
+			resultMap.put("res_code", 500);
+			resultMap.put("res_msg", "회원 퇴사 처리 중 오류가 발생했습니다.");
+		}
+		return resultMap;
+	}
+	
 	// 회원 정보 가져오기(employee,directory,structure)
 	@GetMapping("/getEmployeeDetail")
 	@ResponseBody

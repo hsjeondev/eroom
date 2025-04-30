@@ -149,9 +149,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 									<div class="dropdown-menu dropdown-menu-end py-2">
 									  <a class="dropdown-item editEmployeeBtn" href="#!"
 									  	th:attr="data-employee-no=${employeeManage.employee.employee_no}">수정</a>
-									  <div class="dropdown-divider"></div>
+									  <div class="dropdown-divider" th:if="${employeeManage.employee.employee_employment_yn == 'Y'}"></div>
 									  <a class="dropdown-item text-danger deleteEmployeeBtn" href="#!"
-									  	th:attr="data-employee-no=${employeeManage.employee.employee_no}">삭제</a>
+									  	th:attr="data-employee-no=${employeeManage.employee.employee_no}"
+									  	th:if="${employeeManage.employee.employee_employment_yn == 'Y'}">삭제</a>
 									</div>
 								</div>
 							 </td>
@@ -389,7 +390,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
       <form id="deleteEmployeeForm" autocomplete="off">
         <!-- 헤더 -->
         <div class="modal-header bg-light">
-          <h5 class="modal-title text-danger fw-bold" id="deleteEmployeeModalLabel">회원 삭제</h5>
+          <h5 class="modal-title" id="deleteEmployeeModalLabel">회원 삭제</h5>
           <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
@@ -443,7 +444,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 </div>
 
 <!-- confirm 모달 -->
-<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border border-secondary">
       <div class="modal-header bg-light">
@@ -459,64 +460,101 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
       </div>
     </div>
   </div>
+</div> -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
 </div>
-
 <!-- 공통 알림 모달 -->
 <div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border border-secondary">
-      <div class="modal-header bg-light">
-        <h5 class="modal-title" id="alertMessageModalLabel">알림</h5>
-        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
       </div>
-      <div class="modal-body" id="alertMessageContent">
-        <!-- 메시지가 여기에 들어감 -->
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 메시지가 여기에 들어감 -->
+        </p>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer justify-content-center border-0">
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
       </div>
     </div>
   </div>
 </div>
-
 <!-- 생성용 unsaved 모달 -->
-<div class="modal fade" id="unsavedCreateModal" tabindex="-1" aria-labelledby="unsavedCreateModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border border-secondary">
-      <div class="modal-header bg-light">
-        <h5 class="modal-title" id="unsavedCreateModalLabel">주의</h5>
-        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
+<div class="modal fade" id="unsavedCreateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
       </div>
-      <div class="modal-body">
-        작성 중인 회원 생성 정보가 모두 사라집니다.<br>계속 닫으시겠습니까?
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 회원 생성 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal">취소</button>
-        <button type="button" class="btn btn-primary" id="confirmCreateCloseBtn">계속 닫기</button>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmCreateCloseBtn">확인</button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- 수정용 unsaved 모달 -->
-<div class="modal fade" id="unsavedEditModal" tabindex="-1" aria-labelledby="unsavedEditModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border border-secondary">
-      <div class="modal-header bg-light">
-        <h5 class="modal-title" id="unsavedEditModalLabel">주의</h5>
-        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
+<div class="modal fade" id="unsavedEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
       </div>
-      <div class="modal-body">
-        작성 중인 회원 수정 정보가 모두 사라집니다.<br>계속 닫으시겠습니까?
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 회원 수정 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal">취소</button>
-        <button type="button" class="btn btn-primary" id="confirmEditCloseBtn">계속 닫기</button>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmEditCloseBtn">확인</button>
       </div>
     </div>
   </div>
 </div>
-
+<!-- 삭제용 unsaved 모달 -->
+<div class="modal fade" id="unsavedDeleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 퇴사 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 document.addEventListener('DOMContentLoaded',function(){
 	// 요소 가져오기
@@ -550,7 +588,10 @@ document.addEventListener('DOMContentLoaded',function(){
  	// 수정 모달 닫기 확인
 	const unsavedEditModalElement = document.getElementById('unsavedEditModal');
 	const unsavedEditModal = bootstrap.Modal.getInstance(unsavedEditModalElement) || new bootstrap.Modal(unsavedEditModalElement);
-
+	// 삭제 모달 닫기 확인
+	const unsavedDeleteModalElement = document.getElementById('unsavedDeleteModal');
+	const unsavedDeleteModal = bootstrap.Modal.getInstance(unsavedDeleteModalElement) || new bootstrap.Modal(unsavedDeleteModalElement);
+	
 	// 저장 확인 모달 (공통)
 	const confirmSaveModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
 	// 알림 모달(공통)
@@ -579,6 +620,24 @@ document.addEventListener('DOMContentLoaded',function(){
 		}
 	}
 	
+	// 공통 confirm 모달
+	function showConfirmModal(message, onConfirm){
+		const msgElement = document.getElementById('confirmSaveModalMessage');
+		const confirmBtn = document.getElementById('confirmSaveBtn');
+		
+		msgElement.innerHTML = message;
+		const modalInstance = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+		modalInstance.show();
+		
+		const handler = function(){
+			modalInstance.hide();
+			onConfirm(); // 확인 클릭 시 실행할 콜백
+			confirmBtn.removeEventListener('click',handler); // 중복 방지
+		};
+		
+		confirmBtn.addEventListener('click',handler);
+	}
+	
 	// 오늘 날짜 입사일 input에 기본값으로 세팅 - 회원 생성 모달
 	const hireDateInput = document.getElementById('employeeHireDate');
 	if(hireDateInput){
@@ -594,11 +653,11 @@ document.addEventListener('DOMContentLoaded',function(){
 	const endDateInput = document.getElementById('deleteEmployeeEndDate');
 	if(endDateInput){
 		const today = new Date();
-		const year = toady.getFullYear();
+		const year = today.getFullYear();
 		const month = String(today.getMonth() + 1).padStart(2,'0');
 		const day = String(today.getDate()).padStart(2,'0');
 		const formattedToday = `${year}-${month}-${day}`;
-		endDateInpud.value = formattedToday;
+		endDateInput.value = formattedToday;
 	}
 
 	// 부서 선택시 팀 목록 가져오기 (회원 생성 모달용)
@@ -689,8 +748,130 @@ document.addEventListener('DOMContentLoaded',function(){
 		
 	});
 	
+	// 생성폼 입력 감지 
+	createForm.addEventListener('input',function(){
+		isFormEdited = true;
+	});
 	
-	// 회원 생성 버튼 클릭
+	// 수정폼 입력 감지
+	document.getElementById('editEmployeeForm').addEventListener('input', function () {
+		isEditFormEdited = true;
+	});	
+	
+	// 삭젶폼 입력 감지
+	document.getElementById('deleteEmployeeForm').addEventListener('input',function(){
+		isDeleteFormEdited = true;
+	});
+	
+	// 모달 닫은 뒤 입력값 초기화(생성 모달만 해당)
+	createModalElement.addEventListener('hidden.bs.modal', function () {
+		// 입력값 초기화
+		createForm.reset();
+	
+		// 커스텀 포지션 필드 숨기기
+		customPositionInput.classList.add('d-none');
+		customPositionInput.required = false;
+	
+		// 중복확인 메시지 숨기기
+		nameCheckMsg.classList.add('d-none');
+		nameCheckMsg.textContent = '';
+		nameCheckMsg.className = 'form-text';
+	
+		// 팀 select 초기화
+		teamSelect.innerHTML = '<option value="">팀 선택</option>';
+	
+		// 중복 확인 상태 초기화
+		isNameChecked = false;
+	
+		// 수정 감지 플래그 초기화
+		isFormEdited = false;
+	});	
+
+	
+	// 모달 닫기 방지 (회원 생성 모달) ======================
+	createModalElement.addEventListener('hide.bs.modal', function (e) {
+		if (isFormEdited) {
+			e.preventDefault();
+			unsavedCreateModal.show();
+		}
+	});
+	
+	// 회원 생성용 모달 계속 닫기
+	document.getElementById('confirmCreateCloseBtn').addEventListener('click', function () {
+		isFormEdited = false;
+		unsavedCreateModal.hide();
+		unsavedCreateModalElement.addEventListener('hidden.bs.modal', function handler() {
+			createModal.hide();
+			unsavedCreateModalElement.removeEventListener('hidden.bs.modal', handler);
+		});
+	});
+	
+	// 모달 닫기 방지 (회원 수정 모달)
+	editModalElement.addEventListener('hide.bs.modal', function (e) {
+		const isConfirmVisible = document.getElementById('confirmSaveModal').classList.contains('show');
+		if (isEditFormEdited && !isConfirmVisible) {
+			e.preventDefault();
+			unsavedEditModal.show();
+		}
+	});
+	// 수정용 모달 계속 닫기
+	document.getElementById('confirmEditCloseBtn').addEventListener('click', function () {
+		isEditFormEdited = false;
+		unsavedEditModal.hide();
+		unsavedEditModalElement.addEventListener('hidden.bs.modal', function handler() {
+			editModal.hide();
+			unsavedEditModalElement.removeEventListener('hidden.bs.modal', handler);
+		});
+	});
+	
+	// 삭제용 모달 닫기 방지(회원 삭제 모달)
+	deleteModalElement.addEventListener('hide.bs.modal',function(e){
+		const isConfirmVisible = document.getElementById('confirmSaveModal').classList.contains('show');
+		if(isDeleteFormEdited && !isConfirmVisible){
+			e.preventDefault();
+			console.log('[모달 닫기] 삭제 취소 모달 띄움');
+			unsavedDeleteModal.show();
+		}
+	});
+	
+	// 삭제용 모달 계속 닫기
+	document.getElementById('confirmDeleteCloseBtn').addEventListener('click',function(){
+		isDeleteFormEdited = false;
+		unsavedDeleteModal.hide();
+		unsavedDeleteModalElement.addEventListener('hidden.bs.modal',function handler(){
+			deleteModal.hide();
+			unsavedDeleteModalElement.removeEventListener('hidden.bs.modal',handler);
+		});
+	});
+	
+	// =========== 모달 내부의 수정/삭제버튼 누를시 confirmSaveModal 띄우기 =================
+		
+	// saveEditEmployeeBtn 클릭 시 (회원 수정 요청 전 확인 모달 띄우기)
+	saveEditEmployeeBtn.addEventListener('click', function () {
+		const editEmployeeName = document.getElementById('editEmployeeName').value;
+		if (!editEmployeeName.trim()) {
+			showAlert("수정할 회원 정보를 먼저 불러오세요.");
+			return;
+		}
+
+		currentMode = 'edit';
+		//confirmSaveModal.show();
+		showConfirmModal('정말 수정하시겠습니까?',sendUpdateEmployee);
+	});
+	
+	// 회원 삭제 요청 전 확인 모달
+	document.getElementById('deleteEmployeeBtn').addEventListener('click',function(){
+		const deleteEmployeeName = document.getElementById('deleteEmployeeName').value;
+		if(!deleteEmployeeName.trim()){
+			showAlert("회원 정보를 먼저 불러오세요.");
+			return;
+		}
+		currentMode = 'delete';
+		//confirmSaveModal.show();
+		showConfirmModal('정말 삭제하시겠습니까?',sendDeleteEmployee);
+	});	
+	
+	// 페이지의 회원 생성 요청 전 확인
 	createBtn.addEventListener('click',function(){
 		let isValid = true; // 폼 유효 여부 플래그
 		let message = '';
@@ -735,33 +916,13 @@ document.addEventListener('DOMContentLoaded',function(){
 		// 모든 검증 통과시 등록 확인 모달 띄움
 		currentMode = 'create'; // 회원 생성 모드 설정
 		isFormEdited = true; // 폼 수정 감지
-		confirmSaveModal.show(); // 등록 확인 모달 띄우기
+		// confirmSaveModal.show(); // 등록 확인 모달 띄우기
+		showConfirmModal('정말 등록하시겠습니까?',sendCreateEmployee);
 	});
 	
-	// 생성폼 입력 감지 
-	createForm.addEventListener('input',function(){
-		isFormEdited = true;
-	});
-	
-	// 수정폼 입력 감지
-	document.getElementById('editEmployeeForm').addEventListener('input', function () {
-		isEditFormEdited = true;
-	});	
-	
-	// saveEditEmployeeBtn 클릭 시 (회원 수정 요청 전 확인 모달 띄우기)
-	saveEditEmployeeBtn.addEventListener('click', function () {
-		const editEmployeeName = document.getElementById('editEmployeeName').value;
-		if (!editEmployeeName.trim()) {
-			showAlert("수정할 회원 정보를 먼저 불러오세요.");
-			return;
-		}
-
-		currentMode = 'edit';
-		confirmSaveModal.show();
-	});
 	
 	// confirmSaveModal의 확인 버튼 ============================================= 확인필요
-	document.getElementById('confirmSaveBtn').addEventListener('click', function (e) {
+/* 	document.getElementById('confirmSaveBtn').addEventListener('click', function (e) {
 		e.preventDefault();
 		confirmSaveModal.hide();
 
@@ -772,110 +933,10 @@ document.addEventListener('DOMContentLoaded',function(){
 		} else if(currentMode == 'delete'){
 			sendDeleteEmployee(); // 삭제 함수 호출
 		}
-	});
+	}); */
 	
-	// 모달 닫기 방지 (회원 생성 모달) =========================이거 수정중 모달 따로 나누기 
-	createModalElement.addEventListener('hide.bs.modal', function (e) {
-		if (isFormEdited) {
-			e.preventDefault();
-			unsavedCreateModal.show();
-		}
-	});
-	
-	// 생성용 경고 모달 닫기 버튼
-	document.getElementById('confirmCreateCloseBtn').addEventListener('click', function () {
-		isFormEdited = false;
-		unsavedCreateModal.hide();
-		unsavedCreateModalElement.addEventListener('hidden.bs.modal', function handler() {
-			createModal.hide();
-			unsavedCreateModalElement.removeEventListener('hidden.bs.modal', handler);
-		});
-	});
-	
-	// 모달 닫은 뒤 입력값 초기화
-	createModalElement.addEventListener('hidden.bs.modal', function () {
-		// 입력값 초기화
-		createForm.reset();
-	
-		// 커스텀 포지션 필드 숨기기
-		customPositionInput.classList.add('d-none');
-		customPositionInput.required = false;
-	
-		// 중복확인 메시지 숨기기
-		nameCheckMsg.classList.add('d-none');
-		nameCheckMsg.textContent = '';
-		nameCheckMsg.className = 'form-text';
-	
-		// 팀 select 초기화
-		teamSelect.innerHTML = '<option value="">팀 선택</option>';
-	
-		// 중복 확인 상태 초기화
-		isNameChecked = false;
-	
-		// 수정 감지 플래그 초기화
-		isFormEdited = false;
-	});	
-	
-	// 모달 닫기 방지 (회원 수정 모달)
-	editModalElement.addEventListener('hide.bs.modal', function (e) {
-		const isConfirmVisible = document.getElementById('confirmSaveModal').classList.contains('show');
-		if (isEditFormEdited && !isConfirmVisible) {
-			e.preventDefault();
-			unsavedEditModal.show();
-		}
-	});
-	// 수정용 모달 계속 닫기
-	document.getElementById('confirmEditCloseBtn').addEventListener('click', function () {
-		isEditFormEdited = false;
-		unsavedEditModal.hide();
-		unsavedEditModalElement.addEventListener('hidden.bs.modal', function handler() {
-			editModal.hide();
-			unsavedEditModalElement.removeEventListener('hidden.bs.modal', handler);
-		});
-	});
-	
-	// =================== 회원 생성 함수 =========================
-	function sendCreateEmployee(){
-		
-		const formData = new FormData(createForm);
-		const payload = {}; // JSON으로 변환할 데이터
-		for(const [key,value] of formData.entries()){
-			payload[key] = value;
-		}
-		if(payload.employee_position === '직접 입력'){  
-			payload.employee_position = payload.custom_position; 
-		}
-		delete payload.custom_position; // 커스텀 포지션 삭제
-		
-		fetch('/admin/createEmployee',{
-			method: 'POST',
-			headers : {
-				'Content-Type' : 'application/json',
-				'X-CSRF-TOKEN' : document.querySelector('meta[name="_csrf"]').getAttribute('content'),
-				'X-CSRF-HEADER' : document.querySelector('meta[name="_csrf_header"]').getAttribute('content')
-			},
-			body : JSON.stringify(payload)
-		})
-		.then(response => response.json())
-		.then(data => {
-			if(data.res_code == 200) {
-				isFormEdited = false; // 수정 여부 모달 뜨지 않게 함
-				showAlert(data.res_msg,function(){
-					createModal.hide();
-					location.reload(); // 페이지 새로고침
-				});
-            }else{
-                showAlert(data.res_msg);
-            }
-		})
-		.catch(() => {
-			showAlert('회원 생성 중 오류가 발생했습니다.');
-		});
-	}
-	
-	// ============ 회원 수정 ==============
+	// ============ 목록의 회원 수정 버튼 클릭 ==============
 	let originalData = {}; // 값을 저장할 변수
-		
 		
 	// 회원 수정 버튼 클릭시 fetch로 회원 정보 가져오기
 	document.querySelectorAll('.editEmployeeBtn').forEach(function(btn){
@@ -966,10 +1027,10 @@ document.addEventListener('DOMContentLoaded',function(){
 							document.getElementById('editCustomPositionInput').classList.add('d-none');
 							document.getElementById('editCustomPositionInput').required = false;
 						}
-						// 수정 모달 열기
-						editModal.show();
+							// 수정 모달 열기
+							editModal.show();
 					}else{
-						showAlert(data.res_msg);
+							showAlert(data.res_msg);
 					}
 				})
 				.catch(error => {
@@ -979,8 +1040,15 @@ document.addEventListener('DOMContentLoaded',function(){
 		});
 	});
 	
+	// ============ 목록의 삭제 버튼 클릭시 ===================
 	let deleteEmployeeNo;
-	// 회원 삭제 버튼 클릭시
+	// structure_no로 코드명 매핑
+	function getStructureNameByNo(targetNo, structureList){
+		if(!targetNo || !structureList) return '';
+		const match = structureList.find(item => item.structure_no == targetNo);
+		return match ? match.code_name : '';
+	}
+	// 회원 삭제 버튼 클릭시 fetch로 회원 정보 가져오기
 	document.querySelectorAll('.deleteEmployeeBtn').forEach(btn => {
 		btn.addEventListener('click',function(){
 			deleteEmployeeNo = this.getAttribute('data-employee-no');
@@ -994,17 +1062,65 @@ document.addEventListener('DOMContentLoaded',function(){
 						document.getElementById('deleteEmployeeName').value = data.employee_name || '';
 						document.getElementById('deleteEmployeePosition').value = data.employee_position || '';
 						document.getElementById('deleteEmployeeDepartment').value = getStructureNameByNo(data.department_no, data.department_list);
-						document.getElementById('deleteEmployeeTeam').value = getStructrueNameByNo(data.team_no,data.team_list);
+						document.getElementById('deleteEmployeeTeam').value = getStructureNameByNo(data.team_no,data.team_list);
 						document.getElementById('deleteEmployeeHireDate').value = data.employee_hire_date || '';
+						
+						// 삭제 모달 열기
+						deleteModal.show();
+					}else{
+						showAlert(data.res_msg);
 					}
 				})
+				.catch(error => {
+					console.error("Error",error);
+					showAlert("회원 정보 조회 중 오류가 발생했습니다.");
+				});
 		});
 	});
 	
+	// =================== 회원 생성 함수 =========================
+	function sendCreateEmployee(){
+		
+		const formData = new FormData(createForm);
+		const payload = {}; // JSON으로 변환할 데이터
+		for(const [key,value] of formData.entries()){
+			payload[key] = value;
+		}
+		if(payload.employee_position === '직접 입력'){  
+			payload.employee_position = payload.custom_position; 
+		}
+		delete payload.custom_position; // 커스텀 포지션 삭제
+		
+		fetch('/admin/createEmployee',{
+			method: 'POST',
+			headers : {
+				'Content-Type' : 'application/json',
+				'X-CSRF-TOKEN' : document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+				'X-CSRF-HEADER' : document.querySelector('meta[name="_csrf_header"]').getAttribute('content')
+			},
+			body : JSON.stringify(payload)
+		})
+		.then(response => response.json())
+		.then(data => {
+			if(data.res_code == 200) {
+				isFormEdited = false; // 수정 여부 모달 뜨지 않게 함
+				showAlert(data.res_msg,function(){
+					createModal.hide();
+					location.reload(); // 페이지 새로고침
+				});
+            }else{
+                showAlert(data.res_msg);
+            }
+		})
+		.catch(() => {
+			showAlert('회원 생성 중 오류가 발생했습니다.');
+		});
+	}
 	
+	// ================= 회원 수정 ====================
 	const hireDate = document.getElementById('editEmployeeHireDate').value;
 	const endDate = document.getElementById('editEmployeeEndDate').value;
-		// ================= 회원 수정 함수 =======================
+		// 회원 수정 함수
 		function sendUpdateEmployee(){
 			console.log("수정 함수 호출됨.")
 			const selectedPosition = document.getElementById('editEmployeePosition').value;
@@ -1102,6 +1218,53 @@ document.addEventListener('DOMContentLoaded',function(){
 				showAlert('회원 수정 중 오류가 발생했습니다.');
 			});
 		}
+		
+		// ======================= 회원 삭제 기능 ====================================
+		// 회원 삭제 함수
+		function sendDeleteEmployee(){
+			if(!deleteEmployeeNo){
+				showAlert('삭제할 회원 정보가 없습니다.'); return;
+			}
+			// 퇴사일 input에서 값 가져오기
+			const endDate = document.getElementById('deleteEmployeeEndDate').value;
+			if(!endDate){
+				showAlert('퇴사일을 선택해주세요.'); return;
+			}
+			
+			// payload에 필요한 데이터 담기
+			const payload = {
+					employee_no : deleteEmployeeNo,
+					employee_end_date : endDate,
+					employee_employment_yn : 'N', // 퇴사 처리
+					visible_yn : 'N' // 주소록 숨김 처리
+			};
+			
+			fetch('/admin/deleteEmployee',{
+				method : 'POST',
+				headers : {
+				      'Content-Type': 'application/json',
+				      'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+				      'X-CSRF-HEADER': document.querySelector('meta[name="_csrf_header"]').getAttribute('content')					
+				},
+				body : JSON.stringify(payload)
+			})
+			.then(response => response.json())
+			.then(data => {
+				if(data.res_code == 200){
+					isDeleteFormEdited = false;
+					showAlert(data.res_msg,function(){
+						deleteModal.hide();
+						location.reload();
+					});
+				}else{
+					showAlert(data.res_msg);
+				}
+			})
+			.catch(error => {
+				console.error('회원 삭제 실패',error);
+				showAlert('회원 삭제 중 오류가 발생했습니다.');
+			})
+		};
 });
 </script>
 	
