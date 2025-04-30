@@ -36,6 +36,11 @@ td.name p {
 	height: 100%;
 	object-fit: cover;
 }
+.treeview-label-strong {
+  font-weight: bold;
+  text-decoration: underline;
+  color: #007bff;  /* 진한 파랑 계열 (Bootstrap의 primary 색상) */
+}
 </style>
 </head>
 <body>
@@ -58,24 +63,28 @@ td.name p {
 						<ul class="mb-0 treeview" id="treeviewExample">
 							<li class="treeview-list-item"><a data-bs-toggle="collapse" href="#treeviewExample-1-1" role="button" aria-expanded="true">
 									<p class="treeview-text text-nowrap">
-										<span class="fa-solid fa-folder treeview-icon text-info-light"></span>이룸 컴퍼니
+										<span class="fa-solid fa-folder treeview-icon text-info-light"></span> <span class="treeview-label-text treeview-label-strong">이룸 컴퍼니</span>
 									</p>
 							</a>
 								<ul class="collapse treeview-list" id="treeviewExample-1-1" data-show="true">
 
-									<li th:each="dept, deptStatus : ${departmentList}" class="treeview-list-item"><a data-bs-toggle="collapse" th:href="'#treeview-dept-' + ${deptStatus.index}" role="button" aria-expanded="false">
+									<li th:each="dept, deptStatus : ${departmentList}" class="treeview-list-item"><a class="treeview-dept" th:attr="data-deptCodeName=${dept.codeName}" data-bs-toggle="collapse" th:href="'#treeview-dept-' + ${deptStatus.index}" role="button" aria-expanded="false">
 											<p class="treeview-text text-nowrap">
-												<span class="fa-solid fa-folder treeview-icon"></span> <span th:text="${dept.codeName}">부서명</span>
+												<span class="fa-solid fa-folder treeview-icon"></span> <span class="treeview-label-text" 
+																											th:text="${dept.codeName}"
+																											>부서명</span>
 
 											</p>
 									</a>
 
 										<ul class="collapse treeview-list" th:id="'treeview-dept-' + ${deptStatus.index}" data-show="false">
 											<li th:each="team, teamStatus : ${teamMap[dept.codeName]}" class="treeview-list-item">
-												<div class="treeview-item">
+												<div class="treeview-item treeview-team" th:attr="data-teamCodeName=${team.codeName}">
 													<a class="flex-1 ps-2 ms-2" href="#!">
 														<p class="treeview-text text-nowrap">
-															<span class="treeview-icon fa-solid fa-file-lines"></span> <span th:text="${team.codeName}">팀명</span>
+															<span class="treeview-icon fa-solid fa-file-lines"></span> <span class="treeview-label-text" 
+																															th:text="${team.codeName}"
+																															>팀명</span>
 														</p>
 													</a>
 												</div>
@@ -158,69 +167,14 @@ td.name p {
 
 					<!-- 회원 목록 테이블 -->
 					<div class="bg-body-emphasis border-top border-bottom">
-						<div class="table-responsive">
-							<table class="table table-striped table-sm fs-9 mb-0 text-center">
-								<thead class="text-center align-middle">
-									<tr>
-										<th class="sort" data-sort="no" style="width: 5%;">번호</th>
-										<th class="sort" data-sort="name" style="width: 15%;">이름</th>
-										<th class="sort" data-sort="mail" style="width: 15%;">Email</th>
-										<th class="sort" data-sort="phone" style="width: 15%;">Phone</th>
-										<th class="sort" data-sort="job" style="width: 10%;">직급</th>
-										<th class="sort" data-sort="dept" style="width: 10%;">부서</th>
-										<th class="sort" data-sort="team" style="width: 10%;">팀</th>
-										<th class="sort" data-sort="date" style="width: 15%;">입사일</th>
-										<!-- <th style="width: 5%"></th> -->
-									</tr>
-								</thead>
-								<tbody class="list align-middle" id="customers-table-body">
-									<tr th:each="member, memberStatus : ${employeeList}">
-										<td class="no" th:text="${memberStatus.count}">1</td>
-										<td class="name">
-										<!-- <a class="d-flex align-items-center text-body-emphasis ps-5" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"> -->
-										<a class="d-flex align-items-center text-body-emphasis ps-5"
-									   href="#"
-									   data-bs-toggle="modal"
-									   data-bs-target="#profileModal"
-									   th:attr="data-name=${member.employee_name}, 
-									            data-dept=${member.department_name}, 
-									            data-team=${member.team_name}, 
-									            data-phone=${member.directory_phone}, 
-									            data-email=${member.directory_email}, 
-									            data-position=${member.employee_position},
-									            data-targetEmpNo=${member.employee_no},
-									            data-memberDirectoryNo=${member.directory_no}">
-																			
-
-												<div class="avatar avatar-m me-2">
-													<img class="rounded-circle" src="../../../assets/img/team/23.webp" alt="">
-												</div>
-												<p class="mb-0 fw-bold text-truncate" th:text="${member.employee_name}">이름없음</p>
-
-										</a></td>
-										<td class="mail"><a class="fw-semibold" href="/mail/mailCreate" th:text="${member.directory_email != null ? member.directory_email : '-'}"></a></td>
-										<td class="phone" th:text="${member.directory_phone}">-</td>
-										<td class="job" th:text="${member.employee_position}">-</td>
-										<td class="dept" th:text="${member.department_name != null ? member.department_name : '-'}">부서명</td>
-										<td class="team" th:text="${member.team_name != null ? member.team_name : '-'}">팀명</td>
-										<td class="date" th:if="${member.employee.employeeEmploymentYn == 'Y'}" th:text="${member.formatted_hire_date}">입사일</td>
-										<!-- <td class="text-end pe-0">
-											<div class="btn-reveal-trigger position-static">
-												<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-													<i class="fas fa-ellipsis fs-10"></i>
-												</button>
-												<div class="dropdown-menu dropdown-menu-end py-2">
-													<a class="dropdown-item" href="#!">수정</a>
-													<div class="dropdown-divider"></div>
-													<a class="dropdown-item text-danger" href="#!">삭제</a>
-												</div>
-											</div>
-										</td> -->
-									</tr>
-
-								</tbody>
-							</table>
-						</div>
+					
+					<div id="employeeListInsert">
+						<div th:replace="~{directory/employeeListFragment :: employeeListFragment}"></div>
+					</div>	
+						
+						
+						
+						
 
 						<!-- 페이징 -->
 						<div class="row align-items-center justify-content-center py-2 pe-0 fs-9">
@@ -237,12 +191,15 @@ td.name p {
 								</button>
 							</div>
 						</div>
+						
+						
+						
 					</div>
 
 				</div>
 				<!-- employeeTable -->
 
-				<!-- 회원 생성 모달 -->
+				<!-- 팀 추가 모달 -->
 				<div class="modal fade" id="addDirectoryModal" tabindex="-1" aria-labelledby="addDirectoryModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
 						<div class="modal-content">
@@ -356,7 +313,8 @@ td.name p {
 				</div>
 
 
-
+			</div>
+		</div>
 
 
 
@@ -398,7 +356,8 @@ td.name p {
 									});
 					
 				</script>
-				<script>
+				<!-- 기존 버전 트리 구조 -->
+				<!-- <script>
 				  document.addEventListener('DOMContentLoaded', function () {
 				    const tree = document.querySelector('#treeviewExample');
 				
@@ -428,15 +387,53 @@ td.name p {
 				      }
 				    });
 				  });
-				</script>
+				</script> -->
+				<!-- 글자 색상, 밑줄 추가한 트리구조 -->
 				<script>
-					$(function() {
-						// 트리뷰 아이콘 클릭 시
-						$('.li.treeview-list-item').on('click', function(e) {
-							
-						});
-					});
+				  document.addEventListener('DOMContentLoaded', function () {
+				    const tree = document.querySelector('#treeviewExample');
+				
+				    tree.addEventListener('click', function (e) {
+				      const clickedLi = e.target.closest('li.treeview-list-item');
+				      if (!clickedLi) return;
+				
+				      const clickedIcon = clickedLi.querySelector('.treeview-icon');
+				      if (!clickedIcon) return;
+				
+				      // 기존 아이콘 강조 제거
+				      document.querySelectorAll('.treeview-icon.text-info-light')
+				        .forEach(el => el.classList.remove('text-info-light'));
+				
+				      clickedIcon.classList.add('text-info-light');
+				
+				      // 기존 텍스트 강조 제거
+				      document.querySelectorAll('.treeview-label-text')
+				        .forEach(el => el.classList.remove('treeview-label-strong'));
+				
+				      // 현재 클릭된 li 안의 텍스트 span에 강조 클래스 추가
+				      const clickedLabel = clickedLi.querySelector('.treeview-label-text');
+				      if (clickedLabel) clickedLabel.classList.add('treeview-label-strong');
+				
+				   	  // 상위 폴더의 아이콘과 글자에도 강조
+				      let currentLi = clickedLi.parentElement;
+				      while (currentLi && currentLi.classList.contains('treeview-list')) {
+				        const parentLi = currentLi.closest('li.treeview-list-item');
+				        if (!parentLi) break;
+				
+				        // 아이콘 강조
+				        const parentIcon = parentLi.querySelector('.treeview-icon');
+				        if (parentIcon) parentIcon.classList.add('text-info-light');
+				
+				        // 글자(span.treeview-label-text)도 강조
+				        const parentLabel = parentLi.querySelector('.treeview-label-text');
+				        if (parentLabel) parentLabel.classList.add('treeview-label-strong');
+				
+				        currentLi = parentLi.parentElement;
+				      }
+				    });
+				  });
 				</script>
+
 				
 				<!-- 해당 사원의 이름을 클릭시 해당 사원의 데이터를 모달 안으로 전달해주는 JS -->
 				<script>
@@ -532,14 +529,48 @@ td.name p {
 						  });
 					});
 				</script>
-								
+				<!-- 트리구조 선택시 비동기 방식으로 직원 조회 -->
+				<script>
+				// 트리 - 부서 클릭시 작동
+				document.querySelectorAll('.treeview-dept').forEach(item => {
+				  item.addEventListener('click', function (e) {
+				    const deptEl = e.target.closest('.treeview-dept');
+				    if (!deptEl) return;
+				
+				    const deptCodeName = deptEl.getAttribute('data-deptCodeName');
+				    treeSelectEmployee(deptCodeName);
+				  });
+				});
+				// 트리 - 팀 클릭시 작동
+				document.querySelectorAll('.treeview-team').forEach(item => {
+				  item.addEventListener('click', function (e) {
+				    const teamEl = e.target.closest('.treeview-team');
+				    if (!teamEl) return;
+				
+				    const teamCodeName = teamEl.getAttribute('data-teamCodeName');
+				    treeSelectEmployee(teamCodeName);
+				  });
+				});
+				
+				const treeSelectEmployee = function(codeName){
+					//console.log(code);
+				  fetch(`/directory/employeeList?codeName=${codeName}`)
+					.then(response => response.text())
+					.then(html => {
+					  document.getElementById('employeeListInsert').innerHTML = html;
+					})
+					.catch(err => {
+					  console.error('직원 리스트 불러오기 실패:', err);
+					});
+				};
+				
+				</script>
 
 
 
 
 
-			</div>
-		</div>
+
 	</main>
 
 </body>

@@ -36,6 +36,10 @@ sonar {
   }
 }
 
+configurations.all {
+    exclude group: 'org.glassfish.jaxb', module: 'jaxb-core'
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'

@@ -23,7 +23,7 @@ public class MailDraftDto {
 
 	private Long mail_draft_no;      // 메일 임시저장 번호 (PK)
     private Long mail_no;            // 메일 번호 (FK)
-    private Long employee_no;        // 수신자 사원 번호 (FK)
+    //private Long employee_no;        // 수신자 사원 번호 (FK)
     private LocalDateTime mail_draft_time; // 임시 저장한 시간
     
     @Builder.Default
@@ -34,7 +34,7 @@ public class MailDraftDto {
         return MailDraft.builder()
                 .mailDraftNo(mail_draft_no)
                 .mail(Mail.builder().mailNo(mail_no).build())
-                .employee(Employee.builder().employeeNo(employee_no).build())
+                //.employee(Employee.builder().employeeNo(employee_no).build())
                 .mailDraftTime(mail_draft_time)
                 .mailDraftVisibleYn(mail_draft_visible_yn)
                 .build();

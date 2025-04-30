@@ -42,337 +42,317 @@
 <body>
 <main class="main" id="top" layout:fragment="content">
 <div class="mb-9">
-	<div class="row align-items-center justify-content-between g-3 mb-4">
-		<!-- 상단 제목 -->
-		<div class="d-flex justify-content-start">
-			<span class="fw-bold fs-6">마이페이지</span>
-		</div> 
-	<!-- 삭제. 수정 버튼 col-auto로 하면 왼쪽 col-auto ms-auto 는 오른쪽 -->
-<!-- 		<div class="col-auto ms-auto">
-			<div class="row g-3">
-				<div class="col-auto">
-					<button class="btn btn-phoenix-danger">
-						<svg class="svg-inline--fa fa-trash-can me-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-can" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
-							<path fill="currentColor" d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z"></path>
-						</svg><span class="fa-solid fa-trash-can me-2"></span> Font Awesome fontawesome.com
-						Delete customer
-					</button>
-				</div>
-				<div class="col-auto">
-					<button class="btn btn-phoenix-secondary">
-						<svg class="svg-inline--fa fa-key me-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="key" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
-							<path fill="currentColor" d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"></path>
-						</svg><span class="fas fa-key me-2"></span> Font Awesome fontawesome.com
-						Reset password
-					</button>
-				</div>
-			</div>
-		</div> -->
+	<!-- 상단 제목 -->
+	<div class="d-flex justify-content-between align-items-center mb-2 position-relative">
+	  <span class="fw-bold fs-7">마이페이지</span>
 	</div>
 
-	<div class="row g-5">
-		<div class="col-12 col-md-4 col-xxl-4">
-			<div class="row g-3">
-				<div class="col-12">
-					<div class="card h-100">
-						<div class="card-body">
-							<div class="row align-items-center g-5 mb-3 text-center text-sm-start">
-								<div class="col-12 col-sm-auto mb-sm-2">
-								
-								  <div class="profile-wrapper" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
-								    <img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
-								    <div class="camera-overlay">
-								      <svg class="svg-inline--fa fa-camera fs-4" aria-hidden="true" focusable="false"
-								        data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg"
-								        viewBox="0 0 512 512" style="width: 24px; height: 24px;">
-								        <path fill="currentColor"
-								          d="M149.1 64.3c7.8-14.3 22.9-23.1 39.4-23.1h134.9c16.5 0 31.6 8.9 39.4 23.1l14.9 27.4H464c26.5 0 48 21.5 48 48v272c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V139.7c0-26.5 21.5-48 48-48h86.1l14.9-27.4zM256 408c66.3 0 120-53.7 120-120s-53.7-120-120-120s-120 53.7-120 120s53.7 120 120 120zm0-48a72 72 0 1 0 0-144 72 72 0 1 0 0 144z">
-								        </path>
-								      </svg>
-								    </div>
+	<div class="row g-3">
+	
+		<!-- 1열: 프로필 -->
+		<div class="col-md-4">
+		  <!-- 기존 프로필 카드 그대로 삽입 -->
+			<div class="card">
+				<div class="card-body d-flex align-items-center">
+					<div class="profile-wrapper" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
+						<img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
+						<div class="camera-overlay">
+							<svg class="svg-inline--fa fa-camera fs-4" aria-hidden="true" focusable="false"
+							  data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg"
+							  viewBox="0 0 512 512" style="width: 24px; height: 24px;">
+								 <path fill="currentColor"
+								  d="M149.1 64.3c7.8-14.3 22.9-23.1 39.4-23.1h134.9c16.5 0 31.6 8.9 39.4 23.1l14.9 27.4H464c26.5 0 48 21.5 48 48v272c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V139.7c0-26.5 21.5-48 48-48h86.1l14.9-27.4zM256 408c66.3 0 120-53.7 120-120s-53.7-120-120-120s-120 53.7-120 120s53.7 120 120 120zm0-48a72 72 0 1 0 0-144 72 72 0 1 0 0 144z">
+								</path>
+							</svg>
+						</div>
+					</div>
+					 <!-- 프로필 상단 -->
+					<div class="text-start">
+						<div class="fw-bold fs-7" th:text="${employee.employeeName}">이름</div>
+						<div class="text-body-secondary" th:text="${employee.employeePosition}">직급</div>
+					</div>
+					
+				</div><!-- card-body -->	
+				<!-- 하단 정보 -->
+				<div class="card-footer border-top border-dashed pt-3">
+					<div class="d-flex justify-content-around">
+						<div>
+							<div class="fw-bold fs-8 text-center">총 연차</div>
+							<div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annual_leave_total}">12</div>
+						</div>
+						<div>
+							<div class="fw-bold fs-8 text-center">사용 연차</div>
+							<div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annual_leave_used}">2</div>
+						</div>
+						<div>
+							<div class="fw-bold fs-8 text-center">잔여 연차</div>
+							<div class="fs-7 text-body-primary text-center" th:text="${annualLeave.annual_leave_remain}">10</div>
+						</div>
+					</div>
+				</div>
+			</div><!-- card  -->		  
+		 <!-- ✅ profile-wrapper + Following/Projects/Completion 포함된 카드 -->
+		</div>			
+	
+	
+	    <!-- 2열: 차트 -->
+	    <div class="col-md-8">
+	      <!-- ✅ 차트 카드 -->
+	      <div class="card p-4 h-100 shadow-sm">
+	        <h5 class="fw-bold mb-3">결재 및 프로젝트 활동 요약</h5>
+	        <canvas id="approvalProjectChart" height="200"></canvas>
+	      </div>
+	    </div>	
+	
+	
+	    <!-- 3열: 주소록 -->
+	    <div class="col-md-4">
+	      <!-- ✅ 주소록 카드 (사번, 직급, 이메일 등) -->
+			<div class="card h-100 position-relative">
+				<div class="card-body fs-9">
+					<div class="d-flex align-items-center mb-2">
+						<!-- <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span> -->
+						
+						<!--  수정 버튼 -->
+						<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
+						        data-bs-toggle="modal" data-bs-target="#editInfoModal">
+							<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
+							     focusable="false" data-prefix="fas" data-icon="pen" role="img"
+							     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+								<path fill="currentColor"
+							        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
+							</svg>
+						</button>
+					</div>
+				
+					<!-- 기본 정보 -->
+					<h5 class="text-body-secondary">사번</h5>
+					<p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
+
+					<h5 class="text-body-secondary">직급</h5>
+					<p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p>
+					
+					<h5 class="text-body-secondary">부서</h5>
+					<p class="text-body-secondary" th:text="${departmentName != null ? departmentName : '-'}">부서</p>
+					
+					<div class="mb-3">
+					  <h5 class="text-body-secondary">Email</h5>
+					  <a href="mailto:shatinon@jeemail.com" id="emailValue" th:text="${directory != null and directory.directory_email != null ? directory.directory_email : '-'}">Email</a>
+					</div>
+					
+					<h5 class="text-body-secondary">Phone</h5>
+					<p class="text-body-secondary" id="phoneValue" th:text="${directory != null and directory.directory_phone != null ? directory.directory_phone : '-'}">01000000000</p>
+					
+					<!-- <h5 class="text-body-secondary">주소</h5>
+					<p class="text-body-secondary" id="addressValue">서울특별시 금천구 가산디지털2로 95</p> -->
+				</div><!-- card-body -->
+			</div><!-- card h-100 -->	      
+	      
+	    </div>	
+	
+	
+	    <!-- 4열: 결재 & 프로젝트 슬라이드 -->
+	    <div class="col-md-8">
+	      <!-- ✅ 결재 슬라이드 카드 -->
+			<div class="card p-3 mb-4">
+				<div class="d-flex justify-content-start">
+					<span class="fw-bold fs-8">결재 문서</span>
+				</div>
+				<!-- <h5 class="fw-bold mb-3">결재 문서 요약</h5> -->
+				<div class="row g-3">
+				  
+					<!-- 진행 중인 결재 문서 -->
+					<div class="col-md-6 position-relative">
+						<div class="d-flex justify-content-center align-items-center gap-2">
+							<i class="fas fa-circle fs-10 text-primary mt-n1"></i>
+							<span class="fw-bold fs-9">진행 중인 결재</span>
+						</div>
+						<!-- <h6 class="fw-bold mb-2">📌 진행 중인 결재</h6> -->
+						<div id="approvalPendingCarousel" class="carousel slide" data-bs-ride="carousel">
+							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+							<div class="carousel-indicators">
+							  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+							  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+							  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+							</div>								
+							<div class="carousel-inner px-4">
+								<div class="carousel-item active">
+								  <div class="border rounded p-3 bg-primary-soft">
+								    <h6 class="mb-1">회의실 예약 요청</h6>
+								    <p class="text-muted mb-0">2025-04-14</p>
 								  </div>
 								</div>
-
-								 <!-- 프로필 상단 -->
-								<div class="col-12 col-sm-auto flex-1">
-									<!-- 이름 -->
-									<div class="d-flex">
-										<span class="fw-bold fs-7">강성관</span>
-									</div>
-									<!-- 직급 -->
-									<p class="text-body-secondary">CEO</p>
+								<div class="carousel-item">
+								  <div class="border rounded p-3 bg-primary-soft">
+								    <h6 class="mb-1">출장 신청서</h6>
+								    <p class="text-muted mb-0">2025-04-13</p>
+								  </div>
 								</div>
 							</div>
-							<!-- 하단 정보 -->
-							<div class="d-flex flex-between-center border-top border-dashed pt-4">
-								<div>
-									<h6>Following</h6>
-									<p class="fs-7 text-body-secondary mb-0">297</p>
-								</div>
-								<div>
-									<h6>Projects</h6>
-									<p class="fs-7 text-body-secondary mb-0">56</p>
-								</div>
-								<div>
-									<h6>Completion</h6>
-									<p class="fs-7 text-body-secondary mb-0">97</p>
-								</div>
-							</div>
+							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="prev"
+							        style="top: 60%; left: -10px; z-index: 2;">
+								<i class="fas fa-chevron-left fs-7"></i>
+							</button>
+							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="next"
+							        style="top: 60%; right: -10px; z-index: 2;">
+								<i class="fas fa-chevron-right fs-7"></i>
+							</button>
 						</div>
 					</div>
+				
+					<!-- 승인 완료된 결재 문서 -->
+					<div class="col-md-6 position-relative">
+						<div class="d-flex justify-content-center align-items-center gap-2">
+							<i class="fas fa-circle fs-10 text-success mt-n1"></i>
+							<span class="fw-bold fs-9">승인된 결재</span>
+						</div>
+						<!-- <h6 class="fw-bold mb-2">✅ 승인된 결재</h6> -->
+						<div id="approvalApprovedCarousel" class="carousel slide" data-bs-ride="carousel">
+							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+							<div class="carousel-indicators">
+							  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+							  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+							  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+							</div>								
+							<div class="carousel-inner px-4">
+								<div class="carousel-item active">
+								  <div class="border rounded p-3 bg-success-soft">
+								    <h6 class="mb-1">연차 신청서</h6>
+								    <p class="text-muted mb-0">2025-04-10</p>
+								  </div>
+								</div>
+								<div class="carousel-item">
+								  <div class="border rounded p-3 bg-success-soft">
+								    <h6 class="mb-1">출장 보고서</h6>
+								    <p class="text-muted mb-0">2025-04-08</p>
+								  </div>
+								</div>
+							</div>
+							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="prev"
+							        style="top: 60%; left: -10px; z-index: 2;">
+								<i class="fas fa-chevron-left fs-7"></i>
+							</button>
+							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="next"
+							        style="top: 60%; right: -10px; z-index: 2;">
+								<i class="fas fa-chevron-right fs-7"></i>
+							</button>
+						</div>
+					</div>
+				
 				</div>
-				<!-- 주소록 정보 -->
-			<div class="col-12">
-			  <div class="card h-100 position-relative">
-			    <div class="card-body fs-9">
-			      <div class="d-flex align-items-center mb-2">
-			        <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span>
-			
-			        <!--  수정 버튼 -->
-			        <button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
-			                data-bs-toggle="modal" data-bs-target="#editInfoModal">
-			          <svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
-			               focusable="false" data-prefix="fas" data-icon="pen" role="img"
-			               xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-			            <path fill="currentColor"
-			                  d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
-			          </svg>
-			        </button>
-			      </div>
-			
-			      <!-- 기본 정보 -->
-			      <h5 class="text-body-secondary">직급</h5>
-			      <p class="text-body-secondary">CEO</p>
-			
-			      <h5 class="text-body-secondary">부서</h5>
-			      <p class="text-body-secondary">운영부</p>
-			
-			      <div class="mb-3">
-			        <h5 class="text-body-secondary">Email</h5>
-			        <a href="mailto:shatinon@jeemail.com" id="emailValue">shatinon@jeemail.com</a>
-			      </div>
-			
-			      <h5 class="text-body-secondary">Phone</h5>
-			      <p class="text-body-secondary" id="phoneValue">01011112222</p>
-			
-			      <h5 class="text-body-secondary">주소</h5>
-			      <p class="text-body-secondary" id="addressValue">서울특별시 금천구 가산디지털2로 95</p>
-			    </div>
-			  </div>
 			</div>
-			<!-- 주소록 끝 -->
+			<!-- 최근 결재문서 끝 -->	      
+	      <!-- ✅ 프로젝트 슬라이드 카드 -->
+			<!-- 참여 중인 프로젝트 슬라이드 형태 -->
+			<div class="card p-3 mb-4">
+				<div class="d-flex justify-content-start">
+					<span class="fw-bold fs-8">프로젝트</span>
+				</div>
+				<!-- <h5 class="fw-bold mb-3">나의 프로젝트</h5> -->
+				<div class="row g-3">
+					<!-- 참여 중인 프로젝트 -->
+					<div class="col-md-6 position-relative">
+						<div class="d-flex justify-content-center align-items-center gap-2">
+							<i class="fas fa-circle fs-10 text-primary mt-n1"></i>
+							<span class="fw-bold fs-9">진행 중인 프로젝트</span>
+						</div>
+						<!-- <h6 class="fw-bold mb-2">참여 중인 프로젝트</h6> -->
+						<div id="projectActiveCarousel" class="carousel slide" data-bs-ride="carousel">
+							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+							<div class="carousel-indicators">
+							  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+							  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+							  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+							</div>
+							<!-- 예시 -->
+							<!-- <div class="carousel-indicators">
+							  <th:block th:each="slide, i : ${slideList}">
+							    <button type="button"
+							            th:data-bs-target="#myCarousel"
+							            th:data-bs-slide-to="${i.index}"
+							            th:classappend="${i.index == 0} ? 'active'"
+							            th:aria-label="'슬라이드 ' + ${i.index + 1}">
+							    </button>
+							  </th:block>
+							</div> -->
 							
-			</div> <!-- 프로필 & 주소록 끝 -->
-		</div> <!-- col-12 col-md-4 col-xxl-4 -->
-		
-		<!-- 근태 카드 -->
-		<div class="col-12 col-md-8 col-xxl-8">
-			<div class="row g-4">			
-				<!-- 카드1 START -->
-				<div class="col-md-6">
-					<div class="deals-col me-4">
-						<div class="w-100 h-50" data-sortable="data-sortable">
-							<div class="card mb-3">
-								<div class="card-body">
-									<table class="w-100 text-center mx-auto w-auto text-center">
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">총 연차</span>
-													</div>
-												</div>		
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">  
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">사용 연차</span>
-													</div>
-												</div>
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">잔여 연차</span>
-													</div>
-												</div>
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-									</table>
-								</div> <!-- card-body 끝 -->
-							</div> <!-- card mb-3 끝 -->
-						</div> <!-- w-100 min-vh-50 끝  -->
-					</div><!-- deals-col me-4 끝 -->
-				</div><!-- col-md-6 -->
-	            <!-- 카드1 END -->		
-				
-				<div class="col-md-6">
-					<div class="deals-col me-4">
-						<div class="w-100 h-50" data-sortable="data-sortable">
-							<div class="card mb-3">
-								<div class="card-body">
-									<table class="w-100 text-center mx-auto w-auto text-center">
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">지각</span>
-													</div>
-												</div>		
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">  
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">조퇴</span>
-													</div>
-												</div>
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr class="py-2">
-											<td class="py-3 text-end pe-13 fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-label text-body-secondary">결근</span>
-													</div>
-												</div>
-											</td>
-											<td class="py-3 text-start fw-bold fs-5">
-												<div class="deals-company-agent d-flex justify-content-center align-items-center gap-15">
-													<div class="d-flex align-items-center">
-														<span class="text-body-secondary fw-bold fs-7 mb-0 deal-value text-body-secondary">0</span>
-													</div>
-												</div>
-											</td>
-										</tr>
-									</table>
-								</div> <!-- card-body 끝 -->
-							</div> <!-- card mb-3 끝 -->
-						</div> <!-- w-100 min-vh-50 끝  -->
-					</div><!-- deals-col me-4 끝 -->              
-				</div><!-- col-md-6 -->
-
-
-				<!-- 차트 -->
-				<div class="row flex-between-center mb-4 g-3">
-					<div class="col-auto">
-						<div class="d-flex justify-content-start">
-							<span class="fw-bold fs-7">근무 시간</span>
+							<div class="carousel-inner px-4">
+								<div class="carousel-item active">
+								  <div class="border rounded p-3 bg-primary-soft">
+								    <h6 class="mb-1">Flowlog</h6>
+								    <p class="mb-0 text-muted">실시간 근태 차트 및 자동 연차 계산</p>
+								  </div>
+								</div>
+								<div class="carousel-item">
+								  <div class="border rounded p-3 bg-primary-soft">
+								    <h6 class="mb-1">click click</h6>
+								    <p class="mb-0 text-muted">회원가입/로그인, WebSocket</p>
+								  </div>
+								</div>
+							</div>
+							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="prev"
+							        style="top: 60%; left: -10px; z-index: 2;">
+								<i class="fas fa-chevron-left fs-7"></i>
+							</button>
+							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="next"
+							        style="top: 60%; right: -10px; z-index: 2;">
+								<i class="fas fa-chevron-right fs-7"></i>
+							</button>
 						</div>
-						<p class="text-body-tertiary lh-sm mb-0">
-						  Payment received across all channels
-						</p>
-					</div>
-					<div class="col-8 col-sm-4">
-						<select class="form-select form-select-sm" id="select-gross-revenue-month">
-						  <option>Mar 1 - 31, 2022</option>
-						  <option>April 1 - 30, 2022</option>
-						  <option>May 1 - 31, 2022</option>
-						</select>
-					</div>
-				</div>
-				
-				<div class="echart-total-sales-chart"
-				     style="min-height: 220px; width: 100%; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;">
-					<div style="position: relative; width: 854px; height: 320px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
-						<canvas data-zr-dom-id="zr_0"
-						        width="1067"
-						        height="400"
-						        style="position: absolute; left: 0px; top: 0px; width: 854px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;">
-						</canvas>
-						<canvas data-zr-dom-id="zr_1"
-						        width="1067"
-						        height="400"
-						        style="position: absolute; left: 0px; top: 0px; width: 854px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;">
-						</canvas>
-						<canvas data-zr-dom-id="zr_2"
-						        width="1067"
-						        height="400"
-						        style="position: absolute; left: 0px; top: 0px; width: 854px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;">
-						</canvas>
 					</div>
 				
-					<div class=""
-					     style="position: absolute; display: block; border-style: solid; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; background-color: rgb(239, 242, 246); border-width: 1px; border-radius: 4px; color: rgb(20, 24, 36); font: 14px / 21px 'Microsoft YaHei'; padding: 10px; top: 0px; left: 0px; transform: translate3d(44px, 109px, 0px); border-color: rgb(203, 208, 221); z-index: 1000; pointer-events: none; visibility: hidden; opacity: 0;">
-						<div class="ms-1">
-							<h6 class="fs-9 text-body-tertiary false">
-								<svg class="svg-inline--fa fa-circle me-2" style="color: #3874ff;" aria-hidden="true"
-								     focusable="false" data-prefix="fas" data-icon="circle" role="img"
-								     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
-								     data-fa-i2svg="">
-								  <path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
-								</svg>
-								May 01 : 100
-							</h6>
-							<h6 class="fs-9 text-body-tertiary mb-0">
-								<svg class="svg-inline--fa fa-circle me-2" style="color: #0097eb;" aria-hidden="true"
-								     focusable="false" data-prefix="fas" data-icon="circle" role="img"
-								     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
-								     data-fa-i2svg="">
-								  <path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
-								</svg>
-								Apr 01 : 200
-							</h6>
+					<!-- 완료한 프로젝트 -->
+					<div class="col-md-6 position-relative">
+						<div class="d-flex justify-content-center align-items-center gap-2">
+							<i class="fas fa-circle fs-10 text-success mt-n1"></i>
+							<span class="fw-bold fs-9">완료한 프로젝트</span>
+						</div>
+						<!-- <h6 class="fw-bold mb-2">완료한 프로젝트</h6> -->
+						<div id="projectDoneCarousel" class="carousel slide" data-bs-ride="carousel">
+							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+							<div class="carousel-indicators">
+							  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+							  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+							  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+							</div>								
+							<div class="carousel-inner px-4">
+								<div class="carousel-item active">
+								  <div class="border rounded p-3 bg-success-soft">
+								    <h6 class="mb-1">Portfolio Page</h6>
+								    <p class="mb-0 text-muted">Notion 기반 포트폴리오</p>
+								  </div>
+								</div>
+								<div class="carousel-item">
+								  <div class="border rounded p-3 bg-success-soft">
+								    <h6 class="mb-1">KDT Diary</h6>
+								    <p class="mb-0 text-muted">Java 기반 할일관리 앱, 페이징</p>
+								  </div>
+							  </div>
+							</div>
+							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="prev"
+							        style="top: 60%; left: -10px; z-index: 2;">
+								<i class="fas fa-chevron-left fs-7"></i>
+							</button>
+							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="next"
+							        style="top: 60%; right: -10px; z-index: 2;">
+								<i class="fas fa-chevron-right fs-7"></i>
+							</button>
 						</div>
 					</div>
 				</div>
-
-			</div> <!-- row g-4 끝 -->
-		
-		</div> <!-- col-12 col-md-8 col-xxl-8 -->	<!-- 우측 근태카드 + 차트 부분 끝 -->
-	</div>	<!-- row g-5 --> 
+			</div>	      
+	    </div>	
+	</div><!-- row g-3 -->
 	
-	<!-- 컴포넌트 + 미니카드 test -->
-	
-</div><!-- mb-9 -->   <!-- 프로필, 근태, 차트 위치된 상단 부분. -->
-
-
-
-
-
-
-
-
+</div><!-- mb-9 --> 
 
 <hr>
 <!-- 결재 내역 -->    
