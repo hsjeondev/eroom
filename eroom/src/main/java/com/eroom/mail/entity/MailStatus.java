@@ -43,9 +43,9 @@ public class MailStatus {
 	private LocalDateTime mailStatusDeletedTime;
 	
 	@Column(name="maill_status_visible_yn")
-	private String maillStatusVisibleYn;
+	private String mailStatusVisibleYn;
 	
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "mail_no")
 	private Mail mail;
 	

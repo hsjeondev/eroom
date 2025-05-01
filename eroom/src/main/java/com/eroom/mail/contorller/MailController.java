@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +36,7 @@ import com.eroom.mail.dto.MailDto;
 import com.eroom.mail.entity.Mail;
 import com.eroom.mail.entity.MailDraft;
 import com.eroom.mail.entity.MailReceiver;
+import com.eroom.mail.entity.MailStatus;
 import com.eroom.mail.service.MailService;
 import com.eroom.security.EmployeeDetails;
 
@@ -91,8 +91,10 @@ public class MailController {
 	  
 	  List<Mail> sentMailList = mailService.findMailsBySender(employeeNo,sortOrder);
 	  //List<Mail> sentMailList = mailService.findMailsBySender(myEmployeeNo);
+	  Map<Long, MailStatus> mailStatusMap = mailService.getStatusMapForMails(sentMailList);
+
 	  model.addAttribute("sentMailList", sentMailList);
-	  
+	  model.addAttribute("mailStatusMap", mailStatusMap);
 	  return "mail/mailSent"; // 뷰 파일 이름 
 	  }
 	// 임시 저장 
@@ -150,12 +152,7 @@ public class MailController {
 	
 	
 	
-	// 중요한 메일 조회할곳
-	@GetMapping("/mail/important")
-	public String selectImportantMailAll() {
-		
-		return "mail/mailImportant";
-	}
+	
 	
 	// 휴지통에서 삭제하는 로직
 	/* 테이블 바뀐 뒤 주석 처리
@@ -169,7 +166,7 @@ public class MailController {
 	   mailService.deleteReceivedMailById(id, employeeNo);  // 서비스에서 삭제 처리
 
 	    return "redirect:" + redirectUrl;
-	}
+	}*/
 	// 휴지통으로 옮기는 로직 ( N => Y )
 	@PostMapping("/mail/trash/{id}")
 	public String moveToTrash(@PathVariable("id") Long id,
@@ -179,9 +176,20 @@ public class MailController {
 		mailService.moveToTrash(employeeNo,id);
 		return "redirect:" + redirectUrl;
 	}
-	*/
+	// 중요한 메일 조회할곳
+	@GetMapping("/mail/important")
+	public String selectImportantMailAll(Model model, 
+		    @AuthenticationPrincipal EmployeeDetails employeeDetails,
+		    @RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder) {
+		
+		Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+
+		
+		return "mail/mailImportant";
+	}
+	
 	// 휴지통 조회할곳
-	/*
+	
 	@GetMapping("/mail/trash")
 	public String selectTrashMailAll(Model model, 
 	    @AuthenticationPrincipal EmployeeDetails employeeDetails,
@@ -189,12 +197,13 @@ public class MailController {
 
 	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
 
-	    List<MailReceiver> trashMailList = mailService.getTrashMailsByEmployee(employeeNo, sortOrder);
+	    List<Mail> trashMailList = mailService.getTrashMailsByEmployee(employeeNo, sortOrder);
 
 	    model.addAttribute("trashMailList", trashMailList);
 	    return "mail/mailTrash";
+	    //return "mail/test";
 	}
-	*/
+	
 	// 디테일 파일 다운로드
 	/*@GetMapping("/mail/download/{attachmentId}")
 	@ResponseBody
@@ -294,6 +303,29 @@ public class MailController {
 
 		return resultMap;
 	}
+	
+	// 상태 바꾸기
+	@PostMapping("/mail/status/important/{id}")
+    public String moveImportant(@PathVariable("id") Long id,
+                                                @AuthenticationPrincipal EmployeeDetails employeeDetails, 
+												@RequestParam("redirectUrl") String redirectUrl){
+		Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+		mailService.moveImportant(id,employeeNo);
+        return "redirect:" + redirectUrl;
+    }
+	
+	
+	
+	
+
+//    @PostMapping("/mail/status/trash")
+//    public ResponseEntity<Void> moveTrash(@RequestBody MailDto mailDto,
+//                                            @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+//    	Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+//    	mailService.moveTrash(mailDto.getMail_no(), employeeNo);
+//        return ResponseEntity.ok().build();
+//    }
+	
 	
 	// 임시 저장 페이지
 	@GetMapping("/mail/mailCreateDraft/{id}")

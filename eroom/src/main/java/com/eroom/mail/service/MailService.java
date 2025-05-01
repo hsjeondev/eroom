@@ -3,7 +3,11 @@ package com.eroom.mail.service;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -91,12 +95,12 @@ public class MailService {
 //	    }
 //	    return result;
 //	}
-	/*
-	// 휴지통 N > Y 업데이트 
-	public void moveToTrash(Long employeeNo, Long id) {
-	    mailReceiverRepository.updateDeletedYnAndTime(employeeNo, id);
-	}
 	
+	// 휴지통 N > Y 업데이트 
+//	public void moveToTrash(Long employeeNo, Long id) {
+//	    mailStatusRepository.updateDeletedYnAndTime(employeeNo, id);
+//	}
+	/*
 	@Transactional
 	public void deleteReceivedMailById(Long employeeNo,Long mailReceiverNo) {
 	    mailReceiverRepository.deleteByIdAndEmployeeNo(employeeNo, mailReceiverNo);
@@ -122,21 +126,31 @@ public class MailService {
 	}
 	
 	// 휴지통 조회하는곳
-	/*테이블 바뀐 뒤 주석 처리
-	public List<MailReceiver> getTrashMailsByEmployee(Long employeeNo, String sortOrder) {
-	    List<MailReceiver> resultList;
+	// 테이블 바뀐 뒤 주석 처리
+	/*
+	public List<Mail> getTrashMailsByEmployee(Long employeeNo, String sortOrder) {
+	    List<Mail> resultList=null;
 
 	    if ("latest".equals(sortOrder)) {
-	        resultList = mailReceiverRepository.findByEmployeeNoOrderByLatest(employeeNo);
+	        resultList = mailRepository.findTrashMailsByEmployeeNo(employeeNo);
 	    } else if ("oldest".equals(sortOrder)) {
-	        resultList = mailReceiverRepository.findByEmployeeNoOrderByOldest(employeeNo);
+	        resultList = mailRepository.findTrashMailsByEmployeeNoOldest(employeeNo);
 	    } else {
 	        throw new IllegalArgumentException("유효하지 않은 정렬 조건: " + sortOrder);
 	    }
 
-	    return filterOnlyDeletedMails(resultList);
+	    return resultList;
 	}
 	*/
+	public List<Mail> getTrashMailsByEmployee(Long employeeNo, String sortOrder) {
+	    if ("latest".equalsIgnoreCase(sortOrder)) {
+	        return mailStatusRepository.findAllDeletedMailsByEmployeeLatest(employeeNo);
+	    } else if ("oldest".equalsIgnoreCase(sortOrder)) {
+	        return mailStatusRepository.findAllDeletedMailsByEmployeeOldest(employeeNo);
+	    } else {
+	        throw new IllegalArgumentException("유효하지 않은 정렬 조건: " + sortOrder);
+	    }
+	}
 	/*테이블 교체후 오류 수정중
 	public List<Mail> findOnlyDraftMailsBySender(Long employeeNo, String sortOrder) {
 	    List<Mail> resultList = null;
@@ -234,7 +248,90 @@ public class MailService {
 		
 		return resultList;
 	}
+	// 상태 변경 알파 버전
+	/*@Transactional
+	public void moveImportant(Long mailNo, Long employeeNo) {
+	    //Optional<MailStatus> optional = mailStatusRepository.findByMailNoAndEmployeeNo(mailNo, employeeNo);
+
+	    //MailStatus status = optional.orElseGet(() -> {
+	        MailStatusDto mailStatusDto = new MailStatusDto();
+	        mailStatusDto.setMail_no(mailNo);
+	        mailStatusDto.setEmployee_no(employeeNo);
+	        mailStatusDto.setMail_status_important_yn("Y");
+	        MailStatus mailStatusEntity = mailStatusDto.toEntity();
+	        //return newStatus;
+	    //});
+
+	    //status.setImportantYn("Y");
+	    mailStatusRepository.save(mailStatusEntity);  // INSERT or UPDATE
+	}*/
+	@Transactional
+	public void moveImportant(Long mailNo, Long employeeNo) {
+        Optional<MailStatus> existingStatus = mailStatusRepository.findByMail_mailNoAndEmployee_employeeNo(mailNo, employeeNo);
+
+        if (existingStatus.isPresent()) {
+            // 상태가 이미 존재하면 중요 표시 여부를 반전시킴
+            MailStatus status = existingStatus.get();
+            status.setMailStatusDeletedTime(null);
+            status.setMailStatusDeletedYn("N");
+            status.setMailStatusImportantYn(status.getMailStatusImportantYn().equals("Y") ? "N" : "Y"); // "Y" -> "N", "N" -> "Y"로 토글
+            mailStatusRepository.save(status); // 상태 저장
+        } else {
+            // 상태가 없으면 새로 상태 추가
+        	MailStatusDto mailStatusDto = new MailStatusDto();
+	        mailStatusDto.setMail_no(mailNo);
+	        mailStatusDto.setEmployee_no(employeeNo);
+	        mailStatusDto.setMail_status_important_yn("Y");
+	        //mailStatusDto.setMail_status_deleted_time(LocalDateTime.now());
+	        MailStatus mailStatusEntity = mailStatusDto.toEntity();
+	        //mailStatusEntity.setMailStatusDeletedTime(LocalDateTime.now());
+	        mailStatusRepository.save(mailStatusEntity);
+        }
+    }
+	public Map<Long, MailStatus> getStatusMapForMails(List<Mail> mails) {
+	    List<Long> mailNos = mails.stream()
+	                              .map(Mail::getMailNo)
+	                              .collect(Collectors.toList());
+
+	    List<MailStatus> statusList = mailStatusRepository.findByMailMailNoIn(mailNos);
+
+	    return statusList.stream()
+	            .collect(Collectors.toMap(ms -> ms.getMail().getMailNo(), Function.identity()));
+	}
 	
+	@Transactional
+	public void moveToTrash(Long employeeNo, Long mailNo) {
+	    Optional<MailStatus> optionalStatus = mailStatusRepository.findByMail_mailNoAndEmployee_employeeNo(mailNo, employeeNo);
+
+	    MailStatus status;
+	    if (optionalStatus.isPresent()) {
+	        status = optionalStatus.get();
+	        status.setMailStatusImportantYn("N");
+	        status.setMailStatusDeletedTime(LocalDateTime.now());
+	        status.setMailStatusDeletedYn(status.getMailStatusDeletedYn().equals("Y") ? "N" : "Y"); // "Y" -> "N", "N" -> "Y"로 토글
+            mailStatusRepository.save(status); // 상태 저장
+	    } else {
+	        // 없으면 새로 생성
+        	MailStatusDto mailStatusDto = new MailStatusDto();
+	        mailStatusDto.setMail_no(mailNo);
+	        mailStatusDto.setEmployee_no(employeeNo);
+	        mailStatusDto.setMail_status_deleted_yn("Y");
+	        //mailStatusDto.setMail_status_deleted_time(LocalDateTime.now());
+	        MailStatus mailStatusEntity = mailStatusDto.toEntity();
+	        mailStatusEntity.setMailStatusDeletedTime(LocalDateTime.now());
+	        mailStatusRepository.save(mailStatusEntity);
+
+	    	
+//	        status = MailStatus.builder()
+//	                .mail(mailRepository.findById(mailNo).orElseThrow())
+//	                .employee(employeeRepository.findById(employeeNo).orElseThrow())
+//	                .build();
+//	        status.setMailStatusDeletedYn("Y");
+//	        status.setMailStatusDeletedTime(LocalDateTime.now());
+//	        mailStatusRepository.save(status);
+	    }
+
+	}
     // 본인 메일 조회
 //	public List<Mail> findMailsBySender(Long employeeNo) {
 //	    return mailRepository.findBySenderEmployeeNo(employeeNo);

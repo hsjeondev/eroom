@@ -62,8 +62,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                 <div class="list">
                  <div class="border-top border-translucent hover-actions-trigger py-3"
                  		th:if="${!#lists.isEmpty(trashMailList)}"
-                 		th:each="trashMailList : ${trashMailList}"
-                 		th:classappend="${trashMailList.mailReceiverReadYn == 'N'} ? 'bg-primary-subtle text-primary-emphasis' : ''">
+                 		th:each="trashMail : ${trashMailList}"
+                 		>
                   <div class="row align-items-sm-center gx-2">
                     <div class="col-auto">
                       <div class="d-flex flex-column flex-sm-row">
@@ -81,57 +81,56 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                       </div>
                     </div>
                     <div class="col-auto">
+                    	휴지통 아이콘 같은거
 					  <a class="inbox-link fs-9 senderName"
-					     th:href="@{/mail/detail/{id}(id=${trashMailList.mail.mailNo})}"
-					     th:classappend="${trashMailList.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
-					     th:text="${trashMailList.mail != null and trashMailList.mail.sender != null ? trashMailList.mail.sender.employeeName : '알 수 없음'}">
+					     th:href="@{/mail/detail/{id}(id=${trashMail.mailNo})}"
+					     th:text="${trashMail != null and trashMail.sender != null ? trashMail.sender.employeeName : '알 수 없음'}">
 					     보낸 사람
 					  </a>
 					</div>
                     <div class="col-auto ms-auto">
-                      <div class="hover-actions end-0">
+                      <!-- <div class="hover-actions end-0">
                         <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
                         <div class="dropdown-menu dropdown-menu-end py-2">
                         <a class="dropdown-item" href="#!">중요 표시 여기서도 이거 처리해야 되나</a>
                         
-                        <form th:action="@{/mail/trash/{id}(id=${trashMailList.mail.mailNo})}" method="post">
+                        <form th:action="@{/mail/trash/{id}(id=${trashMail.mailNo})}" method="post">
                         	<input type="hidden" name="redirectUrl" value="/mail/trash"/>
 						  <button type="submit" class="dropdown-item">받은 메일로 이동하는걸로 바꿀 예정</button>
 						</form>
 						
-                        <form th:action="@{/mail/delete/{id}(id=${trashMailList.mailReceiverNo})}" method="post" th:id="'deleteForm-' + ${trashMailList.mailReceiverNo}">
+                        <form th:action="@{/mail/delete/{id}(id=${trashMail.mailNo})}" method="post" th:id="'deleteForm-' + ${trashMail.mailNo}">
 						  <input type="hidden" name="redirectUrl" value="/mail/trash"/>
 						  <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" 
-						          th:data-bs-target="'#confirmDeleteModal-' + ${trashMailList.mailReceiverNo}">🗑️ 삭제</button>
+						          th:data-bs-target="'#confirmDeleteModal-' + ${trashMail.mailNo}">🗑️ 삭제</button>
 						</form>
                         </div>
-                      </div>
+                      </div> -->
                       
                       
                       <!-- 04/17 나중에 시간 남으면 좀 더 구성해보기 일단 전체 시간 다 보이게 설정함 -->
                        <span class="fs-10 fw-bold sendTime"
-					      th:text="${#temporals.format(trashMailList.mail.mailSentTime, 'yyyy.MM.dd HH:mm:ss')}">
+					      th:text="${#temporals.format(trashMail.mailSentTime, 'yyyy.MM.dd HH:mm:ss')}">
 					  </span> 
 					
                     </div>
                   </div>
                   <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11">
 					  <a class="d-block inbox-link"
-					     th:href="@{/mail/detail/{id}(id=${trashMailList.mail.mailNo})}"
+					     th:href="@{/mail/detail/{id}(id=${trashMail.mailNo})}"
 					     th:data-receiver-id="${#authentication.principal.employee.employeeNo}">
 					     
 					     <span class="fs-9 line-clamp-1 mailTitle"
-					           th:classappend="${trashMailList.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
-					           th:text="${trashMailList.mail.mailTitle}">
+					           th:text="${trashMail.mailTitle}">
 					     </span>
 					
 					     <span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"
-					           th:utext="${trashMailList.mail.mailContent}">
+					           th:utext="${trashMail.mailContent}">
 					     </span>
 					  </a>
 					</div>
 					<!-- 삭제 여부 모달 -->
-					<div class="modal fade" th:id="'confirmDeleteModal-' + ${trashMailList.mailReceiverNo}" tabindex="-1" aria-hidden="true">
+					<div class="modal fade" th:id="'confirmDeleteModal-' + ${trashMail.mailNo}" tabindex="-1" aria-hidden="true">
 						  <div class="modal-dialog modal-dialog-centered modal-sm">
 						    <div class="modal-content bg-dark text-white rounded-3 shadow-lg border border-white">
 						      <div class="modal-header border-0">
@@ -144,7 +143,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						      <div class="modal-footer justify-content-center border-0">
 						        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">취소</button>
 						        <button type="button" class="btn btn-danger btn-sm"
-						                th:onclick="'document.getElementById(\'deleteForm-' + ${trashMailList.mailReceiverNo} + '\').submit();'">삭제</button>
+						                th:onclick="'document.getElementById(\'deleteForm-' + ${trashMail.mailNo} + '\').submit();'">삭제</button>
 						      </div>
 						    </div>
 						  </div>

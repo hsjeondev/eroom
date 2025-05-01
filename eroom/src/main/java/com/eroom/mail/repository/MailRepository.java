@@ -27,7 +27,7 @@ public interface MailRepository extends JpaRepository<Mail, Long>{
 		       "AND m.mailNo NOT IN (SELECT d.mail.mailNo FROM MailDraft d) " +
 		       "ORDER BY m.mailSentTime ASC")
 		List<Mail> findSentMailsOldest(@Param("employeeNo") Long employeeNo);
-	*/
+	
 	@Query("SELECT m FROM Mail m " +
 		       "WHERE m.sender.employeeNo = :employeeNo " +
 		       "AND m.mailVisibleYn = 'Y' " +
@@ -43,7 +43,23 @@ public interface MailRepository extends JpaRepository<Mail, Long>{
 		       "ORDER BY m.mailSentTime ASC")
 		List<Mail> findSentMailsOldest(@Param("employeeNo") Long employeeNo);
 	 Optional<Mail> findById(Long mailNo);
+	*/
+	// 보낸 메일
+	@Query("SELECT m FROM Mail m " +
+		       "WHERE m.sender.employeeNo = :employeeNo " +
+		       "AND m.mailVisibleYn = 'Y' " +
+		       "AND m.mailNo NOT IN (SELECT d.mail.mailNo FROM MailDraft d) " +
+		       "AND m.mailNo NOT IN (SELECT s.mail.mailNo FROM MailStatus s WHERE s.employee.employeeNo = :employeeNo AND s.mailStatusDeletedYn = 'Y') " +
+		       "ORDER BY m.mailSentTime DESC")
+		List<Mail> findSentMailsLatest(@Param("employeeNo") Long employeeNo);
 	
+	@Query("SELECT m FROM Mail m " +
+		       "WHERE m.sender.employeeNo = :employeeNo " +
+		       "AND m.mailVisibleYn = 'Y' " +
+		       "AND m.mailNo NOT IN (SELECT d.mail.mailNo FROM MailDraft d) " +
+		       "AND m.mailNo NOT IN (SELECT s.mail.mailNo FROM MailStatus s WHERE s.employee.employeeNo = :employeeNo AND s.mailStatusDeletedYn = 'Y') " +
+		       "ORDER BY m.mailSentTime ASC")
+		List<Mail> findSentMailsOldest(@Param("employeeNo") Long employeeNo);
 	// 임시 보관함
 	 @Query("SELECT m FROM Mail m " +
 		       "WHERE m.sender.employeeNo = :employeeNo " +  // 내가 보낸 메일
@@ -57,6 +73,22 @@ public interface MailRepository extends JpaRepository<Mail, Long>{
 		       "ORDER BY m.mailSentTime ASC")  // 오래된 순
 		List<Mail> findDraftMailsOldest(@Param("employeeNo") Long employeeNo);
 	 
+	 //휴지통 조회 테스트
+	 @Query("SELECT m FROM Mail m " +
+		       "WHERE m.sender.employeeNo = :employeeNo " +
+		       "AND m.mailVisibleYn = 'Y' " +
+		       "AND m.mailNo NOT IN (SELECT d.mail.mailNo FROM MailDraft d) " +
+		       "AND m.mailNo IN (SELECT s.mail.mailNo FROM MailStatus s WHERE s.employee.employeeNo = :employeeNo AND s.mailStatusDeletedYn = 'Y') " +
+		       "ORDER BY m.mailSentTime DESC")
+	 List<Mail> findTrashMailsByEmployeeNo(@Param("employeeNo") Long employeeNo);
+
+	 @Query("SELECT m FROM Mail m " +
+		       "WHERE m.sender.employeeNo = :employeeNo " +
+		       "AND m.mailVisibleYn = 'Y' " +
+		       "AND m.mailNo NOT IN (SELECT d.mail.mailNo FROM MailDraft d) " +
+		       "AND m.mailNo IN (SELECT s.mail.mailNo FROM MailStatus s WHERE s.employee.employeeNo = :employeeNo AND s.mailStatusDeletedYn = 'Y') " +
+		       "ORDER BY m.mailSentTime ASC")
+	 List<Mail> findTrashMailsByEmployeeNoOldest(@Param("employeeNo") Long employeeNo);
 	// 답장 
 	 @Query("SELECT m.sender.employeeNo FROM Mail m WHERE m.mailNo = :mailNo")
 	 Long findSenderEmployeeNoByMailNo(@Param("mailNo") Long mailNo);
