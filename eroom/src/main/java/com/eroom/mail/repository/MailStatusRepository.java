@@ -49,4 +49,21 @@ public interface MailStatusRepository extends JpaRepository<MailStatus, Long> {
 		       "ORDER BY s.mailStatusNo ASC")
 		List<Mail> findAllDeletedMailsByEmployeeOldest(@Param("empNo") Long empNo);
 	
+	// 중요 메일함
+		// 상태 메일함 시간 그냥 다르게 측정할까
+		@Query("SELECT s.mail FROM MailStatus s " +
+			       "WHERE s.employee.employeeNo = :empNo " +
+			       "AND s.mailStatusImportantYn = 'Y' " +
+			       "AND s.mail.mailVisibleYn = 'Y' " +
+			       "ORDER BY s.mail.mailSentTime DESC")
+			List<Mail> findAllImportantMailsByEmployeeLatest(@Param("empNo") Long empNo);
+
+			// 오래된순
+			@Query("SELECT s.mail FROM MailStatus s " +
+			       "WHERE s.employee.employeeNo = :empNo " +
+			       "AND s.mailStatusImportantYn = 'Y' " +
+			       "AND s.mail.mailVisibleYn = 'Y' " +
+			       "ORDER BY s.mail.mailSentTime ASC")
+			List<Mail> findAllImportantMailsByEmployeeOldest(@Param("empNo") Long empNo);
+	
 }

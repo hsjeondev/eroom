@@ -150,7 +150,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					</div>
                 </div>
                 </div>
-            	<nav aria-label="Page navigation example">
+            	<!-- <nav aria-label="Page navigation example">
 					  <ul class="pagination justify-content-center">
 					    <li class="page-item"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
 					    <li class="page-item"><a class="page-link" href="#">1</a></li>
@@ -160,8 +160,24 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					    <li class="page-item"><a class="page-link" href="#">5</a></li>
 					    <li class="page-item"><a class="page-link" href="#">Next</a></li>
 					  </ul>
-					</nav>
-           
+					</nav> -->
+	           	<div class="d-flex justify-content-center mt-3">
+					<div class="d-flex">
+						<button class="page-link disabled" data-list-pagination="prev"
+							disabled>
+							<i class="fas fa-chevron-left"></i>
+						</button>
+						<ul class="mb-0 pagination">
+							<li class="active">
+								<button class="page" type="button" data-i="1" data-page="5">1</button>
+							</li>
+						</ul>
+						<button class="page-link pe-0" data-list-pagination="next"
+							disabled>
+							<i class="fas fa-chevron-right"></i>
+						</button>
+					</div>
+				</div>
            </div>
          </div>
     </main>

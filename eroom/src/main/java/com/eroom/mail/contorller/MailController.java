@@ -70,6 +70,10 @@ public class MailController {
 	    
 	    
 	    List<MailReceiver> received = mailService.getReceivedMailsByEmployee(employeeNo, sortOrder); 
+	   
+	    Map<Long, MailStatus> mailStatusMap = mailService.getStatusMapForMailRecevier(received);
+
+		model.addAttribute("mailStatusMap", mailStatusMap);
 	    
 	    
 	    model.addAttribute("receivedMails", received);
@@ -91,9 +95,9 @@ public class MailController {
 	  
 	  List<Mail> sentMailList = mailService.findMailsBySender(employeeNo,sortOrder);
 	  //List<Mail> sentMailList = mailService.findMailsBySender(myEmployeeNo);
+	  model.addAttribute("sentMailList", sentMailList);
 	  Map<Long, MailStatus> mailStatusMap = mailService.getStatusMapForMails(sentMailList);
 
-	  model.addAttribute("sentMailList", sentMailList);
 	  model.addAttribute("mailStatusMap", mailStatusMap);
 	  return "mail/mailSent"; // 뷰 파일 이름 
 	  }
@@ -184,7 +188,10 @@ public class MailController {
 		
 		Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
 
-		
+		List<Mail> importantMailList = mailService.getImportantMailsByEmployee(employeeNo, sortOrder);
+		Map<Long, MailStatus> mailStatusMap = mailService.getStatusMapForMails(importantMailList);
+	    model.addAttribute("importantMailList", importantMailList);
+	    model.addAttribute("mailStatusMap", mailStatusMap);
 		return "mail/mailImportant";
 	}
 	

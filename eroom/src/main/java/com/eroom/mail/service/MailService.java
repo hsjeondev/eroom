@@ -151,6 +151,17 @@ public class MailService {
 	        throw new IllegalArgumentException("유효하지 않은 정렬 조건: " + sortOrder);
 	    }
 	}
+	
+	// 중요 메일 조회 
+	public List<Mail> getImportantMailsByEmployee(Long employeeNo, String sortOrder) {
+	    if ("latest".equalsIgnoreCase(sortOrder)) {
+	        return mailStatusRepository.findAllImportantMailsByEmployeeLatest(employeeNo);
+	    } else if ("oldest".equalsIgnoreCase(sortOrder)) {
+	        return mailStatusRepository.findAllImportantMailsByEmployeeOldest(employeeNo);
+	    } else {
+	        throw new IllegalArgumentException("유효하지 않은 정렬 조건: " + sortOrder);
+	    }
+	}
 	/*테이블 교체후 오류 수정중
 	public List<Mail> findOnlyDraftMailsBySender(Long employeeNo, String sortOrder) {
 	    List<Mail> resultList = null;
@@ -288,6 +299,17 @@ public class MailService {
 	        mailStatusRepository.save(mailStatusEntity);
         }
     }
+	public Map<Long, MailStatus> getStatusMapForMailRecevier(List<MailReceiver> mails) {
+	    List<Long> mailNos = mails.stream()
+	                              .map(mr -> mr.getMail().getMailNo())
+	                              .collect(Collectors.toList());
+
+	    List<MailStatus> statusList = mailStatusRepository.findByMailMailNoIn(mailNos);
+
+	    return statusList.stream()
+	            .collect(Collectors.toMap(ms -> ms.getMail().getMailNo(), Function.identity()));
+	}
+	
 	public Map<Long, MailStatus> getStatusMapForMails(List<Mail> mails) {
 	    List<Long> mailNos = mails.stream()
 	                              .map(Mail::getMailNo)
