@@ -19,15 +19,6 @@
 	transform: translateX(0);
 	pointer-events: auto;
 }
-
-.unread .name {
-	font-weight: bold;
-	color: #007bff; /* 읽지 않은 채팅방은 파란색 */
-}
-
-.read .name {
-	color: #6c757d; /* 읽은 채팅방은 회색 */
-}
 </style>
 <body>
 	<main class="main" id="top" layout:fragment="content">
@@ -95,11 +86,10 @@
 								</div>
 								<!-- 채팅방 목록 -->
 								<li th:if="${!#lists.isEmpty(chatroomList)}"
-								    th:each="chatroom : ${chatroomList}"
-								    th:attr="data-room-no=${chatroom.chatroomNo}, data-group=${chatroom.chatIsGroupYn}, data-chat-thread='data-chat-thread'"
-								    th:classappend="${chatroom.unreadCount > 0} ? 'unread' : 'read'"
-								    class="nav-item read mb-1 item" role="presentation">
-									<a
+									th:each="chatroom : ${chatroomList}"
+									th:attr="data-room-no=${chatroom.chatroomNo}, data-group=${chatroom.chatIsGroupYn}, data-chat-thread='data-chat-thread'"
+									th:classappend="${chatroom.unreadCount > 0} ? 'unread' : 'read'"
+									class="nav-item read mb-1 item" role="presentation"><a
 									class="nav-link d-flex align-items-center justify-content-center p-2"
 									th:href="'#chatroom-' + ${chatroom.chatroomNo}"
 									th:attr="data-room-no=${chatroom.chatroomNo}, data-group=${chatroom.chatIsGroupYn}"
@@ -243,9 +233,9 @@
 								<input type="hidden" th:name="${_csrf.parameterName}"
 									th:value="${_csrf.token}" />
 								<ul class="list-unstyled mb-4">
-								  <li data-action="rename" class="cursor-pointer">채팅방 이름 변경</li>
-								  <li data-action="add" class="cursor-pointer">참여자 추가하기</li>
-								  <li data-action="delete" class="cursor-pointer">채팅방 삭제</li>
+									<li data-action="rename" class="cursor-pointer">채팅방 이름 변경</li>
+									<li data-action="add" class="cursor-pointer">참여자 추가하기</li>
+									<li data-action="delete" class="cursor-pointer">채팅방 삭제</li>
 								</ul>
 
 							</div>
@@ -1036,7 +1026,6 @@
 		  const currentChatroomNo = document.querySelector(".chatroom-title")?.dataset.roomNo;
 		  const chatHistory = document.querySelector(".chat-history");
 		  const sidebarItem = document.querySelector(`[data-room-no="${data.chatroomNo}"]`);
-		
 		  const isMyMessage = data.senderMember == myEmployeeNo;
 		
 		  if (!sidebarItem) return;
@@ -1089,6 +1078,22 @@
 		  wrapper.appendChild(messageLine);
 		  chatHistory.appendChild(wrapper);
 		
+		// 파일 링크가 있으면 파일도 표시
+		    if (data.drivePath) {
+		        const fileListContainer = document.createElement("div");
+		        fileListContainer.className = "mt-2";
+		        const fileLink = document.createElement("a");
+		        fileLink.href = "/files" + data.drivePath;  // 실제 드라이브 경로를 사용
+		        fileLink.target = "_blank";
+		        fileLink.className = "badge bg-info text-white me-2";
+		        fileLink.innerText = "파일 보기";
+
+		        fileListContainer.appendChild(fileLink);
+		        wrapper.appendChild(fileListContainer);
+		    }
+
+		    chatHistory.appendChild(wrapper);
+		  
 		  const scrollArea = document.querySelector(".flex-grow-1.overflow-auto");
 		  if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
 		};
@@ -1168,10 +1173,11 @@ if (timePreview) {
   wrapperDiv.appendChild(messageOuterDiv);
   chatHistory.appendChild(wrapperDiv);
 
-  const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
-  if (chatArea) {
-    chatArea.scrollTop = chatArea.scrollHeight;
-  }
+	const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
+	if (chatArea) {
+	  chatArea.scrollTop = chatArea.scrollHeight;
+	}
+
 };
 
 
@@ -1224,6 +1230,15 @@ if (timePreview) {
             if (data.res_code === "200") {
                 fileInput.value = "";
                 document.getElementById("chatFilePreview").innerHTML = "";
+                
+                const chatData = {
+                        chatMessageContent: message,
+                        senderMember: Number(myEmployeeNo),
+                        chatroomNo: Number(chatroomNo),
+                        receiverMember: isGroupChat ? null : receiverNo,
+                        drivePath: data.drivePath  // 업로드된 파일의 경로
+                    };
+                socket.send(JSON.stringify(chatData));
             } else {
                 alert("파일 업로드 실패: " + data.res_msg);
             }

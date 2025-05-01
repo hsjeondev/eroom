@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.eroom.chat.dto.ChatMessageDto;
 import com.eroom.chat.dto.ChatroomDto;
 import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.chat.entity.Chatroom;
@@ -176,6 +177,7 @@ public class ChatroomService {
 
 
 	// 채팅 파일 업로드
+	// 채팅 파일 업로드
 	@Transactional
 	public int uploadChatFiles(DriveDto driveDto, Long employeeNo) {
 	    int result = 0;
@@ -192,6 +194,11 @@ public class ChatroomService {
 
 	    List<MultipartFile> files = driveDto.getDriveFiles();
 	    List<String> descriptions = driveDto.getDriveDescriptions();
+
+	    // 로그인한 사용자 정보 가져오기
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Employee sender = employeeDetails.getEmployee(); // 현재 로그인한 직원
 
 	    for (int i = 0; i < files.size(); i++) {
 	        MultipartFile file = files.get(i);
@@ -210,30 +217,31 @@ public class ChatroomService {
 
 	            String description = (descriptions != null && descriptions.size() > i) ? descriptions.get(i) : null;
 	            Employee uploader = employeeRepository.findById(employeeNo)
-	            	    .orElseThrow(() -> new RuntimeException("업로더를 찾을 수 없습니다."));
+	                    .orElseThrow(() -> new RuntimeException("업로더를 찾을 수 없습니다."));
 	            Drive drive = Drive.builder()
-	                .uploader(uploader)
-	                .separatorCode("FL003")
-	                .driveOriName(oriName)
-	                .driveNewName(newName)
-	                .driveType(ext)
-	                .driveSize(file.getSize())
-	                .drivePath("drive/chat/" + newName)
-	                .driveDescription(description)
-	                .param1(driveDto.getParam1()) // 채팅방 번호 저장
-	                .downloadCount(0L)
-	                .visibleYn("Y")
-	                .build();
-	            System.out.println("▶ 저장할 드라이브:");
-	            System.out.println("  driveOriName = " + drive.getDriveOriName());
-	            System.out.println("  driveNewName = " + drive.getDriveNewName());
-	            System.out.println("  driveType = " + drive.getDriveType());
-	            System.out.println("  drivePath = " + drive.getDrivePath());
-	            System.out.println("  driveSize = " + drive.getDriveSize());
-	            System.out.println("  uploader = " + (drive.getUploader() != null ? drive.getUploader().getEmployeeNo() : "null"));
-	            System.out.println("  separatorCode = " + drive.getSeparatorCode());
-	            System.out.println("  param1 (chatroomNo) = " + drive.getParam1());
+	                    .uploader(uploader)
+	                    .separatorCode("FL003")
+	                    .driveOriName(oriName)
+	                    .driveNewName(newName)
+	                    .driveType(ext)
+	                    .driveSize(file.getSize())
+	                    .drivePath("drive/chat/" + newName)
+	                    .driveDescription(description)
+	                    .param1(driveDto.getParam1()) // 채팅방 번호 저장
+	                    .downloadCount(0L)
+	                    .visibleYn("Y")
+	                    .build();
 
+	            // 파일 첨부 메시지 생성
+	            ChatMessageDto chatMessage = new ChatMessageDto();
+	            chatMessage.setSenderMember(sender.getEmployeeNo()); // senderMember 설정
+	            // receiverMember 설정
+	            Long receiverEmployeeNo = driveDto.getParam1();  // 이 값을 통해 수신자 정보를 가져올 수 있음
+	            chatMessage.setReceiverMember(receiverEmployeeNo); // receiverMember 설정
+	            chatMessage.setChatMessageContent("파일첨부메시지");
+	            chatMessage.setMessageRegDate(LocalDateTime.now());
+
+	            // 저장
 	            driveRepository.save(drive);
 	            result++;
 
@@ -245,7 +253,6 @@ public class ChatroomService {
 
 	    return result;
 	}
-
 
 
 }

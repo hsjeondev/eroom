@@ -316,7 +316,7 @@ public class ChatController {
 	        @RequestParam("driveDescriptions") List<String> driveDescriptions,
 	        @AuthenticationPrincipal EmployeeDetails user) {
 		
-		System.out.println("🔥 업로드 요청 수신됨");
+		System.out.println("업로드 요청 수신됨");
 		System.out.println("files: " + (files != null ? files.size() : "null"));
 		
 	    Map<String, String> resultMap = new HashMap<>();
