@@ -36,42 +36,46 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		  
 		  <!-- 파일 올리기 + 검색창을 같은 줄에 배치 -->
 		  <div class="d-flex justify-content-between align-items-center mb-3">
-		   
-
-		    <!-- 검색창 -->
-		    <div class="search-box">
-		      <form class="position-relative">
-		        <input class="form-control search-input search form-control-sm" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
-		        <svg style="height: 40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-		          <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+		    
+		    <!-- 검색창 + 카테고리 선택 -->
+		    <div class="search-box d-flex align-items-center">
+		      <form class="position-relative me-2">
+		        <input class="form-control search-input search form-control-sm" 
+		               type="search" 
+		               placeholder="검색어를 입력하세요." 
+		               aria-label="Search">
+		        <svg style="height: 40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" 
+		             data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+		          <path fill="currentColor" 
+		                d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 
+		                   12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 
+		                   25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 
+		                   0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 
+		                   144 0 1 0 0 288z">
+		          </path>
 		        </svg>
 		      </form>
+
+		      <!-- 카테고리 셀렉트 -->
+		      <select id="filterCategory" name="category" 
+		              class="form-select form-select-sm w-auto">
+		        <option value="all">전체</option>
+		        <option value="development">개발</option>
+		        <option value="planning">기획</option>
+		        <option value="design">디자인</option>
+		      </select>
 		    </div>
-			
-			<!-- 파일 올리기 버튼 -->
-			<div>
-				<button class="btn btn-primary" type="button" id="toggle-upload-btn">파일 올리기</button>
-			</div>
-					
+
+		    <!-- 파일 올리기 버튼 -->
+		    <button 
+		      type="button" 
+		      class="btn btn-primary" 
+		      data-bs-toggle="modal" 
+		      data-bs-target="#addFileModal">
+		      파일 올리기
+		    </button>
+
 		  </div>
-		  
-		  
-
-
-		     
-		    <!-- 부트스트랩 드랍존 업로드 -->
-		    <div id="upload-zone" class="mb-3" style="display: none;">
-		      <form class="dropzone dropzone-multiple p-0" id="dropzone-multiple"
-		            th:action="@{/drive/upload/team}" method="post" enctype="multipart/form-data">
-		        <div class="dz-message" data-dz-message="data-dz-message">
-		          <img class="me-2" src="/assets/img/icons/cloud-upload.svg" width="25" alt=""> 여기에 파일을 놓으세요
-		        </div>
-		        <div class="dz-preview dz-preview-multiple m-0 d-flex flex-column"></div>
-		      </form>
-		      <div class="text-end mt-2">
-		  	  <button type="submit" class="btn btn-primary btn-sm" id="upload-confirm-btn">추가하기</button>
-		  	</div>
-		    </div>
 
 			
 			<div id="tableExample3" data-list='{"valueNames":["filename","filesize","description","writer","date","download"],"page":10,"pagination":true}'>
@@ -155,6 +159,54 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		          </tbody>
 		        </table>
 		      </div>
+			  
+			  <!-- 파일 추가 모달 -->
+			  <div class="modal fade" id="addFileModal" tabindex="-1" aria-labelledby="addFileModalLabel" aria-hidden="true">
+			    <div class="modal-dialog modal-lg">
+			      <form 
+			        id="addFileForm" 
+			        class="modal-content dropzone dropzone-multiple p-0" 
+			        th:action="@{/drive/upload/team}" 
+			        method="post" 
+			        enctype="multipart/form-data">
+					
+					<input type="hidden" name="param1" th:value="${project.project_no}">
+			        
+			        <div class="modal-header">
+			          <h5 class="modal-title" id="addFileModalLabel">파일 추가</h5>
+			          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+			        </div>
+			        
+			        <div class="modal-body">
+			          <!-- 카테고리 선택 -->
+			          <div class="mb-3">
+			            <label for="fileCategory" class="form-label">카테고리</label>
+			            <select id="fileCategory" name="fileCategory" class="form-select">
+			              <option value="1">개발</option>
+			              <option value="2">기획</option>
+			              <option value="3">디자인</option>
+			            </select>
+			          </div>
+
+			          <!-- Dropzone 메시지 영역 -->
+			          <div class="dz-message p-5 text-center" data-dz-message>
+			            <img class="me-2" src="/assets/img/icons/cloud-upload.svg" width="25" alt="">
+			            여기에 파일을 놓거나 클릭하여 선택하세요
+			          </div>
+			          <!-- 프리뷰가 쌓일 영역 -->
+			          <div class="dz-preview dz-preview-multiple m-0 d-flex flex-column"></div>
+			        </div>
+			        
+			        <div class="modal-footer">
+			          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+			          <button type="button" class="btn btn-primary" id="add-upload-confirm-btn">업로드</button>
+			        </div>
+			      </form>
+			    </div>
+			  </div>
+
+
+			   
 		  	<!-- 파일 수정 모달 -->
 		  	<div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true">
 		  	  <div class="modal-dialog">
@@ -207,322 +259,235 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		      </div>
 		    </div>
 
-		    <script>
-		      document.addEventListener('DOMContentLoaded', function () {
-		        const selectAll = document.getElementById('select-all');
-		        const checkboxes = document.querySelectorAll('.row-checkbox');
+			<script>
+			  // ——————————————————————————
+			  // 1) 문서 로드 후 기존 기능들
+			  // ——————————————————————————
+			  document.addEventListener('DOMContentLoaded', function () {
+			    // a) 체크박스 일괄 선택/해제
+			    const selectAll = document.getElementById('select-all');
+			    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+			    if (selectAll) {
+			      selectAll.addEventListener('change', () => {
+			        rowCheckboxes.forEach(cb => cb.checked = selectAll.checked);
+			      });
+			    }
 
-		        selectAll.addEventListener('change', function () {
-		          checkboxes.forEach(checkbox => {
-		            checkbox.checked = selectAll.checked;
-		          });
-		        });
-		        initDropzone();
-		      });
-		      function initDropzone() {
-		    	  let dropzoneInitialized = false;
-		    	  const toggleBtn = document.getElementById('toggle-upload-btn');
-		    	  const uploadZone = document.getElementById('upload-zone');
-		    	  let dz = null;
+			    // b) 개별 파일 삭제
+			    document.querySelectorAll('.delete-file').forEach(button => {
+			      button.addEventListener('click', function () {
+			        const attachNo = this.getAttribute('data-id');
+			        if (!confirm('정말로 이 파일을 삭제하시겠습니까?')) return;
+			        fetch(`/drive/delete/team/${attachNo}`, {
+			          method: 'DELETE',
+			          headers: {
+			            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+			            'header': document.querySelector('meta[name="_csrf_header"]').content
+			          }
+			        })
+			        .then(res => res.json())
+			        .then(data => {
+			          if (data.res_code === '200') {
+			            alert('파일이 성공적으로 삭제되었습니다.');
+			            window.location.reload();
+			          } else {
+			            alert('파일 삭제에 실패하였습니다. 다시 시도해주세요.');
+			          }
+			        })
+			        .catch(err => { alert('오류가 발생했습니다.'); console.error(err); });
+			      });
+			    });
 
-		    	  toggleBtn.addEventListener('click', function () {
-		    	    const open = uploadZone.style.display === 'block';
-		    	    uploadZone.style.display = open ? 'none' : 'block';
-		    	    toggleBtn.textContent = open ? '파일 업로드' : '업로드 닫기';
+			    // c) 일괄 다운로드
+			    const bulkDownloadBtn = document.getElementById('bulk-download');
+			    if (bulkDownloadBtn) {
+			      bulkDownloadBtn.addEventListener('click', () => {
+			        const checked = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+			        if (checked.length === 0) {
+			          alert('다운로드할 파일을 선택하세요.');
+			          return;
+			        }
+			        const form = document.createElement('form');
+			        form.method = 'POST';
+			        form.action = '/drive/download/team/bulk';
+			        form.style.display = 'none';
+			        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+			        form.innerHTML = `<input type="hidden" name="_csrf" value="${csrfToken}">` +
+			          checked.map(cb => {
+			            const id = cb.closest('tr').querySelector('.delete-file').getAttribute('data-id');
+			            return `<input type="hidden" name="fileIds" value="${id}">`;
+			          }).join('');
+			        document.body.appendChild(form);
+			        form.submit();
+			      });
+			    }
 
-		    	    if (!dropzoneInitialized && !open) {
-		    	      dz = new Dropzone("#dropzone-multiple", {
-		    	        url: "/drive/upload/team",
-		    	        autoProcessQueue: false,
-		    	        paramName: "driveFiles",
-		    	        uploadMultiple: true,
-		    	        clickable: "#dropzone-multiple .dz-message",
-		    	        acceptedFiles: ".jpg,.png,.pdf,.xlsx,.docx,.zip",
-		    	        maxFilesize: 10,
-		    	        previewTemplate: `
-		  	        	<div class="card shadow-sm mb-2 p-2 border d-flex flex-row align-items-center" style="width: 100%; max-width: 720px;">
-		  	            <div class="me-2" style="width: 48px; height: 48px;">
-		  	              <img data-dz-thumbnail 
-		  	                   style="width: 100%; height: 100%; object-fit: cover;" 
-		  	                   class="rounded file-icon" />
-		  	            </div>
-		  	            <div class="flex-grow-1">
-		  	              <div class="fw-bold text-truncate" data-dz-name></div>
-		  	              <small class="text-muted" data-dz-size></small>
-		  	              <input type="text" class="form-control form-control-sm mt-1" name="driveDescriptions" placeholder="파일 설명 입력" />
-		  	            </div>
-		  	            <button data-dz-remove class="btn btn-sm btn-outline-danger ms-2" title="삭제">
-		  	              <i class="fas fa-times"></i>
-		  	            </button>
-		  	          </div>
-		  	        `
-		    	      });
+			    // d) 일괄 삭제
+			    const bulkDeleteBtn = document.getElementById('bulk-delete');
+			    if (bulkDeleteBtn) {
+			      bulkDeleteBtn.addEventListener('click', () => {
+			        const checked = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+			        if (checked.length === 0) {
+			          alert('삭제할 파일을 선택하세요.');
+			          return;
+			        }
+			        if (!confirm('정말로 선택한 파일을 삭제하시겠습니까?')) return;
+			        const ids = checked.map(cb => cb.closest('tr').querySelector('.delete-file').getAttribute('data-id'));
+			        fetch('/drive/delete/team/bulk', {
+			          method: 'POST',
+			          headers: {
+			            'Content-Type': 'application/json',
+			            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+			            'header': document.querySelector('meta[name="_csrf_header"]').content
+			          },
+			          body: JSON.stringify({ fileIds: ids })
+			        })
+			        .then(res => res.json())
+			        .then(data => {
+			          if (data.res_code === '200') {
+			            alert('파일이 성공적으로 삭제되었습니다.');
+			            window.location.reload();
+			          } else {
+			            alert('파일 삭제에 실패하였습니다. 다시 시도해주세요.');
+			          }
+			        })
+			        .catch(err => { alert('오류가 발생했습니다.'); console.error(err); });
+			      });
+			    }
 
-		    	      document.getElementById("upload-confirm-btn").addEventListener("click", function () {
-		    	        dz.processQueue();
-		    	      });
+			    // e) 파일 수정 모달에 데이터 채워넣기
+			    document.querySelectorAll('a[data-bs-target="#editFileModal"]').forEach(button => {
+			      button.addEventListener('click', function () {
+			        document.getElementById('editDriveAttachNo').value = this.getAttribute('data-id');
+			        document.getElementById('originalFileName').value = this.getAttribute('data-name');
+			        document.getElementById('editDriveDescription').value = this.getAttribute('data-desc') || '';
+			      });
+			    });
 
-		    	      dz.on("sending", function (file, xhr, formData) {
-		    	        document.getElementById("upload-confirm-btn").disabled = true;
-		    	        const previews = document.querySelectorAll('.dz-preview');
-		    	        previews.forEach(preview => {
-		    	          const desc = preview.querySelector('input[name="driveDescriptions"]');
-		    	          if (desc) {
-		    	            formData.append("driveDescriptions", desc.value);
-		    	          }
-		    	        });
-		    	      });
+			    // f) 파일 수정 폼 제출
+			    document.getElementById('editFileForm').addEventListener('submit', function (e) {
+			      e.preventDefault();
+			      const formData = new FormData(this);
+			      const attachNo = formData.get('driveAttachNo');
+			      fetch(`/drive/update/team/${attachNo}`, {
+			        method: 'POST',
+			        headers: {
+			          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+			          'header': document.querySelector('meta[name="_csrf_header"]').content
+			        },
+			        body: formData
+			      })
+			      .then(res => res.json())
+			      .then(data => {
+			        if (data.res_code === '200') {
+			          alert('수정 완료!');
+			          window.location.reload();
+			        } else {
+			          alert('수정 실패: ' + data.res_msg);
+			        }
+			      })
+			      .catch(err => { alert('오류 발생'); console.error(err); });
+			    });
 
-		    	      dz.on("queuecomplete", function () {
-		    	        document.getElementById("upload-confirm-btn").disabled = false;
-		    	      });
-		    	      dz.on("addedfile", function (file) {
-		  	    	  const ext = file.name.split('.').pop().toLowerCase();
-		  	    	  const iconMap = {
-		  	    	    pdf: "/assets/img/icons/pdf.png",
-		  	    	    docx: "/assets/img/icons/word.png",
-		  	    	    xlsx: "/assets/img/icons/excel.png",
-		  	    	    zip: "/assets/img/icons/zip.com.png"
-		  	    	  };
+			    // g) 팀 요약 정보 fetch
+			    fetch('/drive/summary/team')
+			      .then(res => res.json())
+			      .then(data => {
+			        function fmt(kb) {
+			          if (kb === 0) return '0 KB';
+			          const u = ['KB','MB','GB','TB'], i = Math.floor(Math.log(kb)/Math.log(1024));
+			          return `${(kb/Math.pow(1024,i)).toFixed(1)} ${u[i]}`;
+			        }
+			        document.getElementById('totalFiles').innerText = data.totalFiles+'개';
+			        document.getElementById('totalDownloads').innerText = data.totalDownloads+'회';
+			        document.getElementById('recentUploadDate').innerText = data.recentUploadDate;
+			        document.getElementById('usedGB').innerText = fmt(data.totalUsedKB);
+			        const pct = Math.round(data.totalUsedKB/(50*1024*1024)*100);
+			        document.getElementById('usagePercent').innerText = pct+'%';
+			        document.querySelector('.progress-bar').style.width = pct+'%';
+			        const usage = data.fileTypeUsage||{};
+			        document.getElementById('sizeZip').innerText = fmt(usage.zip||0);
+			        document.getElementById('sizeImage').innerText = fmt(usage.image||0);
+			        document.getElementById('sizeWord').innerText = fmt(usage.docx||0);
+			        document.getElementById('sizeExcel').innerText = fmt(usage.xlsx||0);
+			        document.getElementById('sizeEtc').innerText = fmt(usage.etc||0);
+			        document.getElementById('totalCapacity').innerText = fmt(50*1024*1024);
+			      })
+			      .catch(err => console.error('요약정보 실패:', err));
+			  });
 
-		  	    	  if (!file.type.startsWith("image/") && iconMap[ext]) {
-		  	    	    const previewEl = file.previewElement;
-		  	    	    const imgEl = previewEl.querySelector(".file-icon");
-		  	    	    if (imgEl) {
-		  	    	      imgEl.src = iconMap[ext];
-		  	    	    }
-		  	    	  }
-		  	      });
-		    	      dz.on("successmultiple", function (files, responseText) {
-		    	        try {
-		    	          let response = typeof responseText === "string" ? JSON.parse(responseText) : responseText;
-		    	          if (response.res_msg) {
-		    	            alert(response.res_msg);
-		    	          }
-		    	        } catch (e) {
-		    	          alert("서버 응답 처리 중 오류 발생");
-		    	          console.error(e);
-		    	        }
-		    	        window.location.reload();
-		    	      });
+			  // ——————————————————————————
+			  // 2) 모달 전용 Dropzone 초기화 & 초기화 on close
+			  // ——————————————————————————
+			  let addDz;
+			  const addFileModalEl = document.getElementById('addFileModal');
 
-		    	      dropzoneInitialized = true;
-		    	    }
-		    	  });
-		    	}
-		      document.querySelectorAll('a[data-bs-target="#editFileModal"]').forEach(button => {
-		    	  button.addEventListener('click', function () {
-		    	    const driveAttachNo = this.getAttribute('data-id');
-		    	    const driveDescription = this.getAttribute('data-desc') || "";
-		    	    const driveOriName = this.getAttribute('data-name') || "";
+			  addFileModalEl.addEventListener('shown.bs.modal', function () {
+			    if (!addDz) {
+			      addDz = new Dropzone('#addFileForm', {
+			        url: '/drive/upload/team',
+			        autoProcessQueue: false,
+			        paramName: 'driveFiles',
+			        uploadMultiple: true,
+			        clickable: '.dz-message',
+			        acceptedFiles: '.jpg,.png,.pdf,.xlsx,.docx,.zip',
+			        maxFilesize: 10,
+					previewTemplate: `
+					  <div class="card shadow-sm mb-2 p-2 border d-flex flex-row align-items-center w-90 mx-3">
+					    <div class="me-2" style="width:48px;height:48px;">
+					      <img data-dz-thumbnail class="rounded file-icon" style="width:100%;height:100%;object-fit:cover;"/>
+					    </div>
+					    <div class="flex-grow-1">
+					      <div class="fw-bold text-truncate" data-dz-name></div>
+					      <small class="text-muted" data-dz-size></small>
+					      <input type="text" class="form-control form-control-sm mt-1" name="driveDescriptions" placeholder="파일 설명 입력"/>
+					    </div>
+					    <button data-dz-remove class="btn btn-sm btn-outline-danger ms-2"><i class="fas fa-times"></i></button>
+					  </div>`
 
-		    	    const driveEditor = document.getElementById("userName") ? document.getElementById("userName").value : '';  // 수정자의 이름
-		    	    const structureCode = document.getElementById("userStructureCode") ? document.getElementById("userStructureCode").value : '';  // 팀 코드
-		   
-		    	     
-		    	    document.getElementById('editDriveAttachNo').value = driveAttachNo;
-		    	    document.getElementById('editDriveDescription').value = driveDescription;
-		    	    document.getElementById('originalFileName').value = driveOriName;
-		    	  	document.getElementById('userName').value = driveEditor; 
-		        	document.getElementById('userStructureCode').value = structureCode; 
-		    	  });
-		    	});
-		      document.getElementById("editFileForm").addEventListener("submit", function (e) {
-		    	  e.preventDefault();
-		    	  const formData = new FormData(this);
-		    	  const attachNo = formData.get("driveAttachNo");
+			      });
 
-		    	  fetch(`/drive/update/team/${attachNo}`, {
-		    	    method: "POST",
-		    	    headers : {
-		    	      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
-		    	      'header': document.querySelector('meta[name="_csrf_header"]').content
-		    		},
-		    	    body: formData
-		    	  })
-		    	  .then(response => response.json())
-		    	  .then(data => {
-		    	    if (data.res_code === "200") {
-		    	      alert("수정 완료!");
-		    	      location.reload();
-		    	    } else {
-		    	      alert("수정 실패: " + data.res_msg);
-		    	    }
-		    	  })
-		    	  .catch(err => {
-		    	    alert("오류 발생");
-		    	    console.error(err);
-		    	  });
-		    	});
-		      
-		      // 파일 삭제
-		      document.addEventListener('DOMContentLoaded', function () {
-		    	    const deleteButtons = document.querySelectorAll('.delete-file');
-		    	    
-		    	    deleteButtons.forEach(button => {
-		    	        button.addEventListener('click', function () {
-		    	            const attachNo = this.getAttribute('data-id');  // 클릭한 파일의 attachNo를 가져옴
-		    	            console.log("삭제 파일 번호 : "+attachNo); 
-		    	            const confirmation = confirm('정말로 이 파일을 삭제하시겠습니까?');  // 사용자 확인
-		    	            
-		    	            if (confirmation) {
-		    	                // DELETE 요청 보내기
-		    	                fetch(`/drive/delete/team/${attachNo}`, {
-		    	                    method: 'DELETE',
-		    	                    headers: {
-		    	                        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
-		    	                        'header': document.querySelector('meta[name="_csrf_header"]').content
-		    	                    }
-		    	                })
-		    	                .then(response => response.json())
-		    	                .then(data => {
-		    	                    if (data.res_code === '200') {
-		    	                        alert('파일이 성공적으로 삭제되었습니다.');
-		    	                        location.reload(); // 페이지 리로드로 업데이트된 상태 표시
-		    	                    } else {
-		    	                        alert('파일 삭제에 실패하였습니다. 다시 시도해 주세요.');
-		    	                    }
-		    	                })
-		    	                .catch(err => {
-		    	                    alert('오류가 발생했습니다.');
-		    	                    console.error(err);
-		    	                });
-		    	            }
-		    	        });
-		    	    });
-		    	});
-		      // 파일 일괄 다운로드
-		      document.addEventListener('DOMContentLoaded', function () {
-		      const selectAllCheckbox = document.getElementById('select-all');
-		      const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+			      document.getElementById('add-upload-confirm-btn').addEventListener('click', () => {
+			        addDz.processQueue();
+			      });
+			      addDz.on('sending', function (file, xhr, formData) {
+			        document.getElementById('add-upload-confirm-btn').disabled = true;
+			        document.querySelectorAll('.dz-preview').forEach(preview => {
+			          const d = preview.querySelector('input[name="driveDescriptions"]');
+			          if (d) formData.append('driveDescriptions', d.value);
+			        });
+					
+					  // 2) 카테고리 추가
+					  const category = document.getElementById('fileCategory').value;
+					  formData.append('fileCategory', category);
 
-		      if (selectAllCheckbox) {
-		        selectAllCheckbox.addEventListener('change', function () {
-		          rowCheckboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
-		        });
-		      }
+					  // 3) 프로젝트 번호 추가
+					  const projectNo = document.querySelector('input[name="projectNo"]').value;
+					  formData.append('projectNo', projectNo);
+					});
+					
+			      addDz.on('queuecomplete', () => {
+			        document.getElementById('add-upload-confirm-btn').disabled = false;
+			      });
+			      addDz.on('addedfile', function (file) {
+			        const ext = file.name.split('.').pop().toLowerCase();
+			        const icons = { pdf:'/assets/img/icons/pdf.png', docx:'/assets/img/icons/word.png', xlsx:'/assets/img/icons/excel.png', zip:'/assets/img/icons/zip.com.png' };
+			        if (!file.type.startsWith('image/') && icons[ext]) {
+			          const img = file.previewElement.querySelector('.file-icon');
+			          if (img) img.src = icons[ext];
+			        }
+			      });
+			      addDz.on('successmultiple', () => window.location.reload());
+			    }
+			  });
 
-		      // 체크된 파일 일괄 다운로드
-		      const bulkDownloadBtn = document.getElementById('bulk-download');
-		      if (bulkDownloadBtn) {
-		        bulkDownloadBtn.addEventListener('click', function () {
-		          const checkboxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+			  // 모달 닫힐 때 모든 파일/프리뷰 제거
+			  addFileModalEl.addEventListener('hidden.bs.modal', function () {
+			    if (addDz) addDz.removeAllFiles(true);
+			  });
+			</script>
 
-		          if (checkboxes.length === 0) {
-		            alert('다운로드할 파일을 선택하세요.');
-		            return;
-		          }
 
-		          const form = document.createElement('form');
-		          form.method = 'POST';
-		          form.action = '/drive/download/team/bulk';
-		          form.style.display = 'none';
-		  	
-		          // CSRF 토큰 추가 (form submit 시 필요)
-		          const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-		          const csrfInput = document.createElement('input');
-		          csrfInput.type = 'hidden';
-		          csrfInput.name = '_csrf';
-		          csrfInput.value = csrfToken;
-		          form.appendChild(csrfInput);
-		          
-		          checkboxes.forEach(cb => {
-		            const row = cb.closest('tr');
-		            const id = row.querySelector('.delete-file').getAttribute('data-id');
-		            const input = document.createElement('input');
-		            input.type = 'hidden';
-		            input.name = 'fileIds';
-		            input.value = id;
-		            form.appendChild(input);
-		          });
-
-		          document.body.appendChild(form);
-		          form.submit();
-		        });
-		      }
-		    });
-		      // 일괄 삭제
-		  	document.addEventListener('DOMContentLoaded', function () {
-		      const bulkDeleteBtn = document.getElementById('bulk-delete');
-		      if (bulkDeleteBtn) {
-		          bulkDeleteBtn.addEventListener('click', function () {
-		              const checkboxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
-
-		              if (checkboxes.length === 0) {
-		                  alert('삭제할 파일을 선택하세요.');
-		                  return;
-		              }
-
-		              const confirmation = confirm('정말로 선택한 파일을 삭제하시겠습니까?');
-		              if (!confirmation) return;
-
-		              // 체크된 파일들의 ID를 추출
-		              const ids = checkboxes.map(cb => cb.closest('tr').querySelector('.delete-file').getAttribute('data-id'));
-
-		              // JSON 형태로 요청 보내기
-		              fetch('/drive/delete/team/bulk', {
-		                  method: 'POST',
-		                  headers: {
-		                      'Content-Type': 'application/json',
-		                      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content, 
-		                      'header': document.querySelector('meta[name="_csrf_header"]').content,
-		                  },
-		                  body: JSON.stringify({ fileIds: ids }),  // fileIds를 JSON으로 보냄
-		              })
-		              .then(response => response.json())
-		              .then(data => {
-		                  if (data.res_code === '200') {
-		                      alert('파일이 성공적으로 삭제되었습니다.');
-		                      location.reload();  // 삭제 후 페이지 리로드
-		                  } else {
-		                      alert('파일 삭제에 실패하였습니다. 다시 시도해 주세요.');
-		                  }
-		              })
-		              .catch(err => {
-		                  alert('오류가 발생했습니다.');
-		                  console.error(err);
-		              });
-		          });
-		      }
-		  });
-		  	document.addEventListener('DOMContentLoaded', function () {
-		  	  fetch('/drive/summary/team')
-		  	    .then(response => response.json())
-		  	    .then(data => {
-		  	      function formatFromKB(kb) {
-		  	        if (kb === 0) return '0 KB';
-		  	        const units = ['KB', 'MB', 'GB', 'TB'];
-		  	        const i = Math.floor(Math.log(kb) / Math.log(1024));
-		  	        const size = kb / Math.pow(1024, i);
-		  	        return `${size.toFixed(1)} ${units[i]}`;
-		  	      }
-
-		  	      document.getElementById('totalFiles').innerText = data.totalFiles + '개';
-		  	      document.getElementById('totalDownloads').innerText = data.totalDownloads + '회';
-		  	      document.getElementById('recentUploadDate').innerText = data.recentUploadDate;
-
-		  	      const usedKB = data.totalUsedKB;
-		  	      const maxCapacityKB = 50 * 1024 * 1024; 
-		  	      const percent = Math.round((usedKB / maxCapacityKB) * 100);
-
-		  	      document.getElementById('usedGB').innerText = formatFromKB(usedKB);
-		  	      document.getElementById('usagePercent').innerText = `${percent}%`;
-		  	      document.querySelector('.progress-bar').style.width = `${percent}%`;
-
-		  	      const typeSizeMap = data.fileTypeUsage || {};
-		  	      document.getElementById('sizeZip').innerText = formatFromKB(typeSizeMap.zip || 0);
-		  	      document.getElementById('sizeImage').innerText = formatFromKB(typeSizeMap.image || 0);
-		  	      document.getElementById('sizeWord').innerText = formatFromKB(typeSizeMap.docx || 0);
-		  	      document.getElementById('sizeExcel').innerText = formatFromKB(typeSizeMap.xlsx || 0);
-		  	      document.getElementById('sizeEtc').innerText = formatFromKB(typeSizeMap.etc || 0);
-		  	      document.getElementById('totalCapacity').innerText = formatFromKB(maxCapacityKB);
-		  	    })
-		  	    .catch(error => console.error('팀 요약 정보 불러오기 실패:', error));
-		  	});
-
-		      
-		      
-		    </script>
         
 
     </main>

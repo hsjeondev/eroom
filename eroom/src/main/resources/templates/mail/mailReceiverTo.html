@@ -73,6 +73,16 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                         <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" />
                         <!-- 별 박스 -->
                         <!-- <button class="btn p-0"><span class="fas text-warning fa-star"></span></button> -->
+                      	<form th:action="@{/mail/status/important/{id}(id=${receiverMail.mail.mailNo})}" method="post">
+						    <input type="hidden" name="redirectUrl" value="/mail/receiverTo" />
+						    <button class="btn p-0" type="submit">
+						        <span th:classappend="${
+						            mailStatusMap[receiverMail.mail.mailNo]?.mailStatusImportantYn == 'Y' 
+						                ? 'fas text-warning fa-star' 
+						                : 'far fa-star'
+						        }"></span>
+						    </button>
+						</form>
                       </div>
                     </div>
                     
@@ -101,8 +111,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                       <div class="hover-actions end-0">
                         <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
                         <div class="dropdown-menu dropdown-menu-end py-2">
-                        <a class="dropdown-item" href="#!">⭐중요 표시</a>
-                        
+                        <form th:action="@{/mail/status/important/{id}(id=${receiverMail.mail.mailNo})}" method="post">
+						  <input type="hidden" name="redirectUrl" value="/mail/receiverTo" />
+						  <button type="submit" class="dropdown-item">⭐중요 표시</button>
+						</form>
                         <form th:action="@{/mail/trash/{id}(id=${receiverMail.mail.mailNo})}" method="post">
                         	<input type="hidden" name="redirectUrl" value="/mail/receiverTo"/>
 						  <button type="submit" class="dropdown-item">🗑️휴지통</button>
@@ -148,7 +160,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		                <button class="page-link pe-0" data-list-pagination="next"><span class="fas fa-chevron-right"></span></button>
 		              </div>
             	</div> -->
-            	<nav aria-label="Page navigation example">
+            	<!-- <nav aria-label="Page navigation example">
 					  <ul class="pagination justify-content-center">
 					    <li class="page-item"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
 					    <li class="page-item"><a class="page-link" href="#">1</a></li>
@@ -158,7 +170,24 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					    <li class="page-item"><a class="page-link" href="#">5</a></li>
 					    <li class="page-item"><a class="page-link" href="#">Next</a></li>
 					  </ul>
-					</nav>
+					</nav> -->
+				<div class="d-flex justify-content-center mt-3">
+							<div class="d-flex">
+								<button class="page-link disabled" data-list-pagination="prev"
+									disabled>
+									<i class="fas fa-chevron-left"></i>
+								</button>
+								<ul class="mb-0 pagination">
+									<li class="active">
+										<button class="page" type="button" data-i="1" data-page="5">1</button>
+									</li>
+								</ul>
+								<button class="page-link pe-0" data-list-pagination="next"
+									disabled>
+									<i class="fas fa-chevron-right"></i>
+								</button>
+							</div>
+						</div>	
            </div>
          </div>
     </main>

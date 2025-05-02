@@ -37,7 +37,7 @@ public class MailStatusDto {
     							.employee(Employee.builder().employeeNo(employee_no).build())
     							.mailStatusDeletedYn(mail_status_deleted_yn)
     							.mailStatusImportantYn(mail_status_important_yn)
-    							.maillStatusVisibleYn(mail_status_visible_yn)
+    							.mailStatusVisibleYn(mail_status_visible_yn)
     							.build();
     	return mailStatus;
     }

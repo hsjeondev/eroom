@@ -14,17 +14,48 @@ public interface MailReceiverRepository extends JpaRepository<MailReceiver, Long
 
 	
 	// 오래된 순
+	/*
 	@Query("SELECT mr FROM MailReceiver mr JOIN FETCH mr.mail m WHERE mr.receiver.employeeNo = :empNo ORDER BY m.mailSentTime ASC")
 	List<MailReceiver> findByEmployeeNoOrderByOldest(@Param("empNo") Long empNo);
 	
 	// 최신순
 	@Query("SELECT mr FROM MailReceiver mr JOIN FETCH mr.mail m WHERE mr.receiver.employeeNo = :empNo ORDER BY m.mailSentTime DESC")
 	List<MailReceiver> findByEmployeeNoOrderByLatest(@Param("empNo") Long empNo);
+	
+	@Query("SELECT mr FROM MailReceiver mr JOIN FETCH mr.mail m " +
+		       "WHERE mr.receiver.employeeNo = :empNo AND mr.mailReceiverVisibleYn = 'Y' " +
+		       "ORDER BY m.mailSentTime ASC")
+		List<MailReceiver> findByEmployeeNoOrderByOldest(@Param("empNo") Long empNo);
 
+		// 최신순
+		@Query("SELECT mr FROM MailReceiver mr JOIN FETCH mr.mail m " +
+		       "WHERE mr.receiver.employeeNo = :empNo AND mr.mailReceiverVisibleYn = 'Y' " +
+		       "ORDER BY m.mailSentTime DESC")
+		List<MailReceiver> findByEmployeeNoOrderByLatest(@Param("empNo") Long empNo);
 	@Query("SELECT mr FROM MailReceiver mr JOIN FETCH mr.mail m WHERE mr.receiver.employeeNo = :empNo")
 	List<MailReceiver> findByEmployeeNo(@Param("empNo") Long empNo);
+	*/
+	@Query("SELECT mr FROM MailReceiver mr " +
+		       "JOIN FETCH mr.mail m " +
+		       "WHERE mr.receiver.employeeNo = :empNo " +
+		       "AND mr.mailReceiverVisibleYn = 'Y' " +
+		       "AND m.mailNo NOT IN (" +
+		       "   SELECT s.mail.mailNo FROM MailStatus s " +
+		       "   WHERE s.employee.employeeNo = :empNo AND s.mailStatusDeletedYn = 'Y'" +
+		       ") " +
+		       "ORDER BY m.mailSentTime DESC")
+		List<MailReceiver> findByEmployeeNoOrderByLatest(@Param("empNo") Long empNo);
 	
-
+	@Query("SELECT mr FROM MailReceiver mr " +
+		       "JOIN FETCH mr.mail m " +
+		       "WHERE mr.receiver.employeeNo = :empNo " +
+		       "AND mr.mailReceiverVisibleYn = 'Y' " +
+		       "AND m.mailNo NOT IN (" +
+		       "   SELECT s.mail.mailNo FROM MailStatus s " +
+		       "   WHERE s.employee.employeeNo = :empNo AND s.mailStatusDeletedYn = 'Y'" +
+		       ") " +
+		       "ORDER BY m.mailSentTime ASC")
+		List<MailReceiver> findByEmployeeNoOrderByOldest(@Param("empNo") Long empNo);
 	// 읽음 처리
 	@Modifying
 	@Query("UPDATE MailReceiver mr SET mr.mailReceiverReadYn = 'Y' WHERE mr.mail.mailNo = :mailNo AND mr.receiver.employeeNo = :employeeNo")

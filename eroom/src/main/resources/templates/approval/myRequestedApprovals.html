@@ -6,18 +6,13 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  layout:decorate="~{/include/layout}">
 
  <body>
+		<div class="content">
 	<main class="main" id="top" layout:fragment="content">
 	<!-- 여기에 요소 넣으면 됩니다. -->
-		<div class="content">
-		<!-- <nav class="mb-3" aria-label="breadcrumb">
-			<ol class="breadcrumb mb-0">
-				<li class="breadcrumb-item"><a href="#!">Page 1</a></li>
-				<li class="breadcrumb-item"><a href="#!">Page 2</a></li>
-				<li class="breadcrumb-item active">Default</li>
-			</ol>
-		</nav> -->
+		<div class="d-flex justify-content-start align-items-center mb-5">
+			<i class="uil uil-file-check text-secondary me-2"></i><span class="fw-bold fs-7">작성 문서</span>
+		</div>
 			<div class="pb-8">
-				<h4 class="mb-4">요청한 결재</h4>
 				<div id="reports" data-list="{&quot;valueNames&quot;:[&quot;title&quot;,&quot;text&quot;,&quot;priority&quot;,&quot;reportsby&quot;,&quot;reports&quot;,&quot;date&quot;],&quot;page&quot;:10,&quot;pagination&quot;:true}">
 					<div class="row g-3 justify-content-between mb-2">
 						<div class="col-12">
@@ -128,7 +123,6 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			
 			</div><!-- pb-8 끝 -->
 			
-		</div> <!-- content 끝 -->
 		
 		
 		    <!-- 시그니처패드 모달 구조 -->
@@ -322,6 +316,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		
 		
 	</main>
+		</div> <!-- content 끝 -->
 	
 
 	

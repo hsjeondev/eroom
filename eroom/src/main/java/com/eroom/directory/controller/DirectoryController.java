@@ -51,12 +51,16 @@ public class DirectoryController {
 			    if (structure.getParentCode() != null) {
 			    	// 팀이라는 뜻이니까 code_name을 가져오면 팀명
 			        dto.setTeam_name(structure.getCodeName());
+			        // 개발 초기에 컬럼과 매칭되는 Directory_team 필드를 사용하면 안될 것으로 생각해서 위처럼 따로 team_name이라는 필드를 사용했는데.. 잘못생각했던 거 같음.
+			        dto.setDirectory_team(structure.getCodeName());
 			        // 부서 있다는 뜻이니까 부서 parent_code=separator_code 조회해서 code_name을 가져오면 부서명
 			        Structure parent = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(structure.getParentCode());
 			        dto.setDepartment_name(parent != null ? parent.getCodeName() : "-");
+			        dto.setDirectory_department(parent != null ? parent.getCodeName() : "-");
 			    } else {
 			    	// 부서라는 뜻이니까 code_name을 바로 가져오면 부서명
 			        dto.setDepartment_name(structure.getCodeName() != null ? structure.getCodeName() : "-");
+			        dto.setDirectory_department(structure.getCodeName() != null ? structure.getCodeName() : "-");
 			        dto.setTeam_name("-");
 			    }
 			} else {
@@ -68,6 +72,7 @@ public class DirectoryController {
 				employeeList.add(dto);
 			} 
 		}
+		
 		
 		// 부서 리스트와 팀 리스트를 가져와서 Map에 저장
 		List<Structure> departmentList = new ArrayList<Structure>();
@@ -90,10 +95,10 @@ public class DirectoryController {
 	}
 	// 트리 선택시 비동기 방식으로 회원 리스트 조회
 	@GetMapping("/directory/employeeList")
-	public String getEmployeeListFragment(@RequestParam("codeName") String codeName, Model model) {
+	public String getEmployeeListFragment(@RequestParam("separatorCode") String separatorCode, Model model) {
 //	    List<Employee> employees = employeeService.findEmployeesByStructureCode(code);
 //	    model.addAttribute("employeeList", employees);
-	    System.out.println(codeName + " : 코드네임(부서명,팀명)");
+//	    System.out.println(separatorCode + " : 코드네임(부서명,팀명)");
 	    List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
 		List<Directory> temp = directoryService.selectDirectoryEmployeeAllBySeparatorCode();
 		
@@ -118,9 +123,17 @@ public class DirectoryController {
 			    dto.setTeam_name("-");
 			}
 			// 재직중인 사람만 리스트에 추가
-			if (t.getEmployee().getEmployeeEmploymentYn().equals("Y") && (dto.getTeam_name().equals(codeName) || dto.getDepartment_name().equals(codeName))) {
+			Structure targetStructure = structureService.getBySeparatorCode(separatorCode);
+			String targetCodeName = targetStructure != null ? targetStructure.getCodeName() : null;
+			if (t.getEmployee().getEmployeeEmploymentYn().equals("Y")
+				    && targetCodeName != null
+				    && (targetCodeName.equals(dto.getTeam_name()) || targetCodeName.equals(dto.getDepartment_name()))) {
 				employeeList.add(dto);
-			} 
+			} else if(t.getEmployee().getEmployeeEmploymentYn().equals("Y")
+				    && separatorCode.equals("selectAll")) {
+				employeeList.add(dto);
+				
+			}
 		}
 		
 		// 부서 리스트와 팀 리스트를 가져와서 Map에 저장
@@ -139,15 +152,6 @@ public class DirectoryController {
 		model.addAttribute("departmentList", departmentList);
 		model.addAttribute("teamMap", teamMap);
 		model.addAttribute("employeeList", employeeList);
-	    
-	    
-	    
-	    
-	    
-	    
-	    
-	    
-	    
 	    
 	    
 	    return "directory/employeeListFragment :: employeeListFragment";
@@ -196,5 +200,27 @@ public class DirectoryController {
 		
 		return map;
 	}
+	
+	// 부서이름으로 팀 조회 // 지우자
+	@GetMapping("/directory/teams")
+	@ResponseBody
+	public List<Map<String, Object>> getTeamsByDept(@RequestParam("separatorCode") String separatorCode) {
+//		System.out.println(separatorCode);
+	    List<Structure> teamList = structureService.findChildSeparatorCodes(separatorCode);
+	    if(separatorCode.equals("selectAll")) {
+	    	teamList = structureService.selectDepartmentAll();
+	    }
+	    List<Map<String, Object>> result = new ArrayList<>();
+	    for (Structure team : teamList) {
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("codeName", team.getCodeName());
+	        map.put("separatorCode", team.getSeparatorCode());
+	        result.add(map);
+	    }
+	    return result;
+	}
+	
+
+	
 	
 }
