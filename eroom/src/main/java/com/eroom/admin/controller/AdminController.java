@@ -131,9 +131,6 @@ public class AdminController {
 		model.addAttribute("deptLabel", deptLabel);
 		model.addAttribute("teamLabel", teamLabel);
 		
-		
-		
-		
 		// 사원의 정보 조회
 		List<Employee> employeeList =  new ArrayList<>();; 
 		if(teamId != null) {
@@ -157,7 +154,6 @@ public class AdminController {
 		// 반환용 DTO리스트
 		List<EmployeeManageDto> manageDtoList = new ArrayList<>();
 	
-		
 		for(Employee employee : employeeList) {
 			// 사원 dto
 			EmployeeDto employeeDto = new EmployeeDto().toDto(employee);
@@ -217,7 +213,6 @@ public class AdminController {
 					);
 			
 			manageDtoList.add(manageDto);
-			
 			
 		}
 		model.addAttribute("employeeList",manageDtoList);
@@ -459,8 +454,12 @@ public class AdminController {
 			Directory directory = employee.getDirectory();
 			if(directory != null) {
 				resultMap.put("directory_phone",directory.getDirectoryPhone());
+				resultMap.put("directory_zipcode", directory.getDirectoryZipcode());
+				resultMap.put("directory_address", directory.getDirectoryAddress());
 			}else {
 				resultMap.put("directory_phone", "");
+				resultMap.put("directory_zipcode", "");
+				resultMap.put("directory_address", "");
 			}
 			
 			// 사원이 소속된 부서/팀 정보 가져오기

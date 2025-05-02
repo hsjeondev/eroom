@@ -1,5 +1,6 @@
 package com.eroom.employee.dto;
 
+import java.awt.dnd.DropTarget;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -30,13 +31,16 @@ public class EmployeeUpdateDto {
 	private String employee_employment_yn; // 재직여부
 	private Long structure_no; // 부서 또는 팀
 	private String directory_phone; // 연락처(주소록)
-	
+	private String directory_zipcode; // 우편번호
+	private String directory_address; // 주소
 	
 	// Directory 엔티티 변환
 	public Directory toDirectoryEntity(Employee employee) {
 		return Directory.builder()
 				.employee(employee)
 				.directoryPhone(directory_phone)
+				.directoryZipcode(directory_zipcode)
+				.directoryAddress(directory_address)
 				.build();
 	}
 	
@@ -63,6 +67,8 @@ public class EmployeeUpdateDto {
 		}
 		if(employee.getDirectory() != null) {
 			dto.setDirectory_phone(employee.getDirectory().getDirectoryPhone());
+			dto.setDirectory_zipcode(employee.getDirectory().getDirectoryZipcode());
+			dto.setDirectory_address(employee.getDirectory().getDirectoryAddress());
 		}
 		return dto;
 	}
