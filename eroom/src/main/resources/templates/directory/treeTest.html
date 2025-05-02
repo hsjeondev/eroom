@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko-KR" dir="ltr"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/include/layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>조직도 트리 모달</title>
+  <style>
+    .treeview a.active {
+      background-color: #0d6efd;
+      color: #fff;
+      border-radius: 4px;
+    }
+    .treeview-label-strong {
+      font-weight: bold;
+      text-decoration: underline;
+      color: #007bff;
+    }
+    .treeview-row {
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+<main class="main" id="top">
+<div layout:fragment="content">
+
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#treeModal">트리 테스트</button>
+
+<div class="modal fade" id="treeModal" tabindex="-1" aria-labelledby="treeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header py-2">
+        <h5 class="modal-title fw-bold" id="treeModalLabel">조직도 선택</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+
+      <div class="modal-body px-4">
+        <div id="selectedResult" class="border bg-white rounded p-2 mb-3 small">
+          <strong>선택한 항목:</strong><span><button id="clearBtn" class="btn btn-light btn-sm" type="button">비우기</button></span>
+          <div id="selectedTags" class="mt-1 d-flex flex-wrap gap-2"></div>
+        </div>
+
+        <ul class="treeview" id="treeviewTree">
+          <li class="treeview-list-item">
+            <a href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#tree-company">
+              <p class="treeview-text">
+                <span class="fa-solid fa-folder treeview-icon text-primary"></span>
+                <span class="treeview-label-text fw-bold">이룸 컴퍼니</span>
+              </p>
+            </a>
+            <ul class="collapse show treeview-list" id="tree-company">
+              <li class="treeview-list-item" th:each="dept : ${departmentList}">
+                <a href="javascript:void(0);" data-bs-toggle="collapse" th:attr="data-bs-target='#dept-'+${dept.separatorCode}">
+                  <p class="treeview-text ms-2">
+                    <span class="fa-solid fa-folder treeview-icon"></span>
+                    <span class="treeview-label-text" th:text="${dept.codeName}">부서명</span>
+                  </p>
+                </a>
+                <ul class="collapse treeview-list" th:id="'dept-'+${dept.separatorCode}">
+                  <li class="treeview-list-item" th:each="team : ${teamMap[dept.codeName]}">
+                    <a href="javascript:void(0);" data-bs-toggle="collapse" th:attr="data-bs-target='#team-'+${team.separatorCode}">
+                      <p class="treeview-text ms-3">
+                        <span class="fa-solid fa-file-lines treeview-icon"></span>
+                        <span class="treeview-label-text" th:text="${team.codeName}">팀명</span>
+                      </p>
+                    </a>
+                    <ul class="collapse treeview-list" th:id="'team-'+${team.separatorCode}">
+                      <li class="treeview-list-item" th:each="emp : ${teamEmployeeMap[team.separatorCode]}">
+                        <div class="treeview-item"
+                             th:attr="data-name=${emp.employee_name}, data-no=${emp.employee_no}"
+                             onclick="handleEmpClick(this)">
+                          <p class="treeview-text ms-4">
+                            <span class="fa-solid fa-user treeview-icon"></span>
+                            <span class="treeview-label-text" th:text="${emp.employee_name}">사원명</span>
+                          </p>
+                        </div>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li class="treeview-list-item">
+                <a href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#noTeam">
+                  <p class="treeview-text ms-2">
+                    <span class="fa-solid fa-folder treeview-icon"></span>
+                    <span class="treeview-label-text">기타</span>
+                  </p>
+                </a>
+                <ul class="collapse treeview-list" id="noTeam">
+                  <li class="treeview-list-item" th:each="emp : ${teamEmployeeMap['noTeam']}">
+                    <div class="treeview-item"
+                         th:attr="data-name=${emp.employee_name}, data-no=${emp.employee_no}"
+                         onclick="handleEmpClick(this)">
+                      <p class="treeview-text ms-4">
+                        <span class="fa-solid fa-user treeview-icon"></span>
+                        <span class="treeview-label-text" th:text="${emp.employee_name}">사원명</span>
+                      </p>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-success btn-sm" onclick="confirmSelection()">선택 완료</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function addTag(label, code) {
+    const tagWrap = document.getElementById("selectedTags");
+    if (document.getElementById(`tag-${code}`)) return;
+
+    const tag = document.createElement("span");
+    tag.className = "badge bg-primary text-white d-flex align-items-center";
+    tag.id = `tag-${code}`;
+    tag.innerHTML = `${label} <button type="button" class="btn-close btn-close-white btn-sm ms-1" onclick="removeTag('${code}')"></button>`;
+    tagWrap.appendChild(tag);
+  }
+
+  function removeTag(code) {
+    const tag = document.getElementById(`tag-${code}`);
+    if (tag) tag.remove();
+  }
+
+  function handleEmpClick(el) {
+    const name = el.getAttribute("data-name");
+    const no = el.getAttribute("data-no");
+    addTag(name, no);
+  }
+
+  function confirmSelection() {
+    const selected = document.querySelectorAll("#selectedTags .badge");
+    const result = Array.from(selected).map(el => el.id.replace('tag-', ''));
+    console.log("확정된 선택:", result);
+    bootstrap.Modal.getInstance(document.getElementById('treeModal')).hide();
+  }
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const tree = document.querySelector('#treeviewTree');
+
+  tree.addEventListener('click', function (e) {
+    const clickedLi = e.target.closest('li.treeview-list-item');
+    if (!clickedLi) return;
+
+    const clickedIcon = clickedLi.querySelector('.treeview-icon');
+    if (!clickedIcon) return;
+
+    // 기존 강조 제거
+    document.querySelectorAll('.treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
+    document.querySelectorAll('.treeview-label-text.treeview-label-strong').forEach(el => el.classList.remove('treeview-label-strong'));
+
+    // 현재 클릭 강조
+    clickedIcon.classList.add('text-info-light');
+    const clickedLabel = clickedLi.querySelector('.treeview-label-text');
+    if (clickedLabel) clickedLabel.classList.add('treeview-label-strong');
+
+    // 상위 강조
+    let currentUl = clickedLi.parentElement;
+    while (currentUl && currentUl.classList.contains('treeview-list')) {
+      const parentLi = currentUl.closest('li.treeview-list-item');
+      if (!parentLi) break;
+
+      const parentIcon = parentLi.querySelector('a > p .treeview-icon');
+      const parentLabel = parentLi.querySelector('a > p .treeview-label-text');
+      if (parentIcon) parentIcon.classList.add('text-info-light');
+      if (parentLabel) parentLabel.classList.add('treeview-label-strong');
+
+      currentUl = parentLi.parentElement;
+    }
+  });
+});
+document.getElementById('clearBtn').addEventListener('click', function(){
+	document.getElementById('selectedTags').innerHTML = '';
+});
+</script>
+
+
+</div>
+</main>
+</body>
+</html>

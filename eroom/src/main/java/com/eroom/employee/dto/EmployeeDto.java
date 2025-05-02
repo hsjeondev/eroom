@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import com.eroom.employee.entity.Employee;
+import com.eroom.employee.entity.Structure;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +33,7 @@ public class EmployeeDto {
 	private Long team_no;
 	private String department_name;
 	private String team_name;
+	private Long structure_no;
 	
 	public Employee toEntity() {
 		return Employee.builder()
@@ -43,6 +45,7 @@ public class EmployeeDto {
 				.employeeEndDate(employee_end_date)
 				.employeeEmploymentYn(employee_employment_yn)
 				.employeePosition(employee_position)
+				.structure(Structure.builder().structureNo(structure_no).build())
 				.build();
 	}
 	
@@ -56,6 +59,7 @@ public class EmployeeDto {
 				.employee_end_date(emp.getEmployeeEndDate())
 				.employee_employment_yn(emp.getEmployeeEmploymentYn())
 				.employee_position(emp.getEmployeePosition())
+				.structure_no(emp.getStructure() != null ? emp.getStructure().getStructureNo() : null)
 				.build();
 	}
 	public EmployeeDto(Long employeeNo, String employeeName) {
