@@ -1,136 +1,201 @@
 <!DOCTYPE html>
-<html 
-lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
-	  xmlns:th="http://www.thymeleaf.org"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{/include/layout}">
-  <body>
-<main class="main" id="top" layout:fragment="content">
-	<!-- 상단 타이틀 및 탭은 기존 그대로 유지 -->
-	<div class="d-flex align-items-center gap-2">
-		<a th:href="@{/project/all}" class="text-decoration-none text-dark me-2">
-			<i class="uil uil-angle-left-b fs-4"></i>
-		</a>
-		<h1 class="text-primary mb-0 fs-4" th:text="${project.project_name}">프로젝트 디테일</h1>
-		<span class="badge badge-phoenix fs-10 badge-phoenix-success" th:text="${project.proceed}">completed</span>
-	</div>
-	<br>
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
+<body>
+	<main class="main" id="top" layout:fragment="content">
+		<div class="d-flex align-items-center gap-2">
+			<a th:href="@{/project/all}" class="text-decoration-none text-dark me-2"> <i class="uil uil-angle-left-b fs-4"></i>
+			</a>
+			<h1 class="text-primary mb-0 fs-4" th:text="${project.project_name}">프로젝트 디테일</h1>
+			<span class="badge badge-phoenix fs-10 badge-phoenix-success" th:text="${project.proceed}">completed</span>
+		</div>
+		<br>
 
-	<ul class="nav nav-phoenix-pills mt-3" role="tablist">
-		<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/main(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/main')} ? ' active' : ''">메인</a></li>
-		<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/developmentTab(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/developmentTab')} ? ' active' : ''">개발</a></li>
-		<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/todo(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/todo')} ? ' active' : ''">할 일</a></li>
-		<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/files(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/files')} ? ' active' : ''">파일</a></li>
-		<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/minutes(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/minutes')} ? ' active' : ''">회의록</a></li>
-	</ul>
-	<br>
+		<ul class="nav nav-phoenix-pills mt-3" role="tablist">
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/main(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/main')} ? ' active' : ''">메인</a></li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/developmentTab(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/developmentTab')} ? ' active' : ''">개발</a></li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/todo(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/todo')} ? ' active' : ''">할 일</a></li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/files(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/files')} ? ' active' : ''">파일</a></li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/minutes(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/minutes')} ? ' active' : ''">회의록</a></li>
+		</ul>
+		<br>
 
-	<div class="row g-4">
-		<!-- 좌측 PR 목록 -->
-		<div class="col-md-8">
-			<div class="card shadow-sm">
-				<div class="card-header bg-light fw-bold">Pull Requests</div>
-				<div class="card-body p-3">
-					<div th:if="${pullRequests != null and !pullRequests.isEmpty()}">
-						<table class="table table-hover align-middle">
-							<thead class="table-light">
+		<div class="row g-4">
+			<!-- PR 목록 -->
+			<div class="col-md-8">
+				<div class="card shadow-sm">
+					<div class="card-header bg-light fw-bold">Pull Requests</div>
+					<div class="card-body p-3">
+						<div th:if="${pullRequests != null and !pullRequests.isEmpty()}">
+							<table class="table table-hover align-middle">
+								<thead class="table-light">
+									<tr>
+										<th>#</th>
+										<th>제목</th>
+										<th>작성자</th>
+										<th>브랜치</th>
+										<th>상태</th>
+										<th>링크</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="pr : ${pullRequests}" th:attr="data-pr-number=${pr.number}" class="pr-row" style="cursor: pointer;">
+										<td th:text="${pr.number}"></td>
+										<td th:text="${pr.title}"></td>
+										<td th:text="${pr.author}"></td>
+										<td th:text="${pr.headBranch} + ' → ' + ${pr.baseBranch}"></td>
+										<td th:text="${pr.state}"></td>
+										<td><a th:href="${pr.htmlUrl}" target="_blank">보기</a></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 품질 분석 결과 테이블 -->
+			<div class="col-md-4">
+				<div class="card shadow-sm">
+					<div class="card-header bg-light fw-bold small">PR 품질 분석 결과</div>
+					<div class="card-body p-2">
+						<table class="table table-bordered table-sm align-middle mb-0">
+							<thead class="table-light small">
 								<tr>
-									<th>#</th>
-									<th>제목</th>
-									<th>작성자</th>
-									<th>브랜치</th>
-									<th>상태</th>
-									<th>링크</th>
+									<th class="small">지표</th>
+									<th class="small">값</th>
+									<th class="small">상태</th>
 								</tr>
 							</thead>
-							<tbody>
-								<tr th:each="pr : ${pullRequests}" th:attr="data-pr-number=${pr.number}" class="pr-row" style="cursor:pointer;">
-									<td th:text="${pr.number}"></td>
-									<td th:text="${pr.title}"></td>
-									<td th:text="${pr.author}"></td>
-									<td th:text="${pr.headBranch} + ' → ' + ${pr.baseBranch}"></td>
-									<td th:text="${pr.state}"></td>
-									<td><a th:href="${pr.htmlUrl}" target="_blank">보기</a></td>
+							<tbody id="sonar-result-body" class="small">
+								<tr>
+									<td colspan="3" class="text-muted text-center">좌측 PR을 선택하세요.</td>
 								</tr>
 							</tbody>
 						</table>
+						<!-- 품질 분석 결과 차트 -->
+						<canvas id="qualityChart" height="250" class="mt-3"></canvas>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<!-- 우측 품질 분석 결과 -->
-		<div class="col-md-4">
-			<div class="card shadow-sm">
-				<div class="card-header bg-light fw-bold">PR 품질 분석 결과</div>
-				<div class="card-body p-3">
-					<table class="table table-bordered align-middle">
-						<thead class="table-light">
-							<tr>
-								<th>지표</th>
-								<th>값</th>
-								<th>상태</th>
-							</tr>
-						</thead>
-						<tbody id="sonar-result-body">
-							<tr>
-								<td colspan="3" class="text-muted text-center">좌측 PR을 선택하세요.</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- 분석 결과 Ajax 처리 스크립트 -->
-	<script>
+		<!-- 분석 결과 Ajax 처리 스크립트 -->
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script>
 		document.addEventListener("DOMContentLoaded", function () {
+			let qualityChart; // 이전 차트 제거용
+		
 			document.querySelectorAll(".pr-row").forEach(row => {
 				row.addEventListener("click", function () {
 					const prNumber = this.dataset.prNumber;
-
+		
 					fetch("/api/sonar/quality/pr/" + prNumber)
 						.then(res => res.json())
 						.then(data => {
 							const tbody = document.getElementById("sonar-result-body");
 							tbody.innerHTML = "";
-
+		
 							if (!Array.isArray(data) || data.length === 0) {
 								tbody.innerHTML = '<tr><td colspan="3" class="text-muted text-center">분석 결과가 없습니다.</td></tr>';
+								clearChart();
 								return;
 							}
-
+		
+							const radarLabels = [];
+							const radarValues = [];
+		
 							data.forEach(item => {
 								const tr = document.createElement("tr");
-
+		
 								const metric = document.createElement("td");
-								metric.textContent = translateMetric(item.metric);
-
+								const translated = translateMetric(item.metric);
+								metric.textContent = translated;
+		
 								const value = document.createElement("td");
 								value.textContent = item.value;
-
+		
 								const status = document.createElement("td");
 								status.textContent = getStatus(item.metric, item.value);
 								status.classList.add(
 									status.textContent === "양호" ? "text-success" :
 									status.textContent === "주의" ? "text-danger" : "text-secondary"
 								);
-
+		
 								tr.appendChild(metric);
 								tr.appendChild(value);
 								tr.appendChild(status);
 								tbody.appendChild(tr);
+		
+								// 레이더 차트에 포함할 항목만 선택 (불필요한 항목 필터링)
+								if (["coverage", "bugs", "vulnerabilities", "code_smells", "duplicated_lines_density"].includes(item.metric)) {
+									radarLabels.push(translated);
+									radarValues.push(parseFloat(item.value));
+								}
 							});
+		
+							renderRadarChart(radarLabels, radarValues);
 						})
 						.catch(err => {
 							console.error("분석 결과 조회 실패", err);
 							document.getElementById("sonar-result-body").innerHTML =
 								'<tr><td colspan="3" class="text-danger text-center">데이터를 불러올 수 없습니다.</td></tr>';
+							clearChart();
 						});
 				});
 			});
-
+		
+			function renderRadarChart(labels, values) {
+				const ctx = document.getElementById("qualityChart").getContext("2d");
+		
+				if (qualityChart) {
+					qualityChart.destroy();
+				}
+		
+				qualityChart = new Chart(ctx, {
+					type: 'radar',
+					data: {
+						labels: labels,
+						datasets: [{
+							label: 'PR 품질 지표',
+							data: values,
+							backgroundColor: 'rgba(54, 162, 235, 0.2)',
+							borderColor: 'rgba(54, 162, 235, 1)',
+							pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+							borderWidth: 2
+						}]
+					},
+					options: {
+						responsive: true,
+						scales: {
+							r: {
+								beginAtZero: true,
+								ticks: {
+									stepSize: 10
+								}
+							}
+						},
+						plugins: {
+							legend: {
+								display: false
+							},
+							tooltip: {
+								callbacks: {
+									label: function (context) {
+										return context.formattedValue;
+									}
+								}
+							}
+						}
+					}
+				});
+			}
+		
+			function clearChart() {
+				if (qualityChart) {
+					qualityChart.destroy();
+					qualityChart = null;
+				}
+			}
+		
 			function translateMetric(metric) {
 				const map = {
 					"coverage": "테스트 커버리지",
@@ -144,7 +209,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				};
 				return map[metric] || metric;
 			}
-
+		
 			function getStatus(metric, value) {
 				if (["bugs", "vulnerabilities", "code_smells"].includes(metric)) {
 					return value === "0" ? "양호" : "주의";
@@ -161,7 +226,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				return "확인 필요";
 			}
 		});
-	</script>
-</main>
-  </body>
+		</script>
+	</main>
+</body>
 </html>

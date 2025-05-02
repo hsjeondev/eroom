@@ -51,12 +51,16 @@ public class DirectoryController {
 			    if (structure.getParentCode() != null) {
 			    	// 팀이라는 뜻이니까 code_name을 가져오면 팀명
 			        dto.setTeam_name(structure.getCodeName());
+			        // 개발 초기에 컬럼과 매칭되는 Directory_team 필드를 사용하면 안될 것으로 생각해서 위처럼 따로 team_name이라는 필드를 사용했는데.. 잘못생각했던 거 같음.
+			        dto.setDirectory_team(structure.getCodeName());
 			        // 부서 있다는 뜻이니까 부서 parent_code=separator_code 조회해서 code_name을 가져오면 부서명
 			        Structure parent = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(structure.getParentCode());
 			        dto.setDepartment_name(parent != null ? parent.getCodeName() : "-");
+			        dto.setDirectory_department(parent != null ? parent.getCodeName() : "-");
 			    } else {
 			    	// 부서라는 뜻이니까 code_name을 바로 가져오면 부서명
 			        dto.setDepartment_name(structure.getCodeName() != null ? structure.getCodeName() : "-");
+			        dto.setDirectory_department(structure.getCodeName() != null ? structure.getCodeName() : "-");
 			        dto.setTeam_name("-");
 			    }
 			} else {
@@ -68,6 +72,7 @@ public class DirectoryController {
 				employeeList.add(dto);
 			} 
 		}
+		
 		
 		// 부서 리스트와 팀 리스트를 가져와서 Map에 저장
 		List<Structure> departmentList = new ArrayList<Structure>();
