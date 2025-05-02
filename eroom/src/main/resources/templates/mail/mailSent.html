@@ -70,7 +70,16 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                       <div class="d-flex flex-column flex-sm-row">
                         <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" />
                         <!-- 별 박스 -->
-                        <!-- <button class="btn p-0"><span class="fas text-warning fa-star"></span></button> -->
+                        <form th:action="@{/mail/status/important/{id}(id=${sentMail.mailNo})}" method="post">
+						    <input type="hidden" name="redirectUrl" value="/mail/sent" />
+						    <button class="btn p-0" type="submit">
+						        <span th:classappend="${
+						            mailStatusMap[sentMail.mailNo]?.mailStatusImportantYn == 'Y' 
+						                ? 'fas text-warning fa-star' 
+						                : 'far fa-star'
+						        }"></span>
+						    </button>
+						</form>
                       </div>
                     </div>
                     <div class="col-auto">
@@ -107,8 +116,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                       <div class="hover-actions end-0">
                         <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
                         <div class="dropdown-menu dropdown-menu-end py-2">
-                        <a class="dropdown-item" href="#!">⭐중요 표시</a>
-                        <a class="dropdown-item" href="#!">🗑️휴지통</a>
+                        <form th:action="@{/mail/status/important/{id}(id=${sentMail.mailNo})}" method="post">
+						  <input type="hidden" name="redirectUrl" value="/mail/sent" />
+						  <button type="submit" class="dropdown-item">⭐중요 표시</button>
+						</form>
+                        <form th:action="@{/mail/trash/{id}(id=${sentMail.mailNo})}" method="post">
+                        	<input type="hidden" name="redirectUrl" value="/mail/sent"/>
+						  <button type="submit" class="dropdown-item">🗑️휴지통</button>
+						</form>
                         <a class="dropdown-item text-danger" href="#!">삭제</a></div>
                       </div>
                       
