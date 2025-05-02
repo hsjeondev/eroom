@@ -29,6 +29,8 @@ public class CreateEmployeeDto {
 	
 	// 주소록 정보
 	private String directory_phone; // 전화번호
+	private String directory_zipcode; // 우편번호
+	private String directory_address; // 도로명 주소
 	
 	// 소속 정보
 	private Long department_no; // 부서 번호
@@ -47,14 +49,16 @@ public class CreateEmployeeDto {
 				.build();
 	}
 	
-	public Directory toDirectoryEntity(Employee employee,String separatorCode, String email, String departmentName, String teamName, String creatorName, String companyName) {
+	public Directory toDirectoryEntity(Employee employee,String separatorCode, String email, String departmentName, String teamName, String creatorId, String companyName) {
 		LocalDateTime now = LocalDateTime.now();
 		return Directory.builder()
 				.directoryPhone(this.directory_phone)
 				.directoryEmail(email)
 				.directoryName(this.employee_name) // 생성된 사원 이름
+				.directoryZipcode(this.directory_zipcode)
+				.directoryAddress(this.directory_address)
 				.directoryCompanyName(companyName)
-				.directoryCreator(creatorName)
+				.directoryCreator(creatorId)
 				.visibleYn("Y")
 				.directoryRegDate(now)
 				.directoryPosition(this.employee_position)

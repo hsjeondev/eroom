@@ -230,62 +230,6 @@
 	</div>
 </div><!-- 근태현황 목록 테이블 끝 -->
 
-
-<!-- 근태 정보 수정 모달 -->
-<div class="modal fade" id="editAttendanceModal" tabindex="-1">
-	<div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
-	  <div class="modal-content border border-translucent rounded-3 shadow-sm">
-	    <form id="editAttendanceForm" autocomplete="off" name="editAttendanceForm">
-	
-	      <!-- 헤더 -->
-	      <div class="modal-header px-4 py-3 border-0">
-	        <h5 class="modal-title fw-bold">근태 정보 수정</h5>
-	        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-	      </div>
-	
-	      <!-- 바디 -->
-	      <div class="modal-body px-4 py-2">
-	
-<!-- 출근일시 + 지각 -->
-<div class="mb-3">
-  <label for="editCheckInTime" class="form-label fw-semibold">출근일시</label>
-  <div class="d-flex align-items-center justify-content-between">
-    <input type="datetime-local" class="form-control" id="editCheckInTime"
-           name="attendance_check_in_time" style="width: 70%;">
-    
-    <!-- 체크박스와 라벨을 따로 정렬 -->
-    <div class="d-flex align-items-center ms-2" style="width: 30%; justify-content: flex-start;">
-      <input class="form-check-input mt-0 me-2" type="checkbox" id="lateCheckbox" name="attendance_late_yn">
-      <label for="lateCheckbox" class="form-label mb-0">지각</label>
-    </div>
-  </div>
-</div>
-
-<!-- 퇴근일시 + 조퇴 -->
-<div class="mb-3">
-  <label for="editCheckOutTime" class="form-label fw-semibold">퇴근일시</label>
-  <div class="d-flex align-items-center justify-content-between">
-    <input type="datetime-local" class="form-control" id="editCheckOutTime"
-           name="attendance_check_out_time" style="width: 70%;">
-    
-    <div class="d-flex align-items-center ms-2" style="width: 30%; justify-content: flex-start;">
-      <input class="form-check-input mt-0 me-2" type="checkbox" id="earlyLeaveCheckbox" name="attendance_early_leave_yn">
-      <label for="earlyLeaveCheckbox" class="form-label mb-0">조퇴</label>
-    </div>
-  </div>
-</div>
-	
-	      </div>
-	
-	      <!-- 푸터 -->
-	      <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
-	        <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">취소</button>
-	        <button type="submit" class="btn btn-primary">일정 등록</button>
-	      </div>
-	    </form>
-	  </div>
-	</div>
-</div>
 <script>
 	// 상단에 현재 날짜 표시
 	function updateCurrentTime() {
