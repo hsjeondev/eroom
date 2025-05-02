@@ -41,6 +41,9 @@ td.name p {
   text-decoration: underline;
   color: #007bff;  /* 진한 파랑 계열 (Bootstrap의 primary 색상) */
 }
+.treeview-row {
+  pointer-events: none;
+}
 </style>
 </head>
 <body>
@@ -61,14 +64,14 @@ td.name p {
 							</button>
 						</div>
 						<ul class="mb-0 treeview" id="treeviewExample">
-							<li class="treeview-list-item"><a data-bs-toggle="collapse" href="#treeviewExample-1-1" role="button" aria-expanded="true">
+							<li class="treeview-list-item"><a id="companyRoot" href="javascript:void(0);" role="button" aria-expanded="true">
 									<p class="treeview-text text-nowrap">
 										<span class="fa-solid fa-folder treeview-icon text-info-light"></span> <span class="treeview-label-text treeview-label-strong">이룸 컴퍼니</span>
 									</p>
 							</a>
 								<ul class="collapse treeview-list" id="treeviewExample-1-1" data-show="true">
 
-									<li th:each="dept, deptStatus : ${departmentList}" class="treeview-list-item"><a class="treeview-dept" th:attr="data-deptCodeName=${dept.codeName}" data-bs-toggle="collapse" th:href="'#treeview-dept-' + ${deptStatus.index}" role="button" aria-expanded="false">
+									<li th:each="dept, deptStatus : ${departmentList}" class="treeview-list-item"><a class="treeview-dept" th:attr="data-deptSeparatorCode=${dept.separatorCode}" data-bs-toggle="collapse" th:href="'#treeview-dept-' + ${deptStatus.index}" role="button" aria-expanded="false">
 											<p class="treeview-text text-nowrap">
 												<span class="fa-solid fa-folder treeview-icon"></span> <span class="treeview-label-text" 
 																											th:text="${dept.codeName}"
@@ -79,7 +82,7 @@ td.name p {
 
 										<ul class="collapse treeview-list" th:id="'treeview-dept-' + ${deptStatus.index}" data-show="false">
 											<li th:each="team, teamStatus : ${teamMap[dept.codeName]}" class="treeview-list-item">
-												<div class="treeview-item treeview-team" th:attr="data-teamCodeName=${team.codeName}">
+												<div class="treeview-item treeview-team" th:attr="data-teamSeparatorCode=${team.separatorCode}">
 													<a class="flex-1 ps-2 ms-2" href="#!">
 														<p class="treeview-text text-nowrap">
 															<span class="treeview-icon fa-solid fa-file-lines"></span> <span class="treeview-label-text" 
@@ -113,7 +116,7 @@ td.name p {
 							<div class="col-auto">
 								<!-- 검색 -->
 								<div class="search-box">
-										<input class="form-control search-input search" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
+										<input id="searchInput" class="form-control search-input search" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
 										<svg style="height: 40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
 											<path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path></svg>
 										<!-- <span class="fas fa-search search-box-icon"></span> Font Awesome fontawesome.com -->
@@ -121,38 +124,68 @@ td.name p {
 							</div>
 
 							<!-- 부서/팀 필터 -->
-							<!-- 윤아님거 한번 봤는데 내 방식대로 해야할 필요가 있다.. 트리구조까지 짜려면 내가 쓴 방법으로 해야 좋음 + 트리구조와 select 동시 연동 생각하려면.. 내가 짜야 좋다. -->
-							<div class="col-auto scrollbar overflow-hidden-y flex-grow-1">
+							<!-- <div class="col-auto scrollbar overflow-hidden-y flex-grow-1">
 								<div class="btn-group position-static" role="group">
 									<div class="btn-group position-static text-nowrap">
 										<button style="height: 37.55px;" class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
 											부서<svg style="height: 70%;" class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
 												<path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg>
-											<!-- <span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com -->
+											<span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com
 										</button>
-										<ul class="dropdown-menu">
-											<li><a class="dropdown-item" href="#">영업부</a></li>
-											<li><a class="dropdown-item" href="#">운영부</a></li>
-											<li><a class="dropdown-item" href="#">기획부</a></li>
+										<ul class="dropdown-menu" id="deptDropdown">
+											<li ><a class="dropdown-item active" href="#" >전체</a></li>
+											<li  th:each="dept, deptStatus : ${departmentList}"><a class="dropdown-item" href="#"  th:text="${dept.codeName}">부서명</a></li>
 										</ul>
 									</div>
 									<div class="btn-group position-static text-nowrap">
 										<button style="height: 37.55px;" class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
 											팀<svg style="height: 70%;" class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
 												<path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg>
-											<!-- <span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com -->
+											<span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com
 										</button>
-										<ul class="dropdown-menu">
-											<li><a class="dropdown-item" href="#">인사팀</a></li>
-											<li><a class="dropdown-item" href="#">개발팀</a></li>
-											<li><a class="dropdown-item" href="#">영업팀</a></li>
-											<li></li>
+										<ul class="dropdown-menu" id="teamDropdown">
+										  <li><a class="dropdown-item active" href="#">전체</a></li>
 										</ul>
 									</div>
 								</div>
+							</div> -->
+							<!-- 부서/팀 필터 -->
+							<div class="col-auto scrollbar overflow-hidden-y flex-grow-1">
+							  <div class="btn-group position-static" role="group">
+							    <!-- 부서 드롭다운 -->
+							    <div class="btn-group position-static text-nowrap">
+							      <button id="deptDropdownBtn" class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							        <span>부서</span>
+							        <svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" viewBox="0 0 448 512">
+							          <path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/>
+							        </svg>
+							      </button>
+							      <ul class="dropdown-menu" id="deptDropdown">
+							        <li><a class="dropdown-item active" href="#" data-separatorCode='selectAll'>전체</a></li>
+							        <li th:each="dept : ${departmentList}">
+							          <a class="dropdown-item" href="#" th:text="${dept.codeName}"  th:attr="data-separatorCode=${dept.separatorCode}" >부서명</a>
+							        </li>
+							      </ul>
+							    </div>
+							
+							    <!-- 팀 드롭다운 -->
+							    <div class="btn-group position-static text-nowrap">
+							      <button id="teamDropdownBtn" class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							        <span>팀</span>
+							        <svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" viewBox="0 0 448 512">
+							          <path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/>
+							        </svg>
+							      </button>
+							      <ul class="dropdown-menu" id="teamDropdown">
+							        <li><a class="dropdown-item active" href="#" data-teamname="전체">전체</a></li>
+							        <!-- 팀 항목은 부서 선택 시 비동기로 추가됨 -->
+							      </ul>
+							    </div>
+							  </div>
 							</div>
 
-							<!-- 회원 생성 버튼 -->
+
+							<!-- 부서/팀 추가 버튼 -->
 							<div class="col-auto">
 								<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDirectoryModal">부서/팀 추가</button>
 							</div>
@@ -529,42 +562,387 @@ td.name p {
 						  });
 					});
 				</script>
+				
+				<!-- 트리구조 최상위 클릭시 전 사원 조회 -->
+				<script>
+					document.addEventListener("DOMContentLoaded", function () {
+					  const companyRoot = document.getElementById("companyRoot");
+					  if (companyRoot) {
+					    companyRoot.addEventListener("click", function (e) {
+					      e.preventDefault();
+					      //console.log("a태그 직접 클릭됨");
+					      treeSelectEmployee("selectAll");
+					    });
+					  }
+					});
+				</script>
+
+
+
+
+
+				
 				<!-- 트리구조 선택시 비동기 방식으로 직원 조회 -->
 				<script>
-				// 트리 - 부서 클릭시 작동
-				document.querySelectorAll('.treeview-dept').forEach(item => {
-				  item.addEventListener('click', function (e) {
-				    const deptEl = e.target.closest('.treeview-dept');
-				    if (!deptEl) return;
-				
-				    const deptCodeName = deptEl.getAttribute('data-deptCodeName');
-				    treeSelectEmployee(deptCodeName);
-				  });
-				});
-				// 트리 - 팀 클릭시 작동
-				document.querySelectorAll('.treeview-team').forEach(item => {
-				  item.addEventListener('click', function (e) {
-				    const teamEl = e.target.closest('.treeview-team');
-				    if (!teamEl) return;
-				
-				    const teamCodeName = teamEl.getAttribute('data-teamCodeName');
-				    treeSelectEmployee(teamCodeName);
-				  });
-				});
-				
-				const treeSelectEmployee = function(codeName){
-					//console.log(code);
-				  fetch(`/directory/employeeList?codeName=${codeName}`)
-					.then(response => response.text())
-					.then(html => {
-					  document.getElementById('employeeListInsert').innerHTML = html;
-					})
-					.catch(err => {
-					  console.error('직원 리스트 불러오기 실패:', err);
+					  let selectedDeptSeparatorCode = null;
+				document.addEventListener("DOMContentLoaded", function () {
+					  const deptDropdown = document.getElementById('deptDropdown');
+					  const teamDropdown = document.getElementById('teamDropdown');
+					  const deptBtn = deptDropdown.closest('.btn-group')?.querySelector('button span');
+					  const teamBtn = teamDropdown.closest('.btn-group')?.querySelector('button span');
+
+					  
+					  // 부서 클릭 이벤트 등록
+					  document.querySelectorAll('.treeview-dept').forEach(item => {
+					    item.addEventListener('click', function (e) {
+					      const deptEl = e.target.closest('.treeview-dept');
+					      if (!deptEl) return;
+
+					      const deptSeparatorCode = deptEl.getAttribute('data-deptSeparatorCode');
+					      treeSelectEmployee(deptSeparatorCode);
+					      selectedDeptSeparatorCode = deptSeparatorCode;
+					      
+
+					      // 부서명으로 드롭다운 값 동기화
+					      const deptName = deptEl.querySelector('.treeview-label-text')?.textContent?.trim();
+					      const deptDropdownItems = deptDropdown.querySelectorAll('.dropdown-item');
+
+					      if (deptName && deptDropdownItems && deptBtn) {
+					        deptDropdownItems.forEach(el => {
+					          el.classList.remove('active');
+					          if (el.textContent.trim() === deptName) {
+					            el.classList.add('active');
+					            deptBtn.textContent = deptName;
+					            el.setAttribute('data-separatorcode', deptSeparatorCode); // 추가된 부분
+					          }
+					        });
+					      }
+					      
+
+					      // 팀 드롭다운 초기화 및 조회
+					      if (deptSeparatorCode !== '전체') {
+					        fetch(`/directory/teams?separatorCode=${encodeURIComponent(deptSeparatorCode)}`)
+					          .then(res => res.json())
+					          .then(data => {
+					            teamDropdown.innerHTML = '';
+					            const all = document.createElement('li');
+					            all.innerHTML = `<a class="dropdown-item active" href="#" data-separatorcode="전체">전체</a>`;
+					            teamDropdown.appendChild(all);
+					            teamBtn.textContent = '전체';
+
+					            data.forEach(team => {
+					              const li = document.createElement('li');
+					              li.innerHTML = `<a class="dropdown-item" href="#" data-separatorcode="${team.separatorCode}">${team.codeName}</a>`;
+					              teamDropdown.appendChild(li);
+					            });
+					          });
+					      } else {
+					        teamDropdown.innerHTML = `<li><a class="dropdown-item active" href="#" data-separatorcode="전체">전체</a></li>`;
+					        teamBtn.textContent = '전체';
+					      }
+					    });
+					  });
+
+					  // 팀 클릭 이벤트 등록
+					  document.querySelectorAll('.treeview-team').forEach(item => {
+					    item.addEventListener('click', function (e) {
+					      const teamEl = e.currentTarget;
+					      const teamSeparatorCode = teamEl.getAttribute('data-teamseparatorcode');
+					      if (!teamSeparatorCode) return;
+
+					      const teamName = teamEl.querySelector('.treeview-label-text')?.textContent?.trim();
+					      const parentDeptA = teamEl.closest('ul.treeview-list')?.previousElementSibling;
+					      if (!parentDeptA || !parentDeptA.classList.contains('treeview-dept')) return;
+
+					      const deptName = parentDeptA.querySelector('.treeview-label-text')?.textContent?.trim();
+					      const deptSeparatorCode = parentDeptA.getAttribute('data-deptSeparatorcode');
+
+					      // 부서 드롭다운에서 선택 적용
+					      deptBtn.textContent = deptName;
+					      deptDropdown.querySelectorAll('.dropdown-item').forEach(el => {
+					        el.classList.remove('active');
+					        if (el.textContent.trim() === deptName) {
+					          el.classList.add('active');
+					          el.setAttribute('data-separatorcode', deptSeparatorCode); // 추가된 부분
+					        }
+					      });
+
+					      // 팀 드롭다운 갱신
+					      if (deptSeparatorCode) {
+					        fetch(`/directory/teams?separatorCode=${encodeURIComponent(deptSeparatorCode)}`)
+					          .then(res => res.json())
+					          .then(data => {
+					            teamDropdown.innerHTML = '';
+					            const all = document.createElement('li');
+					            all.innerHTML = `<a class="dropdown-item" href="#" data-separatorcode="전체">전체</a>`;
+					            teamDropdown.appendChild(all);
+
+					            data.forEach(team => {
+					              const li = document.createElement('li');
+					              li.innerHTML = `<a class="dropdown-item" href="#" data-separatorcode="${team.separatorCode}">${team.codeName}</a>`;
+					              teamDropdown.appendChild(li);
+
+					              if (team.separatorCode === teamSeparatorCode) {
+					                li.querySelector('a').classList.add('active');
+					                teamBtn.textContent = team.codeName;
+					              }
+					            });
+
+					            // ✅ 드롭다운이 갱신된 후에 직원 리스트 불러오기
+					            treeSelectEmployee(teamSeparatorCode);
+					          });
+					      }
+					    });
+					  });
+					  
+
+
+
+					  // 검색창 초기화 함수
+					  const resetSearchInput = function () {
+					    document.getElementById('searchInput').value = '';
+					  };
 					});
-				};
+
+</script>
+
+<!-- 직원 리스트 불러오기 -->
+<script>
+
+	// 직원 리스트 비동기 호출 함수
+	window.treeSelectEmployee = function (separatorCode) {
+	  fetch(`/directory/employeeList?separatorCode=${separatorCode}`)
+	    .then(response => response.text())
+	    .then(html => {
+	      document.getElementById('employeeListInsert').innerHTML = html;
+			
+	      const targetEl = document.getElementById('employeeTable');
+	      if (!targetEl) return;
+	
+	      if (targetEl.listjsInstance && typeof targetEl.listjsInstance.destroy === 'function') {
+	        targetEl.listjsInstance.destroy();
+	        delete targetEl.listjsInstance;
+	      }
+	
+	      const options = JSON.parse(targetEl.getAttribute('data-list'));
+	      const newList = new List(targetEl, options);
+	      targetEl.listjsInstance = newList;
+	
+	      resetSearchInput();
+	    })
+	    .catch(err => {
+	      console.error('직원 리스트 불러오기 실패:', err);
+	    });
+	};
+
+</script>
+
 				
-				</script>
+<script th:inline="javascript">
+document.addEventListener("DOMContentLoaded", function () {
+  const deptDropdown = document.getElementById('deptDropdown');
+  const teamDropdown = document.getElementById('teamDropdown');
+  const deptBtn = deptDropdown.closest('.btn-group').querySelector('button span');
+  const teamBtn = teamDropdown.closest('.btn-group').querySelector('button span');
+
+  selectedDeptSeparatorCode = null;
+
+  // 부서 드롭다운 클릭
+  deptDropdown.addEventListener('click', function (e) {
+    const target = e.target.closest('.dropdown-item');
+    if (!target) return;
+    e.preventDefault();
+
+    const deptSeparatorCode = target.getAttribute('data-separatorcode') || target.textContent.trim();
+    if (!deptSeparatorCode) return;
+
+    selectedDeptSeparatorCode = deptSeparatorCode;
+
+    // 드롭다운 표시 갱신
+    deptBtn.textContent = target.textContent.trim();
+    [...deptDropdown.querySelectorAll('.dropdown-item')].forEach(el => el.classList.remove('active'));
+    target.classList.add('active');
+
+    // 직원 리스트 비동기 호출
+    fetchAndRenderEmployees(deptSeparatorCode);
+    
+
+    
+ 	// 트리뷰에서 해당 부서를 자동으로 열고 강조
+    const treeDeptAnchor = document.querySelector(`.treeview-dept[data-deptseparatorcode="${deptSeparatorCode}"]`);
+    if (treeDeptAnchor) {
+      const collapseEl = document.querySelector(treeDeptAnchor.getAttribute('href'));
+      if (collapseEl && !collapseEl.classList.contains('show')) {
+        new bootstrap.Collapse(collapseEl, { toggle: true }); // 열기
+      }
+
+      // 강조 효과 적용
+      document.querySelectorAll('.treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
+      document.querySelectorAll('.treeview-label-text.treeview-label-strong').forEach(el => el.classList.remove('treeview-label-strong'));
+      restoreCompanyRootHighlight();
+	
+      
+      
+      const icon = treeDeptAnchor.querySelector('.treeview-icon');
+      const label = treeDeptAnchor.querySelector('.treeview-label-text');
+      if (icon) icon.classList.add('text-info-light');
+      if (label) label.classList.add('treeview-label-strong');
+      
+
+      
+      
+    }
+
+    // 팀 드롭다운 초기화 및 조회
+    console.log(deptSeparatorCode);
+    if (deptSeparatorCode === 'selectAll') {
+    	  // selectAll인 경우 → 강조 제거 + 드롭다운 초기화
+    	  document.querySelectorAll('.treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
+    	  document.querySelectorAll('.treeview-label-text.treeview-label-strong').forEach(el => el.classList.remove('treeview-label-strong'));
+    	  restoreCompanyRootHighlight();
+
+    	  teamDropdown.innerHTML = `<li><a class="dropdown-item active" href="#" data-separatorcode="전체">전체</a></li>`;
+    	  teamBtn.textContent = '전체';
+
+    	} else if (deptSeparatorCode !== '전체') {
+      fetch(`/directory/teams?separatorCode=${encodeURIComponent(deptSeparatorCode)}`)
+        .then(res => res.json())
+        .then(data => {
+          teamDropdown.innerHTML = '';
+          const all = document.createElement('li');
+          all.innerHTML = `<a class="dropdown-item active" href="#" data-separatorcode="전체">전체</a>`;
+          teamDropdown.appendChild(all);
+          teamBtn.textContent = '전체';
+
+          data.forEach(team => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a class="dropdown-item" href="#" data-separatorcode="${team.separatorCode}">${team.codeName}</a>`;
+            teamDropdown.appendChild(li);
+          });
+        });
+    } else {
+      teamDropdown.innerHTML = `<li><a class="dropdown-item active" href="#" data-separatorcode="전체">전체</a></li>`;
+      teamBtn.textContent = '전체';
+    }
+  });
+
+  // 팀 드롭다운 클릭
+  teamDropdown.addEventListener('click', function (e) {
+    const target = e.target.closest('.dropdown-item');
+    if (!target) return;
+    e.preventDefault();
+
+    const teamSeparatorCode = target.getAttribute('data-separatorcode') || target.textContent.trim();
+    if (!teamSeparatorCode) return;
+
+    teamBtn.textContent = target.textContent.trim();
+    [...teamDropdown.querySelectorAll('.dropdown-item')].forEach(el => el.classList.remove('active'));
+    target.classList.add('active');
+
+      
+   		 if (teamSeparatorCode === '전체') {
+    	  if (selectedDeptSeparatorCode && selectedDeptSeparatorCode !== '전체') {
+    	    fetchAndRenderEmployees(selectedDeptSeparatorCode);  // ✅ 해당 부서의 전체 팀
+    	  } else {
+    	    fetchAndRenderEmployees('selectAll'); // ✅ 모든 사원
+    	  }
+    	  // 트리뷰에서 팀 강조 제거
+    	  document.querySelectorAll('.treeview-team .treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
+    	  document.querySelectorAll('.treeview-team .treeview-label-text.treeview-label-strong').forEach(el => el.classList.remove('treeview-label-strong'));
+
+    	} else {
+    	  fetchAndRenderEmployees(teamSeparatorCode); // ✅ 특정 팀
+    	}
+
+      
+ 	  // 트리뷰에서 해당 팀을 자동으로 열고 강조
+      const teamDiv = document.querySelector(`.treeview-team[data-teamseparatorcode="${teamSeparatorCode}"]`);
+      if (teamDiv) {
+        const teamAnchor = teamDiv.querySelector('a');
+        const label = teamAnchor?.querySelector('.treeview-label-text');
+        const icon = teamAnchor?.querySelector('.treeview-icon');
+
+        // 강조 초기화
+        document.querySelectorAll('.treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
+        document.querySelectorAll('.treeview-label-text.treeview-label-strong').forEach(el => el.classList.remove('treeview-label-strong'));
+        restoreCompanyRootHighlight();
+
+        // 강조 적용
+        if (icon) icon.classList.add('text-info-light');
+        if (label) label.classList.add('treeview-label-strong');
+
+        // 상위 collapse (부서) 열기
+        const parentCollapse = teamDiv.closest('ul.treeview-list');
+        if (parentCollapse && !parentCollapse.classList.contains('show')) {
+          new bootstrap.Collapse(parentCollapse, { toggle: true });
+        }
+
+        // 상위 부서 라벨/아이콘도 강조
+        const deptAnchor = parentCollapse?.previousElementSibling;
+        if (deptAnchor?.classList.contains('treeview-dept')) {
+          const deptIcon = deptAnchor.querySelector('.treeview-icon');
+          const deptLabel = deptAnchor.querySelector('.treeview-label-text');
+          if (deptIcon) deptIcon.classList.add('text-info-light');
+          if (deptLabel) deptLabel.classList.add('treeview-label-strong');
+        }
+      }
+
+      
+      
+      
+    
+  });
+
+  function fetchAndRenderEmployees(separatorCode) {
+    fetch(`/directory/employeeList?separatorCode=${encodeURIComponent(separatorCode)}`)
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('employeeListInsert').innerHTML = html;
+
+        const targetEl = document.getElementById('employeeTable');
+        if (!targetEl) return;
+
+        if (targetEl.listjsInstance && typeof targetEl.listjsInstance.destroy === 'function') {
+          targetEl.listjsInstance.destroy();
+          delete targetEl.listjsInstance;
+        }
+
+        const options = JSON.parse(targetEl.getAttribute('data-list'));
+        const newList = new List(targetEl, options);
+        targetEl.listjsInstance = newList;
+      })
+      .catch(err => console.error("직원 리스트 비동기 로딩 실패:", err));
+
+    	resetSearchInput();
+  }
+});
+</script>
+
+<!-- 검색어 초기화 -->
+<script>
+	const resetSearchInput = function(){
+		document.getElementById('searchInput').value = '';
+	}
+</script>
+<!-- 최상위 트리구조 강조 복구 -->
+<script>
+	
+
+	function restoreCompanyRootHighlight() {
+	  const companyRoot = document.getElementById('companyRoot');
+	  if (!companyRoot) return;
+
+	  const icon = companyRoot.querySelector('.treeview-icon');
+	  const label = companyRoot.querySelector('.treeview-label-text');
+
+	  if (icon) icon.classList.add('text-info-light');
+	  if (label) label.classList.add('treeview-label-strong');
+	}
+
+</script>
+								
+
+
 
 
 
@@ -572,6 +950,8 @@ td.name p {
 
 
 	</main>
+	
+	
 
 </body>
 </html>
