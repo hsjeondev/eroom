@@ -105,7 +105,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						          th:data-bs-target="'#confirmDeleteModal-' + ${trashMail.mailNo}">🗑️ 삭제</button>
 						</form> -->
                       <form th:action="@{/mail/trash/{id}(id=${trashMail.mailNo})}" method="post">
-                        	<input type="hidden" name="redirectUrl" value="/mail/Trash"/>
+                        	<input type="hidden" name="redirectUrl" value="/mail/trash"/>
 						  <button type="submit" class="dropdown-item">복구 아직</button>
 						</form>
                         </div>
