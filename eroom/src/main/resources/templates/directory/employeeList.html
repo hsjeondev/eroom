@@ -531,40 +531,59 @@ td.name p {
 				</script>
 				<!-- 트리구조 선택시 비동기 방식으로 직원 조회 -->
 				<script>
-				// 트리 - 부서 클릭시 작동
-				document.querySelectorAll('.treeview-dept').forEach(item => {
-				  item.addEventListener('click', function (e) {
-				    const deptEl = e.target.closest('.treeview-dept');
-				    if (!deptEl) return;
+				  // 부서 클릭 이벤트 등록
+				  document.querySelectorAll('.treeview-dept').forEach(item => {
+				    item.addEventListener('click', function (e) {
+				      const deptEl = e.target.closest('.treeview-dept');
+				      if (!deptEl) return;
 				
-				    const deptCodeName = deptEl.getAttribute('data-deptCodeName');
-				    treeSelectEmployee(deptCodeName);
+				      const deptCodeName = deptEl.getAttribute('data-deptCodeName');
+				      treeSelectEmployee(deptCodeName);
+				    });
 				  });
-				});
-				// 트리 - 팀 클릭시 작동
-				document.querySelectorAll('.treeview-team').forEach(item => {
-				  item.addEventListener('click', function (e) {
-				    const teamEl = e.target.closest('.treeview-team');
-				    if (!teamEl) return;
 				
-				    const teamCodeName = teamEl.getAttribute('data-teamCodeName');
-				    treeSelectEmployee(teamCodeName);
+				  // 팀 클릭 이벤트 등록
+				  document.querySelectorAll('.treeview-team').forEach(item => {
+				    item.addEventListener('click', function (e) {
+				      const teamEl = e.target.closest('.treeview-team');
+				      if (!teamEl) return;
+				
+				      const teamCodeName = teamEl.getAttribute('data-teamCodeName');
+				      treeSelectEmployee(teamCodeName);
+				    });
 				  });
-				});
 				
-				const treeSelectEmployee = function(codeName){
-					//console.log(code);
-				  fetch(`/directory/employeeList?codeName=${codeName}`)
-					.then(response => response.text())
-					.then(html => {
-					  document.getElementById('employeeListInsert').innerHTML = html;
-					})
-					.catch(err => {
-					  console.error('직원 리스트 불러오기 실패:', err);
-					});
-				};
+				  const treeSelectEmployee = function(codeName) {
+				    fetch(`/directory/employeeList?codeName=${codeName}`)
+				      .then(response => response.text())
+				      .then(html => {
+				        // 1. 직원 리스트 영역에 새로운 HTML 삽입
+				        document.getElementById('employeeListInsert').innerHTML = html;
 				
+				        // 2. List.js 대상 엘리먼트
+				        const targetEl = document.getElementById('employeeTable');
+				        if (!targetEl) return;
+				
+				        // 3. 기존 인스턴스 제거
+				        if (targetEl.listjsInstance && typeof targetEl.listjsInstance.destroy === 'function') {
+				          targetEl.listjsInstance.destroy();
+				          delete targetEl.listjsInstance;
+				        }
+				
+				        // 4. 새로 초기화 (DOM 요소 직접 전달)
+				        const options = JSON.parse(targetEl.getAttribute('data-list'));
+				        const newList = new List(targetEl, options);
+				
+				        // 5. 인스턴스 저장
+				        targetEl.listjsInstance = newList;
+				      })
+				      .catch(err => {
+				        console.error('직원 리스트 불러오기 실패:', err);
+				      });
+				  };
 				</script>
+
+
 
 
 
