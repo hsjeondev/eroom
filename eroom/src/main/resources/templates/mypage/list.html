@@ -8,6 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <meta charset="UTF-8">
 <title>마이페이지</title>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <style>
     .profile-wrapper {
       position: relative;
@@ -138,7 +139,7 @@
 	      <!-- 차트 카드 -->
 	        <div class="card">
 	          <div class="card-body">
-	            <div class="fw-bold fs-8 mb-3 text-secondary">근태 요약</div>
+	            <div class="fw-bold fs-8 mb-3 text-secondary">이번 달 근태 요약</div>
 	            <div class="row text-center">
 	              <div class="col text-center d-flex flex-column align-items-center">
 	                <div class="fw-semibold mb-2">출근일수</div>
@@ -179,7 +180,7 @@
 						
 						<!--  수정 버튼 -->
 						<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
-						        data-bs-toggle="modal" data-bs-target="#editInfoModal">
+						        data-bs-toggle="modal" data-bs-target="#editEmployeeModal">
 							<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
 							     focusable="false" data-prefix="fas" data-icon="pen" role="img"
 							     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -220,7 +221,7 @@
 	        <div class="card p-3 shadow-sm">
 	          <div class="card-title d-flex justify-content-between align-items-center mb-3">
 	            <span class="fw-bold fs-8 text-secondary">근무시간 통합 차트</span>
-	            <p class="text-muted mb-0">이번달 총 근무시간: <strong class="text-primary" th:text="${totalWorkTime}">000시간 00분</strong></p>
+	            <p class="text-muted mb-0">이번 달 총 근무시간: <strong class="text-primary" th:text="${totalWorkTime}">000시간 00분</strong></p>
 	          </div>
 	          <canvas id="workTimeMixedChart" height="260"></canvas>
 	        </div>
@@ -557,38 +558,123 @@
 </div>
 
 <!--주소록 정보 수정 모달 -->
-<div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editInfoModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editInfoModalLabel">정보 수정</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+<div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+    <div class="modal-content border border-secondary">
+      <form id="editEmployeeForm" autocomplete="off">
+        <!-- 헤더 -->
+        <div class="modal-header bg-light">
+          <h5 class="modal-title" id="editEmployeeModalLabel">회원 정보 수정</h5>
+          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- 바디 -->
+        <div class="modal-body px-4 py-3">
+
+          <!-- 이름 -->
+          <div class="mb-3">
+            <label for="editEmployeeName" class="form-label fw-semibold">이름</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="editEmployeeName" name="employee_name" required>
+              <button type="button" class="btn btn-outline-secondary" id="editCheckNameBtn">중복확인</button>
+            </div>
+            <small id="editNameCheckMsg" class="form-text d-none"></small>
+          </div>
+
+          <!-- 연락처 -->
+          <div class="mb-3">
+            <label for="editDirectoryPhone" class="form-label fw-semibold">연락처</label>
+            <input type="text" class="form-control" id="editDirectoryPhone" name="directory_phone" required placeholder="010-0000-0000">
+          </div>
+
+		  <!-- 주소 -->
+		  <div class="mb-3">
+			<label class="form-label fw-semibold">주소</label>
+			<div class="input-group mb-2">
+			  <input type="text" class="form-control" id="editDirectoryZipcode" name="directory_zipcode" placeholder="우편번호" readonly>
+			  <button type="button" class="btn btn-outline-secondary" onclick="execDaumPostcodeForEdit()">주소 검색</button>
+			</div>
+			<input type="text" class="form-control mb-2" id="editDirectoryAddress" name="directory_address" placeholder="주소" readonly>
+		  </div>
+
+        </div>
+
+        <!-- 푸터 -->
+        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="saveEditEmployeeBtn">저장</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+<!-- 공통 저장 확인 모달 -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">확인</h5>
       </div>
-      <div class="modal-body">
-        <form id="editInfoForm">
-          <div class="mb-3">
-            <label for="emailInput" class="form-label">이메일</label>
-            <input type="email" class="form-control" id="emailInput" required>
-          </div>
-          <div class="mb-3">
-            <label for="phoneInput" class="form-label">전화번호</label>
-            <input type="text" class="form-control" id="phoneInput" required>
-          </div>
-          <div class="mb-3">
-            <label for="addressInput" class="form-label">주소</label>
-            <input type="text" class="form-control" id="addressInput" required>
-          </div>
-        </form>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+        </p>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-light" data-bs-dismiss="modal">취소</button>
-        <button class="btn btn-primary" onclick="saveInfo()">저장</button>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
       </div>
     </div>
   </div>
 </div>
-
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="unsavedEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 회원 수정 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmEditCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
+//주소 API 실행 함수(회원 수정용)
+function execDaumPostcodeForEdit() {
+  new daum.Postcode({
+    oncomplete: function(data) {
+      document.getElementById('editDirectoryZipcode').value = data.zonecode;
+      document.getElementById('editDirectoryAddress').value = data.roadAddress;
+    }
+  }).open();
+}
+
 // 차트 데이터를 받아서 각 차트를 렌더링하는 함수
 async function renderCharts() {
 	// 1. API 호출
