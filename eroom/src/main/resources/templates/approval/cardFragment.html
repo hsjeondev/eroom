@@ -1,16 +1,16 @@
 <!-- approval/cardFragment.html -->
 							<!-- 카드1 thymeleaf 사용중 -->
-						<div th:fragment="cardFragment" class="col-12 col-xl-6" th:each="list, listStatus : ${resultList}">
+						<div th:fragment="cardFragment" class="col-12 col-xl-6 list" th:each="list, listStatus : ${resultList}">
 							<div class="card h-100">
 								<div class="card-body">
 									<!-- 결재문서 이름/ 진행상태 / 작성자 이름 칸 -->
 									<div class="border-bottom border-translucent">
 										<div class="d-flex align-items-start mb-1">
-											<div class="d-sm-flex align-items-center ps-2"><a class="fw-bold fs-7 lh-sm title line-clamp-1 me-sm-4" th:text="${list.approval_title}" th:href="@{/approval/{no}/detail(no=${list.approval_no})}">결재 제목</a>
+											<div class="d-sm-flex align-items-center ps-2"><a class="fw-bold fs-7 lh-sm title line-clamp-1 me-sm-4 title" th:text="${list.approval_title}" th:href="@{/approval/{no}/detail(no=${list.approval_no})}">결재 제목</a>
 												<div class="d-flex align-items-center">
 												
 													<!-- 빨간색 -->
-													<span th:if="${list.approval_status == 'D'}">
+													<span th:if="${list.approval_status == 'D'}" class="state">
 														<svg class="svg-inline--fa fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
 															<g transform="translate(256 256)">
 																<g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
@@ -21,7 +21,7 @@
 													</span>
 													
 													<!-- 초록색 -->
-													<span th:if="${list.approval_status == 'A'}">
+													<span th:if="${list.approval_status == 'A'}" class="state">
 														<svg class="svg-inline--fa fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
 														  <g transform="translate(256 256)">
 															  <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
@@ -32,7 +32,7 @@
 													</span>
 													
 													<!-- 파란색 -->
-													<span th:if="${list.approval_status == 'S'}">
+													<span th:if="${list.approval_status == 'S'}" class="state">
 														<svg class="svg-inline--fa fa-circle me-1 text-info" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
 												            <g transform="translate(256 256)">
 													            <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
@@ -43,7 +43,7 @@
 										            </span>
 													
 													<!-- 주황색 -->
-													<span th:if="${list.approval_status == 'F'}">
+													<span th:if="${list.approval_status == 'F'}" class="state">
 														<svg class="svg-inline--fa fa-circle me-1 text-warning" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
 												            <g transform="translate(256 256)">
 													            <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
@@ -68,17 +68,17 @@
 											<a class="fw-semibold fs-9">
 												결재자 : 
 											</a>
-											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step >= 1}"  th:text="|${member.employee.employeeName} |">결재자목록</span>
+											<span class="fw-semibold fs-9 text1" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step >= 1}"  th:text="|${member.employee.employeeName} |">결재자목록</span>
 											<br>
 											<a class="fw-semibold fs-9">
 												합의자 : 
 											</a>
-											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == 0}"  th:text="|${member.employee.employeeName} |">합의자목록</span>
+											<span class="fw-semibold fs-9 text2" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == 0}"  th:text="|${member.employee.employeeName} |">합의자목록</span>
 											<br>
 											<a class="fw-semibold fs-9">
 												참조자 : 
 											</a>
-											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == -1}"  th:text="|${member.employee.employeeName} |">참조자목록</span>
+											<span class="fw-semibold fs-9 text3" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == -1}"  th:text="|${member.employee.employeeName} |">참조자목록</span>
 										</div>
 										
 										<!-- 결재양식  -->
@@ -104,3 +104,4 @@
 							</div><!-- card h-100 끝 -->
 						</div><!-- col-12 col-xl-6 -->
 						<!-- 카드1 끝 -->
+						<div th:if=${#list.isEmpty(resultList)}>테스트1</div>
