@@ -1270,27 +1270,64 @@ if (timePreview) {
 			    .then(data => {
 			      const chatHistory = document.querySelector(".chat-history");
 			      if (!chatHistory) return;
-			      
+
 			      chatHistory.innerHTML = "<hr>"; // 초기화
 
 			      if (data.messageList && data.messageList.length > 0) {
 			        const myEmployeeNo = document.getElementById("myEmployeeNo").value;
-					
+
 			        data.messageList.forEach(msg => {
 			          const isMyMessage = (msg.senderMember == myEmployeeNo);
+			          const hasText = !!msg.chatMessageContent;
+			          const hasFile = !!msg.drivePath;
+
+			          if (!hasText && !hasFile) return; // 둘 다 없으면 스킵
+
 			          const messageDiv = document.createElement("div");
-			          messageDiv.className = "mb-2";
-			          messageDiv.innerHTML = `
-			            <div class="d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'}">
-			              <div class="p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}" style="max-width: 70%;">
-			                ${msg.chatMessageContent}
-			              </div>
-			            </div>
-			          `;
+			          messageDiv.className = "mb-3";
+
+			          const messageWrapper = document.createElement("div");
+			          messageWrapper.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
+
+			          const bubble = document.createElement("div");
+			          bubble.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
+			          bubble.style.maxWidth = "70%";
+
+			          // 텍스트 추가
+			          if (hasText) {
+			            const text = document.createElement("div");
+			            text.textContent = msg.chatMessageContent;
+			            bubble.appendChild(text);
+			          }
+
+			          // 파일 처리
+			          if (hasFile) {
+			            const ext = msg.drivePath.split('.').pop().toLowerCase();
+			            const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
+
+			            if (isImage) {
+			              const img = document.createElement("img");
+			              img.src = "/files" + msg.drivePath;
+			              img.style.maxWidth = "100%";
+			              img.style.borderRadius = "8px";
+			              img.style.marginTop = "8px";
+			              bubble.appendChild(img);
+			            } else {
+			              const link = document.createElement("a");
+			              link.href = "/files" + msg.drivePath;
+			              link.target = "_blank";
+			              link.className = "badge bg-info text-white mt-2 d-inline-block";
+			              link.innerText = "📎 첨부파일 보기";
+			              bubble.appendChild(link);
+			            }
+			          }
+
+			          messageWrapper.appendChild(bubble);
+			          messageDiv.appendChild(messageWrapper);
 			          chatHistory.appendChild(messageDiv);
 			        });
 
-			        // 스크롤 맨 밑으로
+			        // 스크롤 맨 밑으로 이동
 			        const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
 			        if (chatArea) {
 			          chatArea.scrollTop = chatArea.scrollHeight;
@@ -1301,6 +1338,7 @@ if (timePreview) {
 			      console.error("채팅방 상세 조회 실패:", error);
 			    });
 			}
+
 		function bindFilePreview() {
 			  const fileInput = document.getElementById("chatFileInput");
 			  console.log("📁 파일 미리보기 바인딩됨");

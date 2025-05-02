@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.eroom.drive.entity.Drive;
 import com.eroom.employee.entity.Employee;
 
 import jakarta.persistence.Column;
@@ -59,5 +60,8 @@ public class ChatMessage {
 	@OneToMany(mappedBy = "chatMessage")
 	private List<ChatAlarm> chatAlarmList; // 채팅 알림 리스트
 	
+	@ManyToOne
+	@JoinColumn(name = "drive_attach_no")
+	private Drive drive;
 	
 }
