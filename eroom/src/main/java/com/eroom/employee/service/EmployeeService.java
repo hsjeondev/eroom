@@ -274,6 +274,17 @@ public class EmployeeService {
 				updated = true;
 			}
 			
+			// 우편번호 변경 감지
+			if(dto.getDirectory_zipcode() != null && !dto.getDirectory_zipcode().equals(directory.getDirectoryZipcode())) {
+				directory.setDirectoryZipcode(dto.getDirectory_zipcode());
+				updated = true;
+			}
+			// 주소 변경 감지
+			if(dto.getDirectory_address() != null && !dto.getDirectory_address().equals(directory.getDirectoryAddress())) {
+				directory.setDirectoryAddress(dto.getDirectory_address());
+				updated = true;
+			}
+			
 			// visible_yn 퇴사자 : N / 재직자 : Y
 			String employmentYn = dto.getEmployee_employment_yn();
 			if(employmentYn != null) {

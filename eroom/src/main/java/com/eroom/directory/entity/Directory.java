@@ -65,7 +65,10 @@ public class Directory {
 	private String directoryDepartment; // 부서명
 	@Column(name = "directory_team")
 	private String directoryTeam; // 팀명
-	
+	@Column(name = "directory_zipcode")
+	private String directoryZipcode; // 우편번호
+	@Column(name = "directory_address")
+	private String directoryAddress; // 주소
 	@OneToOne
 	@ToString.Exclude
 	@JoinColumn(name = "employee_no")
