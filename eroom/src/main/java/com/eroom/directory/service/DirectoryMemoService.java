@@ -58,6 +58,7 @@ public class DirectoryMemoService {
 					
 				}
 			}
+			directoryMemoEntity.setDirectoryMemoCreator(employee.getEmployeeId());
 			directoryMemoRepository.save(directoryMemoEntity);
 			
 			result = 1;
