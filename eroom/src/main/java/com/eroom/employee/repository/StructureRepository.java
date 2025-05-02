@@ -30,4 +30,7 @@ public interface StructureRepository extends JpaRepository<Structure, Long>{
 	//부서 캘린더 조회
 	@Query("SELECT s.separatorCode FROM Structure s WHERE s.parentCode = :departmentCode AND s.visibleYn = 'Y'")
 	List<String> findTeamCodesByDepartment(@Param("departmentCode") String departmentCode);
+
+	// 부서코드를 통한 부서 하위의 모든 팀 조회
+	List<Structure> findByParentCodeAndVisibleYn(String departmentSeparatorCode, String visibleYn);
 }
