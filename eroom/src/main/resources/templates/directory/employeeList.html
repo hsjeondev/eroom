@@ -794,7 +794,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // 팀 드롭다운 초기화 및 조회
-    if (deptSeparatorCode !== '전체') {
+    console.log(deptSeparatorCode);
+    if (deptSeparatorCode === 'selectAll') {
+    	  // selectAll인 경우 → 강조 제거 + 드롭다운 초기화
+    	  document.querySelectorAll('.treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
+    	  document.querySelectorAll('.treeview-label-text.treeview-label-strong').forEach(el => el.classList.remove('treeview-label-strong'));
+    	  restoreCompanyRootHighlight();
+
+    	  teamDropdown.innerHTML = `<li><a class="dropdown-item active" href="#" data-separatorcode="전체">전체</a></li>`;
+    	  teamBtn.textContent = '전체';
+
+    	} else if (deptSeparatorCode !== '전체') {
       fetch(`/directory/teams?separatorCode=${encodeURIComponent(deptSeparatorCode)}`)
         .then(res => res.json())
         .then(data => {
@@ -810,12 +820,6 @@ document.addEventListener("DOMContentLoaded", function () {
             teamDropdown.appendChild(li);
           });
         });
-      if(deptSeparatorCode == 'selectAll'){
-	      document.querySelectorAll('.treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
-	      document.querySelectorAll('.treeview-label-text.treeview-label-strong').forEach(el => el.classList.remove('treeview-label-strong'));
-	      restoreCompanyRootHighlight();
-    	  
-      }
     } else {
       teamDropdown.innerHTML = `<li><a class="dropdown-item active" href="#" data-separatorcode="전체">전체</a></li>`;
       teamBtn.textContent = '전체';
