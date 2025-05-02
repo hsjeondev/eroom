@@ -1,35 +1,8 @@
 package com.eroom.approval.controller;
 
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.web.IWebExchange;
-import org.thymeleaf.web.IWebRequest;
-import org.thymeleaf.web.servlet.JakartaServletWebApplication;
+
 import lombok.RequiredArgsConstructor;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-// import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 
 @Controller
 @RequiredArgsConstructor
