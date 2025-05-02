@@ -89,10 +89,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					  </a>
 					</div>
                     <div class="col-auto ms-auto">
-                      <!-- <div class="hover-actions end-0">
+                       <div class="hover-actions end-0">
                         <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
                         <div class="dropdown-menu dropdown-menu-end py-2">
-                        <a class="dropdown-item" href="#!">중요 표시 여기서도 이거 처리해야 되나</a>
+                       <!-- <a class="dropdown-item" href="#!">중요 표시 여기서도 이거 처리해야 되나</a>
                         
                         <form th:action="@{/mail/trash/{id}(id=${trashMail.mailNo})}" method="post">
                         	<input type="hidden" name="redirectUrl" value="/mail/trash"/>
@@ -103,10 +103,13 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						  <input type="hidden" name="redirectUrl" value="/mail/trash"/>
 						  <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" 
 						          th:data-bs-target="'#confirmDeleteModal-' + ${trashMail.mailNo}">🗑️ 삭제</button>
+						</form> -->
+                      <form th:action="@{/mail/trash/{id}(id=${trashMail.mailNo})}" method="post">
+                        	<input type="hidden" name="redirectUrl" value="/mail/Trash"/>
+						  <button type="submit" class="dropdown-item">복구 아직</button>
 						</form>
                         </div>
-                      </div> -->
-                      
+                      </div>
                       
                       <!-- 04/17 나중에 시간 남으면 좀 더 구성해보기 일단 전체 시간 다 보이게 설정함 -->
                        <span class="fs-10 fw-bold sendTime"
