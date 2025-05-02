@@ -1,7 +1,6 @@
 package com.eroom.report.service;
 
 import static net.sf.dynamicreports.report.builder.DynamicReports.report;
-
 import static net.sf.dynamicreports.report.builder.DynamicReports.stl;
 import static net.sf.dynamicreports.report.builder.DynamicReports.type;
 
