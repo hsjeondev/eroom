@@ -17,7 +17,9 @@ public class WebSocketConfig implements WebSocketConfigurer{
 	private final ApprovalWebSocketHandler approvalWebSocketHandler;
 	private final CompanyAlarmSocketHandler companyAlarmSocketHandler;
 	private final TeamAlarmSocketHandler teamAlarmSocketHandler;
-	 private final MailWebSocketHandler mailWebSocketHandler;
+	private final MailWebSocketHandler mailWebSocketHandler;
+	private final MailAlarmWebSocketHandler mailAlarmWebSocketHandler;
+	 
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 		registry.addHandler(basicWebSocketHandler, "/ws/basic")
@@ -41,6 +43,9 @@ public class WebSocketConfig implements WebSocketConfigurer{
          .setAllowedOrigins("http://localhost:8080");
 		 
 		 registry.addHandler(mailWebSocketHandler, "/ws/mail")
+         .addInterceptors(new CustomHandshakeInterceptor())
+         .setAllowedOrigins("http://localhost:8080");
+		 registry.addHandler(mailAlarmWebSocketHandler, "/ws/mail/alarm")
          .addInterceptors(new CustomHandshakeInterceptor())
          .setAllowedOrigins("http://localhost:8080");
 		
