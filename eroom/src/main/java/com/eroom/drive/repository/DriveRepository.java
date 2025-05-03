@@ -1,7 +1,6 @@
 package com.eroom.drive.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -67,7 +66,7 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
 	//List<Drive> findBySeparatorCodeAndParam1AndDriveDeleteYn(String separatorCode, Long param1, String driveDeleteYn);
 	List<Drive> findBySeparatorCodeAndParam1AndVisibleYn(String separatorCode, Long param1, String visibleYn);
 	
-	Optional<Drive> findByDriveOriNameAndParam1(String driveOriName, Long param1);
+	List<Drive> findByDriveOriNameAndParam1(String driveOriName, Long param1);
 
 	
 }

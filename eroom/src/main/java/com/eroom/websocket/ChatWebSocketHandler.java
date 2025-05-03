@@ -1,6 +1,7 @@
 package com.eroom.websocket;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -88,7 +89,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 .build();
         chatAlarmRepository.save(alarm);
     }
-
     public void broadcastMessage(ChatMessageDto dto, ChatMessage savedMessage) throws Exception {
         Employee sender = employeeRepository.findById(dto.getSenderMember())
                 .orElseThrow(() -> new IllegalArgumentException("보낸 사람 없음"));
@@ -103,10 +103,12 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         // [파일] 메시지일 경우 drive 정보 추가
         if (dto.getChatMessageContent().startsWith("[파일]")) {
             String fileName = dto.getChatMessageContent().substring(5);
-            Long chatroomNo = dto.getChatroomNo();// "고양이.jpg"
-            Drive drive = driveRepository.findByDriveOriNameAndParam1(fileName,chatroomNo).orElse(null);
-            if (drive != null) {
-            	sendData.put("drivePath", "/files/" + drive.getDrivePath()); 
+            Long chatroomNo = dto.getChatroomNo();
+            List<Drive> drives = driveRepository.findByDriveOriNameAndParam1(fileName, chatroomNo);
+
+            if (!drives.isEmpty()) {
+                Drive drive = drives.get(0); // 첫 번째 드라이브 선택 (또는 여러 드라이브 처리)
+                sendData.put("drivePath", "/filesdrive/chat/" + drive.getDrivePath());
                 sendData.put("driveOriName", drive.getDriveOriName());
             }
         }
@@ -124,6 +126,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             }
         }
     }
+
 
 
     private void sendToUser(Long userNo, String message) throws Exception {

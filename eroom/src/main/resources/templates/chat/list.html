@@ -1091,7 +1091,7 @@
 		
 		    if (isImage) {
 		        const img = document.createElement("img");
-		        img.src = "/files" + data.drivePath;
+		        img.src = data.drivePath;
 		        img.style.maxWidth = "150px";
 		        img.style.borderRadius = "8px";
 		        img.style.marginTop = "5px";
@@ -1207,76 +1207,68 @@ if (timePreview) {
 		  };
 		}
 		// 메시지 보내기
-		function sendMessage() {
-    const messageInput = document.getElementById("messageInput");
-    const message = messageInput.value.trim();
-    const fileInput = document.getElementById("chatFileInput");
+function sendMessage() {
+  const messageInput = document.getElementById("messageInput");
+  const message = messageInput.value.trim();
+  const fileInput = document.getElementById("chatFileInput");
 
-    if (!message && fileInput.files.length === 0) {
-        alert("메시지나 파일을 입력해주세요.");
-        return;
+  if (!message && fileInput.files.length === 0) {
+    alert("메시지나 파일을 입력해주세요.");
+    return;
+  }
+
+  const chatroomNo = document.querySelector(".chatroom-title").dataset.roomNo;
+  const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+  const receiverValue = document.getElementById("receiverNo")?.value;
+  const receiverNo = receiverValue && receiverValue !== "undefined" && receiverValue !== "null" ? Number(receiverValue) : null;
+  const isGroupChat = document.querySelector('.chatroom-title')?.dataset.group === 'Y';
+
+  // 파일이 있는 경우
+  if (fileInput.files.length > 0) {
+    const formData = new FormData();
+    formData.append("chatroomNo", chatroomNo);
+    formData.append("driveDescriptions", "");
+    for (let file of fileInput.files) {
+      formData.append("driveFiles", file); 
     }
 
-    const chatroomNo = document.querySelector(".chatroom-title").dataset.roomNo;
-    const myEmployeeNo = document.getElementById("myEmployeeNo").value;
-    const receiverValue = document.getElementById("receiverNo")?.value;
-    const receiverNo = receiverValue && receiverValue !== "undefined" && receiverValue !== "null" ? Number(receiverValue) : null;
-    const isGroupChat = document.querySelector('.chatroom-title')?.dataset.group === 'Y';
+    fetch("/chat/upload/chat", {
+      method: "POST",
+      headers: {
+        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+      },
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log("파일 업로드 결과:", data);
+      if (data.res_code === "200") {
+        fileInput.value = "";
+        document.getElementById("chatFilePreview").innerHTML = "";
+        messageInput.value = ""; // 입력도 초기화
+      } else {
+        alert("파일 업로드 실패: " + data.res_msg);
+      }
+    })
+    .catch(err => {
+      console.error("파일 업로드 오류:", err);
+    });
 
-    // 🔁 1. 파일이 있는 경우 Ajax로 업로드 먼저
-    if (fileInput.files.length > 0) {
-        const formData = new FormData();
-        formData.append("chatroomNo", chatroomNo);
-        formData.append("driveDescriptions", "");
-        for (let file of fileInput.files) {
-            formData.append("driveFiles", file); 
-        }
+    return; // ⚠️ 아래 socket.send() 실행 막기 위해 return!
+  }
 
-        fetch("/chat/upload/chat", {
-            method: "POST",
-            headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-            },
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log("파일 업로드 결과:", data);
-            if (data.res_code === "200") {
-                fileInput.value = "";
-                document.getElementById("chatFilePreview").innerHTML = "";
-                
-                const chatData = {
-                        chatMessageContent: message,
-                        senderMember: Number(myEmployeeNo),
-                        chatroomNo: Number(chatroomNo),
-                        receiverMember: isGroupChat ? null : receiverNo,
-                        drivePath: data.drivePath  // 업로드된 파일의 경로
-                    };
-                socket.send(JSON.stringify(chatData));
-            } else {
-                alert("파일 업로드 실패: " + data.res_msg);
-            }
-        })
-        .catch(err => {
-            console.error("파일 업로드 오류:", err);
-        });
-    }
-
-    // 🔁 2. 메시지 있는 경우 WebSocket으로 전송
-    if (message) {
-        const chatData = {
-            chatMessageContent: message,
-            senderMember: Number(myEmployeeNo),
-            chatroomNo: Number(chatroomNo),
-            receiverMember: isGroupChat ? null : receiverNo
-        };
-        socket.send(JSON.stringify(chatData));
-        messageInput.value = "";
-    }
+  // 파일이 없는 경우에만 메시지 전송
+  if (message) {
+    const chatData = {
+      chatMessageContent: message,
+      senderMember: Number(myEmployeeNo),
+      chatroomNo: Number(chatroomNo),
+      receiverMember: isGroupChat ? null : receiverNo
+    };
+    socket.send(JSON.stringify(chatData));
+    messageInput.value = "";
+  }
 }
-
-
 
 		
 		function loadChatroomDetail(chatroomNo) {
