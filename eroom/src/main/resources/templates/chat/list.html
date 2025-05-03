@@ -709,16 +709,19 @@
 		    	        <p>채팅 내용이 여기에 표시됩니다</p>
 		    	      </div>
 		    	    </div>
-		    	    <div class="chat-footer border-top p-3 d-flex align-items-center bg-white">
+		    	    <div class="chat-footer border-top p-3 d-flex align-items-center flex-column bg-white">
+		    	    <div class="d-flex w-100 align-items-center mb-2">
 		    	      <button class="btn btn-light me-2"><i class="fas fa-smile"></i></button>
 		    	      <label for="chatFileInput" class="btn btn-light me-2">
 		    	        <i class="fa-solid fa-paperclip"></i>
 		    	      </label>
-		    	      <input type="file" id="chatFileInput" name="files" style="display: none;" multiple>
-		    	      <div id="chatFilePreview" class="d-flex flex-wrap gap-2"></div>
-		    	      <input class="form-control me-2" type="text" placeholder="메시지를 입력하세요..." id="messageInput">
+		    	      <input class="form-control flex-fill me-2" type="text" placeholder="메시지를 입력하세요..." id="messageInput">
 		    	      <button class="btn btn-primary" onclick="sendMessage()">보내기</button>
 		    	    </div>
+		    	    <input type="file" id="chatFileInput" name="files" style="display: none;" multiple>
+		    	    <div id="chatFilePreview" class="d-flex flex-wrap gap-2 w-100"></div>
+		    	  </div>
+
 		    	  </div>
 		    	`;
 		    	bindFilePreview();
@@ -1078,21 +1081,33 @@
 		  wrapper.appendChild(messageLine);
 		  chatHistory.appendChild(wrapper);
 		
-		// 파일 링크가 있으면 파일도 표시
-		    if (data.drivePath) {
-		        const fileListContainer = document.createElement("div");
-		        fileListContainer.className = "mt-2";
-		        const fileLink = document.createElement("a");
-		        fileLink.href = "/files" + data.drivePath;  // 실제 드라이브 경로를 사용
-		        fileLink.target = "_blank";
-		        fileLink.className = "badge bg-info text-white me-2";
-		        fileLink.innerText = "파일 보기";
-
-		        fileListContainer.appendChild(fileLink);
-		        wrapper.appendChild(fileListContainer);
+		// 파일 표시 개선
+		if (data.drivePath) {
+		    const ext = data.drivePath.split('.').pop().toLowerCase();
+		    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
+		
+		    const fileWrapper = document.createElement("div");
+		    fileWrapper.className = "mt-2";
+		
+		    if (isImage) {
+		        const img = document.createElement("img");
+		        img.src = "/files" + data.drivePath;
+		        img.style.maxWidth = "150px";
+		        img.style.borderRadius = "8px";
+		        img.style.marginTop = "5px";
+		        fileWrapper.appendChild(img);
+		    } else {
+		        const link = document.createElement("a");
+		        link.href = "/files" + data.drivePath;
+		        link.className = "badge bg-secondary text-white";
+		        link.target = "_blank";
+		        link.innerText = "📎 " + (data.driveOriName || "첨부파일 다운로드");
+		        fileWrapper.appendChild(link);
 		    }
+		
+		    wrapper.appendChild(fileWrapper);
+		}
 
-		    chatHistory.appendChild(wrapper);
 		  
 		  const scrollArea = document.querySelector(".flex-grow-1.overflow-auto");
 		  if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
@@ -1212,7 +1227,7 @@ if (timePreview) {
     if (fileInput.files.length > 0) {
         const formData = new FormData();
         formData.append("chatroomNo", chatroomNo);
-        formData.append("driveDescriptions", message || "");  // 메시지 -> 설명에 저장
+        formData.append("driveDescriptions", "");
         for (let file of fileInput.files) {
             formData.append("driveFiles", file); 
         }
@@ -1345,46 +1360,63 @@ if (timePreview) {
 			  if (!fileInput) return;
 			  
 			  fileInput.addEventListener("change", function (e) {
-			    const previewArea = document.getElementById("chatFilePreview");
-			    previewArea.innerHTML = "";
+				  const previewArea = document.getElementById("chatFilePreview");
+				  previewArea.innerHTML = "";
 
-			    [...e.target.files].forEach(file => {
-			      const ext = file.name.split('.').pop().toLowerCase();
-			      const isImage = file.type.startsWith("image/");
-			      const iconMap = {
-			        pdf: "/assets/img/icons/pdf.png",
-			        docx: "/assets/img/icons/word.png",
-			        xlsx: "/assets/img/icons/excel.png",
-			        zip: "/assets/img/icons/zip.png"
-			      };
+				  [...e.target.files].forEach((file, index) => {
+				    const ext = file.name.split('.').pop().toLowerCase();
+				    const isImage = file.type.startsWith("image/");
+				    const iconMap = {
+				      pdf: "/assets/img/icons/pdf.png",
+				      docx: "/assets/img/icons/word.png",
+				      xlsx: "/assets/img/icons/excel.png",
+				      zip: "/assets/img/icons/zip.png"
+				    };
 
-			      const wrapper = document.createElement("div");
-			      wrapper.className = "border p-2 rounded d-flex align-items-center gap-2";
-			      wrapper.style.maxWidth = "200px";
+				    const wrapper = document.createElement("div");
+				    wrapper.className = "border p-2 rounded d-flex align-items-center gap-2 position-relative";
+				    wrapper.style.maxWidth = "200px";
 
-			      const thumb = document.createElement("img");
-			      thumb.style.width = "32px";
-			      thumb.style.height = "32px";
-			      thumb.style.objectFit = "cover";
-			      thumb.className = "rounded";
+				    const thumb = document.createElement("img");
+				    thumb.style.width = "32px";
+				    thumb.style.height = "32px";
+				    thumb.style.objectFit = "cover";
+				    thumb.className = "rounded";
 
-			      if (isImage) {
-			        thumb.src = URL.createObjectURL(file);
-			      } else if (iconMap[ext]) {
-			        thumb.src = iconMap[ext];
-			      } else {
-			        thumb.src = "/assets/img/icons/file.png";
-			      }
+				    if (isImage) {
+				      thumb.src = URL.createObjectURL(file);
+				    } else if (iconMap[ext]) {
+				      thumb.src = iconMap[ext];
+				    } else {
+				      thumb.src = "/assets/img/icons/file.png";
+				    }
 
-			      const name = document.createElement("div");
-			      name.className = "small text-truncate";
-			      name.innerText = file.name;
+				    const name = document.createElement("div");
+				    name.className = "small text-truncate";
+				    name.innerText = file.name;
 
-			      wrapper.appendChild(thumb);
-			      wrapper.appendChild(name);
-			      previewArea.appendChild(wrapper);
-			    });
-			  });
+				    // ❌ 삭제 버튼
+				    const removeBtn = document.createElement("button");
+				    removeBtn.className = "btn btn-sm btn-light border position-absolute top-0 end-0 m-1 p-0";
+				    removeBtn.style.width = "18px";
+				    removeBtn.style.height = "18px";
+				    removeBtn.innerText = "×";
+				    removeBtn.onclick = () => {
+				      const dt = new DataTransfer();
+				      [...fileInput.files].forEach((f, i) => {
+				        if (i !== index) dt.items.add(f);
+				      });
+				      fileInput.files = dt.files;
+				      fileInput.dispatchEvent(new Event("change"));
+				    };
+
+				    wrapper.appendChild(thumb);
+				    wrapper.appendChild(name);
+				    wrapper.appendChild(removeBtn);
+				    previewArea.appendChild(wrapper);
+				  });
+				});
+
 			}
 		</script>
 	</main>

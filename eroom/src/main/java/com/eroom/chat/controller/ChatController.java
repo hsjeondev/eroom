@@ -1,5 +1,6 @@
 package com.eroom.chat.controller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ import com.eroom.chat.repository.ChatAlarmRepository;
 import com.eroom.chat.service.ChatMessageService;
 import com.eroom.chat.service.ChatroomService;
 import com.eroom.drive.dto.DriveDto;
+import com.eroom.drive.entity.Drive;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
@@ -315,28 +317,44 @@ public class ChatController {
 	        @RequestParam("chatroomNo") Long chatroomNo,
 	        @RequestParam("driveDescriptions") List<String> driveDescriptions,
 	        @AuthenticationPrincipal EmployeeDetails user) {
-		
-		System.out.println("업로드 요청 수신됨");
-		System.out.println("files: " + (files != null ? files.size() : "null"));
-		
+
 	    Map<String, String> resultMap = new HashMap<>();
 	    resultMap.put("res_code", "500");
 	    resultMap.put("res_msg", "업로드 실패");
 
 	    try {
 	        // 필수 값 세팅
-	    	driveDto.setDriveFiles(files);
-	        driveDto.setSeparatorCode("FL003"); // 채팅 파일용 코드
-	        driveDto.setUploaderNo(user.getEmployee().getEmployeeNo()); // 업로더
+	        driveDto.setDriveFiles(files);
+	        driveDto.setSeparatorCode("FL003");
+	        driveDto.setUploaderNo(user.getEmployee().getEmployeeNo());
 	        driveDto.setDriveDescriptions(driveDescriptions);
-	        driveDto.setParam1(chatroomNo); // param1에 채팅방 번호 귀속
+	        driveDto.setParam1(chatroomNo);
 
-	        int result = chatroomService.uploadChatFiles(driveDto, user.getEmployee().getEmployeeNo());
+	        // 파일 저장 및 Drive 객체 반환
+	        List<Drive> savedDrives = chatroomService.uploadChatFilesAndReturnDrives(driveDto, user.getEmployee().getEmployeeNo());
 
-	        if (result > 0) {
-	            resultMap.put("res_code", "200");
-	            resultMap.put("res_msg", "업로드 성공");
+	        for (Drive drive : savedDrives) {
+	            ChatMessageDto chatMessage = new ChatMessageDto();
+	            chatMessage.setSenderMember(user.getEmployee().getEmployeeNo());
+	            chatMessage.setChatroomNo(chatroomNo);
+	            chatMessage.setChatMessageContent("[파일] " + drive.getDriveOriName());
+
+	            // receiverMember는 1:1일 경우 설정
+	            Chatroom chatroom = chatroomService.selectChatroomOne(chatroomNo);
+	            if ("N".equals(chatroom.getChatIsGroupYn())) {
+	                chatroom.getChatroomMapping().stream()
+	                        .map(ChatroomAttendee::getAttendee)
+	                        .filter(e -> !e.getEmployeeNo().equals(user.getEmployee().getEmployeeNo()))
+	                        .findFirst()
+	                        .ifPresent(opponent -> chatMessage.setReceiverMember(opponent.getEmployeeNo()));
+	            }
+
+	            // 메시지 저장 및 브로드캐스트
+	            chatMessageService.sendAndBroadcast(chatMessage);
 	        }
+
+	        resultMap.put("res_code", "200");
+	        resultMap.put("res_msg", "업로드 성공");
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        resultMap.put("res_msg", "예외 발생: " + e.getMessage());
@@ -344,6 +362,8 @@ public class ChatController {
 
 	    return resultMap;
 	}
+
+
 
 
 }
