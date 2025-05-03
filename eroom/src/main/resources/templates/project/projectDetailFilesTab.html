@@ -166,7 +166,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			      <form 
 			        id="addFileForm" 
 			        class="modal-content dropzone dropzone-multiple p-0" 
-			        th:action="@{/drive/upload/team}" 
+			        th:action="@{/project/fileUpload}" 
 			        method="post" 
 			        enctype="multipart/form-data">
 					
@@ -425,13 +425,17 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			  addFileModalEl.addEventListener('shown.bs.modal', function () {
 			    if (!addDz) {
 			      addDz = new Dropzone('#addFileForm', {
-			        url: '/drive/upload/team',
+			        url: '/project/fileUpload',
 			        autoProcessQueue: false,
 			        paramName: 'driveFiles',
 			        uploadMultiple: true,
 			        clickable: '.dz-message',
 			        acceptedFiles: '.jpg,.png,.pdf,.xlsx,.docx,.zip',
 			        maxFilesize: 10,
+					params: {
+					    param1: document.querySelector('input[name="param1"]').value,
+					    fileCategory: document.getElementById('fileCategory').value
+					  },
 					previewTemplate: `
 					  <div class="card shadow-sm mb-2 p-2 border d-flex flex-row align-items-center w-90 mx-3">
 					    <div class="me-2" style="width:48px;height:48px;">
@@ -457,13 +461,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			          if (d) formData.append('driveDescriptions', d.value);
 			        });
 					
-					  // 2) 카테고리 추가
-					  const category = document.getElementById('fileCategory').value;
-					  formData.append('fileCategory', category);
-
-					  // 3) 프로젝트 번호 추가
-					  const projectNo = document.querySelector('input[name="projectNo"]').value;
-					  formData.append('projectNo', projectNo);
+					
 					});
 					
 			      addDz.on('queuecomplete', () => {
@@ -477,7 +475,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			          if (img) img.src = icons[ext];
 			        }
 			      });
-			      addDz.on('successmultiple', () => window.location.reload());
+			       addDz.on('successmultiple', () => window.location.reload());
 			    }
 			  });
 
