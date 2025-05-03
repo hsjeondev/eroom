@@ -537,7 +537,7 @@
  
  
 <!--프로필 변경 모달 -->
-<div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -556,11 +556,46 @@
       </div>
     </div>
   </div>
+</div> -->
+<!-- 프로필 사진 변경 모달 -->
+<div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
+    <div class="modal-content border border-secondary">
+      <!-- 헤더 -->
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="profileUploadModalLabel">프로필 사진 변경</h5>
+        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- 바디 -->
+      <div class="modal-body px-4 py-3">
+        <!-- 현재 프로필 사진 -->
+        <div class="d-flex justify-content-center mb-3">
+          <div class="profile-wrapper">
+            <img id="previewProfileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필 미리보기">
+          </div>
+        </div>
+
+        <!-- 기본 적용 및 업로드 -->
+        <div class="d-flex flex-column align-items-center gap-2">
+          <button class="btn btn-outline-primary w-75" id="setDefaultProfileBtn">기본 프로필로 변경</button>
+          <label class="btn btn-primary w-75 mb-0" for="profileUploadInput">프로필 사진 업로드</label>
+          <input type="file" id="profileUploadInput" class="d-none" accept="image/*">
+        </div>
+      </div>
+
+      <!-- 푸터 -->
+      <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+        <button type="button" class="btn btn-light w-45" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary w-45" id="saveProfileImageBtn">저장</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!--주소록 정보 수정 모달 -->
 <div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
     <div class="modal-content border border-secondary">
       <form id="editEmployeeForm" autocomplete="off">
         <!-- 헤더 -->
@@ -679,8 +714,6 @@ function execDaumPostcodeForEdit() {
         // 수동으로 input 이벤트 발생시켜서 수정 감지되도록 함
         zipcodeInput.dispatchEvent(new Event('input', { bubbles: true }));
         addressInput.dispatchEvent(new Event('input', { bubbles: true }));
-     // document.getElementById('editDirectoryZipcode').value = data.zonecode;
-     // document.getElementById('editDirectoryAddress').value = data.roadAddress;
     }
   }).open();
 }
@@ -902,35 +935,14 @@ fetch(`/admin/checkNameDuplicate?name=${encodeURIComponent(name)}`)
 			unsavedEditModal.show();
 		}
 	});
-	
-	// 수정 모달 완전히 닫힌 후 초기화
-	editModalElement.addEventListener('hidden.bs.modal', function () {
-	  // 이름 중복 메시지 초기화
-	  const msgElement = document.getElementById('editNameCheckMsg');
-	  msgElement.textContent = '';
-	  msgElement.className = 'form-text d-none';
-
-	  // 중복확인 상태 초기화
-	  isNameChecked = false;
-	});
 	// 수정용 모달 계속 닫기
 	document.getElementById('confirmEditCloseBtn').addEventListener('click', function () {
 		isEditFormEdited = false;
-	    // 먼저 editModal을 명시적으로 닫음
-	  const editModal = bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal'));
-	  const unsavedModal = bootstrap.Modal.getInstance(document.getElementById('unsavedEditModal'));
-	
-	  if (editModal) editModal.hide();
-	  if (unsavedModal) unsavedModal.hide();
-
-	    // 혹시 남아 있을 backdrop 제거
-	    const backdrop = document.querySelector('.modal-backdrop');
-	    if (backdrop) backdrop.remove();
-
-	    // body 상태 초기화
-	    document.body.classList.remove('modal-open');
-	    document.body.style.paddingRight = '';
-		
+		unsavedEditModal.hide();
+		unsavedEditModalElement.addEventListener('hidden.bs.modal', function handler() {
+			editModal.hide();
+			unsavedEditModalElement.removeEventListener('hidden.bs.modal', handler);
+		});
 	});
 	
 	// saveEditEmployeeBtn 클릭 시 (회원 수정 요청 전 확인 모달 띄우기)
@@ -944,21 +956,14 @@ fetch(`/admin/checkNameDuplicate?name=${encodeURIComponent(name)}`)
 		currentMode = 'edit';
 		showConfirmModal('정말 수정하시겠습니까?',sendUpdateEmployee);
 	});	
-	
-	document.addEventListener('hidden.bs.modal', function () {
-	    // 모든 모달이 닫혔는지 확인 후 backdrop 제거
-	    if (!document.querySelector('.modal.show')) {
-	        const backdrop = document.querySelector('.modal-backdrop');
-	        if (backdrop) backdrop.remove();
-	        document.body.classList.remove('modal-open');
-	        document.body.style.paddingRight = '';
-	    }
-	});
 
+	let originalData = {}; // 값을 저장할 변수
 // 회원 수정 버튼 클릭시 정보 가져오기
-document.getElementById('openEditModalBtn').addEventListener('click',function(){
+document.getElementById('openEditModalBtn').addEventListener('click',function(e){
+	e.preventDefault();
 	const employeeNo = this.getAttribute('data-employee-no');
 	console.log("선택한 사원번호:", employeeNo);
+	
 	fetch(`/mypage/getEmployeeDetail?employeeNo=${employeeNo}`)
 	.then(response => response.json())
 	.then(data => {
@@ -977,7 +982,6 @@ document.getElementById('openEditModalBtn').addEventListener('click',function(){
 			};
 			
 			// 모달 열기
-			const editModal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
 			editModal.show();
 		}else{
 			showAlert('회원 정보를 불러올 수 없습니다.');
@@ -991,6 +995,7 @@ document.getElementById('openEditModalBtn').addEventListener('click',function(){
 
 // 회원 정보 수정 요청 보내기
 function sendUpdateEmployee() {
+	console.log("수정 함수 호출됨.");
   const name = document.getElementById('editEmployeeName').value.trim();
   const phone = document.getElementById('editDirectoryPhone').value.trim();
   const zipcode = document.getElementById('editDirectoryZipcode').value.trim();
@@ -998,10 +1003,10 @@ function sendUpdateEmployee() {
 
   const payload = {};
 
-  if (name !== originalData.employee_name) payload.employee_name = name;
-  if (phone !== originalData.directory_phone) payload.directory_phone = phone;
-  if (zipcode !== originalData.directory_zipcode) payload.directory_zipcode = zipcode;
-  if (address !== originalData.directory_address) payload.directory_address = address;
+  if (name !== originalData.employee_name && name !== '') payload.employee_name = name;
+  if (phone !== originalData.directory_phone && phone !== '') payload.directory_phone = phone;
+  if (zipcode !== originalData.directory_zipcode && zipcode !== '') payload.directory_zipcode = zipcode;
+  if (address !== originalData.directory_address && address !== '') payload.directory_address = address;
 
   // 실제로 바뀐 값이 없으면 전송하지 않음
   if (Object.keys(payload).length === 0) {
@@ -1027,7 +1032,11 @@ function sendUpdateEmployee() {
 	          directory_zipcode: zipcode,
 	          directory_address: address
    		 }; 
-        showAlert(data.res_msg, () => location.reload());
+		showAlert(data.res_msg,function(){
+			isEditFormEdited = false;
+			editModal.hide();
+			location.reload();
+		});
       } else {
         showAlert(data.res_msg);
       }
@@ -1055,6 +1064,20 @@ function sendUpdateEmployee() {
 		  modal.hide();
 		}
 	}
+
+	// 모든 모달 닫힌 후 강제로 스크롤/백드롭 초기화
+	document.addEventListener('hidden.bs.modal', function () {
+	  setTimeout(() => {
+	    const isAnyModalOpen = document.querySelector('.modal.show');
+	    if (!isAnyModalOpen) {
+	      document.body.classList.remove('modal-open');
+	      document.body.style.removeProperty('padding-right');
+
+	      // 남아있는 백드롭 제거
+	      document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+	    }
+	  }, 300); // Bootstrap 트랜지션 시간 고려
+	});
 });
 </script>                
 

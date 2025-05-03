@@ -81,12 +81,12 @@
         
 	          <button id="checkInBtn" class="btn btn-outline-primary btn-sm" disabled
 	          		th:attr="disabled=${attendanceStatus != 'notCheckedIn'} ? 'disabled' : null"
-	          		th:text="${attendanceStatus == 'checkedIn' || attendanceStatus == 'checkedOut' ? attendanceTime : '출근하기'}">
+	          		th:text="${attendanceStatus == 'checkedIn' || attendanceStatus == 'checkedOut'} ? ${checkInTime} : '출근하기'">
 	          	출근하기
 	          </button>
 	          <button id="checkOutBtn" class="btn btn-primary btn-sm" disabled
 	          		th:attr="disabled=${attendanceStatus != 'checkedIn'} ? 'disabled' : null"
-	          		th:text="${attendanceStatus == 'checkedOut' ? attendanceTime : '퇴근하기'}"	>
+	          		th:text="${attendanceStatus == 'checkedOut'} ? ${checkOutTime} : '퇴근하기'"	>
 	          	퇴근하기
           	</button>
 
