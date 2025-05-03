@@ -1,5 +1,6 @@
 package com.eroom.websocket;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -10,48 +11,40 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import lombok.RequiredArgsConstructor;
+
 @Component
 @RequiredArgsConstructor
-public class MailAlarmWebSocketHandler extends TextWebSocketHandler{
+public class MailAlarmWebSocketHandler extends TextWebSocketHandler {
+    private final Map<Long, WebSocketSession> userSessions = new ConcurrentHashMap<>(); // 사용자별 세션 관리
 
-	
-	 private static final Map<Long, WebSocketSession> userSessions = new ConcurrentHashMap<>();
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        Long userNo = getUserNoFromSession(session); // 세션에서 사용자 번호 추출
+        if (userNo != null) {
+            userSessions.put(userNo, session); // 해당 사용자 세션을 저장
+        }
+    }
 
-	    @Override
-	    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-	        String senderNo = getQueryParam(session, "employeeNo");
-	        if (senderNo != null) {
-	            userSessions.put(Long.parseLong(senderNo), session);
-	            System.out.println("📬 메일 알림 연결 완료: " + senderNo);
-	        }
-	    }
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        Long userNo = getUserNoFromSession(session); // 세션에서 사용자 번호 추출
+        if (userNo != null) {
+            userSessions.remove(userNo); // 세션이 종료되면 해당 사용자 세션을 제거
+        }
+    }
 
-	    public void sendMailAlarm(Long receiverEmployeeNo, String message) throws Exception {
-	        WebSocketSession session = userSessions.get(receiverEmployeeNo);
-	        if (session != null && session.isOpen()) {
-	            session.sendMessage(new TextMessage(message));
-	        }
-	    }
+    // 특정 사용자에게 메일 알림 전송
+    public void sendToUser(Long userNo, String message) throws IOException {
+        WebSocketSession session = userSessions.get(userNo); // 사용자 세션 가져오기
+        if (session != null && session.isOpen()) {
+            session.sendMessage(new TextMessage(message)); // 세션에 메시지 전송
+        }
+    }
 
-	    @Override
-	    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-	        String senderNo = getQueryParam(session, "employeeNo");
-	        if (senderNo != null) {
-	            userSessions.remove(Long.parseLong(senderNo));
-	            System.out.println("❌ 메일 알림 연결 종료: " + senderNo);
-	        }
-	    }
-
-	    private String getQueryParam(WebSocketSession session, String param) {
-	        String query = session.getUri().getQuery();
-	        if (query != null) {
-	            for (String pair : query.split("&")) {
-	                String[] kv = pair.split("=");
-	                if (kv.length == 2 && kv[0].equals(param)) {
-	                    return kv[1];
-	                }
-	            }
-	        }
-	        return null;
-	    }
+    // 사용자의 번호를 세션에서 추출하는 방법 (예시)
+    private Long getUserNoFromSession(WebSocketSession session) {
+        // 예시: 세션의 principal 또는 다른 정보를 사용하여 사용자 번호 추출
+        String userNoStr = session.getPrincipal() != null ? session.getPrincipal().getName() : null;
+        return userNoStr != null ? Long.parseLong(userNoStr) : null;
+    }
 }

@@ -20,14 +20,17 @@ import com.eroom.drive.entity.Drive;
 import com.eroom.drive.repository.DriveRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
+import com.eroom.mail.dto.MailAlarmDto;
 import com.eroom.mail.dto.MailDraftDto;
 import com.eroom.mail.dto.MailDto;
 import com.eroom.mail.dto.MailReceiverDto;
 import com.eroom.mail.dto.MailStatusDto;
 import com.eroom.mail.entity.Mail;
+import com.eroom.mail.entity.MailAlarm;
 import com.eroom.mail.entity.MailDraft;
 import com.eroom.mail.entity.MailReceiver;
 import com.eroom.mail.entity.MailStatus;
+import com.eroom.mail.repository.MailAlarmRepository;
 import com.eroom.mail.repository.MailDraftRepository;
 import com.eroom.mail.repository.MailReceiverRepository;
 import com.eroom.mail.repository.MailRepository;
@@ -48,6 +51,7 @@ public class MailService {
 	private final MailStatusRepository mailStatusRepository;
 	private final MailDraftRepository mailDraftRepository;
 	private final DriveRepository driveRepository;
+	private final MailAlarmRepository mailAlarmRepository;
 	
 	private final MailAlarmWebSocketHandler mailAlarmWebSocketHandler;
 	private final MailWebSocketHandler mailWebSocketHandler;
@@ -461,12 +465,23 @@ public class MailService {
 		            
 		            mailReceiverDto.setMail_no(mailSaver.getMailNo());
 
-		            MailReceiver mailReceiver = mailReceiverDto.toEntity();
-		            mailReceiverRepository.save(mailReceiver);
+		            MailReceiver mailReceiverEntity = mailReceiverDto.toEntity();
+		            MailReceiver mailRecieverSaver=mailReceiverRepository.save(mailReceiverEntity);
 		            
-		            mailReceiverRepository.save(mailReceiver);
+		            MailAlarmDto mailAlarmDto = new MailAlarmDto();
+		            mailAlarmDto.setMail_receiver_no(mailRecieverSaver.getMailReceiverNo());
+	            	MailAlarm mailAlarm = mailAlarmDto.toEntity();
+	            	mailAlarmRepository.save(mailAlarm);
+	            	
+	            	/*
+	            	Alarm alarm = Alarm.builder()
+	            		    .param1(savedMailAlarm.getMailAlarmNo())  // mail_alarm_no 저장
+	            		    .separatorCode("M001")                    // 메일 알림 코드
+	            		    .build();
 
-		         
+	            	alarmRepository.save(alarm);
+	            	*/
+		         /*
 		         try {
 		             Map<String, Object> message = new HashMap<>();
 		             message.put("type", "mail");
@@ -479,6 +494,22 @@ public class MailService {
 		         } catch (Exception e) {
 		             e.printStackTrace(); // 웹소켓 전송 실패해도 메일 저장은 정상 진행
 		         }
+		         */
+	            	try {
+                        Map<String, Object> message = new HashMap<>();
+                        message.put("type", "mail");
+                        message.put("mailTitle", mailDto.getMail_title());
+                        message.put("senderName", mailSaver.getSender().getEmployeeName());
+                        message.put("mailNo", mailSaver.getMailNo());
+
+                        // 메시지 JSON으로 변환
+                        String jsonMessage = new ObjectMapper().writeValueAsString(message);
+
+                        // WebSocket을 통해 알림 전송
+                        mailWebSocketHandler.sendToUser(receiverNo, jsonMessage);
+                    } catch (Exception e) {
+                        e.printStackTrace(); // 웹소켓 전송 실패해도 메일 저장은 정상 진행
+                    }
 		         // 발송된 메일만 파일 저장
 		         for (MultipartFile file : mailFiles) {
 			            if (!file.isEmpty()) {
