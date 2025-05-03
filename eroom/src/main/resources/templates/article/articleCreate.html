@@ -13,7 +13,7 @@
     <div class="card email-content">
       <div class="card-body">
         <form method="post" class="d-flex flex-column h-100"
-              action="/notice/create" name="notice_create_form" enctype="multipart/form-data">
+              action="/article/create" name="notice_create_form" enctype="multipart/form-data">
           <!-- 작성자 정보 (히든 처리) -->
           <input type="hidden" name="employee_no"
                  th:value="${#authentication.principal.employee.employeeNo}" />
@@ -26,13 +26,13 @@
               긴급 공지
             </div>
             <div class="col-12">
-              <input class="form-control" type="text" placeholder="제목" name="notice_title" id="notice_title"/>
+              <input class="form-control" type="text" placeholder="제목" name="article_title" id="notice_title"/>
             </div>
           </div>
 
           <!-- 내용 -->
           <div class="mb-3 flex-1">
-            <textarea class="tinymce email-textarea" name="notice_content" id="notice_content"
+            <textarea class="tinymce email-textarea" name="article_content" id="notice_content"
                       data-tinymce='{"height":"100%"}'></textarea>
           </div>
 
@@ -42,7 +42,7 @@
               <label class="btn btn-link py-0 px-2 text-body fs-9" for="noticeAttachment">
                 <span class="fa-solid fa-paperclip"></span>
               </label>
-              <input class="d-none" id="noticeAttachment" name="notice_files" type="file" multiple/>
+              <input class="d-none" id="noticeAttachment" name="articleFiles" type="file" multiple/>
               <div id="filePreview" class="mt-2"></div>
             </div>
             <div class="d-flex">
@@ -57,33 +57,50 @@
   </div>
 
   <script>
-    document.getElementById("submitBtn").addEventListener("click", function () {
-      if (confirm("공지를 등록하시겠습니까?")) {
-        tinymce.triggerSave();
-        const form = document.notice_create_form;
-        const payload = new FormData(form);
+  document.getElementById("submitBtn").addEventListener("click", function () {
+	  const form = document.notice_create_form;
+	  const title = form.article_title.value.trim();  // 제목
+	  const content = tinymce.get('notice_content').getContent().trim();  // 내용 (TinyMCE에서 가져옴)
 
-        selectedFiles.forEach(file => {
-          payload.append("notice_files", file);
-        });
+	  // 제목이 비어있는지 확인
+	  if (!title) {
+	    alert("제목을 입력해주세요.");
+	    return;
+	  }
 
-        fetch("/notice/create", {
-          method: "POST",
-          headers: {
-            'header': document.querySelector('meta[name="_csrf_header"]').content,
-            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-          },
-          body: payload
-        })
-        .then(response => response.json())
-        .then(data => {
-          alert(data.res_msg || "등록 완료");
-          if (data.res_code == 200) {
-            location.href = '/notice/list';
-          }
-        });
-      }
-    });
+	  // 내용이 비어있는지 확인
+	  if (!content || content === "<p>&nbsp;</p>" || content === "") {
+	    alert("내용을 입력해주세요.");
+	    return;
+	  }
+
+	  // 공지 등록을 확인하는 메시지
+	  if (confirm("공지를 등록하시겠습니까?")) {
+	    tinymce.triggerSave(); // TinyMCE 에디터의 내용을 폼 데이터에 저장
+
+	    const payload = new FormData(form);
+
+	    selectedFiles.forEach(file => {
+	      payload.append("notice_files", file);
+	    });
+
+	    fetch("/article/create", {
+	      method: "POST",
+	      headers: {
+	        'header': document.querySelector('meta[name="_csrf_header"]').content,
+	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+	      },
+	      body: payload
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	      alert(data.res_msg || "등록 완료");
+	      if (data.res_code == 200) {
+	        location.href = '/article/notice';
+	      }
+	    });
+	  }
+	});
 
     const selectedFiles = [];
 
