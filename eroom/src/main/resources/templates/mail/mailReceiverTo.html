@@ -18,8 +18,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
    <div id="mailSummary" data-list='{"valueNames":["senderName", "mailTitle", "mailContent", "sendTime"], "page":6, "pagination":true}'>   
       <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
             <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mailCreate}">메일 쓰기</a>
-              <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button>
-            </div>
+              <!-- <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button> -->
+            </div> 
             <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" th:href="@{mailCreate}"> <span class="d-none d-sm-inline-block">메일 쓰기</span><span class="d-sm-none fas fa-plus"></span></a></div>
             <div class="col-auto flex-1">
               <div class="search-box w-100">
@@ -47,20 +47,18 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                 <!-- 범용성 생각해서 일단 보류 -->
                 <div class="border-top border-translucent py-2 d-flex justify-content-between">
                   <div class="form-check mb-0 fs-8">
-                    <input class="form-check-input" type="checkbox" data-bulk-select-row="data-bulk-select-row" />
+                    <input class="form-check-input" type="checkbox" data-bulk-select-row="data-bulk-select-row" id="chechAll" />
                   </div>
                   <div>
-                    <button class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Archive"><span class="fas fa-archive fs-10"></span></button>
-                    <button class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete"><span class="fas fa-trash fs-10"></span></button>
-                    <button class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Star"><span class="fas fa-star fs-10"></span></button>
-                    <button class="btn p-0 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tags"><span class="fas fa-tag fs-10"></span></button>
+                    <button id="deleteBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="휴지통"><span class="fas fa-trash fs-10"></span></button>
+                    <button id="starBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="중요"><span class="fas fa-star fs-10"></span></button>
                   </div>
                 </div>
                 <!-- 범용성 생각해서 일단 보류 -->
                 
                 <!-- 메일 목록 스타트부분 -->
                 <div th:if="${#lists.isEmpty(receivedMails)}">
-                	<input type="text" value="내용이 없습니다.">
+                	<div class="text-center text-muted py-5">받은 메일이 없습니다.</div>
                 </div>
                 <div class="list">
                  <div class="border-top border-translucent hover-actions-trigger py-3"
@@ -70,7 +68,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                   <div class="row align-items-sm-center gx-2">
                     <div class="col-auto">
                       <div class="d-flex flex-column flex-sm-row">
-                        <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" />
+                        <input class="form-check-input mb-2 m-sm-0 me-sm-2 mail_checkbox" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" 
+                        		th:value="${receiverMail.mail.mailNo}"/>
                         <!-- 별 박스 -->
                         <!-- <button class="btn p-0"><span class="fas text-warning fa-star"></span></button> -->
                       	<form th:action="@{/mail/status/important/{id}(id=${receiverMail.mail.mailNo})}" method="post">
@@ -102,13 +101,17 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					  </a>
 					  <!-- 조금 떨어져 있으면 좋겠음  -->
 					  <span>|</span>
-					  <span class="inbox-link fs-9"
+					  <!-- <span class="inbox-link fs-9"
 					  		th:classappend="${receiverMail.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
 					        th:text="${receiverMail.mail.mailTitle}">
-					  </span>
+					  </span> -->
+					  <span 
+					  		th:classappend="${receiverMail.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
+					  		class="inbox-link fs-9 text-body-emphasis mailTitle" th:text="${receiverMail.mail.mailTitle != null and !#strings.isEmpty(receiverMail.mail.mailTitle) ? receiverMail.mail.mailTitle : '(제목없음)'}">
+					 </span>
 					</div>
                     <div class="col-auto ms-auto">
-                      <div class="hover-actions end-0">
+                      <!-- <div class="hover-actions end-0">
                         <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
                         <div class="dropdown-menu dropdown-menu-end py-2">
                         <form th:action="@{/mail/status/important/{id}(id=${receiverMail.mail.mailNo})}" method="post">
@@ -120,9 +123,9 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						  <button type="submit" class="dropdown-item">🗑️휴지통</button>
 						</form>
 						
-                        <!-- <a class="dropdown-item text-danger" href="#!">삭제</a> -->
+                        <a class="dropdown-item text-danger" href="#!">삭제</a>
                         </div>
-                      </div>
+                      </div> -->
                       
                       
                       <!-- 04/17 나중에 시간 남으면 좀 더 구성해보기 일단 전체 시간 다 보이게 설정함 -->
@@ -141,10 +144,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					           th:classappend="${receiverMail.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
 					           th:text="${receiverMail.mail.mailTitle}">
 					     </span> -->
-					
-					     <span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"
+						<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent" th:utext="${receiverMail.mail.mailContent != null and !#strings.isEmpty(receiverMail.mail.mailContent) ? receiverMail.mail.mailContent : '(내용없음)'}"></span>
+					     <!-- <span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"
 					           th:utext="${receiverMail.mail.mailContent}">
-					     </span>
+					     </span> -->
 					  </a>
 					</div>
                 </div>
@@ -190,6 +193,107 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						</div>	
            </div>
          </div>
+         <script>
+         const checkAll = document.getElementById('chechAll');
+         checkAll.addEventListener('change', function () {
+           const isChecked = this.checked;
+           const checkboxes = document.querySelectorAll('.mail_checkbox');
+           checkboxes.forEach(cb => cb.checked = isChecked);
+         });
+         function getSelectedMailNos() {
+        	    return Array.from(document.querySelectorAll('.mail_checkbox:checked'))
+        	      .map(cb => cb.value);
+        	  }
+
+        	  function sendBulkUpdate(url) {
+        	    const selected = getSelectedMailNos();
+        	    console.log(selected);	
+        	    if (selected.length === 0) {
+        	      alert("메일을 선택해주세요.");
+        	      return;
+        	    }
+
+        	    fetch(url, {
+        	      method: 'POST',
+        	      headers: { 
+						'Content-Type': 'application/json' ,
+						'header': document.querySelector('meta[name="_csrf_header"]').content,
+                        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+						},
+        	      body: JSON.stringify(selected)
+        	    }).then(res => {
+        	      if (res.ok) location.reload();
+        	      else alert("처리 중 오류가 발생했습니다.");
+        	    });
+        	  }
+
+        	  document.getElementById('deleteBtn').addEventListener('click', function () {
+        	    sendBulkUpdate('/mail/trash');
+        	  });
+
+        	  document.getElementById('starBtn').addEventListener('click', function () {
+        	    sendBulkUpdate('/mail/important');
+        	  });
+         
+         
+         document.addEventListener("DOMContentLoaded", function() {
+        	    const socket = new WebSocket("ws://localhost:8080/ws/mail");  // wss://로 수정 필요 시, 변경
+
+        	    socket.onopen = () => {
+        	      console.log("메일 웹소켓 연결 성공");
+        	    };
+
+        	    socket.onmessage = (event) => {
+        	      const data = JSON.parse(event.data);
+        	      if (data.type === "mail") {
+        	        console.log("새 메일 도착", data);
+        	        fetchNewMails(); // 새 메일 도착 시 받은 메일 목록 Ajax로 갱신
+        	      }
+        	    };
+
+        	    socket.onerror = (error) => {
+        	      console.error("웹소켓 오류:", error);
+        	    };
+
+        	    socket.onclose = () => {
+        	      console.log("웹소켓 연결 종료");
+        	    };
+
+        	    // 새로운 메일을 갱신하는 함수
+        	    function fetchNewMails() {
+        	      fetch('/mail/receiverTo/fragment')
+        	        .then(response => response.text())
+        	        .then(html => {
+        	          // 갱신된 HTML로 mailSummary 콘텐츠 변경
+        	          const mailSummary = document.querySelector('#mailSummary');
+        	          mailSummary.innerHTML = html;
+
+        	          // List.js 재초기화
+        	          initializeListJs();
+        	        })
+        	        .catch(error => console.error('메일 목록 갱신 실패:', error));
+        	    }
+
+        	    // List.js 초기화 함수
+        	    function initializeListJs() {
+        	      const options = {
+        	        valueNames: ["senderName", "mailTitle", "mailContent", "sendTime"],
+        	        page: 6,
+        	        pagination: true
+        	      };
+
+        	      // 기존 List.js 인스턴스를 초기화 후 새로 생성
+        	      if (window.mailList && typeof window.mailList.destroy === "function") {
+            			window.mailList.destroy();  // 기존 인스턴스가 있다면 제거
+        			}
+
+        	      window.mailList = new List('mailSummary', options);  // 'mailSummary'를 List.js에 연결
+        	    }
+
+        	    // 초기 List.js 설정 (페이지 로딩 시 초기화)
+        	    initializeListJs();
+        	});
+         </script>
     </main>
   </body>
 </html>
