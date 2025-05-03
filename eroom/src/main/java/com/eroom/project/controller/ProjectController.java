@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,9 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eroom.drive.dto.DriveDto;
+import com.eroom.drive.service.DriveService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
+import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.project.dto.GithubPullRequestDto;
 import com.eroom.project.dto.ProjectDto;
@@ -26,6 +31,7 @@ import com.eroom.project.dto.ProjectTodoElementDto;
 import com.eroom.project.dto.ProjectTodoListDto;
 import com.eroom.project.service.ProjectService;
 import com.eroom.project.service.ProjectTodoService;
+import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +43,10 @@ public class ProjectController {
 	private final EmployeeService employeeService;
 	private final ProjectService projectService;
 	private final ProjectTodoService projectTodoService;
+	private final DriveService driveService;
+	// 파일 저장 경로 
+			 @Value("${ffupload.location}")
+			 private String fileDir;
 
 	@GetMapping("/all")
 	public String allProjectView(Model model) {
@@ -158,8 +168,12 @@ public class ProjectController {
 	@GetMapping("/detail/{project_no}/files")
 	public String detailProjectFilesView(@PathVariable("project_no") Long project_no, Model model) {
 		
+		List<DriveDto> fileList = projectService.findProjectFiles("FL008", project_no);
 		ProjectDto project = projectService.findByProjectNo(project_no);
+			
+		
 		model.addAttribute("project", project);
+		model.addAttribute("fileList", fileList);
 		
 		return "project/projectDetailFilesTab";
 	}
@@ -397,5 +411,40 @@ public class ProjectController {
 	}
 
 
+	@PostMapping("/fileUpload")
+	@ResponseBody
+	public Map<String,String> uploadTeamDriveFiles(DriveDto driveDto,
+	                                               @RequestParam("driveDescriptions") List<String> driveDescriptions,
+	                                               @AuthenticationPrincipal EmployeeDetails user,
+	                                               @RequestParam("fileCategory") String category) {
+		
+		System.out.println("driveDto" + driveDto);
+		
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "업로드 실패");
+
+	    driveDto.setDriveDescriptions(driveDescriptions);
+	    
+	    String separatorCode = "FL008";
+	    
+	    if(category.equals("1")) {
+	    	separatorCode = "FL0081";
+	    } else if(category.equals("2")) {
+	    	separatorCode = "FL0082";	    	
+	    } else if(category.equals("3")) {
+	    	separatorCode = "FL0083";	    	
+	    }
+
+	    driveDto.setSeparatorCode(separatorCode);
+
+	    int result = projectService.uploadProjectFiles(driveDto, user.getEmployee().getEmployeeNo());
+
+	    if(result > 0) {
+	        resultMap.put("res_code", "200");
+	        resultMap.put("res_msg", "업로드 성공");
+	    }
+	    return resultMap;
+	}
 	
 }

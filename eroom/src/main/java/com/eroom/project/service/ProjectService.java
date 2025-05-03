@@ -1,5 +1,6 @@
 package com.eroom.project.service;
 
+import java.io.File;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -7,11 +8,19 @@ import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.eroom.drive.dto.DriveDto;
+import com.eroom.drive.entity.Drive;
+import com.eroom.drive.repository.DriveRepository;
 import com.eroom.employee.entity.Employee;
+import com.eroom.employee.entity.Separator;
+import com.eroom.employee.repository.SeparatorRepository;
 import com.eroom.project.dto.GithubPullRequestDto;
 import com.eroom.project.dto.ProjectDto;
 import com.eroom.project.dto.ProjectMemberDto;
@@ -32,6 +41,23 @@ public class ProjectService {
 	private final RSACryptor rsaCryptor;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final DriveRepository driveRepository;
+    private final SeparatorRepository separatorRepository;
+    
+ // 파일 저장 경로 
+ 	 @Value("${ffupload.location}")
+ 	 private String fileDir;
+ 	 
+ 	 public List<DriveDto> findProjectFiles(String separatorCode, Long projectNo) {
+ 		List<Drive> drives = driveRepository.findBySeparatorCodeContainingAndParam1AndVisibleYn(separatorCode, projectNo, "Y");
+		List<DriveDto> result = new ArrayList<>();
+		
+		for (Drive drive : drives) {
+			result.add(DriveDto.toDto(drive));
+		}
+		
+		return result;
+ 	 }
     
     @Transactional(rollbackFor = Exception.class)
     public Long saveProject(ProjectDto projectDto, List<ProjectMemberDto> memberDtos) {
@@ -266,6 +292,61 @@ public class ProjectService {
     	
     	return result;
     }
+    
+    public int uploadProjectFiles(DriveDto driveDto, Long employeeNo) {
+        int result = 0;
+
+        if (driveDto.getSeparatorCode() == null || driveDto.getSeparatorCode().isEmpty()) {
+            driveDto.setSeparatorCode(
+                separatorRepository.findBySeparatorName("개인")
+                    .map(Separator::getSeparatorCode)
+                    .orElse("E001")
+            );
+        }
+
+        List<String> descriptions = driveDto.getDriveDescriptions();
+        List<MultipartFile> files = driveDto.getDriveFiles();
+
+        for (int i = 0; i < files.size(); i++) {
+            MultipartFile file = files.get(i);
+            try {
+                String oriName = file.getOriginalFilename();
+                String ext     = oriName.substring(oriName.lastIndexOf("."));
+                String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+
+                // project/ 폴더에 저장
+                String path = fileDir + "project/" + newName;
+                File savedFile = new File(path);
+                savedFile.getParentFile().mkdirs();
+                file.transferTo(savedFile);
+
+                String description = (descriptions != null && descriptions.size() > i)
+                                       ? descriptions.get(i)
+                                       : null;
+
+                Drive drive = Drive.builder()
+                    .uploader(Employee.builder().employeeNo(employeeNo).build())
+                    .separatorCode(driveDto.getSeparatorCode())
+                    .driveOriName(oriName)
+                    .driveNewName(newName)
+                    .driveType(ext)
+                    .driveSize(file.getSize())
+                    .drivePath("project/" + newName)
+                    .driveDescription(description)
+                    .downloadCount(0L)
+                    .visibleYn("Y")
+                    .param1(driveDto.getParam1())
+                    .build();
+
+                driveRepository.save(drive);
+                result++;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
 
 
 }
