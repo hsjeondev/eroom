@@ -34,19 +34,16 @@
 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#treeModal">트리 테스트</button>
 
 <div class="modal fade" id="treeModal" tabindex="-1" aria-labelledby="treeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
+  <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 550px; max-height: 400px;">
     <div class="modal-content">
-      <div class="modal-header py-2">
-        <h5 class="modal-title fw-bold" id="treeModalLabel">조직도 선택</h5>
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="treeModalLabel">조직도 선택</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
       </div>
 
-      <div class="modal-body px-4">
-        <div id="selectedResult" class="border bg-white rounded p-2 mb-3 small">
-          <strong>선택한 항목:</strong><span><button id="clearBtn" class="btn btn-light btn-sm" type="button">비우기</button></span>
-          <div id="selectedTags" class="mt-1 d-flex flex-wrap gap-2"></div>
-        </div>
-
+      <div class="modal-body px-4" style="max-height: 400px; overflow-y: auto;">
+<div class="row">
+<div class="col-6">
 <ul class="treeview" id="treeviewTree">
   <li class="treeview-list-item">
     <p class="treeview-text">
@@ -107,11 +104,22 @@
     </ul>
   </li>
 </ul>
+</div>
+
+<div class="col-6">
+  <div id="selectedResult" class="border bg-white rounded p-2 mb-3 small"
+       style="position: sticky; top: 0;">
+    <strong>선택한 항목:</strong>
+    <span><button id="clearBtn" class="btn btn-light btn-sm" type="button">비우기</button></span>
+    <div id="selectedTags" class="mt-1 d-flex flex-wrap gap-2"></div>
+  </div>
+</div>
+</div>
       </div>
 
       <div class="modal-footer py-2">
         <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
-        <button type="button" class="btn btn-success btn-sm" onclick="confirmSelection()">선택 완료</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="confirmSelection()">선택 완료</button>
       </div>
     </div>
   </div>
@@ -185,9 +193,17 @@ function addTag(label, code) {
 }
 
 function removeTag(code) {
-  const tag = document.getElementById(`tag-${code}`);
-  if (tag) tag.remove();
-}
+	  // 태그 제거
+	  const tag = document.getElementById(`tag-${code}`);
+	  if (tag) tag.remove();
+
+	  // 동일한 data-no를 가진 체크박스 찾아서 해제
+	  const checkbox = document.querySelector(`input[type="checkbox"][data-no="${code}"]`);
+	  if (checkbox && checkbox.checked) {
+	    checkbox.checked = false;
+	    handleCheck(checkbox); // 하위 및 상위 연동 처리
+	  }
+	}
 
 function confirmSelection() {
   const selected = document.querySelectorAll("#selectedTags .badge");
