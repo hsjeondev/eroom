@@ -74,7 +74,7 @@ public class MailReceiverDto {
 		return MailReceiver.builder()
 			.mail(Mail.builder().mailNo(mail_no).build())
 			.receiver(Employee.builder().employeeNo(employee_no).build())
-			.mailReceiverVisibleYn(mail_receiver_read_yn)
+			.mailReceiverVisibleYn(mail_receiver_visible_yn)
 			//.receiver(Employee.builder().employeeNo(employee_no).build())
 			.mailReceiverReadYn(mail_receiver_read_yn)
 			.build();

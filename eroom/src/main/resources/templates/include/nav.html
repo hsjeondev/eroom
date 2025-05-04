@@ -471,7 +471,7 @@
 				      <!-- 공지 게시판 -->
 				      <li class="nav-item">
 				        <a class="nav-link"
-				           th:href="@{/board/notice}"
+				           th:href="@{/article/notice}"
 					        th:classappend="${(requestURI != null and requestURI.startsWith('/board/notice')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">공지 게시판</span></div>
 				        </a>
@@ -480,7 +480,7 @@
 				      <!-- 익명 게시판 -->
 				      <li class="nav-item">
 				        <a class="nav-link"
-				           th:href="@{/board/anonymous}"
+				           th:href="@{/article/anonymous}"
 					        th:classappend="${(requestURI != null and requestURI.startsWith('/reservation/anonymous')) ? 'active' : ''}">
 				          <div class="d-flex align-items-center"><span class="nav-link-text">익명 게시판</span></div>
 				        </a>

@@ -35,6 +35,7 @@ public interface MailReceiverRepository extends JpaRepository<MailReceiver, Long
 	@Query("SELECT mr FROM MailReceiver mr JOIN FETCH mr.mail m WHERE mr.receiver.employeeNo = :empNo")
 	List<MailReceiver> findByEmployeeNo(@Param("empNo") Long empNo);
 	*/
+	/*
 	@Query("SELECT mr FROM MailReceiver mr " +
 		       "JOIN FETCH mr.mail m " +
 		       "WHERE mr.receiver.employeeNo = :empNo " +
@@ -54,6 +55,40 @@ public interface MailReceiverRepository extends JpaRepository<MailReceiver, Long
 		       "   SELECT s.mail.mailNo FROM MailStatus s " +
 		       "   WHERE s.employee.employeeNo = :empNo AND s.mailStatusDeletedYn = 'Y'" +
 		       ") " +
+		       "ORDER BY m.mailSentTime ASC")
+		List<MailReceiver> findByEmployeeNoOrderByOldest(@Param("empNo") Long empNo);
+		
+	@Query("SELECT mr FROM MailReceiver mr " +
+		       "JOIN FETCH mr.mail m " +
+		       "LEFT JOIN MailStatus s ON s.mail = m AND s.employee.employeeNo = :empNo " +
+		       "WHERE mr.receiver.employeeNo = :empNo " +
+		       "AND mr.mailReceiverVisibleYn = 'Y' " +
+		       "AND (s IS NULL OR s.mailStatusDeletedYn <> 'Y') " +
+		       "ORDER BY m.mailSentTime DESC")
+		List<MailReceiver> findByEmployeeNoOrderByLatest(@Param("empNo") Long empNo);
+	@Query("SELECT mr FROM MailReceiver mr " +
+		       "JOIN FETCH mr.mail m " +
+		       "LEFT JOIN MailStatus s ON s.mail = m AND s.employee.employeeNo = :empNo " +
+		       "WHERE mr.receiver.employeeNo = :empNo " +
+		       "AND mr.mailReceiverVisibleYn = 'Y' " +
+		       "AND (s IS NULL OR s.mailStatusDeletedYn <> 'Y') " +
+		       "ORDER BY m.mailSentTime ASC")
+		List<MailReceiver> findByEmployeeNoOrderByOldest(@Param("empNo") Long empNo);*/
+	@Query("SELECT mr FROM MailReceiver mr " +
+		       "JOIN FETCH mr.mail m " +
+		       "LEFT JOIN MailStatus s ON s.mail = m AND s.employee.employeeNo = :empNo " +
+		       "WHERE mr.receiver.employeeNo = :empNo " +
+		       "AND mr.mailReceiverVisibleYn = 'Y' " +
+		       "AND (s IS NULL OR s.mailStatusDeletedYn <> 'Y' OR s.mailStatusDeletedYn IS NULL) " +  // 상태가 없으면 필터링하지 않도록 수정
+		       "ORDER BY m.mailSentTime DESC")
+		List<MailReceiver> findByEmployeeNoOrderByLatest(@Param("empNo") Long empNo);
+
+		@Query("SELECT mr FROM MailReceiver mr " +
+		       "JOIN FETCH mr.mail m " +
+		       "LEFT JOIN MailStatus s ON s.mail = m AND s.employee.employeeNo = :empNo " +
+		       "WHERE mr.receiver.employeeNo = :empNo " +
+		       "AND mr.mailReceiverVisibleYn = 'Y' " +
+		       "AND (s IS NULL OR s.mailStatusDeletedYn <> 'Y' OR s.mailStatusDeletedYn IS NULL) " +  // 상태가 없으면 필터링하지 않도록 수정
 		       "ORDER BY m.mailSentTime ASC")
 		List<MailReceiver> findByEmployeeNoOrderByOldest(@Param("empNo") Long empNo);
 	// 읽음 처리
