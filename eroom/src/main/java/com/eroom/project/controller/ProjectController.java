@@ -166,17 +166,30 @@ public class ProjectController {
 
 	
 	@GetMapping("/detail/{project_no}/files")
-	public String detailProjectFilesView(@PathVariable("project_no") Long project_no, Model model) {
-		
-		List<DriveDto> fileList = projectService.findProjectFiles("FL008", project_no);
-		ProjectDto project = projectService.findByProjectNo(project_no);
-			
-		
-		model.addAttribute("project", project);
-		model.addAttribute("fileList", fileList);
-		
-		return "project/projectDetailFilesTab";
+	public String detailProjectFilesView(
+	    @PathVariable("project_no") Long projectNo,
+	    @RequestParam(name = "category", defaultValue = "0") String category,
+	    Model model
+	) {
+	    // category -> separatorCode 매핑
+	    String base = "FL008";
+	    String separatorCode = switch (category) {
+	        case "1" -> base + "1";
+	        case "2" -> base + "2";
+	        case "3" -> base + "3";
+	        default  -> base;
+	    };
+
+	    List<DriveDto> fileList = 
+	        projectService.findProjectFiles(separatorCode, projectNo);
+	    ProjectDto project = projectService.findByProjectNo(projectNo);
+
+	    model.addAttribute("project", project);
+	    model.addAttribute("fileList", fileList);
+	    model.addAttribute("selectedCategory", category);
+	    return "project/projectDetailFilesTab";
 	}
+
 	
 	@GetMapping("/detail/{project_no}/minutes")
 	public String detailProjectMinutesView(@PathVariable("project_no") Long project_no, Model model) {

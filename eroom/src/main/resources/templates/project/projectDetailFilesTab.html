@@ -39,31 +39,20 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		    
 		    <!-- 검색창 + 카테고리 선택 -->
 		    <div class="search-box d-flex align-items-center">
-		      <form class="position-relative me-2">
-		        <input class="form-control search-input search form-control-sm" 
-		               type="search" 
-		               placeholder="검색어를 입력하세요." 
-		               aria-label="Search">
-		        <svg style="height: 40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" 
-		             data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-		          <path fill="currentColor" 
-		                d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 
-		                   12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 
-		                   25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 
-		                   0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 
-		                   144 0 1 0 0 288z">
-		          </path>
-		        </svg>
-		      </form>
 
 		      <!-- 카테고리 셀렉트 -->
-		      <select id="filterCategory" name="category" 
-		              class="form-select form-select-sm w-auto">
-		        <option value="all">전체</option>
-		        <option value="development">개발</option>
-		        <option value="planning">기획</option>
-		        <option value="design">디자인</option>
-		      </select>
+			  <select id="filterCategory"
+			          name="category"
+			          class="form-select form-select-sm w-auto"
+			          th:attr="onchange=|
+			            window.location.href='@{/project/detail/{project_no}/files(project_no=${project.project_no})}?category=' + this.value
+			          |">
+			    <option value="0" th:selected="${selectedCategory == '0'}">전체</option>
+			    <option value="1" th:selected="${selectedCategory == '1'}">개발</option>
+			    <option value="2" th:selected="${selectedCategory == '2'}">기획</option>
+			    <option value="3" th:selected="${selectedCategory == '3'}">디자인</option>
+			  </select>
+
 		    </div>
 
 		    <!-- 파일 올리기 버튼 -->
@@ -139,13 +128,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		  		          <i class="fas fa-ellipsis fs-10"></i>
 		  		        </button>
 		  		        <div class="dropdown-menu dropdown-menu-end py-2">
-		  		          <a class="dropdown-item" th:href="@{'/drive/download/team/' + ${file.driveAttachNo}}">파일 다운로드</a>
-		  		          <a class="dropdown-item" href="#" 
-		  		             data-bs-toggle="modal" 
-		  		             data-bs-target="#editFileModal"
-		  		             th:attr="data-id=${file.driveAttachNo},data-name=${file.driveOriName},data-desc=${file.driveDescription}">
-		  		             파일 수정
-		  		          </a>
+		  		          <a class="dropdown-item" th:href="@{'/project/download/' + ${file.driveAttachNo}}">파일 다운로드</a>
 		  		          <div class="dropdown-divider"></div>
 		  		          <a class="dropdown-item text-danger delete-file" href="#" th:data-id="${file.driveAttachNo}">파일 삭제</a>
 		  		        </div>
@@ -208,42 +191,53 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
 			   
 		  	<!-- 파일 수정 모달 -->
-		  	<div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true">
-		  	  <div class="modal-dialog">
-		  	    <form id="editFileForm" enctype="multipart/form-data">
-		  	      <div class="modal-content">
-		  	        <div class="modal-header">
-		  	          <h5 class="modal-title" id="editFileModalLabel">파일 수정</h5>
-		  	          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-		  	        </div>
-		  	        <div class="modal-body">
-		  	          <input type="hidden" name="driveAttachNo" id="editDriveAttachNo">
-		  			<div class="mb-3">
-		  			  <label for="originalFileName" class="form-label">기존 파일명</label>
-		  			  <input class="form-control" type="text" id="originalFileName" readonly>
-		  			</div>
-		  	          <div class="mb-3">
-		  	            <label for="editDriveFile" class="form-label">새 파일 선택</label>
-		  	            <input class="form-control" type="file" id="editDriveFile" name="driveFile">
-		  	          </div>
-		  	
-		  	          <div class="mb-3">
-		  	            <label for="editDriveDescription" class="form-label">파일 설명</label>
-		  	            <input class="form-control" type="text" id="editDriveDescription" name="driveDescription">
-		  	          </div>
-		  	          
-		  	          <input type="hidden" id="userName" value="${user.employee.employeeName}">
-		  			  <input type="hidden" id="userStructureCode" value="${user.employee.structure.separatorCode}">
-		  			  
-		  	        </div>
-		  	        <div class="modal-footer">
-		  	          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-		  	          <button type="submit" class="btn btn-primary">수정 저장</button>
-		  	        </div>
-		  	      </div>
-		  	    </form>
-		  	  </div>
-		  	</div>
+			<!-- 파일 수정 모달 -->
+			<div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <form id="editFileForm" enctype="multipart/form-data">
+			      <div class="modal-content">
+			        <div class="modal-header">
+			          <h5 class="modal-title" id="editFileModalLabel">파일 수정</h5>
+			          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+			        </div>
+			        <div class="modal-body">
+			          <input type="hidden" name="driveAttachNo" id="editDriveAttachNo">
+			          
+			          <!-- 카테고리 선택 추가 -->
+			          <div class="mb-3">
+			            <label for="editFileCategory" class="form-label">카테고리</label>
+			            <select id="editFileCategory" name="fileCategory" class="form-select">
+			              <option value="1">개발</option>
+			              <option value="2">기획</option>
+			              <option value="3">디자인</option>
+			            </select>
+			          </div>
+
+			          <div class="mb-3">
+			            <label for="originalFileName" class="form-label">기존 파일명</label>
+			            <input class="form-control" type="text" id="originalFileName" readonly>
+			          </div>
+			          <div class="mb-3">
+			            <label for="editDriveFile" class="form-label">새 파일 선택</label>
+			            <input class="form-control" type="file" id="editDriveFile" name="driveFile">
+			          </div>
+			          <div class="mb-3">
+			            <label for="editDriveDescription" class="form-label">파일 설명</label>
+			            <input class="form-control" type="text" id="editDriveDescription" name="driveDescription">
+			          </div>
+			          
+			          <input type="hidden" id="userName" value="${user.employee.employeeName}">
+			          <input type="hidden" id="userStructureCode" value="${user.employee.structure.separatorCode}">
+			        </div>
+			        <div class="modal-footer">
+			          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+			          <button type="submit" class="btn btn-primary">수정 저장</button>
+			        </div>
+			      </div>
+			    </form>
+			  </div>
+			</div>
+
 		  	
 		  	
 		      <!-- 페이징? -->
@@ -278,7 +272,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			      button.addEventListener('click', function () {
 			        const attachNo = this.getAttribute('data-id');
 			        if (!confirm('정말로 이 파일을 삭제하시겠습니까?')) return;
-			        fetch(`/drive/delete/team/${attachNo}`, {
+			        fetch(`/project/delete/${attachNo}`, {
 			          method: 'DELETE',
 			          headers: {
 			            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
@@ -309,7 +303,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			        }
 			        const form = document.createElement('form');
 			        form.method = 'POST';
-			        form.action = '/drive/download/team/bulk';
+			        form.action = '/project/download/bulk';
 			        form.style.display = 'none';
 			        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
 			        form.innerHTML = `<input type="hidden" name="_csrf" value="${csrfToken}">` +
@@ -333,7 +327,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			        }
 			        if (!confirm('정말로 선택한 파일을 삭제하시겠습니까?')) return;
 			        const ids = checked.map(cb => cb.closest('tr').querySelector('.delete-file').getAttribute('data-id'));
-			        fetch('/drive/delete/team/bulk', {
+			        fetch('/project/delete/bulk', {
 			          method: 'POST',
 			          headers: {
 			            'Content-Type': 'application/json',
