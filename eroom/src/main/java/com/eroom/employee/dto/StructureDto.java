@@ -1,5 +1,6 @@
 package com.eroom.employee.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.eroom.employee.entity.Employee;
@@ -22,9 +23,11 @@ public class StructureDto {
 	private Long structure_no;
 	private String separator_code;
 	private String code_name;
-	private Long order;
+	private Long sort_order;
 	private String parent_code;
 	private String visible_yn;
+	private String creator;
+	private String editor;
 	private List<Employee> employees;
 	
 	public Structure toEntity() {
@@ -32,10 +35,12 @@ public class StructureDto {
 	        .structureNo(structure_no)
 	        .separatorCode(separator_code)
 	        .codeName(code_name)
-	        .order(order)
+	        .sortOrder(sort_order)
 	        .parentCode(parent_code)
 	        .visibleYn(visible_yn)
 	        .employees(employees)
+	        .creator(creator)
+	        .editor(editor)
 	        .build();
 	}
 	
@@ -44,10 +49,12 @@ public class StructureDto {
 	        .structure_no(entity.getStructureNo())
 	        .separator_code(entity.getSeparatorCode())
 	        .code_name(entity.getCodeName())
-	        .order(entity.getOrder())
+	        .sort_order(entity.getSortOrder())
 	        .parent_code(entity.getParentCode())
 	        .visible_yn(entity.getVisibleYn())
 	        .employees(entity.getEmployees())
+	        .creator(entity.getCreator())
+	        .editor(entity.getEditor())
 	        .build();
 	}
 }

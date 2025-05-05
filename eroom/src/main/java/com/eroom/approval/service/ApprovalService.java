@@ -369,7 +369,28 @@ public class ApprovalService {
 		}
 		return result;
 	}
+
+	// 마이페이지, 내 결재 죠회 - 결재완료
+	public List<ApprovalDto> myPageMyApprovalsStatusIsA(Long employeeNo) {
+		List<Approval> list =  approvalRepository.findByEmployee_EmployeeNoAndApprovalStatusAndApprovalVisibleYnOrderByApprovalRegDateDesc(employeeNo, "A", "Y");
+		List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
+		for(Approval l : list) {
+			ApprovalDto dto = new ApprovalDto().toDto(l);
+			resultList.add(dto);
+		}
+		return resultList;
+	}
 	
+	// 마이페이지, 내 결재 조회 - 진행중
+	public List<ApprovalDto> myPageMyApprovalsStatusIsS(Long employeeNo) {
+		List<Approval> list =  approvalRepository.findByEmployee_EmployeeNoAndApprovalStatusAndApprovalVisibleYnOrderByApprovalRegDateDesc(employeeNo, "S", "Y");
+		List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
+		for(Approval l : list) {
+			ApprovalDto dto = new ApprovalDto().toDto(l);
+			resultList.add(dto);
+		}
+		return resultList;
+	}
 
 
 
