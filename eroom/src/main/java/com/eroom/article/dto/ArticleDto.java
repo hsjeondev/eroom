@@ -1,0 +1,63 @@
+package com.eroom.article.dto;
+
+import java.time.LocalDateTime;
+
+import com.eroom.article.entity.Article;
+import com.eroom.employee.entity.Employee;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
+@ToString
+public class ArticleDto {
+	private Long article_no;
+	private Long employee_no;
+	private String article_title;
+	private String article_content;
+	
+	@Builder.Default
+	private String visible_yn="Y";
+	
+	private LocalDateTime article_reg_date;
+	private LocalDateTime article_mod_date;
+
+	
+	private Long article_creator;
+	private Long article_editor;
+	@Builder.Default
+	private String separator_code ="B001";
+	private Integer order;
+
+
+
+	public Article toEntity() {
+	    return Article.builder()
+	            .articleNo(article_no)
+	            .employee(Employee.builder().employeeNo(employee_no).build()) // 작성자 FK
+	            .articleTitle(article_title)
+	            .articleContent(article_content)
+	            .separatorCode(separator_code)
+	            .order(order)
+	            .visibleYn(visible_yn)
+	            .articleCreator(article_creator)
+	            .articleEditor(article_editor)
+	            .articleRegDate(article_reg_date)
+	            .articleModDate(article_mod_date)
+	            .build();
+	}
+
+
+
+
+    
+    
+}

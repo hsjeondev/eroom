@@ -96,12 +96,7 @@ public class AttendanceService {
 	// 홈에서 출퇴근 상태, 시간 반환
 	public Map<String,String> getTodayAttendanceStatusAndTime(Long employeeNo){
 		Map<String,String> resultMap = new HashMap<>();
-		
-		/*
-		 * // 현재 로그인한 정보 Authentication authentication =
-		 * SecurityContextHolder.getContext().getAuthentication(); EmployeeDetails
-		 * employeeDetail = (EmployeeDetails)authentication.getPrincipal();
-		 */
+
 		// 오늘 날짜
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime todayStart = now.toLocalDate().atStartOfDay();
@@ -109,28 +104,28 @@ public class AttendanceService {
 		
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 		
-		// 출근 기록 전체 최신순 조회
+		// 오늘 출근 기록 최신순 조회
 		List<Attendance> checkIns = attendanceRepository.findTodayAttendanceList(employeeNo, todayStart, todayEnd);
-		
-		if(checkIns.isEmpty()) {
-			resultMap.put("attendanceStatus", "notCheckedIn");
-			resultMap.put("attendanceTime", "");
-		}else {
+		// 기본값
+		// 기본값
+		resultMap.put("attendanceStatus", "notCheckedIn");
+		resultMap.put("checkInTime", "");
+		resultMap.put("checkOutTime", "");
+
+		if (!checkIns.isEmpty()) {
 			Attendance recent = checkIns.get(0);
-			String attendanceStatus = "";
-			String attendanceTime = "";
 
-			if (recent.getAttendanceCheckOutTime() == null) {
-				attendanceStatus = "checkedIn";
-				attendanceTime = recent.getAttendanceCheckInTime().format(formatter);
-			} else {
-				attendanceStatus = "checkedOut";
-				attendanceTime = recent.getAttendanceCheckOutTime().format(formatter);
+			if (recent.getAttendanceCheckInTime() != null) {
+				resultMap.put("checkInTime", recent.getAttendanceCheckInTime().format(formatter));
+				resultMap.put("attendanceStatus", "checkedIn");
 			}
-
-			resultMap.put("attendanceStatus", attendanceStatus);
-			resultMap.put("attendanceTime", attendanceTime);
+			if (recent.getAttendanceCheckOutTime() != null) {
+				resultMap.put("checkOutTime", recent.getAttendanceCheckOutTime().format(formatter));
+				resultMap.put("attendanceStatus", "checkedOut");
+			}
 		}
+		
+
 		return resultMap;
 	}
 	

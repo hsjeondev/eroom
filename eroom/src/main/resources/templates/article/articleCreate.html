@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/include/layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>공지 작성</title>
+  <script src="../../vendors/tinymce/tinymce.min.js"></script>
+</head>
+<body>
+<main class="main" id="top" layout:fragment="content">
+  <div class="col">
+    <div class="card email-content">
+      <div class="card-body">
+        <form method="post" class="d-flex flex-column h-100"
+              action="/article/create" name="notice_create_form" enctype="multipart/form-data">
+          <!-- 작성자 정보 (히든 처리) -->
+          <input type="hidden" name="employee_no"
+                 th:value="${#authentication.principal.employee.employeeNo}" />
+          <input type="hidden" name="notice_no"/>
+
+          <div class="row g-3 mb-2">
+            <!-- 긴급 공지 체크 -->
+            <div class="form-check mb-0 fs-8">
+              <input class="form-check-input" type="checkbox" id="checkImportant" />
+              긴급 공지
+            </div>
+            <div class="col-12">
+              <input class="form-control" type="text" placeholder="제목" name="article_title" id="notice_title"/>
+            </div>
+          </div>
+
+          <!-- 내용 -->
+          <div class="mb-3 flex-1">
+            <textarea class="tinymce email-textarea" name="article_content" id="notice_content"
+                      data-tinymce='{"height":"100%"}'></textarea>
+          </div>
+
+          <!-- 파일 -->
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex">
+              <label class="btn btn-link py-0 px-2 text-body fs-9" for="noticeAttachment">
+                <span class="fa-solid fa-paperclip"></span>
+              </label>
+              <input class="d-none" id="noticeAttachment" name="articleFiles" type="file" multiple/>
+              <div id="filePreview" class="mt-2"></div>
+            </div>
+            <div class="d-flex">
+              <button class="btn btn-primary fs-10" type="button" id="submitBtn">
+                작성<span class="fa-solid fa-paper-plane ms-1"></span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  document.getElementById("submitBtn").addEventListener("click", function () {
+	  const form = document.notice_create_form;
+	  const title = form.article_title.value.trim();  // 제목
+	  const content = tinymce.get('notice_content').getContent().trim();  // 내용 (TinyMCE에서 가져옴)
+
+	  // 제목이 비어있는지 확인
+	  if (!title) {
+	    alert("제목을 입력해주세요.");
+	    return;
+	  }
+
+	  // 내용이 비어있는지 확인
+	  if (!content || content === "<p>&nbsp;</p>" || content === "") {
+	    alert("내용을 입력해주세요.");
+	    return;
+	  }
+
+	  // 공지 등록을 확인하는 메시지
+	  if (confirm("공지를 등록하시겠습니까?")) {
+	    tinymce.triggerSave(); // TinyMCE 에디터의 내용을 폼 데이터에 저장
+
+	    const payload = new FormData(form);
+
+	    selectedFiles.forEach(file => {
+	      payload.append("notice_files", file);
+	    });
+
+	    fetch("/article/create", {
+	      method: "POST",
+	      headers: {
+	        'header': document.querySelector('meta[name="_csrf_header"]').content,
+	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+	      },
+	      body: payload
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	      alert(data.res_msg || "등록 완료");
+	      if (data.res_code == 200) {
+	        location.href = '/article/notice';
+	      }
+	    });
+	  }
+	});
+
+    const selectedFiles = [];
+
+    document.getElementById('noticeAttachment').addEventListener('change', function(event) {
+      const fileList = Array.from(event.target.files);
+      const previewContainer = document.getElementById('filePreview');
+
+      fileList.forEach(file => {
+        const exists = selectedFiles.some(f => f.name === file.name && f.size === file.size);
+        if (!exists) selectedFiles.push(file);
+      });
+
+      renderFilePreview();
+      event.target.value = "";
+    });
+
+    function renderFilePreview() {
+      const previewContainer = document.getElementById('filePreview');
+      previewContainer.innerHTML = '';
+
+      if (selectedFiles.length === 0) return;
+
+      const ul = document.createElement('ul');
+      ul.className = 'list-unstyled';
+
+      selectedFiles.forEach((file, index) => {
+        const li = document.createElement('li');
+        li.className = 'mb-1';
+
+        const fileNameHtml = file.downloadUrl
+          ? `<a href="${file.downloadUrl}" target="_blank">${file.name}</a>`
+          : file.name;
+
+        li.innerHTML = `
+          <span class="badge bg-light text-dark d-flex align-items-center justify-content-between px-2 py-1"
+                style="font-size: 0.85rem; min-width: 180px;">
+            ${fileNameHtml} <small>(${(file.size / 1024).toFixed(1)} KB)</small>
+            <button type="button" class="btn btn-sm btn-outline-secondary ms-2 py-0 px-1"
+                    style="font-size: 0.7rem; line-height: 1;" onclick="removeSelectedFile(${index})">✕</button>
+          </span>
+        `;
+        ul.appendChild(li);
+      });
+
+      previewContainer.appendChild(ul);
+    }
+
+    function removeSelectedFile(index) {
+      selectedFiles.splice(index, 1);
+      renderFilePreview();
+    }
+  </script>
+</main>
+</body>
+</html>

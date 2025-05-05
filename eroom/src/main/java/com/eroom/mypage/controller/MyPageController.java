@@ -2,6 +2,7 @@ package com.eroom.mypage.controller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -21,8 +24,10 @@ import com.eroom.attendance.service.AttendanceService;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.DirectoryService;
+import com.eroom.employee.dto.EmployeeUpdateDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
+import com.eroom.employee.service.EmployeeService;
 import com.eroom.employee.service.StructureService;
 import com.eroom.security.EmployeeDetails;
 
@@ -35,6 +40,7 @@ public class MyPageController {
 	private final StructureService structureService;
 	private final DirectoryService employeeDirectoryService;
 	private final AttendanceService attendanceService;
+	private final EmployeeService employeeService;
 	// 마이페이지
 	@GetMapping("/list")
 	public String myPageView(@RequestParam(name= "month",required = false) String month,Model model, Authentication authentication) {
@@ -115,7 +121,6 @@ public class MyPageController {
 
 		return "mypage/list";
 	}
-	
 	@GetMapping("/chartData")
 	@ResponseBody
 	public Map<String,Object> getChartData(){
@@ -126,5 +131,54 @@ public class MyPageController {
 		// 차트 데이터
 		return attendanceService.getAttendanceChartData(employeeDetail);
 		
-	}	
+	}
+	// 회원 정보 가져오기
+	@GetMapping("/getEmployeeDetail")
+	@ResponseBody
+	public Map<String, Object> getEmployeeDetail(@RequestParam("employeeNo") Long employeeNo) {
+	    Map<String, Object> result = new HashMap<>();
+	    Employee employee = employeeService.findEmployeeByEmployeeNo(employeeNo);
+	    Directory directory = employeeDirectoryService.selectDirectoryByEmployeeNo(employeeNo);
+
+	    if (employee == null || directory == null) {
+	        result.put("res_code", 404);
+	        result.put("res_msg", "정보를 찾을 수 없습니다.");
+	        return result;
+	    }
+
+	    result.put("res_code", 200);
+	    result.put("employee_name", employee.getEmployeeName());
+	    result.put("directory_phone", directory.getDirectoryPhone());
+	    result.put("directory_zipcode", directory.getDirectoryZipcode());
+	    result.put("directory_address", directory.getDirectoryAddress());
+	    return result;
+	}
+	
+	
+	// 회원 정보 수정하기
+	@PostMapping("/updateEmployee")
+	@ResponseBody
+	public Map<String, Object> updateMyInfo(@RequestBody EmployeeUpdateDto dto, Authentication authentication) {
+	    Map<String, Object> resultMap = new HashMap<>();
+	    try {
+	        // 로그인한 사용자 정보 가져오기
+	        EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	        Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+
+	        // 본인의 정보만 수정 가능하게 설정
+	        dto.setEmployee_no(employeeNo);
+
+	        // 서비스 호출
+	        employeeService.updateEmployeeFromMypage(dto);
+
+	        resultMap.put("res_code", 200);
+	        resultMap.put("res_msg", "회원 정보가 성공적으로 수정되었습니다.");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        resultMap.put("res_code", 500);
+	        resultMap.put("res_msg", "회원 정보 수정 중 오류가 발생했습니다.");
+	    }
+
+	    return resultMap;
+	}
 }

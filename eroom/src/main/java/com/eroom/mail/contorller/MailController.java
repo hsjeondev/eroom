@@ -22,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,17 +52,38 @@ public class MailController {
 	private final DriveService driveService;
 	@Value("${ffupload.location}")
 	 private String fileDir;
-	/* 테스트로 만들어 놓은거
-	 * @GetMapping("/mail") public String selectMailAll(Model model) { // 조건 필요함
-	 * reveiver에 // to일때는 내가 보낸거 // 조건이 cc면 받은거
-	 * 
-	 * // 조건 더 필요함 status 'N'일때 임시저장x 즉, 발송된 메일 List<Mail> resultList =
-	 * service.selectMailAll(); model.addAttribute("resultList",resultList); return
-	 * "mail/list"; }
-	 */
+	
+	@GetMapping("/mail/receiverTo/fragment")
+	public String selectReceiverToFragment(Model model, 
+	                                       @AuthenticationPrincipal EmployeeDetails employeeDetails,
+	                                       @RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder) {
+	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+
+	    try {
+	        // 받은 메일과 상태 맵을 가져옵니다.
+	        List<MailReceiver> received = mailService.getReceivedMailsByEmployee(employeeNo, sortOrder);
+	        Map<Long, MailStatus> mailStatusMap = mailService.getStatusMapForMailRecevier(received);
+
+	        // 받은 메일이 없거나 null인 경우를 체크
+	        if (received == null || received.isEmpty()) {
+	            System.out.println("받은 메일이 없습니다. 직원 번호: " + employeeNo);
+	        }
+	        
+	        // 모델에 추가
+	        model.addAttribute("mailStatusMap", mailStatusMap);
+	        model.addAttribute("receivedMails", received);
+	    } catch (Exception e) {
+	        // 예외 로그 출력
+	        e.printStackTrace();
+	        model.addAttribute("error", "메일을 가져오는 중 오류가 발생했습니다.");
+	        return "error"; // 오류 페이지를 반환
+	    }
+
+	    // 뷰 리턴
+	    return "mail/mailReceiverTo";
+	}
 	
 	// 받은 메일
-	
 	@GetMapping("/mail/receiverTo")
 	public String selectReceiverToAll(Model model, 
 									@AuthenticationPrincipal EmployeeDetails employeeDetails,
@@ -79,6 +101,7 @@ public class MailController {
 	    model.addAttribute("receivedMails", received);
 	    return "mail/mailReceiverTo";
 	}
+	
 	
 	// 본인 조회 다시 receiver "Me"
 	
@@ -148,10 +171,7 @@ public class MailController {
 //	}
 	
 	// 참조자 메일 < 이건 나중에 메일 기능을 만든다고 하면 쓸 예정
-	@GetMapping("/mail/receiverCc")
-	public String selectReceiverCcAll() {
-		return "mail/mailReceiverCc";
-	}
+
 	
 	
 	
@@ -171,7 +191,20 @@ public class MailController {
 
 	    return "redirect:" + redirectUrl;
 	}*/
+		
+	@PostMapping("/mail/delete")
+    public ResponseEntity<Void> deleteMail(@RequestBody List<Long> mailNos,
+    										@AuthenticationPrincipal EmployeeDetails employeeDetails) {
+        // mailNos에 포함된 메일들의 visible_yn을 "N"으로 업데이트
+		Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+		for (Long mailNo : mailNos) {
+			mailService.updateVisibleYn(employeeNo,mailNo, "N");
+	    }
+        
+        return ResponseEntity.ok().build();
+    }	
 	// 휴지통으로 옮기는 로직 ( N => Y )
+	// 단일
 	@PostMapping("/mail/trash/{id}")
 	public String moveToTrash(@PathVariable("id") Long id,
 							  @RequestParam("redirectUrl") String redirectUrl,
@@ -179,6 +212,40 @@ public class MailController {
 		Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
 		mailService.moveToTrash(employeeNo,id);
 		return "redirect:" + redirectUrl;
+	}
+	// 다중
+	@PostMapping("/mail/trash")
+    @ResponseBody
+    public ResponseEntity<Void> trashBulkMail(@RequestBody List<Long> mailNos,
+    										@AuthenticationPrincipal EmployeeDetails employeeDetails) {
+		Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+		for (Long mailNo : mailNos) {
+	        mailService.moveToTrash(employeeNo,mailNo );  // 하나씩 처리
+	    }
+        return ResponseEntity.ok().build();  // 성공적으로 처리되면 OK 응답
+    }
+	// 상태 바꾸기
+	// 단일
+	@PostMapping("/mail/status/important/{id}")
+    public String moveImportant(@PathVariable("id") Long id,
+                                                @AuthenticationPrincipal EmployeeDetails employeeDetails, 
+												@RequestParam("redirectUrl") String redirectUrl){
+		Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+		mailService.moveImportant(id,employeeNo);
+        return "redirect:" + redirectUrl;
+    }
+	
+	@PostMapping("/mail/important")
+	@ResponseBody
+	public ResponseEntity<Void> markBulkImportant(@RequestBody List<Long> mailNos,
+	                                              @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	    
+	    for (Long mailNo : mailNos) {
+	        mailService.moveImportant(mailNo,employeeNo);  
+	    }
+	    
+	    return ResponseEntity.ok().build(); 
 	}
 	// 중요한 메일 조회할곳
 	@GetMapping("/mail/important")
@@ -311,15 +378,7 @@ public class MailController {
 		return resultMap;
 	}
 	
-	// 상태 바꾸기
-	@PostMapping("/mail/status/important/{id}")
-    public String moveImportant(@PathVariable("id") Long id,
-                                                @AuthenticationPrincipal EmployeeDetails employeeDetails, 
-												@RequestParam("redirectUrl") String redirectUrl){
-		Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
-		mailService.moveImportant(id,employeeNo);
-        return "redirect:" + redirectUrl;
-    }
+	
 	
 	
 	
