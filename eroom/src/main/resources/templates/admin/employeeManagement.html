@@ -127,7 +127,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 							<td class="name">
 								<a class="d-flex align-items-center text-body-emphasis ps-5" th:href="@{/admin/employeeInfoView(employeeNo=${employeeManage.employee.employee_no})}">
 									<div class="avatar avatar-m me-2">
-										<img class="rounded-circle" src="../../../assets/img/team/23.webp" alt="">
+										<img class="rounded-circle" th:src="@{${employeeManage.profile_image_url}}" alt="">
 									</div>
 									<p class="mb-0 fw-bold text-truncate">
 									<span th:text="${employeeManage.employee.employee_name}">이름</span>
@@ -564,7 +564,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
   </div>
 </div>
 <script>
-
+let isEditFormEdited = false; // 회원 수정 폼 수정 여부
 // 주소 API 실행 함수 (회원 생성용)
 function execDaumPostcode() {
   new daum.Postcode({
@@ -582,6 +582,7 @@ function execDaumPostcodeForEdit() {
     oncomplete: function(data) {
       document.getElementById('editDirectoryZipcode').value = data.zonecode;
       document.getElementById('editDirectoryAddress').value = data.roadAddress;
+      isEditFormEdited = true;
     }
   }).open();
 }
@@ -629,7 +630,7 @@ document.addEventListener('DOMContentLoaded',function(){
 	
 	let isNameChecked = false; // 이름 중복 확인 완료 여부
 	let isFormEdited = false; // 회원 생성 폼 수정 여부
-	let isEditFormEdited = false; // 회원 수정 폼 수정 여부
+
 	let isDeleteFormEdited = false; // 회원 삭제 폼 수정 여부
 	
 	let currentMode = ''; // 'create' or 'edit' or 'delete'
