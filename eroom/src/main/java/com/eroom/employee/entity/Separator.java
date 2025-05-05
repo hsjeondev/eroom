@@ -43,9 +43,9 @@ public class Separator {
 	@Column(name="separator_editor")
 	private String separatorEditor;
 	
-	@Column(name="separator_reg_date")
+	@Column(name="separator_reg_date", insertable = false, updatable = false)
 	private LocalDateTime separatorRegDate;
-	@Column(name="separator_mod_date")
+	@Column(name="separator_mod_date", insertable = false, updatable = false)
 	private LocalDateTime separatorModDate;
 	
 	@OneToMany(mappedBy = "separator")

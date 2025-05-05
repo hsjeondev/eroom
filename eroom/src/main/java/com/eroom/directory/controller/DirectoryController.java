@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eroom.directory.dto.AddDepartmentAndTeamDto;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.DirectoryService;
@@ -218,6 +219,35 @@ public class DirectoryController {
 	        result.add(map);
 	    }
 	    return result;
+	}
+	
+//	@PostMapping("/admin/addDepartment")
+//	@ResponseBody
+//	public Map<String, String> addDepartmentMethod(@RequestBody())
+	@PostMapping("/admin/addDepartmentOrTeam")
+	@ResponseBody
+	public Map<String, String> addDepartmentTeamMethod(@RequestBody AddDepartmentAndTeamDto dto, Authentication authentication){
+		EmployeeDetails employeeDetails = (EmployeeDetails)authentication.getPrincipal();
+		Employee employee = employeeDetails.getEmployee();
+		
+		Map<String, String> map = new HashMap<String, String>();
+		if(dto == null) {
+			map.put("res_code", "500");
+			map.put("res_msg", "잘못된 요청입니다.");
+			return map;
+		}
+		
+		
+		String type = (dto.getParentCode() == null) ? "부서" : "팀";
+		int result = 0;
+		result = structureService.addDepartmentOrTeam(dto, employee);
+		
+		if(result > 0) {
+			map.put("res_code", "200");
+			map.put("res_msg", type + " 추가가 완료됐습니다.");
+		}
+		
+		return map;
 	}
 	
 
