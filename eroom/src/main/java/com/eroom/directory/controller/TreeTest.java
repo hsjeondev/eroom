@@ -58,15 +58,45 @@ public class TreeTest {
 				teamEmployeeMap.put(team.getSeparatorCode(), employeeList);
 			}
 		}
-		// 팀없는 사람
+		// 부서&&팀 없는 사람
 		List<EmployeeDto> noTeamList = new ArrayList<>();
 		for (Employee empEntity : empEntityList) {
-			if (empEntity.getStructure() == null || empEntity.getStructure().getParentCode() == null) {
+			if (empEntity.getStructure() == null) {
 				EmployeeDto dto = new EmployeeDto().toDto(empEntity);
 				noTeamList.add(dto);
 			}
 		}
 		teamEmployeeMap.put("noTeam", noTeamList);
+		
+		// 부서는 있지만 팀이 없는 사람
+		for (Structure dept : departmentList) {
+		    List<EmployeeDto> notAssignedList = new ArrayList<>();
+		    for (Employee empEntity : empEntityList) {
+		        Structure empStruct = empEntity.getStructure();
+
+		        if (empStruct != null) {
+		            // ① 구조 자체가 부서에 해당 (즉, 구조 자체가 이 부서와 동일)
+		            if (empStruct.getSeparatorCode().equals(dept.getSeparatorCode())) {
+		                notAssignedList.add(new EmployeeDto().toDto(empEntity));
+		            }
+
+		            // ② 혹은 이 부서의 자식인데 팀 소속이 아님
+		            else if (empStruct.getParentCode() != null &&
+		                     empStruct.getParentCode().equals(dept.getSeparatorCode())) {
+		                List<Structure> teamList = teamMap.get(dept.getCodeName());
+		                boolean isTeam = teamList.stream()
+		                    .anyMatch(t -> t.getSeparatorCode().equals(empStruct.getSeparatorCode()));
+		                if (!isTeam) {
+		                    notAssignedList.add(new EmployeeDto().toDto(empEntity));
+		                }
+		            }
+		        }
+		    }
+
+		    if (!notAssignedList.isEmpty()) {
+		        teamEmployeeMap.put(dept.getSeparatorCode() + "_notAssigned", notAssignedList);
+		    }
+		}
 
 		
 		model.addAttribute("departmentList", departmentList);

@@ -81,6 +81,17 @@
               </li>
             </ul>
           </li>
+          	<!-- 부서는 있지만 팀 없는 사람 -->
+			<li class="treeview-list-item" 
+			    th:each="emp : ${teamEmployeeMap[dept.separatorCode + '_notAssigned']}">
+			  <p class="treeview-text ms-3"> <!-- ← ms-4 에서 ms-3으로 맞춰줌 -->
+			    <input type="checkbox" class="form-check-input me-2 emp-checkbox"
+			           th:attr="data-name=${emp.employee_name}, data-no=${emp.employee_no}"
+			           onchange="handleCheck(this)">
+			    <span class="fa-solid fa-user treeview-icon"></span>
+			    <span class="treeview-label-text" th:text="${emp.employee_name}">사원명</span>
+			  </p>
+			</li>
         </ul>
       </li>
       <li class="treeview-list-item">
@@ -158,7 +169,7 @@ function updateChildren(checkbox, isChecked) {
   });
 }
 
-function updateParents(checkbox) {
+/* function updateParents(checkbox) {
   let li = checkbox.closest('li.treeview-list-item');
   while (li) {
     const parentLi = li.parentElement.closest('li.treeview-list-item');
@@ -179,7 +190,61 @@ function updateParents(checkbox) {
 
     li = parentLi;
   }
-}
+} */
+function updateParents(checkbox) {
+	  let li = checkbox.closest('li.treeview-list-item');
+
+	  while (li) {
+	    const parentLi = li.parentElement.closest('li.treeview-list-item');
+	    if (!parentLi) break;
+
+	    const parentCheckbox = parentLi.querySelector(':scope > .treeview-text input[type="checkbox"]');
+	    const childCheckboxes = Array.from(parentLi.querySelectorAll(':scope > ul > li.treeview-list-item > .treeview-text input[type="checkbox"]'));
+
+	    const allChecked = childCheckboxes.length > 0 && childCheckboxes.every(cb => cb.checked);
+	    const someChecked = childCheckboxes.some(cb => cb.checked);
+
+	    if (parentCheckbox) {
+	      if (allChecked) {
+	        parentCheckbox.checked = true;
+
+	        // ✅ 상위만 tag
+	        const pname = parentCheckbox.getAttribute('data-name');
+	        const pcode = parentCheckbox.getAttribute('data-no');
+	        addTag(pname, pcode);
+
+	        // ✅ 하위 tag 제거
+	        childCheckboxes.forEach(cb => removeTag(cb.getAttribute('data-no')));
+
+	      } else if (someChecked) {
+	        parentCheckbox.checked = false;
+
+	        // ✅ 상위 tag 제거
+	        const pcode = parentCheckbox.getAttribute('data-no');
+	        removeTag(pcode);
+
+	        // ✅ 하위 중 체크된 것만 tag 추가
+	        childCheckboxes.forEach(cb => {
+	          const cname = cb.getAttribute('data-name');
+	          const ccode = cb.getAttribute('data-no');
+	          if (cb.checked) addTag(cname, ccode);
+	          else removeTag(ccode);
+	        });
+
+	      } else {
+	        parentCheckbox.checked = false;
+
+	        // ✅ 전부 제거
+	        const pcode = parentCheckbox.getAttribute('data-no');
+	        removeTag(pcode);
+	      }
+	    }
+
+	    li = parentLi;
+	  }
+	}
+
+
 
 function addTag(label, code) {
   const tagWrap = document.getElementById("selectedTags");
@@ -192,7 +257,7 @@ function addTag(label, code) {
   tagWrap.appendChild(tag);
 }
 
-function removeTag(code) {
+/* function removeTag(code) {
 	  // 태그 제거
 	  const tag = document.getElementById(`tag-${code}`);
 	  if (tag) tag.remove();
@@ -203,7 +268,11 @@ function removeTag(code) {
 	    checkbox.checked = false;
 	    handleCheck(checkbox); // 하위 및 상위 연동 처리
 	  }
-	}
+	} */
+	function removeTag(code) {
+		  const tag = document.getElementById(`tag-${code}`);
+		  if (tag) tag.remove();
+		}
 
 function confirmSelection() {
   const selected = document.querySelectorAll("#selectedTags .badge");
