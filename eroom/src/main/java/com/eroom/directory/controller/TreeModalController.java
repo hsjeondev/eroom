@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-public class TreeTest {
+public class TreeModalController {
 	
 	private final DirectoryService directoryService;
 	private final StructureService structureService;
@@ -103,6 +103,6 @@ public class TreeTest {
 		model.addAttribute("teamMap", teamMap);
 		model.addAttribute("teamEmployeeMap", teamEmployeeMap);
 		
-		return "/directory/treeTest";
+		return "/directory/treeModal";
 	}
 }
