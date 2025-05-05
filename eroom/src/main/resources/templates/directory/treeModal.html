@@ -33,24 +33,24 @@
 
 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#treeModal">트리 테스트</button>
 
-<div class="modal fade" id="treeModal" tabindex="-1" aria-labelledby="treeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 550px; max-height: 400px;">
+<div class="modal fade" id="treeModal" tabindex="-1" aria-labelledby="treeModalLabel" aria-hidden="true" data-bs-focus="false">
+  <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 550px; height: 400px;">
     <div class="modal-content">
       <div class="modal-header bg-light">
         <h5 class="modal-title" id="treeModalLabel">조직도 선택</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
       </div>
 
-      <div class="modal-body px-4" style="max-height: 400px; overflow-y: auto;">
-<div class="row">
+      <div class="modal-body px-4" style="height: 400px; overflow-y: auto;">
+<div class="row" style="height: 100%;">
 <div class="col-6">
 <ul class="treeview" id="treeviewTree">
   <li class="treeview-list-item">
     <p class="treeview-text">
       <input type="checkbox" class="form-check-input me-2 root-checkbox" data-name="이룸 컴퍼니" data-no="root" onchange="handleCheck(this)">
-      <a href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#tree-company">
+      <a href="javascript:void(0);"  data-bs-target="#tree-company" >
         <span class="fa-solid fa-folder treeview-icon text-info-light"></span>
-        <span class="treeview-label-text fw-bold treeview-label-strong">이룸 컴퍼니</span>
+        <span id="eroomCompanySpan" class="treeview-label-text fw-bold treeview-label-strong">이룸 컴퍼니</span>
       </a>
     </p>
     <ul class="collapse show treeview-list" id="tree-company">
@@ -117,14 +117,26 @@
 </ul>
 </div>
 
-<div class="col-6">
-  <div id="selectedResult" class="border bg-white rounded p-2 mb-3 small"
-       style="position: sticky; top: 0;">
+<div class="col-6 d-flex flex-column">
+  <!-- [1] 상단 고정 영역 -->
+  <div id="selectedResult"
+       class="border bg-white rounded p-2 mb-2 small"
+       style="position: sticky; top: 0; z-index: 2; background-color: white; ">
     <strong>선택한 항목:</strong>
-    <span><button id="clearBtn" class="btn btn-light btn-sm" type="button">비우기</button></span>
-    <div id="selectedTags" class="mt-1 d-flex flex-wrap gap-2"></div>
+    <div style="overflow-y: auto; max-height: 270px;" id="selectedTags" class="mt-1 d-flex flex-wrap gap-2"></div>
+  </div>
+
+  <!-- [2] 중간: 빈 영역 (스크롤 여유) -->
+  <div class="flex-grow-1"></div>
+
+  <!-- [3] 하단 고정 영역 -->
+  <div class="text-end"
+       style="position: sticky; bottom: 0; z-index: 2; background-color: white;">
+    <button id="clearBtn" class="btn btn-light btn-sm" type="button">비우기</button>
   </div>
 </div>
+
+
 </div>
       </div>
 
@@ -136,7 +148,7 @@
   </div>
 </div>
 
-<!-- JS -->
+<!-- 트리구조 JS -->
 <script>
 function handleCheck(checkbox) {
   const name = checkbox.getAttribute('data-name');
@@ -155,42 +167,22 @@ function handleCheck(checkbox) {
 }
 
 function updateChildren(checkbox, isChecked) {
-  const li = checkbox.closest('li.treeview-list-item');
-  if (!li) return;
-  const descendants = li.querySelectorAll('input[type="checkbox"]');
-  descendants.forEach(child => {
-    if (child !== checkbox) {
-      child.checked = isChecked;
-      const name = child.getAttribute('data-name');
-      const code = child.getAttribute('data-no');
-      if (isChecked) addTag(name, code);
-      else removeTag(code);
-    }
-  });
-}
+	  const li = checkbox.closest('li.treeview-list-item');
+	  if (!li) return;
 
-/* function updateParents(checkbox) {
-  let li = checkbox.closest('li.treeview-list-item');
-  while (li) {
-    const parentLi = li.parentElement.closest('li.treeview-list-item');
-    if (!parentLi) break;
+	  const descendants = li.querySelectorAll('input[type="checkbox"]');
+	  descendants.forEach(child => {
+	    if (child !== checkbox) {
+	      child.checked = isChecked;
 
-    const parentCheckbox = parentLi.querySelector(':scope > .treeview-text input[type="checkbox"]');
-    const childCheckboxes = Array.from(parentLi.querySelectorAll(':scope > ul > li.treeview-list-item > .treeview-text input[type="checkbox"]'));
+	      // 하위 태그 제거 (상위 클릭 시 기존 하위 태그 남는 문제 해결)
+	      const code = child.getAttribute('data-no');
+	      removeTag(code);
+	    }
+	  });
+	}
 
-    const allChecked = childCheckboxes.length > 0 && childCheckboxes.every(cb => cb.checked);
 
-    if (parentCheckbox) {
-      parentCheckbox.checked = allChecked;
-      const name = parentCheckbox.getAttribute('data-name');
-      const code = parentCheckbox.getAttribute('data-no');
-      if (allChecked) addTag(name, code);
-      else removeTag(code);
-    }
-
-    li = parentLi;
-  }
-} */
 function updateParents(checkbox) {
 	  let li = checkbox.closest('li.treeview-list-item');
 
@@ -253,31 +245,50 @@ function addTag(label, code) {
   const tag = document.createElement("span");
   tag.className = "badge bg-primary text-white d-flex align-items-center";
   tag.id = `tag-${code}`;
-  tag.innerHTML = `${label} <button type="button" class="btn-close btn-close-white btn-sm ms-1" onclick="removeTag('${code}')"></button>`;
+  tag.innerHTML = `${label} <button type="button" class="btn-close btn-close-white btn-sm ms-1" onclick="removeTag('${code}', true)"></button>`;
   tagWrap.appendChild(tag);
 }
 
-/* function removeTag(code) {
-	  // 태그 제거
+	function removeTag(code, skipCheckbox = false) {
 	  const tag = document.getElementById(`tag-${code}`);
 	  if (tag) tag.remove();
 
-	  // 동일한 data-no를 가진 체크박스 찾아서 해제
+	  if (!skipCheckbox) return;
+
 	  const checkbox = document.querySelector(`input[type="checkbox"][data-no="${code}"]`);
 	  if (checkbox && checkbox.checked) {
 	    checkbox.checked = false;
-	    handleCheck(checkbox); // 하위 및 상위 연동 처리
+	    handleCheck(checkbox); // 연쇄 동기화
 	  }
-	} */
-	function removeTag(code) {
-		  const tag = document.getElementById(`tag-${code}`);
-		  if (tag) tag.remove();
-		}
+	}
+
 
 function confirmSelection() {
   const selected = document.querySelectorAll("#selectedTags .badge");
   const result = Array.from(selected).map(el => el.id.replace('tag-', ''));
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 부서, 팀은 separatorCode 그리고 사원은 employeeNo가 result에 담깁니다~
+  // JSON으로 보내고 Controller에서는 @ResponseBody + 매개변수에는 @RequestBody List<String> 사용해서 받아서 쓰시면 됩니다. 
   console.log("확정된 선택:", result);
+  // 부서, 팀은 separatorCode 그리고 사원은 employeeNo가 result에 담깁니다~
+  // JSON으로 보내고 Controller에서는 @ResponseBody + 매개변수에는 @RequestBody List<String> 사용해서 받아서 쓰시면 됩니다. 
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
   bootstrap.Modal.getInstance(document.getElementById('treeModal')).hide();
 }
 
@@ -295,19 +306,43 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <!-- 비우기 버튼 -->
 <script>
-	document.getElementById('clearBtn').addEventListener('click', function(){
-		// 선택된 태그 비우기
-		document.getElementById('selectedTags').innerHTML = '';
+	document.getElementById('clearBtn').addEventListener('click', resetTree);
+	
+	function resetTree() {
+		  // 1. 선택된 태그 비우기
+		  document.getElementById('selectedTags').innerHTML = '';
 
-		// 모든 체크박스 해제 + 태그 동기화
-		const checkboxes = document.querySelectorAll('#treeviewTree input[type="checkbox"]');
-		checkboxes.forEach(cb => {
-			if (cb.checked) {
-				cb.checked = false;
-				handleCheck(cb); // 태그도 함께 제거
-			}
-		});
-	});
+		  // 2. 모든 체크박스 해제
+		  const checkboxes = document.querySelectorAll('#treeviewTree input[type="checkbox"]');
+		  checkboxes.forEach(cb => {
+		    cb.checked = false;
+		  });
+
+		  // 3. 강조 스타일 제거 (이룸 컴퍼니 제외)
+		  document.querySelectorAll('.treeview-icon.text-info-light').forEach(el => {
+		    // 이룸 컴퍼니 제외
+		    if (!el.closest('a')?.querySelector('#eroomCompanySpan')) {
+		      el.classList.remove('text-info-light');
+		    }
+		  });
+
+		  document.querySelectorAll('.treeview-label-text.treeview-label-strong').forEach(el => {
+		    if (el.id !== 'eroomCompanySpan') {
+		      el.classList.remove('treeview-label-strong');
+		    }
+		  });
+
+		  // 4. 트리 접기 (이룸 컴퍼니 제외)
+		  document.querySelectorAll('.treeview-list.collapse').forEach(ul => {
+		    if (ul.id !== 'tree-company') {
+		      ul.classList.remove('show');
+		    } else {
+		      ul.classList.add('show');
+		    }
+		  });
+		}
+
+
 </script>
 
 <!-- 색상 강조 -->
@@ -341,6 +376,7 @@ function handleHighlight(li) {
 	}
 
 </script>
+
 
 
 </div>
