@@ -42,7 +42,7 @@
               <label class="btn btn-link py-0 px-2 text-body fs-9" for="noticeAttachment">
                 <span class="fa-solid fa-paperclip"></span>
               </label>
-              <input class="d-none" id="noticeAttachment" name="articleFiles" type="file" multiple/>
+              <input class="d-none" id="noticeAttachment" name="article_files" type="file" multiple/>
               <div id="filePreview" class="mt-2"></div>
             </div>
             <div class="d-flex">
@@ -81,7 +81,7 @@
 	    const payload = new FormData(form);
 
 	    selectedFiles.forEach(file => {
-	      payload.append("notice_files", file);
+	    	payload.append("article_files", file);
 	    });
 
 	    fetch("/article/create", {
@@ -94,7 +94,7 @@
 	    })
 	    .then(response => response.json())
 	    .then(data => {
-	      alert(data.res_msg || "등록 완료");
+	      alert(data.res_msg);
 	      if (data.res_code == 200) {
 	        location.href = '/article/notice';
 	      }

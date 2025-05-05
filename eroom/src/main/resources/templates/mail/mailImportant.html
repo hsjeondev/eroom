@@ -21,12 +21,12 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" th:href="@{mailCreate}"> <span class="d-none d-sm-inline-block">메일 쓰기</span><span class="d-sm-none fas fa-plus"></span></a></div>
 	            <div class="col-auto flex-1">
 	            <!-- 절반 검색 기능  -->
-	              <div class="search-box w-100">
-	                <form class="position-relative">
-	                  <input class="form-control search-input search" type="search" placeholder="검색" aria-label="Search" />
-	                  <span class="fas fa-search search-box-icon"></span>
-	                </form>
-	              </div>
+	              <div class="search-box w-100" style="max-width: 250px; position: absolute; right: 20px;">
+		              <form class="position-relative">
+		                <input class="form-control search-input search" type="search" placeholder="검색" aria-label="Search" />
+		                <span class="fas fa-search search-box-icon"></span>
+		              </form>
+		            </div>
 	            </div>
        </div>
               <div class="px-lg-1">
@@ -57,21 +57,27 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                 
                 <!-- 메일 목록 스타트부분 -->
                 <div th:if="${#lists.isEmpty(importantMailList)}">
-                	<input type="text" value="내용이 없습니다.">
+                	<div class="col-12">
+							<div class="alert alert-light text-center border border-secondary-light rounded py-4 fs-6 fw-semibold text-body-secondary">
+								<i class="fa-solid fa-circle-info me-2 text-secondary"></i>메일이 없습니다.
+							</div>
+						</div>
                 </div>
                 <div class="list">
                  <div class="border-top border-translucent hover-actions-trigger py-3"
                  		th:if="${!#lists.isEmpty(importantMailList)}"
-                 		th:each="importantMail : ${importantMailList}">
+                 		th:each="importantMail : ${importantMailList}"
+                 		th:onclick="|location.href='@{/mail/detail/{id}(id=${importantMail.mailNo})}'|">
                   <div class="row align-items-sm-center gx-2">
                     <div class="col-auto">
                       <div class="d-flex flex-column flex-sm-row">
                         <input class="form-check-input mb-2 m-sm-0 me-sm-2 mail_checkbox" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" 
-                        	th:value="${importantMail.mailNo}"/>
+                        	th:value="${importantMail.mailNo}"
+                        	onclick="event.stopPropagation()"/>
                         <!-- 별 박스 -->
                         <form th:action="@{/mail/status/important/{id}(id=${importantMail.mailNo})}" method="post">
 						    <input type="hidden" name="redirectUrl" value="/mail/important" />
-						    <button class="btn p-0" type="submit">
+						    <button class="btn p-0" type="submit" onclick="event.stopPropagation()">
 						        <span th:classappend="${
 						            mailStatusMap[importantMail.mailNo]?.mailStatusImportantYn == 'Y' 
 						                ? 'fas text-warning fa-star' 
@@ -141,7 +147,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                   </div>
                   <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11">
                   	<!-- <a class="d-block inbox-link" th:href="@{/mail/detail}"> -->
-                  	<a class="d-block inbox-link" th:href="@{/mail/detail/{id}(id=${importantMail.mailNo})}">
+                  	<a class="d-block inbox-link" >
                   		<span class="fs-9 line-clamp-1 text-body-emphasis mailTitle" th:text="${importantMail.mailTitle != null and !#strings.isEmpty(importantMail.mailTitle) ? importantMail.mailTitle : '(제목없음)'}"></span>
                   		<!-- <span class="fs-9 line-clamp-1 text-body-emphasis mailTitle"  th:text="${sentMail.mailTitle}"></span> -->
                   		<!-- <span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"  th:utext="${sentMail.mailContent}"></span> -->

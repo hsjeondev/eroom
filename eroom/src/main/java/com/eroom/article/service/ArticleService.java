@@ -37,9 +37,7 @@ public class ArticleService {
 	 
 	 // 공지 게시판 작성 
 	 public int createArticle(ArticleDto articleDto, Long employeeNo, List<MultipartFile> articleFiles) {
-	        
 		 int result = 0;
-		 // Employee 엔티티 가져오기
 	        Employee employee = employeeRepository.findById(employeeNo)
 	                .orElseThrow(() -> new IllegalArgumentException("해당 사번의 사용자를 찾을 수 없습니다."));
 	        try {
@@ -54,7 +52,7 @@ public class ArticleService {
 	                String oriName = file.getOriginalFilename();
 			        String ext = oriName.substring(oriName.lastIndexOf("."));
 			        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
-			        String path = fileDir + "article/" + newName;
+			        String path = fileDir + "article/notice" + newName;
 	                DriveDto driveDto = new DriveDto();
 	                
 	                File savedFile = new File(path);
@@ -75,10 +73,10 @@ public class ArticleService {
 	                drive.setDriveNewName(newName); // 파일 고유 이름 생성
 	                drive.setDriveSize(driveDto.getDriveSize());
 	                drive.setDriveType(ext);
-	                drive.setDrivePath("article/" + newName); // 실제 저장 경로로 변경 필요
+	                drive.setDrivePath("article/notice" + newName); // 실제 저장 경로로 변경 필요
 	                drive.setUploader(Employee.builder().employeeNo(articleDto.getEmployee_no()).build());
 	                drive.setParam1(articleSaver.getArticleNo()); // 메일 참조 연결
-	                drive.setSeparatorCode("FL002");
+	                drive.setSeparatorCode("E001");
 	                drive.setVisibleYn("Y");
 	                // DB에 저장
 	                driveRepository.save(drive);

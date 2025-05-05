@@ -61,17 +61,45 @@ public interface MailRepository extends JpaRepository<Mail, Long>{
 		       "ORDER BY m.mailSentTime ASC")
 		List<Mail> findSentMailsOldest(@Param("employeeNo") Long employeeNo);
 	// 임시 보관함
-	 @Query("SELECT m FROM Mail m " +
-		       "WHERE m.sender.employeeNo = :employeeNo " +  // 내가 보낸 메일
-		       "AND m.mailNo IN (SELECT d.mail.mailNo FROM MailDraft d WHERE d.mail.mailNo = m.mailNo) " + // 해당 메일이 임시 저장된 메일인지 확인
-		       "ORDER BY m.mailSentTime DESC")  // 최신순
-		List<Mail> findDraftMailsLatest(@Param("employeeNo") Long employeeNo);
+//	 @Query("SELECT m FROM Mail m " +
+//		       "WHERE m.sender.employeeNo = :employeeNo " +  // 내가 보낸 메일
+//		       "AND m.mailNo IN (SELECT d.mail.mailNo FROM MailDraft d WHERE d.mail.mailNo = m.mailNo) " + // 해당 메일이 임시 저장된 메일인지 확인
+//		       "ORDER BY m.mailSentTime DESC")  // 최신순
+//		List<Mail> findDraftMailsLatest(@Param("employeeNo") Long employeeNo);
+//	 
+//	 @Query("SELECT m FROM Mail m " +
+//		       "WHERE m.sender.employeeNo = :employeeNo " +  // 내가 보낸 메일
+//		       "AND m.mailNo IN (SELECT d.mail.mailNo FROM MailDraft d WHERE d.mail.mailNo = m.mailNo) " + // 해당 메일이 임시 저장된 메일인지 확인
+//		       "ORDER BY m.mailSentTime ASC")  // 오래된 순
+//		List<Mail> findDraftMailsOldest(@Param("employeeNo") Long employeeNo);
 	 
-	 @Query("SELECT m FROM Mail m " +
-		       "WHERE m.sender.employeeNo = :employeeNo " +  // 내가 보낸 메일
-		       "AND m.mailNo IN (SELECT d.mail.mailNo FROM MailDraft d WHERE d.mail.mailNo = m.mailNo) " + // 해당 메일이 임시 저장된 메일인지 확인
-		       "ORDER BY m.mailSentTime ASC")  // 오래된 순
+	@Query("SELECT m FROM Mail m " +
+		       "WHERE m.sender.employeeNo = :employeeNo " +
+		       "AND m.mailVisibleYn = 'Y' " +
+		       "AND m.mailNo IN (SELECT d.mail.mailNo FROM MailDraft d) " +  // 임시 저장된 메일
+		       "AND m.mailNo NOT IN (" +
+		       "   SELECT s.mail.mailNo FROM MailStatus s " +
+		       "   WHERE s.employee.employeeNo = :employeeNo " +
+		       "   AND s.mailStatusDeletedYn = 'Y'" +
+		       ") " +
+		       "ORDER BY m.mailSentTime DESC")
+		List<Mail> findDraftMailsLatest(@Param("employeeNo") Long employeeNo);
+
+		@Query("SELECT m FROM Mail m " +
+		       "WHERE m.sender.employeeNo = :employeeNo " +
+		       "AND m.mailVisibleYn = 'Y' " +
+		       "AND m.mailNo IN (SELECT d.mail.mailNo FROM MailDraft d) " +  // 임시 저장된 메일
+		       "AND m.mailNo NOT IN (" +
+		       "   SELECT s.mail.mailNo FROM MailStatus s " +
+		       "   WHERE s.employee.employeeNo = :employeeNo " +
+		       "   AND s.mailStatusDeletedYn = 'Y'" +
+		       ") " +
+		       "ORDER BY m.mailSentTime ASC")
 		List<Mail> findDraftMailsOldest(@Param("employeeNo") Long employeeNo);
+	 
+	 
+	 
+	 
 	 
 	 //휴지통 조회 테스트
 	 @Query("SELECT m FROM Mail m " +

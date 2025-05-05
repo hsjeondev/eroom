@@ -55,7 +55,7 @@ public class ArticleController {
 	@ResponseBody
 	public Map<String, String> createArticleApi(@AuthenticationPrincipal EmployeeDetails employeeDetails,
 	                                            ArticleDto articleDto,
-	                                            @RequestParam("notice_files") List<MultipartFile> articleFiles) {
+	                                            @RequestParam("article_files") List<MultipartFile> articleFiles) {
 	    Map<String, String> resultMap = new HashMap<>();
 	    resultMap.put("res_code", "500");
 	    resultMap.put("res_msg", "공지 등록 중 오류가 발생했습니다.");

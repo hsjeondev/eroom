@@ -35,7 +35,7 @@ public class ArticleDto {
 	private Long article_editor;
 	@Builder.Default
 	private String separator_code ="B001";
-	private Integer order;
+	private Long order_num;
 
 
 
@@ -46,7 +46,7 @@ public class ArticleDto {
 	            .articleTitle(article_title)
 	            .articleContent(article_content)
 	            .separatorCode(separator_code)
-	            .order(order)
+	            .order_num(order_num)
 	            .visibleYn(visible_yn)
 	            .articleCreator(article_creator)
 	            .articleEditor(article_editor)

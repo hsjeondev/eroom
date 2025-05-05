@@ -107,6 +107,7 @@ public class MailController {
 	
 	// 04/17 본인것만 조회되게 
 	
+
 	  @GetMapping("/mail/sent") 
 	  public String getSentMails(Model model, 
 			  					@AuthenticationPrincipal EmployeeDetails employeeDetails,
@@ -124,7 +125,7 @@ public class MailController {
 	  model.addAttribute("mailStatusMap", mailStatusMap);
 	  return "mail/mailSent"; // 뷰 파일 이름 
 	  }
-	// 임시 저장 
+	// 임시 저장 조회
 		@GetMapping("/mail/draft")
 		public String selectDraftMailAll(Model model,
 										@AuthenticationPrincipal EmployeeDetails employeeDetails,
