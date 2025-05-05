@@ -208,22 +208,22 @@ function updateParents(checkbox) {
 	      if (allChecked) {
 	        parentCheckbox.checked = true;
 
-	        // ✅ 상위만 tag
+	        // 상위만 tag
 	        const pname = parentCheckbox.getAttribute('data-name');
 	        const pcode = parentCheckbox.getAttribute('data-no');
 	        addTag(pname, pcode);
 
-	        // ✅ 하위 tag 제거
+	        // 하위 tag 제거
 	        childCheckboxes.forEach(cb => removeTag(cb.getAttribute('data-no')));
 
 	      } else if (someChecked) {
 	        parentCheckbox.checked = false;
 
-	        // ✅ 상위 tag 제거
+	        // 상위 tag 제거
 	        const pcode = parentCheckbox.getAttribute('data-no');
 	        removeTag(pcode);
 
-	        // ✅ 하위 중 체크된 것만 tag 추가
+	        // 하위 중 체크된 것만 tag 추가
 	        childCheckboxes.forEach(cb => {
 	          const cname = cb.getAttribute('data-name');
 	          const ccode = cb.getAttribute('data-no');
@@ -234,7 +234,7 @@ function updateParents(checkbox) {
 	      } else {
 	        parentCheckbox.checked = false;
 
-	        // ✅ 전부 제거
+	        // 전부 제거
 	        const pcode = parentCheckbox.getAttribute('data-no');
 	        removeTag(pcode);
 	      }
