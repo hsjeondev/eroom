@@ -204,7 +204,7 @@ public class EmployeeService {
 		
 	}
 	
-	// 회원 정보 수정
+	// 회원 정보 수정(관리자)
 	@Transactional
 	public void updateEmployee(EmployeeUpdateDto dto) {
 		// employee 가져오기
@@ -274,6 +274,17 @@ public class EmployeeService {
 				updated = true;
 			}
 			
+			// 우편번호 변경 감지
+			if(dto.getDirectory_zipcode() != null && !dto.getDirectory_zipcode().equals(directory.getDirectoryZipcode())) {
+				directory.setDirectoryZipcode(dto.getDirectory_zipcode());
+				updated = true;
+			}
+			// 주소 변경 감지
+			if(dto.getDirectory_address() != null && !dto.getDirectory_address().equals(directory.getDirectoryAddress())) {
+				directory.setDirectoryAddress(dto.getDirectory_address());
+				updated = true;
+			}
+			
 			// visible_yn 퇴사자 : N / 재직자 : Y
 			String employmentYn = dto.getEmployee_employment_yn();
 			if(employmentYn != null) {
@@ -296,6 +307,51 @@ public class EmployeeService {
 			}
 			
 		}
+	}
+	
+	// 회원 정보 수정 (마이페이지)
+	@Transactional
+	public void updateEmployeeFromMypage(EmployeeUpdateDto dto) {
+	    // 로그인한 사용자 본인 정보만 가져옴
+	    EmployeeDetails employeeDetail = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	    Long employeeNo = employeeDetail.getEmployee().getEmployeeNo();
+	    Employee employee = employeeRepository.findById(employeeNo).orElseThrow(() -> new RuntimeException("회원 없음"));
+
+	    // 이름만 바뀐 경우 employee에도 반영
+	    if (dto.getEmployee_name() != null && !dto.getEmployee_name().equals(employee.getEmployeeName())) {
+	        employee.setEmployeeName(dto.getEmployee_name());
+	    }
+
+	    // Directory 정보 수정
+	    Directory directory = employee.getDirectory();
+	    boolean updated = false;
+
+	    if (directory != null) {
+	        if (dto.getDirectory_phone() != null && !dto.getDirectory_phone().equals(directory.getDirectoryPhone())) {
+	            directory.setDirectoryPhone(dto.getDirectory_phone());
+	            updated = true;
+	        }
+	        if (dto.getDirectory_zipcode() != null && !dto.getDirectory_zipcode().equals(directory.getDirectoryZipcode())) {
+	            directory.setDirectoryZipcode(dto.getDirectory_zipcode());
+	            updated = true;
+	        }
+	        if (dto.getDirectory_address() != null && !dto.getDirectory_address().equals(directory.getDirectoryAddress())) {
+	            directory.setDirectoryAddress(dto.getDirectory_address());
+	            updated = true;
+	        }
+	        if (dto.getEmployee_name() != null && !dto.getEmployee_name().equals(directory.getDirectoryName())) {
+	            directory.setDirectoryName(dto.getEmployee_name()); // 이름 동기화
+	            updated = true;
+	        }
+
+	        if (updated) {
+	            directory.setDirectoryModDate(LocalDateTime.now());
+	            directory.setDirectoryEditor(employeeDetail.getEmployee().getEmployeeId());
+	            employeeDirectoryRepository.save(directory);
+	        }
+	    }
+
+	    employeeRepository.save(employee);
 	}
 	
 	// 회원 정보 삭제 (퇴사 처리)

@@ -16,7 +16,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
    <div id="mailSummary" data-list='{"valueNames":["senderName", "mailTitle", "mailContent", "sendTime"], "page":6, "pagination":true}'>
       <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
             <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mailCreate}">메일 쓰기</a>
-              <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button>
+             <!--  <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button> -->
             </div>
             <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" th:href="@{mailCreate}"> <span class="d-none d-sm-inline-block">메일 쓰기</span><span class="d-sm-none fas fa-plus"></span></a></div>
 	            <div class="col-auto flex-1">
@@ -46,13 +46,13 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                 <!-- 범용성 생각해서 일단 보류 -->
                 <div class="border-top border-translucent py-2 d-flex justify-content-between">
                   <div class="form-check mb-0 fs-8">
-                    <input class="form-check-input" type="checkbox" data-bulk-select-row="data-bulk-select-row" />
+                    <input class="form-check-input" type="checkbox" data-bulk-select-row="data-bulk-select-row" id="chechAll"/>
                   </div>
                   <div>
-                    <button class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Archive"><span class="fas fa-archive fs-10"></span></button>
-                    <button class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete"><span class="fas fa-trash fs-10"></span></button>
-                    <button class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Star"><span class="fas fa-star fs-10"></span></button>
-                    <button class="btn p-0 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tags"><span class="fas fa-tag fs-10"></span></button>
+                    <!-- <button class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Archive"><span class="fas fa-archive fs-10"></span></button> -->
+                    <button id="deleteBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="휴지통"><span class="fas fa-trash fs-10"></span></button>
+                    <button id="starBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="중요"><span class="fas fa-star fs-10"></span></button>
+                    <!-- <button class="btn p-0 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tags"><span class="fas fa-tag fs-10"></span></button> -->
                   </div>
                 </div>
                 <!-- 범용성 생각해서 일단 보류 -->
@@ -68,9 +68,19 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                   <div class="row align-items-sm-center gx-2">
                     <div class="col-auto">
                       <div class="d-flex flex-column flex-sm-row">
-                        <input class="form-check-input mb-2 m-sm-0 me-sm-2" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" />
+                        <input class="form-check-input mb-2 m-sm-0 me-sm-2 mail_checkbox" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" 
+                        		th:value="${sentMail.mailNo}"/>
                         <!-- 별 박스 -->
-                        <!-- <button class="btn p-0"><span class="fas text-warning fa-star"></span></button> -->
+                        <form th:action="@{/mail/status/important/{id}(id=${sentMail.mailNo})}" method="post">
+						    <input type="hidden" name="redirectUrl" value="/mail/sent" />
+						    <button class="btn p-0" type="submit">
+						        <span th:classappend="${
+						            mailStatusMap[sentMail.mailNo]?.mailStatusImportantYn == 'Y' 
+						                ? 'fas text-warning fa-star' 
+						                : 'far fa-star'
+						        }"></span>
+						    </button>
+						</form>
                       </div>
                     </div>
                     <div class="col-auto">
@@ -104,13 +114,19 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                     <!-- <p th:text="${sentMail.sender.directory.directoryEmail}"></p> -->
                     
                     <div class="col-auto ms-auto">
-                      <div class="hover-actions end-0">
+                      <!-- <div class="hover-actions end-0">
                         <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
                         <div class="dropdown-menu dropdown-menu-end py-2">
-                        <a class="dropdown-item" href="#!">⭐중요 표시</a>
-                        <a class="dropdown-item" href="#!">🗑️휴지통</a>
+                        <form th:action="@{/mail/status/important/{id}(id=${sentMail.mailNo})}" method="post">
+						  <input type="hidden" name="redirectUrl" value="/mail/sent" />
+						  <button type="submit" class="dropdown-item">⭐중요 표시</button>
+						</form>
+                        <form th:action="@{/mail/trash/{id}(id=${sentMail.mailNo})}" method="post">
+                        	<input type="hidden" name="redirectUrl" value="/mail/sent"/>
+						  <button type="submit" class="dropdown-item">🗑️휴지통</button>
+						</form>
                         <a class="dropdown-item text-danger" href="#!">삭제</a></div>
-                      </div>
+                      </div> -->
                       
                       
                       <!-- 04/17 나중에 시간 남으면 좀 더 구성해보기 일단 전체 시간 다 보이게 설정함 -->
@@ -152,6 +168,48 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						</div>
                 </div>
                 </div>
+	  <script>
+	  const checkAll = document.getElementById('chechAll');
+	  checkAll.addEventListener('change', function () {
+	    const isChecked = this.checked;
+	    const checkboxes = document.querySelectorAll('.mail_checkbox');
+	    checkboxes.forEach(cb => cb.checked = isChecked);
+	  });
+	  function getSelectedMailNos() {
+	 	    return Array.from(document.querySelectorAll('.mail_checkbox:checked'))
+	 	      .map(cb => cb.value);
+	 	  }
+	
+	 	  function sendBulkUpdate(url) {
+	 	    const selected = getSelectedMailNos();
+	 	    console.log(selected);	
+	 	    if (selected.length === 0) {
+	 	      alert("메일을 선택해주세요.");
+	 	      return;
+	 	    }
+	
+	 	    fetch(url, {
+	 	      method: 'POST',
+	 	      headers: { 
+						'Content-Type': 'application/json' ,
+						'header': document.querySelector('meta[name="_csrf_header"]').content,
+	                 'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+						},
+	 	      body: JSON.stringify(selected)
+	 	    }).then(res => {
+	 	      if (res.ok) location.reload();
+	 	      else alert("처리 중 오류가 발생했습니다.");
+	 	    });
+	 	  }
+	
+	 	  document.getElementById('deleteBtn').addEventListener('click', function () {
+	 	    sendBulkUpdate('/mail/trash');
+	 	  });
+	
+	 	  document.getElementById('starBtn').addEventListener('click', function () {
+	 	    sendBulkUpdate('/mail/important');
+	 	  });
+	  </script>
     </main>
    
   </body>

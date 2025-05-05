@@ -7,6 +7,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 <head>
 	<meta charset="UTF-8">
 	<title>회원관리</title>
+	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<style>
 		.avatar img {
 			max-width: 32px;
@@ -246,6 +247,16 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             <input type="text" class="form-control" id="directoryPhone" name="directory_phone" required placeholder="010-1234-5678">
           </div>
 
+		  <div class="mb-3">
+			<label class="form-label fw-semibold">주소</label>
+			<div class="input-group mb-2">
+			  <input type="text" class="form-control" id="directoryZipcode" name="directory_zipcode" placeholder="우편번호" readonly required>
+			  <button type="button" class="btn btn-outline-secondary" onclick="execDaumPostcode()">주소 검색</button>
+			</div>
+			<input type="text" class="form-control mb-2" id="directoryAddress" name="directory_address" placeholder="주소" readonly required>
+			<!-- <input type="text" class="form-control" id="addressDetail" name="address_detail" placeholder="상세 주소 입력"> -->
+		  </div>	
+
           <div class="mb-3">
             <label for="employeeBirth" class="form-label fw-semibold">생년월일</label>
             <input type="date" class="form-control" id="employeeBirth" name="employee_birth" required>
@@ -284,7 +295,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
           <!-- 이름 -->
           <div class="mb-3">
             <label for="editEmployeeName" class="form-label fw-semibold">이름</label>
-            <input type="text" class="form-control" id="editEmployeeName" name="employee_name" required>
+            <div class="input-group">
+              <input type="text" class="form-control" id="editEmployeeName" name="employee_name" required>
+              <button type="button" class="btn btn-outline-secondary" id="editCheckNameBtn">중복확인</button>
+            </div>
+            <small id="editNameCheckMsg" class="form-text d-none"></small>
           </div>
 
 			<!-- 직급 -->
@@ -343,6 +358,16 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             <label for="editDirectoryPhone" class="form-label fw-semibold">연락처</label>
             <input type="text" class="form-control" id="editDirectoryPhone" name="directory_phone" required placeholder="010-0000-0000">
           </div>
+
+		  <!-- 주소 -->
+		  <div class="mb-3">
+			<label class="form-label fw-semibold">주소</label>
+			<div class="input-group mb-2">
+			  <input type="text" class="form-control" id="editDirectoryZipcode" name="directory_zipcode" placeholder="우편번호" readonly>
+			  <button type="button" class="btn btn-outline-secondary" onclick="execDaumPostcodeForEdit()">주소 검색</button>
+			</div>
+			<input type="text" class="form-control mb-2" id="editDirectoryAddress" name="directory_address" placeholder="주소" readonly>
+		  </div>
 
           <!-- 생년월일 -->
           <div class="mb-3">
@@ -443,24 +468,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
   </div>
 </div>
 
-<!-- confirm 모달 -->
-<!-- <div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border border-secondary">
-      <div class="modal-header bg-light">
-        <h5 class="modal-title" id="confirmSaveModalLabel">확인</h5>
-        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
-      </div>
-      <div class="modal-body">
-        정말 등록하시겠습니까?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal">취소</button>
-        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
-      </div>
-    </div>
-  </div>
-</div> -->
+<!-- 공통 저장 확인 모달 -->
 <div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
@@ -556,6 +564,28 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
   </div>
 </div>
 <script>
+
+// 주소 API 실행 함수 (회원 생성용)
+function execDaumPostcode() {
+  new daum.Postcode({
+    oncomplete: function(data) {
+      // 기본 주소 + 우편번호 세팅
+      document.getElementById('directoryZipcode').value = data.zonecode;
+      document.getElementById('directoryAddress').value = data.roadAddress;
+    }
+  }).open();
+}
+
+// 주소 API 실행 함수(회원 수정용)
+function execDaumPostcodeForEdit() {
+  new daum.Postcode({
+    oncomplete: function(data) {
+      document.getElementById('editDirectoryZipcode').value = data.zonecode;
+      document.getElementById('editDirectoryAddress').value = data.roadAddress;
+    }
+  }).open();
+}
+
 document.addEventListener('DOMContentLoaded',function(){
 	// 요소 가져오기
 	const createForm = document.getElementById('createEmployeeForm');
@@ -719,8 +749,9 @@ document.addEventListener('DOMContentLoaded',function(){
 			editCustomPositionInput.value = '';
 		}
 	});	
+
 	
-	// 이름 중복 확인 버튼 클릭
+	// 이름 중복 확인 버튼 클릭(생성용)
 	checkNameBtn.addEventListener('click',function(){
 		const name = nameInput.value.trim();
 		if(!name){
@@ -747,6 +778,33 @@ document.addEventListener('DOMContentLoaded',function(){
 			});
 		
 	});
+	
+	// 이름 중복 확인 버튼 클릭(수정용)
+	editCheckNameBtn.addEventListener('click',function(){
+    const name = document.getElementById('editEmployeeName').value.trim();
+    
+    // 기존 이름과 같다면 중복 확인 불필요
+    if (name === originalData.employee_name) {
+        document.getElementById('editNameCheckMsg').textContent = '기존 이름과 동일합니다.';
+        document.getElementById('editNameCheckMsg').className = 'form-text text-success';
+        return;
+    }
+
+    fetch(`/admin/checkNameDuplicate?name=${encodeURIComponent(name)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.duplicate) {
+                document.getElementById('editNameCheckMsg').textContent = '이미 존재하는 이름입니다.';
+                document.getElementById('editNameCheckMsg').className = 'form-text text-danger';
+            } else {
+                document.getElementById('editNameCheckMsg').textContent = '사용 가능한 이름입니다.';
+                document.getElementById('editNameCheckMsg').className = 'form-text text-success';
+            }
+        })
+        .catch(() => {
+            showAlert('이름 중복 확인 중 오류가 발생했습니다.');
+        });
+	})
 	
 	// 생성폼 입력 감지 
 	createForm.addEventListener('input',function(){
@@ -908,6 +966,13 @@ document.addEventListener('DOMContentLoaded',function(){
 			showAlert('연락처는 010-0000-0000 형식으로 입력해주세요.');
 			return;
 		}
+		// 주소 유효성 검사(우편번호 + 주소는 필수, 상세주소는 선택)
+		const directoryZipcode = document.getElementById('directoryZipcode').value.trim();
+		const directoryAddress = document.getElementById('directoryAddress').value.trim();
+		if(!directoryZipcode || !directoryAddress){
+			showAlert('주소 검색을 통해 우편번호와 주소를 입력해주세요.');
+			return;
+		}
 		
 		if(!isNameChecked){
 			showAlert('이름 중복 확인을 해주세요.');
@@ -959,6 +1024,8 @@ document.addEventListener('DOMContentLoaded',function(){
 						document.getElementById('editEmployeeBirth').value = data.employee_birth || ''; // 생년월일
 						document.getElementById('editEmployeeHireDate').value = data.employee_hire_date || ''; // 입사일
 						
+						document.getElementById('editDirectoryZipcode').value = data.directory_zipcode || '';
+						document.getElementById('editDirectoryAddress').value = data.directory_address || '';
 						//originalData 문자열로 저장 
 						originalData = {
 							employee_name : data.employee_name || '' ,
@@ -969,7 +1036,9 @@ document.addEventListener('DOMContentLoaded',function(){
 							employee_birth : (data.employee_birth || '').replaceAll('-',''), // 생일은 - 제거해서 저장
 							employee_hire_date : data.employee_hire_date ? data.employee_hire_date.substring(0,10) : '',
 							employee_end_date : data.employee_end_date ? data.employee_end_date.split('T')[0] : '',
-							employee_employment_yn : data.employee_employment_yn || ''
+							employee_employment_yn : data.employee_employment_yn || '',
+							directory_zipcode: data.directory_zipcode || '',
+							directory_address: data.directory_address || ''
 						};
 					
 						// 퇴사자일 경우 퇴사일, 재직여부 입력칸 열기
@@ -1122,7 +1191,7 @@ document.addEventListener('DOMContentLoaded',function(){
 	const endDate = document.getElementById('editEmployeeEndDate').value;
 		// 회원 수정 함수
 		function sendUpdateEmployee(){
-			console.log("수정 함수 호출됨.")
+			console.log("수정 함수 호출됨.");
 			const selectedPosition = document.getElementById('editEmployeePosition').value;
 			const customPosition = document.getElementById('editCustomPositionInput').value.trim();
 			
@@ -1144,7 +1213,9 @@ document.addEventListener('DOMContentLoaded',function(){
 					employee_end_date: document.getElementById('editEmployeeEndDate').value,
 					employee_employment_yn : document.getElementById('editEmployeeEmploymentYn') ? 
 							document.getElementById('editEmployeeEmploymentYn').value : originalData.employee_employment_yn, // input 없으면 원본값으로
-					structure_no : structureNo ? parseInt(structureNo) : null		
+					structure_no : structureNo ? parseInt(structureNo) : null,
+					directory_zipcode : document.getElementById('editDirectoryZipcode').value.trim(),
+					directory_address : document.getElementById('editDirectoryAddress').value.trim()
 			};
 			
 			const payload = {employee_no : editingEmployeeNo};

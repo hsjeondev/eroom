@@ -5,18 +5,13 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{/include/layout}">
  <body>
+		<div class="content">
 	<main class="main" id="top" layout:fragment="content">
 	<!-- 여기에 요소 넣으면 됩니다. -->
-		<div class="content">
-		<!-- <nav class="mb-3" aria-label="breadcrumb">
-			<ol class="breadcrumb mb-0">
-				<li class="breadcrumb-item"><a href="#!">Page 1</a></li>
-				<li class="breadcrumb-item"><a href="#!">Page 2</a></li>
-				<li class="breadcrumb-item active">Default</li>
-			</ol>
-		</nav> -->
+		<div class="d-flex justify-content-start align-items-center mb-5">
+			<i class="uil uil-file-check text-secondary me-2"></i><span class="fw-bold fs-7">합의 문서</span>
+		</div>
 			<div class="pb-8">
-				<h4 class="mb-4">합의된 결재</h4>
 				<!-- &quot;page&quot;: 여기 숫자 바꾸면 한 페이지 컨텐츠 수 조절 가능 -->
 				<div id="reports" data-list="{&quot;valueNames&quot;:[&quot;title&quot;,&quot;reports&quot;,&quot;text1&quot;,&quot;text2&quot;,&quot;text3&quot;,&quot;state&quot;,&quot;date&quot;],&quot;page&quot;:6,&quot;pagination&quot;:true}">
 					<div class="row g-3 justify-content-between mb-2">
@@ -125,7 +120,6 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			
 			</div><!-- pb-8 끝 -->
 			
-		</div> <!-- content 끝 -->
 		
 		
 		
@@ -376,5 +370,6 @@ document.getElementById("filterBtn").addEventListener("click", function () {
 });
 </script>
 	</main>
+		</div> <!-- content 끝 -->
 </body>
 </html>

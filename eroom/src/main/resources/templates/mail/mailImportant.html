@@ -4,9 +4,220 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{/include/layout}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
   <body>
     <main class="main" id="top" layout:fragment="content">
-     	<h1>중요 메일</h1>
+    <div class="row align-items-center justify-content-between g-3 mb-4">
+		<!-- 상단 제목 -->
+		<div class="d-flex justify-content-start">
+			<span class="fw-bold fs-6"  >보낸 메일함</span>
+		</div>
+	</div>
+   <div id="mailSummary" data-list='{"valueNames":["senderName", "mailTitle", "mailContent", "sendTime"], "page":6, "pagination":true}'>
+      <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
+            <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mailCreate}">메일 쓰기</a>
+              <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button>
+            </div>
+            <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" th:href="@{mailCreate}"> <span class="d-none d-sm-inline-block">메일 쓰기</span><span class="d-sm-none fas fa-plus"></span></a></div>
+	            <div class="col-auto flex-1">
+	            <!-- 절반 검색 기능  -->
+	              <div class="search-box w-100">
+	                <form class="position-relative">
+	                  <input class="form-control search-input search" type="search" placeholder="검색" aria-label="Search" />
+	                  <span class="fas fa-search search-box-icon"></span>
+	                </form>
+	              </div>
+	            </div>
+       </div>
+              <div class="px-lg-1">
+                <div class="d-flex align-items-center flex-wrap position-sticky pb-2 bg-body z-2 email-toolbar inbox-toolbar">
+                  <div class="d-flex align-items-center flex-1 me-2">
+                    <button class="btn btn-sm p-0 me-2" type="button" onclick="location.reload()"><span class="text-primary fas fa-redo fs-10"></span></button>
+                    <p class="fw-semibold fs-10 text-body-tertiary text-opacity-85 mb-0 lh-sm text-nowrap">새로 고침</p>
+                  </div>
+                  <div class="d-flex">
+                  	<select class="form-control search-input search" onchange="location = this.value;">
+                  		<option disabled selected>정렬 선택</option>
+					    <option value="?sortOrder=latest" th:selected="${sortOrder == 'latest'}">최신순</option>
+					    <option value="?sortOrder=oldest" th:selected="${sortOrder == 'oldest'}">오래된순</option>
+					</select>
+                  </div>
+                </div>
+                <!-- 범용성 생각해서 일단 보류 -->
+                <div class="border-top border-translucent py-2 d-flex justify-content-between">
+                  <div class="form-check mb-0 fs-8">
+                    <input class="form-check-input" type="checkbox" data-bulk-select-row="data-bulk-select-row" id="chechAll"/>
+                  </div>
+                  <div>
+                    <button id="deleteBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="휴지통"><span class="fas fa-trash fs-10"></span></button>
+                    <button id="starBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="중요"><span class="fas fa-star fs-10"></span></button>
+                  </div>
+                </div>
+                <!-- 범용성 생각해서 일단 보류 -->
+                
+                <!-- 메일 목록 스타트부분 -->
+                <div th:if="${#lists.isEmpty(importantMailList)}">
+                	<input type="text" value="내용이 없습니다.">
+                </div>
+                <div class="list">
+                 <div class="border-top border-translucent hover-actions-trigger py-3"
+                 		th:if="${!#lists.isEmpty(importantMailList)}"
+                 		th:each="importantMail : ${importantMailList}">
+                  <div class="row align-items-sm-center gx-2">
+                    <div class="col-auto">
+                      <div class="d-flex flex-column flex-sm-row">
+                        <input class="form-check-input mb-2 m-sm-0 me-sm-2 mail_checkbox" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" 
+                        	th:value="${importantMail.mailNo}"/>
+                        <!-- 별 박스 -->
+                        <form th:action="@{/mail/status/important/{id}(id=${importantMail.mailNo})}" method="post">
+						    <input type="hidden" name="redirectUrl" value="/mail/important" />
+						    <button class="btn p-0" type="submit">
+						        <span th:classappend="${
+						            mailStatusMap[importantMail.mailNo]?.mailStatusImportantYn == 'Y' 
+						                ? 'fas text-warning fa-star' 
+						                : 'far fa-star'
+						        }"></span>
+						    </button>
+						</form>
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <div class="avatar avatar-s  rounded-circle">
+                        <img class="rounded-circle " src="../../assets/img/team/60.webp" alt="" />
+
+                      </div>
+                    </div>
+                    
+                    
+                    <div class="col-auto">
+                    	 <!-- <a class="text-body-emphasis fw-bold inbox-link fs-9 senderName"  href="../../apps/email/email-detail.html"
+                    	 th:text="${sentMail.sender != null ? sentMail.sender.employeeName : '알 수 없음'}"
+                    	> 
+                    	 보낸 사람
+                    	 받은 사람 : (OOO) 으로 바꿀 예정
+                    	 </a> -->
+                    	 <a class="inbox-link fs-9 senderName"
+					     th:href="@{/mail/detail/{id}(id=${importantMail.mailNo})}"
+					     th:text="${importantMail != null and importantMail.sender != null ? importantMail.sender.employeeName : '알 수 없음'}">
+					     보낸 사람
+					  </a>
+                    	 
+                    	 <!-- <div class="text-body-emphasis fw-bold inbox-link fs-9 senderName">받는 사람:
+                    	 	<span th:with="size=${#lists.size(importantMail.receivers)}">
+                    	 	<span th:if="${size == 1}" th:text="${importantMail.receivers[0].receiver.employeeName}"></span>
+					        <span th:if="${size > 1}">
+						      <span th:text="${importantMail.receivers[0].receiver.employeeName}"></span>
+						      <span th:text="' 외 ' + (${size} - 1) + '명'"></span>
+						      
+						    </span>
+						    </span>
+					    </div> -->
+                    </div>
+                    <!-- 이메일 잘 나옴 -->
+                    <!-- <p th:text="${sentMail.sender.directory.directoryEmail}"></p> -->
+                    
+                    <div class="col-auto ms-auto">
+                      <!-- <div class="hover-actions end-0">
+                        <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
+                        <div class="dropdown-menu dropdown-menu-end py-2">
+                        <form th:action="@{/mail/status/important/{id}(id=${importantMail.mailNo})}" method="post">
+						  <input type="hidden" name="redirectUrl" value="/mail/sent" />
+						  <button type="submit" class="dropdown-item">⭐중요 표시</button>
+						</form>
+                        <form th:action="@{/mail/trash/{id}(id=${importantMail.mailNo})}" method="post">
+                        	<input type="hidden" name="redirectUrl" value="/mail/sent"/>
+						  <button type="submit" class="dropdown-item">🗑️휴지통</button>
+						</form>
+                        <a class="dropdown-item text-danger" href="#!">삭제</a></div>
+                      </div> -->
+                      
+                      
+                      <!-- 04/17 나중에 시간 남으면 좀 더 구성해보기 일단 전체 시간 다 보이게 설정함 -->
+                      <span class="fs-10 fw-bold sendTime" 
+					      th:text="${#temporals.format(importantMail.mailSentTime, 'yyyy.MM.dd HH:mm:ss')}">
+					  </span>
+					
+                    </div>
+                  </div>
+                  <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11">
+                  	<!-- <a class="d-block inbox-link" th:href="@{/mail/detail}"> -->
+                  	<a class="d-block inbox-link" th:href="@{/mail/detail/{id}(id=${importantMail.mailNo})}">
+                  		<span class="fs-9 line-clamp-1 text-body-emphasis mailTitle" th:text="${importantMail.mailTitle != null and !#strings.isEmpty(importantMail.mailTitle) ? importantMail.mailTitle : '(제목없음)'}"></span>
+                  		<!-- <span class="fs-9 line-clamp-1 text-body-emphasis mailTitle"  th:text="${sentMail.mailTitle}"></span> -->
+                  		<!-- <span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"  th:utext="${sentMail.mailContent}"></span> -->
+                   		<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent" th:utext="${importantMail.mailContent != null and !#strings.isEmpty(importantMail.mailContent) ? importantMail.mailContent : '(내용없음)'}"></span>
+                    </a>
+                  </div>
+                </div>
+					</div>
+                <!-- 페이징 -->
+                     
+					<div class="d-flex justify-content-center mt-3">
+							<div class="d-flex">
+								<button class="page-link disabled" data-list-pagination="prev"
+									disabled>
+									<i class="fas fa-chevron-left"></i>
+								</button>
+								<ul class="mb-0 pagination">
+									<li class="active">
+										<button class="page" type="button" data-i="1" data-page="5">1</button>
+									</li>
+								</ul>
+								<button class="page-link pe-0" data-list-pagination="next"
+									disabled>
+									<i class="fas fa-chevron-right"></i>
+								</button>
+							</div>
+						</div>
+                </div>
+                </div>
+             <script>
+             const checkAll = document.getElementById('chechAll');
+             checkAll.addEventListener('change', function () {
+               const isChecked = this.checked;
+               const checkboxes = document.querySelectorAll('.mail_checkbox');
+               checkboxes.forEach(cb => cb.checked = isChecked);
+             });
+             function getSelectedMailNos() {
+            	    return Array.from(document.querySelectorAll('.mail_checkbox:checked'))
+            	      .map(cb => cb.value);
+            	  }
+             function getSelectedMailNos() {
+         	    return Array.from(document.querySelectorAll('.mail_checkbox:checked'))
+         	      .map(cb => cb.value);
+         	  }
+
+         	  function sendBulkUpdate(url) {
+         	    const selected = getSelectedMailNos();
+         	    console.log(selected);	
+         	    if (selected.length === 0) {
+         	      alert("메일을 선택해주세요.");
+         	      return;
+         	    }
+
+         	    fetch(url, {
+         	      method: 'POST',
+         	      headers: { 
+ 						'Content-Type': 'application/json' ,
+ 						'header': document.querySelector('meta[name="_csrf_header"]').content,
+                         'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+ 						},
+         	      body: JSON.stringify(selected)
+         	    }).then(res => {
+         	      if (res.ok) location.reload();
+         	      else alert("처리 중 오류가 발생했습니다.");
+         	    });
+         	  }
+
+         	  document.getElementById('deleteBtn').addEventListener('click', function () {
+         	    sendBulkUpdate('/mail/trash');
+         	  });
+
+         	  document.getElementById('starBtn').addEventListener('click', function () {
+         	    sendBulkUpdate('/mail/important');
+         	  });
+             </script>
     </main>
+   
   </body>
 </html>

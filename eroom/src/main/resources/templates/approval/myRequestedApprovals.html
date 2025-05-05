@@ -6,20 +6,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  layout:decorate="~{/include/layout}">
 
  <body>
+		<div class="content">
 	<main class="main" id="top" layout:fragment="content">
 	<!-- 여기에 요소 넣으면 됩니다. -->
-		<div class="content">
-		<!-- <nav class="mb-3" aria-label="breadcrumb">
-			<ol class="breadcrumb mb-0">
-				<li class="breadcrumb-item"><a href="#!">Page 1</a></li>
-				<li class="breadcrumb-item"><a href="#!">Page 2</a></li>
-				<li class="breadcrumb-item active">Default</li>
-			</ol>
-		</nav> -->
+		<div class="d-flex justify-content-start align-items-center mb-5">
+			<i class="uil uil-file-check text-secondary me-2"></i><span class="fw-bold fs-7">작성 문서</span>
+		</div>
 			<div class="pb-8">
-				<h4 class="mb-4">요청한 결재</h4>
-				<!-- &quot;page&quot;: 여기 숫자 바꾸면 한 페이지 컨텐츠 수 조절 가능 -->
-				<div id="reports" data-list="{&quot;valueNames&quot;:[&quot;title&quot;,&quot;reports&quot;,&quot;text1&quot;,&quot;text2&quot;,&quot;text3&quot;,&quot;state&quot;,&quot;date&quot;],&quot;page&quot;:6,&quot;pagination&quot;:true}">
+				<div id="reports" data-list="{&quot;valueNames&quot;:[&quot;title&quot;,&quot;text&quot;,&quot;priority&quot;,&quot;reportsby&quot;,&quot;reports&quot;,&quot;date&quot;],&quot;page&quot;:10,&quot;pagination&quot;:true}">
 					<div class="row g-3 justify-content-between mb-2">
 						<div class="col-12">
 							<div class="d-md-flex justify-content-between">
@@ -129,7 +123,6 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			
 			</div><!-- pb-8 끝 -->
 			
-		</div> <!-- content 끝 -->
 		
 		
 		    <!-- 시그니처패드 모달 구조 -->
@@ -280,87 +273,50 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	</script>
 
     <!-- 필터 모달 값 비동기로 적용하기 -->
-<script>
-document.getElementById("filterBtn").addEventListener("click", function () {
-  const formatNo = document.getElementById("formatNo").value;
-  const status = document.getElementById("approvalStatus").value;
-  const dateSort = document.getElementById("dateSort").value;
+    <script>
+    document.getElementById("filterBtn").addEventListener("click", function () {
+    	  const formatNo = document.getElementById("formatNo").value;
+    	  const status = document.getElementById("approvalStatus").value;
+    	  const dateSort = document.getElementById("dateSort").value;
 
-  const query = new URLSearchParams();
-  if (formatNo) query.append("formatNo", formatNo);
-  if (status) query.append("approvalStatus", status);
-  if (dateSort) query.append("dateSort", dateSort);
+    	  const query = new URLSearchParams();
+    	  if (formatNo) query.append("formatNo", formatNo);
+    	  if (status) query.append("approvalStatus", status);
+    	  if (dateSort) query.append("dateSort", dateSort);
 
-  fetch("/approval/myRequestedApprovals/fragment?" + query.toString())
-    .then(response => {
-      if (!response.ok) throw new Error("서버 오류 발생");
-      return response.text();
-    })
-    .then(html => {
-      document.getElementById("reportsList").innerHTML = html;
+    	  fetch("/approval/myRequestedApprovals/fragment?" + query.toString())
+    	    .then(response => {
+    	      if (!response.ok) throw new Error("서버 오류 발생");
+    	      return response.text();
+    	    })
+    	    .then(html => {
+    	      document.getElementById("reportsList").innerHTML = html;
+        	  // 모달 닫기
+    	      const filterModal = bootstrap.Modal.getInstance(document.getElementById('reportsFilterModal'));
+    	      if (filterModal) {
+    	        filterModal.hide();
+    	      }
+    	      // 검색창 초기화
+    	      const searchInput = document.querySelector('.search-input');
+    	      if (searchInput) {
+    	        searchInput.value = '';
+    	      }
+				
+    	      bindSearch()
+    	    })
+    	    .catch(error => {
+    	      alert("필터링 실패: " + error.message);
+    	    });
+    	});
 
-      requestAnimationFrame(() => {
-        const hasItems = document.querySelector('#reportsList .col-12');
-        if (!hasItems) {
-          document.getElementById("reportsList").innerHTML =
-            `<div class="text-center text-muted py-5">검색 결과가 없습니다.</div>`;
-          closeFilterModal();
-          resetSearchInput();
-          bindSearch();
-          return;
-        }
-
-        // 기존 리스트 제거 (destroy가 더 안전)
-        if (window.reportsListObj && typeof window.reportsListObj.destroy === 'function') {
-          window.reportsListObj.destroy();
-        }
-        window.reportsListObj = null;
-
-        // 리스트 새로 초기화
-        try {
-          const options = {
-            valueNames: ['title', 'text', 'date', 'reports', 'state'],
-            page: 6,
-            pagination: true
-          };
-          window.reportsListObj = new List('reports', options);
-        } catch (e) {
-          console.error("List.js 초기화 실패", e);
-          alert("리스트 초기화 중 오류 발생");
-          return;
-        }
-
-        closeFilterModal();
-        resetSearchInput();
-        bindSearch();
-      });
-    })
-    .catch(error => {
-      console.error("필터링 중 예외:", error);
-      alert("필터링 실패: " + error.message);
-      closeFilterModal();
-    });
-
-  function closeFilterModal() {
-    const filterModal = bootstrap.Modal.getInstance(document.getElementById('reportsFilterModal'));
-    if (filterModal) filterModal.hide();
-  }
-
-  function resetSearchInput() {
-    const searchInput = document.querySelector('.search-input');
-    if (searchInput) searchInput.value = '';
-  }
-});
-</script>
-
-
-
+	</script>
 	    
 		
 		
 		
 		
 	</main>
+		</div> <!-- content 끝 -->
 	
 
 	

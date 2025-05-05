@@ -2,8 +2,13 @@ package com.eroom.mail.service;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,18 +20,24 @@ import com.eroom.drive.entity.Drive;
 import com.eroom.drive.repository.DriveRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
+import com.eroom.mail.dto.MailAlarmDto;
 import com.eroom.mail.dto.MailDraftDto;
 import com.eroom.mail.dto.MailDto;
 import com.eroom.mail.dto.MailReceiverDto;
 import com.eroom.mail.dto.MailStatusDto;
 import com.eroom.mail.entity.Mail;
+import com.eroom.mail.entity.MailAlarm;
 import com.eroom.mail.entity.MailDraft;
 import com.eroom.mail.entity.MailReceiver;
 import com.eroom.mail.entity.MailStatus;
+import com.eroom.mail.repository.MailAlarmRepository;
 import com.eroom.mail.repository.MailDraftRepository;
 import com.eroom.mail.repository.MailReceiverRepository;
 import com.eroom.mail.repository.MailRepository;
 import com.eroom.mail.repository.MailStatusRepository;
+import com.eroom.websocket.MailAlarmWebSocketHandler;
+import com.eroom.websocket.MailWebSocketHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,6 +51,10 @@ public class MailService {
 	private final MailStatusRepository mailStatusRepository;
 	private final MailDraftRepository mailDraftRepository;
 	private final DriveRepository driveRepository;
+	private final MailAlarmRepository mailAlarmRepository;
+	
+	private final MailAlarmWebSocketHandler mailAlarmWebSocketHandler;
+	private final MailWebSocketHandler mailWebSocketHandler;
 	@Value("${ffupload.location}")
 	 private String fileDir;
 	
@@ -91,12 +106,12 @@ public class MailService {
 //	    }
 //	    return result;
 //	}
-	/*
-	// 휴지통 N > Y 업데이트 
-	public void moveToTrash(Long employeeNo, Long id) {
-	    mailReceiverRepository.updateDeletedYnAndTime(employeeNo, id);
-	}
 	
+	// 휴지통 N > Y 업데이트 
+//	public void moveToTrash(Long employeeNo, Long id) {
+//	    mailStatusRepository.updateDeletedYnAndTime(employeeNo, id);
+//	}
+	/*
 	@Transactional
 	public void deleteReceivedMailById(Long employeeNo,Long mailReceiverNo) {
 	    mailReceiverRepository.deleteByIdAndEmployeeNo(employeeNo, mailReceiverNo);
@@ -122,21 +137,42 @@ public class MailService {
 	}
 	
 	// 휴지통 조회하는곳
-	/*테이블 바뀐 뒤 주석 처리
-	public List<MailReceiver> getTrashMailsByEmployee(Long employeeNo, String sortOrder) {
-	    List<MailReceiver> resultList;
+	// 테이블 바뀐 뒤 주석 처리
+	/*
+	public List<Mail> getTrashMailsByEmployee(Long employeeNo, String sortOrder) {
+	    List<Mail> resultList=null;
 
 	    if ("latest".equals(sortOrder)) {
-	        resultList = mailReceiverRepository.findByEmployeeNoOrderByLatest(employeeNo);
+	        resultList = mailRepository.findTrashMailsByEmployeeNo(employeeNo);
 	    } else if ("oldest".equals(sortOrder)) {
-	        resultList = mailReceiverRepository.findByEmployeeNoOrderByOldest(employeeNo);
+	        resultList = mailRepository.findTrashMailsByEmployeeNoOldest(employeeNo);
 	    } else {
 	        throw new IllegalArgumentException("유효하지 않은 정렬 조건: " + sortOrder);
 	    }
 
-	    return filterOnlyDeletedMails(resultList);
+	    return resultList;
 	}
 	*/
+	public List<Mail> getTrashMailsByEmployee(Long employeeNo, String sortOrder) {
+	    if ("latest".equalsIgnoreCase(sortOrder)) {
+	        return mailStatusRepository.findAllDeletedMailsByEmployeeLatest(employeeNo);
+	    } else if ("oldest".equalsIgnoreCase(sortOrder)) {
+	        return mailStatusRepository.findAllDeletedMailsByEmployeeOldest(employeeNo);
+	    } else {
+	        throw new IllegalArgumentException("유효하지 않은 정렬 조건: " + sortOrder);
+	    }
+	}
+	
+	// 중요 메일 조회 
+	public List<Mail> getImportantMailsByEmployee(Long employeeNo, String sortOrder) {
+	    if ("latest".equalsIgnoreCase(sortOrder)) {
+	        return mailStatusRepository.findAllImportantMailsByEmployeeLatest(employeeNo);
+	    } else if ("oldest".equalsIgnoreCase(sortOrder)) {
+	        return mailStatusRepository.findAllImportantMailsByEmployeeOldest(employeeNo);
+	    } else {
+	        throw new IllegalArgumentException("유효하지 않은 정렬 조건: " + sortOrder);
+	    }
+	}
 	/*테이블 교체후 오류 수정중
 	public List<Mail> findOnlyDraftMailsBySender(Long employeeNo, String sortOrder) {
 	    List<Mail> resultList = null;
@@ -234,7 +270,90 @@ public class MailService {
 		
 		return resultList;
 	}
+	// 휴지통에서 삭제
+	@Transactional
+	public void updateVisibleYn(Long employeeNo, Long mailNo, String visibleYn) {
+        mailStatusRepository.updateVisibleYn(employeeNo, mailNo, visibleYn);
+    }
 	
+	@Transactional
+	public void moveImportant(Long mailNo, Long employeeNo) {
+        Optional<MailStatus> existingStatus = mailStatusRepository.findByMail_mailNoAndEmployee_employeeNo(mailNo, employeeNo);
+
+        if (existingStatus.isPresent()) {
+            // 상태가 이미 존재하면 중요 표시 여부를 반전시킴
+            MailStatus status = existingStatus.get();
+            status.setMailStatusDeletedTime(null);
+            status.setMailStatusDeletedYn("N");
+            status.setMailStatusImportantYn(status.getMailStatusImportantYn().equals("Y") ? "N" : "Y"); // "Y" -> "N", "N" -> "Y"로 토글
+            mailStatusRepository.save(status); // 상태 저장
+        } else {
+            // 상태가 없으면 새로 상태 추가
+        	MailStatusDto mailStatusDto = new MailStatusDto();
+	        mailStatusDto.setMail_no(mailNo);
+	        mailStatusDto.setEmployee_no(employeeNo);
+	        mailStatusDto.setMail_status_important_yn("Y");
+	        //mailStatusDto.setMail_status_deleted_time(LocalDateTime.now());
+	        MailStatus mailStatusEntity = mailStatusDto.toEntity();
+	        //mailStatusEntity.setMailStatusDeletedTime(LocalDateTime.now());
+	        mailStatusRepository.save(mailStatusEntity);
+        }
+    }
+	public Map<Long, MailStatus> getStatusMapForMailRecevier(List<MailReceiver> mails) {
+	    List<Long> mailNos = mails.stream()
+	                              .map(mr -> mr.getMail().getMailNo())
+	                              .collect(Collectors.toList());
+
+	    List<MailStatus> statusList = mailStatusRepository.findByMailMailNoIn(mailNos);
+
+	    return statusList.stream()
+	            .collect(Collectors.toMap(ms -> ms.getMail().getMailNo(), Function.identity()));
+	}
+	
+	public Map<Long, MailStatus> getStatusMapForMails(List<Mail> mails) {
+	    List<Long> mailNos = mails.stream()
+	                              .map(Mail::getMailNo)
+	                              .collect(Collectors.toList());
+
+	    List<MailStatus> statusList = mailStatusRepository.findByMailMailNoIn(mailNos);
+
+	    return statusList.stream()
+	            .collect(Collectors.toMap(ms -> ms.getMail().getMailNo(), Function.identity()));
+	}
+	
+	@Transactional
+	public void moveToTrash(Long employeeNo, Long mailNo) {
+	    Optional<MailStatus> optionalStatus = mailStatusRepository.findByMail_mailNoAndEmployee_employeeNo(mailNo, employeeNo);
+
+	    MailStatus status;
+	    if (optionalStatus.isPresent()) {
+	        status = optionalStatus.get();
+	        status.setMailStatusImportantYn("N");
+	        status.setMailStatusDeletedTime(LocalDateTime.now());
+	        status.setMailStatusDeletedYn(status.getMailStatusDeletedYn().equals("Y") ? "N" : "Y"); // "Y" -> "N", "N" -> "Y"로 토글
+            mailStatusRepository.save(status); // 상태 저장
+	    } else {
+	        // 없으면 새로 생성
+        	MailStatusDto mailStatusDto = new MailStatusDto();
+	        mailStatusDto.setMail_no(mailNo);
+	        mailStatusDto.setEmployee_no(employeeNo);
+	        mailStatusDto.setMail_status_deleted_yn("Y");
+	        //mailStatusDto.setMail_status_deleted_time(LocalDateTime.now());
+	        MailStatus mailStatusEntity = mailStatusDto.toEntity();
+	        mailStatusEntity.setMailStatusDeletedTime(LocalDateTime.now());
+	        mailStatusRepository.save(mailStatusEntity);
+
+	    	
+//	        status = MailStatus.builder()
+//	                .mail(mailRepository.findById(mailNo).orElseThrow())
+//	                .employee(employeeRepository.findById(employeeNo).orElseThrow())
+//	                .build();
+//	        status.setMailStatusDeletedYn("Y");
+//	        status.setMailStatusDeletedTime(LocalDateTime.now());
+//	        mailStatusRepository.save(status);
+	    }
+
+	}
     // 본인 메일 조회
 //	public List<Mail> findMailsBySender(Long employeeNo) {
 //	    return mailRepository.findBySenderEmployeeNo(employeeNo);
@@ -346,129 +465,102 @@ public class MailService {
 		            
 		            mailReceiverDto.setMail_no(mailSaver.getMailNo());
 
-		            MailReceiver mailReceiver = mailReceiverDto.toEntity();
-		            mailReceiverRepository.save(mailReceiver);
+		            MailReceiver mailReceiverEntity = mailReceiverDto.toEntity();
+		            MailReceiver mailRecieverSaver=mailReceiverRepository.save(mailReceiverEntity);
 		            
-		            // 메일 상태 
-//		            MailStatusDto mailStatusDto = new MailStatusDto();
-//		            mailStatusDto.setMail_no(mailSaver.getMailNo());
-//		            
-//		            MailStatus mailStatus = mailStatusDto.toEntity();
-//		            mailStatusRepository.save(mailStatus);
+		            MailAlarmDto mailAlarmDto = new MailAlarmDto();
+		            mailAlarmDto.setMail_receiver_no(mailRecieverSaver.getMailReceiverNo());
+	            	MailAlarm mailAlarm = mailAlarmDto.toEntity();
+	            	mailAlarmRepository.save(mailAlarm);
+	            	
+	            	/*
+	            	Alarm alarm = Alarm.builder()
+	            		    .param1(savedMailAlarm.getMailAlarmNo())  // mail_alarm_no 저장
+	            		    .separatorCode("M001")                    // 메일 알림 코드
+	            		    .build();
+
+	            	alarmRepository.save(alarm);
+	            	*/
+		         /*
+		         try {
+		             Map<String, Object> message = new HashMap<>();
+		             message.put("type", "mail");
+		             message.put("mailTitle", mailDto.getMail_title());
+		             message.put("senderName", mailSaver.getSender().getEmployeeName());
+		             message.put("mailNo", mailSaver.getMailNo());
+
+		             String jsonMessage = new ObjectMapper().writeValueAsString(message);
+		             mailWebSocketHandler.sendToUser(receiverNo, jsonMessage);
+		         } catch (Exception e) {
+		             e.printStackTrace(); // 웹소켓 전송 실패해도 메일 저장은 정상 진행
+		         }
+		         */
+	            	try {
+                        Map<String, Object> message = new HashMap<>();
+                        message.put("type", "mail");
+                        message.put("mailTitle", mailDto.getMail_title());
+                        message.put("senderName", mailSaver.getSender().getEmployeeName());
+                        message.put("mailNo", mailSaver.getMailNo());
+
+                        // 메시지 JSON으로 변환
+                        String jsonMessage = new ObjectMapper().writeValueAsString(message);
+
+                        // WebSocket을 통해 알림 전송
+                        mailWebSocketHandler.sendToUser(receiverNo, jsonMessage);
+                    } catch (Exception e) {
+                        e.printStackTrace(); // 웹소켓 전송 실패해도 메일 저장은 정상 진행
+                    }
+		         // 발송된 메일만 파일 저장
+		         for (MultipartFile file : mailFiles) {
+			            if (!file.isEmpty()) {
+			                // DriveDto 생성
+			                String oriName = file.getOriginalFilename();
+					        String ext = oriName.substring(oriName.lastIndexOf("."));
+					        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+					        String path = fileDir + "mail/" + newName;
+			                DriveDto driveDto = new DriveDto();
+			                
+			                File savedFile = new File(path);
+					        if (!savedFile.getParentFile().exists()) {
+					            savedFile.getParentFile().mkdirs();
+					        }
+					        file.transferTo(savedFile);
+					        
+					        
+			                driveDto.setDriveOriName(oriName);
+			                driveDto.setDriveSize(file.getSize());
+			                
+			                
+			               
+			                // Drive 엔티티로 변환
+			                Drive drive = new Drive();
+			                drive.setDriveOriName(driveDto.getDriveOriName());
+			                drive.setDriveNewName(newName); // 파일 고유 이름 생성
+			                drive.setDriveSize(driveDto.getDriveSize());
+			                drive.setDriveType(ext);
+			                drive.setDrivePath("/mail/" + newName); // 실제 저장 경로로 변경 필요
+			                drive.setUploader(Employee.builder().employeeNo(mailDto.getEmployee_no()).build());
+			                drive.setParam1(mailSaver.getMailNo()); // 메일 참조 연결
+			                drive.setSeparatorCode("FL002");
+			                drive.setVisibleYn("Y");
+			                // DB에 저장
+			                driveRepository.save(drive);
+			                
+			            }
+			        }
+		            
 		        }
 			 }
 			}
-			
 			if (mailDraftYn.equals("Y")) {
-			    // 기존 임시 저장된 메일 찾기
-			    /*List<MailDraft> existingDraft = mailDraftRepository.findByMailNo(mailDto.getMail_no());
-
-			    if (existingDraft != null && !existingDraft.isEmpty()) {
-			        // 기존 임시 저장된 메일이 있으면 업데이트
-			        for (MailDraft existing : existingDraft) {
-			            // 수신자 번호 리스트를 돌며 업데이트
-			            for (Long receiverNo : receiverNos) {
-			                if (existing.getEmployee().getEmployeeNo().equals(receiverNo)) {
-			                    // 이미 존재하는 수신자는 업데이트만 해주기
-			                    existing.setMailDraftTime((LocalDateTime.now())); // 예: 시간 업데이트
-			                    mailDraftRepository.save(existing); // 업데이트 저장
-			                }
-			            }
-			        }
-			    } else {*/
-			        // 기존에 저장된 메일이 없으면 새로 저장
-			        /*if (receiverNos != null && !receiverNos.isEmpty()) {
-			            for (Long receiverNo : receiverNos) {*/
-			                MailDraftDto mailDraftDto = new MailDraftDto();
-			                mailDraftDto.setMail_no(mailSaver.getMailNo()); // 메일 번호
-			                //mailDraftDto.setEmployee_no(receiverNo); // 수신자
-			                mailDraftDto.setMail_draft_time(LocalDateTime.now()); // 현재 시간
-
-			                MailDraft mailDraft = mailDraftDto.toEntity();
-			                mailDraftRepository.save(mailDraft); // 새로 저장
-			            }
-			       // }
-			   // }
-			//}
-			
-		        // 참조자 ( 수신자랑 같은 방향으로 저장 )
-//		        List<Long> ccNos = mailDto.getCc_no(); // 참조자 리스트
-//		        if (ccNos != null && ccNos.isEmpty()) {
-//		            for (Long ccNo : ccNos) {
-//		                Employee ccReceiver = employeeRepository.findById(ccNo).orElseThrow(() ->
-//		                    new IllegalArgumentException("존재하지 않는 사원 번호: " + ccNo));
-//
-//		                MailReceiverDto ccReceiverDto = new MailReceiverDto();
-//		                // 참조자 ( 수신자랑 같은 로직으로함)
-//		                ccReceiverDto.setEmployee_no(ccNo);
-//		                ccReceiverDto.setReceiver(ccReceiver);;
-//		                // 수신자 동일
-//		                ccReceiverDto.setMail_no(mailSaver.getMailNo());
-//		                //ccReceiverDto.setMail_recervier_type("Cc");
-//		                
-//		                
-//		                MailReceiver mailReceiver = ccReceiverDto.toEntity();
-//		                mailReceiverRepository.save(mailReceiver);
-//		                
-//		                // 메일 상태
-//		                MailStatusDto mailStatusDto = new MailStatusDto();
-//			            mailStatusDto.setMail_no(mailSaver.getMailNo());
-//			            
-//			            MailStatus mailStatus = mailStatusDto.toEntity();
-//			            mailStatusRepository.save(mailStatus);
-//		            }
-//		        }
-		        // 파일
-		        for (MultipartFile file : mailFiles) {
-		            if (!file.isEmpty()) {
-		                // DriveDto 생성
-		                String oriName = file.getOriginalFilename();
-				        String ext = oriName.substring(oriName.lastIndexOf("."));
-				        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
-				        String path = fileDir + "mail/" + newName;
-		                DriveDto driveDto = new DriveDto();
-		                
-		                File savedFile = new File(path);
-				        if (!savedFile.getParentFile().exists()) {
-				            savedFile.getParentFile().mkdirs();
-				        }
-				        file.transferTo(savedFile);
-				        
-				        
-		                driveDto.setDriveOriName(oriName);
-		                driveDto.setDriveSize(file.getSize());
-		                
-		                
-		               
-		                // Drive 엔티티로 변환
-		                Drive drive = new Drive();
-		                drive.setDriveOriName(driveDto.getDriveOriName());
-		                drive.setDriveNewName(newName); // 파일 고유 이름 생성
-		                drive.setDriveSize(driveDto.getDriveSize());
-		                drive.setDriveType(ext);
-		                drive.setDrivePath("/mail/" + newName); // 실제 저장 경로로 변경 필요
-		                drive.setUploader(Employee.builder().employeeNo(mailDto.getEmployee_no()).build());
-		                drive.setParam1(mailSaver.getMailNo()); // 메일 참조 연결
-		                drive.setSeparatorCode("FL002");
-		                drive.setVisibleYn("Y");
-		                // DB에 저장
-		                driveRepository.save(drive);
-		                
-		            }
-		        }
-		     // 본인 ( 폐기 )
-		        /*
-				Employee sender = employeeRepository.findById(mailDto.getEmployee_no())
-		                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사원 번호: " + mailDto.getEmployee_no()));
-
-		        MailReceiverDto selfReceiverDto = new MailReceiverDto();
-		        selfReceiverDto.setEmployee_no(sender.getEmployeeNo());
-		        selfReceiverDto.setMail_no(mailSaver.getMailNo());
-		        selfReceiverDto.setMail_recervier_type("Me");
-		        MailReceiver selfReceiver = selfReceiverDto.toEntity(mailSaver, sender);
-		        mailReceiverRepository.save(selfReceiver);
-		        */
-
+	            MailDraftDto mailDraftDto = new MailDraftDto();
+	            mailDraftDto.setMail_no(mailSaver.getMailNo()); // 메일 번호
+	            //mailDraftDto.setEmployee_no(receiverNo); // 수신자
+	            mailDraftDto.setMail_draft_time(LocalDateTime.now()); // 현재 시간
+	
+	            MailDraft mailDraft = mailDraftDto.toEntity();
+	            mailDraftRepository.save(mailDraft); // 새로 저장
+            }
 			result =1;
 		}catch (Exception e) {
 			e.printStackTrace();
