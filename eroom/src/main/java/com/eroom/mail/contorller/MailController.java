@@ -52,34 +52,7 @@ public class MailController {
 	private final DriveService driveService;
 	@Value("${ffupload.location}")
 	 private String fileDir;
-	/* 테스트로 만들어 놓은거
-	 * @GetMapping("/mail") public String selectMailAll(Model model) { // 조건 필요함
-	 * reveiver에 // to일때는 내가 보낸거 // 조건이 cc면 받은거
-	 * 
-	 * // 조건 더 필요함 status 'N'일때 임시저장x 즉, 발송된 메일 List<Mail> resultList =
-	 * service.selectMailAll(); model.addAttribute("resultList",resultList); return
-	 * "mail/list"; }
-	 */
 	
-	/*
-	 * @GetMapping("/mail/receiverTo/fragment") public String
-	 * selectReceiverToFragment(Model model,
-	 * 
-	 * @AuthenticationPrincipal EmployeeDetails employeeDetails,
-	 * 
-	 * @RequestParam(name = "sortOrder", defaultValue = "latest") String sortOrder)
-	 * { Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
-	 * 
-	 * // 메일 데이터를 가져오기 List<MailReceiver> received =
-	 * mailService.getReceivedMailsByEmployee(employeeNo, sortOrder); Map<Long,
-	 * MailStatus> mailStatusMap =
-	 * mailService.getStatusMapForMailRecevier(received);
-	 * 
-	 * // 모델에 추가 model.addAttribute("mailStatusMap", mailStatusMap);
-	 * model.addAttribute("receivedMails", received);
-	 * 
-	 * // 해당 프래그먼트를 위한 뷰 리턴 return "mail/receiverToFragment"; }
-	 */
 	@GetMapping("/mail/receiverTo/fragment")
 	public String selectReceiverToFragment(Model model, 
 	                                       @AuthenticationPrincipal EmployeeDetails employeeDetails,
