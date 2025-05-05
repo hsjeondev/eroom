@@ -1029,11 +1029,10 @@
 		  const currentChatroomNo = document.querySelector(".chatroom-title")?.dataset.roomNo;
 		  const chatHistory = document.querySelector(".chat-history");
 		  const sidebarItem = document.querySelector(`[data-room-no="${data.chatroomNo}"]`);
-		  const isMyMessage = data.senderMember == myEmployeeNo;
+		  const isMyMessage = String(data.senderMember) === String(myEmployeeNo);
 		
 		  if (!sidebarItem) return;
 		
-		  // 다른 채팅방일 경우 사이드바에 알림 뱃지 갱신
 		  if (!currentChatroomNo || Number(currentChatroomNo) !== Number(data.chatroomNo)) {
 		    sidebarItem.classList.add('unread');
 		    sidebarItem.classList.remove('read');
@@ -1054,11 +1053,9 @@
 		
 		    const timePreview = sidebarItem.querySelector('.text-body-tertiary');
 		    if (timePreview) timePreview.innerText = getFormattedDate();
-		
 		    return;
 		  }
 		
-		  // 현재 열린 채팅방일 경우 채팅 내용 렌더링
 		  if (!chatHistory) return;
 		
 		  const wrapper = document.createElement("div");
@@ -1074,15 +1071,16 @@
 		  const messageBubble = document.createElement("div");
 		  messageBubble.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
 		  messageBubble.style.maxWidth = "70%";
-		  messageBubble.innerText = data.chatMessageContent;
 		
-		  messageLine.appendChild(messageBubble);
-		  wrapper.appendChild(nameLine);
-		  wrapper.appendChild(messageLine);
-		  chatHistory.appendChild(wrapper);
+		  // 텍스트가 있으면 추가
+		  if (data.chatMessageContent) {
+		    const text = document.createElement("div");
+		    text.innerText = data.chatMessageContent;
+		    messageBubble.appendChild(text);
+		  }
 		
-		// 파일 표시 개선
-		if (data.drivePath) {
+		  // 파일이 있으면 추가
+		  if (data.drivePath) {
 		    const ext = data.drivePath.split('.').pop().toLowerCase();
 		    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
 		
@@ -1090,31 +1088,31 @@
 		    fileWrapper.className = "mt-2";
 		
 		    if (isImage) {
-		        const img = document.createElement("img");
-		        img.src = data.drivePath;
-		        img.style.maxWidth = "150px";
-		        img.style.borderRadius = "8px";
-		        img.style.marginTop = "5px";
-		        fileWrapper.appendChild(img);
+		      const img = document.createElement("img");
+		      img.src = data.drivePath;
+		      img.style.maxWidth = "150px";
+		      img.style.borderRadius = "8px";
+		      fileWrapper.appendChild(img);
 		    } else {
-		        const link = document.createElement("a");
-		        link.href = "/files" + data.drivePath;
-		        link.className = "badge bg-secondary text-white";
-		        link.target = "_blank";
-		        link.innerText = "📎 " + (data.driveOriName || "첨부파일 다운로드");
-		        fileWrapper.appendChild(link);
+		      const link = document.createElement("a");
+		      link.href = "/files/" + data.drivePath.replace(/^\/+/, "");
+		      link.className = "badge bg-secondary text-white";
+		      link.target = "_blank";
+		      link.innerText = "📎 " + (data.driveOriName || "첨부파일 다운로드");
+		      fileWrapper.appendChild(link);
 		    }
 		
-		    wrapper.appendChild(fileWrapper);
-		}
-
-		  
+		    messageBubble.appendChild(fileWrapper);
+		  }
+		
+		  messageLine.appendChild(messageBubble);
+		  wrapper.appendChild(nameLine);
+		  wrapper.appendChild(messageLine);
+		  chatHistory.appendChild(wrapper);
+		
 		  const scrollArea = document.querySelector(".flex-grow-1.overflow-auto");
 		  if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
 		};
-
-
-
 
 
 
@@ -1313,13 +1311,27 @@ function sendMessage() {
 			            const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
 
 			            if (isImage) {
-			              const img = document.createElement("img");
-			              img.src = "/files" + msg.drivePath;
-			              img.style.maxWidth = "100%";
-			              img.style.borderRadius = "8px";
-			              img.style.marginTop = "8px";
-			              bubble.appendChild(img);
-			            } else {
+		            	  const fileWrapper = document.createElement("div");
+		            	  fileWrapper.className = "text-center"; // 가운데 정렬
+
+		            	  const fileName = document.createElement("div");
+		            	  fileName.className = "fw-bold mb-2";
+		            	  fileName.innerText = `[파일] ${msg.driveOriName || '파일'}`;
+
+		            	  const img = document.createElement("img");
+		            	  img.src = "/files/" + msg.drivePath.replace(/^\/+/, "");
+		            	  img.style.maxWidth = "180px";
+		            	  img.style.maxHeight = "180px";
+		            	  img.style.borderRadius = "8px";
+		            	  img.style.objectFit = "cover";
+		            	  img.style.display = "block";
+		            	  img.style.margin = "0 auto";
+
+		            	  fileWrapper.appendChild(fileName);
+		            	  fileWrapper.appendChild(img);
+
+		            	  bubble.appendChild(fileWrapper);
+		            	}else {
 			              const link = document.createElement("a");
 			              link.href = "/files" + msg.drivePath;
 			              link.target = "_blank";

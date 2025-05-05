@@ -108,7 +108,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
             if (!drives.isEmpty()) {
                 Drive drive = drives.get(0); // 첫 번째 드라이브 선택 (또는 여러 드라이브 처리)
-                sendData.put("drivePath", "/filesdrive/chat/" + drive.getDrivePath());
+                sendData.put("drivePath", "/files/drive/chat/" + drive.getDrivePath().replaceFirst("^drive/chat/", ""));
                 sendData.put("driveOriName", drive.getDriveOriName());
             }
         }

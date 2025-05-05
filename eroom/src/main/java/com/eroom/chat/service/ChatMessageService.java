@@ -14,6 +14,7 @@ import com.eroom.chat.repository.ChatAlarmRepository;
 import com.eroom.chat.repository.ChatMessageRepository;
 import com.eroom.chat.repository.ChatroomRepository;
 import com.eroom.chat.specification.ChatMessageSpecification;
+import com.eroom.drive.entity.Drive;
 import com.eroom.employee.entity.Employee;
 import com.eroom.websocket.ChatWebSocketHandler;
 
@@ -45,6 +46,9 @@ public class ChatMessageService {
 	            .chatroom(Chatroom.builder().chatroomNo(dto.getChatroomNo()).build())
 	            .senderMember(Employee.builder().employeeNo(dto.getSenderMember()).build())
 	            .chatMessageContent(dto.getChatMessageContent())
+	            .drive(dto.getDriveAttachNo() != null 
+	            ? Drive.builder().driveAttachNo(dto.getDriveAttachNo()).build() 
+	            : null)
 	            .build()
 	    );
 

@@ -30,7 +30,7 @@ public class ChatMessageDto {
     private String messageIsDeletedYn; // 삭제 여부 (Y/N);
     private Long driveAttachNo;     // 드라이브 번호
     private String drivePath; 
-    
+    private String driveOriName;
     // DTO -> Entity
 	public ChatMessage toEntity() {
 		return ChatMessage.builder()
@@ -54,6 +54,7 @@ public class ChatMessageDto {
 				.messageIsDeletedYn(entity.getMessageIsDeletedYn())
 				.driveAttachNo(entity.getDrive() != null ? entity.getDrive().getDriveAttachNo() : null)
 		        .drivePath(entity.getDrive() != null ? entity.getDrive().getDrivePath() : null)
+		        .driveOriName(entity.getDrive() != null ? entity.getDrive().getDriveOriName() : null)
 				.build();
 	}
     

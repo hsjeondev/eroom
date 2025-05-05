@@ -9,7 +9,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/filesdrive/chat/**")  // URL 접근 경로
-                .addResourceLocations("file:///C:/dev/eroom/upload/drive/chat/"); // 실제 로컬 경로
+    	registry.addResourceHandler("/files/drive/chat/**") // 수정된 부분
+    		.addResourceLocations("file:///C:/dev/eroom/upload/drive/chat/");
+
     }
 }
