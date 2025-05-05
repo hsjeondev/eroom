@@ -94,7 +94,8 @@
 			<div class="card">
 				<div class="card-body d-flex align-items-center">
 					<div id="openProfileUploadModalBtn" class="profile-wrapper me-3" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
-						<img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
+						<img id="profileImage" class="rounded-circle" alt="프로필"
+							th:src="${profileImage}">
 						<div class="camera-overlay">
 							<svg class="svg-inline--fa fa-camera fs-4" aria-hidden="true" focusable="false"
 							  data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg"
@@ -549,7 +550,8 @@
         <!-- 현재 프로필 사진 -->
         <div class="d-flex justify-content-center mb-3">
           <div class="profile-wrapper">
-            <img id="previewProfileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필 미리보기">
+            <img id="previewProfileImage" class="rounded-circle" alt="프로필 미리보기"
+            	th:src="${profileImage}">
           </div>
         </div>
 
@@ -671,7 +673,7 @@
         </p>
       </div>
       <div class="modal-footer justify-content-center border-0">
-        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-phoenix-secondary" id="cancelEditCloseBtn" data-bs-dismiss="modal">취소</button>
         <button type="button" class="btn btn-danger" id="confirmEditCloseBtn">확인</button>
       </div>
     </div>
@@ -697,6 +699,20 @@ function execDaumPostcodeForEdit() {
 
 document.addEventListener('DOMContentLoaded', function (){
 
+	document.addEventListener('click', function (e) {
+		  console.log("document click 감지됨", e.target);
+
+		  if (e.target && e.target.id === 'saveProfileImageBtn') {
+		    console.log("저장 버튼 클릭됨 - 위임 방식");
+		   //  alert("위임 방식으로 버튼 눌림");
+		    if (!isProfileEdited) {
+		      showAlert("변경된 내용이 없습니다.");
+		      return;
+		    }
+		    showConfirmModal("정말 저장하시겠습니까?", sendProfileUpload);
+		  }
+		});
+	
 // 차트 데이터를 받아서 각 차트를 렌더링하는 함수
 async function renderCharts() {
 	// 1. API 호출
@@ -835,7 +851,8 @@ const unsavedEditModalElement = document.getElementById('unsavedEditModal');
 const unsavedEditModal = bootstrap.Modal.getInstance(unsavedEditModalElement) || new bootstrap.Modal(unsavedEditModalElement);
 
 const checkNameBtn = document.getElementById('checkNameBtn');
-const nameCheckMsg = document.getElementById('nameCheckMsg');
+// const nameCheckMsg = document.getElementById('nameCheckMsg');
+const nameCheckMsg = document.getElementById('editNameCheckMsg');
 
 let isNameChecked = false; // 이름 중복 확인 완료 여부
 let isEditFormEdited = false; // 회원 수정 폼 수정 여부
@@ -917,7 +934,7 @@ fetch(`/admin/checkNameDuplicate?name=${encodeURIComponent(name)}`)
 	});
 	// 수정 모달 닫힐때
 	editModalElement.addEventListener('hidden.bs.modal', function () {
-		const nameCheckMsg = document.getElementById('editNameCheckMsg');
+		//const nameCheckMsg = document.getElementById('editNameCheckMsg');
 		nameCheckMsg.classList.add('d-none');
 		nameCheckMsg.textContent = '';
 		nameCheckMsg.className = 'form-text';
@@ -1054,7 +1071,7 @@ function sendUpdateEmployee() {
 	// 프로필 모달 오픈시 초기화
 	document.getElementById('openProfileUploadModalBtn').addEventListener('click',function(){
 		// 현재 이미지 src 저장
-		originalProfileSrc = profileImage.src;
+		originalProfileSrc = profileImageElement.src;
 		previewImageElement.src = originalProfileSrc;
 		profileUploadInput.value = '';
 		isProfileEdited = false;
@@ -1100,59 +1117,6 @@ function sendUpdateEmployee() {
 	});
 	
 	// 저장 버튼 클릭 -> 확인 모달 -> fetch 요청
-/* 	document.getElementById('saveProfileImageBtn').addEventListener('onfirmlick',function(){
-		console.log('버튼 연결됨');
-		if(!isProfileEdited){
-			showAlert('변경된 내용이 없습니다.');
-			return;
-		}
-		showConfirmModal('정말 저장하시겠습니까?',sendProfileUpload);
-	}); */
-/* 	document.addEventListener('click',function(e){
-		if(e.target && e.target.id === 'saveProfileImageBtn'){
-			console.log("저장 버튼 클릭됨");
-			
-			// unsaved 모달이 열려있으면 저장X
-			const isUnsavedOpen = document.getElementById('unsavedEditModal').classList.contains('show');
-			if(isUnsavedOpen) return;
-			
-			if(!isProfileEdited){
-				showAlert("변경된 내용이 없습니다.");
-				return;
-			}
-			if(unsavedEditModal._isShown){
-				unsavedEditModal.hide();
-			}
-			
-			showConfirmModal("정말 저장하시겠습니까?",sendProfileUpload);
-		}
-	}); */
-	
-	const saveProfileBtn = document.getElementById('saveProfileImageBtn');
-	if(!saveProfileBtn){
-		console.error("저장 버튼이 DOM에 존재하지 않음");
-		return;
-	}
-	saveProfileBtn.addEventListener('click',function(){
-		console.log("저장 버튼 클릭됨");
-		alert("버튼 눌림");
-/* 		const isUnsavedOpen = document.getElementById('unsavedEditModal').classList.contains('show');
-		if(isUnsavedOpen) return; */
-		
-		if(!isProfileEdited){
-			showAlert("변경된 내용이 없습니다."); 
-			return;
-		}
-		
-		const file = profileUploadInput.files[0];
-		if(!file){
-			console.log("선택된 파일 없음(기본 이미지로 전환 여부 체크)");
-		}
-/* 		if(unsavedEditModal._isShown){
-			unsavedEditModal.hide();
-		}  */
-		showConfirmModal("정말 저장하시겠습니까?",sendProfileUpload);
-	});
 	
 	function sendProfileUpload(){
 		const file = profileUploadInput.files[0];
@@ -1179,7 +1143,7 @@ function sendUpdateEmployee() {
 				showAlert('프로필이 성공적으로 변경되었습니다', () => {
 					isProfileEdited = false;
 					profileUploadModal.hide();
-					profileImage.src = previewImageElement.src;
+					profileImageElement.src = previewImageElement.src;
 				});
 			}else{
 				showAlert('업로드 실패:'+data.res_msg);

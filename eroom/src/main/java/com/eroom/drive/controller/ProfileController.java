@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.drive.dto.DriveDto;
@@ -25,11 +26,22 @@ public class ProfileController {
 	@PostMapping("/mypage/upload/profile")
 	@ResponseBody
 	public Map<String,String> uploadProfileImage(DriveDto driveDto,
-												@AuthenticationPrincipal EmployeeDetails user){
+								@RequestParam(value = "resetDefault", required = false) Boolean resetDefault,
+								@AuthenticationPrincipal EmployeeDetails user){
 		Map<String,String> resultMap = new HashMap<>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "업로드 실패");
 		
+		Long employeeNo = user.getEmployee().getEmployeeNo();
+		
+		if(Boolean.TRUE.equals(resetDefault)) {
+			// 기본 이미지로 초기화
+			profileService.resetProfileImage(employeeNo);
+			resultMap.put("res_code", "200");
+			resultMap.put("res_msg", "기본 이미지로 변경됨");
+			return resultMap;
+		}
+		// 새 이미지 업로드
 		int result = profileService.uploadProfileImage(driveDto,user.getEmployee().getEmployeeNo());
 		
 		if(result > 0) {

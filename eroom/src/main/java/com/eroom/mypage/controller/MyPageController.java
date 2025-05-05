@@ -24,6 +24,9 @@ import com.eroom.attendance.service.AttendanceService;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.DirectoryService;
+import com.eroom.drive.entity.Drive;
+import com.eroom.drive.repository.DriveRepository;
+import com.eroom.drive.service.ProfileService;
 import com.eroom.employee.dto.EmployeeUpdateDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
@@ -41,6 +44,9 @@ public class MyPageController {
 	private final DirectoryService employeeDirectoryService;
 	private final AttendanceService attendanceService;
 	private final EmployeeService employeeService;
+	private final DriveRepository driveRepository;
+	private final ProfileService profileService;
+	
 	// 마이페이지
 	@GetMapping("/list")
 	public String myPageView(@RequestParam(name= "month",required = false) String month,Model model, Authentication authentication) {
@@ -74,7 +80,6 @@ public class MyPageController {
         	model.addAttribute("directory", directoryDto);
         }
         
-        
         // 연차 정보 조회
         AnnualLeave annualLeave = attendanceService.selectAnnualLeaveByEmployeeNo(employeeNo);
         AnnualLeaveDto annualLeaveDto;
@@ -87,6 +92,15 @@ public class MyPageController {
 			annualLeaveDto.setAnnual_leave_remain(0.0);
 		}
         model.addAttribute("annualLeave",annualLeaveDto);
+        
+        // 프로필 이미지 조회
+        Drive latestProfile = driveRepository.findTop1ByUploader_EmployeeNoAndSeparatorCodeAndVisibleYnOrderByDriveRegDateDesc(
+        		employeeNo, "FL008", "Y");
+
+        String profileImgUrl = (latestProfile != null) ?
+        	"/upload/" + latestProfile.getDrivePath() :
+        	"/assets/img/team/avatar.webp"; // 기본 프로필 이미지
+        model.addAttribute("profileImage",profileImgUrl);
         
 		// 근태 기록이 있는 월 목록 조회
 		List<String> monthList = attendanceService.selectAttendanceMonthList(employeeNo);
