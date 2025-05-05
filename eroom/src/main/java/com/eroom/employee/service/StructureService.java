@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eroom.directory.dto.AddDepartmentAndTeamDto;
+import com.eroom.directory.dto.DepartmentSortDto;
+import com.eroom.directory.dto.TeamSortDto;
+import com.eroom.directory.dto.UpdateSortOrderDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Separator;
 import com.eroom.employee.entity.Structure;
@@ -192,6 +195,42 @@ public class StructureService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return result;
+	}
+	
+	// sortable js를 사용한 순서 변경
+	@Transactional(rollbackFor = Exception.class)
+	public int updateSortOrderMethod(UpdateSortOrderDto dto, Employee employee) {
+		int result = 0;
+		
+		try {
+			List<DepartmentSortDto> sortData = dto.getSortData();
+			for(int i = 0; i < sortData.size(); i++) {
+				// 부서 데이터 가져오기
+				DepartmentSortDto deptSortDto = sortData.get(i);
+				Structure deptEntity = structureRepository.findBySeparatorCode(deptSortDto.getDepartmentSeparatorCode());
+				// 부서 정보 업데이트
+				deptEntity.setSortOrder(deptSortDto.getDepartmentSortOrder());
+				deptEntity.setEditor(employee.getEmployeeId());
+				structureRepository.save(deptEntity);
+				List<TeamSortDto> teamDto = deptSortDto.getTeams();
+				for(int j = 0; j < teamDto.size(); j++) {
+					// 팀 데이터 가져오기
+					TeamSortDto teamSortDto = teamDto.get(j);
+					Structure teamEntity = structureRepository.findBySeparatorCode(teamSortDto.getTeamSeparatorCode());
+					// 팀 정보 업데이트
+					teamEntity.setSortOrder(teamSortDto.getTeamSortOrder());
+					teamEntity.setParentCode(teamSortDto.getNewDepartmentSeparatorCode());
+					teamEntity.setEditor(employee.getEmployeeId());
+					structureRepository.save(teamEntity);
+				}
+			}
+			
+			result = 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		return result;
 	}
 	
