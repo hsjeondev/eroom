@@ -13,7 +13,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		</div>
 			<div class="pb-8">
 				<!-- &quot;page&quot;: 여기 숫자 바꾸면 한 페이지 컨텐츠 수 조절 가능 -->
-				<div id="reports" data-list="{&quot;valueNames&quot;:[&quot;title&quot;,&quot;reports&quot;,&quot;text1&quot;,&quot;text2&quot;,&quot;text3&quot;,&quot;state&quot;,&quot;date&quot;],&quot;page&quot;:6,&quot;pagination&quot;:true}">
+				<div id="reports" data-list='{
+										       "valueNames": ["writer", "text1", "text2", "text3", "title", "state", "date", "reports"],
+										       "page": 10,
+										       "pagination": true
+										     }'>
 					<div class="row g-3 justify-content-between mb-2">
 						<div class="col-12">
 							<div class="d-md-flex justify-content-between">
@@ -104,118 +108,35 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					</div><!-- row g-3 justify-content-between mb-2 끝 -->
 					
 					
-					<!-- <div th:each="t : ${test}" th:text="${t.approvalTitle}"></div>
-					<div th:each="t : ${test}" th:text="${t.approvalNo}"></div> -->
-					<div class="row g-3 list" id="reportsList">
-						
-						<!-- 카드1 thymeleaf 사용중 -->
-						<div class="col-12 col-xl-6" th:each="list, listStatus : ${resultList}">
-							<div class="card h-100">
-								<div class="card-body">
-									<!-- 결재문서 이름/ 진행상태 / 작성자 이름 칸 -->
-									<div class="border-bottom border-translucent">
-										<div class="d-flex align-items-start mb-1">
-											<div class="d-sm-flex align-items-center ps-2"><a class="fw-bold fs-7 lh-sm title line-clamp-1 me-sm-4" th:text="${list.approval_title}" th:href="@{/approval/{no}/detail(no=${list.approval_no})}">결재 제목</a>
-												<div class="d-flex align-items-center">
-												
-													<!-- 빨간색 -->
-													<span th:if="${list.approval_status == 'D'}">
-														<svg class="svg-inline--fa fa-circle me-1 text-danger" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
-															<g transform="translate(256 256)">
-																<g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
-																	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
-																</g>
-															</g>
-														</svg><span class="fw-bold fs-9 text-body lh-2">반려</span>
-													</span>
-													
-													<!-- 초록색 -->
-													<span th:if="${list.approval_status == 'A'}">
-														<svg class="svg-inline--fa fa-circle me-1 text-success" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
-														  <g transform="translate(256 256)">
-															  <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
-															  	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
-															  </g>
-														  </g>
-													  	</svg><span class="fw-bold fs-9 text-body lh-2">승인</span>
-													</span>
-													
-													<!-- 파란색 -->
-													<span th:if="${list.approval_status == 'S'}">
-														<svg class="svg-inline--fa fa-circle me-1 text-info" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
-												            <g transform="translate(256 256)">
-													            <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
-													            	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
-													            </g>
-												            </g>
-											            </svg><span class="fw-bold fs-9 text-body lh-2">진행</span>
-										            </span>
-													
-													<!-- 주황색 -->
-													<span th:if="${list.approval_status == 'F'}">
-														<svg class="svg-inline--fa fa-circle me-1 text-warning" data-fa-transform="shrink-6 up-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.4375em;">
-												            <g transform="translate(256 256)">
-													            <g transform="translate(0, -32)  scale(0.625, 0.625)  rotate(0 0 0)">
-													            	<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" transform="translate(-256 -256)"></path>
-													            </g>
-												            </g>
-											            </svg>
-														<span class="fw-bold fs-9 text-body lh-2">대기</span>
-													</span>
-												</div>
-											</div>
-										</div>
-										<!-- 작성자 -->
-											<br>
-										<p class="fs-9 fw-semibold text-body ms-4 text mb-4 ps-2" th:text="|작성자 : ${list.employee.employeeName}|">
-											작성자
-										</p>
-									</div>
-									<!-- 결재자, 참조자, 합의자 + 날짜 칸 -->
-									<div class="row g-1 g-sm-3 mt-2 lh-1">
-										<div class="col-12 col-sm-auto flex-1 text-truncate">
-											<a class="fw-semibold fs-9">
-												결재자 : 
-											</a>
-											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step >= 1}"  th:text="|${member.employee.employeeName} |">결재자목록</span>
-											<br>
-											<a class="fw-semibold fs-9">
-												합의자 : 
-											</a>
-											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == 0}"  th:text="|${member.employee.employeeName} |">합의자목록</span>
-											<br>
-											<a class="fw-semibold fs-9">
-												참조자 : 
-											</a>
-											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == -1}"  th:text="|${member.employee.employeeName} |">참조자목록</span>
-										</div>
 										
-										<!-- 결재양식  -->
-										<div class="col-12 col-sm-auto">
-											<br>
-											<br>
-										  <div class="d-flex align-items-center">
-										  	<!-- 문서 아이콘 -> fs-20 숫자로 사이즈 조절 -->
-										    <span class="uil uil-clipboard-alt fs-20 text-body-secondary me-2" ></span>
-										    <p class="mb-0 fs-9 fw-semibold text-body-tertiary reports" th:text="${list.approval_format.approvalFormatTitle}">[양식명]</p>
-										  </div>
-										</div>
-										<!-- 날짜 -->
-										<div class="col-12 col-sm-auto">
-											<br>
-											<br>
-											<div class="d-flex align-items-center"><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock me-2" style="stroke-width:2;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-												<p class="mb-0 fs-9 fw-semibold text-body-tertiary date" th:text="${list.reg_date}">2025.04.10</p>
-											</div>
-										</div>
-									</div>
-								</div> <!-- card-body -->
-							</div><!-- card h-100 끝 -->
-						</div><!-- col-12 col-xl-6 -->
-						<!-- 카드1 끝 -->
-					
-					
-					
+					<!-- 카드 전체 -->
+					<div class="row g-3 list" id="reportsList">
+					  <!-- 비어있을 경우에도 .list-item 하나는 있어야 함 -->
+					  <div th:if="${#lists.isEmpty(resultList)}" class="list-item">
+					  
+					  
+					  <div class="text-white p-3">
+				          <div class="attendance-card mx-auto">
+				            <div class="card shadow-sm border-0">
+				              <div class="card-body text-center p-4">
+				
+				                  <div class="current-time fw-semibold mb-2">결재 정보가 없습니다.</div>
+				
+				              </div>
+				            </div>
+				          </div>
+				        </div>
+					    <span class="writer"></span>
+					    <span class="text1"></span>
+					    <span class="text2"></span>
+					    <span class="text3"></span>
+					    <a class="title"></a>
+					    <span class="state"></span>
+					    <span class="date"></span>
+					    <span class="reports"></span>
+					  </div>
+						<!-- 카드 fragment 반복 -->
+						<div class="bg-light rounded p-4 mt-4" th:replace="~{approval/cardFragment :: cardFragment}"></div>
 					</div><!-- row g-3 list -->
 				
 				<!-- 페이징 -->
@@ -284,13 +205,13 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		
 		
 		    <!-- 시그니처 모달 작동 스크립트 -->
+		    <!-- 시그니처 모달 작동 스크립트 -->
     <script th:inline="javascript">
     window.addEventListener('load', function () {
       let signaturePad;
       const canvas = document.getElementById('signatureCanvas');
       const clearBtn = document.getElementById('clearSignature');
       const saveBtn = document.getElementById('saveSignature');
-      const updateBtn = document.getElementById('updateSignature');
       const deleteBtn = document.getElementById('deleteSignature');
 
       function initSignaturePad() {
@@ -323,82 +244,58 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
           signaturePad.clear();
         }
       });
-
-      saveBtn.addEventListener('click', function () {
-        if (signaturePad && !signaturePad.isEmpty()) {
-          const saveDataURL = signaturePad.toDataURL();
-          console.log('서명 데이터 URL:', saveDataURL);
-          
-          fetch('/approval/signature/create', {
-        	  method : 'POST',
-        	  headers : {
-      	        'Content-Type': 'application/json',
-    	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
-    	        'header': document.querySelector('meta[name="_csrf_header"]').content
-        	  },
-        	  body : JSON.stringify({
-        		  signature_data_url : saveDataURL
-        	  })
-          })
-          .then(response => response.json())
-          .then(data => {
-        		  alert(data.res_msg);
-          })
-          
-          const modalInstance = bootstrap.Modal.getInstance(signatureModal);
-          modalInstance.hide();
-        } else {
-       		// 서명 미입력시.
-          alert('서명이 없습니다!');
-        }
-      });
+		
+      if(saveBtn){
+	      saveBtn.addEventListener('click', function () {
+	        if (signaturePad && !signaturePad.isEmpty()) {
+	          const saveDataURL = signaturePad.toDataURL();
+	          console.log('서명 데이터 URL:', saveDataURL);
+	          
+	          fetch('/approval/signature/create', {
+	        	  method : 'POST',
+	        	  headers : {
+	      	        'Content-Type': 'application/json',
+	    	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+	    	        'header': document.querySelector('meta[name="_csrf_header"]').content
+	        	  },
+	        	  body : JSON.stringify({
+	        		  signature_data_url : saveDataURL
+	        	  })
+	          })
+	          .then(response => response.json())
+	          .then(data => {
+	        		  alert(data.res_msg);
+	          })
+	          
+	          const modalInstance = bootstrap.Modal.getInstance(signatureModal);
+	          modalInstance.hide();
+	        } else {
+	       		// 서명 미입력시.
+	          alert('서명이 없습니다!');
+	        }
+	      });
+      }
       
-      updateBtn.addEventListener('click', function () {
-        if (signaturePad && !signaturePad.isEmpty()) {
-          const updateDataURL = signaturePad.toDataURL();
-          console.log('서명 데이터 URL:', updateDataURL);
-          
-          fetch('/approval/signature/update', {
-        	  method : 'PUT',
-        	  headers : {
-      	        'Content-Type': 'application/json',
-    	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
-    	        'header': document.querySelector('meta[name="_csrf_header"]').content
-        	  },
-        	  body : JSON.stringify({
-        		  signature_data_url : updateDataURL
-        	  })
-          })
-          .then(response => response.json())
-          .then(data => {
-        		  alert(data.res_msg);
-          })
-          
-          const modalInstance = bootstrap.Modal.getInstance(signatureModal);
-          modalInstance.hide();
-        } else {
-       		// 서명 미입력시.
-          alert('서명이 없습니다!');
-        }
-      });
-      
-      deleteBtn.addEventListener('click', function(){
-    	  fetch('/approval/signature/delete', {
-    		  method : 'PUT',
-        	  headers : {
-      	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
-      	        'header': document.querySelector('meta[name="_csrf_header"]').content
-          	  }
-    	  })
-    	  .then(response => response.json())
-    	  .then(data => {
-    		  alert(data.res_msg);
-    	  })
-    	  .catch(error => {
-    	        console.error('삭제 중 오류 발생:', error);
-    	        alert('삭제 실패');
-    	  });
-      });
+      if(deleteBtn){
+	      deleteBtn.addEventListener('click', function(){
+	    	  fetch('/approval/signature/delete', {
+	    		  method : 'PUT',
+	        	  headers : {
+	      	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+	      	        'header': document.querySelector('meta[name="_csrf_header"]').content
+	          	  }
+	    	  })
+	    	  .then(response => response.json())
+	    	  .then(data => {
+	    		  alert(data.res_msg);
+	    	        location.reload();
+	    	  })
+	    	  .catch(error => {
+	    	        console.error('삭제 중 오류 발생:', error);
+	    	        alert('삭제 실패');
+	    	  });
+	      });
+      }
       
       
       
@@ -407,7 +304,6 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
     
     </script>
     
-        </script>
     <!-- 검색 기능 함수 따로 빼기. 원래 태그 수정 필요없음 -->
 	<script>
 	  function bindSearch() {
