@@ -22,13 +22,14 @@ import com.eroom.drive.service.DriveService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
-import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.project.dto.GithubPullRequestDto;
 import com.eroom.project.dto.ProjectDto;
+import com.eroom.project.dto.ProjectMeetingMinuteDto;
 import com.eroom.project.dto.ProjectMemberDto;
 import com.eroom.project.dto.ProjectTodoElementDto;
 import com.eroom.project.dto.ProjectTodoListDto;
+import com.eroom.project.service.ProjectMeetingMinuteService;
 import com.eroom.project.service.ProjectService;
 import com.eroom.project.service.ProjectTodoService;
 import com.eroom.security.EmployeeDetails;
@@ -44,6 +45,7 @@ public class ProjectController {
 	private final ProjectService projectService;
 	private final ProjectTodoService projectTodoService;
 	private final DriveService driveService;
+	private final ProjectMeetingMinuteService projectMeetingMinuteService;
 	// 파일 저장 경로 
 			 @Value("${ffupload.location}")
 			 private String fileDir;
@@ -193,11 +195,13 @@ public class ProjectController {
 	
 	@GetMapping("/detail/{project_no}/minutes")
 	public String detailProjectMinutesView(@PathVariable("project_no") Long project_no, Model model) {
-		
-		ProjectDto project = projectService.findByProjectNo(project_no);
-		model.addAttribute("project", project);
-		
-		return "project/projectDetailMinutesTab";
+	    ProjectDto project = projectService.findByProjectNo(project_no);
+	    List<ProjectMeetingMinuteDto> minutes = projectMeetingMinuteService.getMeetingMinutesByProject(project_no);
+
+	    model.addAttribute("project", project);
+	    model.addAttribute("minutes", minutes);
+
+	    return "project/projectDetailMinutesTab";
 	}
 	
 	@GetMapping("/create")
