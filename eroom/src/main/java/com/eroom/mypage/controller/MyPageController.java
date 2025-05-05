@@ -154,21 +154,31 @@ public class MyPageController {
 	@GetMapping("/getEmployeeDetail")
 	@ResponseBody
 	public Map<String, Object> getEmployeeDetail(@RequestParam("employeeNo") Long employeeNo) {
-	    Map<String, Object> result = new HashMap<>();
+		Map<String, Object> result = new HashMap<>();
 	    Employee employee = employeeService.findEmployeeByEmployeeNo(employeeNo);
-	    Directory directory = employeeDirectoryService.selectDirectoryByEmployeeNo(employeeNo);
 
-	    if (employee == null || directory == null) {
+	    if (employee == null) {
 	        result.put("res_code", 404);
-	        result.put("res_msg", "정보를 찾을 수 없습니다.");
+	        result.put("res_msg", "회원 정보를 찾을 수 없습니다.");
 	        return result;
 	    }
 
+	    // 기본 정보 설정
 	    result.put("res_code", 200);
 	    result.put("employee_name", employee.getEmployeeName());
-	    result.put("directory_phone", directory.getDirectoryPhone());
-	    result.put("directory_zipcode", directory.getDirectoryZipcode());
-	    result.put("directory_address", directory.getDirectoryAddress());
+	    result.put("employee_position", employee.getEmployeePosition());
+	    result.put("employee_birth", employee.getEmployeeBirth() != null ? employee.getEmployeeBirth().toString() : "");
+	    result.put("employee_hire_date", employee.getEmployeeHireDate() != null ? employee.getEmployeeHireDate().toLocalDate().toString() : "");
+	    result.put("employee_end_date", employee.getEmployeeEndDate() != null ? employee.getEmployeeEndDate().toLocalDate().toString() : "");
+
+	    // Directory 정보는 있을 때만 추가
+	    Directory directory = employeeDirectoryService.selectDirectoryByEmployeeNo(employeeNo);
+	    if (directory != null) {
+	        result.put("directory_phone", directory.getDirectoryPhone());
+	        result.put("directory_zipcode", directory.getDirectoryZipcode());
+	        result.put("directory_address", directory.getDirectoryAddress());
+	    }
+
 	    return result;
 	}
 	

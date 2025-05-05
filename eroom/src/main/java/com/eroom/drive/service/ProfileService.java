@@ -125,6 +125,10 @@ public class ProfileService {
 	 }
 	 
 	 public String getProfileImageUrl(Long employeeNo) {
+		 if(employeeNo == null) {
+			 return "/assets/img/team/avatar.webp";
+		 }
+		 
 		 Drive profile = driveRepository.findTop1ByUploader_EmployeeNoAndSeparatorCodeAndVisibleYnOrderByDriveRegDateDesc(employeeNo, "FL008", "Y");
 		 // 등록된 프로필 이미지가 있으면 해당 경로 반환, 없으면 기본 이미지 반환
 		 return(profile != null) ? "/upload/"+profile.getDrivePath() : "/assets/img/team/avatar.webp";

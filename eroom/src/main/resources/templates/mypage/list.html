@@ -196,11 +196,6 @@
 					<h5 class="text-body-secondary">사번</h5>
 					<p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
 
-					<!-- <h5 class="text-body-secondary">직급</h5>
-					<p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p> -->
-					
-					<!-- <h5 class="text-body-secondary">부서</h5>
-					<p class="text-body-secondary" th:text="${departmentName != null ? departmentName : '-'}">부서</p> -->
 					<h5 class="text-body-secondary">소속</h5>
 					<p class="text-body-secondary" 
 					   th:text="${(departmentName != null ? departmentName : '-') + ' / ' + (teamName != null ? teamName : '-')}">
@@ -212,7 +207,7 @@
 					  <a href="mailto:shatinon@jeemail.com" id="emailValue" th:text="${directory != null and directory.directory_email != null ? directory.directory_email : '-'}">Email</a>
 					</div>
 					
-					<h5 class="text-body-secondary">Phone</h5>
+					<h5 class="text-body-secondary">연락처</h5>
 					<p class="text-body-secondary" id="phoneValue" th:text="${directory != null and directory.directory_phone != null ? directory.directory_phone : '-'}">01000000000</p>
 					
 					<h5 class="text-body-secondary">주소</h5>
@@ -222,8 +217,6 @@
 					             : '-'}">
 					  (00000) 주소정보
 					</p>
-					<!-- <h5 class="text-body-secondary">주소</h5>
-					<p class="text-body-secondary" id="addressValue">서울특별시 금천구 가산디지털2로 95</p> -->
 				</div><!-- card-body -->
 			</div><!-- card h-100 -->	      
 	      
@@ -1156,6 +1149,13 @@ function sendUpdateEmployee() {
 					isProfileEdited = false;
 					profileUploadModal.hide();
 					profileImageElement.src = previewImageElement.src;
+					
+					// 헤더 이미지 즉시 반영
+					const headerImg = document.getElementById('headerProfileImg');
+					if(headerImg) headerImg.src = previewImageElement.src;
+					
+					const dropdownImg = document.getElementById('dropdownProfileImg');
+					if(dropdownImg) dropdownImg.src = previewImageElement.src;
 				});
 			}else{
 				showAlert('업로드 실패:'+data.res_msg);

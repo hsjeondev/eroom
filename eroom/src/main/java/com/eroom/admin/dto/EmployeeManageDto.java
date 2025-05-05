@@ -47,6 +47,8 @@ public class EmployeeManageDto {
     private String formatted_hire_date; // 입사일
     private String formatted_end_date; // 퇴사일
     
+    private String profile_image_url; // 프로필 사진 정보
+    
     
     // toEntity 메소드 (DTO 안에 있는 정보를 각 Entity로 변환)
     // 수정, 저장시 DTO->Entity 변환에 사용
@@ -82,7 +84,7 @@ public class EmployeeManageDto {
     // 여러 Entity를 받아 통합DTO로 변환
     public static EmployeeManageDto toDto(EmployeeDto employeeDto, DirectoryDto directoryDto, StructureDto structureDto,
     		List<AttendanceDto> attendanceList, AnnualLeaveDto annualLeaveDto,
-    		String departmentName, String teamName, String formattedHireDate, String formattedEndDate) {
+    		String departmentName, String teamName, String formattedHireDate, String formattedEndDate,String profileImageUrl) {
     		return EmployeeManageDto.builder() 
 					.employee(employeeDto)
 					.directory(directoryDto)
@@ -95,6 +97,7 @@ public class EmployeeManageDto {
 							employeeDto.getEmployee_hire_date().toLocalDate().toString() : "-")
 					.formatted_end_date(employeeDto.getEmployee_end_date() != null ? 
 							employeeDto.getEmployee_end_date().toLocalDate().toString() : "-")
+					.profile_image_url(profileImageUrl)
 					.build();
     }
     
