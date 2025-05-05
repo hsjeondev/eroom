@@ -907,7 +907,9 @@ fetch(`/admin/checkNameDuplicate?name=${encodeURIComponent(name)}`)
 	
 	// 모달 닫기 방지 (회원 수정 모달)
 	editModalElement.addEventListener('hide.bs.modal', function (e) {
-		const isConfirmVisible = document.getElementById('confirmSaveModal').classList.contains('show');
+		// const isConfirmVisible = document.getElementById('confirmSaveModal').classList.contains('show');
+		const confirmSaveModalElement = document.getElementById('confirmSaveModal');
+		const isConfirmVisible = confirmSaveModalElement && confirmSaveModalElement.classList.contains('show');
 		if (isEditFormEdited && !isConfirmVisible) {
 			e.preventDefault();
 			unsavedEditModal.show();
@@ -1063,7 +1065,7 @@ function sendUpdateEmployee() {
 	document.getElementById('setDefaultProfileBtn').addEventListener('click',function(){
 		const defaultSrc = '/assets/img/team/avatar.webp';
 		previewImageElement.src = defaultSrc;
-		isProfileEdited = (originalProfileSrc !== defaultSrc);
+		isProfileEdited = true;
 	});
 	
 	// 파일 업로드 시 이미지 미리보기
@@ -1072,7 +1074,7 @@ function sendUpdateEmployee() {
 		if(file){
 			const newPreview = URL.createObjectURL(file);
 			previewImageElement.src = newPreview;
-			isProfileEdited = (originalProfileSrc !== newPreview);
+			isProfileEdited = true;
 		}
 	});
 	
@@ -1142,7 +1144,7 @@ function sendUpdateEmployee() {
 			return;
 		}
 		
-		const file = profileUpoadInput.files[0];
+		const file = profileUploadInput.files[0];
 		if(!file){
 			console.log("선택된 파일 없음(기본 이미지로 전환 여부 체크)");
 		}
