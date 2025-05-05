@@ -43,4 +43,9 @@ public class ProjectMeetingMinute {
     @CreationTimestamp
     @Column(name = "meeting_date")
     private LocalDateTime meetingDate;
+    
+    public void updateTitleAndContent(String title, String content) {
+        this.meetingTitle = title;
+        this.meetingContent = content;
+    }
 }

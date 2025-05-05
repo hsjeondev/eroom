@@ -51,7 +51,7 @@
 						<!-- 개별 회의록 -->
 						<tbody class="list" id="members-table-body">
 							<tr th:each="minute : ${minutes}" class="hover-actions-trigger btn-reveal-trigger position-static">
-								<td class="meeting_title align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000 text-decoration-none" href="#">
+								<td class="meeting_title align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000 text-decoration-none" th:href="@{/project/minute/detail(minuteNo=${minute.meetingMinuteNo}, projectNo=${project.project_no})}">
 										<h5 class="mb-0 ms-3 fw-semibold" th:text="${minute.meetingTitle}">회의 제목</h5>
 								</a></td>
 								<td class="participants align-middle white-space-nowrap" th:text="${minute.participants}">0</td>

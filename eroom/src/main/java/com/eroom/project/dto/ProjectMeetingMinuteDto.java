@@ -33,7 +33,6 @@ public class ProjectMeetingMinuteDto {
                 .meetingContent(entity.getMeetingContent())
                 .writer(entity.getMeetingMinuteWriter())
                 .meetingDate(entity.getMeetingDate())
-                .participants(0)
                 .build();
     }
 
