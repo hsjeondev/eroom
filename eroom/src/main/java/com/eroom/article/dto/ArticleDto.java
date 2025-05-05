@@ -1,4 +1,4 @@
-package com.eroom.board.dto;
+package com.eroom.article.dto;
 
 import java.time.LocalDateTime;
 
