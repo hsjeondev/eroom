@@ -1,10 +1,13 @@
 package com.eroom.employee.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eroom.directory.dto.AddDepartmentAndTeamDto;
 import com.eroom.employee.entity.Employee;
@@ -72,6 +75,7 @@ public class StructureService {
 	}
 	
 	// admin의 부서, 팀 추가
+	@Transactional(rollbackFor = Exception.class)
 	public int addDepartmentOrTeam(AddDepartmentAndTeamDto dto, Employee employee) {
 		int result = 0;
 		try {
@@ -80,27 +84,40 @@ public class StructureService {
 			List<Structure> structureDB = null;
 			boolean exists = false;
 			String separatorCode = "";
+			
 			if(dto.getParentCode() == null) {
 				// 부서 추가
-				structureDB = structureRepository.findByVisibleYnAndParentCodeIsNullOrderBySortOrderAsc("Y");
+				structureDB = structureRepository.findByParentCodeIsNullOrderBySortOrderAsc();
+				List<Structure> deptStructureDB = structureRepository.findOnlyDepts();
 				Long sortOrder = null;
 				if (structureDB == null || structureDB.isEmpty()) {
 				    sortOrder = 1L;
-				    separatorCode = "D001";
 				} else {
 				    sortOrder = structureDB.get(structureDB.size() - 1).getSortOrder() + 1;
-				    String tempSepCode = structureDB.get(structureDB.size() - 1).getSeparatorCode();
-				    StringBuilder temp = new StringBuilder();
-				    for(int i = 0; i < tempSepCode.length(); i++) {
-				    	if('0' <= tempSepCode.charAt(i) && tempSepCode.charAt(i) <= '9') {
-				    		temp.append(tempSepCode.charAt(i));
-				    	}
-				    }
-				    Long tempSepCodeLong = Long.parseLong(temp.toString()) + 1;
-				    String padded = StringUtils.leftPad(String.valueOf(tempSepCodeLong), 3, '0');
-				    separatorCode = "D" + padded;
 				    
 				}
+				if(deptStructureDB == null || deptStructureDB.isEmpty()) {
+					separatorCode = "D001";
+				} else {
+					StringBuilder temp = new StringBuilder();
+					List<Long> deptPad = new ArrayList<Long>();
+					for(int i = 0; i < deptStructureDB.size(); i++) {
+						for(int j = 0; j < deptStructureDB.get(i).getSeparatorCode().length(); j ++) {
+							if('0' <=  deptStructureDB.get(i).getSeparatorCode().charAt(j) &&  deptStructureDB.get(i).getSeparatorCode().charAt(j) <= '9') {
+								temp.append(deptStructureDB.get(i).getSeparatorCode().charAt(j));
+							}
+						}
+						deptPad.add(Long.parseLong(temp.toString()));
+						temp.setLength(0);
+					}
+					Collections.sort(deptPad, Comparator.reverseOrder());
+					Long deptSepCodeLong = deptPad.get(0) + 1;
+					String padded = StringUtils.leftPad(String.valueOf(deptSepCodeLong), 3, '0');
+					
+					separatorCode = "D" + padded;
+				}
+				
+				
 				separator = Separator.builder()
 							.separatorCode(separatorCode)
 							.separatorName(dto.getCodeName())
@@ -115,16 +132,49 @@ public class StructureService {
 						.separatorCode(separatorCode)
 						.build();
 				exists = structureRepository.existsByCodeNameAndVisibleYn(dto.getCodeName(), "Y");
+				
+				
 			} else {
 				// 팀 추가
-				structureDB = structureRepository.findByParentCodeAndVisibleYnOrderBySortOrderAsc(dto.getParentCode(), "Y");
+				structureDB = structureRepository.findByParentCodeOrderBySortOrderAsc(dto.getParentCode());
+				List<Structure> teamStructureDB = structureRepository.findOnlyTeams();
 				Long sortOrder = null;
 				if (structureDB == null || structureDB.isEmpty()) {
 				    sortOrder = 1L;
 				} else {
-				    sortOrder = structureDB.get(structureDB.size() - 1).getSortOrder() + 1;
+				    sortOrder = teamStructureDB.get(teamStructureDB.size() - 1).getSortOrder() + 1;
 				}
+				
+				if(teamStructureDB == null || teamStructureDB.isEmpty()) {
+					separatorCode = "T001";
+				} else {
+					StringBuilder temp = new StringBuilder();
+					List<Long> teamPad = new ArrayList<Long>();
+					for(int i = 0; i < teamStructureDB.size(); i++) {
+						for(int j = 0; j < teamStructureDB.get(i).getSeparatorCode().length(); j ++) {
+							if('0' <=  teamStructureDB.get(i).getSeparatorCode().charAt(j) &&  teamStructureDB.get(i).getSeparatorCode().charAt(j) <= '9') {
+								temp.append(teamStructureDB.get(i).getSeparatorCode().charAt(j));
+							}
+						}
+						teamPad.add(Long.parseLong(temp.toString()));
+						temp.setLength(0);
+					}
+					Collections.sort(teamPad, Comparator.reverseOrder());
+					Long tempSepCodeLong = teamPad.get(0) + 1;
+					String padded = StringUtils.leftPad(String.valueOf(tempSepCodeLong), 3, '0');
+					
+					separatorCode = "T" + padded;
+					
+				}
+				separator = Separator.builder()
+						.separatorCode(separatorCode)
+						.separatorName(dto.getCodeName())
+						.separatorParentCode(dto.getParentCode())
+						.separatorYn("Y")
+						.separatorCreator(employee.getEmployeeId())
+						.build();
 				structure = Structure.builder()
+							.separatorCode(separatorCode)
 							.codeName(dto.getCodeName())
 							.parentCode(dto.getParentCode())
 							.visibleYn("Y")
