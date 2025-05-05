@@ -1,6 +1,7 @@
 package com.eroom.websocket;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,6 +19,8 @@ import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.chat.repository.ChatAlarmRepository;
 import com.eroom.chat.repository.ChatMessageRepository;
 import com.eroom.chat.repository.ChatroomRepository;
+import com.eroom.drive.entity.Drive;
+import com.eroom.drive.repository.DriveRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +35,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final ChatMessageRepository chatMessageRepository;
     private final EmployeeRepository employeeRepository;
     private final ChatAlarmRepository chatAlarmRepository;
-
+    private final DriveRepository driveRepository;
+    
     private static final Map<Long, WebSocketSession> userSessions = new ConcurrentHashMap<>();
 
     @Override
@@ -85,8 +89,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 .build();
         chatAlarmRepository.save(alarm);
     }
-
-    private void broadcastMessage(ChatMessageDto dto, ChatMessage savedMessage) throws Exception {
+    public void broadcastMessage(ChatMessageDto dto, ChatMessage savedMessage) throws Exception {
         Employee sender = employeeRepository.findById(dto.getSenderMember())
                 .orElseThrow(() -> new IllegalArgumentException("보낸 사람 없음"));
 
@@ -96,6 +99,19 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         sendData.put("senderName", sender.getEmployeeName());
         sendData.put("chatroomNo", dto.getChatroomNo());
         sendData.put("receiverMember", dto.getReceiverMember());
+
+        // [파일] 메시지일 경우 drive 정보 추가
+        if (dto.getChatMessageContent().startsWith("[파일]")) {
+            String fileName = dto.getChatMessageContent().substring(5);
+            Long chatroomNo = dto.getChatroomNo();
+            List<Drive> drives = driveRepository.findByDriveOriNameAndParam1(fileName, chatroomNo);
+
+            if (!drives.isEmpty()) {
+                Drive drive = drives.get(0); // 첫 번째 드라이브 선택 (또는 여러 드라이브 처리)
+                sendData.put("drivePath", "/files/drive/chat/" + drive.getDrivePath().replaceFirst("^drive/chat/", ""));
+                sendData.put("driveOriName", drive.getDriveOriName());
+            }
+        }
 
         String sendPayload = new ObjectMapper().writeValueAsString(sendData);
 
@@ -110,6 +126,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             }
         }
     }
+
+
 
     private void sendToUser(Long userNo, String message) throws Exception {
         WebSocketSession session = userSessions.get(userNo);

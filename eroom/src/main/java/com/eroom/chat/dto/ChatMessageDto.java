@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.eroom.chat.entity.ChatMessage;
 import com.eroom.chat.entity.Chatroom;
+import com.eroom.drive.entity.Drive;
 import com.eroom.employee.entity.Employee;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +28,9 @@ public class ChatMessageDto {
     private String chatMessageContent; // 메시지 내용
     private LocalDateTime messageRegDate; // 보낸 시간
     private String messageIsDeletedYn; // 삭제 여부 (Y/N);
-    
+    private Long driveAttachNo;     // 드라이브 번호
+    private String drivePath; 
+    private String driveOriName;
     // DTO -> Entity
 	public ChatMessage toEntity() {
 		return ChatMessage.builder()
@@ -36,7 +39,10 @@ public class ChatMessageDto {
 				.senderMember(Employee.builder().employeeNo(senderMember).build())
 				.chatMessageContent(chatMessageContent)
 				.messageRegDate(messageRegDate)
-				.messageIsDeletedYn(messageIsDeletedYn).build();
+				.messageIsDeletedYn(messageIsDeletedYn)
+				.drive(driveAttachNo != null ? Drive.builder().driveAttachNo(driveAttachNo).build() : null)
+				.build();
+			
 	}
     // Entity -> DTO
 	public static ChatMessageDto toDto(ChatMessage entity) {
@@ -45,7 +51,11 @@ public class ChatMessageDto {
 				.senderMember(entity.getSenderMember().getEmployeeNo())
 				.chatMessageContent(entity.getChatMessageContent())
 				.messageRegDate(entity.getMessageRegDate())
-				.messageIsDeletedYn(entity.getMessageIsDeletedYn()).build();
+				.messageIsDeletedYn(entity.getMessageIsDeletedYn())
+				.driveAttachNo(entity.getDrive() != null ? entity.getDrive().getDriveAttachNo() : null)
+		        .drivePath(entity.getDrive() != null ? entity.getDrive().getDrivePath() : null)
+		        .driveOriName(entity.getDrive() != null ? entity.getDrive().getDriveOriName() : null)
+				.build();
 	}
     
     
