@@ -18,7 +18,7 @@
 		</ul>
 
 		<!-- 본문 -->
-		<div id="members" data-list='{"valueNames":["customer","email","mobile_number","city","last_active","joined"],"page":10,"pagination":true}'>
+		<div id="members" data-list='{"valueNames":["customer","email","mobile_number","city","last_active","joined"],"page":15,"pagination":true}'>
 			<div class="row align-items-center justify-content-between g-3 mb-4 mt-2">
 				<div class="col col-auto">
 					<div class="search-box">
@@ -32,13 +32,13 @@
 						<button class="btn btn-link text-body me-4 px-0">
 							<span class="fa-solid fa-file-export fs-9 me-2"></span>문서화
 						</button>
-						<button class="btn btn-primary">회의록 작성</button>
+						<button type="button" class="btn btn-primary" th:onclick="|location.href='/project/minute/create-page?projectNo=${project.project_no}'|">회의록 작성</button>
 					</div>
 				</div>
 			</div>
 			<div class="mx-n4 mx-lg-n6 px-4 px-lg-6 mb-9 bg-body-emphasis border-y mt-2 position-relative top-1">
 				<div class="table-responsive scrollbar ms-n1 ps-1">
-					<table class="table table-sm fs-9 mb-0">
+					<table class="table table-sm fs-8 mb-0 align-middle text-nowrap">
 						<thead>
 							<tr>
 								<th class="align-middle" scope="col" data-sort="meeting_title" style="width: 15%; min-width: 200px; padding-left: 1rem;">제목</th>
@@ -47,20 +47,20 @@
 								<th class="align-middle text-end pe-0" scope="col" data-sort="meeting_date" style="width: 19%; min-width: 200px;">회의일</th>
 							</tr>
 						</thead>
-						
+
 						<!-- 개별 회의록 -->
 						<tbody class="list" id="members-table-body">
 							<tr th:each="minute : ${minutes}" class="hover-actions-trigger btn-reveal-trigger position-static">
-								<td class="meeting_title align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#">
-										<h6 class="mb-0 ms-3 fw-semibold" th:text="${minute.meetingTitle}">회의 제목</h6>
+								<td class="meeting_title align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000 text-decoration-none" href="#">
+										<h5 class="mb-0 ms-3 fw-semibold" th:text="${minute.meetingTitle}">회의 제목</h5>
 								</a></td>
 								<td class="participants align-middle white-space-nowrap" th:text="${minute.participants}">0</td>
 								<td class="writer align-middle white-space-nowrap text-body" th:text="${minute.writer}">작성자</td>
 								<td class="meeting_date align-middle white-space-nowrap text-body-tertiary text-end" th:text="${#temporals.format(minute.meetingDate, 'yyyy.MM.dd HH시 mm분')}">회의일</td>
 							</tr>
 						</tbody>
-						
 					</table>
+
 				</div>
 				<div class="row align-items-center justify-content-between py-2 pe-0 fs-9">
 					<div class="col-auto d-flex">

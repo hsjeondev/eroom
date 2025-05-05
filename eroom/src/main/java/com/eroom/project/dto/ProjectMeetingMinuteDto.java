@@ -12,23 +12,40 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ProjectMeetingMinuteDto {
+
     private Long meetingMinuteNo;
+    private Long projectNo;
     private String meetingTitle;
-    private int participants;
+    private String meetingContent;
     private String writer;
     private LocalDateTime meetingDate;
-    
-    public static ProjectMeetingMinuteDto toEntity(ProjectMeetingMinute entity) {
+    private int participants;
+
+    // Entity → DTO
+    public static ProjectMeetingMinuteDto toDto(ProjectMeetingMinute entity) {
         return ProjectMeetingMinuteDto.builder()
                 .meetingMinuteNo(entity.getMeetingMinuteNo())
                 .meetingTitle(entity.getMeetingTitle())
-                .participants(0)
+                .meetingContent(entity.getMeetingContent())
                 .writer(entity.getMeetingMinuteWriter())
                 .meetingDate(entity.getMeetingDate())
+                .participants(0)
+                .build();
+    }
+
+    // DTO → Entity
+    public ProjectMeetingMinute toEntity() {
+        return ProjectMeetingMinute.builder()
+                .meetingMinuteNo(meetingMinuteNo)
+                .projectNo(projectNo)
+                .meetingTitle(meetingTitle)
+                .meetingContent(meetingContent)
+                .meetingMinuteWriter(writer)
+                .meetingDate(meetingDate)
                 .build();
     }
 }
