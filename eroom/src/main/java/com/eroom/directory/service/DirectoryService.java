@@ -2,6 +2,7 @@ package com.eroom.directory.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import com.eroom.directory.repository.DirectoryRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Separator;
 import com.eroom.employee.entity.Structure;
+import com.eroom.employee.repository.SeparatorRepository;
 import com.eroom.employee.repository.StructureRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class DirectoryService {
 
 	private final DirectoryRepository directoryRepository;
+	private final SeparatorRepository separatorRepository;
 
 	// 직원 주소록 리스트 조회
 	public List<Directory> selectDirectoryEmployeeAllBySeparatorCode() {
@@ -38,7 +41,7 @@ public class DirectoryService {
 	}
 	// 협력업체 리스트
 	public List<Directory> selectDirectoryPartner() {
-		List<Directory> list = directoryRepository.findBySeparatorCode("A002");
+		List<Directory> list = directoryRepository.findBySeparatorCodeAndVisibleYn("A002", "Y");
 		return list;
 	}
 	public int createPartner(Map<String, String> formData, Employee creator) {
@@ -65,6 +68,59 @@ public class DirectoryService {
 	    			.build();
 	    	Directory entity = dto.toEntity2();
 	    	directoryRepository.save(entity);
+			result = 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	public int updatePartner(Map<String, String> formData, Employee employee) {
+		int result = 0;
+		try {
+			String editNo = formData.get("editNo");
+			Long editNoLong = Long.parseLong(editNo);
+			String name = formData.get("editName");
+	    	String companyName = formData.get("editCompanyName");
+	    	String email = formData.get("editEmail");
+	    	String phone = formData.get("editPhone");
+	    	String department = formData.get("editDepartment");
+	    	String team = formData.get("editTeam");
+	    	String position = formData.get("editPosition");
+	    	Optional<Directory> entityList = directoryRepository.findById(editNoLong);
+	    	if(entityList.isEmpty()) {
+	    		return result;
+	    	}
+	    	Directory entity = entityList.get();
+	    	
+	    	Separator separator = separatorRepository.getById("A002");
+	    	
+	    	entity.setDirectoryName(name);
+	    	entity.setDirectoryCompanyName(companyName);
+	    	entity.setDirectoryEmail(email);
+	    	entity.setDirectoryPhone(phone);
+	    	entity.setDirectoryDepartment(department);
+	    	entity.setDirectoryTeam(team);
+	    	entity.setDirectoryPosition(position);
+	    	entity.setSeparator(separator);
+	    	entity.setDirectoryCreator(employee.getEmployeeId());
+	    	directoryRepository.save(entity);
+	    	result = 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	public int deletePartner(Map<String, String> data, Employee employee) {
+		int result = 0;
+		try {
+			String deleteNoStr = data.get("deleteNo");
+			Long deleteNo = Long.parseLong(deleteNoStr);
+			Directory entity = directoryRepository.findById(deleteNo).orElse(null);
+			if(entity == null) {
+				return result;
+			}
+			entity.setVisibleYn("N");
+			directoryRepository.save(entity);
 			result = 1;
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -203,6 +203,52 @@ public class DirectoryController {
 		
 		return map;
 	}
+	@PutMapping("/directory/partner/update")
+	@ResponseBody
+	public Map<String, String> updatePartner(@RequestBody Map<String, String> formData, Authentication authentication){
+		EmployeeDetails employeeDetail = (EmployeeDetails)authentication.getPrincipal();
+		Employee employee = employeeDetail.getEmployee();
+		
+		
+		
+		Map<String, String> map = new HashMap<String, String>();
+		
+		
+		map.put("res_code", "500");
+		map.put("res_msg", "협력업체 인원 수정을 실패했습니다.");
+		
+		int result = directoryService.updatePartner(formData, employee);
+		
+		if(result > 0) {
+			map.put("res_code", "200");
+			map.put("res_msg", "협력업체 인원 수정이 완료되었습니다.");
+		}
+		
+		return map;
+	}
+	@PutMapping("/directory/partner/delete")
+	@ResponseBody
+	public Map<String, String> deletePartner(@RequestBody Map<String, String> data, Authentication authentication){
+		EmployeeDetails employeeDetail = (EmployeeDetails)authentication.getPrincipal();
+		Employee employee = employeeDetail.getEmployee();
+		
+		
+		
+		Map<String, String> map = new HashMap<String, String>();
+		
+		
+		map.put("res_code", "500");
+		map.put("res_msg", "협력업체 인원 삭제를 실패했습니다.");
+		
+		int result = directoryService.deletePartner(data, employee);
+		
+		if(result > 0) {
+			map.put("res_code", "200");
+			map.put("res_msg", "협력업체 인원 삭제 완료되었습니다.");
+		}
+		
+		return map;
+	}
 	
 	// 부서이름으로 팀 조회 // 지우자
 	@GetMapping("/directory/teams")

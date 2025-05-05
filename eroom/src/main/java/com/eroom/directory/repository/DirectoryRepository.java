@@ -16,9 +16,10 @@ public interface DirectoryRepository extends JpaRepository<Directory, Long>{
 	
 	// 주소록 정보 조회
 	Directory findByEmployee_EmployeeNo(Long employeeNo);
-
-	@Query("SELECT d FROM Directory d JOIN FETCH d.separator WHERE d.separator.separatorCode = :separatorCode")
-	List<Directory> findBySeparatorCode(@Param("separatorCode") String separatorCode);
+	
+	// 외부업체 주소록 조회
+	@Query("SELECT d FROM Directory d JOIN FETCH d.separator WHERE d.separator.separatorCode = :separatorCode AND d.visibleYn = :visibleYn")
+	List<Directory> findBySeparatorCodeAndVisibleYn(@Param("separatorCode") String separatorCode, @Param("visibleYn") String visibleYn);
 
 
 }
