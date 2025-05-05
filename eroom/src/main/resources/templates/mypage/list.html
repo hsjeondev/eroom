@@ -93,7 +93,7 @@
 		  <!-- 기존 프로필 카드 그대로 삽입 -->
 			<div class="card">
 				<div class="card-body d-flex align-items-center">
-					<div class="profile-wrapper me-3" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
+					<div id="openProfileUploadModalBtn" class="profile-wrapper me-3" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
 						<img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
 						<div class="camera-overlay">
 							<svg class="svg-inline--fa fa-camera fs-4" aria-hidden="true" focusable="false"
@@ -534,29 +534,6 @@
 	</div>
 </div><!-- 근태현황 목록 테이블 끝 -->
     
- 
- 
-<!--프로필 변경 모달 -->
-<!-- <div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="profileUploadModalLabel">프로필 사진 변경</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-      </div>
-      <div class="modal-body text-center">
-        <button class="btn btn-outline-primary mb-3" onclick="setDefaultProfile()">
-          기본 프로필 적용하기
-        </button>
-        <br>
-        <label class="btn btn-primary" for="profileUploadInput">
-          프로필 사진 업로드하기
-        </label>
-        <input type="file" id="profileUploadInput" class="d-none" accept="image/*" onchange="previewProfileImage(event)">
-      </div>
-    </div>
-  </div>
-</div> -->
 <!-- 프로필 사진 변경 모달 -->
 <div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
@@ -883,11 +860,12 @@ function showConfirmModal(message, onConfirm){
 	const confirmBtn = document.getElementById('confirmSaveBtn');
 	
 	msgElement.innerHTML = message;
-	const modalInstance = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
-	modalInstance.show();
+	//const modalInstance = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+	//modalInstance.show();
+	confirmSaveModal.show();
 	
 	const handler = function(){
-		modalInstance.hide();
+		confirmSaveModal.hide();
 		onConfirm(); // 확인 클릭 시 실행할 콜백
 		confirmBtn.removeEventListener('click',handler); // 중복 방지
 	};
@@ -935,12 +913,23 @@ fetch(`/admin/checkNameDuplicate?name=${encodeURIComponent(name)}`)
 			unsavedEditModal.show();
 		}
 	});
+	// 수정 모달 닫힐때
+	editModalElement.addEventListener('hidden.bs.modal', function () {
+		const nameCheckMsg = document.getElementById('editNameCheckMsg');
+		nameCheckMsg.classList.add('d-none');
+		nameCheckMsg.textContent = '';
+		nameCheckMsg.className = 'form-text';
+	});
+	
 	// 수정용 모달 계속 닫기
 	document.getElementById('confirmEditCloseBtn').addEventListener('click', function () {
 		isEditFormEdited = false;
 		unsavedEditModal.hide();
 		unsavedEditModalElement.addEventListener('hidden.bs.modal', function handler() {
 			editModal.hide();
+			nameCheckMsg.classList.add('d-none');
+			nameCheckMsg.textContent = '';
+			nameCheckMsg.className = 'form-text';
 			unsavedEditModalElement.removeEventListener('hidden.bs.modal', handler);
 		});
 	});
@@ -1035,6 +1024,9 @@ function sendUpdateEmployee() {
 		showAlert(data.res_msg,function(){
 			isEditFormEdited = false;
 			editModal.hide();
+			nameCheckMsg.classList.add('d-none');
+			nameCheckMsg.textContent = '';
+			nameCheckMsg.className = 'form-text';
 			location.reload();
 		});
       } else {
@@ -1047,22 +1039,155 @@ function sendUpdateEmployee() {
     });
 }
 
-	/* 기본프로필 변경 */
-	function setDefaultProfile() {
-	  const profileImage = document.getElementById('profileImage');
-	  profileImage.src = '/assets/img/team/avatar.webp'; // 부트스트랩 기본 프로필 이미지
-	  const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
-	  modal.hide();
-	}
-	/* 프로필 사진 업로드 */
-	function previewProfileImage(event) {
-		const file = event.target.files[0];
-		if (file) {
-		  const profileImage = document.getElementById('profileImage');
-		  profileImage.src = URL.createObjectURL(file);
-		  const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
-		  modal.hide();
+	// 원본 이미지 src 저장용 (변경 감지)
+	let isProfileEdited = false;
+	let originalProfileSrc = '';
+	
+	const profileImageElement = document.getElementById('profileImage'); // 메인 이미지
+	const previewImageElement = document.getElementById('previewProfileImage'); // 모달 안 이미지
+	const profileUploadInput = document.getElementById('profileUploadInput'); // 파일 input
+	const profileUploadModalElement = document.getElementById('profileUploadModal'); 
+	const profileUploadModal = bootstrap.Modal.getInstance(profileUploadModalElement) || new bootstrap.Modal(profileUploadModalElement);
+	
+	// 프로필 모달 오픈시 초기화
+	document.getElementById('openProfileUploadModalBtn').addEventListener('click',function(){
+		// 현재 이미지 src 저장
+		originalProfileSrc = profileImage.src;
+		previewImageElement.src = originalProfileSrc;
+		profileUploadInput.value = '';
+		isProfileEdited = false;
+		
+		profileUploadModal.show();
+	});
+	// 기본 이미지로 변경
+	document.getElementById('setDefaultProfileBtn').addEventListener('click',function(){
+		const defaultSrc = '/assets/img/team/avatar.webp';
+		previewImageElement.src = defaultSrc;
+		isProfileEdited = (originalProfileSrc !== defaultSrc);
+	});
+	
+	// 파일 업로드 시 이미지 미리보기
+	profileUploadInput.addEventListener('change',function(e){
+		const file = e.target.files[0];
+		if(file){
+			const newPreview = URL.createObjectURL(file);
+			previewImageElement.src = newPreview;
+			isProfileEdited = (originalProfileSrc !== newPreview);
 		}
+	});
+	
+	// 프로필 모달 닫을 때 수정감지 -> 경고 모달
+	profileUploadModalElement.addEventListener('hide.bs.modal',function(e){
+		const confirmVisible = document.getElementById('confirmSaveModal').classList.contains('show');
+		if(isProfileEdited && !confirmVisible){
+			e.preventDefault();
+			unsavedEditModal.show();
+		}
+	});
+	
+	// 계속 닫기
+	document.getElementById('confirmEditCloseBtn').addEventListener('click',function(){
+		isProfileEdited = false;
+		unsavedEditModal.hide();
+		profileUploadModal.hide();
+	});
+	
+	// 취소 (경고 모달만 닫기)
+	document.getElementById('cancelEditCloseBtn').addEventListener('click',function(){
+		unsavedEditModal.hide();
+	});
+	
+	// 저장 버튼 클릭 -> 확인 모달 -> fetch 요청
+/* 	document.getElementById('saveProfileImageBtn').addEventListener('onfirmlick',function(){
+		console.log('버튼 연결됨');
+		if(!isProfileEdited){
+			showAlert('변경된 내용이 없습니다.');
+			return;
+		}
+		showConfirmModal('정말 저장하시겠습니까?',sendProfileUpload);
+	}); */
+/* 	document.addEventListener('click',function(e){
+		if(e.target && e.target.id === 'saveProfileImageBtn'){
+			console.log("저장 버튼 클릭됨");
+			
+			// unsaved 모달이 열려있으면 저장X
+			const isUnsavedOpen = document.getElementById('unsavedEditModal').classList.contains('show');
+			if(isUnsavedOpen) return;
+			
+			if(!isProfileEdited){
+				showAlert("변경된 내용이 없습니다.");
+				return;
+			}
+			if(unsavedEditModal._isShown){
+				unsavedEditModal.hide();
+			}
+			
+			showConfirmModal("정말 저장하시겠습니까?",sendProfileUpload);
+		}
+	}); */
+	
+	const saveProfileBtn = document.getElementById('saveProfileImageBtn');
+	if(!saveProfileBtn){
+		console.error("저장 버튼이 DOM에 존재하지 않음");
+		return;
+	}
+	saveProfileBtn.addEventListener('click',function(){
+		console.log("저장 버튼 클릭됨");
+		alert("버튼 눌림");
+/* 		const isUnsavedOpen = document.getElementById('unsavedEditModal').classList.contains('show');
+		if(isUnsavedOpen) return; */
+		
+		if(!isProfileEdited){
+			showAlert("변경된 내용이 없습니다."); 
+			return;
+		}
+		
+		const file = profileUpoadInput.files[0];
+		if(!file){
+			console.log("선택된 파일 없음(기본 이미지로 전환 여부 체크)");
+		}
+/* 		if(unsavedEditModal._isShown){
+			unsavedEditModal.hide();
+		}  */
+		showConfirmModal("정말 저장하시겠습니까?",sendProfileUpload);
+	});
+	
+	function sendProfileUpload(){
+		const file = profileUploadInput.files[0];
+		const formData = new FormData();
+		
+		if(file){
+			formData.append('driveFiles',file); // 드라이브 DTO의 필드명과 맞춰야함
+		}else{
+			// 기본 이미지로 변경 -> 서버에서 처리 필요(예 : default 값으로 등록)
+			formData.append('resetDefault','true');
+		}
+		
+		fetch('/mypage/upload/profile',{
+			method : 'POST',
+			body : formData,
+			headers : {
+				 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+			        'X-CSRF-HEADER': document.querySelector('meta[name="_csrf_header"]').getAttribute('content')
+			}
+		})
+		.then(response => response.json())
+		.then(data => {
+			if(data.res_code == '200'){
+				showAlert('프로필이 성공적으로 변경되었습니다', () => {
+					isProfileEdited = false;
+					profileUploadModal.hide();
+					profileImage.src = previewImageElement.src;
+				});
+			}else{
+				showAlert('업로드 실패:'+data.res_msg);
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			showAlert('서버 오류가 발생했습니다.');
+		});
+		
 	}
 
 	// 모든 모달 닫힌 후 강제로 스크롤/백드롭 초기화

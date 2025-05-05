@@ -69,6 +69,8 @@ public class Directory {
 	private String directoryZipcode; // 우편번호
 	@Column(name = "directory_address")
 	private String directoryAddress; // 주소
+	@Column(name="drive_attach_no")
+	private Long driveAttachNo; // 드라이브 번호
 	@OneToOne
 	@ToString.Exclude
 	@JoinColumn(name = "employee_no")
