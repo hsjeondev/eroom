@@ -54,8 +54,12 @@
 							  <tr th:each="notice, stat : ${noticeList}">
 							    <td class="align-middle ps-3 name" th:text="${stat.index + 1}">1</td>
 							    <td class="align-middle email">
-							      <a th:href="@{/article/detail/{id}(id=${notice.articleNo})}" th:text="${notice.articleTitle}">제목</a>
+							      <!-- <a th:href="@{/article/detail/{id}(id=${notice.articleNo})}" th:text="${notice.articleTitle}">제목</a> -->
+							    <div class="form-check mb-1 mb-md-0 d-flex align-items-center lh-1">
+				                    <label class="form-check-label mb-0 fs-8 me-2 line-clamp-1 flex-grow-1 flex-md-grow-0 cursor-pointer"><span th:text="${notice.articleTitle}"></span></label>
+				                  </div>
 							    </td>
+							    
 							    <td class="align-middle age" >관리자</td>
 							    <td class="align-middle white-space-nowrap text-end pe-0" th:text="${#temporals.format(notice.articleRegDate, 'yyyy-MM-dd HH:mm')}">2025-05-03 14:00</td>
 							  </tr>
@@ -68,7 +72,10 @@
                       </div>
                     
 				</div>
+				
+				
 			</div>
+			
 </main>
 </body>
 </html>

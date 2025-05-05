@@ -9,7 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eroom.article.dto.ArticleDto;
 import com.eroom.article.entity.Article;
@@ -52,14 +54,15 @@ public class ArticleController {
 	@PostMapping("/article/create")
 	@ResponseBody
 	public Map<String, String> createArticleApi(@AuthenticationPrincipal EmployeeDetails employeeDetails,
-	                                            ArticleDto articleDto) {
+	                                            ArticleDto articleDto,
+	                                            @RequestParam("notice_files") List<MultipartFile> articleFiles) {
 	    Map<String, String> resultMap = new HashMap<>();
 	    resultMap.put("res_code", "500");
 	    resultMap.put("res_msg", "공지 등록 중 오류가 발생했습니다.");
 
 	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
 
-	    int result = articleService.createArticle(articleDto, employeeNo);
+	    int result = articleService.createArticle(articleDto, employeeNo,articleFiles);
 	    
 	    if (result > 0) {
 	        resultMap.put("res_code", "200");
