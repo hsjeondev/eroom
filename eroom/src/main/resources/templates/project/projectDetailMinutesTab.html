@@ -1,40 +1,260 @@
 <!DOCTYPE html>
-<html 
-lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
-	  xmlns:th="http://www.thymeleaf.org"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{/include/layout}">
-  <body>
-    <main class="main" id="top" layout:fragment="content">
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
+<body>
+	<main class="main" id="top" layout:fragment="content">
 		<div class="d-flex align-items-center gap-2">
-		  	<a th:href="@{/project/all}" class="text-decoration-none text-dark me-2">
-		  		<i class="uil uil-angle-left-b fs-4"></i>
+			<a th:href="@{/project/all}" class="text-decoration-none text-dark me-2"> <i class="uil uil-angle-left-b fs-4"></i>
 			</a>
-		  	<h1 class="text-primary mb-0 fs-4" th:text="${project.project_name}">프로젝트 디테일</h1>
-		  	<span class="badge badge-phoenix fs-10 badge-phoenix-success" th:text="${project.proceed}">completed</span>
+			<h1 class="text-primary mb-0 fs-4" th:text="${project.project_name}">프로젝트 디테일</h1>
+			<span class="badge badge-phoenix fs-10 badge-phoenix-success" th:text="${project.proceed}">completed</span>
 		</div>
-    	<br>
+		<br>
 		<ul class="nav nav-phoenix-pills mt-3" role="tablist">
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/project/detail/{id}/main(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/main')} ? ' active' : ''">메인</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/project/detail/{id}/developmentTab(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/developmentTab')} ? ' active' : ''">개발</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/project/detail/{id}/todo(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/todo')} ? ' active' : ''">할 일</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/project/detail/{id}/files(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/files')} ? ' active' : ''">파일</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/project/detail/{id}/minutes(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/minutes')} ? ' active' : ''">회의록</a>
-            </li>
-          </ul>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/main(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/main')} ? ' active' : ''">메인</a></li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/developmentTab(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/developmentTab')} ? ' active' : ''">개발</a></li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/todo(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/todo')} ? ' active' : ''">할 일</a></li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/files(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/files')} ? ' active' : ''">파일</a></li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/minutes(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/minutes')} ? ' active' : ''">회의록</a></li>
+		</ul>
+		
+        <div id="members" data-list='{"valueNames":["customer","email","mobile_number","city","last_active","joined"],"page":10,"pagination":true}'>
+          <div class="row align-items-center justify-content-between g-3 mb-4 mt-2">
+            <div class="col col-auto">
+              <div class="search-box">
+                <form class="position-relative">
+                  <input class="form-control search-input search" type="search" placeholder="제목 검색" aria-label="Search" />
+                  <span class="fas fa-search search-box-icon"></span>
 
-	        
-        
-
-    </main>
-  </body>
+                </form>
+              </div>
+            </div>
+            <div class="col-auto">
+              <div class="d-flex align-items-center">
+                <button class="btn btn-link text-body me-4 px-0"><span class="fa-solid fa-file-export fs-9 me-2"></span>문서화</button>
+                <button class="btn btn-primary">회의록 작성</button>
+              </div>
+            </div>
+          </div>
+          <div class="mx-n4 mx-lg-n6 px-4 px-lg-6 mb-9 bg-body-emphasis border-y mt-2 position-relative top-1">
+            <div class="table-responsive scrollbar ms-n1 ps-1">
+              <table class="table table-sm fs-9 mb-0">
+                <thead>
+                  <tr>
+                    <th class="sort align-middle" scope="col" data-sort="customer" style="width:15%; min-width:200px;">CUSTOMER</th>
+                    <th class="sort align-middle" scope="col" data-sort="email" style="width:15%; min-width:200px;">EMAIL</th>
+                    <th class="sort align-middle pe-3" scope="col" data-sort="mobile_number" style="width:20%; min-width:200px;">MOBILE NUMBER</th>
+                    <th class="sort align-middle" scope="col" data-sort="city" style="width:10%;">CITY</th>
+                    <th class="sort align-middle text-end" scope="col" data-sort="last_active" style="width:21%;  min-width:200px;">LAST ACTIVE</th>
+                    <th class="sort align-middle text-end pe-0" scope="col" data-sort="joined" style="width:19%;  min-width:200px;">JOINED</th>
+                  </tr>
+                </thead>
+                <tbody class="list" id="members-table-body">
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle" src="../assets/img/team/32.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Carry Anna</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:annac34@gmail.com">annac34@gmail.com</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+912346578">+912346578</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">Budapest</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">34 min ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Dec 12, 12:56 PM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle avatar-placeholder" src="../assets/img/team/avatar.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Milind Mikuja</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:mimiku@yahoo.com">mimiku@yahoo.com</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+8801564768976">+8801564768976</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">Manchester</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">6 hours ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Dec 9, 2:28 PM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle" src="../assets/img/team/35.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Stanly Drinkwater</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:stnlwasser@hotmail.com">stnlwasser@hotmail.com</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+78675436798">+78675436798</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">Smallville</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">43 min ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Dec 4, 12:56 PM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle" src="../assets/img/team/57.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Josef Stravinsky</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:Josefsky@sni.it">Josefsky@sni.it</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+118796567894">+118796567894</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">Metropolis</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">2 hours ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Dec 1, 4:07 AM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle" src="../assets/img/team/58.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Igor Borvibson</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:vibigorr@technext.it">vibigorr@technext.it</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+65899655678">+65899655678</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">Central city</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">5 days ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Nov 28, 7:28 PM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle" src="../assets/img/team/59.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Katerina Karenin</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:karkat99@gmail.com">karkat99@gmail.com</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+00564327890">+00564327890</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">Gotham</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">2 weeks ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Nov 24, 10:16 AM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m">
+                          <div class="avatar-name rounded-circle"><span>R</span></div>
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Roy Anderson</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:andersonroy@netflix.chill">andersonroy@netflix.chill</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+55890776">+55890776</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">Vancouver</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">4 days ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Nov 18, 5:43 PM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle" src="../assets/img/team/31.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Martina scorcese</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:cesetina1@gmail.com">cesetina1@gmail.com</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+666611896">+666611896</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">Viena</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">6 min ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Nov 18, 2:09 AM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle" src="../assets/img/team/33.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Luis Bunuel</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:luisuel@live.com">luisuel@live.com</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+55786534">+55786534</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">Bangalore</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">56 min ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Nov 16, 3:22 PM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle" src="../assets/img/team/34.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Jean Renoir</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:renoirjean1836@gmail.com">renoirjean1836@gmail.com</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+8801765458767">+8801765458767</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">Chittagong</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">Yesterday</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Nov 09, 8:49 AM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle" src="../assets/img/team/29.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Ricky Antony</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:ricky@example.com">ricky@example.com</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+2012001851">+2012001851</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">New Jersey</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">1 hour ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Oct 19, 8:00 AM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle" src="../assets/img/team/3.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Emma Watson</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:emma@example.com">emma@example.com</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+2122288403">+2122288403</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">New York</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">6 hours ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Oct 15, 12:00 PM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle avatar-placeholder" src="../assets/img/team/avatar.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Jennifer Schramm</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:jennifer@example.com">jennifer@example.com</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+8283829631">+8283829631</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">Charlotte</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">12 hours ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Oct 12, 11:00 AM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle" src="../assets/img/team/32.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Raymond Mims</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:raymond@example.com">raymond@example.com</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+5624685646">+5624685646</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">Artesia</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">2 day ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Oct 10, 8:30 AM</td>
+                  </tr>
+                  <tr class="hover-actions-trigger btn-reveal-trigger position-static">
+                    <td class="customer align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000" href="#!">
+                        <div class="avatar avatar-m"><img class="rounded-circle" src="../assets/img/team/25.webp" alt="" />
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-semibold">Michael Jenkins</h6>
+                      </a></td>
+                    <td class="email align-middle white-space-nowrap"><a class="fw-semibold" href="mailto:jenkins@example.com">jenkins@example.com</a></td>
+                    <td class="mobile_number align-middle white-space-nowrap"><a class="fw-bold text-body-emphasis" href="tel:+3026138829">+3026138829</a></td>
+                    <td class="city align-middle white-space-nowrap text-body">Philadelphia</td>
+                    <td class="last_active align-middle text-end white-space-nowrap text-body-tertiary">12 hours ago</td>
+                    <td class="joined align-middle white-space-nowrap text-body-tertiary text-end">Oct 3, 8:30 AM</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="row align-items-center justify-content-between py-2 pe-0 fs-9">
+              <div class="col-auto d-flex">
+                <p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info"></p><a class="fw-semibold" href="#!" data-list-view="*">View all<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a><a class="fw-semibold d-none" href="#!" data-list-view="less">View Less<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a>
+              </div>
+              <div class="col-auto d-flex">
+                <button class="page-link" data-list-pagination="prev"><span class="fas fa-chevron-left"></span></button>
+                <ul class="mb-0 pagination"></ul>
+                <button class="page-link pe-0" data-list-pagination="next"><span class="fas fa-chevron-right"></span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="footer position-absolute">
+          <div class="row g-0 justify-content-between align-items-center h-100">
+            <div class="col-12 col-sm-auto text-center">
+              <p class="mb-0 mt-2 mt-sm-0 text-body">Thank you for creating with Phoenix<span class="d-none d-sm-inline-block"></span><span class="d-none d-sm-inline-block mx-1">|</span><br class="d-sm-none" />2025 &copy;<a class="mx-1" href="https://themewagon.com">Themewagon</a></p>
+            </div>
+            <div class="col-12 col-sm-auto text-center">
+              <p class="mb-0 text-body-tertiary text-opacity-85">v1.22.0</p>
+            </div>
+          </div>
+        </footer>
+	</main>
+</body>
 </html>
