@@ -58,8 +58,11 @@ public class MyPageController {
 		
 		Structure employeeStructure = employee.getStructure();  
 		String departmentName = "-"; // 기본값
+		String teamName = "-";
 		// 부서 정보 조회
 		if(employeeStructure != null) {
+			teamName = employeeStructure.getCodeName();
+			
 			// 부서 정보가 있을 경우에만 parentCode를 사용하여 부서명 조회
 			String parentCode = employeeStructure.getParentCode();
 			Structure structure = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(parentCode);
@@ -71,6 +74,7 @@ public class MyPageController {
 			}
 		}
         model.addAttribute("departmentName", departmentName);
+        model.addAttribute("teamName",teamName);
         
         // 주소록 정보 조회
         Directory directory = employeeDirectoryService.selectDirectoryByEmployeeNo(employeeNo);
@@ -195,4 +199,5 @@ public class MyPageController {
 
 	    return resultMap;
 	}
+
 }

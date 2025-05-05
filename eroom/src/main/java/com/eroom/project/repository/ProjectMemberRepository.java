@@ -14,20 +14,4 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Lo
 
 	List<ProjectMember> findByProject_ProjectNo(Long project_no);
 	
-	// 진행 중인 프로젝트
-//	@Query("SELECT pm.project FROM ProjectMember pm "
-//			+ "WHERE pm.employee.employeeNo = :employeeNo "
-//			+ "AND pm.visibleYn = 'Y' AND pm.project.visibleYn = 'Y' "
-//			+ "AND pm.project.projectStart <= CURRENT_DATE "
-//			+ "AND pm.project.projectEnd > CURRENT_DATE")
-//	List<Project> findActiveProjectsByEmployeeNo(@Param("employeeNo") Long employeeNo);
-//
-//	// 완료된 프로젝트
-//	@Query("SELECT pm.project FROM ProjectMember pm "
-//			+ "WHERE pm.employee.employeeNo = :employeeNo "
-//			+ "AND pm.visibleYn = 'Y' AND pm.project.visibleYn = 'Y' "
-//			+ "AND pm.project.projectEnd < CURRENT_DATE")
-//	List<Project> findCompletedProjectsByEmployeeNo(@Param("employeeNo") Long employeeNo);
-	
-	
 }

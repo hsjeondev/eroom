@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -50,6 +51,19 @@ public class ProfileController {
 		}
 		return resultMap;
 		
+	}
+	
+	// 로그인 한 사용자의 프로필 사진
+	@GetMapping("/profile/image")
+	@ResponseBody
+	public Map<String,String> getProfileImage(@AuthenticationPrincipal EmployeeDetails user){
+		Map<String,String> result = new HashMap<>();
+		
+		Long employeeNo = user.getEmployee().getEmployeeNo();
+		String profileImageUrl = profileService.getProfileImageUrl(employeeNo);
+		
+		result.put("profileImage", profileImageUrl);
+		return result;
 	}
 	
 }

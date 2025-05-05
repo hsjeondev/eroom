@@ -200,7 +200,7 @@
           </li>
             <li class="nav-item dropdown"><a class="nav-link lh-1 pe-0" id="navbarDropdownUser" href="#!" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false">
                 <div class="avatar avatar-l ">
-                  <img class="rounded-circle " src="/assets/img/team/40x40/57.webp" alt="" />
+                  <img id="headerProfileImg" class="rounded-circle " src="/assets/img/team/40x40/57.webp" alt="" />
 
                 </div>
               </a>
@@ -209,7 +209,7 @@
                   <div class="card-body p-0">
                     <div class="text-center pt-4 pb-3">
                       <div class="avatar avatar-xl ">
-                        <img class="rounded-circle " src="/assets/img/team/72x72/57.webp" alt="" />
+                        <img id="dropdownProfileImg" class="rounded-circle " src="/assets/img/team/72x72/57.webp" alt="" />
 
                       </div>
                       	<th:block sec:authorize="isAuthenticated()">
@@ -367,6 +367,26 @@
     			      }
     			    });
     			  }
+    			  
+    			  // 프로필 이미지
+    			  fetch('/profile/image')
+    			  	.then(response => response.json())
+    			  	.then(data => {
+    			  		if(data.profileImage){
+    			  			const headerImg = document.getElementById('headerProfileImg');
+    			  			if(headerImg){
+    			  				headerImg.src = data.profileImage;
+    			  			}
+    			  			
+    			  			// 드롭다운용 이미지
+    			  			const dropdownImg = document.getElementById('dropdownProfileImg');
+    			  			if(dropdownImg){
+    			  				dropdownImg.src = data.profileImage;
+    			  			}
+    			  		}
+    			  	})
+    			  	.catch(error => console.error('프로필 이미지 로드 실패 : ',error));
+    			  
     			});			
 			</script>
 
