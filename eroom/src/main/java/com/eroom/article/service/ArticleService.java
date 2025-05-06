@@ -31,6 +31,13 @@ public class ArticleService {
 	 @Value("${ffupload.location}")
 	 private String fileDir;
 	 
+	 
+	 // 게시글 삭제
+	 public void deleteArticleNotice(Long articleNo) {
+		 articleRepository.updateArticleVisibilityStatus(articleNo, "N");  // Repository 메소드 호출
+	    }
+	 
+	 
 	 // 게시판 다운로드 파일 정보
 	 public Drive findAttachmentById(Long driveId) {
 		    return driveRepository.findById(driveId)

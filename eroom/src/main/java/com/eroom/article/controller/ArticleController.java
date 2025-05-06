@@ -47,10 +47,20 @@ public class ArticleController {
 		return "/article/articleAnonymous";
 	}
 	
-	// 게시글 수정 
-	@GetMapping("/article/notice/edit/{id}")
+	// 공지 게시판 삭제 버튼 클릭시
+	@PostMapping("/article/notice/delete")
+	public String deleteArticleNotice(@RequestParam("articleNo") Long articleNo) {
+		System.out.println(articleNo);
+		articleService.deleteArticleNotice(articleNo);
+	    return "redirect:/article/notice";
+	}
+	
+	// 게시글 수정 . 왜 css 깨지는지 이유 모르겠음
+	@GetMapping("/article/articleEdit/{id}")
 	public String editArticleNoticeForm(@PathVariable("id") Long id, Model model) {
+		
 	    Article article = articleService.selectArticleNoticeOne(id);
+	    
 	    List<Drive> attachList = articleService.findArticleAttaNoticechments(id);
 	    model.addAttribute("article", article);
 	    model.addAttribute("attachList", attachList);
