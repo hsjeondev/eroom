@@ -63,8 +63,6 @@
 	  height: 3px;
 	/*   background-color: rgba(13, 110, 253, 0.5); */ /* 반투명 primary */
 	  background-color: rgba(108, 117, 125, 0.5); /* secondary 반투명 */  
-	/*   margin: 0 4px; */
-	/*   border-radius: 50%; */
 	  border: none;
 	}
 	
@@ -72,10 +70,7 @@
 	 /*  background-color: #0d6efd; */ /* 활성화된 점 */
 	  background-color: #6c757d; /* secondary 진한 색 */  
 	}
-	
-/* 	.carousel-inner .carousel-item > .border {
-	  min-height: 100px;
-	}	 */
+
 </style>
 </head>
 <body>
@@ -87,12 +82,12 @@
 	</div>
 
 	<div class="row g-3">
-	
 		<!-- 1열: 프로필 -->
 		<div class="col-md-4">
 		  <!-- 기존 프로필 카드 그대로 삽입 -->
 			<div class="card">
 				<div class="card-body d-flex align-items-center">
+					<!-- 프로필 이미지 + 카메라 오버레이 -->
 					<div id="openProfileUploadModalBtn" class="profile-wrapper me-3" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
 						<img id="profileImage" class="rounded-circle" alt="프로필"
 							th:src="${profileImage}">
@@ -111,8 +106,8 @@
 						<div class="fw-bold fs-7" th:text="${employee.employeeName}">이름</div>
 						<div class="text-body-secondary" th:text="${employee.employeePosition}">직급</div>
 					</div>
-					
 				</div><!-- card-body -->	
+				
 				<!-- 하단 정보 -->
 				<div class="card-footer border-top border-dashed pt-3">
 					<div class="d-flex justify-content-around">
@@ -131,9 +126,7 @@
 					</div>
 				</div>
 			</div><!-- card  -->		  
-		 <!-- ✅ profile-wrapper + Following/Projects/Completion 포함된 카드 -->
 		</div>			
-	
 	
 	    <!-- 2열: 근태요약 -->
 	    <div class="col-md-8">
@@ -170,15 +163,12 @@
 	        </div>
 	    </div>	
 	
-	
 	    <!-- 3열: 주소록 -->
 	    <div class="col-md-4">
-	      <!-- ✅ 주소록 카드 (사번, 직급, 이메일 등) -->
+	      <!--  주소록 카드 (사번, 직급, 이메일 등) -->
 			<div class="card h-100 position-relative">
 				<div class="card-body fs-9">
 					<div class="d-flex align-items-center mb-2">
-						<!-- <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span> -->
-						
 						<!--  수정 버튼 -->
 						<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
 						        data-bs-toggle="modal" data-bs-target="#editEmployeeModal" id="openEditModalBtn"
@@ -219,9 +209,7 @@
 					</p>
 				</div><!-- card-body -->
 			</div><!-- card h-100 -->	      
-	      
 	    </div>	
-	
 	
 	    <!-- 4열: 근무시간 통합 차트 -->
         <div class="col-md-8">
@@ -234,124 +222,91 @@
 	        </div>
         </div>
 	</div><!-- row g-3 -->
-	
 </div><!-- mb-9 --> 
 
 <hr>
 <div class="mb-9">
 	<!-- 결재 / 프로젝트 관련 슬라이드 -->
 	<div class="row g-3 mt-4">
-	  
-	  <!-- ✅ 결재 문서: 좌측 50% -->
+	  <!-- 결재 문서: 좌측 50% -->
 		<div class="col-md-6">
 	    	<div class="card p-3 h-100">
 				<div class="d-flex justify-content-start mb-3">
 				  <span class="fw-bold fs-8">결재 문서</span>
 				</div>
-				<!-- <div class="row g-3"> -->
-	        		<!-- 진행 중 결재 슬라이드 -->
-					<!-- <div class="col-md-6 position-relative"> -->
-					<div class="mb-4">
-						<div class="text-center mb-2">
-							<i class="fas fa-circle fs-10 text-primary me-1"></i>
-							<span class="fw-bold fs-9">진행 중인 결재</span>
+        		<!-- 진행 중 결재 슬라이드 -->
+				<div class="mb-4">
+					<div class="text-center mb-2">
+						<i class="fas fa-circle fs-10 text-primary me-1"></i>
+						<span class="fw-bold fs-9">진행 중인 결재</span>
+					</div>
+					<!-- <h6 class="fw-bold mb-2">📌 진행 중인 결재</h6> -->
+					<div id="approvalPendingCarousel" class="carousel slide" data-bs-ride="carousel">
+						<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+						<div class="carousel-indicators" id="pendingCarouselIndicators">
+							<!-- JS 호출 -->
+						</div>								
+						<div class="carousel-inner px-4 text-center" id="pendingCarouselInner">
+							<!-- JS 호출 -->
 						</div>
-						<!-- <h6 class="fw-bold mb-2">📌 진행 중인 결재</h6> -->
-						<div id="approvalPendingCarousel" class="carousel slide" data-bs-ride="carousel">
-							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
-							<div class="carousel-indicators">
-							  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
-							  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
-							  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
-							</div>								
-							<div class="carousel-inner px-4 text-center">
-								<div class="carousel-item active">
-								  <div class="border rounded p-3 bg-primary-soft">
-								    <h6 class="mb-1">회의실 예약 요청</h6>
-								    <p class="text-muted mb-0">2025-04-14</p>
-								  </div>
-								</div>
-								<div class="carousel-item">
-								  <div class="border rounded p-3 bg-primary-soft">
-								    <h6 class="mb-1">출장 신청서</h6>
-								    <p class="text-muted mb-0">2025-04-13</p>
-								  </div>
-								</div>
-							</div>
-							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
-							        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="prev"
-							        style="top: 60%; left: -10px; z-index: 2;">
-								<i class="fas fa-chevron-left fs-7"></i>
-							</button>
-							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
-							        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="next"
-							        style="top: 60%; right: -10px; z-index: 2;">
+						<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+						        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="prev"
+						        style="top: 60%; left: -10px; z-index: 2;">
+							<i class="fas fa-chevron-left fs-7"></i>
+						</button>
+						<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+						        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="next"
+						        style="top: 60%; right: -10px; z-index: 2;">
+							<i class="fas fa-chevron-right fs-7"></i>
+						</button>
+					</div>
+				</div>	
+       			 <!-- 승인 완료 결재 슬라이드 -->
+				<div class="mb-4">
+					<div class="text-center mb-2">
+						<i class="fas fa-circle fs-10 text-success mt-n1"></i>
+						<span class="fw-bold fs-9">승인된 결재</span>
+					</div>
+					<div id="approvalCompletedCarousel" class="carousel slide" data-bs-ride="carousel">
+						<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+						<div class="carousel-indicators" id="completedCarouselIndicators">
+						  <!-- <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+						  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button> -->
+						</div>								
+						<div class="carousel-inner px-4 text-center" id="completedCarouselInner">
+							<!-- <div class="carousel-item active">
+							  <div class="border rounded p-3 bg-success-soft">
+							    <h6 class="mb-1">연차 신청서</h6>
+							    <p class="text-muted mb-0">2025-04-10</p>
+							  </div>
+							</div> -->
+						</div>
+						<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+						        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="prev"
+						        style="top: 60%; left: -10px; z-index: 2;">
+							<i class="fas fa-chevron-left fs-7"></i>
+						</button>
+						<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+						        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="next"
+						        style="top: 60%; right: -10px; z-index: 2;">
 								<i class="fas fa-chevron-right fs-7"></i>
-							</button>
-						</div>
-					</div>	
-					<!-- </div>진행중 결재 슬라이드 끝     -->    
-	       			 <!-- 승인 완료 결재 슬라이드 -->
-					<!-- <div class="col-md-6 position-relative"> -->
-					<div class="mb-4">
-						<div class="text-center mb-2">
-							<i class="fas fa-circle fs-10 text-success mt-n1"></i>
-							<span class="fw-bold fs-9">승인된 결재</span>
-						</div>
-					<!-- <h6 class="fw-bold mb-2">✅ 승인된 결재</h6> -->
-						<div id="approvalApprovedCarousel" class="carousel slide" data-bs-ride="carousel">
-							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
-							<div class="carousel-indicators">
-							  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
-							  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
-							  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
-							</div>								
-							<div class="carousel-inner px-4 text-center">
-								<div class="carousel-item active">
-								  <div class="border rounded p-3 bg-success-soft">
-								    <h6 class="mb-1">연차 신청서</h6>
-								    <p class="text-muted mb-0">2025-04-10</p>
-								  </div>
-								</div>
-								<div class="carousel-item">
-								  <div class="border rounded p-3 bg-success-soft">
-								    <h6 class="mb-1">출장 보고서</h6>
-								    <p class="text-muted mb-0">2025-04-08</p>
-								  </div>
-								</div>
-							</div>
-							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
-							        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="prev"
-							        style="top: 60%; left: -10px; z-index: 2;">
-								<i class="fas fa-chevron-left fs-7"></i>
-							</button>
-							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
-							        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="next"
-							        style="top: 60%; right: -10px; z-index: 2;">
-									<i class="fas fa-chevron-right fs-7"></i>
-							</button>
-						</div>
-					</div>	
-					<!-- </div>승인 완료 결재 슬라이즈  -->      
-	      		<!-- </div>row g-3 -->
+						</button>
+					</div>
+				</div>	
 	    	</div><!-- card p-3 h-100 -->
 		</div><!-- 좌측 슬라이드 끝 col-md-6 -->
 	
-		<!-- ✅ 프로젝트 슬라이드: 우측 50% -->
+		<!--  프로젝트 슬라이드: 우측 50% -->
 		<div class="col-md-6">
 			<div class="card p-3 h-100">
 				<div class="d-flex justify-content-start mb-3">
 				  <span class="fw-bold fs-8">프로젝트</span>
 				</div>
-				<!-- <div class="row g-3"> -->
-				  <!-- 진행 중 프로젝트 슬라이드 -->
-					<!-- <div class="col-md-6 position-relative"> -->
 					<div class="mb-4">
 						<div class="text-center mb-2">
 							<i class="fas fa-circle fs-10 text-primary mt-n1"></i>
 							<span class="fw-bold fs-9">진행 중인 프로젝트</span>
 						</div>
-						<!-- <h6 class="fw-bold mb-2">참여 중인 프로젝트</h6> -->
 						<div id="projectActiveCarousel" class="carousel slide" data-bs-ride="carousel">
 							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
 							<div class="carousel-indicators">
@@ -1167,7 +1122,159 @@ function sendUpdateEmployee() {
 		});
 		
 	}
+	
+	// 진행중인 결재 슬라이드 요소
+	let pendingCarouselInner = document.getElementById('pendingCarouselInner'); // 캐러셀 안의 슬라이드 항목 감싸는 요소
+	let pendingCarouselIndicators = document.getElementById('pendingCarouselIndicators'); // 하단 인디케이터 버튼 들어가는 요소
+	let approvalPendingCarousel = document.getElementById('approvalPendingCarousel'); // 전체 캐러셀 래퍼(좌우 버튼 포함)
+	// 진행중인 결재 목록 가져오는 함수
+	async function loadApprovalCarouselPending(){
+		try{
+			const res = await fetch('/mypage/approval/ongoing');
+			
+			if(!res.ok){
+				throw new Error('서버 오류:'+res.status);
+			}
+			
+			const text = await res.text();
+			// console.log('응답 원문:',text);
+			// const data = await res.json();	
+			const data = JSON.parse(text);
+			// 초기화
+			pendingCarouselInner.innerHTML = '';
+			pendingCarouselIndicators.innerHTML = '';
+			if(!data || !Array.isArray(data) || data.length === 0){
+				// 데이터가 없거나 비정상일 경우 안내 슬라이드 1장 출력
+				pendingCarouselInner.innerHTML = `
+					<div class="carousel-item active">
+						<div class="border rounded p-4 bg-light text-center">
+							<p class="mb-0 text-muted">진행 중인 결재 문서가 없습니다.</p>
+						</div>
+					</div>	
+				`;
+				// 인디케이터도 하나만 표시
+				pendingCarouselIndicators.innerHTML = `
+					<button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="0"
+						class="active" aria-current="true" aria-label="슬라이드 1"></button>
+				`;
+				return;
+			}
+			
+			// 데이터가 존재할 경우 슬라이드 생성
+			data.forEach((item,index) => {
+				const approvalTitle = item.approval_title ?? '제목 없음'; // 결재 제목
+				const approvalNo = item.approval_no ?? 0; // 상세 페이지 이동용 ID
+				const displayDate = item.approval_display_date ?? '-'; // 등록일
+				
+				// 슬라이드 항목
+				pendingCarouselInner.innerHTML += `
+					<div class="carousel-item ${index === 0 ? 'active' : ''}">
+						<div class="border rounded p-3 bg-primary-soft">
+							<h6 class="mb-1">
+								<a href="/approval/${approvalNo}/detail" class="text-dark text-decoration-none">
+								  ${approvalTitle}
+								</a>
+							</h6>
+							<p class="text-muted mb-0">${displayDate}</p>
+						</div>
+					</div>	
+				`;
+				
+				// 인디케이터 항목
+				pendingCarouselIndicators.innerHTML += `
+					<button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="${index}"
+					  ${index === 0 ? 'class="active" aria-current="true"' : ''} aria-label="슬라이드 ${index + 1}"></button>
+				`;
+			});
+			
+		}catch(error){
+			console.error('진행 중 결재 로딩 오류:',error);
+			
+			pendingCarouselInner.innerHTML = `
+			  <div class="carousel-item active">
+		        <div class="border rounded p-4 bg-light text-center">
+		          <p class="mb-0 text-danger">결재 데이터를 불러오지 못했습니다.</p>
+		        </div>
+		      </div>				
+			`;
+			
+		    pendingCarouselIndicators.innerHTML = `
+		      <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="0"
+		        class="active" aria-current="true" aria-label="슬라이드 1"></button>
+		   `;			
+		}
+	};
+	
+	// 승인된 결재 목록 슬라이드 요소
+	let completedCarouselInner = document.getElementById('completedCarouselInner');
+	let completedCarouselIndicators = document.getElementById('completedCarouselIndicators');
+	let approvalCompletedCarousel = document.getElementById('approvalCompletedCarousel');
+	// 승인된 결재 목록 가져오기
+	async function loadApprovalCarouselCompleted(){
+		try{
+			const res = await fetch('/mypage/approval/completed');
+			if(!res.ok) throw new Error('서버 오류:'+res.status);
+			const text = await res.text();
+			const data = JSON.parse(text);
+			// 초기화
+			completedCarouselInner.innerHTML = '';
+			completedCarouselIndicators.innerHTML = '';
+			// 데이터가 없을 경우
+			if(!data || !Array.isArray(data) || data.length === 0){
+				completedCarouselInner.innerHTML = `
+					<div class="carousel-item active">
+						<div class="border rounded p-4 bg-light text-center">
+							<p class="mb-0 text-muted">승인된 결재 문서가 없습니다.</p>
+						</div>
+					</div>
+				`;
+				completedCarouselIndicators.innerHTML = `
+					<button type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide-to="0"
+						class="active" aria-current="true" aria-label="슬라이드 1"></button>
+				`;
+				return;				
+			}
+			// 슬라이드 항목 생성
+			data.forEach((item, index) => {
+				const approvalTitle = item.approval_title ?? '제목 없음';
+				const approvalNo = item.approval_no ?? 0;
+				const displayDate = item.approval_display_date ?? '-';
 
+				completedCarouselInner.innerHTML += `
+					<div class="carousel-item ${index === 0 ? 'active' : ''}">
+						<div class="border rounded p-3 bg-success-soft">
+							<h6 class="mb-1">
+								<a href="/approval/${approvalNo}/detail" class="text-dark text-decoration-none">
+									${approvalTitle}
+								</a>
+							</h6>
+							<p class="text-muted mb-0">${displayDate}</p>
+						</div>
+					</div>
+				`;
+
+				completedCarouselIndicators.innerHTML += `
+					<button type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide-to="${index}"
+						${index === 0 ? 'class="active" aria-current="true"' : ''} aria-label="슬라이드 ${index + 1}"></button>
+				`;
+			});			
+		}catch(error){
+			console.error('승인된 결재 로딩 오류:', error);
+
+			completedCarouselInner.innerHTML = `
+				<div class="carousel-item active">
+					<div class="border rounded p-4 bg-light text-center">
+						<p class="mb-0 text-danger">결재 데이터를 불러오지 못했습니다.</p>
+					</div>
+				</div>
+			`;
+
+			completedCarouselIndicators.innerHTML = `
+				<button type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide-to="0"
+					class="active" aria-current="true" aria-label="슬라이드 1"></button>
+			`;			
+		}
+	};
 	// 모든 모달 닫힌 후 강제로 스크롤/백드롭 초기화
 	document.addEventListener('hidden.bs.modal', function () {
 	  setTimeout(() => {
@@ -1181,6 +1288,9 @@ function sendUpdateEmployee() {
 	    }
 	  }, 300); // Bootstrap 트랜지션 시간 고려
 	});
+	
+	loadApprovalCarouselPending(); // 진행중 결재 목록 함수 호출
+	loadApprovalCarouselCompleted(); // 승인된 결재 목록 함수 호출
 });
 </script>                
 
