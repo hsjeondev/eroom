@@ -24,6 +24,9 @@ import com.eroom.attendance.service.AttendanceService;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.DirectoryService;
+import com.eroom.drive.entity.Drive;
+import com.eroom.drive.repository.DriveRepository;
+import com.eroom.drive.service.ProfileService;
 import com.eroom.employee.dto.EmployeeUpdateDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
@@ -41,6 +44,9 @@ public class MyPageController {
 	private final DirectoryService employeeDirectoryService;
 	private final AttendanceService attendanceService;
 	private final EmployeeService employeeService;
+	private final DriveRepository driveRepository;
+	private final ProfileService profileService;
+	
 	// 마이페이지
 	@GetMapping("/list")
 	public String myPageView(@RequestParam(name= "month",required = false) String month,Model model, Authentication authentication) {
@@ -52,8 +58,11 @@ public class MyPageController {
 		
 		Structure employeeStructure = employee.getStructure();  
 		String departmentName = "-"; // 기본값
+		String teamName = "-";
 		// 부서 정보 조회
 		if(employeeStructure != null) {
+			teamName = employeeStructure.getCodeName();
+			
 			// 부서 정보가 있을 경우에만 parentCode를 사용하여 부서명 조회
 			String parentCode = employeeStructure.getParentCode();
 			Structure structure = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(parentCode);
@@ -65,6 +74,7 @@ public class MyPageController {
 			}
 		}
         model.addAttribute("departmentName", departmentName);
+        model.addAttribute("teamName",teamName);
         
         // 주소록 정보 조회
         Directory directory = employeeDirectoryService.selectDirectoryByEmployeeNo(employeeNo);
@@ -73,7 +83,6 @@ public class MyPageController {
         	DirectoryDto directoryDto = new DirectoryDto().toDto(directory);
         	model.addAttribute("directory", directoryDto);
         }
-        
         
         // 연차 정보 조회
         AnnualLeave annualLeave = attendanceService.selectAnnualLeaveByEmployeeNo(employeeNo);
@@ -87,6 +96,15 @@ public class MyPageController {
 			annualLeaveDto.setAnnual_leave_remain(0.0);
 		}
         model.addAttribute("annualLeave",annualLeaveDto);
+        
+        // 프로필 이미지 조회
+        Drive latestProfile = driveRepository.findTop1ByUploader_EmployeeNoAndSeparatorCodeAndVisibleYnOrderByDriveRegDateDesc(
+        		employeeNo, "FL008", "Y");
+
+        String profileImgUrl = (latestProfile != null) ?
+        	"/upload/" + latestProfile.getDrivePath() :
+        	"/assets/img/team/avatar.webp"; // 기본 프로필 이미지
+        model.addAttribute("profileImage",profileImgUrl);
         
 		// 근태 기록이 있는 월 목록 조회
 		List<String> monthList = attendanceService.selectAttendanceMonthList(employeeNo);
@@ -136,21 +154,31 @@ public class MyPageController {
 	@GetMapping("/getEmployeeDetail")
 	@ResponseBody
 	public Map<String, Object> getEmployeeDetail(@RequestParam("employeeNo") Long employeeNo) {
-	    Map<String, Object> result = new HashMap<>();
+		Map<String, Object> result = new HashMap<>();
 	    Employee employee = employeeService.findEmployeeByEmployeeNo(employeeNo);
-	    Directory directory = employeeDirectoryService.selectDirectoryByEmployeeNo(employeeNo);
 
-	    if (employee == null || directory == null) {
+	    if (employee == null) {
 	        result.put("res_code", 404);
-	        result.put("res_msg", "정보를 찾을 수 없습니다.");
+	        result.put("res_msg", "회원 정보를 찾을 수 없습니다.");
 	        return result;
 	    }
 
+	    // 기본 정보 설정
 	    result.put("res_code", 200);
 	    result.put("employee_name", employee.getEmployeeName());
-	    result.put("directory_phone", directory.getDirectoryPhone());
-	    result.put("directory_zipcode", directory.getDirectoryZipcode());
-	    result.put("directory_address", directory.getDirectoryAddress());
+	    result.put("employee_position", employee.getEmployeePosition());
+	    result.put("employee_birth", employee.getEmployeeBirth() != null ? employee.getEmployeeBirth().toString() : "");
+	    result.put("employee_hire_date", employee.getEmployeeHireDate() != null ? employee.getEmployeeHireDate().toLocalDate().toString() : "");
+	    result.put("employee_end_date", employee.getEmployeeEndDate() != null ? employee.getEmployeeEndDate().toLocalDate().toString() : "");
+
+	    // Directory 정보는 있을 때만 추가
+	    Directory directory = employeeDirectoryService.selectDirectoryByEmployeeNo(employeeNo);
+	    if (directory != null) {
+	        result.put("directory_phone", directory.getDirectoryPhone());
+	        result.put("directory_zipcode", directory.getDirectoryZipcode());
+	        result.put("directory_address", directory.getDirectoryAddress());
+	    }
+
 	    return result;
 	}
 	
@@ -181,4 +209,5 @@ public class MyPageController {
 
 	    return resultMap;
 	}
+
 }

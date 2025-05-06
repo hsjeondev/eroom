@@ -71,7 +71,7 @@
                   <div id="currentTime" class="current-time fw-semibold mb-2"></div>
                   <div class="d-flex justify-content-center mb-3">
                     <img id="profileImage" class="rounded-circle me-3 profile-img"
-                         src="/assets/img/team/15.webp" alt="프로필">
+                         src="" alt="프로필" style="display: none;">
                     <div class="text-start">
                       <p class="fw-semibold fs-8 mb-0" th:text="${employee.employeeName}">이름</p>
                       <small th:if="${employee.structure != null}"
@@ -272,6 +272,22 @@
         if(localStorage.getItem("attendanceDate") === today){
           // 필요시 상태 복구 로직 넣기
         }
+        
+        // 프로필 사진
+		const profile = document.getElementById('profileImage');
+        fetch('/profile/image')
+        	.then(response => response.json())
+        	.then(data => {
+        		if(data.profileImage){
+        			if(profile){
+        				profile.onload = () => profile.style.display = 'inline';
+        				profile.src = data.profileImage;
+        			}
+        		}
+        	})
+        	.catch(error => {
+        		console.error('프로필 이미지 로드 실패 : ',error);
+        	});
       });
     </script>
 
