@@ -36,4 +36,6 @@ public interface MeetingRoomRepository extends JpaRepository<MeetingRoom,Long>,J
 
 	@Query("SELECT r FROM MeetingRoom r WHERE r.visibleYn = 'Y' AND r.separatorCode = 'F001' AND DATE(r.reservationStart) = CURRENT_DATE")
 	List<MeetingRoom> findTodayMeetingRoomReservations();
+	
+	List<MeetingRoom> findByVisibleYnAndSeparatorCodeOrderByReservationStartDesc(String visibleYn, String separatorCode);
 }

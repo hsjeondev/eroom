@@ -37,4 +37,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle,Long>,JpaSpecif
 	
 	 @Query("SELECT v FROM Vehicle v WHERE DATE(v.reservationStart) = CURRENT_DATE AND v.visibleYn = 'Y' AND v.separatorCode = 'F002'")
 	 List<Vehicle> findTodayVehicleReservations();
+	 
+	 List<Vehicle> findByVisibleYnAndSeparatorCodeOrderByReservationStartDesc(String visibleYn, String separatorCode);
 }
