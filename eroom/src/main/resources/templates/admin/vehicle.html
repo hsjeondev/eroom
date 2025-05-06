@@ -46,18 +46,18 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					<tr>
 						<th class="sort" data-sort="no" style="width: 5%;">번호</th>
 						<th class="sort" data-sort="vehicle" style="width: 25%;">차량</th>
-						<th class="sort" data-sort="passengers" style="width: 20%;">탑승 인원</th>
+						<th class="sort" data-sort="passengers" style="width: 20%;">탑승 가능 인원</th>
 						<th class="sort" data-sort="date" style="width: 20%;">등록일</th>
 						<th style="width: 10%;"></th>
 					</tr>
 				</thead>
 				<tbody class="list align-middle">
 					<!-- 차량 1 -->
-					<tr class="align-middle">
-						<td class="no">1</td>
-						<td class="vehicle">제네시스 G80[37주 2800]</td>
-						<td class="passengers">4명</td>
-						<td class="date">2025-04-10</td>
+					<tr th:if="${!#lists.isEmpty(vehicleList)}" th:each="vehicle, status : ${vehicleList}" class="align-middle">
+						<td class="no" th:text="${status.count}">번호</td>
+						<td class="vehicle" th:text="${vehicle.facilityName}">차량명</td>
+						<td class="passengers" th:text="|${vehicle.facilityCapacity}명|">탑승 가능 인원</td>
+						<td class="date" th:text="${#temporals.format(vehicle.facilityRegDate, 'yy.MM.dd')}">등록일</td>
 						<td class="text-end pe-0">
 							<div class="btn-reveal-trigger position-static">
 								<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
@@ -71,51 +71,15 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 							</div>
 						</td>
 					</tr>
-					<!-- 차량 2 -->
-					<tr class="align-middle">
-						<td class="no">2</td>
-						<td class="vehicle">아반떼[40마 4144]</td>
-						<td class="passengers">4명</td>
-						<td class="date">2025-04-10</td>
-						<td class="text-end pe-0">
-							<div class="btn-reveal-trigger position-static">
-								<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-									<i class="fas fa-ellipsis fs-10"></i>
-								</button>
-								<div class="dropdown-menu dropdown-menu-end py-2">
-									<a class="dropdown-item" href="#!">수정</a>
-										<div class="dropdown-divider"></div>
-									<a class="dropdown-item text-danger" href="#!">삭제</a>
-								</div>
-							</div>
-						</td>
-					</tr>
-					<!-- 차량 3 -->
-					<tr class="align-middle">
-						<td class="no">3</td>
-						<td class="vehicle">아이오닉[30다 5512]</td>
-						<td class="passengers">4명</td>
-						<td class="date">2025-04-10</td>
-						<td class="text-end pe-0">
-							<div class="btn-reveal-trigger position-static">
-								<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-									<i class="fas fa-ellipsis fs-10"></i>
-								</button>
-								<div class="dropdown-menu dropdown-menu-end py-2">
-									<a class="dropdown-item" href="#!">수정</a>
-										<div class="dropdown-divider"></div>
-									<a class="dropdown-item text-danger" href="#!">삭제</a>
-								</div>
-							</div>
-						</td>
+					<tr th:if="${#lists.isEmpty(vehicleList)}">
+						<td colspan="5">등록된 차량이 없습니다.</td>
 					</tr>
 				</tbody>
 			</table>
 	    </div>
 	
-	    <!-- 페이징? -->
+	    <!-- 페이징 -->
 	    <div class="d-flex justify-content-center mt-3">
-	     <!--  <span class="d-none d-sm-inline-block" data-list-info="data-list-info">1 to 4 <span class="text-body-tertiary"> Items of </span>4</span> -->
 	      <div class="d-flex">
 	        <button class="page-link disabled" data-list-pagination="prev" disabled><i class="fas fa-chevron-left"></i></button>
 	        <ul class="mb-0 pagination">
@@ -135,7 +99,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		<span class="fw-bold fs-7"> 차량 예약 현황</span>
 	</div>
 
-	<div id="reservationTable" data-list='{"valueNames":["no","vehicle","passengers","date"], "page": 5, "pagination": true}'>
+	<div id="reservationTable" data-list='{"valueNames":["no","vehicle","reservation","date","time"], "page": 5, "pagination": true}'>
 		<!-- 검색창 + 추가 버튼 영역 -->
 		<div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
 			<!-- 검색창 (가운데 정렬) -->
@@ -158,40 +122,23 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				<thead class="text-center align-middle">
 					<tr>
 						<th class="sort" data-sort="no" style="width: 5%;">번호</th>
-						<th class="sort" data-sort="vehicle" style="width: 15%;">차량</th>
-						<th class="sort" data-sort="reservation" style="width: 10%;">예약자</th>
-						<th class="sort" data-sort="passengers" style="width: 30%;">탑승인원</th>
-						<th class="sort" data-sort="date" style="width: 20%;">예약일</th>
-						<th class="sort" data-sort="time" style="width: 20%;">예약 시간</th>
+						<th class="sort" data-sort="vehicle" style="width: 25%;">차량</th>
+						<th class="sort" data-sort="reservation" style="width: 15%;">예약자</th>
+						<th class="sort" data-sort="date" style="width: 25%;">예약일</th>
+						<th class="sort" data-sort="time" style="width: 30%;">예약 시간</th>
 					</tr>
 				</thead>
 				<tbody class="list align-middle">
-					<!-- 차량 1 -->
-					<tr>
-						<td class="no">1</td>
-						<td class="vehicle">아이오닉[30다 5512]</td>
-						<td class="reservation">이예준</td>
-						<td class="passengers">이예준, 조은성, 권용규</td>
-						<td class="date">2025-04-10</td>
-						<td class="time">10:00 ~ 13:00</td>
+					<tr th:if="${!#lists.isEmpty(vehicleReservationList)}"
+						th:each="res, status : ${vehicleReservationList}">
+						<td class="no" th:text="${status.count}">1</td>
+						<td class="vehicle" th:text="${res.vehicleName}">차량명</td>
+						<td class="reservation" th:text="${res.reserverName}">예약자</td>
+						<td class="date" th:text="${#temporals.format(res.reservation_start, 'yyyy.MM.dd')}">예약날짜</td>
+						<td class="time" th:text="${#temporals.format(res.reservation_start, 'HH:mm')} + ' ~ ' + ${#temporals.format(res.reservation_end, 'HH:mm')}">예약시간</td>
 					</tr>
-					<!-- 차량 2 -->
-					<tr>
-						<td class="no">2</td>
-						<td class="vehicle">아반떼[40마 4144]</td>
-						<td class="reservation">김태영</td>
-						<td class="passengers">김태영</td>
-						<td class="date">2025-04-10</td>
-						<td class="time">17:00 ~ 22:00</td>
-					</tr>
-					<!-- 차량 3 -->
-					<tr>
-						<td class="no">3</td>
-						<td class="vehicle">G80[37주 2800]</td>
-						<td class="reservation">전홍식</td>
-						<td class="passengers">전홍식, 조윤아, 강성관</td>
-						<td class="date">2025-04-17</td>
-						<td class="time">10:00 ~ 18:00</td>
+					<tr th:if="${#lists.isEmpty(vehicleReservationList)}">
+						<td colspan="5">예약된 차량이 없습니다.</td>
 					</tr>
 				</tbody>
 			</table>

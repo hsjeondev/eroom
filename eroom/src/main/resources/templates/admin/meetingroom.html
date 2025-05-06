@@ -19,7 +19,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
 
 
-	<div id="meetingroomTable" data-list='{"valueNames":["no","meetingroom","location","capacity","date"], "page": 5, "pagination": true}'>
+	<div id="meetingroomTable" data-list='{"valueNames":["no","meetingroom","capacity","date"], "page": 5, "pagination": true}'>
     
 		<!-- 검색창 + 추가 버튼 영역 -->
 		<div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
@@ -50,21 +50,19 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				<thead class="text-center align-middle">
 					<tr>
 						<th class="sort" data-sort="no" style="width: 5%;">번호</th>
-						<th class="sort" data-sort="meetingroom" style="width: 30%;">회의실</th>
-						<th class="sort" data-sort="location" style="width: 20%;">위치</th>
-						<th class="sort" data-sort="capacity" style="width: 15%;">수용 인원</th>
+						<th class="sort" data-sort="meetingroom" style="width: 25%;">회의실</th>
+						<th class="sort" data-sort="capacity" style="width: 20%;">수용 인원</th>
 						<th class="sort" data-sort="date" style="width: 20%;">등록일</th>
 						<th style="width: 10%;"></th>
 					</tr>
 				</thead>
 				<tbody class="list align-middle">
 					<!-- 회의실 1 -->
-					<tr>
-						<td class="no">1</td>
-						<td class="meetingroom">회의실A</td>
-						<td class="location">1관 2층</td>
-						<td class="capacity">8명</td>
-						<td class="date">2025-04-10</td>
+					<tr th:if="${!#lists.isEmpty(meetingroomList)}" th:each="meetingroom, status : ${meetingroomList}">
+						<td class="no" th:text="${status.count}">1</td>
+						<td class="meetingroom" th:text="${meetingroom.facilityName}">회의실A</td>
+						<td class="capacity" th:text="|${meetingroom.facilityCapacity}명|"></td>
+						<td class="date" th:text="${#temporals.format(meetingroom.facilityRegDate, 'yy.MM.dd')}">2025-04-10</td>
 						<td class="align-middle text-end pe-0">
 							<div class="btn-reveal-trigger position-static">
 								<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
@@ -78,53 +76,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 							</div>
 						</td>
 					</tr>
-				
-					<!-- 회의실 2 -->
-					<tr>
-						<td class="no">2</td>
-						<td class="meetingroom">회의실B</td>
-						<td class="location">1관 3층</td>
-						<td class="capacity">5명</td>
-						<td class="date">2025-04-10</td>
-						<td class="text-end pe-0">
-							<div class="btn-reveal-trigger position-static">
-								<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-									<i class="fas fa-ellipsis fs-10"></i>
-								</button>
-								<div class="dropdown-menu dropdown-menu-end py-2">
-									<a class="dropdown-item" href="#!">수정</a>
-									<div class="dropdown-divider"></div>
-									<a class="dropdown-item text-danger" href="#!">삭제</a>
-								</div>
-							</div>
-						</td>
-					</tr>
-				
-					<!-- 회의실 3 -->
-					<tr>
-						<td class="no">3</td>
-						<td class="meetingroom">회의실C</td>
-						<td class="location">1관 4층</td>
-						<td class="capacity">10명</td>
-						<td class="date">2025-04-10</td>
-						<td class="text-end pe-0">
-							<div class="btn-reveal-trigger position-static">
-								<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-									<i class="fas fa-ellipsis fs-10"></i>
-								</button>
-								<div class="dropdown-menu dropdown-menu-end py-2">
-									<a class="dropdown-item" href="#!">수정</a>
-									<div class="dropdown-divider"></div>
-									<a class="dropdown-item text-danger" href="#!">삭제</a>
-								</div>
-							</div>
-						</td>
+					<tr th:if="${#lists.isEmpty(meetingroomList)}">
+						<td colspan="5">등록된 회의실이 없습니다.</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 
-	    <!-- 페이징? -->
+	    <!-- 페이징 -->
 	    <div class="d-flex justify-content-center mt-3">
 			<div class="d-flex">
 				<button class="page-link disabled" data-list-pagination="prev" disabled><i class="fas fa-chevron-left"></i></button>
@@ -146,7 +105,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	</div>
 
 
-	<div id="reservationTable" data-list='{"valueNames":["no","meetingroom","reservation","capacity","date","time"], "page": 5, "pagination": true}'>
+	<div id="reservationTable" data-list='{"valueNames":["no","meetingroom","reservation","date","time"], "page": 5, "pagination": true}'>
 	    
 		<!-- 검색창 + 추가 버튼 영역 -->
 		<div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
@@ -171,41 +130,24 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				<thead class="text-center align-middle">
 					<tr>
 						<th class="sort" data-sort="no" style="width: 5%;">번호</th>
-						<th class="sort" data-sort="meetingroom" style="width: 15%;">회의실</th>
-						<th class="sort" data-sort="reservation" style="width: 10%;">예약자</th>
-						<th class="sort" data-sort="capacity" style="width: 30%;">참가 인원</th>
-						<th class="sort" data-sort="date" style="width: 20%;">예약일</th>
-						<th class="sort" data-sort="time" style="width: 20%;">예약 시간</th>
+						<th class="sort" data-sort="meetingroom" style="width: 25%;">회의실</th>
+						<th class="sort" data-sort="reservation" style="width: 15%;">예약자</th>
+						<th class="sort" data-sort="date" style="width: 25%;">예약일</th>
+						<th class="sort" data-sort="time" style="width: 30%;">예약 시간</th>
 					</tr>
 				</thead>
 				<tbody class="list align-middle">
-				<!-- 회의실 1 -->
-					<tr>
-						<td class="no">1</td>
-						<td class="meetingroom">회의실A</td>
-						<td class="reservation">강성관</td>
-						<td class="capacity">강성관, 권용규, 김태영, 이예준, 전홍식, 조은성, 조윤아</td>
-						<td class="date">2025-04-10</td>
-						<td class="time">10:00 ~ 12:00</td>
+					<tr th:if="${!#lists.isEmpty(meetingroomReservationList)}"
+						th:each="res, status : ${meetingroomReservationList}">
+						<td class="no" th:text="${status.count}">1</td>
+						<td class="meetingroom" th:text="${res.meetingRoomName}">회의실A</td>
+						<td class="reservation" th:text="${res.reserverName}">강성관</td>
+						<td class="date" th:text="${#temporals.format(res.reservation_start, 'yyyy.MM.dd')}">2025-04-10</td>
+						<td class="time" th:text="${#temporals.format(res.reservation_start, 'HH:mm')} + ' ~ ' + ${#temporals.format(res.reservation_end, 'HH:mm')}">10:00 ~ 12:00</td>
 					</tr>
-					<!-- 회의실 2 -->
-					<tr>
-						<td class="no">2</td>
-						<td class="meetingroom">회의실B</td>
-						<td class="reservation">조윤아</td>
-						<td class="capacity">조윤아, 이예준, 강성관</td>
-						<td class="date">2025-04-10</td>
-						<td class="time">13:00 ~ 14:00</td>
+					<tr th:if="${#lists.isEmpty(meetingroomReservationList)}">
+						<td colspan="5">예약된 회의실이 없습니다.</td>
 					</tr>
-					<!-- 회의실 3 -->
-					<tr>
-						<td class="no">3</td>
-						<td class="meetingroom">회의실C</td>
-						<td class="reservation">전홍식</td>
-						<td class="capacity">전홍식, 조은성, 정재익, 양서원, 권용규, 황정현, 박수빈, 조윤아, 강성관, 이예준</td>
-						<td class="date">2025-04-10</td>
-						<td class="time">15:00 ~ 17:00</td>
-					 </tr>
 				</tbody>
 			</table>
 	    </div>
