@@ -57,7 +57,7 @@ public class Directory {
 	private String visibleYn; // 사용여부
 	@Column(name = "directory_reg_date", insertable = false, updatable = false)
 	private LocalDateTime directoryRegDate; // 생성시간
-	@Column(name = "directory_mod_date")
+	@Column(name = "directory_mod_date", insertable = false, updatable = false)
 	private LocalDateTime directoryModDate; // 수정시간
 	@Column(name = "directory_position")
 	private String directoryPosition; // 직급
@@ -69,6 +69,8 @@ public class Directory {
 	private String directoryZipcode; // 우편번호
 	@Column(name = "directory_address")
 	private String directoryAddress; // 주소
+	@Column(name="drive_attach_no")
+	private Long driveAttachNo; // 드라이브 번호
 	@OneToOne
 	@ToString.Exclude
 	@JoinColumn(name = "employee_no")

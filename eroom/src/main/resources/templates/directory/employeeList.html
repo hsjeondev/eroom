@@ -187,7 +187,8 @@ td.name p {
 
 							<!-- 부서/팀 추가 버튼 -->
 							<div class="col-auto">
-								<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDirectoryModal">부서/팀 추가</button>
+								<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDepartmentAndTeamModal">부서/팀 추가</button>
+								<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sortOrderModal">부서/팀 정렬</button>
 							</div>
 
 
@@ -232,38 +233,88 @@ td.name p {
 				</div>
 				<!-- employeeTable -->
 
-				<!-- 팀 추가 모달 -->
-				<div class="modal fade" id="addDirectoryModal" tabindex="-1" aria-labelledby="addDirectoryModalLabel" aria-hidden="true">
-					<div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
-						<div class="modal-content">
-							<div class="modal-header py-2">
-								<h5 class="modal-title fw-bold" id="addDirectoryModalLabel">부서/팀 추가</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+
+				<!-- Sortable JS 모달 -->
+				<div class="modal fade" id="sortOrderModal" tabindex="-1" aria-labelledby="sortOrderModalLabel" aria-hidden="true">
+				  <div class="modal-dialog modal-lg modal-dialog-centered">
+				    <div class="modal-content border border-secondary" style="height: 100%;">
+				      <div class="modal-header bg-light">
+				        <h5 class="modal-title" id="sortOrderModalLabel">부서 및 팀 정렬</h5>
+				        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+				      </div>
+				      <div class="modal-body">
+				        <!-- 부서 및 팀 정렬 리스트 -->
+				        <ul id="departmentList" class="list-group" >
+				          <li class="list-group-item department-item" th:each="dept, deptStatus : ${departmentList}" th:attr="data-order=${deptStatus.count}">
+				            <div class="fw-bold department-header" th:text="${dept.codeName}">부서명</div>
+				            <ul class="list-group ms-3 sortable-team" th:attr="data-department-id=${dept.separatorCode}">
+				              <li th:each="team, teamStatus : ${teamMap[dept.codeName]}" class="list-group-item team-item" th:attr="data-team-id=${team.separatorCode}" th:text="${team.codeName}">팀명</li>
+				            </ul>
+				          </li>
+				        </ul>
+				      </div>
+				      <div class="modal-footer">
+				        <button class="btn btn-light" data-bs-dismiss="modal">닫기</button>
+				        <button class="btn btn-primary" id="saveSortOrderBtn">저장</button>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+				
+				
+				
+				
+				
+
+				
+				<!-- 부서, 팀 추가 모달 -->
+		<div class="modal fade" id="addDepartmentAndTeamModal" tabindex="-1" aria-labelledby="addDepartmentAndTeamModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+				<div class="modal-content">
+					<div class="modal-header py-2">
+						<h5 class="modal-title fw-bold" id="addDepartmentAndTeamModalLabel">부서/팀 추가</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+					</div>
+					<div class="modal-body px-4">
+						<!-- 라디오 전환 -->
+						<div class="mb-3">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="addType" id="addDept" value="dept" checked>
+								<label class="form-check-label" for="addDept">부서 추가</label>
 							</div>
-							<div class="modal-body px-4">
-								<form>
-									<!-- 부서 -->
-									<div class="mb-3">
-										<label for="dept" class="form-label fw-semibold">부서</label> <select class="form-select form-select-sm" id="dept">
-											<option selected>선택</option>
-											<option value="영업부">영업부</option>
-											<option value="운영부">운영부</option>
-											<option value="기술부">기술부</option>
-										</select>
-									</div>
-									<!-- 팀명 -->
-									<div class="mb-3">
-										<label for="teamName" class="form-label fw-semibold">팀명</label> <input type="text" class="form-control form-control-sm" id="teamName" placeholder="ㅇㅇ팀">
-									</div>
-								</form>
-							</div>
-							<div class="modal-footer py-2">
-								<button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
-								<button type="submit" class="btn btn-primary btn-sm" onclick="showConfirm()">등록</button>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="addType" id="addTeam" value="team">
+								<label class="form-check-label" for="addTeam">팀 추가</label>
 							</div>
 						</div>
+		
+						<!-- 폼 -->
+						<form id="addForm">
+							<!-- 부서명 -->
+							<div id="deptInput" class="mb-3">
+								<label for="deptName" class="form-label fw-semibold">부서명</label>
+								<input type="text" class="form-control form-control-sm" id="deptName" placeholder="예: 기술부">
+							</div>
+		
+							<!-- 팀 선택 + 팀명 -->
+							<div id="teamInputs" class="mb-3" style="display: none;">
+								<label for="parentDept" class="form-label fw-semibold">상위 부서</label>
+								<select class="form-select form-select-sm mb-2" id="parentDept">
+									<option selected disabled value="0">선택</option>
+									<option th:each="dept : ${departmentList}" th:text="${dept.codeName}" th:value="${dept.separatorCode}">기술부</option>
+								</select>
+								<label for="teamName" class="form-label fw-semibold">팀명</label>
+								<input type="text" class="form-control form-control-sm" id="teamName" placeholder="예: 개발 1팀">
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer py-2">
+						<button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
+						<button type="submit" class="btn btn-primary btn-sm" onclick="showConfirm()">등록</button>
 					</div>
 				</div>
+			</div>
+		</div>
 
 				<!--  Confirm Modal -->
 				<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
@@ -794,7 +845,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // 팀 드롭다운 초기화 및 조회
-    console.log(deptSeparatorCode);
     if (deptSeparatorCode === 'selectAll') {
     	  // selectAll인 경우 → 강조 제거 + 드롭다운 초기화
     	  document.querySelectorAll('.treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
@@ -940,6 +990,185 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 </script>
+
+<!-- 부서,팀 추가 모달 이벤트 처리 -->
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const deptInput = document.getElementById('deptInput');
+		const teamInputs = document.getElementById('teamInputs');
+		const radios = document.querySelectorAll('input[name="addType"]');
+	
+		radios.forEach(radio => {
+			radio.addEventListener('change', () => {
+				if (radio.value === 'dept') {
+					deptInput.style.display = 'block';
+					teamInputs.style.display = 'none';
+				} else {
+					deptInput.style.display = 'none';
+					teamInputs.style.display = 'block';
+				}
+			});
+		});
+	});
+	
+function showConfirm() {
+	const addType = document.querySelector('input[name="addType"]:checked').value;
+
+	if (addType === 'dept') {
+		// 부서 추가
+		const deptName = document.getElementById('deptName').value.trim();
+		if (!deptName) {
+			alert('부서명을 입력해주세요.');
+			return;
+		}
+
+		fetch('/admin/addDepartmentOrTeam', {
+			method: 'POST',
+			headers: {
+			    'Content-Type': 'application/json',
+			    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+			    'header': document.querySelector('meta[name="_csrf_header"]').content
+			},
+			body: JSON.stringify({ codeName: deptName })
+		})
+		.then(res => res.ok ? res.json() : Promise.reject(res))
+		.then(data => {
+			if(data.res_code === '200'){
+				alert('부서가 등록되었습니다.');
+			}
+			location.reload();
+		})
+		.catch(err => {
+			console.error(err);
+			alert('부서 등록 실패');
+		});
+		
+	} else {
+		// 팀 추가
+		const parentDept = document.getElementById('parentDept').value;
+		const teamName = document.getElementById('teamName').value.trim();
+
+		if (!parentDept || parentDept == '0') {
+			alert('상위 부서를 선택해주세요.');
+			return;
+		}
+		if (!teamName) {
+			alert('팀명을 입력해주세요.');
+			return;
+		}
+
+		fetch('/admin/addDepartmentOrTeam', {
+			method: 'POST',
+			headers: {
+			    'Content-Type': 'application/json',
+			    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+			    'header': document.querySelector('meta[name="_csrf_header"]').content
+			},
+			body: JSON.stringify({
+				parentCode: parentDept,
+				codeName: teamName
+			})
+		})
+		.then(res => res.ok ? res.json() : Promise.reject(res))
+		.then(data => {
+			if(data.res_code === '200'){
+				alert('팀이 등록되었습니다.');
+			}
+			location.reload();
+		})
+		.catch(err => {
+			console.error(err);
+			alert('팀 등록 실패');
+		});
+	}
+}
+</script>
+
+<!-- Sortable.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js" integrity="sha512-zYXldzJsDrNKV+odAwFYiDXV2Cy37cwizT+NkuiPGsa9X1dOz04eHvUWVuxaJ299GvcJT31ug2zO4itXBjFx4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // 1. 부서 정렬 Sortable
+  const departmentList = document.getElementById('departmentList');
+  Sortable.create(departmentList, {
+    animation: 150,
+    handle: '.department-header',
+    draggable: '.department-item',
+    onEnd: () => {
+      console.log('부서 순서 변경됨');
+    }
+  });
+
+  // 2. 각 팀 리스트에 대해 Sortable + 교차 이동 허용
+  document.querySelectorAll('.sortable-team').forEach(teamList => {
+    Sortable.create(teamList, {
+      group: 'teams', // 동일 그룹이면 드래그 간 이동 가능
+      animation: 150,
+      draggable: '.team-item',
+      onEnd: () => {
+        console.log('팀 위치 변경됨');
+      }
+    });
+  });
+
+  // 3. 저장 버튼 클릭 시 → 정렬된 데이터 추출
+  document.getElementById('saveSortOrderBtn').addEventListener('click', function () {
+    const result = [];
+
+    document.querySelectorAll('#departmentList > .department-item').forEach((deptEl, deptIndex) => {
+      const departmentOrder = deptIndex + 1;
+      const departmentName = deptEl.querySelector('.department-header').innerText.trim();
+      const departmentId = deptEl.querySelector('.sortable-team').getAttribute('data-department-id');
+
+      const teamList = [];
+      deptEl.querySelectorAll('.team-item').forEach((teamEl, teamIndex) => {
+        teamList.push({
+        	teamSeparatorCode: teamEl.getAttribute('data-team-id'),
+        	teamCodeName: teamEl.innerText.trim(),
+        	teamSortOrder: teamIndex + 1,
+        	newDepartmentSeparatorCode: departmentId
+        });
+      });
+
+      result.push({
+    	  departmentSeparatorCode: departmentId,
+    	  departmentCodeName: departmentName,
+    	  departmentSortOrder: departmentOrder,
+        teams: teamList
+      });
+    });
+
+    console.log('저장 데이터:', result);
+
+    fetch('/admin/updateSortOrder', {
+      method: 'PUT',
+      headers: {
+	    'Content-Type': 'application/json',
+	    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+	    'header': document.querySelector('meta[name="_csrf_header"]').content
+      },
+      body: JSON.stringify({
+    	  sortData: result
+    	  })
+    })
+    .then(res => res.json())
+    .then(data => {
+    	if(data.res_code == '200'){
+	      alert('정렬 정보가 저장되었습니다!');
+	      location.reload();
+    	}
+    	console.log(data.res_msg);
+    })
+    .catch(err => {
+      console.error('정렬 저장 오류:', err);
+      alert('오류가 발생했습니다.');
+    });
+  });
+});
+</script>
+
+
 								
 
 

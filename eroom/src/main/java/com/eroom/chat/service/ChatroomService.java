@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.eroom.chat.dto.ChatMessageDto;
 import com.eroom.chat.dto.ChatroomDto;
 import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.chat.entity.Chatroom;
@@ -176,21 +177,103 @@ public class ChatroomService {
 
 
 	// 채팅 파일 업로드
-	public int uploadChatFiles(DriveDto driveDto, Long employeeNo) {
-	    int result = 0;
+	// 채팅 파일 업로드
+//	@Transactional
+//	public int uploadChatFiles(DriveDto driveDto, Long employeeNo) {
+//	    int result = 0;
+//
+//	    // 채팅 업로드는 무조건 separatorCode 가 FL003 이어야 함
+//	    if (!"FL003".equals(driveDto.getSeparatorCode())) {
+//	        throw new IllegalArgumentException("채팅 업로드에는 separatorCode=FL003 이 필수입니다.");
+//	    }
+//
+//	    // 채팅방 번호도 필수
+//	    if (driveDto.getParam1() == null) {
+//	        throw new IllegalArgumentException("chatroomNo (param1)이 누락되었습니다.");
+//	    }
+//
+//	    List<MultipartFile> files = driveDto.getDriveFiles();
+//	    List<String> descriptions = driveDto.getDriveDescriptions();
+//
+//	    // 로그인한 사용자 정보 가져오기
+//	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+//	    Employee sender = employeeDetails.getEmployee(); // 현재 로그인한 직원
+//
+//	    for (int i = 0; i < files.size(); i++) {
+//	        MultipartFile file = files.get(i);
+//	        try {
+//	            String oriName = file.getOriginalFilename();
+//	            String ext = oriName.substring(oriName.lastIndexOf("."));
+//	            String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+//
+//	            // 채팅 전용 디렉토리
+//	            String path = fileDir + "drive/chat/" + newName;
+//	            File savedFile = new File(path);
+//	            if (!savedFile.getParentFile().exists()) {
+//	                savedFile.getParentFile().mkdirs();
+//	            }
+//	            file.transferTo(savedFile);
+//
+//	            String description = (descriptions != null && descriptions.size() > i) ? descriptions.get(i) : null;
+//	            Employee uploader = employeeRepository.findById(employeeNo)
+//	                    .orElseThrow(() -> new RuntimeException("업로더를 찾을 수 없습니다."));
+//	            Drive drive = Drive.builder()
+//	                    .uploader(uploader)
+//	                    .separatorCode("FL003")
+//	                    .driveOriName(oriName)
+//	                    .driveNewName(newName)
+//	                    .driveType(ext)
+//	                    .driveSize(file.getSize())
+//	                    .drivePath("drive/chat/" + newName)
+//	                    .driveDescription(description)
+//	                    .param1(driveDto.getParam1()) // 채팅방 번호 저장
+//	                    .downloadCount(0L)
+//	                    .visibleYn("Y")
+//	                    .build();
+//
+//	            // 파일 첨부 메시지 생성
+//	            ChatMessageDto chatMessage = new ChatMessageDto();
+//	            chatMessage.setSenderMember(sender.getEmployeeNo()); // senderMember 설정
+//	            // receiverMember 설정
+//	            Long receiverEmployeeNo = driveDto.getParam1();  // 이 값을 통해 수신자 정보를 가져올 수 있음
+//	            chatMessage.setReceiverMember(receiverEmployeeNo); // receiverMember 설정
+//	            chatMessage.setChatMessageContent("파일첨부메시지");
+//	            chatMessage.setMessageRegDate(LocalDateTime.now());
+//
+//	            // 저장
+//	            driveRepository.save(drive);
+//	            result++;
+//
+//	        } catch (Exception e) {
+//	            System.out.println("채팅 파일 업로드 실패: " + file.getOriginalFilename());
+//	            e.printStackTrace();
+//	        }
+//	    }
+//
+//	    return result;
+//	}
 
-	    // 채팅 업로드는 무조건 separatorCode 가 FL003 이어야 함
+
+
+
+	@Transactional
+	public List<Drive> uploadChatFilesAndReturnDrives(DriveDto driveDto, Long employeeNo) {
+	    List<Drive> savedDrives = new ArrayList<>();
+
 	    if (!"FL003".equals(driveDto.getSeparatorCode())) {
 	        throw new IllegalArgumentException("채팅 업로드에는 separatorCode=FL003 이 필수입니다.");
 	    }
 
-	    // 채팅방 번호도 필수
 	    if (driveDto.getParam1() == null) {
 	        throw new IllegalArgumentException("chatroomNo (param1)이 누락되었습니다.");
 	    }
 
 	    List<MultipartFile> files = driveDto.getDriveFiles();
 	    List<String> descriptions = driveDto.getDriveDescriptions();
+
+	    Employee uploader = employeeRepository.findById(employeeNo)
+	        .orElseThrow(() -> new RuntimeException("업로더를 찾을 수 없습니다."));
 
 	    for (int i = 0; i < files.size(); i++) {
 	        MultipartFile file = files.get(i);
@@ -199,7 +282,6 @@ public class ChatroomService {
 	            String ext = oriName.substring(oriName.lastIndexOf("."));
 	            String newName = UUID.randomUUID().toString().replace("-", "") + ext;
 
-	            // 채팅 전용 디렉토리
 	            String path = fileDir + "drive/chat/" + newName;
 	            File savedFile = new File(path);
 	            if (!savedFile.getParentFile().exists()) {
@@ -210,7 +292,7 @@ public class ChatroomService {
 	            String description = (descriptions != null && descriptions.size() > i) ? descriptions.get(i) : null;
 
 	            Drive drive = Drive.builder()
-	                .uploader(Employee.builder().employeeNo(employeeNo).build())
+	                .uploader(uploader)
 	                .separatorCode("FL003")
 	                .driveOriName(oriName)
 	                .driveNewName(newName)
@@ -218,22 +300,20 @@ public class ChatroomService {
 	                .driveSize(file.getSize())
 	                .drivePath("drive/chat/" + newName)
 	                .driveDescription(description)
-	                .param1(driveDto.getParam1()) // 채팅방 번호 저장
+	                .param1(driveDto.getParam1())
 	                .downloadCount(0L)
 	                .visibleYn("Y")
 	                .build();
 
-	            driveRepository.save(drive);
-	            result++;
-
+	            savedDrives.add(driveRepository.save(drive));
 	        } catch (Exception e) {
-	            System.out.println("채팅 파일 업로드 실패: " + file.getOriginalFilename());
 	            e.printStackTrace();
 	        }
 	    }
 
-	    return result;
+	    return savedDrives;
 	}
+
 
 
 

@@ -49,6 +49,12 @@ public class DirectoryDto {
 	private String formatted_hire_date;
 	private String formatted_end_date;
 	
+	private Long drive_attach_no;
+	
+	// 주소 정보
+	private String directory_zipcode; // 우편번호
+	private String directory_address; // 주소
+	
 //	private String employee_name;
 //	private String department_name;
 //	private String team_name;
@@ -70,6 +76,9 @@ public class DirectoryDto {
 				.directoryTeam(directory_team)
 				.directoryRegDate(directory_reg_date)
 				.directoryModDate(directory_mod_date)
+				.driveAttachNo(drive_attach_no)
+				.directoryZipcode(directory_zipcode)
+				.directoryAddress(directory_address)
 				.employee(Employee.builder().employeeNo(employee_no).build())
 				.separator(Separator.builder().separatorCode(separator_code).build())
 				.build();
@@ -89,6 +98,9 @@ public class DirectoryDto {
 				.directoryTeam(directory_team)
 				.directoryRegDate(directory_reg_date)
 				.directoryModDate(directory_mod_date)
+				.driveAttachNo(drive_attach_no)
+				.directoryZipcode(directory_zipcode)
+				.directoryAddress(directory_address)
 				.separator(Separator.builder().separatorCode(separator_code).build())
 				.build();
 	}
@@ -111,6 +123,9 @@ public class DirectoryDto {
 				.directory_reg_date(entity.getDirectoryRegDate())
 				.directory_mod_date(entity.getDirectoryModDate())
 				.employee_no(entity.getEmployee().getEmployeeNo() != null ? entity.getEmployee().getEmployeeNo() : null)
+				.drive_attach_no(entity.getDriveAttachNo())
+				.directory_zipcode(entity.getDirectoryZipcode())
+				.directory_address(entity.getDirectoryAddress())
 				.employee_name(entity.getEmployee().getEmployeeName())
 				.employee_position(entity.getEmployee().getEmployeePosition())
 				.code_name(entity.getSeparator().getSeparatorName())
@@ -149,6 +164,10 @@ public class DirectoryDto {
 	            
 	            .formatted_hire_date(emp != null && emp.getEmployeeHireDate() != null ? emp.getEmployeeHireDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
 	            .formatted_end_date(emp != null && emp.getEmployeeEndDate() != null ? emp.getEmployeeEndDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
+	            
+	            .drive_attach_no(entity.getDriveAttachNo())
+				.directory_zipcode(entity.getDirectoryZipcode())
+				.directory_address(entity.getDirectoryAddress())
 	            .build();
 	}
 

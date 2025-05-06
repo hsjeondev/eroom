@@ -57,6 +57,12 @@
 											</div>
 										</td> -->
 									</tr>
+									<tr th:if="${#lists.isEmpty(employeeList)}" class="list-item align-middle">
+										<td colspan="8">
+											직원이 없습니다.
+										</td>
+									</tr>
+									
 
 								</tbody>
 							</table>

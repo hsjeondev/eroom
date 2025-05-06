@@ -66,6 +66,13 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
 	//List<Drive> findBySeparatorCodeAndParam1AndDriveDeleteYn(String separatorCode, Long param1, String driveDeleteYn);
 	List<Drive> findBySeparatorCodeAndParam1AndVisibleYn(String separatorCode, Long param1, String visibleYn);
 	
+
+	List<Drive> findByDriveOriNameAndParam1(String driveOriName, Long param1);
+
+
 	List<Drive> findBySeparatorCodeContainingAndParam1AndVisibleYn(String separatorCode, Long param1, String visibleYn);
+
+	// 가장 최근 프로필 사진 1건 조회
+	Drive findTop1ByUploader_EmployeeNoAndSeparatorCodeAndVisibleYnOrderByDriveRegDateDesc(Long employeeNo,String separatorCode, String visibleYn);
 	
 }

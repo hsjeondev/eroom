@@ -1,6 +1,5 @@
 package com.eroom.admin.controller;
 
-import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -27,6 +26,7 @@ import com.eroom.attendance.service.AttendanceService;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.DirectoryService;
+import com.eroom.drive.service.ProfileService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.EmployeeUpdateDto;
 import com.eroom.employee.dto.StructureDto;
@@ -48,6 +48,7 @@ public class AdminController {
 	private final DirectoryService employeeDirectoryService;
 	private final StructureService structureService;
 	private final AttendanceService attendanceService;
+	private final ProfileService profileService;
 	
 	// 회의실 목록
 	@GetMapping("/meetingroom")
@@ -201,6 +202,8 @@ public class AdminController {
 				annualLeaveDto.setAnnual_leave_remain(0.0);
 			}
 			
+			String profileImageUrl = profileService.getProfileImageUrl(employee.getEmployeeNo());
+
 			// EmployeeManageDto 통합 DTO 생성
 			EmployeeManageDto manageDto = EmployeeManageDto.toDto(employeeDto,
 					directoryDto,
@@ -210,7 +213,8 @@ public class AdminController {
 					departmentName,
 					teamName,
 					employeeDto.getEmployee_hire_date() != null ? employeeDto.getEmployee_hire_date().toLocalDate().toString() : "-",
-					employeeDto.getEmployee_end_date() != null?  employeeDto.getEmployee_end_date().toLocalDate().toString() : "-"
+					employeeDto.getEmployee_end_date() != null?  employeeDto.getEmployee_end_date().toLocalDate().toString() : "-",
+					profileImageUrl
 					);
 			
 			manageDtoList.add(manageDto);
@@ -237,10 +241,16 @@ public class AdminController {
 		Employee employee = employeeService.findEmployeeByEmployeeNo(employeeNo);
 		model.addAttribute("employee", employee);
 		
+		// 프로필 이미지 URL 추가
+		String profileImageUrl = profileService.getProfileImageUrl(employeeNo);
+		model.addAttribute("profileImageUrl", profileImageUrl);
+		
 		// 부서 정보
 		String departmentName = "-"; // 기본값
+		String teamName = "-";
 		Structure employeeStructure = employee.getStructure();
 		if (employeeStructure != null) {
+			teamName = employeeStructure.getCodeName();
 			// 부서 정보가 있을 경우에만 parentCode를 사용하여 부서명 조회
 			String parentCode = employeeStructure.getParentCode();
 			Structure structure = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(parentCode);
@@ -252,7 +262,7 @@ public class AdminController {
 			}
 		}
 		model.addAttribute("departmentName", departmentName);
-
+		model.addAttribute("teamName",teamName);
 		// 주소록 정보 조회
 		Directory directory = employeeDirectoryService.selectDirectoryByEmployeeNo(employeeNo);
 		if (directory != null) {
