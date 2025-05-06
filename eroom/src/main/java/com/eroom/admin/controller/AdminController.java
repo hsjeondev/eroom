@@ -246,19 +246,22 @@ public class AdminController {
 		model.addAttribute("profileImageUrl", profileImageUrl);
 		
 		// 부서 정보
+		Structure employeeStructure = employee.getStructure();  
 		String departmentName = "-"; // 기본값
 		String teamName = "-";
-		Structure employeeStructure = employee.getStructure();
-		if (employeeStructure != null) {
-			teamName = employeeStructure.getCodeName();
-			// 부서 정보가 있을 경우에만 parentCode를 사용하여 부서명 조회
-			String parentCode = employeeStructure.getParentCode();
-			Structure structure = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(parentCode);
-			if (structure != null) {
-				departmentName = structure.getCodeName();
-			} else {
-				// 부서 정보가 없을 경우 기본값 사용
-				departmentName = "-";
+		// 부서 정보 조회
+		if(employeeStructure != null) {
+			if(employeeStructure.getParentCode() == null) {
+				// 팀이 없을 경우
+				departmentName = employeeStructure.getCodeName();
+				teamName = "-";
+			}else {
+				// 팀이 있는 경우
+				teamName = employeeStructure.getCodeName();
+				Structure department = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(employeeStructure.getParentCode());
+				if(department != null) {
+					departmentName = department.getCodeName();
+				}
 			}
 		}
 		model.addAttribute("departmentName", departmentName);
