@@ -47,7 +47,7 @@ public class Article {
     private String articleContent;
 
     @Column(name = "order_num")
-    private Integer order;  // 'order'는 예약어라 'order_num' 추천
+    private Long order_num;  //
 
     @Column(name = "visible_yn")
     private String visibleYn ; // 기본값

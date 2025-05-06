@@ -538,7 +538,7 @@ public class MailService {
 			                drive.setDriveNewName(newName); // 파일 고유 이름 생성
 			                drive.setDriveSize(driveDto.getDriveSize());
 			                drive.setDriveType(ext);
-			                drive.setDrivePath("/mail/" + newName); // 실제 저장 경로로 변경 필요
+			                drive.setDrivePath("mail/" + newName); // 실제 저장 경로로 변경 필요
 			                drive.setUploader(Employee.builder().employeeNo(mailDto.getEmployee_no()).build());
 			                drive.setParam1(mailSaver.getMailNo()); // 메일 참조 연결
 			                drive.setSeparatorCode("FL002");
