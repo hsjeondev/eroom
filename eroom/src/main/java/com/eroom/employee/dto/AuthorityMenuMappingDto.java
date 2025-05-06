@@ -1,9 +1,7 @@
 package com.eroom.employee.dto;
 
-
-
 import com.eroom.employee.entity.Authority;
-import com.eroom.employee.entity.AuthorityMenu;
+import com.eroom.nav.entity.NavMenuItem;
 import com.eroom.employee.entity.AuthorityMenuMapping;
 
 import lombok.AllArgsConstructor;
@@ -21,22 +19,25 @@ import lombok.ToString;
 @Builder
 public class AuthorityMenuMappingDto {
 
-	private Long authority_menu_mapping_no;
-	private Long authority_no;
-	private Long authority_menu_no;
-	
-	public AuthorityMenuMapping toEntity() {
-		return AuthorityMenuMapping.builder()
-				.authorityMenuMappingNo(authority_no)
-				.authority(Authority.builder().authorityNo(authority_menu_mapping_no).build())
-				.authorityMenu(AuthorityMenu.builder().authorityMenuNo(authority_menu_mapping_no).build())
-				.build();
-	}
-	
-	public AuthorityMenuMappingDto toDto(AuthorityMenuMapping entity) {
-		return AuthorityMenuMappingDto.builder()
-				.authority_menu_mapping_no(entity.getAuthorityMenuMappingNo())
-				.build();
-	}
-	
+    private Long authorityMenuMappingNo;
+    private Long authorityNo;
+    private Long authorityMenuNo;
+
+    // Entity로 변환하는 메서드
+    public AuthorityMenuMapping toEntity() {
+        return AuthorityMenuMapping.builder()
+                .authorityMenuMappingNo(this.authorityMenuMappingNo)
+                .authority(Authority.builder().authorityNo(this.authorityNo).build()) // authority_no로 Authority 설정
+                .navMenuItem(NavMenuItem.builder().id(this.authorityMenuNo).build()) // authority_menu_no로 NavMenuItem 설정
+                .build();
+    }
+
+    // DTO로 변환하는 메서드
+    public static AuthorityMenuMappingDto toDto(AuthorityMenuMapping entity) {
+        return AuthorityMenuMappingDto.builder()
+                .authorityMenuMappingNo(entity.getAuthorityMenuMappingNo())
+                .authorityNo(entity.getAuthority().getAuthorityNo()) // Authority의 authorityNo
+                .authorityMenuNo(entity.getNavMenuItem().getId()) // NavMenuItem의 id
+                .build();
+    }
 }
