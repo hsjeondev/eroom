@@ -57,7 +57,7 @@ public class Directory {
 	private String visibleYn; // 사용여부
 	@Column(name = "directory_reg_date", insertable = false, updatable = false)
 	private LocalDateTime directoryRegDate; // 생성시간
-	@Column(name = "directory_mod_date")
+	@Column(name = "directory_mod_date", insertable = false, updatable = false)
 	private LocalDateTime directoryModDate; // 수정시간
 	@Column(name = "directory_position")
 	private String directoryPosition; // 직급
