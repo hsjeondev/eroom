@@ -26,24 +26,7 @@
     .card {
       flex: 1 1 auto;
     }
-  
-  .profile-wrapper .camera-overlay {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.4);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
 
-  .profile-wrapper:hover .camera-overlay {
-    opacity: 1;
-  }  
-  .modal-header {
-  height: 40px; /* 원하는 높이로 조절 */
-  padding: 0.5rem 1rem; /* 패딩도 조절 가능 */
-  align-items: center; /* 내용 세로 중앙 정렬 */
-}  
   </style>
 </head>
 <body>
@@ -55,9 +38,7 @@
     <div class="d-flex justify-content-between align-items-center mb-2 position-relative"
         th:if="${isAdmin}">
       <span class="fw-bold fs-7">근태 / 회원 정보 수정</span>
-      <div class="position-absolute start-50 translate-middle-x">
-        <span class="current-time fw-bold text-secondary fs-6 mb-0" id="currentTime"></span>
-      </div>
+
     </div>
 
     <!-- 카드 그룹: 프로필 + 근태요약 / 주소록 + 근무시간 -->
@@ -67,23 +48,8 @@
         <div class="card">
           <div class="card-body d-flex align-items-center">
 			<!-- 관리자일 때 -->
-			<div class="profile-wrapper me-3" th:if="${isAdmin}"
-			     data-bs-toggle="modal" data-bs-target="#profileUploadModal" style="position: relative; cursor: pointer;">
-			  <img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
-			  <div class="camera-overlay" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0;
-			                                     background-color: rgba(0, 0, 0, 0.4); border-radius: 50%;
-			                                     display: flex; align-items: center; justify-content: center;">
-			    <svg class="svg-inline--fa fa-camera fs-4 text-white" aria-hidden="true" focusable="false"
-			         data-prefix="fas" data-icon="camera" role="img"
-			         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 24px; height: 24px;">
-			      <path fill="currentColor"
-			            d="M149.1 64.3c7.8-14.3 22.9-23.1 39.4-23.1h134.9c16.5 0 31.6 8.9 39.4 23.1l14.9 27.4H464
-			             c26.5 0 48 21.5 48 48v272c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V139.7c0-26.5
-			             21.5-48 48-48h86.1l14.9-27.4zM256 408c66.3 0 120-53.7 120-120s-53.7-120-120-120
-			             s-120 53.7-120 120s53.7 120 120 120zm0-48a72 72 0 1 0 0-144 72 72 0 1 0 0 144z">
-			      </path>
-			    </svg>
-			  </div>
+			<div class="profile-wrapper me-3" >
+			  <img id="profileImage" class="rounded-circle" th:src="@{${profileImageUrl}}" alt="프로필">
 			</div>
 			
 
@@ -94,8 +60,6 @@
           </div>
           <div class="card-footer border-top border-dashed pt-3">
    			<div class="d-flex align-items-center mb-2" th:if="${isAdmin}">
-				<!-- <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span> -->
-				
 				<!--  수정 버튼 -->
 				<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0" id="editAnnualLeaveBtn"
 				        data-bs-toggle="modal" data-bs-target="#editInfoModal">
@@ -128,7 +92,7 @@
       <div class="col-md-8">
         <div class="card">
           <div class="card-body">
-            <div class="fw-bold fs-8 mb-3 text-secondary">근태 요약</div>
+            <div class="fw-bold fs-8 mb-3 text-secondary">이번 달 근태 요약</div>
             <div class="row text-center">
               <div class="col text-center d-flex flex-column align-items-center">
                 <div class="fw-semibold mb-2">출근일수</div>
@@ -163,10 +127,8 @@
         <div class="card">
           <div class="card-body fs-9">
 			<div class="d-flex align-items-center mb-2" th:if="${isAdmin}">
-				<!-- <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span> -->
-				
 				<!--  수정 버튼 -->
-				<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0" id="editDirectoryBtn"
+<!-- 				<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0" id="editDirectoryBtn"
 				        data-bs-toggle="modal" data-bs-target="#editInfoModal">
 					<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
 					     focusable="false" data-prefix="fas" data-icon="pen" role="img"
@@ -174,29 +136,42 @@
 						<path fill="currentColor"
 					        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
 					</svg>
-				</button>
+				</button> -->
 			</div>          
             <h5 class="text-body-secondary">사번</h5>
             <p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
-            <h5 class="text-body-secondary">직급</h5>
-            <p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p>
-            <h5 class="text-body-secondary">부서</h5>
-            <p class="text-body-secondary" th:text="${departmentName != null ? departmentName : '-'}">부서</p>
+
+			<h5 class="text-body-secondary">소속</h5>
+			<p class="text-body-secondary" 
+			   th:text="${(departmentName != null ? departmentName : '-') + ' / ' + (teamName != null ? teamName : '-')}">
+			   부서 / 팀
+			</p>           
+            
             <div class="mb-3">
               <h5 class="text-body-secondary">Email</h5>
               <a href="mailto:email@email.com" id="emailValue" th:text="${directory != null and directory.directory_email != null ? directory.directory_email : '-'}">email@email.com</a>
             </div>
-            <h5 class="text-body-secondary">Phone</h5>
+            
+            <h5 class="text-body-secondary">연락처</h5>
             <p class="text-body-secondary" id="phoneValue" th:text="${directory != null and directory.directory_phone != null ? directory.directory_phone : '-'}">010-0000-0000</p>
+ 			
+ 			<h5 class="text-body-secondary">주소</h5>
+			<p class="text-body-secondary" id="addressValue"
+			   th:text="${directory != null and directory.directory_zipcode != null and directory.directory_address != null 
+			             ? '(' + directory.directory_zipcode + ') ' + directory.directory_address 
+			             : '-'}">
+			  (00000) 주소정보
+			</p>
+          
           </div>
         </div>
       </div>
 
       <div class="col-md-8">
-        <div class="card p-3 shadow-sm">
+        <div class="card p-3">
           <div class="card-title d-flex justify-content-between align-items-center mb-3">
             <span class="fw-bold fs-8 text-secondary">근무시간 통합 차트</span>
-            <p class="text-muted mb-0">이번달 총 근무시간: <strong class="text-primary" th:text="${totalWorkTime}">000시간 00분</strong></p>
+            <p class="text-muted mb-0">이번 달 총 근무시간: <strong class="text-primary" th:text="${totalWorkTime}">000시간 00분</strong></p>
           </div>
           <canvas id="workTimeMixedChart" height="260"></canvas>
         </div>
@@ -357,17 +332,20 @@
 
 <!-- confirm Modal -->
 <div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border border-secondary">
-      <div class="modal-header bg-light">
-        <h5 class="modal-title" id="confirmSaveModalLabel">수정 확인</h5>
-        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">수정 확인</h5>
+       <!--  <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button> -->
       </div>
-      <div class="modal-body">
-        정말 수정하시겠습니까?
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+          수정 하시겠습니까?
+        </p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-light" id="cancelSaveBtn">취소</button>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" id="cancelSaveBtn" data-bs-dismiss="modal">취소</button>
         <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
       </div>
     </div>
@@ -376,25 +354,27 @@
 
 <!-- Alert Modal (닫기 경고용) -->
 <div class="modal fade" id="unsavedAlertModal" tabindex="-1" aria-labelledby="unsavedAlertModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border border-secondary">
-      <div class="modal-header bg-light">
-        <h5 class="modal-title" id="unsavedAlertModalLabel">창닫기</h5>
-        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="unsavedAlertModalLabel">창닫기</h5>
+       <!--  <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button> -->
       </div>
-      <div class="modal-body">
-        창을 닫으면 입력한 정보는 사라집니다.<br>계속 닫으시겠습니까?
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 회원 수정 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-light" id="stayModalBtn">아니오</button>
-        <button type="button" class="btn btn-primary" id="confirmCloseBtn">예</button>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" id="stayModalBtn" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmCloseBtn">확인</button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- 퇴근시간 유효성 경고 모달 -->
-<div class="modal fade" id="invalidCheckOutModal" tabindex="-1" aria-labelledby="invalidCheckOutModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="invalidCheckOutModal" tabindex="-1" aria-labelledby="invalidCheckOutModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border border-secondary">
       <div class="modal-header bg-light text-white">
@@ -410,9 +390,26 @@
       </div>
     </div>
   </div>
+</div> -->
+<div class="modal fade" id="invalidCheckOutModal" tabindex="-1" aria-labelledby="invalidCheckOutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="invalidCheckOutModalLabel">입력 오류</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          퇴근 시간은 출근 시간보다 늦어야 합니다.<br>다시 선택해 주세요.
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
 </div>
 <!-- 알림 모달 (성공/실패 공통) -->
-<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border border-secondary">
       <div class="modal-header bg-light">
@@ -420,9 +417,26 @@
         <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
       </div>
       <div class="modal-body" id="alertMessageContent">
-        <!-- 서버 응답 메시지가 들어갈 자리 -->
+        서버 응답 메시지가 들어갈 자리
       </div>
       <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div> -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 서버 응답 메시지가 들어갈 자리 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
       </div>
     </div>
@@ -432,14 +446,14 @@
 document.addEventListener('DOMContentLoaded', function() {
 
 	// 상단에 현재 날짜 표시
-	function updateCurrentTime() {
+/* 	function updateCurrentTime() {
 		const now = new Date();
 		const year = now.getFullYear();
 		const month = String(now.getMonth() + 1).padStart(2, '0');
 		const date = String(now.getDate()).padStart(2, '0');
 		document.getElementById('currentTime').innerText = `${year}.${month}.${date}`;
 	}
-	updateCurrentTime();
+	updateCurrentTime(); */
 
 	//서버 응답 메시지를 모달에 표시하고 확인 시 콜백 실행
 	function showAlertModal(message, callback) {
@@ -761,42 +775,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </main>
 </body>
 </html>
-
-<!-- <script>
-	// 모달 열릴 때 input에 기존 정보 세팅
-	const editInfoModal = document.getElementById('editInfoModal');
-	editInfoModal.addEventListener('show.bs.modal', function () {
-		const email = document.getElementById('emailValue').textContent.trim();
-		const phone = document.getElementById('phoneValue').textContent.trim();
-		const address = document.getElementById('addressValue').textContent.trim();
-		
-		document.getElementById('emailInput').value = email;
-		document.getElementById('phoneInput').value = phone;
-		document.getElementById('addressInput').value = address;
-	});
-
-	// 저장 버튼 클릭 시 값 반영
-	function saveInfo() {
-		 const email = document.getElementById('emailInput').value;
-		 const phone = document.getElementById('phoneInput').value;
-		 const address = document.getElementById('addressInput').value;
-		
-		 // 카드 안 텍스트 갱신
-		 document.getElementById('emailValue').textContent = email;
-		 document.getElementById('emailValue').href = "mailto:" + email;
-		 document.getElementById('phoneValue').textContent = phone;
-		 document.getElementById('addressValue').textContent = address;
-		
-		 // 모달 닫기
-		 const modal = bootstrap.Modal.getInstance(editInfoModal);
-		 modal.hide();
-	}
-	
-	function setDefaultProfile() {
-	   const profileImage = document.getElementById('profileImage');
-	   profileImage.src = '/assets/img/team/avatar.webp'; // 부트스트랩 기본 프로필 이미지
-	   const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
-	   modal.hide();
-	 }	
-</script>	 -->		
-               

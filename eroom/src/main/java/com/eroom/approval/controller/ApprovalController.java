@@ -259,9 +259,33 @@ public class ApprovalController {
 		}
 		model.addAttribute("approvalFormatList", approvalFormatList);
 		// 부서 정보 조회
-		Structure structure = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(employee.getStructure().getParentCode());
-        String departmentName = structure != null ? structure.getCodeName() : "-";
-        model.addAttribute("departmentName", departmentName);
+		Structure structure = null;
+//		Structure employeeStructure = structureService.getBySeparatorCode(employee.getStructure().getSeparatorCode());
+		Structure employeeStructure = employee.getStructure();
+		
+		if (employeeStructure != null) {
+			String parentCode = employeeStructure.getParentCode();
+
+
+			structure = structureService.getBySeparatorCode(employee.getStructure().getSeparatorCode());
+			if (parentCode != null) {
+				// 팀이 있다는 뜻
+				String teamName = structure != null && structure.getCodeName() != null ? structure.getCodeName() : "-";
+				model.addAttribute("teamName", teamName);
+				Structure parentStructure = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(parentCode);
+				String departmentName = parentStructure.getCodeName();
+				model.addAttribute("departmentName", departmentName);
+			} else {
+				// 팀이 없다는 뜻
+				String departmentName = structure != null && structure.getCodeName() != null ? structure.getCodeName() : "-";
+				model.addAttribute("teamName", "-");
+				model.addAttribute("departmentName", departmentName);
+			}
+		} else {
+			// 구조 자체가 null
+			model.addAttribute("teamName", "-");
+			model.addAttribute("departmentName", "-");
+		}
         // 현재 날짜
         model.addAttribute("now", DateTimeFormatter.ofPattern("yyyy.MM.dd").format(LocalDateTime.now()));
         // 부서 코드네임 조회

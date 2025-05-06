@@ -76,9 +76,19 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						<i class="fas fa-ellipsis fs-10"></i>
 					</button>
 					<div class="dropdown-menu dropdown-menu-end py-2">
-						<a class="dropdown-item" href="#!">수정</a>
+						<a class="dropdown-item edit-btn"href="#"
+						   data-bs-toggle="modal"
+						   data-bs-target="#editPartnerDirectoryModal"
+						   th:attr="data-partner-no=${list.directory_no},
+								      data-name=${list.directory_name},
+								      data-company-name=${list.directory_company_name},
+								      data-email=${list.directory_email},
+								      data-position=${list.directory_position},
+								      data-department=${list.directory_department},
+								      data-team=${list.directory_team},
+								      data-phone=${list.directory_phone}">수정</a>
 						<div class="dropdown-divider"></div>
-						<a class="dropdown-item text-danger" href="#!">삭제</a>
+						<a class="dropdown-item text-danger delete-btn" href="#" th:attr="data-delete-no=${list.directory_no}" id="deletePartnerBtn">삭제</a>
 					</div>
 				</div>
 			</td>
@@ -103,7 +113,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
     
 
 
-<!-- 회의실 추가 모달 -->
+<!-- 협력업체 인원 추가 모달 -->
 <div class="modal fade" id="addPartnerDirectoryModal" tabindex="-1" aria-labelledby="addPartnerDirectoryModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -156,6 +166,67 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
     </div>
   </div>
 </div>
+
+<!-- 수정 모달 -->
+<div class="modal fade" id="editPartnerDirectoryModal" tabindex="-1" aria-labelledby="editPartnerDirectoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+    <div class="modal-content border border-secondary">
+        <!-- 헤더 -->
+        <div class="modal-header bg-light">
+        	<!-- 제목 -->
+          <h5 class="modal-title" id="editPartnerDirectoryModalLabel">협력업체 정보 수정</h5>
+          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+	      <!-- 바디 -->
+	      <div class="modal-body">
+	        <form id="editPartnerDirectoryForm">
+	        <input type="hidden" id="editNo">
+	          <div class="mb-3">
+	            <label for="editName" class="form-label">이름</label>
+	            <input type="text" class="form-control form-control-sm" id="editName" placeholder="예: 홍길동">
+	          </div>
+	          <div class="mb-3">
+	            <label for="editCompanyName" class="form-label">회사명</label>
+	            <input type="text" class="form-control form-control-sm" id="editCompanyName" placeholder="예: 이룸컴퍼니">
+	          </div>
+	          <div class="mb-3">
+	            <label for="editEmail" class="form-label">이메일</label>
+	            <input type="email" class="form-control form-control-sm" id="editEmail" placeholder="예: example@exp.co.kr">
+	          </div>
+	          <div class="mb-3">
+	            <label for="editPhone" class="form-label">전화번호</label>
+	            <input type="text" class="form-control form-control-sm" id="editPhone" placeholder="예: 010-1234-5678">
+	          </div>
+	          <div class="mb-3">
+	            <label for="editDepartment" class="form-label">부서명</label>
+	            <input type="text" class="form-control form-control-sm" id="editDepartment" placeholder="예: OO부">
+	          </div>
+	          <div class="mb-3">
+	            <label for="editTeam" class="form-label">팀명</label>
+	            <input type="text" class="form-control form-control-sm" id="editTeam" placeholder="예: OO팀">
+	          </div>
+	          <div class="mb-3">
+	            <label for="editPosition" class="form-label">직급</label>
+	            <input type="text" class="form-control form-control-sm" id="editPosition" placeholder="예: 부장">
+	          </div>
+	        </form>
+	      </div>
+
+        <!-- 푸터 / 취소, 확인 버튼 있는 곳 -->
+        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="editPartnerBtn">정보 수정</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<!-- create 메소드 -->
 <script>
 document.getElementById("submitBtn").addEventListener('click', function(e){
     e.preventDefault(); // 기본 제출 막기
@@ -217,9 +288,10 @@ document.getElementById("submitBtn").addEventListener('click', function(e){
 		  })
 		  .then(res => res.json())
 		  .then(data => {
-		      alert(data.res_msg);
-		      location.href = '/directory/partner';
-		      alert(data.res_msg);
+			  if(data.res_code == '200'){
+			      alert(data.res_msg);
+			      location.reload();
+			  }
 		  })
 		  .catch(err => {
 		    console.error(err);
@@ -229,6 +301,136 @@ document.getElementById("submitBtn").addEventListener('click', function(e){
     	
     }
 });
+</script>
+
+<!-- edit 메소드 -->
+<script>
+// 수정 모달 채우기
+document.querySelectorAll('.edit-btn').forEach(btn => {
+	  btn.addEventListener('click', () => {
+	    document.getElementById('editNo').value = btn.dataset.partnerNo;
+	    document.getElementById('editName').value = btn.dataset.name;
+	    document.getElementById('editCompanyName').value = btn.dataset.companyName;
+	    document.getElementById('editEmail').value = btn.dataset.email;
+	    document.getElementById('editPhone').value = btn.dataset.phone;
+	    document.getElementById('editDepartment').value = btn.dataset.department;
+	    document.getElementById('editTeam').value = btn.dataset.team;
+	    document.getElementById('editPosition').value = btn.dataset.position;
+
+	    new bootstrap.Modal(document.getElementById('editPartnerDirectoryModal')).show();
+	  });
+	});
+
+
+
+document.getElementById("editPartnerBtn").addEventListener('click', function(e){
+    e.preventDefault(); // 기본 제출 막기
+    let formDataEdit = {};
+
+    const fieldEdit = [
+    	  { idEdit: "editNo" },
+    	  { idEdit: "editName", message: "이름을 입력해주세요." },
+    	  { idEdit: "editCompanyName", message: "회사명을 입력해주세요." },
+    	  { idEdit: "editEmail", message: "이메일을 입력해주세요." },
+    	  { idEdit: "editPhone", message: "전화번호를 입력해주세요." },
+    	  { idEdit: "editDepartment", message: "부서명을 입력해주세요." },
+    	  { idEdit: "editTeam", message: "팀명을 입력해주세요." },
+    	  { idEdit: "editPosition", message: "직급을 입력해주세요." }
+    ];
+    
+    
+ // 연락처 유효성 검사
+	const phoneInputEdit = document.getElementById('editPhone');
+	const phoneValueEdit = phoneInputEdit.value.trim();
+	
+	const phoneRegexEdit = /^010-\d{4}-\d{4}$/; // 010-숫자4자리-숫자4자리
+
+    let isValidEdit = true;
+
+	
+    fieldEdit.forEach(fieldEdit => {
+        const inputEdit = document.getElementById(fieldEdit.idEdit);
+        const valueEdit = inputEdit.value.trim();
+
+        if (!valueEdit) {
+            if (isValidEdit) {
+                alert(fieldEdit.message);
+                inputEdit.focus();
+            }
+            inputEdit.style.border = "1px solid red";
+            isValidEdit = false;
+        } else if (fieldEdit.idEdit === 'phone' && !phoneRegexEdit.test(valueEdit)) {
+            if (isValidEdit) {
+                alert("전화번호는 010-1234-5678 형식으로 입력해주세요.");
+                inputEdit.focus();
+            }
+            inputEdit.style.border = "1px solid red";
+            isValidEdit = false;
+        } else {
+            inputEdit.style.border = "";
+            formDataEdit[fieldEdit.idEdit] = valueEdit;
+        }
+    });
+    
+    
+    
+    if(isValidEdit){
+	    fetch('/directory/partner/update', {
+	        method: 'PUT',
+	        headers: {
+	          'Content-Type': 'application/json',
+	          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+	          'header': document.querySelector('meta[name="_csrf_header"]').content
+	        },
+	        body: JSON.stringify(formDataEdit)
+	      })
+	      .then(res => res.json())
+	      .then(data => {
+	    	  if(data.res_code == '200'){
+		        alert(data.res_msg);
+		        location.reload();
+	    	  }
+	      })
+	      .catch(err => {
+	        console.error(err);
+	        alert("수정 중 오류 발생");
+	      });
+    }
+    
+});
+</script>
+
+<!-- 삭제 버튼 -->
+<script>
+document.querySelectorAll('.delete-btn').forEach(btn => {
+	  btn.addEventListener('click', function () {
+	    const deleteNo = this.dataset.deleteNo;
+
+	    if (confirm('정말 삭제하시겠습니까?')) {
+	      fetch('/directory/partner/delete', {
+	        method: 'PUT',
+	        headers: {
+	          'Content-Type': 'application/json',
+	          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+	          'header': document.querySelector('meta[name="_csrf_header"]').content
+	        },
+	        body: JSON.stringify({ deleteNo: deleteNo })
+	      })
+	        .then(res => res.json())
+	        .then(data => {
+	          if (data.res_code == '200') {
+	            alert(data.res_msg);
+	            location.reload();
+	          }
+	        })
+	        .catch(err => {
+	          console.error(err);
+	          alert('삭제 중 오류 발생');
+	        });
+	    }
+	  });
+	});
+
 </script>
 
 
