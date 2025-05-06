@@ -35,6 +35,12 @@ import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.employee.service.StructureService;
+import com.eroom.facility.entity.Facility;
+import com.eroom.facility.service.FacilityService;
+import com.eroom.reservation.dto.MeetingRoomDto;
+import com.eroom.reservation.dto.VehicleDto;
+import com.eroom.reservation.service.MeetingRoomService;
+import com.eroom.reservation.service.VehicleService;
 import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
@@ -49,32 +55,30 @@ public class AdminController {
 	private final StructureService structureService;
 	private final AttendanceService attendanceService;
 	private final ProfileService profileService;
+	private final FacilityService facilityService;
+	private final MeetingRoomService meetingRoomService;
+	private final VehicleService vehicleService;
 	
 	// 회의실 목록
 	@GetMapping("/meetingroom")
 	public String selectMeetingroomList(Model model) {
-		// 이름 바꿀 예정
+		List<Facility> resultList = facilityService.selectMeetingRoomAll();
+		// 전체 예약 현황
+		List<MeetingRoomDto> reservationList = meetingRoomService.getAllReservations();
+		model.addAttribute("meetingroomList",resultList);
+		model.addAttribute("meetingroomReservationList",reservationList); // 예약 내역 리스트
 		return "admin/meetingroom";
 	}
 	
 	// 차량 목록
 	@GetMapping("/vehicle")
 	public String selectVehicleList(Model model) {
-		// 이름 바꿀 예정
+		List<Facility> resultList = facilityService.selectVehicleAll();
+		// 전체 예약 현황
+		List<VehicleDto> reservationList = vehicleService.getAllReservations();
+		model.addAttribute("vehicleList",resultList);
+		model.addAttribute("vehicleReservationList",reservationList); // 예약 내역 리스트
 		return "admin/vehicle";
-	}
-	
-	// 숙직실 목록
-	@GetMapping("/sleep")
-	public String selectSleepList(Model model) {
-		// 이름 바꿀 예정 -> selectSleepManagementList
-		return "admin/sleep";
-	}
-	
-	// 주소록 관리
-	@GetMapping("/directoryManagement")
-	public String selectDirectoryManagementList(Model model) {
-		return "admin/directoryManagement";
 	}
 	
 	// 회원 관리

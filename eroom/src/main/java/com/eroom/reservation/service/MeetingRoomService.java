@@ -168,7 +168,38 @@ public class MeetingRoomService {
         return dtoList;
     }
     
-
+    // 회의실 전체 예약 현황
+    public List<MeetingRoomDto> getAllReservations(){
+    	List<MeetingRoom> entityList = repository.findByVisibleYnAndSeparatorCodeOrderByReservationStartDesc("Y", "F001");
+    	
+    	List<MeetingRoomDto> dtoList = new ArrayList<>();
+    	for(MeetingRoom meetingRoom : entityList) {
+    		MeetingRoomDto dto = new MeetingRoomDto().toDto(meetingRoom);
+    		// 회의실 이름
+    		Facility facility = facilityRepository.findByFacilityNo(meetingRoom.getFacilityNo());
+    		if(facility != null) {
+    			dto.setMeetingRoomName(facility.getFacilityName());
+    		}
+    		// 예약자 이름
+    		Employee employee = employeeRepository.findByEmployeeNo(meetingRoom.getEmployeeNo());
+    		if(employee != null) {
+    			dto.setReserverName(employee.getEmployeeName());
+    		}
+    		
+    		// 참여자
+    		List<ReservationEmployeeMapping> mappings = mappingRepository.findByReservation(meetingRoom);
+    		List<String> participantNames = new ArrayList<>();
+    		for(ReservationEmployeeMapping mapping : mappings) {
+    			if(mapping.getEmployee() != null) {
+    				participantNames.add(mapping.getEmployee().getEmployeeName());
+    			}
+    		}
+    		dto.setParticipantNames(participantNames);
+    		
+    		dtoList.add(dto);
+    	}
+    	return dtoList;
+    }
 	
 		
 }
