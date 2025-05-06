@@ -1,40 +1,96 @@
 <!DOCTYPE html>
-<html 
-lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
-	  xmlns:th="http://www.thymeleaf.org"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{/include/layout}">
-  <body>
-    <main class="main" id="top" layout:fragment="content">
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
+<body>
+	<main class="main" id="top" layout:fragment="content">
 		<div class="d-flex align-items-center gap-2">
-		  	<a th:href="@{/project/all}" class="text-decoration-none text-dark me-2">
-		  		<i class="uil uil-angle-left-b fs-4"></i>
+			<a th:href="@{/project/all}" class="text-decoration-none text-dark me-2"> <i class="uil uil-angle-left-b fs-4"></i>
 			</a>
-		  	<h1 class="text-primary mb-0 fs-4" th:text="${project.project_name}">프로젝트 디테일</h1>
-		  	<span class="badge badge-phoenix fs-10 badge-phoenix-success" th:text="${project.proceed}">completed</span>
+			<h1 class="text-primary mb-0 fs-4" th:text="${project.project_name}">프로젝트 디테일</h1>
+			<span class="badge badge-phoenix fs-10 badge-phoenix-success" th:text="${project.proceed}">completed</span>
 		</div>
-    	<br>
+		<br>
 		<ul class="nav nav-phoenix-pills mt-3" role="tablist">
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/project/detail/{id}/main(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/main')} ? ' active' : ''">메인</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/project/detail/{id}/developmentTab(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/developmentTab')} ? ' active' : ''">개발</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/project/detail/{id}/todo(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/todo')} ? ' active' : ''">할 일</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/project/detail/{id}/files(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/files')} ? ' active' : ''">파일</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" th:href="@{/project/detail/{id}/minutes(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/minutes')} ? ' active' : ''">회의록</a>
-            </li>
-          </ul>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/main(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/main')} ? ' active' : ''">메인</a></li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/developmentTab(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/developmentTab')} ? ' active' : ''">개발</a></li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/todo(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/todo')} ? ' active' : ''">할 일</a></li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/files(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/files')} ? ' active' : ''">파일</a></li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/minutes(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/minutes')} ? ' active' : ''">회의록</a></li>
+		</ul>
 
-	        
-        
+		<!-- 본문 -->
+		<div id="members" data-list='{"valueNames":["customer","email","mobile_number","city","last_active","joined"],"page":15,"pagination":true}'>
+			<div class="row align-items-center justify-content-between g-3 mb-4 mt-2">
+				<div class="col col-auto">
+					<div class="search-box">
+						<form class="position-relative">
+							<input class="form-control search-input search" type="search" placeholder="제목 검색" aria-label="Search" /> <span class="fas fa-search search-box-icon"></span>
+						</form>
+					</div>
+				</div>
+				<div class="col-auto">
+					<div class="d-flex align-items-center">
+						<button class="btn btn-link text-body me-4 px-0">
+							<span class="fa-solid fa-file-export fs-9 me-2"></span>문서화
+						</button>
+						<button type="button" class="btn btn-primary" th:onclick="|location.href='/project/minute/create-page?projectNo=${project.project_no}'|">회의록 작성</button>
+					</div>
+				</div>
+			</div>
+			<div class="mx-n4 mx-lg-n6 px-4 px-lg-6 mb-9 bg-body-emphasis border-y mt-2 position-relative top-1">
+				<div class="table-responsive scrollbar ms-n1 ps-1">
+					<table class="table table-sm fs-8 mb-0 align-middle text-nowrap">
+						<thead>
+							<tr>
+								<th class="align-middle" scope="col" data-sort="meeting_title" style="width: 15%; min-width: 200px; padding-left: 1rem;">제목</th>
+								<th class="align-middle pe-3" scope="col" data-sort="participants" style="width: 20%; min-width: 200px;">참여인원</th>
+								<th class="align-middle" scope="col" data-sort="writer" style="width: 10%;">작성자</th>
+								<th class="align-middle text-end pe-0" scope="col" data-sort="meeting_date" style="width: 19%; min-width: 200px;">회의일</th>
+							</tr>
+						</thead>
 
-    </main>
-  </body>
+						<!-- 개별 회의록 -->
+						<tbody class="list" id="members-table-body">
+							<tr th:each="minute : ${minutes}" class="hover-actions-trigger btn-reveal-trigger position-static">
+								<td class="meeting_title align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000 text-decoration-none" th:href="@{/project/minute/detail(minuteNo=${minute.meetingMinuteNo}, projectNo=${project.project_no})}">
+										<h5 class="mb-0 ms-3 fw-semibold" th:text="${minute.meetingTitle}">회의 제목</h5>
+								</a></td>
+								<td class="participants align-middle white-space-nowrap" th:text="${minute.participants}">0</td>
+								<td class="writer align-middle white-space-nowrap text-body" th:text="${minute.writer}">작성자</td>
+								<td class="meeting_date align-middle white-space-nowrap text-body-tertiary text-end" th:text="${#temporals.format(minute.meetingDate, 'yyyy.MM.dd HH시 mm분')}">회의일</td>
+							</tr>
+						</tbody>
+					</table>
+
+				</div>
+				<div class="row align-items-center justify-content-between py-2 pe-0 fs-9">
+					<div class="col-auto d-flex">
+						<p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info"></p>
+						<a class="fw-semibold" href="#!" data-list-view="*">View all<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a><a class="fw-semibold d-none" href="#!" data-list-view="less">View Less<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a>
+					</div>
+					<div class="col-auto d-flex">
+						<button class="page-link" data-list-pagination="prev">
+							<span class="fas fa-chevron-left"></span>
+						</button>
+						<ul class="mb-0 pagination"></ul>
+						<button class="page-link pe-0" data-list-pagination="next">
+							<span class="fas fa-chevron-right"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer class="footer position-absolute">
+			<div class="row g-0 justify-content-between align-items-center h-100">
+				<div class="col-12 col-sm-auto text-center">
+					<p class="mb-0 mt-2 mt-sm-0 text-body">
+						Thank you for creating with Phoenix<span class="d-none d-sm-inline-block"></span><span class="d-none d-sm-inline-block mx-1">|</span><br class="d-sm-none" />2025 &copy;<a class="mx-1" href="https://themewagon.com">Themewagon</a>
+					</p>
+				</div>
+				<div class="col-12 col-sm-auto text-center">
+					<p class="mb-0 text-body-tertiary text-opacity-85">v1.22.0</p>
+				</div>
+			</div>
+		</footer>
+	</main>
+</body>
 </html>
