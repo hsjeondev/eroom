@@ -1,6 +1,7 @@
 package com.eroom.drive.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eroom.drive.entity.Drive;
+import com.eroom.employee.entity.Employee;
 
 @Repository
 public interface DriveRepository extends JpaRepository<Drive, Long>{
@@ -74,5 +76,7 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
 
 	// 가장 최근 프로필 사진 1건 조회
 	Drive findTop1ByUploader_EmployeeNoAndSeparatorCodeAndVisibleYnOrderByDriveRegDateDesc(Long employeeNo,String separatorCode, String visibleYn);
+	
+
 	
 }
