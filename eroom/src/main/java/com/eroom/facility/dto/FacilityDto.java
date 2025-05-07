@@ -28,16 +28,24 @@ public class FacilityDto {
 	private String facility_name;
 	private String facility_capacity;
 	
+//	public Facility toEntity() {
+//		return Facility.builder()
+//				.facilityNo(facility_no)
+//				.separatorCode(separator_code)
+//				.visibleYn(visible_yn)
+//				.facilityCreator(facility_creator)
+//				.facilityEditor(facility_editor)
+//				.facilityName(facility_name)
+//				.facilityCapacity(facility_capacity)
+//				.build();
+//	}
 	public Facility toEntity() {
-		return Facility.builder()
-				.facilityNo(facility_no)
-				.separatorCode(separator_code)
-				.visibleYn(visible_yn)
-				.facilityCreator(facility_creator)
-				.facilityEditor(facility_editor)
-				.facilityName(facility_name)
-				.facilityCapacity(facility_capacity)
-				.build();
+	    Facility facility = new Facility();
+	    facility.setFacilityNo(this.facility_no);
+	    facility.setFacilityName(this.facility_name);
+	    facility.setFacilityCapacity(this.facility_capacity);
+	    facility.setFacilityEditor(this.facility_editor);
+	    return facility;
 	}
 	
 	public FacilityDto toDto(Facility facility) {

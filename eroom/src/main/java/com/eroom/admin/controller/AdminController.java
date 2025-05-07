@@ -64,7 +64,7 @@ public class AdminController {
 	// 회의실 목록
 	@GetMapping("/meetingroom")
 	public String selectMeetingroomList(Model model) {
-		List<Facility> resultList = facilityService.selectMeetingRoomAll();
+		List<Facility> resultList = facilityService.selectVisibleMeetingRooms();
 		// 전체 예약 현황
 		List<MeetingRoomDto> reservationList = meetingRoomService.getAllReservations();
 		model.addAttribute("meetingroomList",resultList);
@@ -89,6 +89,7 @@ public class AdminController {
 		}
 		return resultMap;
 	}
+
 	
 	// 회의실 생성
 	@PostMapping("/meetingroom/create")
@@ -115,7 +116,7 @@ public class AdminController {
 	            .build();
 
 	    try {
-	        facilityService.createFacility(dto);
+	        facilityService.createMeetingroom(dto);
 	        resultMap.put("res_code", 200);
 	        resultMap.put("res_msg", "회의실 등록 성공");
 	    } catch (Exception e) {
@@ -127,6 +128,85 @@ public class AdminController {
 	    return resultMap;
 	}
 	
+	// 회의실 수정
+	@PostMapping("/meetingroom/edit")
+	@ResponseBody
+	public Map<String, Object> updateMeetingRoom(@RequestParam("facility_no") Long facilityNo,
+	        									@RequestParam(value = "room_name", required = false) String roomName,
+	        									@RequestParam(value = "room_capacity", required = false) String roomCapacity,
+	        									Authentication authentication) {
+
+	    System.out.println("=== updateMeetingRoom() 호출됨 ===");
+	    Map<String, Object> resultMap = new HashMap<>();
+
+	    // 로그인 사용자
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    String employeeId = employeeDetails.getEmployee().getEmployeeId();
+
+	    // DTO 구성
+	    FacilityDto dto = FacilityDto.builder()
+	            .facility_no(facilityNo)
+	            .facility_name(roomName)
+	            .facility_capacity(roomCapacity)
+	            .facility_editor(employeeId)
+	            .build();
+
+	    try {
+	        Facility updated = facilityService.updateMeetingroom(dto);
+	        if (updated != null) {
+	            resultMap.put("res_code", 200);
+	            resultMap.put("res_msg", "회의실 정보가 성공적으로 수정되었습니다.");
+	        } else {
+	            resultMap.put("res_code", 404);
+	            resultMap.put("res_msg", "수정할 회의실을 찾을 수 없습니다.");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        resultMap.put("res_code", 500);
+	        resultMap.put("res_msg", "서버 오류로 수정 실패: " + e.getMessage());
+	    }
+
+	    return resultMap;
+	}
+	
+	// 회의실 삭제
+	@PostMapping("/meetingroom/delete")
+	@ResponseBody
+	public Map<String, Object> deleteMeetingRoom(@RequestParam("facility_no") Long facilityNo,
+												Authentication authentication) {
+
+	    Map<String, Object> resultMap = new HashMap<>();
+
+	    // 로그인 사용자 정보
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    String employeeId = employeeDetails.getEmployee().getEmployeeId();
+
+	    // DTO 구성
+	    FacilityDto dto = FacilityDto.builder()
+	            .facility_no(facilityNo)
+	            .facility_editor(employeeId)
+	            .visible_yn("N") // 삭제는 visible_yn = N 처리
+	            .build();
+
+	    try {
+	        Facility deleted = facilityService.deleteMeetingroom(dto);
+	        if (deleted != null) {
+	            resultMap.put("res_code", 200);
+	            resultMap.put("res_msg", "회의실이 성공적으로 삭제되었습니다.");
+	        } else {
+	            resultMap.put("res_code", 404);
+	            resultMap.put("res_msg", "삭제할 회의실을 찾을 수 없습니다.");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        resultMap.put("res_code", 500);
+	        resultMap.put("res_msg", "서버 오류로 삭제 실패: " + e.getMessage());
+	    }
+
+	    return resultMap;
+	}	
+	
+	
 	// 회의실명 중복 체크
 	@GetMapping("/meetingroom/checkDuplicate")
 	@ResponseBody
@@ -134,6 +214,18 @@ public class AdminController {
 		Map<String,Object> resultMap = new HashMap<>();
 		// String trimmedName = roomName.replaceAll("\\s", "");
 		boolean exists = facilityService.existsByNameIgnoringSpaces(roomName);
+		resultMap.put("exists", exists);
+		resultMap.put("res_code", 200);
+		resultMap.put("res_msg", exists ? "중복된 이름입니다." : "사용 가능한 이름입니다.");		
+		return resultMap;
+	}
+	
+	// 차량명 중복 체크
+	@GetMapping("/vehicle/checkDuplicate")
+	@ResponseBody
+	public Map<String,Object> checkDuplicateVehicleName(@RequestParam("vehicleName") String vehicleName){
+		Map<String,Object> resultMap = new HashMap<>();
+		boolean exists = facilityService.existsByNameIgnoringSpaces(vehicleName);
 		resultMap.put("exists", exists);
 		resultMap.put("res_code", 200);
 		resultMap.put("res_msg", exists ? "중복된 이름입니다." : "사용 가능한 이름입니다.");		
@@ -149,6 +241,24 @@ public class AdminController {
 		model.addAttribute("vehicleList",resultList);
 		model.addAttribute("vehicleReservationList",reservationList); // 예약 내역 리스트
 		return "admin/vehicle";
+	}
+	
+	// 차량 조회
+	@GetMapping("/vehicle/get")
+	@ResponseBody
+	public Map<String,Object> getVehicleByNo(@RequestParam("facilityNo") Long facilityNo){
+		Map<String,Object> resultMap = new HashMap<>();
+		FacilityDto dto = facilityService.selectFacilityByNo(facilityNo);
+		if(dto == null) {
+			resultMap.put("res_code", 404);
+			resultMap.put("res_msg", "해당 차량 정보를 찾을 수 없습니다.");
+		}else {
+			resultMap.put("res_code",200 );
+			resultMap.put("facility_no", dto.getFacility_no());
+			resultMap.put("facility_name",dto.getFacility_name() );
+			resultMap.put("facility_capacity",dto.getFacility_capacity());
+		}
+		return resultMap;
 	}
 	
 	// 회원 관리
