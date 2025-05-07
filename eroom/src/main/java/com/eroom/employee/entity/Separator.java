@@ -36,8 +36,8 @@ public class Separator {
 	private String separatorParentCode;
 	@Column(name="separator_name")
 	private String separatorName;
-	@Column(name="separator_yn")
-	private String separatorYn;
+	@Column(name="visible_yn")
+	private String visibleYn;
 	@Column(name="separator_creator")
 	private String separatorCreator;
 	@Column(name="separator_editor")
