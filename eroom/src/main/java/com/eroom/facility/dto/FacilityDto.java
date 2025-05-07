@@ -37,8 +37,6 @@ public class FacilityDto {
 				.facilityEditor(facility_editor)
 				.facilityName(facility_name)
 				.facilityCapacity(facility_capacity)
-				.facilityRegDate(facility_reg_date)
-				.facilityModDate(facility_mod_date)
 				.build();
 	}
 	

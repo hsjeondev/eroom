@@ -31,6 +31,7 @@ import com.eroom.chat.service.ChatMessageService;
 import com.eroom.chat.service.ChatroomService;
 import com.eroom.drive.dto.DriveDto;
 import com.eroom.drive.entity.Drive;
+import com.eroom.drive.service.ProfileService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
@@ -51,13 +52,15 @@ public class ChatController {
 	private final ChatMessageService chatMessageService;
 	private final ChatAlarmRepository chatAlarmRepository;
 	private final ChatWebSocketHandler webSocketHandler; 
+	private final ProfileService profileService;
+	
 	@GetMapping("/test")
 	public String test123() {
 		return "chat/test";
 	}
 	
 	@GetMapping("/list")
-	public String selectChatRoomAll(@RequestParam(name = "department" ,required = false) String department, Model model) {
+	public String selectChatRoomAll(@RequestParam(name = "department", required = false) String department, Model model) {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
@@ -66,6 +69,25 @@ public class ChatController {
 	    for (ChatroomDto dto : chatroomDtos) {
 	        int unreadCount = chatAlarmRepository.countUnreadAlarms(myEmployeeNo, dto.getChatroomNo());
 	        dto.setUnreadCount(unreadCount);
+
+	        Long targetEmployeeNo = null;
+	        if ("N".equals(dto.getChatIsGroupYn())) {
+	            // participantIds가 null인지 확인
+	            List<Long> participants = dto.getParticipantIds();
+	            if (participants != null) {
+	                for (Long no : participants) {
+	                    if (!no.equals(myEmployeeNo)) {
+	                        targetEmployeeNo = no;
+	                        break;
+	                    }
+	                }
+	            }
+	        } else {
+	            targetEmployeeNo = dto.getCreater();
+	        }
+
+	        String profileUrl = profileService.getProfileImageUrl(targetEmployeeNo);
+	        dto.setProfileImageUrl(profileUrl);
 	    }
 
 	    model.addAttribute("chatroomList", chatroomDtos);
@@ -73,6 +95,7 @@ public class ChatController {
 
 	    return "chat/list";
 	}
+
 
 	
 	@GetMapping("/employes")
@@ -250,29 +273,29 @@ public class ChatController {
 	public Map<String, Object> getReceiver(@RequestParam("chatroomNo") Long chatroomNo) {
 	    Map<String, Object> resultMap = new HashMap<>();
 
-	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
-	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	    try {
+	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	        EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	        Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
 
-	    Chatroom chatroom = chatroomService.selectChatroomOne(chatroomNo);
-	    if (chatroom == null) {
-	        resultMap.put("receiverNo", null);
-	        return resultMap;
-	    }
-
-	    // 1:1 채팅방인지 확인
-	    if ("N".equals(chatroom.getChatIsGroupYn())) {
-	        for (ChatroomAttendee attendee : chatroom.getChatroomMapping()) {
-	            if (!attendee.getAttendee().getEmployeeNo().equals(myEmployeeNo)) {
-	                resultMap.put("receiverNo", attendee.getAttendee().getEmployeeNo());
-	                return resultMap;
+	        Chatroom chatroom = chatroomService.selectChatroomOne(chatroomNo);
+	        if (chatroom != null && "N".equals(chatroom.getChatIsGroupYn())) {
+	            for (ChatroomAttendee attendee : chatroom.getChatroomMapping()) {
+	                if (!attendee.getAttendee().getEmployeeNo().equals(myEmployeeNo)) {
+	                    resultMap.put("receiverNo", attendee.getAttendee().getEmployeeNo());
+	                    return resultMap;
+	                }
 	            }
 	        }
+	    } catch (Exception e) {
+	        e.printStackTrace(); // 꼭 출력해서 서버 로그 확인
 	    }
 
-	    resultMap.put("receiverNo", null); // 그룹 채팅은 receiverNo 없음
+	    resultMap.put("receiverNo", null); // 항상 응답 보장
 	    return resultMap;
 	}
+
+
 
 	@PostMapping("/read")
 	@ResponseBody

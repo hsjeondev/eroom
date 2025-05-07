@@ -13,11 +13,11 @@
     <div class="card email-content">
       <div class="card-body">
         <form method="post" class="d-flex flex-column h-100"
-              action="/article/create" name="notice_create_form" enctype="multipart/form-data">
+              action="/article/update" name="notice_create_form" enctype="multipart/form-data">
           <!-- 작성자 정보 (히든 처리) -->
           <input type="hidden" name="employee_no"
                  th:value="${#authentication.principal.employee.employeeNo}" />
-          <input type="hidden" name="notice_no"/>
+          <input type="hidden" name="notice_no" th:value="${article.articleNo}" />
 
           <div class="row g-3 mb-2">
             <!-- 긴급 공지 체크 -->
@@ -27,14 +27,18 @@
               긴급 공지
             </div>
             <div class="col-12">
-              <input class="form-control" type="text" placeholder="제목" name="article_title" id="notice_title"/>
+              <input class="form-control" type="text" placeholder="제목" name="article_title" id="notice_title" 
+              th:value="${article.articleTitle}"/>
             </div>
           </div>
 
           <!-- 내용 -->
           <div class="mb-3 flex-1">
             <textarea class="tinymce email-textarea" name="article_content" id="notice_content"
-                      data-tinymce='{"height":"100%"}'></textarea>
+                      data-tinymce='{"height":"100%"}'
+                      th:text="${article.articleContent}">
+            </textarea>
+                      
           </div>
 
           <!-- 파일 -->
@@ -45,13 +49,34 @@
               </label>
               <input class="d-none" id="noticeAttachment" name="article_files" type="file" multiple/>
               <div id="filePreview" class="mt-2"></div>
-            </div>
+            </div> 
+            <div class="d-flex flex-column mb-3" id="filePreview">
+			  <!-- 기존 첨부파일 목록 표시 -->
+			  <div>기존 파일(따로 두는걸로 일단 작업중)
+				  <ul class="list-unstyled">
+				    <th:block th:each="file : ${attachList}">
+				      <li>
+				        <span class="badge bg-light text-dark">
+				          <a th:href="@{${file.drivePath}}" target="_blank" th:text="${file.driveOriName}"></a>
+				          <button type="button" class="btn btn-sm btn-outline-danger ms-2 py-0 px-1"
+				                  th:onclick="'removeFile(' + ${file.driveAttachNo} + ')'" aria-label="삭제">
+				            ✕
+				          </button>
+				          <input type="hidden" id="attach_no" th:value="${file.driveAttachNo}">
+				        </span>
+				      </li>
+				    </th:block>
+				  </ul>
+			  </div>
+			</div>
+			            
             <div class="d-flex">
               <button class="btn btn-primary fs-10" type="button" id="submitBtn">
-                작성<span class="fa-solid fa-paper-plane ms-1"></span>
+                수정<span class="fa-solid fa-paper-plane ms-1"></span>
               </button>
             </div>
-          </div>
+          </div><!-- 파일 -->
+          
         </form>
       </div>
     </div>
@@ -76,7 +101,7 @@
 	  }
 
 	  // 공지 등록을 확인하는 메시지
-	  if (confirm("공지를 등록하시겠습니까?")) {
+	  if (confirm("공지를 수정하시겠습니까?")) {
 	    tinymce.triggerSave(); // TinyMCE 에디터의 내용을 폼 데이터에 저장
 
 	    const payload = new FormData(form);
@@ -85,7 +110,7 @@
 	    	payload.append("article_files", file);
 	    });
 
-	    fetch("/article/create", {
+	    fetch("/article/update", {
 	      method: "POST",
 	      headers: {
 	        'header': document.querySelector('meta[name="_csrf_header"]').content,
@@ -153,6 +178,31 @@
       selectedFiles.splice(index, 1);
       renderFilePreview();
     }
+    
+    function removeFile(attachNo) {
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+        console.log('삭제할 파일의 attachNo:', attachNo);
+        fetch('/article/file/delete/' + attachNo, {
+          method: 'POST',
+          headers: {
+            'header': document.querySelector('meta[name="_csrf_header"]').content,
+	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+          }
+        
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.res_msg);
+          if (data.res_code == 200) {
+            // 페이지 새로고침 또는 해당 파일 DOM에서 제거
+            location.reload(); // 또는 직접 해당 li 제거 처리
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert("파일 삭제 중 오류가 발생했습니다.");
+        });
+      }
   </script>
 </main>
 </body>

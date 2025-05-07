@@ -21,65 +21,80 @@
 		<div id="members" data-list='{"valueNames":["customer","email","mobile_number","city","last_active","joined"],"page":15,"pagination":true}'>
 			<div class="row align-items-center justify-content-between g-3 mb-4 mt-2">
 				<div class="col col-auto">
-					<div class="search-box">
+					<!-- <div class="search-box">
 						<form class="position-relative">
 							<input class="form-control search-input search" type="search" placeholder="제목 검색" aria-label="Search" /> <span class="fas fa-search search-box-icon"></span>
 						</form>
-					</div>
+					</div> -->
 				</div>
 				<div class="col-auto">
 					<div class="d-flex align-items-center">
-						<button class="btn btn-link text-body me-4 px-0">
+						<!-- <button class="btn btn-link text-body me-4 px-0">
 							<span class="fa-solid fa-file-export fs-9 me-2"></span>문서화
-						</button>
+						</button> -->
+						<th:block th:if="${isProjectMember}">
 						<button type="button" class="btn btn-primary" th:onclick="|location.href='/project/minute/create-page?projectNo=${project.project_no}'|">회의록 작성</button>
+						</th:block>
 					</div>
 				</div>
 			</div>
-			<div class="mx-n4 mx-lg-n6 px-4 px-lg-6 mb-9 bg-body-emphasis border-y mt-2 position-relative top-1">
-				<div class="table-responsive scrollbar ms-n1 ps-1">
-					<table class="table table-sm fs-8 mb-0 align-middle text-nowrap">
-						<thead>
-							<tr>
-								<th class="align-middle" scope="col" data-sort="meeting_title" style="width: 15%; min-width: 200px; padding-left: 1rem;">제목</th>
-								<th class="align-middle pe-3" scope="col" data-sort="participants" style="width: 20%; min-width: 200px;">참여인원</th>
-								<th class="align-middle" scope="col" data-sort="writer" style="width: 10%;">작성자</th>
-								<th class="align-middle text-end pe-0" scope="col" data-sort="meeting_date" style="width: 19%; min-width: 200px;">회의일</th>
-							</tr>
-						</thead>
+			<div class="row g-4">
+				<div class="col-md-8">
+					<div class="card shadow-sm">
+						<div class="card-header bg-light fw-bold">회의록 목록</div>
+						<div class="table-responsive scrollbar ms-n1 ps-1">
+							<table class="table table-hover table-sm align-middle text-nowrap">
+								<thead class="table-light">
+									<tr>
+										<th class="text-start ps-4 w-40" data-sort="meeting_title">제목</th>
+										<th class="text-center w-15" data-sort="participants">참여인원</th>
+										<th class="text-center w-15" data-sort="writer">작성자</th>
+										<th class="text-center pe-1 w-30" data-sort="meeting_date">회의일</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody class="list" id="members-table-body">
+									<tr th:each="minute : ${minutes}">
+										<td class="text-start ps-4" style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><a th:href="@{/project/minute/detail(minuteNo=${minute.meetingMinuteNo}, projectNo=${project.project_no})}" th:text="${minute.meetingTitle}" class="fw-semibold text-decoration-none text-body text-hover-1000"> 회의 제목 </a></td>
+										<td class="text-center" th:text="${minute.participants}+' 명'">회의 참여인원</td>
+										<td class="text-center" th:text="${minute.writer}">작성자</td>
+										<td class="text-center pe-1 text-body-tertiary" th:text="${#temporals.format(minute.meetingDate, 'yyyy.MM.dd&nbsp&nbsp&nbspHH시 mm분')}">회의일</td>
+										<td><a>요약</a></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 
-						<!-- 개별 회의록 -->
-						<tbody class="list" id="members-table-body">
-							<tr th:each="minute : ${minutes}" class="hover-actions-trigger btn-reveal-trigger position-static">
-								<td class="meeting_title align-middle white-space-nowrap"><a class="d-flex align-items-center text-body text-hover-1000 text-decoration-none" th:href="@{/project/minute/detail(minuteNo=${minute.meetingMinuteNo}, projectNo=${project.project_no})}">
-										<h5 class="mb-0 ms-3 fw-semibold" th:text="${minute.meetingTitle}">회의 제목</h5>
-								</a></td>
-								<td class="participants align-middle white-space-nowrap" th:text="${minute.participants}">0</td>
-								<td class="writer align-middle white-space-nowrap text-body" th:text="${minute.writer}">작성자</td>
-								<td class="meeting_date align-middle white-space-nowrap text-body-tertiary text-end" th:text="${#temporals.format(minute.meetingDate, 'yyyy.MM.dd HH시 mm분')}">회의일</td>
-							</tr>
-						</tbody>
-					</table>
-
-				</div>
-				<div class="row align-items-center justify-content-between py-2 pe-0 fs-9">
-					<div class="col-auto d-flex">
-						<p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info"></p>
-						<a class="fw-semibold" href="#!" data-list-view="*">View all<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a><a class="fw-semibold d-none" href="#!" data-list-view="less">View Less<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a>
+						<!-- 페이징 영역 유지 -->
+						<div class="row align-items-center justify-content-between py-2 pe-0 fs-9">
+							<div class="col-auto d-flex"></div>
+							<div class="col-auto d-flex">
+								<button class="page-link" data-list-pagination="prev">
+									<span class="fas fa-chevron-left"></span>
+								</button>
+								<ul class="mb-0 pagination"></ul>
+								<button class="page-link pe-0" data-list-pagination="next">
+									<span class="fas fa-chevron-right"></span>
+								</button>
+							</div>
+							<div class="col-auto d-flex"></div>
+						</div>
 					</div>
-					<div class="col-auto d-flex">
-						<button class="page-link" data-list-pagination="prev">
-							<span class="fas fa-chevron-left"></span>
-						</button>
-						<ul class="mb-0 pagination"></ul>
-						<button class="page-link pe-0" data-list-pagination="next">
-							<span class="fas fa-chevron-right"></span>
-						</button>
+				</div>
+				<!-- 회의 내용 요약 테이블 -->
+				<div class="col-md-4">
+					<div class="card shadow-sm">
+						<div class="card-header bg-light fw-bold">회의 내용 요약</div>
+						<div class="card-body p-2">
+							<!-- 여기에 요약 데이터 들어감 -->
+							회의록을 선택하세요.
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<footer class="footer position-absolute">
+
+		<!-- <footer class="footer position-absolute">
 			<div class="row g-0 justify-content-between align-items-center h-100">
 				<div class="col-12 col-sm-auto text-center">
 					<p class="mb-0 mt-2 mt-sm-0 text-body">
@@ -90,7 +105,7 @@
 					<p class="mb-0 text-body-tertiary text-opacity-85">v1.22.0</p>
 				</div>
 			</div>
-		</footer>
+		</footer> -->
 	</main>
 </body>
 </html>

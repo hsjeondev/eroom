@@ -40,12 +40,14 @@ public class ProjectMeetingMinute {
     @Column(name = "meeting_content")
     private String meetingContent;
 
-    @CreationTimestamp
     @Column(name = "meeting_date")
     private LocalDateTime meetingDate;
     
     @Column(name = "meeting_minute_visible")
     private String meetingMinuteVisible;
+    
+    @Column(name = "meeting_content_summary")
+    private String meetingContentSummary;
     
     public void updateTitleAndContent(String title, String content) {
         this.meetingTitle = title;

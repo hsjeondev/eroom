@@ -47,10 +47,58 @@ public class ArticleController {
 		return "/article/articleAnonymous";
 	}
 	
-	// 게시글 수정 
-	@GetMapping("/article/notice/edit/{id}")
+	// 공지 게시판 삭제 버튼 클릭시
+	@PostMapping("/article/notice/delete")
+	public String deleteArticleNotice(@RequestParam("articleNo") Long articleNo) {
+		articleService.deleteArticleNotice(articleNo);
+	    return "redirect:/article/notice";
+	}
+	
+	// 게시글 수정중 기존 파일 삭제
+	@PostMapping("/article/file/delete/{attachNo}")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> deleteAttachedFile(@PathVariable("attachNo") Long attachNo) {
+		System.out.println("attachNo received: " + attachNo);
+		Map<String, Object> result = new HashMap<>();
+	    try {
+	    	System.out.println(attachNo);
+	    	articleService.markAsDeleted(attachNo);  // visibleYn = "N" 처리 등
+	        result.put("res_code", 200);
+	        result.put("res_msg", "파일이 삭제되었습니다.");
+	    } catch (Exception e) {
+	        result.put("res_code", 500);
+	        result.put("res_msg", "삭제 실패: " + e.getMessage());
+	    }
+	    return ResponseEntity.ok(result);
+	}
+	
+	// 게시글 수정
+	@PostMapping("/article/update")
+	@ResponseBody
+	public Map<String, String> updateArticleApi(@AuthenticationPrincipal EmployeeDetails employeeDetails,
+	                                            ArticleDto articleDto,
+	                                            @RequestParam("article_files") List<MultipartFile> articleFiles) {
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+	    resultMap.put("res_msg", "공지 수정 중 오류가 발생했습니다.");
+
+	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	    int result = articleService.updateArticle(articleDto,articleFiles);
+	    
+	    if (result > 0) {
+	        resultMap.put("res_code", "200");
+	        resultMap.put("res_msg", "공지 수정 완료");
+	    }
+
+	    return resultMap;
+	}
+	
+	// 게시글 수정 페이지
+	@GetMapping("/article/articleEdit/{id}")
 	public String editArticleNoticeForm(@PathVariable("id") Long id, Model model) {
+		
 	    Article article = articleService.selectArticleNoticeOne(id);
+	    
 	    List<Drive> attachList = articleService.findArticleAttaNoticechments(id);
 	    model.addAttribute("article", article);
 	    model.addAttribute("attachList", attachList);

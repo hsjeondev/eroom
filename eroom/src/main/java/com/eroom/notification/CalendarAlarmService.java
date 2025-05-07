@@ -47,67 +47,6 @@ public class CalendarAlarmService {
 		        }
 		    }
 		  
-		  //알림 페이지용 전체 알림 조회 (Y/N 모두)
-		  @Transactional
-		  public List<CalendarAlarmDto> getMyAlarms() {
-		      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		      EmployeeDetails user = (EmployeeDetails) auth.getPrincipal();
-		      Long employeeNo = user.getEmployeeNo();
-
-		      List<CalendarAlarm> alarms = calendarAlarmRepository.findByEmployeeNoOrderByAlarmRegDateDesc(employeeNo);
-
-
-		      List<CalendarAlarmDto> result = new ArrayList<>();
-		      for (CalendarAlarm alarm : alarms) {
-		          result.add(new CalendarAlarmDto().toDto(alarm));
-		      }
-		      return result;
-		  }
-		  //헤더 종에서 N인 알림만 보여줄 때 사용
-		  @Transactional
-		  public List<CalendarAlarmDto> getUnreadAlarms() {
-		      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		      EmployeeDetails user = (EmployeeDetails) auth.getPrincipal();
-		      Long employeeNo = user.getEmployeeNo();
-
-		      // 🔽 N인 것만 조회
-		      List<CalendarAlarm> alarms = calendarAlarmRepository
-		    	        .findByEmployeeNoAndAlarmReadYnOrderByAlarmRegDateDesc(employeeNo, "N");
-
-
-		      List<CalendarAlarmDto> result = new ArrayList<>();
-		      for (CalendarAlarm alarm : alarms) {
-		          result.add(new CalendarAlarmDto().toDto(alarm));
-		      }
-		      return result;
-		  }
-		  		  
-		  //목록에서 회사 일정 클릭하면 캘린더로 이동 -> 그리고 N을 Y로 변경
-		  @Transactional
-		  public void markAsRead(Long alarmId) {
-		      CalendarAlarm target = calendarAlarmRepository.findById(alarmId).orElse(null);
-
-		      if (target != null && "N".equals(target.getAlarmReadYn())) {
-		          CalendarAlarm updated = CalendarAlarm.builder()
-		              .alarmId(target.getAlarmId())
-		              .calendarNo(target.getCalendarNo())
-		              .employeeNo(target.getEmployeeNo())
-		              .separator(target.getSeparator())
-		              .alarmReadYn("Y") // 읽음 처리
-		              .alarmRegDate(target.getAlarmRegDate())
-		              .build();
-
-		          calendarAlarmRepository.save(updated);
-		      }
-		  }
-		  
-		  //전체 읽음 처리 버튼
-		  @Transactional
-		  public void markAllAsRead(Long employeeNo) {
-		      calendarAlarmRepository.updateAllToReadByEmployeeNo(employeeNo);
-		  }
-		  
-		  
 		  //해당 팀원에게 알림 저장
 		  @Transactional
 		  public void createTeamCalendarAlarms(TeamCalendar calendar) {
@@ -130,6 +69,70 @@ public class CalendarAlarmService {
 			}
 		}
 
+//=======================================================================================================
+		  
+		  //알림 페이지용 전체 알림 조회 (Y/N 모두)
+//		  @Transactional
+//		  public List<CalendarAlarmDto> getMyAlarms() {
+//		      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		      EmployeeDetails user = (EmployeeDetails) auth.getPrincipal();
+//		      Long employeeNo = user.getEmployeeNo();
+//
+//		      List<CalendarAlarm> alarms = calendarAlarmRepository.findByEmployeeNoOrderByAlarmRegDateDesc(employeeNo);
+//
+//
+//		      List<CalendarAlarmDto> result = new ArrayList<>();
+//		      for (CalendarAlarm alarm : alarms) {
+//		          result.add(new CalendarAlarmDto().toDto(alarm));
+//		      }
+//		      return result;
+//		  }
+		  //헤더 종에서 N인 알림만 보여줄 때 사용
+//		  @Transactional
+//		  public List<CalendarAlarmDto> getUnreadAlarms() {
+//		      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		      EmployeeDetails user = (EmployeeDetails) auth.getPrincipal();
+//		      Long employeeNo = user.getEmployeeNo();
+//
+//		      // 🔽 N인 것만 조회
+//		      List<CalendarAlarm> alarms = calendarAlarmRepository
+//		    	        .findByEmployeeNoAndAlarmReadYnOrderByAlarmRegDateDesc(employeeNo, "N");
+//
+//
+//		      List<CalendarAlarmDto> result = new ArrayList<>();
+//		      for (CalendarAlarm alarm : alarms) {
+//		          result.add(new CalendarAlarmDto().toDto(alarm));
+//		      }
+//		      return result;
+//		  }
+		  		  
+		  //목록에서 회사 일정 클릭하면 캘린더로 이동 -> 그리고 N을 Y로 변경
+//		  @Transactional
+//		  public void markAsRead(Long alarmId) {
+//		      CalendarAlarm target = calendarAlarmRepository.findById(alarmId).orElse(null);
+//
+//		      if (target != null && "N".equals(target.getAlarmReadYn())) {
+//		          CalendarAlarm updated = CalendarAlarm.builder()
+//		              .alarmId(target.getAlarmId())
+//		              .calendarNo(target.getCalendarNo())
+//		              .employeeNo(target.getEmployeeNo())
+//		              .separator(target.getSeparator())
+//		              .alarmReadYn("Y") // 읽음 처리
+//		              .alarmRegDate(target.getAlarmRegDate())
+//		              .build();
+//
+//		          calendarAlarmRepository.save(updated);
+//		      }
+//		  }
+		  
+		  //전체 읽음 처리 버튼
+//		  @Transactional
+//		  public void markAllAsRead(Long employeeNo) {
+//		      calendarAlarmRepository.updateAllToReadByEmployeeNo(employeeNo);
+//		  }
+//		  
+		  
+	
 
 	
 	

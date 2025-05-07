@@ -17,10 +17,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	    <span class="fw-bold fs-7">회의실 목록</span>
 	  </div>
 
-
-
 	<div id="meetingroomTable" data-list='{"valueNames":["no","meetingroom","capacity","date"], "page": 5, "pagination": true}'>
-    
 		<!-- 검색창 + 추가 버튼 영역 -->
 		<div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
 			<!-- 검색창 (가운데 정렬) -->
@@ -36,14 +33,12 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					</svg>
 				</form>
 			</div>
-			
 			<!-- 추가 버튼 (오른쪽 고정) -->
 			<button class="btn btn-sm btn-primary position-absolute top-0 end-0" type="button"
-				data-bs-toggle="modal" data-bs-target="#addMeetingroomModal">
+				data-bs-toggle="modal" data-bs-target="#createRoomModal">
 			  회의실 등록
 			</button>
 		</div>
-
 		<!-- 테이블 본문 -->
 		<div class="table-responsive">
 			<table class="table table-striped table-sm fs-9 mb-0 text-center">
@@ -69,9 +64,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 									<i class="fas fa-ellipsis fs-10"></i>
 								</button>
 								<div class="dropdown-menu dropdown-menu-end py-2">
-									<a class="dropdown-item" href="#!">수정</a>
+									<a class="dropdown-item editRoomBtn" href="#!"
+										th:attr="data-facility-no=${meetingroom.facilityNo}">수정</a>
 									<div class="dropdown-divider"></div>
-									<a class="dropdown-item text-danger" href="#!">삭제</a>
+									<a class="dropdown-item text-danger deleteRoomBtn" href="#!"
+										th:attr="data-facility-no=${meetingroom.facilityNo}">삭제</a>
 								</div>
 							</div>
 						</td>
@@ -82,7 +79,6 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				</tbody>
 			</table>
 		</div>
-
 	    <!-- 페이징 -->
 	    <div class="d-flex justify-content-center mt-3">
 			<div class="d-flex">
@@ -103,7 +99,6 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		<i class="fas fa-users text-secondary me-2"></i>
 		<span class="fw-bold fs-7">회의실 예약 현황</span>
 	</div>
-
 
 	<div id="reservationTable" data-list='{"valueNames":["no","meetingroom","reservation","date","time"], "page": 5, "pagination": true}'>
 	    
@@ -165,46 +160,570 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	</div>  <!-- reservationTable -->  
 </div> <!-- mb-3 -->      
 
+<!-- 회의실 생성 모달 -->
+<div class="modal fade" id="createRoomModal" tabindex="-1" aria-labelledby="createRoomModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+    <div class="modal-content border border-secondary">
+      <form id="createRoomForm" autocomplete="off">
+        <!-- 헤더 -->
+        <div class="modal-header bg-light">
+          <h5 class="modal-title" id="createRoomModalLabel">회의실 등록</h5>
+          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
 
-<!-- 회의실 추가 모달 -->
-<div class="modal fade" id="addMeetingroomModal" tabindex="-1" aria-labelledby="addMeetingroomModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
+        <!-- 바디 -->
+        <div class="modal-body px-4 py-3">
+          <!-- 회의실명 -->
+          <div class="mb-3">
+            <label for="createRoomName" class="form-label fw-semibold">회의실명</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="createRoomName" name="room_name" required>
+              <button type="button" class="btn btn-outline-secondary" id="checkRoomNameBtn">중복확인</button>
+            </div>
+            <small id="roomNameCheckMsg" class="form-text d-none"></small>
+          </div>
+          <!-- 수용 인원 -->
+          <div class="mb-3">
+            <label for="createRoomCapacity" class="form-label fw-semibold">수용 인원</label>
+            <input type="number" class="form-control" id="createRoomCapacity" name="room_capacity" required min="1" placeholder="숫자만 입력">
+          </div>
+        </div>
+        <!-- 푸터 -->
+        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="saveCreateRoomBtn">생성</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 회의실 수정 모달 -->
+<div class="modal fade" id="editRoomModal" tabindex="-1" aria-labelledby="editRoomModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+    <div class="modal-content border border-secondary">
+      <form id="editRoomForm" autocomplete="off">
+        <!-- 헤더 -->
+        <div class="modal-header bg-light">
+          <h5 class="modal-title" id="editRoomModalLabel">회의실 정보 수정</h5>
+          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <!-- 바디 -->
+        <div class="modal-body px-4 py-3">
+          <!-- 회의실명 -->
+          <div class="mb-3">
+            <label for="editRoomName" class="form-label fw-semibold">회의실명</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="editRoomName" name="room_name" required>
+              <button type="button" class="btn btn-outline-secondary" id="editCheckRoomNameBtn">중복확인</button>
+            </div>
+            <small id="editRoomNameCheckMsg" class="form-text d-none"></small>
+          </div>
+          <!-- 수용 인원 -->
+          <div class="mb-3">
+            <label for="editRoomCapacity" class="form-label fw-semibold">수용 인원</label>
+            <input type="number" class="form-control" id="editRoomCapacity" name="room_capacity" required min="1">
+          </div>
+        </div>
+        <!-- 푸터 -->
+        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="saveEditRoomBtn">저장</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 공통 저장 확인 모달 -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--  생성용 unsaved 모달 -->
+<div class="modal fade" id="unsavedCreateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 회의실 등록 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmCreateCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 수정용 unsaved 모달 -->
+<div class="modal fade" id="unsavedEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 회의실 수정 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmEditCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+
+document.addEventListener('DOMContentLoaded',function(){
+	
+	let currentMode = ''; // 동작 모드 : 'create', 'edit', 'delete'
+	let isCreateFormEdited = false; // 생성폼 수정 여부
+	let isEditFormEdited = false; // 수정폼 수정 여부
+	let currentFacilityNo = null; // 수정, 삭제용 회의실 고유 번호
+	let isNameChecked = false; // 생성 모달에서 이름 중복확인 여부
+	let prevCreateName = ''; // 마지막 중복확인 통과한 회의실명 저장
+	
+	// 모달 인스턴스 초기화(생성용)
+	const createRoomModalEl = document.getElementById('createRoomModal'); 
+	const createModal = bootstrap.Modal.getOrCreateInstance(createRoomModalEl);
+	const unsavedCreateModal = new bootstrap.Modal(document.getElementById('unsavedCreateModal'));
+	// 생성 모달 필드 요소
+	const nameInput = document.getElementById('createRoomName');         // 회의실명
+	const capacityInput = document.getElementById('createRoomCapacity'); // 수용 인원
+	const roomNameCheckMsg = document.getElementById('roomNameCheckMsg');// 이름 중복확인 메시지	
+	// 모달 인스턴스 (수정용)
+	const editRoomModalEl = document.getElementById('editRoomModal');
+	const editModal = bootstrap.Modal.getOrCreateInstance(editRoomModalEl);
+	const unsavedEditModal = new bootstrap.Modal(document.getElementById('unsavedEditModal'));
+	// 수정 모달 필드 요소
+	const editNameInput = document.getElementById('editRoomName');
+	const editCapacityInput = document.getElementById('editRoomCapacity');
+	
+	const editRoomNameCheckMsg = document.getElementById('editRoomNameCheckMsg');
+	// 수정 모달 이름 중복 확인 변수
+	let isEditNameChecked = false;
+	let prevEditName = '';
+
+	// 회의실명 입력값 변경시 -> 변경 감지 플래그 ON + 중복확인 무효화 처리
+	nameInput.addEventListener('input',function(){
+		isCreateFormEdited = true; // 생성폼 수정 여부 true
+		// 중복 확인 했고, 기존 이름과 다르면 다시 확인
+		if(isNameChecked && nameInput.value.trim() !== prevCreateName){
+			isNameChecked = false;
+			roomNameCheckMsg.classList.add('text-danger');
+			roomNameCheckMsg.textContent = '다시 중복확인이 필요합니다.';
+			roomNameCheckMsg.classList.remove('d-none');
+		}
+	});
+	// 수용 인원 변경 시에도 변경 감지 플래그 ON
+	capacityInput.addEventListener('input',function(){
+		isCreateFormEdited = true;
+	});
+	
+	// 생성 모달 닫기 : 변경사항 있으면 닫기 방지 -> unsaved 모달 띄움
+	createRoomModalEl.addEventListener('hide.bs.modal',function(e){
+		if(isCreateFormEdited){ // 수정 여부 감지되면
+			e.preventDefault(); // 기본 닫기 방지
+			unsavedCreateModal.show(); // 수정 이력 감지 모달 열기
+		}
+	});
+	
+	// unsavedCreateModal 확인 버튼 클릭시 -> 계속 닫기 , 값 초기화
+	document.getElementById('confirmCreateCloseBtn').addEventListener('click',function(){
+		isCreateFormEdited = false;
+		isNameChecked = false;
+		prevCreateName = '';
+		// 입력 필드 초기화
+		nameInput.value = '';
+		capacityInput.value = '';
+		// 메세지 초기화
+		roomNameCheckMsg.classList.add('d-none');
+		roomNameCheckMsg.textContent = '';
+		// 모달 닫기
+		unsavedCreateModal.hide();
+		createModal.hide();
+	});
+	
+	// 수정 모달 닫을때
+	editRoomModalEl.addEventListener('hide.bs.modal',function(e){
+		if(isEditFormEdited){
+			e.preventDefault();
+			unsavedEditModal.show();
+		}
+	});
+	
+	// unsavedEditModal 확인 버튼 클릭시 -> 계속 닫기 , 값 초기화
+	document.getElementById('confirmEditCloseBtn').addEventListener('click',function(){
+		isEditFormEdited = false;
+		isEditNameChecked = false;
+		prevEditName = '';
+		// 입력 필드 초기화
+		editNameInput.value = '';
+		editCapacityInput.value = '';
+		// 메세지 초기화
+		editRoomNameCheckMsg.classList.add('d-none');
+		editRoomNameCheckMsg.textContent = '';
+		// 모달 닫기
+		unsavedEditModal.hide();
+		editModal.hide();
+	});
+	
+	// 회의실명 중복 확인 버튼
+	document.getElementById('checkRoomNameBtn').addEventListener('click',function(){
+		const roomName = nameInput.value.trim().replace(/\s+/g, ''); // 모든 공백 제거
+		// 입력 없을 경우 경고
+		if(!roomName){
+			roomNameCheckMsg.textContent = '회의실명을 입력해주세요.';
+			roomNameCheckMsg.classList.remove('d-none');
+			roomNameCheckMsg.classList.add('text-danger');
+			return;
+		}
 		
-			<!-- 헤더 -->
-			<div class="modal-header">
-				<h5 class="modal-title" id="addMeetingroomModalLabel">회의실 등록</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
+		// fetch로 이름 중복 체크 서버 호출하기
+	fetch(`/admin/meetingroom/checkDuplicate?roomName=${encodeURIComponent(roomName)}`)
+		.then(response => response.json())
+		.then(data => {
+			if (data.exists) {
+				isNameChecked = false;
+				roomNameCheckMsg.textContent = '이미 존재하는 회의실명입니다.';
+				roomNameCheckMsg.classList.remove('text-success');
+				roomNameCheckMsg.classList.add('text-danger');
+			} else {
+				prevCreateName = roomName;
+				isNameChecked = true;
+				roomNameCheckMsg.textContent = '사용 가능한 회의실명입니다.';
+				roomNameCheckMsg.classList.remove('text-danger');
+				roomNameCheckMsg.classList.add('text-success');
+			}
+			roomNameCheckMsg.classList.remove('d-none');
+		})
+		.catch(error => {
+			showAlertModal('중복 확인 중 오류가 발생했습니다.');
+			console.error(error);
+		});
 		
-			<!-- 바디 -->
-			<div class="modal-body">
-				<form id="addMeetingroomForm">
-					<div class="mb-3">
-						<label for="roomName" class="form-label">회의실 이름</label>
-						<input type="text" class="form-control form-control-sm" id="roomName" placeholder="예: 회의실A">
-					</div>
-					<div class="mb-3">
-						<label for="roomLocation" class="form-label">위치</label>
-						<input type="text" class="form-control form-control-sm" id="roomLocation" placeholder="예: 1관 2층">
-					</div>
-					<div class="mb-3">
-						<label for="roomCapacity" class="form-label">수용 인원</label>
-						<input type="number" class="form-control form-control-sm" id="roomCapacity" placeholder="예: 10">
-					</div>
-				</form>
-			</div>
+	});
+	
+	// confirmSaveModal 함수
+	function showConfirmModal(message){
+		const modalMessage = document.getElementById('confirmSaveModalMessage');
+		modalMessage.textContent = message;
+		const confirmModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+		confirmModal.show();
+	}
+	
+	// alertModal 함수
+	function showAlertModal(message, callback) {
+		const alertMessageContent = document.getElementById('alertMessageContent');
+		const alertModalEl = document.getElementById('alertMessageModal');
+		const alertModal = bootstrap.Modal.getOrCreateInstance(alertModalEl);
+
+		alertMessageContent.textContent = message;
+
+		// 이전 이벤트 리스너 제거 (중복 방지)
+		const confirmBtn = alertModalEl.querySelector('.btn-primary');
+		const newConfirmBtn = confirmBtn.cloneNode(true);
+		confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+		// 확인 버튼에 콜백 연결
+		newConfirmBtn.addEventListener('click', function () {
+			if (callback) callback(); // 콜백이 있으면 실행
+		});
+
+		alertModal.show();
+	}	
+	
+	// 생성 모달의 저장 버튼 클릭시
+	document.getElementById('saveCreateRoomBtn').addEventListener('click',function(){
+		 currentMode = 'create';
+		 showConfirmModal('회의실을 등록하시겠습니까?');
+	});
+	
+	// 수정 모달의 저장 버튼 클릭시
+	document.getElementById('saveEditRoomBtn').addEventListener('click',function(){
+		  currentMode = 'edit';
+		  showConfirmModal('회의실 정보를 수정하시겠습니까?');
+	});
+	
+	// 삭제버튼 클릭시
+	document.querySelectorAll('.deleteRoomBtn').forEach(btn => {
+		btn.addEventListener('click',function(){
+		    currentFacilityNo = btn.dataset.facilityNo;
+		    currentMode = 'delete';
+		    showConfirmModal('정말 삭제하시겠습니까?');
+		});
+	});
+	
+	// comfirm 모달의 확인 버튼 클릭시
+	document.getElementById('confirmSaveBtn').addEventListener('click',function(){
+		  const confirmModalEl = document.getElementById('confirmSaveModal');
+		  const confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
+		  confirmModal.hide(); // 확인 버튼 누르면 confirm 모달 닫기
+		  if (currentMode === 'create') sendCreateRoom(); // 생성 함수 호출
+		  else if (currentMode === 'edit') sendEditRoom(); // 수정 함수 호출
+		  else if (currentMode === 'delete') sendDeleteRoom(); // 삭제 함수 호출
+	});
+	
+	// 회의실 생성 함수 -> confirm모달에서 save버튼 눌렀을때
+	function sendCreateRoom(){
+		console.log("=== sendCreateRoom() 호출됨 ===");
+		const form = document.getElementById('createRoomForm');
+		const formData = new FormData(form);
+
+		const roomName = formData.get('room_name')?.trim().replace(/\s+/g, '');
+		const roomCapacity = formData.get('room_capacity')?.trim();
+		// 유효성 검사
+		if(!roomName){
+			showAlertModal('회의실명을 입력해주세요.');
+			return;
+		}
+		if(!roomCapacity || isNaN(roomCapacity) || Number(roomCapacity) < 1){
+			showAlertModal('수용 인원은 1 이상의 숫자로 입력해주세요.');
+			return;
+		}
+		// 중복확인 여부 확인
+		if (!isNameChecked || roomName !== prevCreateName) {
+			showAlertModal('회의실명 중복 확인을 먼저 해주세요.');
+			return;
+		}
+		console.log("=== fetch 시작됨 ===");
+		// 서버 요청
+		fetch('/admin/meetingroom/create', {
+			method: 'POST',
+			body: formData,
+			headers : {
+				'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+				'X-CSRF-HEADER': document.querySelector('meta[name="_csrf_header"]').getAttribute('content')
+			}
+		})
+		.then(response => response.json())
+		.then(data => {
+			console.log("=== 서버 응답 ===", data);
+			if (data.res_code === 200) {
+				showAlertModal(data.res_msg, function () {
+					// 초기화
+					form.reset();
+					roomNameCheckMsg.classList.add('d-none');
+					roomNameCheckMsg.textContent = '';
+					isCreateFormEdited = false;
+					isNameChecked = false;
+					prevCreateName = '';
+					createModal.hide();
+					location.reload();
+				});
+			} else {
+				showAlertModal(data.res_msg || '등록에 실패했습니다.');
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			showAlertModal('서버 오류가 발생했습니다.');
+		});
+	}
+	
+	// 수정 모달 - 이름 입력 변경 감지
+	editNameInput.addEventListener('input',function(){
+		isEditFormEdited = true;
+		if(isEditNameChecked && editNameInput.value.trim() !== prevEditName){
+			isEditNameChecked = false;
+			editRoomNameCheckMsg.classList.add('text-danger');
+			editRoomNameCheckMsg.textContent = '다시 중복확인이 필요합니다.';
+			editRoomNameCheckMsg.classList.remove('d-none');
+		}
+	});
+	// 수정 모달 - 수용 인원 변경 감지
+	editCapacityInput.addEventListener('input',function(){
+		isEditFormEdited = true;
+	});
+	// 수정 모달 이름 중복 확인 버튼 클릭
+	document.getElementById('editCheckRoomNameBtn').addEventListener('click',function(){
+		const editName = editNameInput.value.trim().replace(/\s+/g, '');
+		if(!editName){
+			editRoomNameCheckMsg.textContent = '회의실명을 입력해주세요.';
+			editRoomNameCheckMsg.classList.remove('d-none');
+			return;
+		}
+		// 기존 이름과 동일한 경우
+		if(editName == prevEditName.replace(/\s+/g, '')){
+			isEditNameChecked = true;
+			editRoomNameCheckMsg.textContent = '기존 이름과 동일합니다.';
+			editRoomNameCheckMsg.classList.remove('text-danger');
+			editRoomNameCheckMsg.classList.add('text-success');
+			editRoomNameCheckMsg.classList.remove('d-none');
+			return;
+		}
 		
-			<!-- 푸터 -->
-			<div class="modal-footer">
-				<button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">닫기</button>
-				<button type="submit" class="btn btn-primary btn-sm" form="addMeetingroomForm">등록</button>
-			</div>
-		</div>
-	</div>
-</div><!-- 모달 끝 -->
+		// fetch부분 api
+		fetch(`/admin/meetingroom/checkDuplicate?roomName=${encodeURIComponent(editName)}`)
+			.then(response => response.json())
+			.then(data => {
+				if(data.exists){
+					isEditNameChecked = false;
+					editRoomNameCheckMsg.textContent = '이미 존재하는 회의실명입니다.';
+					editRoomNameCheckMsg.classList.remove('text-success');
+					editRoomNameCheckMsg.classList.add('text-danger');
+				}else{
+					prevEditName = editName;
+					isEditNameChecked = true;
+					editRoomNameCheckMsg.textContent = '사용 가능한 회의실명입니다.';
+					editRoomNameCheckMsg.classList.remove('text-danger');
+					editRoomNameCheckMsg.classList.add('text-success');
+				}
+				editRoomNameCheckMsg.classList.remove('d-none');
+			})
+			.catch(error => {
+				showAlertModal('중복 확인 중 오류가 발생했습니다.');
+				console.error(error);
+			});
+	});
+	
+	// 목록의 수정 버튼 클릭시
+	document.querySelectorAll('.editRoomBtn').forEach(btn => {
+		btn.addEventListener('click',function(){
+			const facilityNo = btn.getAttribute('data-facility-no');
+			currentFacilityNo = facilityNo;
+			currentMode = 'edit';
+			
+			// 서버에서 회의실 정보 가져오기
+			fetch(`/admin/meetingroom/get?facilityNo=${facilityNo}`)
+				.then(response => response.json())
+				.then(data => {
+					if(data.res_code == 200){
+						// 모달 필드 채우기
+						editNameInput.value = data.facility_name;
+						editCapacityInput.value = data.facility_capacity;
+						// 초기화
+						isEditFormEdited = false;
+						isEditNameChecked = false;
+						prevEditName = data.facility_name.trim().replace(/\s+/g, '');
+						editRoomNameCheckMsg.classList.add('d-none');
+						editRoomNameCheckMsg.textContent = '';
+						// 모달 열기
+						editModal.show();
+					}else{
+						showAlertModal('오류가 발생했습니다.');
+					}
+				})
+				.catch(error => {
+					showAlertModal('오류가 발생했습니다.');
+					console.error(error);
+				});
+		});
+	});
+	
+	// 회의실 수정 함수 
+	function sendEditRoom(){
+		const form = document.getElementById('editRoomForm');
+		const formData = new FormData(form);
+
+		const roomName = formData.get('room_name')?.trim().replace(/\s+/g, '');
+		const roomCapacity = formData.get('room_capacity')?.trim();
+
+		// 유효성 검사
+		if(!roomName){
+			showAlertModal('회의실명을 입력해주세요.');
+			return;
+		}
+		if(!roomCapacity || isNaN(roomCapacity) || Number(roomCapacity) < 1){
+			showAlertModal('수용 인원은 1 이상의 숫자로 입력해주세요.');
+			return;
+		}
+
+		// 중복 확인 여부 확인
+		if (!isEditNameChecked || roomName !== prevEditName) {
+			showAlertModal('회의실명 중복 확인을 먼저 해주세요.');
+			return;
+		}
+
+		// 서버 요청
+		formData.append('facility_no', currentFacilityNo);
+
+		fetch('/admin/meetingroom/edit', {
+			method: 'POST',
+			body: formData
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.res_code === 200) {
+				showAlertModal('회의실 정보가 성공적으로 수정되었습니다.');
+				// 초기화
+				isEditFormEdited = false;
+				isEditNameChecked = false;
+				prevEditName = '';
+				editModal.hide();
+				location.reload();
+			} else {
+				showAlertModal(data.res_msg || '수정에 실패했습니다.');
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			showAlertModal('서버 오류가 발생했습니다.');
+		});		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+});
+/* DOMContentLoaded 끝 부분 */
 
 
+
+
+
+
+
+
+</script>
     </main>
   </body>
 </html>

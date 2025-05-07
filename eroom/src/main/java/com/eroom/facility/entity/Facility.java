@@ -44,7 +44,7 @@ public class Facility {
 	@Column(name = "facility_editor")
 	private String facilityEditor;
 	
-	@Column(updatable = false, name = " facility_reg_date")
+	@Column(updatable = false, name = "facility_reg_date")
 	@CreationTimestamp
 	private LocalDateTime facilityRegDate;
 	
