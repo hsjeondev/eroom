@@ -53,6 +53,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         ObjectMapper objectMapper = new ObjectMapper();
         ChatMessageDto dto = objectMapper.readValue(message.getPayload(), ChatMessageDto.class);
 
+        if (dto.getChatMessageContent() != null &&
+        	    dto.getChatMessageContent().startsWith("[파일]")) {
+        	    System.out.println("📂 파일 메시지는 컨트롤러에서 처리 → WebSocket 저장 생략");
+        	    return;
+        	}
         // 저장할 메시지 객체 생성
         ChatMessage chatMessage = ChatMessage.builder()
                 .chatroom(Chatroom.builder().chatroomNo(dto.getChatroomNo()).build())
