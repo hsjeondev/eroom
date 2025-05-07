@@ -24,6 +24,7 @@ public class ChatMessageDto {
 	private Long chatMessageNo;      // 채팅 메시지 번호 
     private Long chatroomNo;          // 채팅방 번호
     private Long senderMember;        // 보낸 사람 번호(Employee PK)
+    private String senderName; 		  // 보낸 사람 이름
     private Long receiverMember;      // 받은 사람 번호(Employee PK)
     private String chatMessageContent; // 메시지 내용
     private LocalDateTime messageRegDate; // 보낸 시간
@@ -49,6 +50,7 @@ public class ChatMessageDto {
 		return ChatMessageDto.builder().chatMessageNo(entity.getChatMessageNo())
 				.chatroomNo(entity.getChatroom().getChatroomNo())
 				.senderMember(entity.getSenderMember().getEmployeeNo())
+				.senderName(entity.getSenderMember().getEmployeeName())
 				.chatMessageContent(entity.getChatMessageContent())
 				.messageRegDate(entity.getMessageRegDate())
 				.messageIsDeletedYn(entity.getMessageIsDeletedYn())

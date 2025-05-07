@@ -1298,94 +1298,88 @@ function sendMessage() {
 }
 
 		
-		function loadChatroomDetail(chatroomNo) {
-			  fetch('/chat/roomDetail?roomNo=' + chatroomNo)
-			    .then(response => response.json())
-			    .then(data => {
-			      const chatHistory = document.querySelector(".chat-history");
-			      if (!chatHistory) return;
+function loadChatroomDetail(chatroomNo) {
+    fetch('/chat/roomDetail?roomNo=' + chatroomNo)
+        .then(response => response.json())
+        .then(data => {
+            const chatHistory = document.querySelector(".chat-history");
+            if (!chatHistory) return;
 
-			      chatHistory.innerHTML = "<hr>"; // 초기화
+            chatHistory.innerHTML = "<hr>"; // 초기화
 
-			      if (data.messageList && data.messageList.length > 0) {
-			        const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+            if (data.messageList && data.messageList.length > 0) {
+                const myEmployeeNo = document.getElementById("myEmployeeNo").value;
 
-			        data.messageList.forEach(msg => {
-			          const isMyMessage = (msg.senderMember == myEmployeeNo);
-			          const hasText = !!msg.chatMessageContent;
-			          const hasFile = !!msg.drivePath;
+                data.messageList.forEach(msg => {
+                    const isMyMessage = (msg.senderMember == myEmployeeNo);
+                    const senderDisplayName = isMyMessage ? '나' : (msg.senderName || '알 수 없음');
 
-			          if (!hasText && !hasFile) return; // 둘 다 없으면 스킵
+                    const messageDiv = document.createElement("div");
+                    messageDiv.className = "mb-3";
 
-			          const messageDiv = document.createElement("div");
-			          messageDiv.className = "mb-3";
+                    // 이름 추가 표시
+                    const senderNameDiv = document.createElement("div");
+                    senderNameDiv.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-1`;
+                    senderNameDiv.innerHTML = `<div class="small text-muted">${senderDisplayName}</div>`;
 
-			          const messageWrapper = document.createElement("div");
-			          messageWrapper.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
+                    const messageWrapper = document.createElement("div");
+                    messageWrapper.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
 
-			          const bubble = document.createElement("div");
-			          bubble.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
-			          bubble.style.maxWidth = "70%";
+                    const bubble = document.createElement("div");
+                    bubble.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
+                    bubble.style.maxWidth = "70%";
 
-			          // 텍스트 추가
-			          if (hasText) {
-			            const text = document.createElement("div");
-			            text.textContent = msg.chatMessageContent;
-			            bubble.appendChild(text);
-			          }
+                    if (msg.chatMessageContent) {
+                        const text = document.createElement("div");
+                        text.textContent = msg.chatMessageContent;
+                        bubble.appendChild(text);
+                    }
 
-			          // 파일 처리
-			          if (hasFile) {
-			            const ext = msg.drivePath.split('.').pop().toLowerCase();
-			            const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
+                    if (msg.drivePath) {
+                        const ext = msg.drivePath.split('.').pop().toLowerCase();
+                        const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
 
-			            if (isImage) {
-		            	  const fileWrapper = document.createElement("div");
-		            	  fileWrapper.className = "text-center"; // 가운데 정렬
+                        if (isImage) {
+                            const fileWrapper = document.createElement("div");
+                            fileWrapper.className = "text-center";
 
-		            	  const fileName = document.createElement("div");
-		            	  fileName.className = "fw-bold mb-2";
-		            	  fileName.innerText = `[파일] ${msg.driveOriName || '파일'}`;
+                            const img = document.createElement("img");
+                            img.src = "/files/" + msg.drivePath.replace(/^\/+/, "");
+                            img.style.maxWidth = "180px";
+                            img.style.maxHeight = "180px";
+                            img.style.borderRadius = "8px";
+                            img.style.objectFit = "cover";
+                            img.style.display = "block";
+                            img.style.margin = "0 auto";
 
-		            	  const img = document.createElement("img");
-		            	  img.src = "/files/" + msg.drivePath.replace(/^\/+/, "");
-		            	  img.style.maxWidth = "180px";
-		            	  img.style.maxHeight = "180px";
-		            	  img.style.borderRadius = "8px";
-		            	  img.style.objectFit = "cover";
-		            	  img.style.display = "block";
-		            	  img.style.margin = "0 auto";
+                            fileWrapper.appendChild(img);
+                            bubble.appendChild(fileWrapper);
+                        } else {
+                            const link = document.createElement("a");
+                            link.href = "/files" + msg.drivePath;
+                            link.target = "_blank";
+                            link.className = "badge bg-info text-white mt-2 d-inline-block";
+                            link.innerText = "📎 첨부파일 보기";
+                            bubble.appendChild(link);
+                        }
+                    }
 
-		            	  fileWrapper.appendChild(fileName);
-		            	  fileWrapper.appendChild(img);
+                    messageWrapper.appendChild(bubble);
+                    messageDiv.appendChild(senderNameDiv); // 이름 표시 추가
+                    messageDiv.appendChild(messageWrapper);
+                    chatHistory.appendChild(messageDiv);
+                });
 
-		            	  bubble.appendChild(fileWrapper);
-		            	}else {
-			              const link = document.createElement("a");
-			              link.href = "/files" + msg.drivePath;
-			              link.target = "_blank";
-			              link.className = "badge bg-info text-white mt-2 d-inline-block";
-			              link.innerText = "📎 첨부파일 보기";
-			              bubble.appendChild(link);
-			            }
-			          }
+                // 스크롤을 아래로 이동
+                const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
+                if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
+            }
+        })
+        .catch(error => {
+            console.error("채팅방 상세 조회 실패:", error);
+        });
+}
 
-			          messageWrapper.appendChild(bubble);
-			          messageDiv.appendChild(messageWrapper);
-			          chatHistory.appendChild(messageDiv);
-			        });
-
-			        // 스크롤 맨 밑으로 이동
-			        const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
-			        if (chatArea) {
-			          chatArea.scrollTop = chatArea.scrollHeight;
-			        }
-			      }
-			    })
-			    .catch(error => {
-			      console.error("채팅방 상세 조회 실패:", error);
-			    });
-			}
 
 		function bindFilePreview() {
 			  const fileInput = document.getElementById("chatFileInput");
