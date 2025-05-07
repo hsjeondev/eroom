@@ -336,10 +336,92 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
 document.addEventListener('DOMContentLoaded',function(){
 	
-	let currentMode = ''; // 'create', 'edit', 'delete'
+	let currentMode = ''; // 동작 모드 : 'create', 'edit', 'delete'
 	let isCreateFormEdited = false; // 생성폼 수정 여부
 	let isEditFormEdited = false; // 수정폼 수정 여부
-	let currentFacilityNo = null; // 수정, 삭제용
+	let currentFacilityNo = null; // 수정, 삭제용 회의실 고유 번호
+	let isNameChecked = false; // 생성 모달에서 이름 중복확인 여부
+	let prevCreateName = ''; // 마지막 중복확인 통과한 회의실명 저장
+	
+	// 모달 인스턴스 초기화(생성용)
+	const createRoomModalEl = document.getElementById('createRoomModal'); 
+	const createModal = bootstrap.Modal.getOrCreateInstance(createRoomModalEl);
+	const unsavedCreateModal = new bootstrap.Modal(document.getElementById('unsavedCreateModal'));
+	// 생성 모달 필드 요소
+	const nameInput = document.getElementById('createRoomName');         // 회의실명
+	const capacityInput = document.getElementById('createRoomCapacity'); // 수용 인원
+	const roomNameCheckMsg = document.getElementById('roomNameCheckMsg');// 이름 중복확인 메시지	
+
+	// 회의실명 입력값 변경시 -> 변경 감지 플래그 ON + 중복확인 무효화 처리
+	nameInput.addEventListener('input',function(){
+		isCreateFormEdited = true; // 생성폼 수정 여부 true
+		// 중복 확인 했고, 기존 이름과 다르면 다시 확인
+		if(isNameChecked && nameInput.value.trim() !== prevCreateName){
+			isNameChecked = false;
+			roomNameCheckMsg.classList.add('text-danger');
+			roomNameCheckMsg.textContent = '다시 중복확인이 필요합니다.';
+			roomNameCheckMsg.classList.remove('d-none');
+		}
+	});
+	// 수용 인원 변경 시에도 변경 감지 플래그 ON
+	capacityInput.addEventListener('input',function(){
+		isCreateFormEdited = true;
+	});
+	
+	// 생성 모달 닫기 : 변경사항 있으면 닫기 방지 -> unsaved 모달 띄움
+	createRoomModalEl.addEventListener('hide.bs.modal',function(e){
+		if(isCreateFormEdited){ // 수정 여부 감지되면
+			e.preventDefault(); // 기본 닫기 방지
+			unsavedCreateModal.show(); // 수정 이력 감지 모달 열기
+		}
+	});
+	
+	// unsavedCreateModal 확인 버튼 클릭시 -> 계속 닫기 , 값 초기화
+	document.getElementById('confirmCreateCloseBtn').addEventListener('click',function(){
+		isCreateFormEdited = false;
+		isNameChecked = false;
+		prevCreateName = '';
+		// 입력 필드 초기화
+		nameInput.value = '';
+		capacityInput.value = '';
+		// 메세지 초기화
+		roomNameCheckMsg.classList.add('d-none');
+		roomNameCheckMsg.textContent = '';
+		// 모달 닫기
+		createModal.hide();
+	});
+	
+	// 회의실명 중복 확인 버튼
+	document.getElementById('checkRoomNameBtn').addEventListener('click',function(){
+		const roomName = nameInput.value.trim();
+		// 입력 없을 경우 경고
+		if(!roomName){
+			roomNameCheckMsg.textContent = '회의실명을 입력해주세요.';
+			roomNameCheckMsg.classList.remove('d-none');
+			roomNameCheckMsg.classList.add('text-danger');
+			return;
+		}
+		
+		// fetch로 이름 중복 체크 서버 호출하기
+		
+		
+		// 중복확인 성공한 경우 처리
+		isNameChecked = true;
+		prevCreateName = roomName;
+		
+		roomNameCheckMsg.textContent = '사용 가능한 회의실명입니다.';
+		roomNameCheckMsg.classList.remove('text-danger');
+		roomNameCheckMsg.classList.add('text-success');
+		roomNameCheckMsg.classList.remove('d-none');
+	});
+	
+	// confirmSaveModal 함수
+	function showConfirmModal(message){
+		const modalMessage = document.getElementById('confirmSaveModalMessage');
+		modalMessage.textContent = message;
+		const confirmModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+		confirmModal.show();
+	}
 	
 	// 생성 모달의 저장 버튼 클릭시
 	document.getElementById('saveCreateRoomBtn').addEventListener('click',function(){
@@ -375,7 +457,17 @@ document.addEventListener('DOMContentLoaded',function(){
 	
 	
 	
-	
+	// 모달 인스턴스 (수정용)
+	const editRoomModalEl = document.getElementById('editRoomModal');
+	const editModal = bootstrap.Modal.getOrCreateInstance(editRoomModalEl);
+	const unsavedEditModal = new bootstrap.Modal(document.getElementById('unsavedEditModal'));
+	// 수정 모달 필드 요소
+	const editNameInput = document.getElementById('editRoomName');
+	const editCapacityInput = document.getElementById('editRoomCapacity');
+	// 입력값 감지
+	editNameInput.addEventListener('input',function(){
+		
+	});
 	
 	
 	
