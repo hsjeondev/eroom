@@ -298,109 +298,73 @@
 	
 		<!--  프로젝트 슬라이드: 우측 50% -->
 		<div class="col-md-6">
-			<div class="card p-3 h-100">
-				<div class="d-flex justify-content-start mb-3">
-				  <span class="fw-bold fs-8">프로젝트</span>
-				</div>
-					<div class="mb-4">
-						<div class="text-center mb-2">
-							<i class="fas fa-circle fs-10 text-primary mt-n1"></i>
-							<span class="fw-bold fs-9">진행 중인 프로젝트</span>
-						</div>
-						<div id="projectActiveCarousel" class="carousel slide" data-bs-ride="carousel">
-							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
-							<div class="carousel-indicators">
-							  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
-							  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
-							  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
-							</div>
-							<!-- 예시 -->
-							<!-- <div class="carousel-indicators">
-							  <th:block th:each="slide, i : ${slideList}">
-							    <button type="button"
-							            th:data-bs-target="#myCarousel"
-							            th:data-bs-slide-to="${i.index}"
-							            th:classappend="${i.index == 0} ? 'active'"
-							            th:aria-label="'슬라이드 ' + ${i.index + 1}">
-							    </button>
-							  </th:block>
-							</div> -->
-							
-							<div class="carousel-inner px-4 text-center">
-								<div class="carousel-item active">
-								  <div class="border rounded p-3 bg-primary-soft">
-								    <h6 class="mb-1">Flowlog</h6>
-								    <p class="mb-0 text-muted">실시간 근태 차트 및 자동 연차 계산</p>
-								  </div>
-								</div>
-								<div class="carousel-item">
-								  <div class="border rounded p-3 bg-primary-soft">
-								    <h6 class="mb-1">click click</h6>
-								    <p class="mb-0 text-muted">회원가입/로그인, WebSocket</p>
-								  </div>
-								</div>
-							</div>
-							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
-							        type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="prev"
-							        style="top: 60%; left: -10px; z-index: 2;">
-								<i class="fas fa-chevron-left fs-7"></i>
-							</button>
-							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
-							        type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="next"
-							        style="top: 60%; right: -10px; z-index: 2;">
-								<i class="fas fa-chevron-right fs-7"></i>
-							</button>
-						</div>
-					<!-- </div> -->
-					</div>
-								  
-				  <!-- 완료된 프로젝트 슬라이드 -->
-					<!-- <div class="col-md-6 position-relative"> -->
-					<div class="mb-4">
-						<div class="text-center mb-2">
-							<i class="fas fa-circle fs-10 text-success mt-n1"></i>
-							<span class="fw-bold fs-9">완료한 프로젝트</span>
-						</div>
-						<!-- <h6 class="fw-bold mb-2">완료한 프로젝트</h6> -->
-						<div id="projectDoneCarousel" class="carousel slide" data-bs-ride="carousel">
-							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
-							<div class="carousel-indicators">
-							  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
-							  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
-							  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
-							</div>								
-							<div class="carousel-inner px-4 text-center">
-								<div class="carousel-item active">
-								  <div class="border rounded p-3 bg-success-soft">
-								    <h6 class="mb-1">Portfolio Page</h6>
-								    <p class="mb-0 text-muted">Notion 기반 포트폴리오</p>
-								  </div>
-								</div>
-								<div class="carousel-item">
-								  <div class="border rounded p-3 bg-success-soft">
-								    <h6 class="mb-1">KDT Diary</h6>
-								    <p class="mb-0 text-muted">Java 기반 할일관리 앱, 페이징</p>
-								  </div>
-							  </div>
-							</div>
-							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
-							        type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="prev"
-							        style="top: 60%; left: -10px; z-index: 2;">
-								<i class="fas fa-chevron-left fs-7"></i>
-							</button>
-							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
-							        type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="next"
-							        style="top: 60%; right: -10px; z-index: 2;">
-								<i class="fas fa-chevron-right fs-7"></i>
-							</button>
-						</div>
-					<!-- </div> -->	
-					</div>
-							  
-				  <!-- 기존 코드 유지 -->
-				<!-- </div> -->
-			</div>
-		</div>
+  <div class="card p-3 h-100">
+    <div class="d-flex justify-content-start mb-3">
+      <span class="fw-bold fs-8">프로젝트</span>
+    </div>
+
+    <!-- 진행 중인 프로젝트 -->
+    <div class="mb-4">
+      <div class="text-center mb-2">
+        <i class="fas fa-circle fs-10 text-primary mt-n1"></i>
+        <span class="fw-bold fs-9">진행 중인 프로젝트</span>
+      </div>
+      <div id="projectActiveCarousel" class="carousel slide" data-bs-ride="carousel">
+        <!-- 인디케이터 -->
+        <div class="carousel-indicators" id="activeProjectIndicators">
+          <!-- JS에서 동적으로 생성 -->
+        </div>
+        <!-- 슬라이드 -->
+        <div class="carousel-inner px-4 text-center" id="activeProjectInner">
+          <!-- JS에서 동적으로 삽입 -->
+        </div>
+        <!-- 이전 버튼 -->
+        <button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+                type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="prev"
+                style="top: 60%; left: -10px; z-index: 2;">
+          <i class="fas fa-chevron-left fs-7"></i>
+        </button>
+        <!-- 다음 버튼 -->
+        <button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+                type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="next"
+                style="top: 60%; right: -10px; z-index: 2;">
+          <i class="fas fa-chevron-right fs-7"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- 완료된 프로젝트 -->
+    <div class="mb-4">
+      <div class="text-center mb-2">
+        <i class="fas fa-circle fs-10 text-success mt-n1"></i>
+        <span class="fw-bold fs-9">완료한 프로젝트</span>
+      </div>
+      <div id="projectDoneCarousel" class="carousel slide" data-bs-ride="carousel">
+        <!-- 인디케이터 -->
+        <div class="carousel-indicators" id="doneProjectIndicators">
+          <!-- JS에서 동적으로 생성 -->
+        </div>
+        <!-- 슬라이드 -->
+        <div class="carousel-inner px-4 text-center" id="doneProjectInner">
+          <!-- JS에서 동적으로 삽입 -->
+        </div>
+        <!-- 이전 버튼 -->
+        <button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+                type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="prev"
+                style="top: 60%; left: -10px; z-index: 2;">
+          <i class="fas fa-chevron-left fs-7"></i>
+        </button>
+        <!-- 다음 버튼 -->
+        <button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+                type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="next"
+                style="top: 60%; right: -10px; z-index: 2;">
+          <i class="fas fa-chevron-right fs-7"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 	
 	</div><!-- row g-3 mt-4 슬라이드 구역 -->    
 </div>
@@ -1293,6 +1257,116 @@ function sendUpdateEmployee() {
 	loadApprovalCarouselCompleted(); // 승인된 결재 목록 함수 호출
 });
 </script>                
+
+<script>
+// 내 프로젝트 불러오기
+  const activeContainer = document.querySelector('#projectActiveCarousel .carousel-inner');
+  const doneContainer = document.querySelector('#projectDoneCarousel .carousel-inner');
+  const activeIndicators = document.querySelector('#projectActiveCarousel .carousel-indicators');
+  const doneIndicators = document.querySelector('#projectDoneCarousel .carousel-indicators');
+
+  const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+  const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}.${month}.${day}`;
+  }
+
+  fetch('/project/projectMypage', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      [csrfHeader]: csrfToken
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    const { activeProjects = [], doneProjects = [] } = data;
+
+    const renderCarousel = (list, container, indicators, carouselId, bgClass, isDone) => {
+    	  container.innerHTML = '';
+    	  indicators.innerHTML = '';
+
+    	  if (!list || list.length === 0) {
+    	    container.innerHTML = `
+    	      <div class="carousel-item active">
+    	        <div class="border rounded p-4 bg-light text-center">
+    	          <p class="mb-0 text-muted">프로젝트가 없습니다.</p>
+    	        </div>
+    	      </div>
+    	    `;
+    	    indicators.innerHTML = `
+    	      <button type="button" data-bs-target="#${carouselId}" data-bs-slide-to="0"
+    	        class="active" aria-current="true" aria-label="슬라이드 1"></button>
+    	    `;
+    	    return;
+    	  }
+
+    	  list.forEach((project, index) => {
+    	    const date = isDone ? formatDate(project.project_end) : formatDate(project.project_start);
+    	    const dateLabel = isDone ? '종료일' : '시작일';
+
+    	    const item = document.createElement('div');
+    	    item.className = `carousel-item ${index === 0 ? 'active' : ''}`;
+    	    item.innerHTML = `
+    	    	  <a href="/project/detail/${project.project_no}/main" class="text-decoration-none text-dark">
+    	    	    <div class="border rounded p-3 ${bgClass}">
+    	    	      <h5 class="mb-1 fw-bold">${project.project_name || ''}</h5>
+    	    	      <p class="mb-0 text-muted fs-9">${dateLabel} : ${date}</p>
+    	    	    </div>
+    	    	  </a>
+    	    	`;
+    	    container.appendChild(item);
+
+    	    const indicator = document.createElement('button');
+    	    indicator.type = 'button';
+    	    indicator.setAttribute('data-bs-target', `#${carouselId}`);
+    	    indicator.setAttribute('data-bs-slide-to', index.toString());
+    	    indicator.setAttribute('aria-label', `슬라이드 ${index + 1}`);
+    	    if (index === 0) {
+    	      indicator.className = 'active';
+    	      indicator.setAttribute('aria-current', 'true');
+    	    }
+    	    indicators.appendChild(indicator);
+    	  });
+    	};
+
+
+    renderCarousel(activeProjects, activeContainer, activeIndicators, 'projectActiveCarousel', 'bg-primary-soft', false);
+    renderCarousel(doneProjects, doneContainer, doneIndicators, 'projectDoneCarousel', 'bg-success-soft', true);
+  })
+  .catch(err => {
+    console.error('프로젝트 데이터 로딩 실패:', err);
+    activeContainer.innerHTML = `
+      <div class="carousel-item active">
+        <div class="border rounded p-4 bg-light text-center">
+          <p class="mb-0 text-danger">진행 중인 프로젝트 데이터를 불러올 수 없습니다.</p>
+        </div>
+      </div>
+    `;
+    doneContainer.innerHTML = `
+      <div class="carousel-item active">
+        <div class="border rounded p-4 bg-light text-center">
+          <p class="mb-0 text-danger">완료한 프로젝트 데이터를 불러올 수 없습니다.</p>
+        </div>
+      </div>
+    `;
+    activeIndicators.innerHTML = `
+      <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="0"
+        class="active" aria-current="true" aria-label="슬라이드 1"></button>
+    `;
+    doneIndicators.innerHTML = `
+      <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="0"
+        class="active" aria-current="true" aria-label="슬라이드 1"></button>
+    `;
+  });
+</script>
+
 
 			
 </main>

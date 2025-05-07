@@ -14,4 +14,16 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Lo
 
 	List<ProjectMember> findByProject_ProjectNo(Long project_no);
 	
+	List<ProjectMember> findByEmployeeEmployeeNo(Long employeeNo);
+	
+	@Query("SELECT COUNT(DISTINCT pm.project.projectNo) " +
+		       "FROM ProjectMember pm " +
+		       "WHERE pm.employee.employeeNo = :employeeNo " +
+		       "AND pm.project.proceed = :status " +
+		       "AND pm.project.visibleYn = 'Y'")
+		int countMyProjectsByStatus(@Param("employeeNo") Long employeeNo,
+		                            @Param("status") String status);
+
+
+	
 }

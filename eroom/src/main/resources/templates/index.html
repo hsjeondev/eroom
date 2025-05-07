@@ -59,7 +59,7 @@
       <div class="custom-grid">
 
         <!-- 1행·1열: 출퇴근 카드 -->
-        <div class="bg-info text-white p-3">
+        <div class="text-white p-1">
           <div class="attendance-card mx-auto">
             <div class="card shadow-sm border-0">
               <div class="card-body text-center p-4">
@@ -104,7 +104,7 @@
         </div>
 
         <!-- 1행·2열 -->
-        <div class="bg-primary text-white p-3">
+        <div class="text-white p-1">
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
 					<div class="card-body text-center p-4" style="height: 207.81px;">
@@ -115,7 +115,7 @@
         </div>
 
         <!-- 1~2행·3열 (위 두 칸 합침) -->
-        <div class="bg-danger text-white p-3 span-two-rows">
+        <div class="text-white p-1 span-two-rows">
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
 					<div class="card-body text-center p-4" style="height: 447.62px;">
@@ -126,18 +126,18 @@
 		</div>
 
         <!-- 2행·1열 -->
-        <div class="bg-warning text-white p-3">
-			<div class="attendance-card mx-auto">
-				<div class="card shadow-sm border-0">
-					<div class="card-body text-center p-4" style="height: 207.81px;">
-						프로젝트<br>(내가 참여중인 프로젝트 / 진행 중, 진행 예정, 완료 / 개수)
-					</div>
-				</div>
-			</div>
-        </div>
+		<div class="text-white p-1">
+		  <div class="attendance-card mx-auto">
+		    <div class="card shadow-sm border-0">
+		      <div id="projectSummary" class="card-body text-start p-4" style="height: 207.81px;">
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
 
         <!-- 2행·2열 -->
-        <div class="bg-secondary text-white p-3">
+        <div class="text-white p-1">
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
 					<div class="card-body text-center p-4" style="height: 207.81px;">
@@ -148,7 +148,7 @@
         </div>
 
         <!-- 3행·1열 -->
-        <div class="bg-light text-dark p-3">
+        <div class="text-dark p-1">
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
 					<div class="card-body text-center p-4" style="height: 207.81px;">
@@ -159,7 +159,7 @@
         </div>
 
         <!-- 3행·2열 -->
-        <div class="bg-dark text-white p-3">
+        <div class="text-white p-1">
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
 					<div class="card-body text-center p-4" style="height: 207.81px;">
@@ -170,7 +170,7 @@
         </div>
 
         <!-- 3행·3열 -->
-        <div class="bg-success text-white p-3">
+        <div class="text-white p-1">
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
 					<div class="card-body text-center p-4" style="height: 207.81px;">
@@ -290,6 +290,45 @@
         	});
       });
     </script>
+    
+    <script>
+    // 내 프로젝트 개수
+  fetch('/project/myProjectCount', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      [document.querySelector('meta[name="_csrf_header"]').content]: 
+        document.querySelector('meta[name="_csrf"]').content
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.res_code === '200') {
+      const summaryBox = document.getElementById('projectSummary');
+      summaryBox.innerHTML = `
+    	  <div class="fw-bold fs-7 position-absolute top-0 start-0 mt-2 ms-3 text-dark">참여 프로젝트</div>
+    	  <div class="d-flex justify-content-center align-items-center h-100 gap-4">
+    	    <div class="text-center">
+    	      <div class="fw-medium fs-6">진행 중</div>
+    	      <div class="text-muted fs-7">${data.doingCount}개</div>
+    	    </div>
+    	    <div class="text-center">
+    	      <div class="fw-medium fs-6">예정</div>
+    	      <div class="text-muted fs-7">${data.upcomingCount}개</div>
+    	    </div>
+    	    <div class="text-center">
+    	      <div class="fw-medium fs-6">완료</div>
+    	      <div class="text-muted fs-7">${data.doneCount}개</div>
+    	    </div>
+    	  </div>
+    	`;
+    }
+  })
+  .catch(err => {
+    console.error("프로젝트 요약 불러오기 실패:", err);
+  });
+</script>
+    
 
   </div>
 </main>
