@@ -36,6 +36,7 @@ public class ProjectDto {
 	private String proceed;
 	private int progress;
 	private List<ProjectMemberDto> project_members;
+	private String visible_yn;
 
 	public Project toEntity() {
 		Project project = Project.builder()
@@ -48,6 +49,7 @@ public class ProjectDto {
 				.projectGithubToken(project_github_token)
 				.proceed(proceed)
 				.progress(progress)
+				.visibleYn(visible_yn)
 				.build();
 
 
@@ -74,6 +76,7 @@ public class ProjectDto {
 				.project_github_token(project.getProjectGithubToken())
 				.progress(project.getProgress())
 				.project_members(dtoList)
+				.visible_yn(project.getVisibleYn())
 				.build();
 	}
 }
