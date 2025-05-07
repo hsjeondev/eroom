@@ -36,6 +36,7 @@ import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.security.EmployeeDetails;
+import com.eroom.websocket.ChatWebSocketHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,7 +50,7 @@ public class ChatController {
 	private final EmployeeRepository employeeRepository;
 	private final ChatMessageService chatMessageService;
 	private final ChatAlarmRepository chatAlarmRepository;
-	
+	private final ChatWebSocketHandler webSocketHandler; 
 	@GetMapping("/test")
 	public String test123() {
 		return "chat/test";
@@ -311,14 +312,14 @@ public class ChatController {
 	// 채팅 파일 업로드
 	@PostMapping("/upload/chat")
 	@ResponseBody
-	public Map<String, String> uploadChatDriveFiles(
+	public Map<String, Object> uploadChatDriveFiles(
 	        DriveDto driveDto,
 	        @RequestParam("driveFiles") List<MultipartFile> files,
 	        @RequestParam("chatroomNo") Long chatroomNo,
 	        @RequestParam("driveDescriptions") List<String> driveDescriptions,
 	        @AuthenticationPrincipal EmployeeDetails user) {
 
-	    Map<String, String> resultMap = new HashMap<>();
+	    Map<String, Object> resultMap = new HashMap<>();
 	    resultMap.put("res_code", "500");
 	    resultMap.put("res_msg", "업로드 실패");
 
@@ -333,28 +334,28 @@ public class ChatController {
 	        // 파일 저장 및 Drive 객체 반환
 	        List<Drive> savedDrives = chatroomService.uploadChatFilesAndReturnDrives(driveDto, user.getEmployee().getEmployeeNo());
 
+	        List<String> fileNames = new ArrayList<>();
+	        Map<String, String> drivePaths = new HashMap<>();
 	        for (Drive drive : savedDrives) {
-	            ChatMessageDto chatMessage = new ChatMessageDto();
-	            chatMessage.setSenderMember(user.getEmployee().getEmployeeNo());
-	            chatMessage.setChatroomNo(chatroomNo);
-	            chatMessage.setChatMessageContent("[파일] " + drive.getDriveOriName());
+	            String oriName = drive.getDriveOriName();
+	            String path = drive.getDrivePath(); // 실제 다운로드 경로
+	            fileNames.add(oriName);
+	            drivePaths.put(oriName, path);
+	            ChatMessageDto msg = ChatMessageDto.builder()
+	                    .chatMessageContent("[파일] " + oriName)
+	                    .chatroomNo(chatroomNo)
+	                    .senderMember(user.getEmployee().getEmployeeNo())
+	                    .receiverMember(null) // or 상대방 번호 if 1:1
+	                    .build();
 
-	            // receiverMember는 1:1일 경우 설정
-	            Chatroom chatroom = chatroomService.selectChatroomOne(chatroomNo);
-	            if ("N".equals(chatroom.getChatIsGroupYn())) {
-	                chatroom.getChatroomMapping().stream()
-	                        .map(ChatroomAttendee::getAttendee)
-	                        .filter(e -> !e.getEmployeeNo().equals(user.getEmployee().getEmployeeNo()))
-	                        .findFirst()
-	                        .ifPresent(opponent -> chatMessage.setReceiverMember(opponent.getEmployeeNo()));
-	            }
-
-	            // 메시지 저장 및 브로드캐스트
-	            chatMessageService.sendAndBroadcast(chatMessage);
+	                webSocketHandler.broadcastMessage(msg, null);
 	        }
 
 	        resultMap.put("res_code", "200");
 	        resultMap.put("res_msg", "업로드 성공");
+	        resultMap.put("fileNames", fileNames);
+	        resultMap.put("drivePaths", drivePaths);
+	        
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        resultMap.put("res_msg", "예외 발생: " + e.getMessage());
@@ -362,9 +363,5 @@ public class ChatController {
 
 	    return resultMap;
 	}
-	
-
-
-
 
 }

@@ -58,4 +58,7 @@ public class Project {
 	@OneToMany(mappedBy="project")
 	private List<ProjectMember> projectMembers;
 	
+	@Column(name="visible_yn")
+	private String visibleYn;
+	
 }

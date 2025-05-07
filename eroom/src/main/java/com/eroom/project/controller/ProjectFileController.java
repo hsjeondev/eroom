@@ -30,9 +30,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eroom.drive.dto.DriveDto;
 import com.eroom.drive.entity.Drive;
 import com.eroom.drive.repository.DriveRepository;
 import com.eroom.drive.service.DriveService;
+import com.eroom.project.service.ProjectService;
 import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
@@ -44,9 +46,46 @@ public class ProjectFileController {
 	
 	private final DriveService driveService;
 	private final DriveRepository driveRepository;
+	private final ProjectService projectService;
 	// 파일 저장 경로 
 			 @Value("${ffupload.location}")
 			 private String fileDir;
+			 
+			 @PostMapping("/fileUpload")
+				@ResponseBody
+				public Map<String,String> uploadTeamDriveFiles(DriveDto driveDto,
+				                                               @RequestParam("driveDescriptions") List<String> driveDescriptions,
+				                                               @AuthenticationPrincipal EmployeeDetails user,
+				                                               @RequestParam("fileCategory") String category) {
+					
+					System.out.println("driveDto" + driveDto);
+					
+				    Map<String, String> resultMap = new HashMap<>();
+				    resultMap.put("res_code", "500");
+				    resultMap.put("res_msg", "업로드 실패");
+
+				    driveDto.setDriveDescriptions(driveDescriptions);
+				    
+				    String separatorCode = "FL006";
+				    
+				    if(category.equals("1")) {
+				    	separatorCode = "FL0061";
+				    } else if(category.equals("2")) {
+				    	separatorCode = "FL0062";	    	
+				    } else if(category.equals("3")) {
+				    	separatorCode = "FL0063";	    	
+				    }
+
+				    driveDto.setSeparatorCode(separatorCode);
+
+				    int result = projectService.uploadProjectFiles(driveDto, user.getEmployee().getEmployeeNo());
+
+				    if(result > 0) {
+				        resultMap.put("res_code", "200");
+				        resultMap.put("res_msg", "업로드 성공");
+				    }
+				    return resultMap;
+				}
 	
 	@GetMapping("/download/{driveAttachNo}")
 	public ResponseEntity<Object> downloadTeamDriveFile(@PathVariable("driveAttachNo") Long id,

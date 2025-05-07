@@ -15,11 +15,11 @@
 				<h2 class="h4 fw-semibold mb-4" th:text="${minute.meetingTitle}">제목</h2>
 
 				<p class="mb-3">
-					<strong class="me-2">참여자:</strong> <span th:each="name : ${participantNames}" class="me-1 badge bg-light text-dark fw-normal" th:text="${name}">이름</span>
+					<strong class="me-2">참여자:</strong> <span th:each="name : ${participants}" class="me-1 badge bg-light text-dark fw-normal" th:text="${name}">이름</span>
 				</p>
 
 				<p class="mb-3">
-					<strong class="me-2">회의일:</strong> <span th:text="${#temporals.format(minute.meetingDate, 'yyyy.MM.dd HH시 mm분')}">2025.01.01 10시 30분</span>
+					<strong class="me-2">회의일:</strong> <span th:text="${#temporals.format(minute.meetingDate, 'yyyy.MM.dd HH시 mm분')}">회의일시</span>
 				</p>
 
 				<div class="mb-4">
@@ -28,6 +28,7 @@
 				</div>
 
 				<!-- 수정/삭제 -->
+				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 				<div class="d-flex justify-content-end gap-2 mt-4" th:if="${isParticipant}">
 					<button class="btn btn-outline-secondary" th:attr="data-minute-no=${minute.meetingMinuteNo}, data-project-no=${projectNo}">수정</button>
 					<button class="btn btn-danger" th:attr="data-minute-no=${minute.meetingMinuteNo}, data-project-no=${projectNo}">삭제</button>
@@ -70,7 +71,77 @@
 		      });
 		    }
 		  });
+		  
+		  // 삭제
+		  document.addEventListener("DOMContentLoaded", function () {
+		    const deleteBtn = document.querySelector('button.btn-danger[data-minute-no]');
+		    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+		
+		    if (deleteBtn && confirmDeleteBtn) {
+		      deleteBtn.addEventListener("click", function () {
+		        const minuteNo = this.getAttribute("data-minute-no");
+		
+		        // 확인 버튼에 minuteNo 저장
+		        confirmDeleteBtn.setAttribute("data-minute-no", minuteNo);
+		
+		        // 모달 표시
+		        const deleteModal = new bootstrap.Modal(document.getElementById("confirmDeleteModal"));
+		        deleteModal.show();
+		      });
+		    }
+		  });
+		  document.addEventListener("DOMContentLoaded", function () {
+			  const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+
+			  if (confirmDeleteBtn) {
+			    confirmDeleteBtn.addEventListener("click", function () {
+			      const minuteNo = this.getAttribute("data-minute-no");
+
+			      fetch("/project/minute/delete", {
+			        method: "POST",
+			        headers: {
+			          "Content-Type": "application/json",
+			          [document.querySelector('meta[name="_csrf_header"]').getAttribute("content")]:
+			            document.querySelector('meta[name="_csrf"]').getAttribute("content")
+			        },
+			        body: JSON.stringify({ minuteNo })
+			      })
+			      .then(res => res.json())
+			      .then(data => {
+			        if (data.success) {
+			          const deleteModal = bootstrap.Modal.getInstance(document.getElementById("confirmDeleteModal"));
+			          deleteModal.hide();
+			          window.location.href = document.referrer || "/";
+			        } else {
+			          console.warn("삭제 실패: 서버 응답이 success=false");
+			        }
+			      })
+			      .catch(err => {
+			        console.error("삭제 요청 중 오류:", err);
+			      });
+			    });
+			  }
+			});
 		</script>
+
+		<!-- 회의록 삭제 확인창 -->
+		<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-sm">
+				<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+					<div class="modal-header border-0">
+						<h5 class="modal-title text-dark">정말 삭제할까요?</h5>
+					</div>
+					<div class="modal-body text-center">
+						<p class="mb-0 text-body">이 회의록을 삭제하시겠습니까?</p>
+					</div>
+					<div class="modal-footer justify-content-center border-0">
+						<button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+						<button type="button" class="btn btn-danger" id="confirmDeleteBtn">삭제</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 	</main>
 </body>
 </html>
