@@ -16,4 +16,6 @@ public interface ProjectMeetingMinuteMappingRepository extends JpaRepository<Pro
 
 	@Query("SELECT m.employeeNo FROM ProjectMeetingMinuteMapping m WHERE m.meetingMinuteNo = :minuteNo")
 	List<Long> findEmployeeNosByMeetingMinuteNo(@Param("minuteNo") Long minuteNo);
+
+	boolean existsByMeetingMinuteNoAndEmployeeNo(Long minuteNo, Long employeeNo);
 }

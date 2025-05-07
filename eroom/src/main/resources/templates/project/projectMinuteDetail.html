@@ -24,12 +24,12 @@
 
 				<div class="mb-4">
 					<strong class="d-block mb-2">내용</strong>
-					<div class="border rounded bg-light-subtle p-3" th:text="${minute.meetingContent}">회의 내용</div>
+					<div class="border rounded bg-light-subtle p-3" th:text="${minute.meetingContent}" style="white-space: pre-wrap;"></div>
 				</div>
 
 				<!-- 수정/삭제 -->
 				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-				<div class="d-flex justify-content-end gap-2 mt-4" th:if="${isParticipant}">
+				<div class="d-flex justify-content-end gap-2 mt-4" th:if="${isMinuteParticipant}">
 					<button class="btn btn-outline-secondary" th:attr="data-minute-no=${minute.meetingMinuteNo}, data-project-no=${projectNo}">수정</button>
 					<button class="btn btn-danger" th:attr="data-minute-no=${minute.meetingMinuteNo}, data-project-no=${projectNo}">삭제</button>
 				</div>

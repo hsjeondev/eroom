@@ -221,18 +221,26 @@ public class ProjectController {
 	    return "project/projectDetailFilesTab";
 	}
 
-	
 	@GetMapping("/detail/{project_no}/minutes")
 	public String detailProjectMinutesView(@PathVariable("project_no") Long project_no, Model model) {
+	    // 로그인 사용자 정보
+	    EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	    Long employeeNo = userDetails.getEmployee().getEmployeeNo();
+
+	    // 프로젝트 정보 및 회의록 목록
 	    ProjectDto project = projectService.findByProjectNo(project_no);
 	    List<ProjectMeetingMinuteDto> minutes = projectMeetingMinuteService.getMeetingMinutesByProject(project_no);
 
+	    // 프로젝트 참여 여부 확인
+	    boolean isProjectMember = projectService.isProjectMember(project_no, employeeNo);
+
 	    model.addAttribute("project", project);
 	    model.addAttribute("minutes", minutes);
+	    model.addAttribute("isProjectMember", isProjectMember);
 
 	    return "project/projectDetailMinutesTab";
 	}
-	
+
 	@GetMapping("/create")
 	public String createProjectView(Model model) {
 	    return "project/projectCreate";
