@@ -14,8 +14,7 @@
 			<div class="tab-pane active" role="tabpanel" aria-labelledby="create-minute" id="create-minute">
 				<p class="mb-4">(회의록 작성 안내사항 문구)</p>
 				<form id="createMinute" method="post" th:action="@{/project/minute/create}" novalidate>
-					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-					<input type="hidden" name="projectNo" th:value="${projectNo}" />
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> <input type="hidden" name="projectNo" th:value="${projectNo}" />
 					<div class="form-floating">
 						<input class="form-control" type="text" name="meetingTitle" id="create-minute-name" placeholder="제목을 입력해주세요." /> <label for="create-minute-name">회의록 제목</label>
 					</div>
@@ -60,15 +59,83 @@
 		</footer>
 
 		<script>
-		  document.addEventListener("DOMContentLoaded", function () {
-		    const selectAll = document.getElementById("select-all");
-		    const checkboxes = document.querySelectorAll(".participant-checkbox:not(#select-all)");
+		// 유효성 검사
+		document.addEventListener("DOMContentLoaded", () => {
+		  const form = document.getElementById("createMinute");
+		  const titleInput = document.getElementById("create-minute-name");
+		  const contentInput = document.getElementById("create-minute-content");
+		  const participantCheckboxes = document.querySelectorAll(".participant-checkbox:not(#select-all)");
+		  const confirmButton = document.querySelector("#validationModal .btn[data-bs-dismiss]");
+		  const selectAll = document.getElementById("select-all");
+		  const checkboxes = document.querySelectorAll(".participant-checkbox:not(#select-all)");
 		
-		    selectAll.addEventListener("change", function () {
-		      checkboxes.forEach(cb => cb.checked = selectAll.checked);
-		    });
+		  let focusElement = null; // 유효성 실패 시 포커스할 요소
+		
+		  // 폼 유효성 검사
+		  form.addEventListener("submit", (e) => {
+		    // 제목
+		    if (!titleInput.value.trim()) {
+		      e.preventDefault();
+		      showValidationModal("", "제목을 입력해주세요.", titleInput);
+		      return;
+		    }
+		
+		    // 내용
+		    if (!contentInput.value.trim()) {
+		      e.preventDefault();
+		      showValidationModal("", "내용을 입력해주세요.", contentInput);
+		      return;
+		    }
+		
+		    // 참여자
+		    const isAnyChecked = Array.from(participantCheckboxes).some(cb => cb.checked);
+		    if (!isAnyChecked) {
+		      e.preventDefault();
+		      showValidationModal("", "참여자를 최소 1명 이상 선택해주세요.", null);
+		    }
 		  });
+		
+		  // 유효성 실패 시 모달창 표시
+		  function showValidationModal(title, message, target) {
+		    document.getElementById("validationModalTitle").textContent = title;
+		    document.getElementById("validationModalMessage").textContent = message;
+		    focusElement = target;
+		
+		    const modal = new bootstrap.Modal(document.getElementById("validationModal"));
+		    modal.show();
+		  }
+		
+		  // 모달 확인 클릭 시 지정된 요소로 포커스 이동
+		  confirmButton.addEventListener("click", () => {
+		    if (focusElement) {
+		      setTimeout(() => focusElement.focus(), 300);
+		    }
+		  });
+		
+		  // 참여자 전체 선택
+		  selectAll.addEventListener("change", () => {
+		    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+		  });
+		});
 		</script>
+
+		<!-- 유효성 검사 확인창 -->
+		<div class="modal fade" id="validationModal" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-sm">
+				<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+					<div class="modal-header border-0">
+						<h5 class="modal-title text-dark" id="validationModalTitle">입력 확인</h5>
+					</div>
+					<div class="modal-body text-center">
+						<p class="mb-0 text-body" id="validationModalMessage">필수 항목을 모두 입력해주세요.</p>
+					</div>
+					<div class="modal-footer justify-content-center border-0">
+						<button type="button" class="btn btn-phoenix-secondary bg-primary text-white" data-bs-dismiss="modal">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 	</main>
 </body>
 </html>
