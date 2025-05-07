@@ -1,5 +1,7 @@
 package com.eroom.employee.entity;
 
+import com.eroom.nav.entity.NavMenuItem;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,7 +37,7 @@ public class AuthorityMenuMapping {
 	
 	@ManyToOne
 	@JoinColumn(name = "authority_menu_no")
-	private AuthorityMenu authorityMenu;
+	private NavMenuItem navMenuItem;
 	
 	
 	
