@@ -75,14 +75,14 @@ public class ProjectMinuteController {
 	    EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	    Long currentUserNo = userDetails.getEmployee().getEmployeeNo();
 
-	    // 프로젝트 참여 여부
-	    boolean isProjectMember = projectService.isProjectMember(projectNo, currentUserNo);
+	    // 회의록 참여 여부
+	    boolean isMinuteParticipant = projectMeetingMinuteService.isMinuteParticipant(minuteNo, currentUserNo);
 
 	    // 모델에 전달
 	    model.addAttribute("minute", dto);
 	    model.addAttribute("participants", participants);
 	    model.addAttribute("projectNo", projectNo);
-	    model.addAttribute("isProjectMember", isProjectMember);
+	    model.addAttribute("isMinuteParticipant", isMinuteParticipant);
 
 	    return "project/projectMinuteDetail";
 	}
@@ -92,21 +92,11 @@ public class ProjectMinuteController {
 	                             @RequestParam("projectNo") Long projectNo,
 	                             Model model) {
 
-	    // 회의록 기본 정보
+	    // 회의록 기본 정보 조회
 	    ProjectMeetingMinuteDto dto = projectMeetingMinuteService.findByMinuteNo(minuteNo);
 
-	    // 현재 참여자 번호 목록
+	    // 회의 참여자 번호 목록 조회
 	    List<Long> selectedParticipantNos = projectMeetingMinuteService.findParticipantNos(minuteNo);
-
-	    // 로그인한 사용자
-	    EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	    Long currentUserNo = userDetails.getEmployee().getEmployeeNo();
-
-	    // 프로젝트 참여 여부 검사
-	    boolean isProjectMember = projectService.isProjectMember(projectNo, currentUserNo);
-	    if (!isProjectMember) {
-	        return "error/403";
-	    }
 
 	    // 프로젝트 멤버 목록 조회
 	    List<Employee> projectEmployees = projectService.findEmployeesByProjectNo(projectNo);
