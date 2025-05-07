@@ -84,6 +84,7 @@ public class ApprovalService {
 					.approvalFormat(ApprovalFormat.builder().approvalFormatNo(Long.valueOf(dto.getFormat_no())).build())
 					.approvalContent(dto.getContent())
 					.approvalStatus("S")
+					.approvalVisibleYn("Y")
 					.build();
 			
 			Approval approvalResult = approvalRepository.save(approval);
