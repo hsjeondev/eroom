@@ -178,4 +178,15 @@ public class VehicleService {
 
 	    return dtoList;
 	}
+	
+	// 차량 전체 예약 현황
+	public List<VehicleDto> getAllReservations(){
+		List<Vehicle> reservationList = repository.findByVisibleYnAndSeparatorCodeOrderByReservationStartDesc("Y", "F002");
+		List<VehicleDto> dtoList = new ArrayList<>();
+		for(Vehicle vehicle : reservationList) {
+			VehicleDto dto = new VehicleDto().toDto(vehicle);
+			dtoList.add(dto);
+		}
+		return dtoList;
+	}
 }

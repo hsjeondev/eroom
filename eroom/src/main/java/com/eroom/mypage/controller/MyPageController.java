@@ -2,6 +2,7 @@ package com.eroom.mypage.controller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eroom.approval.dto.ApprovalDto;
+import com.eroom.approval.service.ApprovalService;
 import com.eroom.attendance.dto.AnnualLeaveDto;
 import com.eroom.attendance.dto.AttendanceDto;
 import com.eroom.attendance.entity.AnnualLeave;
@@ -46,6 +49,7 @@ public class MyPageController {
 	private final EmployeeService employeeService;
 	private final DriveRepository driveRepository;
 	private final ProfileService profileService;
+	private final ApprovalService approvalService;
 	
 	// 마이페이지
 	@GetMapping("/list")
@@ -61,17 +65,19 @@ public class MyPageController {
 		String teamName = "-";
 		// 부서 정보 조회
 		if(employeeStructure != null) {
-			teamName = employeeStructure.getCodeName();
-			
-			// 부서 정보가 있을 경우에만 parentCode를 사용하여 부서명 조회
-			String parentCode = employeeStructure.getParentCode();
-			Structure structure = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(parentCode);
-			if(structure != null) {
-				departmentName = structure.getCodeName();
-			} else {
-				// 부서 정보가 없을 경우 기본값 사용
-				departmentName = "-";
+			if(employeeStructure.getParentCode() == null) {
+				// 팀이 없을 경우
+				departmentName = employeeStructure.getCodeName();
+				teamName = "-";
+			}else {
+				// 팀이 있는 경우
+				teamName = employeeStructure.getCodeName();
+				Structure department = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(employeeStructure.getParentCode());
+				if(department != null) {
+					departmentName = department.getCodeName();
+				}
 			}
+
 		}
         model.addAttribute("departmentName", departmentName);
         model.addAttribute("teamName",teamName);
@@ -209,5 +215,53 @@ public class MyPageController {
 
 	    return resultMap;
 	}
+	
+	// 진행중인 결재 목록
+	@GetMapping("/approval/ongoing")
+	@ResponseBody
+	public List<Map<String,Object>> getOngoingApprovals(Authentication authentication){
+		EmployeeDetails employee = (EmployeeDetails) authentication.getPrincipal();
+		List<ApprovalDto> dtoList = approvalService.myPageMyApprovalsStatusIsS(employee.getEmployee().getEmployeeNo());
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+		List<Map<String,Object>> resultList = new ArrayList<>();
+		for(ApprovalDto dto : dtoList) {
+			Map<String,Object> map = new HashMap<>();
+			map.put("approval_no", dto.getApproval_no());
+			map.put("approval_title", dto.getApproval_title());
+			if(dto.getApproval_reg_date() != null) {
+				map.put("approval_display_date", dto.getApproval_reg_date().format(formatter));
+			}else {
+				map.put("approval_display_date", "-");
+			}
+			resultList.add(map);
+		}
+		return resultList;
+	}
+	
+	// 승인된 결재 목록
+	@GetMapping("/approval/completed")
+	@ResponseBody
+	public List<Map<String,Object>> getCompletedApprovals(Authentication authentication){
+		EmployeeDetails employee = (EmployeeDetails) authentication.getPrincipal();
+		List<ApprovalDto> dtoList = approvalService.myPageMyApprovalsStatusIsA(employee.getEmployee().getEmployeeNo());
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+		List<Map<String,Object>> resultList = new ArrayList<>();
+		for(ApprovalDto dto : dtoList) {
+			Map<String,Object> map = new HashMap<>();
+			map.put("approval_no",dto.getApproval_no());
+			map.put("approval_title",dto.getApproval_title());
+			if(dto.getApproval_completed_date() != null) {
+				map.put("approval_display_date", dto.getApproval_completed_date().format(formatter));
+			}else {
+				map.put("approval_display_date","-");
+			}
+			resultList.add(map);
+			
+		}
+		return resultList;
+	}
+	
 
 }

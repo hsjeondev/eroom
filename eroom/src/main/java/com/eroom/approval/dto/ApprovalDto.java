@@ -38,6 +38,8 @@ public class ApprovalDto {
     private ApprovalFormat approval_format; // 결재 양식
     private String approval_visible_yn; // 결재 사용여부
     
+    private String approval_display_date; // 사용자에게 보여줄 날짜(기안일/완료일)
+    
 	public Approval toEntity() {
 		return Approval.builder()
 				.approvalNo(approval_no)
