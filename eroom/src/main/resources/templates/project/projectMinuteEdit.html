@@ -32,7 +32,7 @@
 							</div>
 
 							<!-- 부서 인원 -->
-							<div class="form-check" th:each="emp : ${structureEmployees}">
+							<div class="form-check" th:each="emp : ${projectEmployees}">
 								<input type="checkbox" class="form-check-input participant-checkbox" th:id="'emp-' + ${emp.employeeNo}" th:name="participants" th:value="${emp.employeeNo}" th:checked="${selectedParticipantNos.contains(emp.employeeNo)}" /> <label class="form-check-label ms-1" th:for="'emp-' + ${emp.employeeNo}" th:text="${emp.employeeName}">이름</label>
 							</div>
 						</div>

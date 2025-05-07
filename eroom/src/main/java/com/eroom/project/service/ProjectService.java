@@ -347,6 +347,22 @@ public class ProjectService {
         return result;
     }
 
+    // 프로젝트 참여자 목록 조회
+	public List<Employee> findEmployeesByProjectNo(Long projectNo) {
+		return projectMemberRepository.findEmployeesByProjectNo(projectNo);
+	}
+	
+	// 프로젝트 참여 여부 조회
+	public boolean isProjectMember(Long projectNo, Long employeeNo) {
+	    List<Employee> members = findEmployeesByProjectNo(projectNo);
 
+	    for (Employee emp : members) {
+	        if (emp.getEmployeeNo().equals(employeeNo)) {
+	            return true;
+	        }
+	    }
 
+	    return false;
+	}
+	
 }

@@ -29,7 +29,7 @@
 
 				<!-- 수정/삭제 -->
 				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-				<div class="d-flex justify-content-end gap-2 mt-4" th:if="${isParticipant}">
+				<div class="d-flex justify-content-end gap-2 mt-4" th:if="${isMinuteParticipant}">
 					<button class="btn btn-outline-secondary" th:attr="data-minute-no=${minute.meetingMinuteNo}, data-project-no=${projectNo}">수정</button>
 					<button class="btn btn-danger" th:attr="data-minute-no=${minute.meetingMinuteNo}, data-project-no=${projectNo}">삭제</button>
 				</div>
