@@ -1874,7 +1874,7 @@
 
           const updateListControls = () => {
             listInfo &&
-              (listInfo.innerHTML = `${list.i} to ${numberOfcurrentItems} <span class='text-body-tertiary'> Items of </span>${totalItem}`);
+              (listInfo.innerHTML = `${list.i} - ${numberOfcurrentItems} / ${totalItem}`);
 
             paginationButtonPrev &&
               togglePaginationButtonDisable(
