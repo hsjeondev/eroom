@@ -181,13 +181,14 @@
     
     function removeFile(attachNo) {
         if (!confirm("정말 삭제하시겠습니까?")) return;
-
+        console.log('삭제할 파일의 attachNo:', attachNo);
         fetch('/article/file/delete/' + attachNo, {
           method: 'POST',
           headers: {
             'header': document.querySelector('meta[name="_csrf_header"]').content,
 	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
           }
+        
         })
         .then(res => res.json())
         .then(data => {

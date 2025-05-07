@@ -57,9 +57,11 @@ public class ArticleController {
 	// 게시글 수정중 기존 파일 삭제
 	@PostMapping("/article/file/delete/{attachNo}")
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> deleteAttachedFile(@PathVariable Long attachNo) {
-	    Map<String, Object> result = new HashMap<>();
+	public ResponseEntity<Map<String, Object>> deleteAttachedFile(@PathVariable("attachNo") Long attachNo) {
+		System.out.println("attachNo received: " + attachNo);
+		Map<String, Object> result = new HashMap<>();
 	    try {
+	    	System.out.println(attachNo);
 	    	articleService.markAsDeleted(attachNo);  // visibleYn = "N" 처리 등
 	        result.put("res_code", 200);
 	        result.put("res_msg", "파일이 삭제되었습니다.");
