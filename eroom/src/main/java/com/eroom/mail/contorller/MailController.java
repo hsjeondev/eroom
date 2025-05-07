@@ -235,7 +235,7 @@ public class MailController {
 		mailService.moveImportant(id,employeeNo);
         return "redirect:" + redirectUrl;
     }
-	
+	// 다중 별표 처리( 중요 표시 )
 	@PostMapping("/mail/important")
 	@ResponseBody
 	public ResponseEntity<Void> markBulkImportant(@RequestBody List<Long> mailNos,
@@ -243,7 +243,8 @@ public class MailController {
 	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
 	    
 	    for (Long mailNo : mailNos) {
-	        mailService.moveImportant(mailNo,employeeNo);  
+	        //mailService.moveImportant(mailNo,employeeNo);  
+	        mailService.toggleStarred(mailNo,employeeNo);  
 	    }
 	    
 	    return ResponseEntity.ok().build(); 
