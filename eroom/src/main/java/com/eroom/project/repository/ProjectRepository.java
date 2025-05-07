@@ -1,6 +1,7 @@
 package com.eroom.project.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -19,4 +20,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
 		       " SET p.proceed = :proceed " +
 		       " WHERE p.projectEnd = :projectEnd")
 	int updateProceedByEndDate(@Param("proceed") String proceed, @Param("projectEnd") LocalDate projectEnd);
+	
+	List<Project> findByProceed(String proceed);
+
+	Long countByProceed(String proceed);
+
 }

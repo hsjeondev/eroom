@@ -3,14 +3,15 @@ package com.eroom.employee.controller;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.eroom.chat.service.ChatroomService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.service.EmployeeService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
@@ -20,9 +21,20 @@ public class EmployeeController {
 	private final EmployeeService employeeService;
 
 	@GetMapping("/login")
-	public String loginView() {
-		return "login";
+	public String loginView(HttpServletRequest request, Model model) {
+	    String errorMsg = (String) request.getSession().getAttribute("loginErrorMsg");
+	    
+	    System.out.println("errorMsg " + errorMsg);
+
+	    if (errorMsg != null) {
+	        model.addAttribute("error", "true");
+	        model.addAttribute("errorMsg", errorMsg);
+	        request.getSession().removeAttribute("loginErrorMsg");
+	    }
+
+	    return "login";
 	}
+
 
 	@GetMapping("/admin")
 	public String adminView() {

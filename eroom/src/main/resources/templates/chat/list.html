@@ -1024,6 +1024,7 @@
 		  };
 		  // 메시지 수신
 		 socket.onmessage = function(event) {
+			 console.log("📩 WebSocket 메시지 수신:", event.data);
 		  const data = JSON.parse(event.data);
 		  const myEmployeeNo = document.getElementById("myEmployeeNo").value;
 		  const currentChatroomNo = document.querySelector(".chatroom-title")?.dataset.roomNo;
@@ -1057,36 +1058,36 @@
 		  }
 		
 		  if (!chatHistory) return;
-		
+		  
 		  const wrapper = document.createElement("div");
 		  wrapper.className = "mb-3";
-		
+
 		  const nameLine = document.createElement("div");
 		  nameLine.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-1`;
 		  nameLine.innerHTML = `<div class="small text-muted">${isMyMessage ? '나' : data.senderName}</div>`;
-		
+
 		  const messageLine = document.createElement("div");
 		  messageLine.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
-		
+
 		  const messageBubble = document.createElement("div");
 		  messageBubble.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
 		  messageBubble.style.maxWidth = "70%";
-		
+
 		  // 텍스트가 있으면 추가
 		  if (data.chatMessageContent) {
 		    const text = document.createElement("div");
 		    text.innerText = data.chatMessageContent;
 		    messageBubble.appendChild(text);
 		  }
-		
+
 		  // 파일이 있으면 추가
 		  if (data.drivePath) {
 		    const ext = data.drivePath.split('.').pop().toLowerCase();
 		    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
-		
+
 		    const fileWrapper = document.createElement("div");
 		    fileWrapper.className = "mt-2";
-		
+
 		    if (isImage) {
 		      const img = document.createElement("img");
 		      img.src = data.drivePath;
@@ -1101,14 +1102,15 @@
 		      link.innerText = "📎 " + (data.driveOriName || "첨부파일 다운로드");
 		      fileWrapper.appendChild(link);
 		    }
-		
+
 		    messageBubble.appendChild(fileWrapper);
 		  }
-		
+
 		  messageLine.appendChild(messageBubble);
 		  wrapper.appendChild(nameLine);
 		  wrapper.appendChild(messageLine);
 		  chatHistory.appendChild(wrapper);
+
 		
 		  const scrollArea = document.querySelector(".flex-grow-1.overflow-auto");
 		  if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
@@ -1184,7 +1186,7 @@ if (timePreview) {
   messageOuterDiv.appendChild(messageInnerDiv);
   wrapperDiv.appendChild(nameDiv);
   wrapperDiv.appendChild(messageOuterDiv);
-  chatHistory.appendChild(wrapperDiv);
+  chatHistory.appendChild(wrapperDiv); 
 
 	const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
 	if (chatArea) {
@@ -1210,16 +1212,16 @@ function sendMessage() {
   const message = messageInput.value.trim();
   const fileInput = document.getElementById("chatFileInput");
 
-  if (!message && fileInput.files.length === 0) {
-    alert("메시지나 파일을 입력해주세요.");
-    return;
-  }
-
   const chatroomNo = document.querySelector(".chatroom-title").dataset.roomNo;
   const myEmployeeNo = document.getElementById("myEmployeeNo").value;
   const receiverValue = document.getElementById("receiverNo")?.value;
   const receiverNo = receiverValue && receiverValue !== "undefined" && receiverValue !== "null" ? Number(receiverValue) : null;
   const isGroupChat = document.querySelector('.chatroom-title')?.dataset.group === 'Y';
+  
+  if (!message && fileInput.files.length === 0) {
+    alert("메시지나 파일을 입력해주세요.");
+    return;
+  }
 
   // 파일이 있는 경우
   if (fileInput.files.length > 0) {
@@ -1240,22 +1242,37 @@ function sendMessage() {
     })
     .then(res => res.json())
     .then(data => {
+    	console.log("서버 응답:", data);
       if (data.res_code === "200") {
         const fileNames = data.fileNames;
         
-    	 fileNames.forEach(fileName => {
- 	        const chatData = {
- 	          chatMessageContent: `[파일] ${fileName}`,
- 	          senderMember: Number(myEmployeeNo),
- 	          chatroomNo: Number(chatroomNo),
- 	          receiverMember: isGroupChat ? null : receiverNo
- 	        };
- 	        socket.send(JSON.stringify(chatData));
- 	      });
+        fileNames.forEach(fileName => {
+        	const safeName = fileName.trim();
+        	  const drivePath = data.drivePaths?.[fileName];  // ✅ 반드시 선언해야 함
+
+        	  if (!drivePath) {
+        	    console.warn(`[경고] ${fileName}에 대한 drivePath 없음`);
+        	    return;
+        	  }
+
+        	  const chatData = {
+        	    chatMessageContent: `[파일] ${fileName}`,
+        	    senderMember: Number(myEmployeeNo),
+        	    chatroomNo: Number(chatroomNo),
+        	    receiverMember: isGroupChat ? null : receiverNo,
+        	    driveOriName: fileName,
+        	    drivePath: drivePath  
+        	  };
+
+        	  console.log("📤 WebSocket 전송:", chatData);
+        	  socket.send(JSON.stringify(chatData));
+        	  console.log("🚚 업로드 후 fileNames:", fileNames);
+        	});
 
  	      fileInput.value = "";
  	      document.getElementById("chatFilePreview").innerHTML = "";
  	      messageInput.value = "";
+ 	      return;
       } else {
         alert("파일 업로드 실패: " + data.res_msg);
       }
