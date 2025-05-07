@@ -39,7 +39,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			
 			<!-- 추가 버튼 (오른쪽 고정) -->
 			<button class="btn btn-sm btn-primary position-absolute top-0 end-0" type="button"
-				data-bs-toggle="modal" data-bs-target="#addMeetingroomModal">
+				data-bs-toggle="modal" data-bs-target="#createRoomModal">
 			  회의실 등록
 			</button>
 		</div>
@@ -69,9 +69,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 									<i class="fas fa-ellipsis fs-10"></i>
 								</button>
 								<div class="dropdown-menu dropdown-menu-end py-2">
-									<a class="dropdown-item" href="#!">수정</a>
+									<a class="dropdown-item editRoomBtn" href="#!"
+										th:attr="data-facility-no=${meetingroom.facilityNo}">수정</a>
 									<div class="dropdown-divider"></div>
-									<a class="dropdown-item text-danger" href="#!">삭제</a>
+									<a class="dropdown-item text-danger deleteRoomBtn" href="#!"
+										th:attr="data-facility-no=${meetingroom.facilityNo}">삭제</a>
 								</div>
 							</div>
 						</td>
@@ -166,45 +168,240 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 </div> <!-- mb-3 -->      
 
 
-<!-- 회의실 추가 모달 -->
-<div class="modal fade" id="addMeetingroomModal" tabindex="-1" aria-labelledby="addMeetingroomModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
-		
-			<!-- 헤더 -->
-			<div class="modal-header">
-				<h5 class="modal-title" id="addMeetingroomModalLabel">회의실 등록</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-		
-			<!-- 바디 -->
-			<div class="modal-body">
-				<form id="addMeetingroomForm">
-					<div class="mb-3">
-						<label for="roomName" class="form-label">회의실 이름</label>
-						<input type="text" class="form-control form-control-sm" id="roomName" placeholder="예: 회의실A">
-					</div>
-					<div class="mb-3">
-						<label for="roomLocation" class="form-label">위치</label>
-						<input type="text" class="form-control form-control-sm" id="roomLocation" placeholder="예: 1관 2층">
-					</div>
-					<div class="mb-3">
-						<label for="roomCapacity" class="form-label">수용 인원</label>
-						<input type="number" class="form-control form-control-sm" id="roomCapacity" placeholder="예: 10">
-					</div>
-				</form>
-			</div>
-		
-			<!-- 푸터 -->
-			<div class="modal-footer">
-				<button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">닫기</button>
-				<button type="submit" class="btn btn-primary btn-sm" form="addMeetingroomForm">등록</button>
-			</div>
-		</div>
-	</div>
-</div><!-- 모달 끝 -->
+<!-- 회의실 생성 모달 -->
+<div class="modal fade" id="createRoomModal" tabindex="-1" aria-labelledby="createRoomModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+    <div class="modal-content border border-secondary">
+      <form id="createRoomForm" autocomplete="off">
+        <!-- 헤더 -->
+        <div class="modal-header bg-light">
+          <h5 class="modal-title" id="createRoomModalLabel">회의실 등록</h5>
+          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- 바디 -->
+        <div class="modal-body px-4 py-3">
+
+          <!-- 회의실명 -->
+          <div class="mb-3">
+            <label for="createRoomName" class="form-label fw-semibold">회의실명</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="createRoomName" name="room_name" required>
+              <button type="button" class="btn btn-outline-secondary" id="checkRoomNameBtn">중복확인</button>
+            </div>
+            <small id="roomNameCheckMsg" class="form-text d-none"></small>
+          </div>
+
+          <!-- 수용 인원 -->
+          <div class="mb-3">
+            <label for="createRoomCapacity" class="form-label fw-semibold">수용 인원</label>
+            <input type="number" class="form-control" id="createRoomCapacity" name="room_capacity" required min="1" placeholder="숫자만 입력">
+          </div>
+
+        </div>
+
+        <!-- 푸터 -->
+        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="saveCreateRoomBtn">생성</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 회의실 수정 모달 -->
+<div class="modal fade" id="editRoomModal" tabindex="-1" aria-labelledby="editRoomModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+    <div class="modal-content border border-secondary">
+      <form id="editRoomForm" autocomplete="off">
+        <!-- 헤더 -->
+        <div class="modal-header bg-light">
+          <h5 class="modal-title" id="editRoomModalLabel">회의실 정보 수정</h5>
+          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- 바디 -->
+        <div class="modal-body px-4 py-3">
+
+          <!-- 회의실명 -->
+          <div class="mb-3">
+            <label for="editRoomName" class="form-label fw-semibold">회의실명</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="editRoomName" name="room_name" required>
+              <button type="button" class="btn btn-outline-secondary" id="editCheckRoomNameBtn">중복확인</button>
+            </div>
+            <small id="editRoomNameCheckMsg" class="form-text d-none"></small>
+          </div>
+
+          <!-- 수용 인원 -->
+          <div class="mb-3">
+            <label for="editRoomCapacity" class="form-label fw-semibold">수용 인원</label>
+            <input type="number" class="form-control" id="editRoomCapacity" name="room_capacity" required min="1">
+          </div>
+
+        </div>
+
+        <!-- 푸터 -->
+        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="saveEditRoomBtn">저장</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 공통 저장 확인 모달 -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--  생성용 unsaved 모달 -->
+<div class="modal fade" id="unsavedCreateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 회의실 등록 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmCreateCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 수정용 unsaved 모달 -->
+<div class="modal fade" id="unsavedEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 회의실 수정 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmEditCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+
+document.addEventListener('DOMContentLoaded',function(){
+	
+	let currentMode = ''; // 'create', 'edit', 'delete'
+	let isCreateFormEdited = false; // 생성폼 수정 여부
+	let isEditFormEdited = false; // 수정폼 수정 여부
+	let currentFacilityNo = null; // 수정, 삭제용
+	
+	// 생성 모달의 저장 버튼 클릭시
+	document.getElementById('saveCreateRoomBtn').addEventListener('click',function(){
+		 currentMode = 'create';
+		 showConfirmModal('회의실을 등록하시겠습니까?');
+	});
+	
+	// 수정 모달의 저장 버튼 클릭시
+	document.getElementById('saveEditRoomBtn').addEventListener('click',function(){
+		  currentMode = 'edit';
+		  showConfirmModal('회의실 정보를 수정하시겠습니까?');
+	});
+	
+	// 삭제버튼 클릭시
+	document.querySelectorAll('.deleteRoomBtn').forEach(btn => {
+		btn.addEventListener('click',function(){
+		    currentFacilityNo = btn.dataset.facilityNo;
+		    currentMode = 'delete';
+		    showConfirmModal('정말 삭제하시겠습니까?');
+		});
+	});
+	
+	// comfirm 모달의 확인 버튼 클릭시
+	document.getElementById('confirmSaveBtn').addEventListener('click',function(){
+		  if (currentMode === 'create') sendCreateRoom(); // 생성 함수 호출
+		  else if (currentMode === 'edit') sendEditRoom(); // 수정 함수 호출
+		  else if (currentMode === 'delete') sendDeleteRoom(); // 삭제 함수 호출
+	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+});
+/* DOMContentLoaded 끝 부분 */
 
 
+
+
+
+
+
+
+</script>
     </main>
   </body>
 </html>
