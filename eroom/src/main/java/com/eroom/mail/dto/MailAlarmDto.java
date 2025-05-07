@@ -36,4 +36,15 @@ public class MailAlarmDto {
             .mailAlarmRegDate(mail_alarm_reg_date)
             .build();
     }
+    public  MailAlarmDto toDto(MailAlarm mailAlarm) {
+        return MailAlarmDto.builder()
+            .mail_alarm_no(mailAlarm.getMailAlarmNo())
+            .mail_receiver_no(
+                mailAlarm.getMailReceiver().getMailReceiverNo()
+            )
+            .mail_alarm_read_yn(mailAlarm.getMailAlarmReadYn())
+            .mail_alarm_reg_date(mailAlarm.getMailAlarmRegDate())
+            .build();
+    }
+    
 }

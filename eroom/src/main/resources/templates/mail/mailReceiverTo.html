@@ -14,20 +14,16 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		<div class="d-flex justify-content-start">
 			<span class="fw-bold fs-6">받은 메일함</span>
 		</div>
+		<input type="hidden" id="myEmployeeNo"
+			th:value="${#authentication.principal.employee.employeeNo}">
 	</div>
    <div id="mailSummary" data-list='{"valueNames":["senderName", "mailTitle", "mailContent", "sendTime"], "page":6, "pagination":true}'>   
       <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
             <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mailCreate}">메일 쓰기</a>
-              <!-- <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button> -->
             </div> 
             <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" th:href="@{mailCreate}"> <span class="d-none d-sm-inline-block">메일 쓰기</span><span class="d-sm-none fas fa-plus"></span></a></div>
             <div class="col-auto flex-1">
-              <!-- <div class="search-box w-100">
-                <form class="position-relative">
-                  <input class="form-control search-input search" type="search" placeholder="검색" aria-label="Search" />
-                  <span class="fas fa-search search-box-icon"></span>
-                </form>
-              </div> -->
+              
               <div class="search-box w-100" style="max-width: 250px; position: absolute; right: 20px;">
               <form class="position-relative">
                 <input class="form-control search-input search" type="search" placeholder="검색" aria-label="Search" />
@@ -63,6 +59,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                 <!-- 범용성 생각해서 일단 보류 -->
                 
                 <!-- 메일 목록 스타트부분 -->
+                
                 <div th:if="${#lists.isEmpty(receivedMails)}">
                 	<div class="col-12">
 							<div class="alert alert-light text-center border border-secondary-light rounded py-4 fs-6 fw-semibold text-body-secondary">
@@ -249,7 +246,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
          
          
          document.addEventListener("DOMContentLoaded", function() {
-        	    const socket = new WebSocket("ws://localhost:8080/ws/mail");  // wss://로 수정 필요 시, 변경
+        	 	const senderNo = document.getElementById("myEmployeeNo").value; 
+        	    const socket = new WebSocket("ws://localhost:8080/ws/mail?senderNo="+senderNo);  // wss://로 수정 필요 시, 변경
 
         	    socket.onopen = () => {
         	      console.log("메일 웹소켓 연결 성공");
@@ -278,8 +276,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
         	        .then(html => {
         	          // 갱신된 HTML로 mailSummary 콘텐츠 변경
         	          const mailSummary = document.querySelector('#mailSummary');
+        	          mailSummary.innerHTML = "";
         	          mailSummary.innerHTML = html;
-
+        	          // 해결 방법 찾다가 시간 너무 써서 일단 리로드로 해결
+        	          location.reload();
         	          // List.js 재초기화
         	          initializeListJs();
         	        })

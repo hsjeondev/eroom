@@ -35,9 +35,9 @@ public class MailWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        
-        Principal principal = session.getPrincipal();
-        String senderNo = principal.getName();
+    	String senderNo = getQueryParam(session, "senderNo");
+//        Principal principal = session.getPrincipal();
+//        String senderNo = principal.getName();
         if (senderNo != null) {
             userSessions.put(Long.parseLong(senderNo), session);
         }
