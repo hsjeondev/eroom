@@ -228,11 +228,19 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
       appendMessage('나', msg, 'end');
       input.value = '';
-
+      const loadingBubble = appendMessage('GPT', '✍️ 답변을 작성 중입니다... ✍️', 'start');
+      
+      
       fetch(`/gpt/ask?prompt=${encodeURIComponent(msg)}`)
         .then(res => res.text())
-        .then(res => appendMessage('GPT', res, 'start'))
-        .catch(() => appendMessage('GPT', '❗ 오류가 발생했습니다.', 'start'));
+        .then(res => {
+        	let parsedResponse = res.replaceAll(/\[(.*?)\]\((http[s]?:\/\/[^\s]+)\)/g, `<a href="$2" target="_blank">$1</a>`);
+        	parsedResponse = parsedResponse.replaceAll(/(http[s]?:\/\/[^\s]+)/g, `<a href="$1" target="_blank">$1</a>`);
+        	loadingBubble.innerHTML = parsedResponse;
+       	})
+        .catch(() => {
+        	loadingBubble.innerHTML = '❗ 오류가 발생했습니다. ❗';
+        });
     }
 
     function appendMessage(sender, text) {
@@ -241,12 +249,14 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
     	  const bubble = document.createElement('div');
     	  bubble.className = `chat-bubble ${sender === '나' ? 'user' : 'gpt'}`;
-    	  bubble.innerText = text;
+    	  bubble.innerHTML = text;
 
     	  wrapper.appendChild(bubble);
     	  messages.appendChild(wrapper);
     	  messages.scrollTop = messages.scrollHeight;
-    	}
+
+    	  return bubble;
+   	}
   });
 </script>
 

@@ -14,12 +14,9 @@ import lombok.ToString;
 @Setter
 @ToString
 @Builder
+@AllArgsConstructor
 public class GptRequestDto {
 	private String model;
     private List<GptMessageDto> messages;
 
-    public GptRequestDto(String model, List<GptMessageDto> messages) {
-        this.model = model;
-        this.messages = messages;
-    }
 }
