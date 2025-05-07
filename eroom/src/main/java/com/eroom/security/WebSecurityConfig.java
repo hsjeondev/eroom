@@ -47,7 +47,12 @@ public class WebSecurityConfig {
 			.logout(logout -> logout.logoutUrl("/logout")
 									.clearAuthentication(true)
 									.logoutSuccessUrl("/login")
-									.invalidateHttpSession(true));
+									.invalidateHttpSession(true)
+									.deleteCookies("remember-me"))
+			.rememberMe(rememberMe -> rememberMe.rememberMeParameter("remember-me")
+											.tokenValiditySeconds(60*60*24*30)
+											.alwaysRemember(false)
+											.tokenRepository(tokenRepository()));
 		
 		return http.build();
 	}
