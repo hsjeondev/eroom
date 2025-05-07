@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,11 +39,12 @@ public class DirectoryController {
 	
 
 	@GetMapping("/directory/employee")
-	public String selectDirectoryEmployeeList(@RequestParam(name="deptId",required=false) Long deptId, @RequestParam(name="teamId",required=false) Long teamId,Model model, Authentication authentication) {
+	public String selectDirectoryEmployeeList(@RequestParam(name="deptId",required=false) Long deptId, @RequestParam(name="teamId",required=false) Long teamId,Model model, @AuthenticationPrincipal EmployeeDetails user) {
 //		EmployeeDetails employeeDetail = (EmployeeDetails)authentication.getPrincipal();
 //		Employee employee = employeeDetail.getEmployee();
 //		model.addAttribute("employee", employee);
-		
+		model.addAttribute("employeeDetails", user);
+		System.out.println(user.getAuthorities() + "123");
 		List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
 		List<Directory> temp = directoryService.selectDirectoryEmployeeAllBySeparatorCode();
 		
@@ -164,7 +166,7 @@ public class DirectoryController {
 	
 	
 	
-	
+	// 협력업체 조회
 	@GetMapping("/directory/partner")
 	public String selectDirectoryPartnerList(Model model) {
 		List<DirectoryDto> resultList = new ArrayList<DirectoryDto>();
@@ -180,6 +182,7 @@ public class DirectoryController {
 		return "directory/partnerList";
 	}
 	
+	// 협력업체 추가
 	@PostMapping("/directory/partner/create")
 	@ResponseBody
 	public Map<String, String> createPartner(@RequestBody Map<String, String> formData, Authentication authentication){
@@ -203,6 +206,7 @@ public class DirectoryController {
 		
 		return map;
 	}
+	// 협력업체 수정
 	@PutMapping("/directory/partner/update")
 	@ResponseBody
 	public Map<String, String> updatePartner(@RequestBody Map<String, String> formData, Authentication authentication){
@@ -226,6 +230,7 @@ public class DirectoryController {
 		
 		return map;
 	}
+	// 협력업체 삭제
 	@PutMapping("/directory/partner/delete")
 	@ResponseBody
 	public Map<String, String> deletePartner(@RequestBody Map<String, String> data, Authentication authentication){
@@ -250,7 +255,7 @@ public class DirectoryController {
 		return map;
 	}
 	
-	// 부서이름으로 팀 조회 // 지우자
+	// 부서코드로 팀 조회
 	@GetMapping("/directory/teams")
 	@ResponseBody
 	public List<Map<String, Object>> getTeamsByDept(@RequestParam("separatorCode") String separatorCode) {
@@ -269,9 +274,7 @@ public class DirectoryController {
 	    return result;
 	}
 	
-//	@PostMapping("/admin/addDepartment")
-//	@ResponseBody
-//	public Map<String, String> addDepartmentMethod(@RequestBody())
+	// 부서, 팀 추가
 	@PostMapping("/admin/addDepartmentOrTeam")
 	@ResponseBody
 	public Map<String, String> addDepartmentTeamMethod(@RequestBody AddDepartmentAndTeamDto dto, Authentication authentication){
@@ -297,7 +300,7 @@ public class DirectoryController {
 		
 		return map;
 	}
-	
+	// 부서, 팀 정렬
 	@PutMapping("/admin/updateSortOrder")
 	@ResponseBody
 	public Map<String, String> updateSortOrderMethod(@RequestBody UpdateSortOrderDto dto, Authentication authentication){
