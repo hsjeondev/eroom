@@ -44,6 +44,9 @@ public class ProjectMeetingMinute {
     @Column(name = "meeting_date")
     private LocalDateTime meetingDate;
     
+    @Column(name = "meeting_minute_visible")
+    private String meetingMinuteVisible;
+    
     public void updateTitleAndContent(String title, String content) {
         this.meetingTitle = title;
         this.meetingContent = content;

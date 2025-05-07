@@ -93,4 +93,18 @@ public class ProjectMeetingMinuteService {
         projectMeetingMinuteMappingRepository.saveAll(newMappings);
     }
 
+
+	public void deleteMinute(Long minuteNo) {
+	    // 원본 엔티티 조회
+	    ProjectMeetingMinute entity = projectMeetingMinuteRepository.findById(minuteNo)
+	        .orElse(null);
+
+	    // DTO로 변환 후 visible 값을 "N"으로 설정
+	    ProjectMeetingMinuteDto dto = ProjectMeetingMinuteDto.toDto(entity);
+	    dto.setMeetingMinuteVisible("N");
+
+	    // 다시 entity 변환 후 저장
+	    projectMeetingMinuteRepository.save(dto.toEntity());
+	}
+
 }
