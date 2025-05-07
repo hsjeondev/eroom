@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,6 +36,7 @@ import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.employee.service.StructureService;
+import com.eroom.facility.dto.FacilityDto;
 import com.eroom.facility.entity.Facility;
 import com.eroom.facility.service.FacilityService;
 import com.eroom.reservation.dto.MeetingRoomDto;
@@ -68,6 +70,74 @@ public class AdminController {
 		model.addAttribute("meetingroomList",resultList);
 		model.addAttribute("meetingroomReservationList",reservationList); // 예약 내역 리스트
 		return "admin/meetingroom";
+	}
+	
+	// 회의실 조회
+	@GetMapping("/meetingroom/get")
+	@ResponseBody
+	public Map<String,Object> getMeetingRoomByNo(@RequestParam("facilityNo") Long facilityNo){
+		Map<String,Object> resultMap = new HashMap<>();
+		FacilityDto dto = facilityService.selectFacilityByNo(facilityNo);
+		if(dto == null) {
+			resultMap.put("res_code", 404);
+			resultMap.put("res_msg", "해당 회의실 정보를 찾을 수 없습니다.");
+		}else {
+			resultMap.put("res_code",200 );
+			resultMap.put("facility_no", dto.getFacility_no());
+			resultMap.put("facility_name",dto.getFacility_name() );
+			resultMap.put("facility_capacity",dto.getFacility_capacity());
+		}
+		return resultMap;
+	}
+	
+	// 회의실 생성
+	@PostMapping("/meetingroom/create")
+	@ResponseBody
+	public Map<String, Object> createMeetingRoom(
+	        @RequestParam("room_name") String roomName,
+	        @RequestParam("room_capacity") String roomCapacity,
+	        Authentication authentication) {
+		System.out.println("=== createMeetingRoom() 호출됨 ===");
+	    Map<String, Object> resultMap = new HashMap<>();
+
+	    // 로그인한 사용자 정보
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    String employeeId = employeeDetails.getEmployee().getEmployeeId();
+
+	    // DTO 구성
+	    FacilityDto dto = FacilityDto.builder()
+	            .facility_name(roomName)
+	            .facility_capacity(roomCapacity)
+	            .separator_code("F001")
+	            .visible_yn("Y")
+	            .facility_creator(employeeId)
+	            .facility_editor(employeeId)
+	            .build();
+
+	    try {
+	        facilityService.createFacility(dto);
+	        resultMap.put("res_code", 200);
+	        resultMap.put("res_msg", "회의실 등록 성공");
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	        resultMap.put("res_code", 500);
+	        resultMap.put("res_msg", "서버 오류로 등록 실패: "+e.getMessage());
+	    }
+
+	    return resultMap;
+	}
+	
+	// 회의실명 중복 체크
+	@GetMapping("/meetingroom/checkDuplicate")
+	@ResponseBody
+	public Map<String,Object> checkDuplicateRoomName(@RequestParam("roomName") String roomName){
+		Map<String,Object> resultMap = new HashMap<>();
+		// String trimmedName = roomName.replaceAll("\\s", "");
+		boolean exists = facilityService.existsByNameIgnoringSpaces(roomName);
+		resultMap.put("exists", exists);
+		resultMap.put("res_code", 200);
+		resultMap.put("res_msg", exists ? "중복된 이름입니다." : "사용 가능한 이름입니다.");		
+		return resultMap;
 	}
 	
 	// 차량 목록
