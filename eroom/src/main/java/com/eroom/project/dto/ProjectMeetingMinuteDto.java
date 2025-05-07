@@ -23,16 +23,19 @@ public class ProjectMeetingMinuteDto {
     private String meetingContent;
     private String writer;
     private LocalDateTime meetingDate;
+    private String meetingMinuteVisible = "Y";
     private int participants;
 
     // Entity → DTO
     public static ProjectMeetingMinuteDto toDto(ProjectMeetingMinute entity) {
         return ProjectMeetingMinuteDto.builder()
                 .meetingMinuteNo(entity.getMeetingMinuteNo())
+                .projectNo(entity.getProjectNo())
                 .meetingTitle(entity.getMeetingTitle())
                 .meetingContent(entity.getMeetingContent())
                 .writer(entity.getMeetingMinuteWriter())
                 .meetingDate(entity.getMeetingDate())
+                .meetingMinuteVisible(entity.getMeetingMinuteVisible())
                 .build();
     }
 
@@ -45,6 +48,7 @@ public class ProjectMeetingMinuteDto {
                 .meetingContent(meetingContent)
                 .meetingMinuteWriter(writer)
                 .meetingDate(meetingDate)
+                .meetingMinuteVisible(meetingMinuteVisible != null ? meetingMinuteVisible : "Y")
                 .build();
     }
 }
