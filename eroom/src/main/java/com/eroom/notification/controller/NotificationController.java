@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -15,7 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.notification.CalendarAlarmService;
+import com.eroom.notification.dto.AlarmDto;
 import com.eroom.notification.dto.CalendarAlarmDto;
+import com.eroom.notification.service.AlarmService;
 import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
@@ -25,56 +26,85 @@ import lombok.RequiredArgsConstructor;
 public class NotificationController {
 	
 	private final CalendarAlarmService calendarAlarmService;
-	//calendaralarm , calendarList
-	//알림 페이지에서 목록 가져오기
-//	@GetMapping("/notification")
-//	public String notificationView(Model model) {		
-//		//캘린더 알람 목록 가져오기
-//		List<CalendarAlarmDto> calendarList = calendarAlarmService.getCalendarAlarm();
-//		List<CalendarAlarmDto> teamList = calendarAlarmService.getTeamAlarm();
-//		model.addAttribute("calendaralarm",calendarList);
-//		model.addAttribute("teamList",teamList);
-//		return "notification/notification";
-//	}
+	private final AlarmService alarmService;
+
 	
+	//알림 페이지 목록조회
 	@GetMapping("/notification")
 	public String notificationView(Model model) {
-	    List<CalendarAlarmDto> calendarList = calendarAlarmService.getMyAlarms();
-	    model.addAttribute("calendaralarm", calendarList);
-	    return "notification/notification";
+		List<AlarmDto> alarmList = alarmService.getMyAlarms();
+		model.addAttribute("alarmList", alarmList);
+		return "notification/notification";
 	}
 	
-		//종 누르면 내려오는 목록 가져오기
+	//헤더 종 누르면 내려오는 목록 가져오기
 	@GetMapping("/notification/data")
 	@ResponseBody
-	public List<CalendarAlarmDto> getNotificationData() {
-	    return calendarAlarmService.getUnreadAlarms();  // 회사 + 팀 전체 알림
+	public List<AlarmDto> getNotificationData(@AuthenticationPrincipal EmployeeDetails userDetails) {
+	    Long loginEmployeeNo = userDetails.getEmployee().getEmployeeNo();
+	    //System.out.println("로그인한 사번: " + loginEmployeeNo);
+	    List<AlarmDto> list = alarmService.getUnreadAlarms(loginEmployeeNo);
+	    return list;
+	    
 	}
 	  
-	  @PatchMapping("/notification/read/{alarmId}")
-	  @ResponseBody
-	  public Map<String, String> readNotification(@PathVariable("alarmId") Long alarmId) {
-	      Map<String, String> result = new HashMap<>();
-	      result.put("res_code", "500");
-	      result.put("res_msg", "읽음 처리 실패");
+	//헤더 종 누르고, 목록 하나 하나 누르면 N에서 Y로 처리
+	@PatchMapping("/notification/read/{alarmId}")
+	@ResponseBody
+	public Map<String, String> readNotification(@PathVariable("alarmId") Long alarmId) {
+	    Map<String, String> result = new HashMap<>();
+	    result.put("res_code", "500");
+	    result.put("res_msg", "읽음 처리 실패");
 
-	      try {
-	          calendarAlarmService.markAsRead(alarmId);
-	          result.put("res_code", "200");
-	          result.put("res_msg", "읽음 처리 성공");
-	      } catch (Exception e) {
-	          e.printStackTrace(); // 서버 콘솔에 에러 출력
-	      }
+	    try {
+	        alarmService.markAsRead(alarmId);  // ← calendarAlarmService → alarmService
+	        result.put("res_code", "200");
+	        result.put("res_msg", "읽음 처리 성공");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
 
-	      return result;
-	  }
+	    return result;
+	}
+	  
 	  
 	  //전체 읽음 처리
 	  @PatchMapping("/notification/readall")
 	  @ResponseBody
 	  public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal EmployeeDetails userDetails) {
 	      Long employeeNo = userDetails.getEmployee().getEmployeeNo();
-	      calendarAlarmService.markAllAsRead(employeeNo);
+	      alarmService.markAllAsRead(employeeNo);
 	      return ResponseEntity.ok().build();
 	  }
+
+	  
+	//================================================================================================================  
+		//calendaralarm , calendarList
+		//알림 페이지에서 목록 가져오기
+//		@GetMapping("/notification")
+//		public String notificationView(Model model) {		
+//			//캘린더 알람 목록 가져오기
+//			List<CalendarAlarmDto> calendarList = calendarAlarmService.getCalendarAlarm();
+//			List<CalendarAlarmDto> teamList = calendarAlarmService.getTeamAlarm();
+//			model.addAttribute("calendaralarm",calendarList);
+//			model.addAttribute("teamList",teamList);
+//			return "notification/notification";
+//		}
+		
+//		@GetMapping("/notification")
+//		public String notificationView(Model model) {
+//		    List<CalendarAlarmDto> calendarList = calendarAlarmService.getMyAlarms();
+//		    model.addAttribute("calendaralarm", calendarList);
+//		    return "notification/notification";
+//		}  
+	  
+	  //전체 읽음 처리
+//	  @PatchMapping("/notification/readall")
+//	  @ResponseBody
+//	  public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal EmployeeDetails userDetails) {
+//	      Long employeeNo = userDetails.getEmployee().getEmployeeNo();
+//	      calendarAlarmService.markAllAsRead(employeeNo);
+//	      return ResponseEntity.ok().build();
+//	  }
 }
+

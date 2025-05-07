@@ -1297,50 +1297,53 @@ function sendUpdateEmployee() {
     const { activeProjects = [], doneProjects = [] } = data;
 
     const renderCarousel = (list, container, indicators, carouselId, bgClass, isDone) => {
-      container.innerHTML = '';
-      indicators.innerHTML = '';
+    	  container.innerHTML = '';
+    	  indicators.innerHTML = '';
 
-      if (!list || list.length === 0) {
-        container.innerHTML = `
-          <div class="carousel-item active">
-            <div class="border rounded p-4 bg-light text-center">
-              <p class="mb-0 text-muted">프로젝트가 없습니다.</p>
-            </div>
-          </div>
-        `;
-        indicators.innerHTML = `
-          <button type="button" data-bs-target="#${carouselId}" data-bs-slide-to="0"
-            class="active" aria-current="true" aria-label="슬라이드 1"></button>
-        `;
-        return;
-      }
+    	  if (!list || list.length === 0) {
+    	    container.innerHTML = `
+    	      <div class="carousel-item active">
+    	        <div class="border rounded p-4 bg-light text-center">
+    	          <p class="mb-0 text-muted">프로젝트가 없습니다.</p>
+    	        </div>
+    	      </div>
+    	    `;
+    	    indicators.innerHTML = `
+    	      <button type="button" data-bs-target="#${carouselId}" data-bs-slide-to="0"
+    	        class="active" aria-current="true" aria-label="슬라이드 1"></button>
+    	    `;
+    	    return;
+    	  }
 
-      list.forEach((project, index) => {
-        const date = isDone ? formatDate(project.project_end) : formatDate(project.project_start);
-        const dateLabel = isDone ? '종료일' : '시작일';
+    	  list.forEach((project, index) => {
+    	    const date = isDone ? formatDate(project.project_end) : formatDate(project.project_start);
+    	    const dateLabel = isDone ? '종료일' : '시작일';
 
-        const item = document.createElement('div');
-        item.className = `carousel-item ${index === 0 ? 'active' : ''}`;
-        item.innerHTML = `
-          <div class="border rounded p-3 ${bgClass}">
-            <h6 class="mb-1">${project.project_name || ''}</h6>
-            <p class="mb-0 text-muted">${dateLabel} : ${date}</p>
-          </div>
-        `;
-        container.appendChild(item);
+    	    const item = document.createElement('div');
+    	    item.className = `carousel-item ${index === 0 ? 'active' : ''}`;
+    	    item.innerHTML = `
+    	    	  <a href="/project/detail/${project.project_no}/main" class="text-decoration-none text-dark">
+    	    	    <div class="border rounded p-3 ${bgClass}">
+    	    	      <h5 class="mb-1 fw-bold">${project.project_name || ''}</h5>
+    	    	      <p class="mb-0 text-muted fs-9">${dateLabel} : ${date}</p>
+    	    	    </div>
+    	    	  </a>
+    	    	`;
+    	    container.appendChild(item);
 
-        const indicator = document.createElement('button');
-        indicator.type = 'button';
-        indicator.setAttribute('data-bs-target', `#${carouselId}`);
-        indicator.setAttribute('data-bs-slide-to', index.toString());
-        indicator.setAttribute('aria-label', `슬라이드 ${index + 1}`);
-        if (index === 0) {
-          indicator.className = 'active';
-          indicator.setAttribute('aria-current', 'true');
-        }
-        indicators.appendChild(indicator);
-      });
-    };
+    	    const indicator = document.createElement('button');
+    	    indicator.type = 'button';
+    	    indicator.setAttribute('data-bs-target', `#${carouselId}`);
+    	    indicator.setAttribute('data-bs-slide-to', index.toString());
+    	    indicator.setAttribute('aria-label', `슬라이드 ${index + 1}`);
+    	    if (index === 0) {
+    	      indicator.className = 'active';
+    	      indicator.setAttribute('aria-current', 'true');
+    	    }
+    	    indicators.appendChild(indicator);
+    	  });
+    	};
+
 
     renderCarousel(activeProjects, activeContainer, activeIndicators, 'projectActiveCarousel', 'bg-primary-soft', false);
     renderCarousel(doneProjects, doneContainer, doneIndicators, 'projectDoneCarousel', 'bg-success-soft', true);

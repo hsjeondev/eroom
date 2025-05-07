@@ -50,6 +50,19 @@ public class ProjectService {
     // 파일 저장 경로 
  	@Value("${ffupload.location}")
  	private String fileDir;
+ 	
+ 	public int countMyDoingProject(Long employeeNo) {
+ 	    return projectMemberRepository.countMyProjectsByStatus(employeeNo, "진행 중");
+ 	}
+
+ 	public int countMyUpcomingProject(Long employeeNo) {
+ 	    return projectMemberRepository.countMyProjectsByStatus(employeeNo, "진행 예정");
+ 	}
+
+ 	public int countMyDoneProject(Long employeeNo) {
+ 	    return projectMemberRepository.countMyProjectsByStatus(employeeNo, "완료");
+ 	}
+
  	 
  	public List<ProjectDto> getDoneProject(Long employeeNo) {
  	    List<ProjectMember> memberList = projectMemberRepository.findByEmployeeEmployeeNo(employeeNo);
@@ -159,10 +172,26 @@ public class ProjectService {
 
         return projectDtos;
     }
-    
-    public Long getProjectCount() {
+        
+    public List<ProjectDto> findAllProjectsByProceed(String proceed) {
+        List<Project> projects = projectRepository.findByProceed(proceed);
+        List<ProjectDto> projectDtos = new ArrayList<>();
+
+        for (Project project : projects) {
+            projectDtos.add(new ProjectDto().toDto(project));
+        }
+
+        return projectDtos;
+    }
+
+    public Long getAllProjectCount() {
         return projectRepository.count();
     }
+    
+    public Long countAllProjectsByProceed(String proceed) {
+        return projectRepository.countByProceed(proceed);
+    }
+
     
     public ProjectDto findByProjectNo(Long projectNo) {
     	Project project = projectRepository.findById(projectNo).orElse(null);
@@ -399,6 +428,22 @@ public class ProjectService {
         return result;
     }
 
+    // 프로젝트 참여자 목록 조회
+	public List<Employee> findEmployeesByProjectNo(Long projectNo) {
+		return projectMemberRepository.findEmployeesByProjectNo(projectNo);
+	}
+	
+	// 프로젝트 참여 여부 조회
+	public boolean isProjectMember(Long projectNo, Long employeeNo) {
+	    List<Employee> members = findEmployeesByProjectNo(projectNo);
 
+	    for (Employee emp : members) {
+	        if (emp.getEmployeeNo().equals(employeeNo)) {
+	            return true;
+	        }
+	    }
 
+	    return false;
+	}
+	
 }

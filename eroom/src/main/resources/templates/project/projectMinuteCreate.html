@@ -15,6 +15,7 @@
 				<p class="mb-4">(회의록 작성 안내사항 문구)</p>
 				<form id="createMinute" method="post" th:action="@{/project/minute/create}" novalidate>
 					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> <input type="hidden" name="projectNo" th:value="${projectNo}" />
+					<!-- 제목 -->
 					<div class="form-floating">
 						<input class="form-control" type="text" name="meetingTitle" id="create-minute-name" placeholder="제목을 입력해주세요." /> <label for="create-minute-name">회의록 제목</label>
 					</div>
@@ -29,11 +30,16 @@
 								<input class="form-check-input participant-checkbox" type="checkbox" id="select-all" /> <label class="form-check-label ms-1 fw-semibold" for="select-all">전체 선택</label>
 							</div>
 							<!-- 부서 인원 -->
-							<div class="form-check" th:each="emp : ${structureEmployees}">
+							<div class="form-check" th:each="emp : ${projectEmployees}">
 								<input type="checkbox" class="form-check-input participant-checkbox" th:id="'emp-' + ${emp.employeeNo}" th:name="participants" th:value="${emp.employeeNo}" /> <label class="form-check-label ms-1" th:for="'emp-' + ${emp.employeeNo}" th:text="${emp.employeeName}">이름</label>
 							</div>
 						</div>
 					</div>
+					<!-- 회의일 -->
+					<div class="form-floating mt-4">
+						<input class="form-control" type="datetime-local" name="meetingDate" id="create-minute-date" /> <label for="create-minute-date">회의일</label>
+					</div>
+					<!-- 내용 -->
 					<div class="form-floating mt-4">
 						<textarea class="form-control" placeholder="내용을 작성해주세요." name="meetingContent" id="create-minute-content" style="height: 400px"></textarea>
 						<label for="create-minute-content">회의 내용</label>
@@ -64,6 +70,7 @@
 		  const form = document.getElementById("createMinute");
 		  const titleInput = document.getElementById("create-minute-name");
 		  const contentInput = document.getElementById("create-minute-content");
+		  const dateInput = document.getElementById("create-minute-date");
 		  const participantCheckboxes = document.querySelectorAll(".participant-checkbox:not(#select-all)");
 		  const confirmButton = document.querySelector("#validationModal .btn[data-bs-dismiss]");
 		  const selectAll = document.getElementById("select-all");
@@ -93,6 +100,13 @@
 		      e.preventDefault();
 		      showValidationModal("", "참여자를 최소 1명 이상 선택해주세요.", null);
 		    }
+		    
+		    // 회의일
+		    if (!dateInput.value.trim()) {
+			  e.preventDefault();
+			  showValidationModal("", "회의일을 선택해주세요.", dateInput);
+			  return;
+			}
 		  });
 		
 		  // 유효성 실패 시 모달창 표시

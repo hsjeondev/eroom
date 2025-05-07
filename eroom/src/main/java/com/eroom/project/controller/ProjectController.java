@@ -55,7 +55,7 @@ public class ProjectController {
 	public String allProjectView(Model model) {
 		
 		List<ProjectDto> projectList = projectService.findAllProject();
-		Long projectCount = projectService.getProjectCount();
+		Long projectCount = projectService.getAllProjectCount();
 		
 		model.addAttribute("projectList", projectList);
 		model.addAttribute("projectCount", projectCount);
@@ -64,22 +64,50 @@ public class ProjectController {
 	}
 	
 	@GetMapping("/doing")
-	public String doingProjectView() {
+	public String doingProjectView(Model model) {
+		
+		List<ProjectDto> projectList = projectService.findAllProjectsByProceed("진행 중");
+		Long projectCount = projectService.countAllProjectsByProceed("진행 중");
+		
+		model.addAttribute("projectList", projectList);
+		model.addAttribute("projectCount", projectCount);
+		
 		return "project/doingProject";
 	}
 	
 	@GetMapping("/done")
-	public String doneProjectView() {
+	public String doneProjectView(Model model) {
+		
+		List<ProjectDto> projectList = projectService.findAllProjectsByProceed("완료");
+		Long projectCount = projectService.countAllProjectsByProceed("완료");
+		
+		model.addAttribute("projectList", projectList);
+		model.addAttribute("projectCount", projectCount);
+		
 		return "project/doneProject";
 	}
 	
 	@GetMapping("/hold")
-	public String holdProjectView() {
+	public String holdProjectView(Model model) {
+		
+		List<ProjectDto> projectList = projectService.findAllProjectsByProceed("보류");
+		Long projectCount = projectService.countAllProjectsByProceed("보류");
+		
+		model.addAttribute("projectList", projectList);
+		model.addAttribute("projectCount", projectCount);
+		
 		return "project/holdProject";
 	}
 	
 	@GetMapping("/yet")
-	public String yetProjectView() {
+	public String yetProjectView(Model model) {
+		
+		List<ProjectDto> projectList = projectService.findAllProjectsByProceed("진행 예정");
+		Long projectCount = projectService.countAllProjectsByProceed("진행 예정");
+		
+		model.addAttribute("projectList", projectList);
+		model.addAttribute("projectCount", projectCount);
+		
 		return "project/yetProject";
 	}
 	
@@ -193,18 +221,26 @@ public class ProjectController {
 	    return "project/projectDetailFilesTab";
 	}
 
-	
 	@GetMapping("/detail/{project_no}/minutes")
 	public String detailProjectMinutesView(@PathVariable("project_no") Long project_no, Model model) {
+	    // 로그인 사용자 정보
+	    EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	    Long employeeNo = userDetails.getEmployee().getEmployeeNo();
+
+	    // 프로젝트 정보 및 회의록 목록
 	    ProjectDto project = projectService.findByProjectNo(project_no);
 	    List<ProjectMeetingMinuteDto> minutes = projectMeetingMinuteService.getMeetingMinutesByProject(project_no);
 
+	    // 프로젝트 참여 여부 확인
+	    boolean isProjectMember = projectService.isProjectMember(project_no, employeeNo);
+
 	    model.addAttribute("project", project);
 	    model.addAttribute("minutes", minutes);
+	    model.addAttribute("isProjectMember", isProjectMember);
 
 	    return "project/projectDetailMinutesTab";
 	}
-	
+
 	@GetMapping("/create")
 	public String createProjectView(Model model) {
 	    return "project/projectCreate";
@@ -441,9 +477,7 @@ public class ProjectController {
 	        Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
 
 	        List<ProjectDto> doingProject = projectService.getMyDoingProject(employeeNo);
-	        System.out.println("doingProject " + doingProject);
 	        List<ProjectDto> doneProject = projectService.getDoneProject(employeeNo);
-	        System.out.println("doneProject " + doneProject);
 
 	        map.put("res_code", "200");
 	        map.put("res_msg", "내 프로젝트를 성공적으로 불러왔습니다.");
@@ -455,6 +489,35 @@ public class ProjectController {
 
 	    return map;
 	}
+	
+	@PostMapping("/myProjectCount")
+	@ResponseBody
+	public Map<String, Object> projectMypageCountsApi() {
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("res_code", "500");
+	    map.put("res_msg", "프로젝트 개수를 불러오는 중 오류가 발생하였습니다.");
+
+	    try {
+	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	        EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	        Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+
+	        int doingCount = projectService.countMyDoingProject(employeeNo); // 진행 중
+	        int upcomingCount = projectService.countMyUpcomingProject(employeeNo); // 진행 예정
+	        int doneCount = projectService.countMyDoneProject(employeeNo); // 완료
+	        
+	        map.put("res_code", "200");
+	        map.put("res_msg", "프로젝트 개수를 성공적으로 불러왔습니다.");
+	        map.put("doingCount", doingCount);
+	        map.put("upcomingCount", upcomingCount);
+	        map.put("doneCount", doneCount);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return map;
+	}
+
 
 
 	

@@ -107,4 +107,9 @@ public class ProjectMeetingMinuteService {
 	    projectMeetingMinuteRepository.save(dto.toEntity());
 	}
 
+
+	public boolean isMinuteParticipant(Long minuteNo, Long employeeNo) {
+	    return projectMeetingMinuteMappingRepository.existsByMeetingMinuteNoAndEmployeeNo(minuteNo, employeeNo);
+	}
+
 }

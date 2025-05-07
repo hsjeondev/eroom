@@ -12,6 +12,8 @@ import org.springframework.data.repository.query.Param;
 import com.eroom.mail.entity.Mail;
 import com.eroom.mail.entity.MailStatus;
 
+import jakarta.transaction.Transactional;
+
 public interface MailStatusRepository extends JpaRepository<MailStatus, Long> {
 
 	Optional<MailStatus> findByMail_mailNoAndEmployee_employeeNo(Long mailNo, Long employeeNo);
@@ -72,6 +74,7 @@ public interface MailStatusRepository extends JpaRepository<MailStatus, Long> {
 	       "ORDER BY s.mail.mailSentTime ASC")
 	List<Mail> findAllImportantMailsByEmployeeOldest(@Param("empNo") Long empNo);
 
+	@Transactional
 	@Modifying
 	@Query("UPDATE MailStatus ms " +
 	       "SET ms.mailStatusVisibleYn = 'N' " +

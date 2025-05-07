@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.eroom.article.dto.ArticleDto;
@@ -30,6 +31,74 @@ public class ArticleService {
 	 private final DriveRepository driveRepository;
 	 @Value("${ffupload.location}")
 	 private String fileDir;
+	 
+	 // 게시글 수정 파일 삭제
+	 @Transactional
+	 public void markAsDeleted(Long attachNo) {
+	     Drive drive = driveRepository.findById(attachNo)
+	             .orElseThrow(() -> new IllegalArgumentException("해당 첨부파일을 찾을 수 없습니다."));
+
+	     drive.setVisibleYn("N");
+	     driveRepository.save(drive); 
+	 }
+	 
+	 // 게시글 수정
+	 @Transactional
+	 public int updateArticle(ArticleDto articleDto, List<MultipartFile> articleFiles) {
+	     int result = 0;
+
+	     try {
+	         Article article = articleRepository.findById(articleDto.getArticle_no())
+	                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+
+	         // 게시글 정보 업데이트
+	         article.setArticleTitle(articleDto.getArticle_title());
+	         article.setArticleContent(articleDto.getArticle_content());
+	         article.setArticleModDate(LocalDateTime.now());  // 수정일 추가
+
+	         // 첨부파일 처리
+	         for (MultipartFile file : articleFiles) {
+	             if (!file.isEmpty()) {
+	                 String oriName = file.getOriginalFilename();
+	                 String ext = oriName.substring(oriName.lastIndexOf("."));
+	                 String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+	                 String path = fileDir + "article/notice" + newName;
+
+	                 File savedFile = new File(path);
+	                 if (!savedFile.getParentFile().exists()) {
+	                     savedFile.getParentFile().mkdirs();
+	                 }
+	                 file.transferTo(savedFile);
+
+	                 Drive drive = new Drive();
+	                 drive.setDriveOriName(oriName);
+	                 drive.setDriveNewName(newName);
+	                 drive.setDriveSize(file.getSize());
+	                 drive.setDriveType(ext);
+	                 drive.setDrivePath("article/notice" + newName);
+	                 drive.setUploader(Employee.builder().employeeNo(articleDto.getEmployee_no()).build());
+	                 drive.setParam1(article.getArticleNo());
+	                 drive.setSeparatorCode("FL004");
+	                 drive.setVisibleYn("Y");
+
+	                 driveRepository.save(drive);
+	             }
+	         }
+
+	         result = 1;
+	     } catch (Exception e) {
+	         e.printStackTrace();
+	     }
+
+	     return result;
+	 }
+	 
+	 
+	 // 게시글 삭제
+	 public void deleteArticleNotice(Long articleNo) {
+		 articleRepository.updateArticleVisibilityStatus(articleNo, "N");  // Repository 메소드 호출
+	    }
+	 
 	 
 	 // 게시판 다운로드 파일 정보
 	 public Drive findAttachmentById(Long driveId) {
@@ -103,19 +172,6 @@ public class ArticleService {
 	            }
 	        }
 			result = 1;
-//	        Article article = Article.builder()
-//	                .employee(employee)
-//	                .articleTitle(articleDto.getArticle_title())
-//	                .articleContent(articleDto.getArticle_content())
-//	                .separatorCode("B001")
-//	                .order(articleDto.getOrder())
-//	                .visibleYn("Y")
-//	                .articleCreator(employeeNo)
-//	                .articleEditor(employeeNo)
-//	                .articleRegDate(LocalDateTime.now())
-//	                // .articleModDate(LocalDateTime.now())
-//	                .build();
-//			articleRepository.save(article);
 	        }catch (Exception e) {
 				e.printStackTrace();
 			}
