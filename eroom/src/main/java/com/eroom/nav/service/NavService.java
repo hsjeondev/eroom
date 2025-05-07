@@ -35,7 +35,13 @@ public class NavService {
             // 권한에 해당하는 메뉴 항목을 가져옵니다.
             List<AuthorityMenuMapping> mappings = authorityMenuMappingRepository.findByAuthority(authority);
             for (AuthorityMenuMapping mapping : mappings) {
-                allowedMenuIds.add(mapping.getNavMenuItem().getId());
+                NavMenuItem navItem = mapping.getNavMenuItem();
+                if (navItem != null) {
+                    allowedMenuIds.add(navItem.getId());
+                } else {
+                    // 문제가 되는 매핑 로깅
+                    System.out.println("AuthorityMenuMapping ID " + mapping.getAuthorityMenuMappingNo()+ " has null NavMenuItem.");
+                }
             }
         }
 

@@ -174,7 +174,7 @@ public class ProjectController {
 	    Model model
 	) {
 	    // category -> separatorCode 매핑
-	    String base = "FL008";
+	    String base = "FL006";
 	    String separatorCode = switch (category) {
 	        case "1" -> base + "1";
 	        case "2" -> base + "2";
@@ -443,14 +443,14 @@ public class ProjectController {
 
 	    driveDto.setDriveDescriptions(driveDescriptions);
 	    
-	    String separatorCode = "FL008";
+	    String separatorCode = "FL006";
 	    
 	    if(category.equals("1")) {
-	    	separatorCode = "FL0081";
+	    	separatorCode = "FL0061";
 	    } else if(category.equals("2")) {
-	    	separatorCode = "FL0082";	    	
+	    	separatorCode = "FL0062";	    	
 	    } else if(category.equals("3")) {
-	    	separatorCode = "FL0083";	    	
+	    	separatorCode = "FL0063";	    	
 	    }
 
 	    driveDto.setSeparatorCode(separatorCode);
