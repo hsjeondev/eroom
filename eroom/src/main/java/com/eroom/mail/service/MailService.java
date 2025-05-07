@@ -275,7 +275,38 @@ public class MailService {
 	public void updateVisibleYn(Long employeeNo, Long mailNo, String visibleYn) {
         mailStatusRepository.updateVisibleYn(employeeNo, mailNo, visibleYn);
     }
-	
+	// 체크 박스로 처리하는 별 표시 ( 중요 표시 )
+	@Transactional
+	public void toggleStarred(Long mailNo, Long employeeNo) {
+	    Optional<MailStatus> existingStatus = mailStatusRepository.findByMail_mailNoAndEmployee_employeeNo(mailNo, employeeNo);
+
+	    if (existingStatus.isPresent()) {
+	    	
+	        MailStatus status = existingStatus.get();
+	        status.setMailStatusDeletedTime(null);
+	        status.setMailStatusDeletedYn("N");
+	        
+	        // 별표 상태가 "Y"이면 그대로 두고, "N"이면 "Y"로 변경
+	        if ("N".equals(status.getMailStatusImportantYn())) {
+	            status.setMailStatusImportantYn("Y");
+	        }
+	        
+	        mailStatusRepository.save(status); // 상태 저장
+	    } else {
+	        // 상태가 없으면 새로 상태 추가
+	        MailStatusDto mailStatusDto = new MailStatusDto();
+	        mailStatusDto.setMail_no(mailNo);
+	        mailStatusDto.setEmployee_no(employeeNo);
+	        mailStatusDto.setMail_status_important_yn("Y"); // 별표 상태는 "Y"로 설정
+	        //mailStatusDto.setMailStatusDeletedTime(LocalDateTime.now());
+	        
+	        MailStatus mailStatusEntity = mailStatusDto.toEntity();
+	        //mailStatusEntity.setMailStatusDeletedTime(LocalDateTime.now());
+	        mailStatusRepository.save(mailStatusEntity);
+	    }
+	}
+
+	// 별 단일 처리(중요 표시)
 	@Transactional
 	public void moveImportant(Long mailNo, Long employeeNo) {
         Optional<MailStatus> existingStatus = mailStatusRepository.findByMail_mailNoAndEmployee_employeeNo(mailNo, employeeNo);
