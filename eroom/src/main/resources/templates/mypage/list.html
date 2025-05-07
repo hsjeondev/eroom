@@ -920,7 +920,15 @@ fetch(`/admin/checkNameDuplicate?name=${encodeURIComponent(name)}`)
 			showAlert("수정할 회원 정보를 먼저 불러오세요.");
 			return;
 		}
-
+		// 유효성
+ 		const phoneInput = document.getElementById('editDirectoryPhone');
+		const phoneValue = phoneInput.value.trim();
+		
+		const phoneRegex = /^010-\d{4}-\d{4}$/;
+		if(!phoneRegex.test(phoneValue)){
+			showAlert('연락처는 010-0000-0000 형식으로 입력해주세요.');
+			return;
+		}	
 		currentMode = 'edit';
 		showConfirmModal('정말 수정하시겠습니까?',sendUpdateEmployee);
 	});	
