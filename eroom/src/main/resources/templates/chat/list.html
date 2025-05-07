@@ -1226,6 +1226,7 @@ function sendMessage() {
     const formData = new FormData();
     formData.append("chatroomNo", chatroomNo);
     formData.append("driveDescriptions", "");
+    
     for (let file of fileInput.files) {
       formData.append("driveFiles", file); 
     }
@@ -1239,11 +1240,22 @@ function sendMessage() {
     })
     .then(res => res.json())
     .then(data => {
-      console.log("파일 업로드 결과:", data);
       if (data.res_code === "200") {
-        fileInput.value = "";
-        document.getElementById("chatFilePreview").innerHTML = "";
-        messageInput.value = ""; // 입력도 초기화
+        const fileNames = data.fileNames;
+        
+    	 fileNames.forEach(fileName => {
+ 	        const chatData = {
+ 	          chatMessageContent: `[파일] ${fileName}`,
+ 	          senderMember: Number(myEmployeeNo),
+ 	          chatroomNo: Number(chatroomNo),
+ 	          receiverMember: isGroupChat ? null : receiverNo
+ 	        };
+ 	        socket.send(JSON.stringify(chatData));
+ 	      });
+
+ 	      fileInput.value = "";
+ 	      document.getElementById("chatFilePreview").innerHTML = "";
+ 	      messageInput.value = "";
       } else {
         alert("파일 업로드 실패: " + data.res_msg);
       }
@@ -1252,7 +1264,7 @@ function sendMessage() {
       console.error("파일 업로드 오류:", err);
     });
 
-    return; // ⚠️ 아래 socket.send() 실행 막기 위해 return!
+    return; 
   }
 
   // 파일이 없는 경우에만 메시지 전송
