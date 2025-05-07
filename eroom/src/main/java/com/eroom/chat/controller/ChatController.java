@@ -36,6 +36,7 @@ import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.security.EmployeeDetails;
+import com.eroom.websocket.ChatWebSocketHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,7 +50,7 @@ public class ChatController {
 	private final EmployeeRepository employeeRepository;
 	private final ChatMessageService chatMessageService;
 	private final ChatAlarmRepository chatAlarmRepository;
-	
+	private final ChatWebSocketHandler webSocketHandler; 
 	@GetMapping("/test")
 	public String test123() {
 		return "chat/test";
@@ -334,13 +335,26 @@ public class ChatController {
 	        List<Drive> savedDrives = chatroomService.uploadChatFilesAndReturnDrives(driveDto, user.getEmployee().getEmployeeNo());
 
 	        List<String> fileNames = new ArrayList<>();
+	        Map<String, String> drivePaths = new HashMap<>();
 	        for (Drive drive : savedDrives) {
-	            fileNames.add(drive.getDriveOriName());
+	            String oriName = drive.getDriveOriName();
+	            String path = drive.getDrivePath(); // 실제 다운로드 경로
+	            fileNames.add(oriName);
+	            drivePaths.put(oriName, path);
+	            ChatMessageDto msg = ChatMessageDto.builder()
+	                    .chatMessageContent("[파일] " + oriName)
+	                    .chatroomNo(chatroomNo)
+	                    .senderMember(user.getEmployee().getEmployeeNo())
+	                    .receiverMember(null) // or 상대방 번호 if 1:1
+	                    .build();
+
+	                webSocketHandler.broadcastMessage(msg, null);
 	        }
 
 	        resultMap.put("res_code", "200");
 	        resultMap.put("res_msg", "업로드 성공");
 	        resultMap.put("fileNames", fileNames);
+	        resultMap.put("drivePaths", drivePaths);
 	        
 	    } catch (Exception e) {
 	        e.printStackTrace();
@@ -349,9 +363,5 @@ public class ChatController {
 
 	    return resultMap;
 	}
-	
-
-
-
 
 }
