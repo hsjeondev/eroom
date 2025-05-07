@@ -266,21 +266,44 @@
     			      }
 
     			      // 최신순 정렬
-    			      data.sort((a, b) => new Date(b.alarm_reg_date) - new Date(a.alarm_reg_date));
+    			      data.sort((a, b) => new Date(b.reg_date) - new Date(a.reg_date));
 
     			      let hasUnread = false;
 
     			      data.forEach(notification => {
-    			    	  console.log("🔴 최종 hasUnread:", hasUnread);
+    			    	  //console.log(" hasUnread:", hasUnread);
     			    	
-    			        const separator = notification.separator || "";
-    			        let message = separator.startsWith('A') 
-    			          ? "새로운 회사 일정이 등록되었습니다." 
-    			          : "새로운 팀 일정이 등록되었습니다.";
+    			       let message = "";
 
-    			        const time = notification.alarm_reg_date
+						if (notification.separator_code === 'R001') {
+						  const calendarSeparator = notification.calendarAlarm?.separator || "";
+						
+						  if (calendarSeparator.startsWith("A")) {
+						    message = "📢 새로운 회사 일정이 등록되었습니다.";
+						  } else if (calendarSeparator.startsWith("T")) {
+						    message = "👥 새로운 팀 일정이 등록되었습니다.";
+						  } else {
+						    message = "📅 새로운 일정 알림이 도착했습니다.";
+						  }
+						} else {
+						  switch (notification.separator_code) {
+						    case 'R002':
+						      message = "✉️ 새로운 메일이 도착했습니다.";
+						      break;
+						    case 'R003':
+						      message = "💬 새로운 채팅 메시지가 도착했습니다.";
+						      break;
+						    case 'R004':
+						      message = "📄 결재 요청이 도착했습니다.";
+						      break;
+						    default:
+						      message = "🔔 새로운 알림이 도착했습니다.";
+						  }
+						}
+
+    			        const time = notification.reg_date
     			          ? (() => {
-    			              const date = new Date(notification.alarm_reg_date);
+    			              const date = new Date(notification.reg_date);
     			              const hours = date.getHours();
     			              const minutes = date.getMinutes().toString().padStart(2, '0');
     			              const period = hours >= 12 ? '오후' : '오전';
@@ -294,7 +317,7 @@
     			            //console.log("alarm.employee_no:", notification.employee_no, typeof notification.employee_no);
 							
     			            //본인이 쓴 거면 종 X
-    			            const isUnread = notification.alarm_read_yn === "N";
+    			            const isUnread = notification.read_yn === "N";
     			            const isMine = notification.employee_no.toString() === loginEmployeeNo;
 
     			            if (isUnread && !isMine) {
@@ -306,7 +329,7 @@
     			          : "px-2 px-sm-3 py-3 notification-card read border-bottom";
 
     			        const html = `
-    			          <div class="${className}" data-alarm-id="${notification.alarm_id}">
+    			          <div class="${className}" data-alarm-id="${notification.alarm_no}">
     			            <div class="d-flex align-items-center">
     			              <div class="avatar avatar-m me-3">
     			                <img class="rounded-circle" src="/assets/img/team/40x40/avatar.webp" alt="profile">
@@ -369,8 +392,13 @@
     			  if (notificationListContainer) {
     			    notificationListContainer.addEventListener("click", function (e) {
     			      const alarmItem = e.target.closest('[data-alarm-id]');
+    		
+    		
+    			      const alarmId = alarmItem?.getAttribute('data-alarm-id');
+    		
     			      if (alarmItem) {
     			        const alarmId = alarmItem.getAttribute('data-alarm-id');
+    			        console.log(alarmId);
     			        if (alarmId) {
     			          fetch(`/notification/read/${alarmId}`, {
     			            method: 'PATCH',

@@ -19,7 +19,7 @@ public interface CalendarAlarmRepository extends JpaRepository<CalendarAlarm,Lon
 	 
 	 List<CalendarAlarm> findByEmployeeNoAndAlarmReadYnOrderByAlarmRegDateDesc(Long employeeNo, String alarmReadYn);
 	 
-	 @Modifying
-	 @Query("UPDATE CalendarAlarm a SET a.alarmReadYn = 'Y' WHERE a.employeeNo = :employeeNo AND a.alarmReadYn = 'N'")
-	 int updateAllToReadByEmployeeNo(@Param("employeeNo") Long employeeNo);
+//	 @Modifying
+//	 @Query("UPDATE CalendarAlarm a SET a.alarmReadYn = 'Y' WHERE a.employeeNo = :employeeNo AND a.alarmReadYn = 'N'")
+//	 int updateAllToReadByEmployeeNo(@Param("employeeNo") Long employeeNo);
 }

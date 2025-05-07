@@ -38,7 +38,7 @@ public class ChatAlarmDto {
                 .employee(employeeNo != null ? Employee.builder().employeeNo(employeeNo).build() : null)
                 .build();
     }
-    public static ChatAlarmDto toDto(ChatAlarm entity) {
+    public ChatAlarmDto toDto(ChatAlarm entity) {
         return ChatAlarmDto.builder()
                 .chatAlarmNo(entity.getChatAlarmNo())
                 .chatMessageNo(entity.getChatMessage() != null ? entity.getChatMessage().getChatMessageNo() : null)

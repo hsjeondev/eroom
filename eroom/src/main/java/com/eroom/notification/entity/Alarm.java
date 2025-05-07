@@ -1,5 +1,9 @@
 package com.eroom.notification.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.eroom.approval.entity.ApprovalAlarm;
 import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.mail.entity.MailAlarm;
@@ -40,22 +44,29 @@ public class Alarm {
 	@Column(name = "separator_code")
 	private String separatorCode;
 	
+	@Column(name = "read_yn")
+	private String readYn;
+	
+	@Column(name = "reg_date")
+	@CreationTimestamp
+	private LocalDateTime regDate;
+	
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "param1", insertable = false, updatable = false)
     private CalendarAlarm calendarAlarm;
     
     //메일 알람
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "param1", referencedColumnName = "alarm_id", insertable = false, updatable = false)
+    @JoinColumn(name = "param1", referencedColumnName = "mail_alarm_no", insertable = false, updatable = false)
     private MailAlarm mailAlarm;
 
     //채팅 알람
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "param1", referencedColumnName = "alarm_id", insertable = false, updatable = false)
+    @JoinColumn(name = "param1", referencedColumnName = "chat_alarm_no", insertable = false, updatable = false)
     private ChatAlarm chatAlarm;
 
     //결재 알람
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "param1", referencedColumnName = "alarm_id", insertable = false, updatable = false)
+    @JoinColumn(name = "param1", referencedColumnName = "approval_alarm_no", insertable = false, updatable = false)
     private ApprovalAlarm approvalAlarm;
 }
