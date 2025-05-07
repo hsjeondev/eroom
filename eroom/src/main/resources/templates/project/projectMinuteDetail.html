@@ -15,11 +15,11 @@
 				<h2 class="h4 fw-semibold mb-4" th:text="${minute.meetingTitle}">제목</h2>
 
 				<p class="mb-3">
-					<strong class="me-2">참여자:</strong> <span th:each="name : ${participantNames}" class="me-1 badge bg-light text-dark fw-normal" th:text="${name}">이름</span>
+					<strong class="me-2">참여자:</strong> <span th:each="name : ${participants}" class="me-1 badge bg-light text-dark fw-normal" th:text="${name}">이름</span>
 				</p>
 
 				<p class="mb-3">
-					<strong class="me-2">회의일:</strong> <span th:text="${#temporals.format(minute.meetingDate, 'yyyy.MM.dd HH시 mm분')}">2025.01.01 10시 30분</span>
+					<strong class="me-2">회의일:</strong> <span th:text="${#temporals.format(minute.meetingDate, 'yyyy.MM.dd HH시 mm분')}">회의일시</span>
 				</p>
 
 				<div class="mb-4">
