@@ -94,12 +94,12 @@
 									th:href="'#chatroom-' + ${chatroom.chatroomNo}"
 									th:attr="data-room-no=${chatroom.chatroomNo}, data-group=${chatroom.chatIsGroupYn}"
 									data-bs-toggle="tab" data-chat-thread="data-chat-thread"
-									role="tab" aria-selected="true"> <!-- 아바타 이미지 -->
-										<div
-											class="avatar avatar-xl status-online position-relative me-2 me-sm-0 me-xl-2">
-											<img
-												class="rounded-circle border border-2 border-light-subtle"
-												src="../assets/img/team/20.webp" alt="" />
+									role="tab" aria-selected="true"> 
+									<!-- 아바타 이미지 -->
+										<div class="avatar avatar-xl status-online position-relative me-2 me-sm-0 me-xl-2">
+										  <img class="rounded-circle border border-2 border-light-subtle"
+											     th:src="@{${chatroom.profileImageUrl}}"
+											     alt="프로필 이미지">
 										</div>
 										<div class="flex-1 d-sm-none d-xl-block">
 											<div
