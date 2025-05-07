@@ -29,8 +29,8 @@ public class ChatroomDto {
     private String chatLastMessage;
     private Integer unreadCount; // 읽지 않은 메시지 수
     private LocalDateTime lastMessageRegDate;
-    
-   
+    private String profileImageUrl;
+    private List<String> participantProfiles;
     // 참여자 ID 리스트
     private List<Long> participantIds;
     // 채팅 메시지 리스트
@@ -46,6 +46,12 @@ public class ChatroomDto {
                 .build();
     }
     public static ChatroomDto toDto(Chatroom entity) {
+    	 List<Long> participants = new java.util.ArrayList<>();
+    	    if (entity.getChatroomMapping() != null) {
+    	        for (var attendee : entity.getChatroomMapping()) {
+    	            participants.add(attendee.getAttendee().getEmployeeNo());
+    	        }
+    	    }
         return ChatroomDto.builder()
                 .chatroomNo(entity.getChatroomNo())
                 .chatroomName(entity.getChatroomName())
@@ -55,6 +61,7 @@ public class ChatroomDto {
                 .chatroomModDate(entity.getChatroomModDate())
                 .chatLastMessage(entity.getChatLastMessage())
                 .lastMessageRegDate(entity.getChatroomModDate())
+                .participantIds(participants)
                 .build();
     }
     public static ChatroomDto toDto(Chatroom entity, List<ChatMessageDto> messages) {
@@ -70,4 +77,6 @@ public class ChatroomDto {
                 .messageList(messages)  // 메시지 리스트 추가
                 .build();
     }
+    
+
 }
