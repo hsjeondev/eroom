@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,10 +17,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.directory.dto.AddDepartmentAndTeamDto;
+import com.eroom.directory.dto.DeleteDepartmentOrTeamDto;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.dto.UpdateSortOrderDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.DirectoryService;
+import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.EmployeeService;
@@ -38,11 +41,12 @@ public class DirectoryController {
 	
 
 	@GetMapping("/directory/employee")
-	public String selectDirectoryEmployeeList(@RequestParam(name="deptId",required=false) Long deptId, @RequestParam(name="teamId",required=false) Long teamId,Model model, Authentication authentication) {
+	public String selectDirectoryEmployeeList(@RequestParam(name="deptId",required=false) Long deptId, @RequestParam(name="teamId",required=false) Long teamId,Model model, @AuthenticationPrincipal EmployeeDetails user) {
 //		EmployeeDetails employeeDetail = (EmployeeDetails)authentication.getPrincipal();
 //		Employee employee = employeeDetail.getEmployee();
 //		model.addAttribute("employee", employee);
-		
+		model.addAttribute("employeeDetails", user);
+		System.out.println(user.getAuthorities() + "123");
 		List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
 		List<Directory> temp = directoryService.selectDirectoryEmployeeAllBySeparatorCode();
 		
@@ -83,11 +87,14 @@ public class DirectoryController {
 		departmentList = structureService.selectDepartmentAll();
 		for (Structure s : departmentList) {
 			// 부서명으로 팀 리스트를 가져와서 Map에 저장
-			List<Structure> teamList = new ArrayList<Structure>();
+			List<Structure> teamListByParentCode = new ArrayList<Structure>();
 			// separator_code로 팀 리스트를 조회 후 <부서명, 팀리스트> 형태로 Map에 저장
-			teamList = structureService.selectTeamAll(s.getSeparatorCode());
-			teamMap.put(s.getCodeName(), teamList);
+			teamListByParentCode = structureService.selectTeamAllByParentCode(s.getSeparatorCode());
+			teamMap.put(s.getCodeName(), teamListByParentCode);
 		}
+		// 팀 리스트 조회
+		List<Structure> teamList = structureService.findOnlyTeamsVisibleY();
+		model.addAttribute("teamList", teamList);
 		
 		
 		model.addAttribute("departmentList", departmentList);
@@ -99,42 +106,127 @@ public class DirectoryController {
 	// 트리 선택시 비동기 방식으로 회원 리스트 조회
 	@GetMapping("/directory/employeeList")
 	public String getEmployeeListFragment(@RequestParam("separatorCode") String separatorCode, Model model) {
-//	    List<Employee> employees = employeeService.findEmployeesByStructureCode(code);
-//	    model.addAttribute("employeeList", employees);
-//	    System.out.println(separatorCode + " : 코드네임(부서명,팀명)");
-	    List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
+//	    List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
+//		List<Directory> temp = directoryService.selectDirectoryEmployeeAllBySeparatorCode();
+//		
+//		// 직원 리스트를 가져와서 DTO로 변환
+//		for(Directory t : temp) {
+//			DirectoryDto dto = new DirectoryDto().toDto(t);
+//			if (t.getEmployee().getStructure() != null) {
+//			    Structure structure = t.getEmployee().getStructure();
+//			    if (structure.getParentCode() != null) {
+//			    	// 팀이라는 뜻이니까 code_name을 가져오면 팀명
+//			        dto.setTeam_name(structure.getCodeName());
+//			        // 부서 있다는 뜻이니까 부서 parent_code=separator_code 조회해서 code_name을 가져오면 부서명
+//			        Structure parent = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(structure.getParentCode());
+//			        dto.setDepartment_name(parent != null ? parent.getCodeName() : "-");
+//			    } else {
+//			    	// 부서라는 뜻이니까 code_name을 바로 가져오면 부서명
+//			        dto.setDepartment_name(structure.getCodeName() != null ? structure.getCodeName() : "-");
+//			        dto.setTeam_name("-");
+//			    }
+//			} else {
+//			    dto.setDepartment_name("-");
+//			    dto.setTeam_name("-");
+//			}
+//			// 재직중인 사람만 리스트에 추가
+//			Structure targetStructure = structureService.getBySeparatorCode(separatorCode);
+//			String targetCodeName = targetStructure != null ? targetStructure.getCodeName() : null;
+//			if (t.getEmployee().getEmployeeEmploymentYn().equals("Y")
+//				    && targetCodeName != null
+//				    && (targetCodeName.equals(dto.getTeam_name()) || targetCodeName.equals(dto.getDepartment_name()))) {
+//				employeeList.add(dto);
+//			} else if(t.getEmployee().getEmployeeEmploymentYn().equals("Y")
+//				    && separatorCode.equals("selectAll")) {
+//				employeeList.add(dto);
+//				
+//			}
+//		}
+//		
+//		// 부서 리스트와 팀 리스트를 가져와서 Map에 저장
+//		List<Structure> departmentList = new ArrayList<Structure>();
+//		Map<String, List<Structure>> teamMap = new HashMap<String, List<Structure>>();
+//		departmentList = structureService.selectDepartmentAll();
+//		for (Structure s : departmentList) {
+//			// 부서명으로 팀 리스트를 가져와서 Map에 저장
+//			List<Structure> teamList = new ArrayList<Structure>();
+//			// separator_code로 팀 리스트를 조회 후 <부서명, 팀리스트> 형태로 Map에 저장
+//			teamList = structureService.selectTeamAll(s.getSeparatorCode());
+//			teamMap.put(s.getCodeName(), teamList);
+//		}
+//		
+//		
+//		model.addAttribute("departmentList", departmentList);
+//		model.addAttribute("teamMap", teamMap);
+//		model.addAttribute("employeeList", employeeList);
+		
+		try {
+			getEmployeeListBySeparatorCodeMethod(separatorCode, model);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	    
+	    
+	    return "directory/employeeListFragment :: employeeListFragment";
+	}
+	
+	// fragment 말고 model로 비동기 반환
+	@GetMapping("/directory/searchEmployeeList")
+	@ResponseBody
+	public Map<String, Object> getEmployeeListBySeparatorCode(@RequestParam("separatorCode") String separatorCode, Model model){
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("res_code", "500");
+		map.put("res_msg", "조회 실패");
+		try {
+			Map<String, Object> result = getEmployeeListBySeparatorCodeMethod(separatorCode, model);
+			map.put("res_code", "200");
+			map.put("res_msg", "조회 성공");
+			map.put("result", result);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return map;
+	}
+	
+	// 비동기 방식으로 회원 리스트 조회하는 공용 메소드
+	public Map<String, Object> getEmployeeListBySeparatorCodeMethod(String separatorCode, Model model) {
+		List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
 		List<Directory> temp = directoryService.selectDirectoryEmployeeAllBySeparatorCode();
+		List<EmployeeDto> searchRemainEmployee = new ArrayList<EmployeeDto>();
+		Map<String, Object> result = new HashMap<String, Object>();
 		
 		// 직원 리스트를 가져와서 DTO로 변환
 		for(Directory t : temp) {
-			DirectoryDto dto = new DirectoryDto().toDto(t);
+			DirectoryDto dto = new DirectoryDto().toDto3(t);
 			if (t.getEmployee().getStructure() != null) {
-			    Structure structure = t.getEmployee().getStructure();
-			    if (structure.getParentCode() != null) {
-			    	// 팀이라는 뜻이니까 code_name을 가져오면 팀명
-			        dto.setTeam_name(structure.getCodeName());
-			        // 부서 있다는 뜻이니까 부서 parent_code=separator_code 조회해서 code_name을 가져오면 부서명
-			        Structure parent = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(structure.getParentCode());
-			        dto.setDepartment_name(parent != null ? parent.getCodeName() : "-");
-			    } else {
-			    	// 부서라는 뜻이니까 code_name을 바로 가져오면 부서명
-			        dto.setDepartment_name(structure.getCodeName() != null ? structure.getCodeName() : "-");
-			        dto.setTeam_name("-");
-			    }
+				Structure structure = t.getEmployee().getStructure();
+				if (structure.getParentCode() != null) {
+					// 팀이라는 뜻이니까 code_name을 가져오면 팀명
+					dto.setTeam_name(structure.getCodeName());
+					// 부서 있다는 뜻이니까 부서 parent_code=separator_code 조회해서 code_name을 가져오면 부서명
+					Structure parent = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(structure.getParentCode());
+					dto.setDepartment_name(parent != null ? parent.getCodeName() : "-");
+				} else {
+					// 부서라는 뜻이니까 code_name을 바로 가져오면 부서명
+					dto.setDepartment_name(structure.getCodeName() != null ? structure.getCodeName() : "-");
+					dto.setTeam_name("-");
+				}
 			} else {
-			    dto.setDepartment_name("-");
-			    dto.setTeam_name("-");
+				dto.setDepartment_name("-");
+				dto.setTeam_name("-");
 			}
 			// 재직중인 사람만 리스트에 추가
 			Structure targetStructure = structureService.getBySeparatorCode(separatorCode);
 			String targetCodeName = targetStructure != null ? targetStructure.getCodeName() : null;
 			if (t.getEmployee().getEmployeeEmploymentYn().equals("Y")
-				    && targetCodeName != null
-				    && (targetCodeName.equals(dto.getTeam_name()) || targetCodeName.equals(dto.getDepartment_name()))) {
+					&& targetCodeName != null
+					&& (targetCodeName.equals(dto.getTeam_name()) || targetCodeName.equals(dto.getDepartment_name()))) {
 				employeeList.add(dto);
+				searchRemainEmployee.add(new EmployeeDto().toDto(t.getEmployee()));
 			} else if(t.getEmployee().getEmployeeEmploymentYn().equals("Y")
-				    && separatorCode.equals("selectAll")) {
+					&& separatorCode.equals("selectAll")) {
 				employeeList.add(dto);
+				searchRemainEmployee.add(new EmployeeDto().toDto(t.getEmployee()));
 				
 			}
 		}
@@ -147,7 +239,7 @@ public class DirectoryController {
 			// 부서명으로 팀 리스트를 가져와서 Map에 저장
 			List<Structure> teamList = new ArrayList<Structure>();
 			// separator_code로 팀 리스트를 조회 후 <부서명, 팀리스트> 형태로 Map에 저장
-			teamList = structureService.selectTeamAll(s.getSeparatorCode());
+			teamList = structureService.selectTeamAllByParentCode(s.getSeparatorCode());
 			teamMap.put(s.getCodeName(), teamList);
 		}
 		
@@ -155,16 +247,15 @@ public class DirectoryController {
 		model.addAttribute("departmentList", departmentList);
 		model.addAttribute("teamMap", teamMap);
 		model.addAttribute("employeeList", employeeList);
-	    
-	    
-	    return "directory/employeeListFragment :: employeeListFragment";
+		model.addAttribute("searchRemainEmployee", searchRemainEmployee);
+		result.put("searchRemainEmployee", searchRemainEmployee);
+		return result;
 	}
 
-
 	
 	
 	
-	
+	// 협력업체 조회
 	@GetMapping("/directory/partner")
 	public String selectDirectoryPartnerList(Model model) {
 		List<DirectoryDto> resultList = new ArrayList<DirectoryDto>();
@@ -180,6 +271,7 @@ public class DirectoryController {
 		return "directory/partnerList";
 	}
 	
+	// 협력업체 추가
 	@PostMapping("/directory/partner/create")
 	@ResponseBody
 	public Map<String, String> createPartner(@RequestBody Map<String, String> formData, Authentication authentication){
@@ -203,6 +295,7 @@ public class DirectoryController {
 		
 		return map;
 	}
+	// 협력업체 수정
 	@PutMapping("/directory/partner/update")
 	@ResponseBody
 	public Map<String, String> updatePartner(@RequestBody Map<String, String> formData, Authentication authentication){
@@ -226,6 +319,7 @@ public class DirectoryController {
 		
 		return map;
 	}
+	// 협력업체 삭제
 	@PutMapping("/directory/partner/delete")
 	@ResponseBody
 	public Map<String, String> deletePartner(@RequestBody Map<String, String> data, Authentication authentication){
@@ -250,7 +344,7 @@ public class DirectoryController {
 		return map;
 	}
 	
-	// 부서이름으로 팀 조회 // 지우자
+	// 부서코드로 팀 조회
 	@GetMapping("/directory/teams")
 	@ResponseBody
 	public List<Map<String, Object>> getTeamsByDept(@RequestParam("separatorCode") String separatorCode) {
@@ -269,10 +363,8 @@ public class DirectoryController {
 	    return result;
 	}
 	
-//	@PostMapping("/admin/addDepartment")
-//	@ResponseBody
-//	public Map<String, String> addDepartmentMethod(@RequestBody())
-	@PostMapping("/admin/addDepartmentOrTeam")
+	// 부서, 팀 추가
+	@PostMapping("/admin/directory/addDepartmentOrTeam")
 	@ResponseBody
 	public Map<String, String> addDepartmentTeamMethod(@RequestBody AddDepartmentAndTeamDto dto, Authentication authentication){
 		EmployeeDetails employeeDetails = (EmployeeDetails)authentication.getPrincipal();
@@ -284,9 +376,12 @@ public class DirectoryController {
 			map.put("res_msg", "잘못된 요청입니다.");
 			return map;
 		}
-		
-		
 		String type = (dto.getParentCode() == null) ? "부서" : "팀";
+		
+		map.put("res_code", "500");
+		map.put("res_msg", type + " 추가에 실패했습니다.");
+		
+		
 		int result = 0;
 		result = structureService.addDepartmentOrTeam(dto, employee);
 		
@@ -297,8 +392,8 @@ public class DirectoryController {
 		
 		return map;
 	}
-	
-	@PutMapping("/admin/updateSortOrder")
+	// 부서, 팀 정렬
+	@PutMapping("/admin/directory/updateSortOrder")
 	@ResponseBody
 	public Map<String, String> updateSortOrderMethod(@RequestBody UpdateSortOrderDto dto, Authentication authentication){
 		EmployeeDetails employeeDetails = (EmployeeDetails)authentication.getPrincipal();
@@ -325,9 +420,72 @@ public class DirectoryController {
 		}
 		
 		return map;
-		
-		
 	}
+	
+	// 부서, 팀 삭제
+//	@PutMapping("/admin/employee/delete")
+//	@ResponseBody
+//	public Map<String, String> deleteDepartmentTeamMethod(@RequestBody AddDepartmentAndTeamDto dto, @AuthenticationPrincipal EmployeeDetails user){
+//		Employee employee = user.getEmployee();
+//		
+//		Map<String, String> map = new HashMap<String, String>();
+//		if(dto == null) {
+//			map.put("res_code", "500");
+//			map.put("res_msg", "잘못된 요청입니다.");
+//			return map;
+//		}
+//		
+//		
+//		String type = (dto.getParentCode() == null) ? "부서" : "팀";
+//		
+//		map.put("res_code", "500");
+//		map.put("res_msg", type + " 삭제 실패했습니다.");
+//		
+//		
+//		int result = 0;
+//		result = structureService.deleteDepartmentOrTeam(dto, employee);
+//		
+//		if(result > 0) {
+//			map.put("res_code", "200");
+//			map.put("res_msg", type + " 삭제가 완료됐습니다.");
+//		}
+//		
+//		
+//		return map;
+//	}
+	
+	@PutMapping("/admin/directory/deleteDepartmentOrTeam")
+	@ResponseBody
+	public Map<String, String> deleteDepartmentTeamMethod(@RequestBody DeleteDepartmentOrTeamDto dto, @AuthenticationPrincipal EmployeeDetails user){
+		Employee employee = user.getEmployee();
+		
+		Map<String, String> map = new HashMap<String, String>();
+		if(dto == null) {
+			map.put("res_code", "500");
+			map.put("res_msg", "잘못된 요청입니다.");
+			return map;
+		}
+		
+		
+		String type = (dto.getDeleteTeamCode() == null || dto.getDeleteTeamCode().equals("0")) ? "부서" : "팀";
+		// System.out.println(dto);
+		map.put("res_code", "500");
+		map.put("res_msg", type + " 삭제 실패했습니다.");
+		
+		
+		int result = 0;
+		result = structureService.deleteDepartmentOrTeam(dto, employee);
+		
+		if(result > 0) {
+			map.put("res_code", "200");
+			map.put("res_msg", type + " 삭제가 완료됐습니다.");
+		}
+		
+		
+		return map;
+	}
+	
+
 
 	
 	

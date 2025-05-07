@@ -29,10 +29,13 @@ public interface StructureRepository extends JpaRepository<Structure, Long>{
 //	@Query("SELECT s FROM Structure s WHERE s.parentCode IS NULL AND s.visibleYn = 'Y'")
 	@Query("SELECT s FROM Structure s WHERE s.parentCode IS NULL AND s.visibleYn = 'Y' ORDER BY s.sortOrder")
 	List<Structure> findOnlyDepartments();
-	// 팀만 조회
+	// 팀만 조회 visible Y만
+	@Query("SELECT s FROM Structure s WHERE s.parentCode IS NOT NULL AND s.visibleYn = 'Y' ORDER BY s.sortOrder")
+	List<Structure> findOnlyTeamsVisibleY();
+	// 팀만 조회(visible 상관없이!)
 	@Query("SELECT s FROM Structure s WHERE s.parentCode IS NOT NULL ORDER BY s.sortOrder")
 	List<Structure> findOnlyTeams();
-	// 부서만 조회
+	// 부서만 조회(visible 상관없이!)
 	@Query("SELECT s FROM Structure s WHERE s.parentCode IS NULL ORDER BY s.sortOrder")
 	List<Structure> findOnlyDepts();
 	
@@ -52,4 +55,5 @@ public interface StructureRepository extends JpaRepository<Structure, Long>{
 
 	// 팀이름 중복 확인
 	boolean existsByCodeNameAndParentCodeAndVisibleYn(String codeName, String parentCode, String string);
+
 }

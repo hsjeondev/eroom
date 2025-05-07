@@ -215,7 +215,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
         <!-- 푸터 / 취소, 확인 버튼 있는 곳 -->
         <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
-          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-light me-2" id="modalCancelButton">취소</button>
           <button type="button" class="btn btn-primary" id="editPartnerBtn">정보 수정</button>
         </div>
     </div>
@@ -398,6 +398,18 @@ document.getElementById("editPartnerBtn").addEventListener('click', function(e){
     }
     
 });
+
+
+//모달 취소 버튼 클릭 시 모달 수동 닫기
+document.getElementById('modalCancelButton').addEventListener('click', function () {
+    const editModal = bootstrap.Modal.getInstance(document.getElementById('editPartnerDirectoryModal'));
+    editModal.hide();  // Bootstrap 인스턴스 수동으로 닫기
+
+    // 혹시 남아있는 backdrop 강제로 제거
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => backdrop.remove());
+});
+
 </script>
 
 <!-- 삭제 버튼 -->

@@ -1,4 +1,4 @@
-package com.eroom.gpt;
+package com.eroom.directory.dto;
 
 import java.util.List;
 
@@ -10,13 +10,17 @@ import lombok.Setter;
 import lombok.ToString;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @ToString
 @Builder
-@AllArgsConstructor
-public class GptRequestDto {
-	private String model;
-    private List<GptMessageDto> messages;
+public class DeleteDepartmentOrTeamDto {
 
+	private String deleteDeptCode;
+	private String deleteTeamCode;
+	private String remainTeamCode;
+	private List<Long> employeeNoList;
+	
+	
 }
