@@ -145,7 +145,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	    <div class="card bg-body-emphasis shadow-sm rounded-3">
 	      <div class="card-header d-flex flex-between-center px-4 py-3 border-bottom border-translucent">
 	        <h5 class="mb-0 d-flex align-items-center gap-2">
-	          GPT 채팅
+	          Eroom 챗봇
 	          <svg class="svg-inline--fa fa-circle text-success fs-11" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
 	            <path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
 	          </svg>
@@ -156,6 +156,10 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	      <div class="card-body chat p-0" style="height: 300px; overflow-y: auto;">
 	        <div id="chatMessages" class="d-flex flex-column scrollbar h-100 p-3">
 	          <!-- 대화 메시지 들어갈 영역 -->
+	          
+	          <div class="d-flex justify-content-start mb-2"><div class="chat-bubble gpt">안녕하세요! Eroom 챗봇입니다.<br>무엇을 도와 드릴까요? 😊</div></div>
+	          
+	          
 	        </div>
 	      </div>
 	
@@ -173,7 +177,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	  </div>
 	<!-- 채팅창 닫혀 있을 때 버튼 -->
 	<button id="chatToggleBtn" class="btn btn-support-chat p-0 border border-translucent">
-	  <span class="fs-8 btn-text text-primary text-nowrap">Chat GPT</span>
+	  <span class="fs-8 btn-text text-primary text-nowrap">Eroom 챗봇</span>
 	  <span class="ping-icon-wrapper mt-n4 ms-n6 mt-sm-0 ms-sm-2 position-absolute position-sm-relative">
 	    <span class="ping-icon-bg"> </span>
 	    <i class="fas fa-circle ping-icon text-primary fs-9"></i>
