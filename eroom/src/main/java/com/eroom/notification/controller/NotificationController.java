@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -15,7 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.notification.CalendarAlarmService;
+import com.eroom.notification.dto.AlarmDto;
 import com.eroom.notification.dto.CalendarAlarmDto;
+import com.eroom.notification.service.AlarmService;
 import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class NotificationController {
 	
 	private final CalendarAlarmService calendarAlarmService;
+	private final AlarmService alarmService;
 	//calendaralarm , calendarList
 	//알림 페이지에서 목록 가져오기
 //	@GetMapping("/notification")
@@ -37,11 +39,16 @@ public class NotificationController {
 //		return "notification/notification";
 //	}
 	
+//	@GetMapping("/notification")
+//	public String notificationView(Model model) {
+//	    List<CalendarAlarmDto> calendarList = calendarAlarmService.getMyAlarms();
+//	    model.addAttribute("calendaralarm", calendarList);
+//	    return "notification/notification";
+//	}
+	
 	@GetMapping("/notification")
 	public String notificationView(Model model) {
-	    List<CalendarAlarmDto> calendarList = calendarAlarmService.getMyAlarms();
-	    model.addAttribute("calendaralarm", calendarList);
-	    return "notification/notification";
+		List<AlarmDto> alarmList = alarmService.getMyAlarms();
 	}
 	
 		//종 누르면 내려오는 목록 가져오기

@@ -185,6 +185,7 @@
 					        type="button">
 					  전체 읽음 처리
 						</button>
+						<input type="hidden" id="loginEmployeeNo" th:value="${#authentication.principal.employee.employeeNo}">						
 					</div>
                 </div>
                 <div class="card-body p-0">
@@ -233,8 +234,13 @@
             </li>
           </ul>
         </div>
+        
+
     		<script>
     		function fetchNotificationList() {
+    		const loginEmployeeNo = document.getElementById("loginEmployeeNo").value;
+    	
+    		//console.log(loginEmployeeNo+"!!!!!!!!!!!!!!!!!!!");
     			  fetch("/notification/data")
     			    .then(response => response.json())
     			    .then(data => {
@@ -242,6 +248,8 @@
     			      const container = document.getElementById("notificationListContainer");
     			      const notificationDot = document.getElementById("notificationDot");
     			      container.innerHTML = "";
+    			      
+    			      
 
     			      if (data.length === 0) {
     			        container.innerHTML = `<div class="no-notification-message text-center text-muted py-5">
@@ -257,6 +265,8 @@
     			      let hasUnread = false;
 
     			      data.forEach(notification => {
+    			    	  console.log("🔴 최종 hasUnread:", hasUnread);
+    			    	
     			        const separator = notification.separator || "";
     			        let message = separator.startsWith('A') 
     			          ? "새로운 회사 일정이 등록되었습니다." 
@@ -273,9 +283,17 @@
     			              return `${period} ${hour12}:${minutes} / ${datePart}`;
     			            })()
     			          : "시간 정보 없음";
+    			            
+    			            //console.log("loginEmployeeNo:", loginEmployeeNo, typeof loginEmployeeNo);
+    			            //console.log("alarm.employee_no:", notification.employee_no, typeof notification.employee_no);
+							
+    			            //본인이 쓴 거면 종 X
+    			            const isUnread = notification.alarm_read_yn === "N";
+    			            const isMine = notification.employee_no.toString() === loginEmployeeNo;
 
-    			        const isUnread = notification.alarm_read_yn === "N";
-    			        if (isUnread) hasUnread = true;
+    			            if (isUnread && !isMine) {
+    			              hasUnread = true;
+    			            }
 
     			        const className = isUnread
     			          ? "px-2 px-sm-3 py-3 notification-card unread border-bottom"
