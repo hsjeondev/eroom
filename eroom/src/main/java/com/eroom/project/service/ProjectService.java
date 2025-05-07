@@ -142,7 +142,7 @@ public class ProjectService {
             String owner = split[0];
             String repo = split[1].replace(".git", "");
 
-            String apiUrl = "https://api.github.com/repos/" + owner + "/" + repo + "/pulls?state=all";
+            String apiUrl = "https://api.github.com/repos/" + owner + "/" + repo + "/pulls?state=all&per_page=10";
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
