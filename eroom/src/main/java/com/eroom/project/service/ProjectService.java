@@ -7,8 +7,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,9 +47,58 @@ public class ProjectService {
     private final DriveRepository driveRepository;
     private final SeparatorRepository separatorRepository;
     
- // 파일 저장 경로 
- 	 @Value("${ffupload.location}")
- 	 private String fileDir;
+    // 파일 저장 경로 
+ 	@Value("${ffupload.location}")
+ 	private String fileDir;
+ 	 
+ 	public List<ProjectDto> getDoneProject(Long employeeNo) {
+ 	    List<ProjectMember> memberList = projectMemberRepository.findByEmployeeEmployeeNo(employeeNo);
+
+ 	    Set<Project> projectSet = new HashSet<>();
+ 	    for (ProjectMember pm : memberList) {
+ 	        Project project = pm.getProject();
+ 	        if (project != null && "완료".equals(project.getProceed())) {
+ 	            projectSet.add(project);
+ 	        }
+ 	    }
+
+ 	    List<ProjectDto> result = new ArrayList<>();
+ 	    for (Project project : projectSet) {
+ 	        ProjectDto dto = new ProjectDto();
+ 	        dto.setProject_no(project.getProjectNo());
+ 	        dto.setProject_name(project.getProjectName());
+ 	        dto.setProject_end(project.getProjectEnd()); // 완료된 프로젝트는 종료일
+ 	        result.add(dto);
+ 	    }
+
+ 	    return result;
+ 	}
+
+ 	public List<ProjectDto> getMyDoingProject(Long employeeNo) {
+ 	    List<ProjectMember> memberList = projectMemberRepository.findByEmployeeEmployeeNo(employeeNo);
+
+ 	    Set<Project> projectSet = new HashSet<>();
+ 	    for (ProjectMember pm : memberList) {
+ 	        Project project = pm.getProject();
+ 	        if (project != null && "진행 중".equals(project.getProceed())) {
+ 	            projectSet.add(project);
+ 	        }
+ 	    }
+
+ 	    List<ProjectDto> result = new ArrayList<>();
+ 	    for (Project project : projectSet) {
+ 	        ProjectDto dto = new ProjectDto();
+ 	        dto.setProject_no(project.getProjectNo());
+ 	        dto.setProject_name(project.getProjectName());
+ 	        dto.setProject_start(project.getProjectStart()); // 진행 중인 프로젝트는 시작일
+ 	        result.add(dto);
+ 	    }
+
+ 	    return result;
+ 	}
+
+
+
  	 
  	 public List<DriveDto> findProjectFiles(String separatorCode, Long projectNo) {
  		List<Drive> drives = driveRepository.findBySeparatorCodeContainingAndParam1AndVisibleYn(separatorCode, projectNo, "Y");
@@ -142,7 +194,7 @@ public class ProjectService {
             String owner = split[0];
             String repo = split[1].replace(".git", "");
 
-            String apiUrl = "https://api.github.com/repos/" + owner + "/" + repo + "/pulls?state=all";
+            String apiUrl = "https://api.github.com/repos/" + owner + "/" + repo + "/pulls?state=all&per_page=10";
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()

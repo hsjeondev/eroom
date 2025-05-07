@@ -81,34 +81,34 @@ xmlns:th="http://www.thymeleaf.org">
             <div class="row flex-between-center mb-7">
               <div class="col-auto">
                 <div class="form-check mb-0">
-                  <input class="form-check-input" id="basic-checkbox" type="checkbox" checked="checked" />
+                  <input class="form-check-input" name="remember-me" id="basic-checkbox" type="checkbox" checked="checked" />
                   <label class="form-check-label mb-0" for="basic-checkbox">자동 로그인</label>
                 </div>
               </div>
             </div>
-            <button class="btn btn-primary w-100 mb-3" data-bs-target="#verticallyCentered">Sign In</button>
+            <button class="btn btn-primary w-100 mb-3" data-bs-target="#verticallyCentered">로그인</button>
             </form>
             
           </div>
         </div>
       </div> 
       <!-- 모달창 -->
-      <div class="modal fade" id="verticallyCentered" tabindex="-1" aria-labelledby="verticallyCenteredModalLabel" aria-hidden="true">
-		  <div class="modal-dialog modal-dialog-centered">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <h5 class="modal-title" id="verticallyCenteredModalLabel">알림</h5>
-		        <button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-		      </div>
-		      <div class="modal-body">
-		        <p class="text-body-tertiary lh-lg mb-0"></p>
-		      </div>
-		      <div class="modal-footer">
-		        <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Okay</button>
-		      </div>
-		    </div>
-		  </div>
+	<div class="modal fade" id="loginErrorModal" tabindex="-1" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+	    <div class="modal-content bg-body-secondary text-body rounded-3 shadow-lg border border-secondary-light">
+	      <div class="modal-header border-0">
+	        <h5 class="modal-title text-dark" id="loginErrorModalTitle">알림</h5>
+	      </div>
+	      <div class="modal-body text-center">
+	        <p class="mb-0 text-body" id="loginErrorModalMessage">에러 메시지가 표시됩니다</p>
+	      </div>
+	      <div class="modal-footer justify-content-center border-0">
+	        <button type="button" class="btn btn-phoenix-secondary me-1 mb-1" data-bs-dismiss="modal">확인</button>
+	      </div>
+	    </div>
 	  </div>
+	</div>
+
       <script>
         var navbarTopStyle = window.config.config.phoenixNavbarTopStyle;
         var navbarTop = document.querySelector('.navbar-top');
@@ -136,55 +136,49 @@ xmlns:th="http://www.thymeleaf.org">
     <script th:src="@{/vendors/dayjs/dayjs.min.js}"></script>
     <script th:src="@{/assets/js/phoenix.js}"></script>
 
-	<script>
-	  const form = document.login_employee_form;
-	  
-	  const modalElement = document.getElementById('verticallyCentered');
-	  const modalBodyText = modalElement.querySelector('.modal-body p');
-	  const modal = new bootstrap.Modal(modalElement);
-	  
-	  form.addEventListener('submit', (e) => {
-		  e.preventDefault();
+	<script th:inline="javascript">
+  const modalElement = document.getElementById('loginErrorModal');
+  const modalBodyText = modalElement.querySelector('#loginErrorModalMessage');
+  const modal = new bootstrap.Modal(modalElement); // 이거 하나만 전역에서 생성
 
-		  let vali_check = false;
-		  let vali_text = "";
-
-		  if (!form.employee_id.value) {
-		    vali_text += "아이디를 입력하세요";
-		  } else if (!form.employee_pw.value) {
-		    vali_text += "비밀번호를 입력하세요";
-		  } else {
-		    vali_check = true;
-		  }
-
-		  if (!vali_check) {
-		    modalBodyText.textContent = vali_text;
-		    modal.show();
-		  } else {
-		    form.submit();
-		  }
-		});
-	</script>
-<!-- 	<script th:inline="javascript">
-  	window.addEventListener("DOMContentLoaded", () => {
-
+  window.addEventListener("DOMContentLoaded", () => {
     /*<![CDATA[*/
-    let errorMessage = /*[[${session.loginErrorMessage}]]*/ null;
+    const hasError = /*[[${error}]]*/ false;
+    const errorMessage = /*[[${errorMsg}]]*/ null;
     /*]]>*/
 
-    if (errorMessage !== null) {
+    if (hasError && errorMessage) {
       modalBodyText.textContent = errorMessage;
       modal.show();
-      
-      fetch('/remove-login-error', {
-          method: 'GET',
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-          }
-        });
     }
+
+    const form = document.login_employee_form;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      let vali_check = false;
+      let vali_text = "";
+
+      if (!form.employee_id.value) {
+        vali_text += "아이디를 입력하세요";
+      } else if (!form.employee_pw.value) {
+        vali_text += "비밀번호를 입력하세요";
+      } else {
+        vali_check = true;
+      }
+
+      if (!vali_check) {
+        modalBodyText.textContent = vali_text;
+        modal.show();
+      } else {
+        form.submit();
+      }
+    });
   });
-</script> -->
+</script>
+
+	
 
   </body>
 

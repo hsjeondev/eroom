@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,7 +46,6 @@ public class ProjectController {
 	private final EmployeeService employeeService;
 	private final ProjectService projectService;
 	private final ProjectTodoService projectTodoService;
-	private final DriveService driveService;
 	private final ProjectMeetingMinuteService projectMeetingMinuteService;
 	// 파일 저장 경로 
 			 @Value("${ffupload.location}")
@@ -426,42 +427,35 @@ public class ProjectController {
 
 		return map;
 	}
-
-
-	@PostMapping("/fileUpload")
+	
+	@PostMapping("/projectMypage")
 	@ResponseBody
-	public Map<String,String> uploadTeamDriveFiles(DriveDto driveDto,
-	                                               @RequestParam("driveDescriptions") List<String> driveDescriptions,
-	                                               @AuthenticationPrincipal EmployeeDetails user,
-	                                               @RequestParam("fileCategory") String category) {
-		
-		System.out.println("driveDto" + driveDto);
-		
-	    Map<String, String> resultMap = new HashMap<>();
-	    resultMap.put("res_code", "500");
-	    resultMap.put("res_msg", "업로드 실패");
+	public Map<String, Object> projectMypageApi() {
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("res_code", "500");
+	    map.put("res_msg", "내 프로젝트를 불러오는 중 오류가 발생하였습니다.");
 
-	    driveDto.setDriveDescriptions(driveDescriptions);
-	    
-	    String separatorCode = "FL006";
-	    
-	    if(category.equals("1")) {
-	    	separatorCode = "FL0061";
-	    } else if(category.equals("2")) {
-	    	separatorCode = "FL0062";	    	
-	    } else if(category.equals("3")) {
-	    	separatorCode = "FL0063";	    	
+	    try {
+	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	        EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	        Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+
+	        List<ProjectDto> doingProject = projectService.getMyDoingProject(employeeNo);
+	        System.out.println("doingProject " + doingProject);
+	        List<ProjectDto> doneProject = projectService.getDoneProject(employeeNo);
+	        System.out.println("doneProject " + doneProject);
+
+	        map.put("res_code", "200");
+	        map.put("res_msg", "내 프로젝트를 성공적으로 불러왔습니다.");
+	        map.put("activeProjects", doingProject);
+	        map.put("doneProjects", doneProject);
+	    } catch (Exception e) {
+	        e.printStackTrace();
 	    }
 
-	    driveDto.setSeparatorCode(separatorCode);
-
-	    int result = projectService.uploadProjectFiles(driveDto, user.getEmployee().getEmployeeNo());
-
-	    if(result > 0) {
-	        resultMap.put("res_code", "200");
-	        resultMap.put("res_msg", "업로드 성공");
-	    }
-	    return resultMap;
+	    return map;
 	}
+
+
 	
 }
