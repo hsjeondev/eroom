@@ -1,9 +1,11 @@
 package com.eroom.approval.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.approval.dto.ApprovalSignatureDto;
+import com.eroom.approval.entity.ApprovalSignature;
 import com.eroom.approval.service.ApprovalSignatureService;
 import com.eroom.employee.entity.Employee;
 import com.eroom.security.EmployeeDetails;
@@ -92,6 +95,33 @@ public class ApprovalSignatureController {
 			map.put("res_msg", "서명 삭제 성공");
 		}
 		
+		return map;
+	}
+	
+	@GetMapping("/approval/signature/search")
+	@ResponseBody
+	public Map<String, Object> getSignature(@AuthenticationPrincipal EmployeeDetails user) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			map.put("res_code", "500");
+			map.put("res_msg", "조회 실패");
+			ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(user.getEmployee());
+			if (approvalSignature != null) {
+				// Base64로 인코딩해서 반환
+				// "data:image/png;base64," + approvalSignatureService.encodeToBase64(approvalSignature.getApprovalSignatureBlob());
+				ApprovalSignatureDto dto = new ApprovalSignatureDto().toDto(approvalSignature);
+				map.put("signatureDto", dto);
+			} else {
+				// 이미지가 없으면 빈 문자열 반환
+				// return "";
+				map.put("signatureDto", "");
+			}
+			map.put("res_code", "200");
+			map.put("res_msg", "조회 성공");
+			return map;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return map;
 	}
 

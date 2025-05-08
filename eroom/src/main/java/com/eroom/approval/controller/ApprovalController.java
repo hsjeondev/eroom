@@ -1233,7 +1233,7 @@ public class ApprovalController {
 		model.addAttribute("resultList", resultList);
 		
 		
-		return "/approval/fallBackApprovals";
+		return "approval/fallBackApprovals";
 	}
 	// 비동기 방식을 위한 메소드
 	@GetMapping("/approval/fallBackApprovals/fragment")

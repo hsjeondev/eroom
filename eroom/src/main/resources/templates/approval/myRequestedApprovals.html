@@ -173,20 +173,26 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	<!-- 시그니처 모달 작동 스크립트 -->
 	<script th:inline="javascript">
   		function lastSignature() {
-	    	  const canvas = document.getElementById('signatureCanvas');
-	    	  const ctx = canvas.getContext('2d');
-	    	  const base64Image = document.getElementById('signatureImage').value;
-	
-	    	  if (base64Image) {
-	    	    const image = new Image();
-	    	    image.onload = function() {
-	    	      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-	    	    };
-	    	    image.src = base64Image;
-	    	  }
+  		    fetch('/approval/signature/search')
+  	        .then(response => response.json())
+  	        .then(data => {
+  	            if (data != null && data.res_code == '200') {
+  	                const canvas = document.getElementById('signatureCanvas');
+  	                const ctx = canvas.getContext('2d');
+  	                const image = new Image();
+  	                
+  	                image.onload = function() {
+  	                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+  	                };
+  	                
+  	                image.src = data.signatureDto.signature_data_url;
+  	            }
+  	        })
+  	        .catch(error => {
+  	            console.error('이미지 로딩 실패:', error);
+  	        });
     	};
 
-    
     
     
     
@@ -213,6 +219,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
       const signatureModal = document.getElementById('signatureModal');
       signatureModal.addEventListener('shown.bs.modal', function () {
         initSignaturePad();
+        lastSignature();
       });
 
       document.addEventListener('click', function(e) {
