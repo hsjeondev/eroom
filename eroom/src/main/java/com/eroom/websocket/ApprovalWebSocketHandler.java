@@ -68,7 +68,6 @@ public class ApprovalWebSocketHandler extends TextWebSocketHandler {
     public void sendApprovalNotification(Long receiverNo, String message, Approval approval) {
         WebSocketSession session = sessions.get(receiverNo);
 
-        if (session != null && session.isOpen()) {
             try {
             	saveNotificationToDatabase(receiverNo, message, approval);
                 session.sendMessage(new TextMessage(message));
@@ -76,9 +75,6 @@ public class ApprovalWebSocketHandler extends TextWebSocketHandler {
             } catch (Exception e) {
                 log.error("알림 전송 실패: employeeNo=" + receiverNo, e);
             }
-        } else {
-            log.warn("알림 전송 실패: 세션이 존재하지 않거나 닫힘. employeeNo={}", receiverNo);
-        }
     }
     
     // 알람 저장용
