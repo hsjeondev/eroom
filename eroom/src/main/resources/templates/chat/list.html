@@ -98,27 +98,30 @@
 									<!-- 아바타 이미지 -->
 										<div class="avatar avatar-xl status-online position-relative me-2 me-sm-0 me-xl-2">
 										  <img class="rounded-circle border border-2 border-light-subtle"
-											     th:src="@{${chatroom.profileImageUrl}}"
-											     alt="프로필 이미지">
+										     th:src="@{${chatroom.chatIsGroupYn == 'Y' ? '/assets/img/icons/logo.png' : chatroom.profileImageUrl}}"
+										     alt="프로필 이미지">
 										</div>
 										<div class="flex-1 d-sm-none d-xl-block">
-											<div
-												class="d-flex justify-content-between align-items-center">
-												<h5 th:text="${chatroom.chatroomName}"
-													class="text-body fw-normal name text-nowrap">채팅방 이름</h5>
-												<div th:if="${chatroom.unreadCount > 0}"
-													class="badge bg-danger text-white ms-2"
-													th:text="${chatroom.unreadCount}"></div>
-												<p
-													th:text="${#temporals.format(chatroom.lastMessageRegDate, 'yy.MM.dd')}"
-													class="fs-10 text-body-tertiary text-opacity-85 mb-0 text-nowrap">마지막
-													메시지 시간</p>
-											</div>
-											<div class="d-flex justify-content-between">
-												<p th:text="${chatroom.chatLastMessage}"
-													class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">
-													마지막메시지</p>
-											</div>
+										  <div class="d-flex justify-content-between align-items-start">
+										    <h5 th:text="${chatroom.chatroomName}"
+										        class="text-body fw-normal name text-nowrap">채팅방 이름</h5>
+										
+										    <div class="d-flex flex-column align-items-end ms-2">
+										      <p th:text="${#temporals.format(chatroom.lastMessageRegDate, 'yy.MM.dd')}"
+										         class="fs-10 text-body-tertiary text-opacity-85 mb-1 text-nowrap">
+										         마지막 메시지 시간
+										      </p>
+										      <div th:if="${chatroom.unreadCount > 0}"
+										           class="badge badge-phoenix badge-phoenix-primary px-1 unread-badge"
+										           th:text="${chatroom.unreadCount}">4</div>
+										    </div>
+										  </div>
+										  <div class="d-flex justify-content-between">
+										    <p th:text="${chatroom.chatLastMessage}"
+										       class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">
+										       마지막메시지
+										    </p>
+										  </div>
 										</div>
 								</a></li>
 							</ul>
@@ -803,11 +806,15 @@
 
 		      // 상대방 프로필 이미지 설정
 		      const other = data.find(user => String(user.employeeNo) !== String(myEmployeeNo));
-		      const imageUrl = other?.profileImageUrl || '/assets/img/profile/default-profile.png';
-		      const modalProfileImg = document.getElementById("modalProfileImage");
-		      if (modalProfileImg) {
-		        modalProfileImg.src = imageUrl;
-		      }
+		      const isGroupChat = target.dataset.group === "Y";
+		      const imageUrl = isGroupChat
+		      ? '/assets/img/icons/logo.png'
+		      : (data.find(user => String(user.employeeNo) !== String(myEmployeeNo))?.profileImageUrl || '/assets/img/profile/default-profile.png');
+
+		    const modalProfileImg = document.getElementById("modalProfileImage");
+		    if (modalProfileImg) {
+		      modalProfileImg.src = imageUrl;
+		    }
 
 		      // 참여자 목록 렌더링
 		      const participantList = document.getElementById('participantList');
@@ -1049,16 +1056,26 @@
     sidebarItem.classList.add("unread");
     sidebarItem.classList.remove("read");
 
-    const badge = sidebarItem.querySelector(".badge");
-    if (badge) {
-      badge.innerText = (parseInt(badge.innerText) || 0) + 1;
-    } else {
-      const newBadge = document.createElement("div");
-      newBadge.className = "badge bg-danger text-white ms-2";
-      newBadge.innerText = "1";
-      const container = sidebarItem.querySelector(".d-flex.justify-content-between");
-      if (container) container.appendChild(newBadge);
+    const rightInfoBox = sidebarItem.querySelector(".d-flex.flex-column.align-items-end");
+    if (rightInfoBox) {
+      // 날짜 수정
+      const timePreview = rightInfoBox.querySelector("p.text-body-tertiary");
+      if (timePreview) {
+        timePreview.innerText = getFormattedDate();
+      }
+
+      // 배지 수정 또는 추가
+      let badge = rightInfoBox.querySelector(".badge");
+      if (badge) {
+        badge.innerText = (parseInt(badge.innerText) || 0) + 1;
+      } else {
+        badge = document.createElement("div");
+        badge.className = "badge badge-phoenix badge-phoenix-primary px-1 unread-badge";
+        badge.innerText = "1";
+        rightInfoBox.appendChild(badge);
+      }
     }
+
 
     const messagePreview = sidebarItem.querySelector(".message");
     if (messagePreview) messagePreview.innerText = data.chatMessageContent;
