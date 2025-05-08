@@ -121,7 +121,7 @@
 	          <small th:text="|(${#numbers.formatDecimal(file.driveSize / 1024, 1, 1)} KB)|"></small>
 	        </span>
 	        <button type="button" class="btn btn-sm btn-outline-danger ms-2 py-0 px-1"
-	                th:onclick="'removeFile(' + ${file.driveAttachNo} + ')'" aria-label="삭제"
+	                th:onclick="'removeFile(' + ${file.driveAttachNo} + ', this)'" aria-label="삭제"
 	                style="font-size: 0.7rem;">✕</button>
 	      </span>
 	    </li>
@@ -247,7 +247,7 @@
       renderFilePreview();
     }
     
-    function removeFile(attachNo) {
+    function removeFile(attachNo,btn) {
         if (!confirm("정말 삭제하시겠습니까?\n※기존에 있던 파일입니다.\n")) return;
         console.log('삭제할 파일의 attachNo:', attachNo);
         fetch('/article/file/delete/' + attachNo, {
@@ -263,7 +263,13 @@
           alert(data.res_msg);
           if (data.res_code == 200) {
             // 페이지 새로고침 또는 해당 파일 DOM에서 제거
-            location.reload(); // 또는 직접 해당 li 제거 처리
+            // location.reload(); // 또는 직접 해당 li 제거 처리
+            
+            // 12 : 51 추가한 한줄
+        	//  fileElement.remove();
+        	  const li = btn.closest('li');
+              if (li) li.remove();
+           
           }
         })
         .catch(err => {
