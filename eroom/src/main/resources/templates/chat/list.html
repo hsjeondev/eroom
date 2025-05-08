@@ -56,24 +56,22 @@
 				</div>
 				<!-- 검색 입력란 -->
 				<div class="form-icon-container mb-4 d-sm-none d-xl-block">
-					<input class="form-control form-icon-input search" type="text"
-						placeholder="이름을 입력하세요" /> <span
-						class="fas fa-user text-body fs-9 form-icon"></span>
+					<input class="form-control form-icon-input search" type="text" placeholder="이름을 입력하세요" /> 
+					<span class="fas fa-user text-body fs-9 form-icon"></span>
 				</div>
 				<!-- 탭 메뉴 (전체, 읽지않음, 읽음) -->
 				<ul class="nav nav-phoenix-pills mb-5 d-sm-none d-xl-flex"
-					id="contactListTab" data-chat-thread-tab="data-chat-thread-tab"
-					role="tablist">
+					id="contactListTab" data-chat-thread-tab role="tablist">
 					<li class="nav-item" role="presentation"><a
 						class="nav-link cursor-pointer active" data-bs-toggle="tab"
 						data-chat-thread-list="all" role="tab" aria-selected="true">전체</a>
 					</li>
-					<li class="nav-item" role="presentation"><a
+					<li class="nav-item item read" role="presentation"><a
 						class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab"
-						data-chat-thread-list="read" aria-selected="false">읽지않음</a></li>
-					<li class="nav-item" role="presentation"><a
+						data-chat-thread-list="read" aria-selected="false">읽음</a></li>
+					<li class="nav-item item unread" role="presentation"><a
 						class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab"
-						data-chat-thread-list="unread" aria-selected="false">읽음</a></li>
+						data-chat-thread-list="unread" aria-selected="false">읽지않음</a></li>
 				</ul>
 				<!-- 채팅 목록 -->
 				<div class="scrollbar">
@@ -81,9 +79,9 @@
 						<div data-chat-thread-tab-content="data-chat-thread-tab-content">
 							<ul class="nav chat-thread-tab flex-column list chat_list">
 								<!-- 채팅방이 없을 경우 -->
-								<div th:if="${#lists.isEmpty(chatroomList)}">
+								<li th:if="${#lists.isEmpty(chatroomList)}">
 									<p class="text-center text-muted mt-4">참여 중인 채팅방이 없습니다.</p>
-								</div>
+								</li>
 								<!-- 채팅방 목록 -->
 								<li th:if="${!#lists.isEmpty(chatroomList)}"
 									th:each="chatroom : ${chatroomList}"
@@ -98,27 +96,30 @@
 									<!-- 아바타 이미지 -->
 										<div class="avatar avatar-xl status-online position-relative me-2 me-sm-0 me-xl-2">
 										  <img class="rounded-circle border border-2 border-light-subtle"
-											     th:src="@{${chatroom.profileImageUrl}}"
-											     alt="프로필 이미지">
+										     th:src="@{${chatroom.chatIsGroupYn == 'Y' ? '/assets/img/icons/logo.png' : chatroom.profileImageUrl}}"
+										     alt="프로필 이미지">
 										</div>
 										<div class="flex-1 d-sm-none d-xl-block">
-											<div
-												class="d-flex justify-content-between align-items-center">
-												<h5 th:text="${chatroom.chatroomName}"
-													class="text-body fw-normal name text-nowrap">채팅방 이름</h5>
-												<div th:if="${chatroom.unreadCount > 0}"
-													class="badge bg-danger text-white ms-2"
-													th:text="${chatroom.unreadCount}"></div>
-												<p
-													th:text="${#temporals.format(chatroom.lastMessageRegDate, 'yy.MM.dd')}"
-													class="fs-10 text-body-tertiary text-opacity-85 mb-0 text-nowrap">마지막
-													메시지 시간</p>
-											</div>
-											<div class="d-flex justify-content-between">
-												<p th:text="${chatroom.chatLastMessage}"
-													class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">
-													마지막메시지</p>
-											</div>
+										  <div class="d-flex justify-content-between align-items-start">
+										    <h5 th:text="${chatroom.chatroomName}"
+										        class="text-body fw-normal name text-nowrap">채팅방 이름</h5>
+										
+										    <div class="d-flex flex-column align-items-end ms-2">
+										      <p th:text="${#temporals.format(chatroom.lastMessageRegDate, 'yy.MM.dd')}"
+										         class="fs-10 text-body-tertiary text-opacity-85 mb-1 text-nowrap">
+										         마지막 메시지 시간
+										      </p>
+										      <div th:if="${chatroom.unreadCount > 0}"
+										           class="badge badge-phoenix badge-phoenix-primary px-1 unread-badge"
+										           th:text="${chatroom.unreadCount}">4</div>
+										    </div>
+										  </div>
+										  <div class="d-flex justify-content-between">
+										    <p th:text="${chatroom.chatLastMessage}"
+										       class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">
+										       마지막메시지
+										    </p>
+										  </div>
 										</div>
 								</a></li>
 							</ul>
@@ -225,8 +226,7 @@
 					<div class="modal-content">
 						<div class="modal-body">
 							<div class="text-center mb-3">
-								<img src="../assets/img/team/20.webp" class="rounded-circle"
-									width="80" />
+								<img id="modalProfileImage" src="/assets/img/profile/default-profile.png" class="rounded-circle" width="80" />
 								<h5 id="modalChatroomName" class="mt-2">채팅방 이름</h5>
 							</div>
 							<div id="group-only-options">
@@ -711,7 +711,6 @@
 		    	    </div>
 		    	    <div class="chat-footer border-top p-3 d-flex align-items-center flex-column bg-white">
 		    	    <div class="d-flex w-100 align-items-center mb-2">
-		    	      <button class="btn btn-light me-2"><i class="fas fa-smile"></i></button>
 		    	      <label for="chatFileInput" class="btn btn-light me-2">
 		    	        <i class="fa-solid fa-paperclip"></i>
 		    	      </label>
@@ -798,20 +797,35 @@
 			// 참여자 목록 불러오기
 		    const chatroomNo = target.dataset.roomNo;
 		    fetch('/chat/participants?chatroomNo=' + encodeURIComponent(chatroomNo))
-		      .then(response => response.json())
-		      .then(data => {
-		        const participantList = document.getElementById('participantList');
-		        participantList.innerHTML = ''; // 초기화
-		        data.forEach(name => {
-		          const li = document.createElement('li');
-		          li.textContent = name;
-		          participantList.appendChild(li);
-		        });
-		      })
-		      .catch(error => {
-		        console.error('참여자 불러오기 실패:', error);
+		    .then(response => response.json())
+		    .then(data => {
+		      const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+
+		      // 상대방 프로필 이미지 설정
+		      const other = data.find(user => String(user.employeeNo) !== String(myEmployeeNo));
+		      const isGroupChat = target.dataset.group === "Y";
+		      const imageUrl = isGroupChat
+		      ? '/assets/img/icons/logo.png'
+		      : (data.find(user => String(user.employeeNo) !== String(myEmployeeNo))?.profileImageUrl || '/assets/img/profile/default-profile.png');
+
+		    const modalProfileImg = document.getElementById("modalProfileImage");
+		    if (modalProfileImg) {
+		      modalProfileImg.src = imageUrl;
+		    }
+
+		      // 참여자 목록 렌더링
+		      const participantList = document.getElementById('participantList');
+		      participantList.innerHTML = '';
+		      data.forEach(p => {
+		        const li = document.createElement('li');
+		        li.textContent = p.employeeName;
+		        participantList.appendChild(li);
 		      });
-		    
+		    })
+		    .catch(error => {
+		      console.error('참여자 불러오기 실패:', error);
+		    });
+
 		    const modal = new bootstrap.Modal(document.getElementById("chatroomDetailModal"));
 		    modal.show();
 		  });
@@ -1023,98 +1037,126 @@
 			 console.log('WebSocket 연결 성공');
 		  };
 		  // 메시지 수신
-		 socket.onmessage = function(event) {
-			 console.log("📩 WebSocket 메시지 수신:", event.data);
-		  const data = JSON.parse(event.data);
-		  const myEmployeeNo = document.getElementById("myEmployeeNo").value;
-		  const currentChatroomNo = document.querySelector(".chatroom-title")?.dataset.roomNo;
-		  const chatHistory = document.querySelector(".chat-history");
-		  const sidebarItem = document.querySelector(`[data-room-no="${data.chatroomNo}"]`);
-		  const isMyMessage = String(data.senderMember) === String(myEmployeeNo);
-		
-		  if (!sidebarItem) return;
-		
-		  if (!currentChatroomNo || Number(currentChatroomNo) !== Number(data.chatroomNo)) {
-		    sidebarItem.classList.add('unread');
-		    sidebarItem.classList.remove('read');
-		
-		    const badge = sidebarItem.querySelector('.badge');
-		    if (badge) {
-		      badge.innerText = (parseInt(badge.innerText) || 0) + 1;
-		    } else {
-		      const newBadge = document.createElement("div");
-		      newBadge.className = "badge bg-danger text-white ms-2";
-		      newBadge.innerText = "1";
-		      const container = sidebarItem.querySelector('.d-flex.justify-content-between');
-		      if (container) container.appendChild(newBadge);
-		    }
-		
-		    const messagePreview = sidebarItem.querySelector('.message');
-		    if (messagePreview) messagePreview.innerText = data.chatMessageContent;
-		
-		    const timePreview = sidebarItem.querySelector('.text-body-tertiary');
-		    if (timePreview) timePreview.innerText = getFormattedDate();
-		    return;
-		  }
-		
-		  if (!chatHistory) return;
-		  
-		  const wrapper = document.createElement("div");
-		  wrapper.className = "mb-3";
+		socket.onmessage = function (event) {
+  console.log("📩 WebSocket 메시지 수신:", event.data);
+  const data = JSON.parse(event.data);
+  const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+  const currentChatroomNo = document.querySelector(".chatroom-title")?.dataset.roomNo;
+  const chatHistory = document.querySelector(".chat-history");
+  const sidebarItem = document.querySelector(`[data-room-no="${data.chatroomNo}"]`);
+  const isMyMessage = String(data.senderMember) === String(myEmployeeNo);
 
-		  const nameLine = document.createElement("div");
-		  nameLine.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-1`;
-		  nameLine.innerHTML = `<div class="small text-muted">${isMyMessage ? '나' : data.senderName}</div>`;
+  if (!sidebarItem) return;
 
-		  const messageLine = document.createElement("div");
-		  messageLine.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
+  // 다른 방일 경우 → unread badge 처리
+  if (!currentChatroomNo || Number(currentChatroomNo) !== Number(data.chatroomNo)) {
+    sidebarItem.classList.add("unread");
+    sidebarItem.classList.remove("read");
 
-		  const messageBubble = document.createElement("div");
-		  messageBubble.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
-		  messageBubble.style.maxWidth = "70%";
+    const rightInfoBox = sidebarItem.querySelector(".d-flex.flex-column.align-items-end");
+    if (rightInfoBox) {
+      // 날짜 수정
+      const timePreview = rightInfoBox.querySelector("p.text-body-tertiary");
+      if (timePreview) {
+        timePreview.innerText = getFormattedDate();
+      }
 
-		  // 텍스트가 있으면 추가
-		  if (data.chatMessageContent) {
-		    const text = document.createElement("div");
-		    text.innerText = data.chatMessageContent;
-		    messageBubble.appendChild(text);
-		  }
+      // 배지 수정 또는 추가
+      let badge = rightInfoBox.querySelector(".badge");
+      if (badge) {
+        badge.innerText = (parseInt(badge.innerText) || 0) + 1;
+      } else {
+        badge = document.createElement("div");
+        badge.className = "badge badge-phoenix badge-phoenix-primary px-1 unread-badge";
+        badge.innerText = "1";
+        rightInfoBox.appendChild(badge);
+      }
+    }
 
-		  // 파일이 있으면 추가
-		  if (data.drivePath) {
-		    const ext = data.drivePath.split('.').pop().toLowerCase();
-		    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
 
-		    const fileWrapper = document.createElement("div");
-		    fileWrapper.className = "mt-2";
+    const messagePreview = sidebarItem.querySelector(".message");
+    if (messagePreview) messagePreview.innerText = data.chatMessageContent;
 
-		    if (isImage) {
-		      const img = document.createElement("img");
-		      img.src = data.drivePath;
-		      img.style.maxWidth = "150px";
-		      img.style.borderRadius = "8px";
-		      fileWrapper.appendChild(img);
-		    } else {
-		      const link = document.createElement("a");
-		      link.href = "/files/" + data.drivePath.replace(/^\/+/, "");
-		      link.className = "badge bg-secondary text-white";
-		      link.target = "_blank";
-		      link.innerText = "📎 " + (data.driveOriName || "첨부파일 다운로드");
-		      fileWrapper.appendChild(link);
-		    }
+    const timePreview = sidebarItem.querySelector(".text-body-tertiary");
+    if (timePreview) timePreview.innerText = getFormattedDate();
 
-		    messageBubble.appendChild(fileWrapper);
-		  }
+    return;
+  }
 
-		  messageLine.appendChild(messageBubble);
-		  wrapper.appendChild(nameLine);
-		  wrapper.appendChild(messageLine);
-		  chatHistory.appendChild(wrapper);
+  // 현재 방이라면 → chat-history에 메시지 렌더링
+  if (!chatHistory) return;
 
-		
-		  const scrollArea = document.querySelector(".flex-grow-1.overflow-auto");
-		  if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
-		};
+  const profileImageUrl = data.senderProfileImageUrl || "/assets/img/profile/default-profile.png";
+  const senderDisplayName = isMyMessage ? "나" : data.senderName || "알 수 없음";
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "mb-3";
+
+  const nameLine = document.createElement("div");
+  nameLine.className = `d-flex ${isMyMessage ? "justify-content-end" : "justify-content-start"} mb-1`;
+  nameLine.innerHTML = `<div class="small text-muted">${senderDisplayName}</div>`;
+
+  const messageLine = document.createElement("div");
+  messageLine.className = `d-flex align-items-start ${isMyMessage ? "justify-content-end" : "justify-content-start"} mb-2`;
+
+  const profileImg = document.createElement("img");
+  profileImg.src = profileImageUrl;
+  profileImg.className = "rounded-circle";
+  profileImg.style.width = "35px";
+  profileImg.style.height = "35px";
+  profileImg.style.objectFit = "cover";
+
+  const messageBubble = document.createElement("div");
+  messageBubble.className = `p-2 rounded-2 ${isMyMessage ? "bg-primary text-white" : "bg-light"}`;
+  messageBubble.style.maxWidth = "70%";
+
+  if (data.chatMessageContent) {
+    const text = document.createElement("div");
+    text.innerText = data.chatMessageContent;
+    messageBubble.appendChild(text);
+  }
+
+  if (data.drivePath) {
+    const ext = data.drivePath.split(".").pop().toLowerCase();
+    const isImage = ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(ext);
+
+    const fileWrapper = document.createElement("div");
+    fileWrapper.className = "mt-2";
+
+    if (isImage) {
+      const img = document.createElement("img");
+      img.src = data.drivePath;
+      img.style.maxWidth = "150px";
+      img.style.borderRadius = "8px";
+      fileWrapper.appendChild(img);
+    } else {
+      const link = document.createElement("a");
+      link.href = "/files/" + data.drivePath.replace(/^\/+/, "");
+      link.className = "badge bg-secondary text-white";
+      link.target = "_blank";
+      link.innerText = "📎 " + (data.driveOriName || "첨부파일 다운로드");
+      fileWrapper.appendChild(link);
+    }
+
+    messageBubble.appendChild(fileWrapper);
+  }
+
+  // 조립
+  if (isMyMessage) {
+    messageLine.appendChild(messageBubble);
+    messageLine.appendChild(profileImg);
+  } else {
+    messageLine.appendChild(profileImg);
+    messageLine.appendChild(messageBubble);
+  }
+
+  wrapper.appendChild(nameLine);
+  wrapper.appendChild(messageLine);
+  chatHistory.appendChild(wrapper);
+
+  const scrollArea = document.querySelector(".flex-grow-1.overflow-auto");
+  if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
+};
 
 
 
@@ -1223,6 +1265,9 @@ function sendMessage() {
     return;
   }
 
+  //프로필 이미지 URL을 가져오기
+  const myProfileImageUrl = document.querySelector('.chat_list [data-room-no="'+chatroomNo+'"] img')?.src 
+                            || '/assets/img/profile/default-profile.png';
   // 파일이 있는 경우
   if (fileInput.files.length > 0) {
     const formData = new FormData();
@@ -1261,7 +1306,9 @@ function sendMessage() {
         	    chatroomNo: Number(chatroomNo),
         	    receiverMember: isGroupChat ? null : receiverNo,
         	    driveOriName: fileName,
-        	    drivePath: drivePath  
+        	    drivePath: drivePath,
+        	    senderProfileImageUrl: myProfileImageUrl,
+                senderName: "나"
         	  };
 
         	  console.log("📤 WebSocket 전송:", chatData);
@@ -1290,7 +1337,9 @@ function sendMessage() {
       chatMessageContent: message,
       senderMember: Number(myEmployeeNo),
       chatroomNo: Number(chatroomNo),
-      receiverMember: isGroupChat ? null : receiverNo
+      receiverMember: isGroupChat ? null : receiverNo,
+      senderProfileImageUrl: myProfileImageUrl, 
+      senderName: "나"
     };
     socket.send(JSON.stringify(chatData));
     messageInput.value = "";
@@ -1298,94 +1347,113 @@ function sendMessage() {
 }
 
 		
-		function loadChatroomDetail(chatroomNo) {
-			  fetch('/chat/roomDetail?roomNo=' + chatroomNo)
-			    .then(response => response.json())
-			    .then(data => {
-			      const chatHistory = document.querySelector(".chat-history");
-			      if (!chatHistory) return;
+function loadChatroomDetail(chatroomNo) {
+    fetch('/chat/roomDetail?roomNo=' + chatroomNo)
+        .then(response => response.json())
+        .then(data => {
+            const chatHistory = document.querySelector(".chat-history");
+            if (!chatHistory) return;
 
-			      chatHistory.innerHTML = "<hr>"; // 초기화
+            chatHistory.innerHTML = "<hr>"; // 초기화
 
-			      if (data.messageList && data.messageList.length > 0) {
-			        const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+            if (data.messageList && data.messageList.length > 0) {
+                const myEmployeeNo = document.getElementById("myEmployeeNo").value;
 
-			        data.messageList.forEach(msg => {
-			          const isMyMessage = (msg.senderMember == myEmployeeNo);
-			          const hasText = !!msg.chatMessageContent;
-			          const hasFile = !!msg.drivePath;
+                data.messageList.forEach(msg => {
+                    const isMyMessage = (msg.senderMember == myEmployeeNo);
+                    const senderDisplayName = isMyMessage ? '나' : (msg.senderName || '알 수 없음');
+                    const profileImageUrl = msg.senderProfileImageUrl || '/assets/img/profile/default-profile.png';
 
-			          if (!hasText && !hasFile) return; // 둘 다 없으면 스킵
+                    const messageDiv = document.createElement("div");
+                    messageDiv.className = "mb-3";
 
-			          const messageDiv = document.createElement("div");
-			          messageDiv.className = "mb-3";
+                    const messageWrapper = document.createElement("div");
+                    messageWrapper.className = `d-flex align-items-start ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
 
-			          const messageWrapper = document.createElement("div");
-			          messageWrapper.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
+                    // 프로필 이미지 추가 ✅
+                    const profileImg = document.createElement("img");
+                    profileImg.src = profileImageUrl;
+                    profileImg.className = "rounded-circle";
+                    profileImg.style.width = "35px";
+                    profileImg.style.height = "35px";
 
-			          const bubble = document.createElement("div");
-			          bubble.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
-			          bubble.style.maxWidth = "70%";
+                    if (!isMyMessage) {
+                        profileImg.classList.add("me-2");
+                        messageWrapper.appendChild(profileImg);
+                    }
 
-			          // 텍스트 추가
-			          if (hasText) {
-			            const text = document.createElement("div");
-			            text.textContent = msg.chatMessageContent;
-			            bubble.appendChild(text);
-			          }
+                    const bubble = document.createElement("div");
+                    bubble.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
+                    bubble.style.maxWidth = "70%";
 
-			          // 파일 처리
-			          if (hasFile) {
-			            const ext = msg.drivePath.split('.').pop().toLowerCase();
-			            const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
+                    if (msg.chatMessageContent) {
+                        const text = document.createElement("div");
+                        text.textContent = msg.chatMessageContent;
+                        bubble.appendChild(text);
+                    }
 
-			            if (isImage) {
-		            	  const fileWrapper = document.createElement("div");
-		            	  fileWrapper.className = "text-center"; // 가운데 정렬
+                    if (msg.drivePath) {
+                        const ext = msg.drivePath.split('.').pop().toLowerCase();
+                        const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
 
-		            	  const fileName = document.createElement("div");
-		            	  fileName.className = "fw-bold mb-2";
-		            	  fileName.innerText = `[파일] ${msg.driveOriName || '파일'}`;
+                        if (isImage) {
+                            const fileWrapper = document.createElement("div");
+                            fileWrapper.className = "text-center";
 
-		            	  const img = document.createElement("img");
-		            	  img.src = "/files/" + msg.drivePath.replace(/^\/+/, "");
-		            	  img.style.maxWidth = "180px";
-		            	  img.style.maxHeight = "180px";
-		            	  img.style.borderRadius = "8px";
-		            	  img.style.objectFit = "cover";
-		            	  img.style.display = "block";
-		            	  img.style.margin = "0 auto";
+                            const img = document.createElement("img");
+                            img.src = "/files/" + msg.drivePath.replace(/^\/+/, "");
+                            img.style.maxWidth = "180px";
+                            img.style.maxHeight = "180px";
+                            img.style.borderRadius = "8px";
+                            img.style.objectFit = "cover";
+                            img.style.display = "block";
+                            img.style.margin = "0 auto";
 
-		            	  fileWrapper.appendChild(fileName);
-		            	  fileWrapper.appendChild(img);
+                            fileWrapper.appendChild(img);
+                            bubble.appendChild(fileWrapper);
+                        } else {
+                            const link = document.createElement("a");
+                            link.href = "/files" + msg.drivePath;
+                            link.target = "_blank";
+                            link.className = "badge bg-info text-white mt-2 d-inline-block";
+                            link.innerText = "📎 첨부파일 보기";
+                            bubble.appendChild(link);
+                        }
+                    }
 
-		            	  bubble.appendChild(fileWrapper);
-		            	}else {
-			              const link = document.createElement("a");
-			              link.href = "/files" + msg.drivePath;
-			              link.target = "_blank";
-			              link.className = "badge bg-info text-white mt-2 d-inline-block";
-			              link.innerText = "📎 첨부파일 보기";
-			              bubble.appendChild(link);
-			            }
-			          }
+                    messageWrapper.appendChild(bubble);
 
-			          messageWrapper.appendChild(bubble);
-			          messageDiv.appendChild(messageWrapper);
-			          chatHistory.appendChild(messageDiv);
-			        });
+                    if (isMyMessage) {
+                        profileImg.classList.add("ms-2");
+                        messageWrapper.appendChild(profileImg);
+                    }
 
-			        // 스크롤 맨 밑으로 이동
-			        const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
-			        if (chatArea) {
-			          chatArea.scrollTop = chatArea.scrollHeight;
-			        }
-			      }
-			    })
-			    .catch(error => {
-			      console.error("채팅방 상세 조회 실패:", error);
-			    });
-			}
+                    const senderNameDiv = document.createElement("div");
+                    senderNameDiv.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-1`;
+                    senderNameDiv.innerHTML = `<div class="small text-muted">${senderDisplayName}</div>`;
+
+                    messageDiv.appendChild(senderNameDiv);
+                    messageDiv.appendChild(messageWrapper);
+                    chatHistory.appendChild(messageDiv);
+                });
+
+                const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
+                setTimeout(() => {
+                	  if (chatArea) {
+                	    chatArea.scrollTo({
+                	      top: chatArea.scrollHeight,
+                	      behavior: 'smooth'
+                	    });
+                	  }
+                	}, 0);
+            }
+        })
+        .catch(error => {
+            console.error("채팅방 상세 조회 실패:", error);
+        });
+}
+
+
 
 		function bindFilePreview() {
 			  const fileInput = document.getElementById("chatFileInput");
@@ -1451,6 +1519,44 @@ function sendMessage() {
 				});
 
 			}
+		function applyChatroomFilter(type) {
+			  const allItems = document.querySelectorAll('.chat_list .item');
+
+			  allItems.forEach(item => {
+			    const isUnread = item.classList.contains('unread');
+			    if (type === 'all') {
+			      item.style.display = '';
+			    } else if (type === 'read' && isUnread) {
+			      item.style.display = 'none';
+			    } else if (type === 'unread' && !isUnread) {
+			      item.style.display = 'none';
+			    } else {
+			      item.style.display = '';
+			    }
+			  });
+			}
+
+			// 탭 버튼 클릭 이벤트 바인딩
+			document.querySelectorAll('[data-chat-thread-list]').forEach(tab => {
+			  tab.addEventListener('click', e => {
+			    const type = tab.getAttribute('data-chat-thread-list');
+			    applyChatroomFilter(type);
+
+			    // 탭 active 클래스 갱신
+			    document.querySelectorAll('[data-chat-thread-list]').forEach(t => t.classList.remove('active'));
+			    tab.classList.add('active');
+			  });
+			});
+			document.querySelector('.search')?.addEventListener('input', function () {
+				  const keyword = this.value.trim().toLowerCase();
+				  const items = document.querySelectorAll('.chat_list .item');
+
+				  items.forEach(item => {
+				    const name = item.querySelector('.name')?.innerText.toLowerCase() || '';
+				    item.style.display = name.includes(keyword) ? '' : 'none';
+				  });
+				});
+
 		</script>
 	</main>
 </body>

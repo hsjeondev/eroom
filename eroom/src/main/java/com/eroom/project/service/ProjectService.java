@@ -51,6 +51,26 @@ public class ProjectService {
  	@Value("${ffupload.location}")
  	private String fileDir;
  	
+ 	public List<ProjectMemberDto> findByProjectMembersNo(Long projectNo) {
+ 	    List<ProjectMember> members = projectMemberRepository.findByProject_ProjectNo(projectNo);
+ 	    List<ProjectMemberDto> dtoList = new ArrayList<>();
+
+ 	    for (ProjectMember pm : members) {
+ 	        ProjectMemberDto dto = ProjectMemberDto.builder()
+ 	            .project_member_no(pm.getProjectMemberNo())
+ 	            .project(pm.getProject())
+ 	            .project_member(pm.getEmployee())
+ 	            .project_manager(pm.getProjectManager())
+ 	            .github_username(pm.getGithubUsername())
+ 	            .is_manager(pm.getIsManager())
+ 	            .build();
+ 	        dtoList.add(dto);
+ 	    }
+
+ 	    return dtoList;
+ 	}
+
+ 	
  	public int countMyDoingProject(Long employeeNo) {
  	    return projectMemberRepository.countMyProjectsByStatus(employeeNo, "진행 중");
  	}

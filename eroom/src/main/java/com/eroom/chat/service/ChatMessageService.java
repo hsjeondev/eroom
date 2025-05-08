@@ -80,8 +80,5 @@ public class ChatMessageService {
 	        e.printStackTrace();
 	    }
 	}
-
-	
-	
 	
 }

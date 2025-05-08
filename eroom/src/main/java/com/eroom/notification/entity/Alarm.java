@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.eroom.approval.entity.ApprovalAlarm;
+import com.eroom.calendar.entity.CalendarAlarm;
 import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.mail.entity.MailAlarm;
 
@@ -51,14 +52,15 @@ public class Alarm {
 	@CreationTimestamp
 	private LocalDateTime regDate;
 	
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "param1", insertable = false, updatable = false)
-    private CalendarAlarm calendarAlarm;
     
     //메일 알람
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "param1", referencedColumnName = "mail_alarm_no", insertable = false, updatable = false)
     private MailAlarm mailAlarm;
+    
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "param1", referencedColumnName = "alarm_id", insertable = false, updatable = false)
+    private CalendarAlarm calendarAlarm;
 
     //채팅 알람
     @OneToOne(fetch = FetchType.LAZY)

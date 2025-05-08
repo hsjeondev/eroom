@@ -77,6 +77,7 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
 	// 가장 최근 프로필 사진 1건 조회
 	Drive findTop1ByUploader_EmployeeNoAndSeparatorCodeAndVisibleYnOrderByDriveRegDateDesc(Long employeeNo,String separatorCode, String visibleYn);
 	
+	Optional<Drive> findTopByUploaderAndSeparatorCodeOrderByDriveRegDateDesc(Employee uploader, String separatorCode);
 
 	
 }

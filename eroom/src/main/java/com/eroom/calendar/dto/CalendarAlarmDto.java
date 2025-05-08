@@ -1,8 +1,8 @@
-package com.eroom.notification.dto;
+package com.eroom.calendar.dto;
 
 import java.time.LocalDateTime;
 
-import com.eroom.notification.entity.CalendarAlarm;
+import com.eroom.calendar.entity.CalendarAlarm;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

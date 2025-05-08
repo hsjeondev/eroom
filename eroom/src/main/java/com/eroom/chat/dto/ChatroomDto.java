@@ -60,7 +60,7 @@ public class ChatroomDto {
                 .chatroomRegDate(entity.getChatroomRegDate())
                 .chatroomModDate(entity.getChatroomModDate())
                 .chatLastMessage(entity.getChatLastMessage())
-                .lastMessageRegDate(entity.getChatroomModDate())
+                .lastMessageRegDate(entity.getLastMessageRegDate())
                 .participantIds(participants)
                 .build();
     }
@@ -73,7 +73,7 @@ public class ChatroomDto {
                 .chatroomRegDate(entity.getChatroomRegDate())
                 .chatroomModDate(entity.getChatroomModDate())
                 .chatLastMessage(entity.getChatLastMessage())
-                .lastMessageRegDate(entity.getChatroomModDate())
+                .lastMessageRegDate(entity.getLastMessageRegDate())
                 .messageList(messages)  // 메시지 리스트 추가
                 .build();
     }
