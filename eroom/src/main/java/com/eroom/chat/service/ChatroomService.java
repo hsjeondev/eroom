@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.eroom.chat.dto.ChatMessageDto;
 import com.eroom.chat.dto.ChatroomDto;
 import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.chat.entity.Chatroom;
@@ -228,6 +228,29 @@ public class ChatroomService {
 
 	    return savedDrives;
 	}
+	public Long findOrCreateOneToOneChatroom(Long myEmpNo, Long targetEmpNo) {
+	    // 1:1 채팅방 존재 여부 확인
+	    Optional<Chatroom> existingChatroom = repository.findOneToOneRoom(myEmpNo, targetEmpNo);
+
+	    if (existingChatroom.isPresent()) {
+	        return existingChatroom.get().getChatroomNo();
+	    }
+
+	    // 없으면 새로 생성
+	    ChatroomDto dto = new ChatroomDto();
+	    dto.setCreater(myEmpNo);
+	    dto.setChatIsGroupYn("N");
+	    dto.setParticipantIds(List.of(targetEmpNo));
+
+	    ChatroomDto createdChatroom = this.createChatroom(dto);
+
+	    if (createdChatroom == null || createdChatroom.getChatroomNo() == null) {
+	        throw new RuntimeException("1:1 채팅방 생성 실패");
+	    }
+
+	    return createdChatroom.getChatroomNo();
+	}
+
 
 
 
