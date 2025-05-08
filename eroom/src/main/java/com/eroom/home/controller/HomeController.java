@@ -39,8 +39,8 @@ public class HomeController {
 		model.addAttribute("checkInTime",statusMap.get("checkInTime"));
 		model.addAttribute("checkOutTime",statusMap.get("checkOutTime"));
 		
-		System.out.println("attendanceStatus : " + statusMap.get("attendanceStatus"));
-		System.out.println("attendanceTime : " + statusMap.get("attendanceTime"));
+//		System.out.println("attendanceStatus : " + statusMap.get("attendanceStatus"));
+//		System.out.println("attendanceTime : " + statusMap.get("attendanceTime"));
 		
 		return "index";
 	}
