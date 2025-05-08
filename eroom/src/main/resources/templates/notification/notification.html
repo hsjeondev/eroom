@@ -10,8 +10,18 @@
 	<div class="content">
  	  <div class="position-absolute top-0 start-0 p-3">
 	    <h3 class="fw-bold fs-5 text-body-emphasis">알림</h3>
-	  </div> 
-		
+	  </div>
+			<!-- 알림이 없을 때 -->
+			<div th:if="${#lists.isEmpty(alarmList)}">
+				<div class="col-12">
+					<div
+						class="alert alert-light text-center border border-secondary-light rounded py-4 fs-6 fw-semibold text-body-secondary">
+						<i class="fa-solid fa-circle-info me-2 text-secondary"></i>알림이
+						없습니다.
+					</div>
+				</div>
+			</div>
+
 
 			<!-- 오늘 알림 -->
 			<div th:if="${alarmList.?[#temporals.format(#this.reg_date,'yyyy.MM.dd') == #temporals.format(#temporals.createNow(), 'yyyy.MM.dd')].size() > 0}">
