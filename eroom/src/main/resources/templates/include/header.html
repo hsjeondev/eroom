@@ -276,7 +276,7 @@
     			       let message = "";
 
 						if (notification.separator_code === 'R001') {
-						  const calendarSeparator = notification.calendarAlarm?.separator || "";
+						  const calendarSeparator = notification.calendarAlarm_separator || "";
 						
 						  if (calendarSeparator.startsWith("A")) {
 						    message = "📢 새로운 회사 일정이 등록되었습니다.";
