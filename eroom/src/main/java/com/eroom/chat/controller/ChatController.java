@@ -243,20 +243,25 @@ public class ChatController {
 	// 채팅방 참여자 조회
 	@GetMapping("/participants")
 	@ResponseBody
-	public List<String> getParticipants(@RequestParam("chatroomNo") Long chatroomNo) {
+	public List<Map<String, Object>> getParticipants(@RequestParam("chatroomNo") Long chatroomNo) {
 	    Chatroom chatroom = chatroomService.selectChatroomOne(chatroomNo);
 	    if (chatroom == null) {
 	        throw new RuntimeException("채팅방 정보를 찾을 수 없습니다.");
 	    }
-	    // ChatroomAttendee에서 참여자 정보 가져오기
-	    List<String> participantNames = new ArrayList<String>();
-	    
+
+	    List<Map<String, Object>> participantList = new ArrayList<>();
 	    for (ChatroomAttendee mapping : chatroom.getChatroomMapping()) {
-	        participantNames.add(mapping.getAttendee().getEmployeeName());
+	        Employee attendee = mapping.getAttendee();
+	        Map<String, Object> info = new HashMap<>();
+	        info.put("employeeNo", attendee.getEmployeeNo());
+	        info.put("employeeName", attendee.getEmployeeName());
+	        info.put("profileImageUrl", profileService.getProfileImageUrl(attendee.getEmployeeNo()));
+	        participantList.add(info);
 	    }
-	    
-	    return participantNames;
+	    return participantList;
 	}
+
+
 	@PostMapping("/delete")
 	@ResponseBody
 	public Map<String, String> deleteChatroom(@RequestBody ChatroomDto param) {
