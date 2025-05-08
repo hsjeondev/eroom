@@ -39,4 +39,8 @@ public class ApprovalAlarmService {
 		return result;
 	}
 
+	public ApprovalAlarm findAlarmOne(Long param1) {
+		return approvalAlarmRepository.findById(param1).orElse(null);
+	}
+
 }

@@ -406,14 +406,22 @@
     			              [document.querySelector('meta[name="_csrf_header"]').content]: document.querySelector('meta[name="_csrf"]').content
     			            }
     			          })
-    			          .then(response => {
-    			            if (response.ok) {   			          
-    			              location.href = "/calendar/all";
-    			            } else {
-    			              console.error('읽음 처리 실패');
-    			            }
-    			          })
-    			          .catch(error => console.error('읽음 처리 에러:', error));
+    			          .then(response => response.json())
+    			          .then(data => {
+    			        	  console.log(data.res_msg);
+    			        	  if (data != null && data.res_code == '200') {
+    			        	    if (data.separator_code == 'R001') {
+    			        	      location.href = "/calendar/all";
+    			        	    } else if (data.separator_code == 'R002') {
+    			        	      // R002 처리 로직
+    			        	    } else if (data.separator_code == 'R003') {
+    			        	      // R003 처리 로직
+    			        	    } else if (data.separator_code == 'R004') {
+    			        	      location.href = `/approval/${data.pk}/detail`;
+    			        	    }
+    			        	  }
+    			        	})
+    			        	.catch(error => console.error('읽음 처리 에러:', error));
     			        }
     			      }
     			    });

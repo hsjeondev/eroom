@@ -32,8 +32,9 @@ public class AlarmDto {
 	private ChatAlarmDto chatAlarm;
 	private ApprovalAlarmDto approvalAlarm;
 	private LocalDateTime reg_date;
-	private String comment;
+	private String comment; // 결재 알람 코멘트
 	private String calendarAlarm_separator;
+	private Long approval_no;
 	
 	public Alarm toEntity() {
 		return Alarm.builder()

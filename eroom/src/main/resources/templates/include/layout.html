@@ -306,7 +306,9 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 	      approvalSocket.onopen = function() { console.log('결재 웹소켓 연결 성공!'); };
 	      approvalSocket.onmessage = function(event) { 
+	    	  // alert 보기 싫으면 주석처리
 	    	  alert(event.data); 
+	    	  // alert 보기 싫으면 주석처리
 			  const notificationDot = document.getElementById('notificationDot');
 			  if (notificationDot) {
 			    notificationDot.style.display = 'block'; // 빨간 점 표시
