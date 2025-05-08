@@ -51,6 +51,9 @@ public class Article {
 
     @Column(name = "visible_yn")
     private String visibleYn ; // 기본값
+    
+    @Column(name = "article_emergency_yn")
+    private String articleEmergencyYn ; // 기본값
 
     @Column(name = "article_creator")
     private Long articleCreator;
