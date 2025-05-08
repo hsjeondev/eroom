@@ -19,8 +19,9 @@ public interface ArticleRepository extends JpaRepository<Article, Long>{
 
 	
 	// 공지 게시판 조회
-	List<Article> findBySeparatorCodeAndVisibleYnOrderByArticleRegDateDesc(String separatorCode, String visibleYn);
-	
+	 List<Article> findBySeparatorCodeAndVisibleYnOrderByArticleRegDateDesc(String separatorCode, String visibleYn);
+	//List<Article> findBySeparatorCodeAndVisibleYnOrderByArticleEmergencyYnDescArticleRegDateDesc(String separatorCode, String visibleYn);
+
 	// 삭제 쿼리
     @Modifying
     @Transactional  // 트랜잭션 관리 추가
