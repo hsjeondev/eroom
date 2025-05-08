@@ -1,5 +1,7 @@
 package com.eroom.websocket;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,7 +124,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
             if (!drives.isEmpty()) {
                 Drive drive = drives.get(0); // 첫 번째 드라이브 선택 (또는 여러 드라이브 처리)
-                sendData.put("drivePath", "/files/drive/chat/" + drive.getDrivePath().replaceFirst("^drive/chat/", ""));
+                String encodedFileName = URLEncoder.encode(drive.getDriveNewName(), StandardCharsets.UTF_8).replace("+", "%20");;
+                sendData.put("drivePath", "/files/drive/chat/" + encodedFileName);
                 sendData.put("driveOriName", drive.getDriveOriName());
             }
         }
