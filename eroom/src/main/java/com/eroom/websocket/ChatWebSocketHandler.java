@@ -104,7 +104,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         
         String profileImageUrl = profileDriveOpt
         	    .map(drive -> "/files/" + drive.getDrivePath()) // 여기 수정!
-        	    .orElse("/assets/img/profile/default-profile.png");
+        	    .orElse("/assets/img/team/avatar.webp");
         
         Map<String, Object> sendData = new HashMap<>();
         sendData.put("chatMessageContent", dto.getChatMessageContent());

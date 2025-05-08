@@ -1093,7 +1093,10 @@
   // 현재 방이라면 → chat-history에 메시지 렌더링
   if (!chatHistory) return;
 
-  const profileImageUrl = data.senderProfileImageUrl || "/assets/img/profile/default-profile.png";
+  const profileImageUrl = data.senderProfileImageUrl && data.senderProfileImageUrl.trim() !== ""
+	  ? data.senderProfileImageUrl
+	  : "/assets/img/profile/default-profile.png";
+  console.log("프로필 URL:", data.senderProfileImageUrl);
   const senderDisplayName = isMyMessage ? "나" : data.senderName || "알 수 없음";
 
   const wrapper = document.createElement("div");
@@ -1274,7 +1277,7 @@ function sendMessage() {
 
   //프로필 이미지 URL을 가져오기
   const myProfileImageUrl = document.querySelector('.chat_list [data-room-no="'+chatroomNo+'"] img')?.src 
-                            || '/assets/img/profile/default-profile.png';
+|| '/assets/img/profile/default-profile.png';
   // 파일이 있는 경우
   if (fileInput.files.length > 0) {
     const formData = new FormData();
