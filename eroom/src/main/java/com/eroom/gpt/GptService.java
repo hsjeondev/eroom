@@ -178,4 +178,69 @@ public class GptService {
             return "오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
         }
     }
+    
+    // 회의록 요약
+    public String summarizeMeetingContent(String meetingContent) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 프롬프트
+        String systemPrompt = """
+	    아래는 사내 회의에서 기록된 회의 내용입니다. 이 내용을 바탕으로 요점을 간결하게 요약해 주세요.
+	
+	    - 문장은 항목별로 줄 바꿈하며 나열해 주세요.
+	    - 중요 결정사항, 담당자, 일정, 요청사항 중심으로 요약해 주세요.
+	    - 날짜, 이름, 수치 등 중요한 정보는 반드시 포함해 주세요.
+	    - 추측하지 말고 명확하게 드러난 사실만 요약해 주세요.
+	    - 분량은 약 6~20줄 정도가 적절합니다.
+	    """;
+
+        GptMessageDto systemMessage = new GptMessageDto("system", systemPrompt);
+        GptMessageDto userMessage = new GptMessageDto("user", meetingContent);
+
+        GptRequestDto request = new GptRequestDto("gpt-4o-mini", List.of(systemMessage, userMessage));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(apiKey);
+
+        HttpEntity<GptRequestDto> entity = new HttpEntity<>(request, headers);
+
+        try {
+            ResponseEntity<GptResponseDto> response = restTemplate.exchange(
+                API_URL,
+                HttpMethod.POST,
+                entity,
+                GptResponseDto.class
+            );
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                String rawSummary = response.getBody()
+                                            .getChoices()
+                                            .get(0)
+                                            .getMessage()
+                                            .getContent();
+                return cleanGptSummary(rawSummary);
+            } else {
+                System.out.println("요약 응답 실패: " + response.getStatusCode());
+                return "응답을 받을 수 없습니다. 잠시 후 다시 시도해주세요.";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+        }
+    }
+    
+    // 요약 후 후처리
+    private String cleanGptSummary(String raw) {
+        if (raw == null) return "";
+
+        return raw
+            .replaceAll("(?i)^안녕하세요[.,!\\s]*", "")
+            .replaceAll("(?i)^다음은 요약입니다[.,!\\s]*", "")
+            .replaceAll("(?i)(감사합니다|이상입니다)[.!\\s]*$", "")
+            .replaceAll("\\.{2,}", "") // 말줄임표 제거
+            .replaceAll("(?m)^\\s*\\n", "") // 빈 줄 제거
+            .trim();
+    }
+
 }
