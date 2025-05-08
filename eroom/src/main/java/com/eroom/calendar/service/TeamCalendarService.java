@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.eroom.calendar.dto.TeamCalendarDto;
 import com.eroom.calendar.entity.TeamCalendar;
 import com.eroom.calendar.repository.TeamCalendarRepository;
-import com.eroom.notification.CalendarAlarmService;
 import com.eroom.websocket.TeamAlarmSocketHandler;
 
 import jakarta.transaction.Transactional;

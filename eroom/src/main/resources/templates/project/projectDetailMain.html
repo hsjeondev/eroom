@@ -23,7 +23,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
 		  </div>
 		
-		  <div>
+		  <div th:if="${isManager == true}">
 		    <a th:href="@{/project/{id}/update(id=${project.project_no})}" class="text-decoration-none text-dark">
 			  <i class="uil uil-setting fs-6 cursor-pointer"></i>
 			</a>
