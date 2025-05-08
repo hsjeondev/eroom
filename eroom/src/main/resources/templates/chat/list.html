@@ -1386,7 +1386,11 @@ function loadChatroomDetail(chatroomNo) {
                     bubble.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
                     bubble.style.maxWidth = "70%";
 
-                    if (msg.chatMessageContent) {
+                    if (msg.driveOriName) {
+                        const text = document.createElement("div");
+                        text.textContent = `[파일] ${msg.driveOriName}`;
+                        bubble.appendChild(text);
+                    } else if (msg.chatMessageContent) {
                         const text = document.createElement("div");
                         text.textContent = msg.chatMessageContent;
                         bubble.appendChild(text);

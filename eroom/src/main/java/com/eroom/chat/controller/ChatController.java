@@ -96,9 +96,6 @@ public class ChatController {
 
 	    return "chat/list";
 	}
-
-
-	
 	@GetMapping("/employes")
 	@ResponseBody
 	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam(name = "separator_code") String separatorCode) {
