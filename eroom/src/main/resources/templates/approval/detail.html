@@ -3,7 +3,7 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       th:with="isPdfMode=${param.mode} == 'pdf'"
-      layout:decorate="~{/include/layout}"
+      layout:decorate="~{include/layout}"
       th:remove="${isPdfMode} ? 'tag' : 'none'">
 
 <head>
