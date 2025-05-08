@@ -81,7 +81,7 @@ public class NavService {
             }
         }
         
-        System.out.println("rootList " + rootList);
+//        System.out.println("rootList " + rootList);
 
         return rootList;
     }
