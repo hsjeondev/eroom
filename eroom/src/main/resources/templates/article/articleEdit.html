@@ -17,15 +17,16 @@
           <!-- 작성자 정보 (히든 처리) -->
           <input type="hidden" name="employee_no"
                  th:value="${#authentication.principal.employee.employeeNo}" />
-          <input type="hidden" name="notice_no" th:value="${article.articleNo}" />
+          <input type="hidden" name="article_no" th:value="${article.articleNo}" />
 
           <div class="row g-3 mb-2">
             <!-- 긴급 공지 체크 -->
             <div class="form-check mb-0 fs-8">
-              <input class="form-check-input" type="checkbox" id="checkImportant" />
-              <span class="text-danger" data-feather="bell" style="height: 30px; width: 30px;"></span>
-              긴급 공지
-            </div>
+				  <input class="form-check-input" type="checkbox" id="checkImportant"
+				         th:checked="${article.articleEmergencyYn == 'Y'}" />
+				  <span class="text-danger" data-feather="bell" style="height: 30px; width: 30px;"></span>
+				  긴급 공지
+				</div>
             <div class="col-12">
               <input class="form-control" type="text" placeholder="제목" name="article_title" id="notice_title" 
               th:value="${article.articleTitle}"/>
@@ -42,7 +43,8 @@
           </div>
 
           <!-- 파일 -->
-          <div class="d-flex justify-content-between align-items-center">
+          <!-- <div class="d-flex justify-content-between align-items-center">
+          파일 선택
             <div class="d-flex">
               <label class="btn btn-link py-0 px-2 text-body fs-9" for="noticeAttachment">
                 <span class="fa-solid fa-paperclip"></span>
@@ -51,7 +53,7 @@
               <div id="filePreview" class="mt-2"></div>
             </div> 
             <div class="d-flex flex-column mb-3" id="filePreview">
-			  <!-- 기존 첨부파일 목록 표시 -->
+			  기존 첨부파일 목록 표시
 			  <div>기존 파일(따로 두는걸로 일단 작업중)
 				  <ul class="list-unstyled">
 				    <th:block th:each="file : ${attachList}">
@@ -68,6 +70,22 @@
 				    </th:block>
 				  </ul>
 			  </div>
+			  <div class="mb-3">
+				  <label class="form-label">📎 기존 첨부파일</label>
+				  <ul class="list-unstyled" id="existingFileList">
+				    <th:block th:each="file : ${attachList}">
+				      <li class="mb-1">
+				        <span class="badge bg-light text-dark d-flex align-items-center justify-content-between px-2 py-1"
+				              style="font-size: 0.85rem; min-width: 180px;">
+				          <a th:href="@{${file.drivePath}}" target="_blank" th:text="${file.driveOriName}" class="me-2 text-decoration-none text-dark"></a>
+				          <button type="button" class="btn btn-sm btn-outline-danger ms-2 py-0 px-1"
+				                  th:onclick="'removeFile(' + ${file.driveAttachNo} + ')'" aria-label="삭제"
+				                  style="font-size: 0.7rem;">✕</button>
+				        </span>
+				      </li>
+				    </th:block>
+				  </ul>
+				</div>
 			</div>
 			            
             <div class="d-flex">
@@ -75,8 +93,52 @@
                 수정<span class="fa-solid fa-paper-plane ms-1"></span>
               </button>
             </div>
-          </div><!-- 파일 -->
+          </div> --><!-- 파일 -->
           
+          <div class="d-flex justify-content-between align-items-center">
+          <div id="filePreview" class="mt-2">
+    <!-- 파일 선택 -->
+	    <div class="d-flex">
+	        <label class="btn btn-link py-0 px-2 text-body fs-9" for="noticeAttachment">
+	            <span class="fa-solid fa-paperclip"></span>
+	        </label>
+	        <input class="d-none" id="noticeAttachment" name="article_files" type="file" multiple />
+	        <div id="filePreview" class="mt-2" th:if="${attachList == null or attachList.isEmpty()}">
+	            <!-- 파일을 선택하지 않은 경우, 아무것도 표시되지 않음 -->
+	            <ul id="newFileList" class="list-unstyled" style="margin-top: 0;"></ul>
+	        </div>
+	        <div id="filePreview" class="mt-2" th:if="${attachList != null and !attachList.isEmpty()}">
+	            <!-- 기존 첨부파일 목록 표시 -->
+	            <ul class="list-unstyled" style="margin-bottom: 0;">
+	  <th:block th:each="file : ${attachList}">
+	    <li class="mb-1">
+	      <span class="badge bg-light text-dark d-flex align-items-center justify-content-between px-2 py-1"
+	            style="font-size: 0.85rem; min-width: 180px; ">
+	        <span>
+	          <a th:href="@{${file.drivePath}}" target="_blank"
+	             th:text="${file.driveOriName}" 
+	             class="me-2 text-decoration-none text-dark"></a>
+	          <small th:text="|(${#numbers.formatDecimal(file.driveSize / 1024, 1, 1)} KB)|"></small>
+	        </span>
+	        <button type="button" class="btn btn-sm btn-outline-danger ms-2 py-0 px-1"
+	                th:onclick="'removeFile(' + ${file.driveAttachNo} + ', this)'" aria-label="삭제"
+	                style="font-size: 0.7rem;">✕</button>
+	      </span>
+	    </li>
+	  </th:block>
+	</ul>
+    <ul id="newFileList" class="list-unstyled" style="margin-top: 0;"></ul>
+	        </div>
+	    </div>
+</div>
+    <!-- 버튼들 -->
+    <div class="d-flex">
+
+        <button class="btn btn-primary fs-10" type="button" id="submitBtn">
+            수정<span class="fa-solid fa-paper-plane ms-1"></span>
+        </button>
+    </div>
+</div>
         </form>
       </div>
     </div>
@@ -99,11 +161,19 @@
 	    alert("내용을 입력해주세요.");
 	    return;
 	  }
-
+	  let existingInput = document.querySelector('input[name="notice_emergency_yn"]');
+	  if (existingInput) {
+	    existingInput.remove(); // 중복 방지
+	  }
+	  const emergencyInput = document.createElement('input');
+	  emergencyInput.type = 'hidden';
+	  emergencyInput.name = 'article_emergency_yn';
+	  emergencyInput.value = document.getElementById('checkImportant').checked ? 'Y' : 'N';
+	  form.appendChild(emergencyInput);
 	  // 공지 등록을 확인하는 메시지
 	  if (confirm("공지를 수정하시겠습니까?")) {
 	    tinymce.triggerSave(); // TinyMCE 에디터의 내용을 폼 데이터에 저장
-
+		
 	    const payload = new FormData(form);
 
 	    selectedFiles.forEach(file => {
@@ -144,43 +214,41 @@
     });
 
     function renderFilePreview() {
-      const previewContainer = document.getElementById('filePreview');
-      previewContainer.innerHTML = '';
+    	  const newFileList = document.getElementById('newFileList');
+    	  if (!newFileList) return;
 
-      if (selectedFiles.length === 0) return;
+    	  newFileList.innerHTML = ''; // 새 파일 목록만 초기화
 
-      const ul = document.createElement('ul');
-      ul.className = 'list-unstyled';
+    	  if (selectedFiles.length === 0) return;
 
-      selectedFiles.forEach((file, index) => {
-        const li = document.createElement('li');
-        li.className = 'mb-1';
+    	  selectedFiles.forEach((file, index) => {
+    	    const li = document.createElement('li');
+    	    li.className = 'mb-1';
 
-        const fileNameHtml = file.downloadUrl
-          ? `<a href="${file.downloadUrl}" target="_blank">${file.name}</a>`
-          : file.name;
+    	    const fileNameHtml = file.downloadUrl
+    	      ? `<a href="${file.downloadUrl}" target="_blank">${file.name}</a>`
+    	      : file.name;
 
-        li.innerHTML = `
-          <span class="badge bg-light text-dark d-flex align-items-center justify-content-between px-2 py-1"
-                style="font-size: 0.85rem; min-width: 180px;">
-            ${fileNameHtml} <small>(${(file.size / 1024).toFixed(1)} KB)</small>
-            <button type="button" class="btn btn-sm btn-outline-secondary ms-2 py-0 px-1"
-                    style="font-size: 0.7rem; line-height: 1;" onclick="removeSelectedFile(${index})">✕</button>
-          </span>
-        `;
-        ul.appendChild(li);
-      });
-
-      previewContainer.appendChild(ul);
-    }
+    	    li.innerHTML = `
+    	      <span class="badge bg-light text-dark d-flex align-items-center justify-content-between px-2 py-1"
+    	            style="font-size: 0.85rem; min-width: 180px;">
+    	        ${fileNameHtml} <small>(${(file.size / 1024).toFixed(1)} KB)</small>
+    	        
+    	                <button type="button" class="btn btn-sm btn-outline-danger ms-2 py-0 px-1"
+    	                    style="font-size: 0.7rem;" onclick="removeSelectedFile(${index})">✕</button>
+    	      </span>
+    	    `;
+    	    newFileList.appendChild(li);
+    	  });
+    	}
 
     function removeSelectedFile(index) {
       selectedFiles.splice(index, 1);
       renderFilePreview();
     }
     
-    function removeFile(attachNo) {
-        if (!confirm("정말 삭제하시겠습니까?")) return;
+    function removeFile(attachNo,btn) {
+        if (!confirm("정말 삭제하시겠습니까?\n※기존에 있던 파일입니다.\n")) return;
         console.log('삭제할 파일의 attachNo:', attachNo);
         fetch('/article/file/delete/' + attachNo, {
           method: 'POST',
@@ -195,7 +263,13 @@
           alert(data.res_msg);
           if (data.res_code == 200) {
             // 페이지 새로고침 또는 해당 파일 DOM에서 제거
-            location.reload(); // 또는 직접 해당 li 제거 처리
+            // location.reload(); // 또는 직접 해당 li 제거 처리
+            
+            // 12 : 51 추가한 한줄
+        	//  fileElement.remove();
+        	  const li = btn.closest('li');
+              if (li) li.remove();
+           
           }
         })
         .catch(err => {
