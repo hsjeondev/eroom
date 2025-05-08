@@ -35,8 +35,8 @@
 						<div class="d-flex">
 							<div class="me-3 flex-1 mt-2">
 								<h4 class="fs-9 text-body-emphasis"
-									th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '회사 일정 공지' :
-                        alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '팀 일정 공지' :
+									th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm_separator?.startsWith('A') ? '회사 일정 공지' :
+                        alarm.separator_code == 'R001' and alarm.calendarAlarm_separator?.startsWith('T') ? '팀 일정 공지' :
                         alarm.separator_code == 'R002' ? '채팅 알림' :
                         alarm.separator_code == 'R003' ? '메일 알림' :
                         alarm.separator_code == 'R004' ? '결재 알림' : '기타 알림'}">
@@ -46,8 +46,8 @@
 									<span class="me-2"><i
 										class="fas fa-bullhorn text-primary"></i></span> <span
 										class="fw-bold text-dark"
-										th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '🧾 새로운 회사 일정 등록' :
-                            alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '👥 새로운 팀 일정 등록' :
+										th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm_separator?.startsWith('A') ? '🧾 새로운 회사 일정 등록' :
+                            alarm.separator_code == 'R001' and alarm.calendarAlarm_separator?.startsWith('T') ? '👥 새로운 팀 일정 등록' :
                             alarm.separator_code == 'R002' ? '💬 새로운 채팅 알림' :
                             alarm.separator_code == 'R003' ? '📩 새로운 메일 알림' :
                             alarm.separator_code == 'R004' ? '📋 새로운 결재 요청' : '새로운 알림'}">
@@ -83,8 +83,8 @@
 
 							<div class="me-3 flex-1 mt-2">
 								<h4 class="fs-9 text-body-emphasis"
-									th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '회사 일정 공지' :
-									  alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '팀 일정 공지' :
+									th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm_separator?.startsWith('A') ? '회사 일정 공지' :
+									  alarm.separator_code == 'R001' and alarm.calendarAlarm_separator?.startsWith('T') ? '팀 일정 공지' :
 									  alarm.separator_code == 'R002' ? '채팅 알림' :
 									  alarm.separator_code == 'R003' ? '메일 알림' :
 									  alarm.separator_code == 'R004' ? '결재 알림' : '기타 알림'}">
@@ -94,8 +94,8 @@
 									<span class="me-2"><i
 										class="fas fa-bullhorn text-primary"></i></span> <span
 										class="fw-bold text-dark"
-										th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '🧾 새로운 회사 일정 등록' :
-										  alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '👥 새로운 팀 일정 등록' :
+										th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm_separator?.startsWith('A') ? '🧾 새로운 회사 일정 등록' :
+										  alarm.separator_code == 'R001' and alarm.calendarAlarm_separator?.startsWith('T') ? '👥 새로운 팀 일정 등록' :
 										  alarm.separator_code == 'R002' ? '💬 새로운 채팅 알림' :
 										  alarm.separator_code == 'R003' ? '📩 새로운 메일 알림' :
 										  alarm.separator_code == 'R004' ? '📋 새로운 결재 요청' : '새로운 알림'}">
@@ -139,8 +139,8 @@
 									<div class="d-flex">
 										<div class="me-3 flex-1 mt-2">
 											<h4 class="fs-9 text-body-emphasis"
-												th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '회사 일정 공지' :
-                            alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '팀 일정 공지' :
+												th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm_separator?.startsWith('A') ? '회사 일정 공지' :
+                            alarm.separator_code == 'R001' and alarm.calendarAlarm_separator?.startsWith('T') ? '팀 일정 공지' :
                             alarm.separator_code == 'R002' ? '채팅 알림' :
                             alarm.separator_code == 'R003' ? '메일 알림' :
                             alarm.separator_code == 'R004' ? '결재 알림' : '기타 알림'}">
@@ -150,8 +150,8 @@
 												<span class="me-2"><i
 													class="fas fa-bullhorn text-primary"></i></span> <span
 													class="fw-bold text-dark"
-													th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '🧾 새로운 회사 일정 등록' :
-                                alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '👥 새로운 팀 일정 등록' :
+													th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm_separator?.startsWith('A') ? '🧾 새로운 회사 일정 등록' :
+                                alarm.separator_code == 'R001' and alarm.calendarAlarm_separator?.startsWith('T') ? '👥 새로운 팀 일정 등록' :
                                 alarm.separator_code == 'R002' ? '💬 새로운 채팅 알림' :
                                 alarm.separator_code == 'R003' ? '📩 새로운 메일 알림' :
                                 alarm.separator_code == 'R004' ? '📋 새로운 결재 요청' : '새로운 알림'}">
