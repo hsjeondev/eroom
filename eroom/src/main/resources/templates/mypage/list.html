@@ -379,39 +379,60 @@
 					</div> -->
 <hr>
 <!-- 근태 현황 목록 테이블 -->     
-<div id="attendanceTable" data-list='{"valueNames":["no","date","checkin","checkout","late","early"],"page":10,"pagination":true}'>
+<div id="attendanceTable" data-list='{"valueNames":["no","date","checkin","checkout","late","early"]}'><!-- ,"page":10,"pagination":true -->
   <!-- 상단: 날짜 선택 + 검색창 -->
-  <div class="d-flex justify-content-between align-items-center mb-3 px-3 gap-2 flex-wrap">
-     <div class="row g-2 mb-4">
-		<div class="d-flex justify-content-start align-items-center mb-2">
-			<!-- <i class="fas fa-user-tie text-secondary me-2"></i> -->
-			<span class="fw-bold fs-7">근태 현황</span>
-		</div>
-	</div>
-        <!-- 검색창 -->
-    <div class="flex-grow-1 d-flex justify-content-center">
-      <div class="search-box w-50">
-        <form class="position-relative">
-          <input class="form-control form-control-sm search-input search" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
-          <svg style="height:40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-            <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
-          </svg>
-        </form>
-      </div>
+<!-- 상단: 제목 + 검색 + 월선택 + 엑셀버튼 -->
+<div class="d-flex justify-content-between align-items-center mb-3 px-3 gap-2 flex-wrap">
+
+  <!-- 왼쪽: 제목 -->
+  <div class="row g-2 mb-4">
+    <div class="d-flex justify-content-start align-items-center mb-2">
+      <span class="fw-bold fs-7">근태 현황</span>
     </div>
-    <!-- 날짜 선택 -->
-    <div>
-    <form th:action="@{/mypage/list}" method="get" id="monthSelectForm" th:if="${monthList != null}">
-	      <select class="form-select form-select-sm" data-list-filter="data-list-filter" 
-	      	name="month" id="month" onchange="this.form.submit()">
-	        <option th:each="month : ${monthList}"
-	            th:value="${month}" th:text="${month}" 
-	        	th:selected="${month == selectedMonth}"></option>
-	      </select>
+  </div>
+
+  <!-- 가운데: 검색창 -->
+  <div class="flex-grow-1 d-flex justify-content-center">
+    <div class="search-box w-50">
+      <form class="position-relative">
+        <input class="form-control form-control-sm search-input search" type="search"
+               placeholder="검색어를 입력하세요." aria-label="Search">
+        <svg style="height:40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true"
+             focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img"
+             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <path fill="currentColor"
+                d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/>
+        </svg>
       </form>
     </div>
-
   </div>
+
+  <!-- 오른쪽: 엑셀 버튼 + 월 선택 -->
+  <div class="d-flex align-items-center gap-2">
+    <!-- 엑셀 다운로드 버튼 -->
+    <form th:action="@{/mypage/attendanceExcel}" method="get" class="me-2">
+      <input type="hidden" name="month" th:value="${selectedMonth}" />
+      <button type="submit" class="btn btn-link text-body px-0" title="엑셀로 내보내기">
+        <svg class="svg-inline--fa fa-file-export fs-9 me-1" aria-hidden="true" focusable="false"
+             data-prefix="fas" data-icon="file-export" role="img"
+             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="14" height="14" style="display: inline-block;">
+          <path fill="currentColor"
+                d="M0 64C0 28.7 28.7 0 64 0H224V128c0 17.7 14.3 32 32 32H384V288H216c-13.3 0-24 10.7-24 24s10.7 24 24 24H384V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64zM384 336V288H494.1l-39-39c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l39-39H384zm0-208H256V0L384 128z"/>
+        </svg>
+        Excel
+      </button>
+    </form>
+
+    <!-- 월 선택 셀렉트 -->
+    <form th:action="@{/mypage/list}" method="get" id="monthSelectForm" th:if="${monthList != null}">
+      <select class="form-select form-select-sm" name="month" id="month" onchange="this.form.submit()">
+        <option th:each="month : ${monthList}"
+                th:value="${month}" th:text="${month}"
+                th:selected="${month == selectedMonth}"></option>
+      </select>
+    </form>
+  </div>
+</div>
 
   <!-- 테이블 -->
 	<div class="table-responsive">
@@ -444,7 +465,7 @@
 	</div>
 
   <!-- 페이징 -->
-	<div class="row justify-content-center py-2 fs-9">
+<!-- 	<div class="row justify-content-center py-2 fs-9">
 	    <div class="col-auto d-flex">
 	      <button class="page-link disabled" data-list-pagination="prev" disabled>
 	        <i class="fas fa-chevron-left"></i>
@@ -456,9 +477,9 @@
 	        <i class="fas fa-chevron-right"></i>
 	      </button>
 	    </div>
-	</div>
+	</div> -->
 </div><!-- 근태현황 목록 테이블 끝 -->
-    
+<br><br><br>    
 <!-- 프로필 사진 변경 모달 -->
 <div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
