@@ -1,4 +1,4 @@
-package com.eroom.notification.entity;
+package com.eroom.calendar.entity;
 
 import java.time.LocalDateTime;
 

@@ -3,6 +3,7 @@ package com.eroom.notification.dto;
 import java.time.LocalDateTime;
 
 import com.eroom.approval.dto.ApprovalAlarmDto;
+import com.eroom.calendar.dto.CalendarAlarmDto;
 import com.eroom.chat.dto.ChatAlarmDto;
 import com.eroom.mail.dto.MailAlarmDto;
 import com.eroom.notification.entity.Alarm;
