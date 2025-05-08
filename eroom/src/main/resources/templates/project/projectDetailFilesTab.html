@@ -56,13 +56,15 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		    </div>
 
 		    <!-- 파일 올리기 버튼 -->
-		    <button 
-		      type="button" 
-		      class="btn btn-primary" 
-		      data-bs-toggle="modal" 
-		      data-bs-target="#addFileModal">
-		      파일 올리기
-		    </button>
+		    <div th:if="${isMember == true}">
+		    	<button 
+			      type="button" 
+			      class="btn btn-primary" 
+			      data-bs-toggle="modal" 
+			      data-bs-target="#addFileModal">
+			      파일 올리기
+			    </button>
+		    </div>
 
 		  </div>
 
@@ -84,7 +86,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		              <th class="sort py-2" data-sort="date">등록일</th>
 		              <th class="sort py-2" data-sort="download">다운로드횟수</th>
 		              <th class="text-end pe-0 py-2">
-		                <div class="btn-reveal-trigger position-static">
+		                <div th:if="${isMember == true}" class="btn-reveal-trigger position-static">
 		                  <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
 		                    <i class="fas fa-ellipsis fs-10"></i>
 		                  </button>
@@ -123,7 +125,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		  		    <td class="align-middle date" th:text="${#temporals.format(file.driveRegDate, 'yyyy-MM-dd')}">등록일</td>
 		  		    <td class="align-middle download" th:text="${file.downloadCount}">다운로드횟수</td>
 		  		    <td class="align-middle text-end pe-0">
-		  		      <div class="btn-reveal-trigger position-static">
+		  		      <div th:if="${isMember == true }" class="btn-reveal-trigger position-static">
 		  		        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
 		  		          <i class="fas fa-ellipsis fs-10"></i>
 		  		        </button>
