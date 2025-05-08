@@ -52,6 +52,7 @@ public class ArticleService {
 	                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
 
 	         // 게시글 정보 업데이트
+	         article.setArticleEmergencyYn(articleDto.getArticle_emergency_yn());
 	         article.setArticleTitle(articleDto.getArticle_title());
 	         article.setArticleContent(articleDto.getArticle_content());
 	         article.setArticleModDate(LocalDateTime.now());  // 수정일 추가
@@ -62,7 +63,7 @@ public class ArticleService {
 	                 String oriName = file.getOriginalFilename();
 	                 String ext = oriName.substring(oriName.lastIndexOf("."));
 	                 String newName = UUID.randomUUID().toString().replace("-", "") + ext;
-	                 String path = fileDir + "article/notice" + newName;
+	                 String path = fileDir + "article/notice/" + newName;
 
 	                 File savedFile = new File(path);
 	                 if (!savedFile.getParentFile().exists()) {
@@ -75,7 +76,7 @@ public class ArticleService {
 	                 drive.setDriveNewName(newName);
 	                 drive.setDriveSize(file.getSize());
 	                 drive.setDriveType(ext);
-	                 drive.setDrivePath("article/notice" + newName);
+	                 drive.setDrivePath("article/notice/" + newName);
 	                 drive.setUploader(Employee.builder().employeeNo(articleDto.getEmployee_no()).build());
 	                 drive.setParam1(article.getArticleNo());
 	                 drive.setSeparatorCode("FL004");
@@ -88,6 +89,7 @@ public class ArticleService {
 	         result = 1;
 	     } catch (Exception e) {
 	         e.printStackTrace();
+	         throw new RuntimeException("게시글 수정 중 오류 발생", e); // 예외를 다시 던져야 트랜잭션도 롤백됨
 	     }
 
 	     return result;
@@ -140,7 +142,7 @@ public class ArticleService {
 	                String oriName = file.getOriginalFilename();
 			        String ext = oriName.substring(oriName.lastIndexOf("."));
 			        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
-			        String path = fileDir + "article/notice" + newName;
+			        String path = fileDir + "article/notice/" + newName;
 	                DriveDto driveDto = new DriveDto();
 	                
 	                File savedFile = new File(path);
@@ -161,7 +163,7 @@ public class ArticleService {
 	                drive.setDriveNewName(newName); // 파일 고유 이름 생성
 	                drive.setDriveSize(driveDto.getDriveSize());
 	                drive.setDriveType(ext);
-	                drive.setDrivePath("article/notice" + newName); // 실제 저장 경로로 변경 필요
+	                drive.setDrivePath("article/notice/" + newName); // 실제 저장 경로로 변경 필요
 	                drive.setUploader(Employee.builder().employeeNo(articleDto.getEmployee_no()).build());
 	                drive.setParam1(articleSaver.getArticleNo()); // 메일 참조 연결
 	                drive.setSeparatorCode("FL004");

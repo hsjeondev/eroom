@@ -27,6 +27,10 @@ public class ArticleDto {
 	@Builder.Default
 	private String visible_yn="Y";
 	
+	@Builder.Default
+	private String article_emergency_yn="N";
+	
+	
 	private LocalDateTime article_reg_date;
 	private LocalDateTime article_mod_date;
 
@@ -48,6 +52,7 @@ public class ArticleDto {
 	            .separatorCode(separator_code)
 	            .order_num(order_num)
 	            .visibleYn(visible_yn)
+	            .articleEmergencyYn(article_emergency_yn)
 	            .articleCreator(article_creator)
 	            .articleEditor(article_editor)
 	            .articleRegDate(article_reg_date)
