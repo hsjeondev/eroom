@@ -98,17 +98,11 @@ public class AlarmService {
 	         alarmRepository.save(updated);
 	         // 확인용 이전 Alarm Entity 반환
 	         if("R001".equals(target.getSeparatorCode())) {
-	        	 // pk 넣든 필요한 거 넣으세요
-	        	 map.put("separator_code", "R001");
-	        	 return map;
+	        	 return null;
 	         } else if("R002".equals(target.getSeparatorCode())) {
-	        	 // pk 넣든 필요한 거 넣으세요
-	        	 map.put("separator_code", "R002");
-	        	 return map;
+	        	 return null;
 	         } else if("R003".equals(target.getSeparatorCode())) {
-	        	 // pk 넣든 필요한 거 넣으세요
-	        	 map.put("separator_code", "R003");
-	        	 return map;
+	        	 return null;
 	        	 
 	         } else if("R004".equals(target.getSeparatorCode())) {
 	        	 ApprovalAlarm approvalAlarm = approvalAlarmService.findAlarmOne(target.getParam1());
