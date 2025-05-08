@@ -1,4 +1,4 @@
-package com.eroom.notification;
+package com.eroom.calendar.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -8,13 +8,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.eroom.calendar.dto.CalendarAlarmDto;
+import com.eroom.calendar.entity.CalendarAlarm;
 import com.eroom.calendar.entity.CompanyCalendar;
 import com.eroom.calendar.entity.TeamCalendar;
+import com.eroom.calendar.repository.CalendarAlarmRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
-import com.eroom.notification.dto.CalendarAlarmDto;
-import com.eroom.notification.entity.CalendarAlarm;
-import com.eroom.notification.repository.CalendarAlarmRepository;
 import com.eroom.security.EmployeeDetails;
 import com.eroom.websocket.TeamAlarmSocketHandler;
 

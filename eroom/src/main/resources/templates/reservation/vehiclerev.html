@@ -48,7 +48,7 @@
 								</thead>
 								<tbody class="list align-middle">
 									<tr th:if="${#lists.isEmpty(list)}">
-										<td colspan="5">등록된 차량이 없습니다 😓</td>
+										<td colspan="5">등록된 차량이 없습니다 🥹</td>
 									</tr>
 									<tr class="align-middle vehicle-row"
 										th:if="${!#lists.isEmpty(list)}"
@@ -57,7 +57,7 @@
 										<td class="vehicle" th:text="${result.facilityName}"></td>
 										<td class="passengers" th:text="${result.facilityCapacity}"></td>
 										<td class="date"
-											th:text="${#temporals.format(result.facilityRegDate, 'yy-MM-dd')}"></td>
+											th:text="${#temporals.format(result.facilityRegDate, 'yy.MM.dd')}"></td>
 										<td class="text-end pe-0">
 											<button class="btn btn-sm btn-outline-primary"
 												data-bs-toggle="modal" data-bs-target="#addEventModal"
@@ -115,7 +115,7 @@
 									<td th:text="${res.vehicleName}"></td>
 									<td th:text="${res.reserverName}"></td>
 									<td
-										th:text="${#temporals.format(res.reservation_start, 'yyyy-MM-dd')}"></td>
+										th:text="${#temporals.format(res.reservation_start, 'yyyy.MM.dd')}"></td>
 									
 									<td><span
 										th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span>

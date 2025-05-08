@@ -12,6 +12,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import com.eroom.approval.entity.Approval;
 import com.eroom.approval.entity.ApprovalAlarm;
 import com.eroom.approval.service.ApprovalAlarmService;
+import com.eroom.employee.entity.Employee;
+import com.eroom.employee.service.EmployeeService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +26,18 @@ public class ApprovalWebSocketHandler extends TextWebSocketHandler {
     // employeeNo -> 세션 매핑
     private static Map<Long, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final ApprovalAlarmService approvalAlarmService;
+    private final EmployeeService employeeService;
+    
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         // 연결될 때 employeeNo 가져오기
-        Long employeeNo = (Long) session.getAttributes().get("employeeNo");
+//        Long employeeNo = (Long) session.getAttributes().get("employeeNo");
+    	String userId = session.getPrincipal().getName();
+        Employee employee = employeeService.findEmployeeByEmployeeId(userId);
+        Long employeeNo = employee.getEmployeeNo();
+        
+        System.out.println("출력 테스트 : " + userId);
         if (employeeNo != null) {
             sessions.put(employeeNo, session);
             log.info("웹소켓 연결됨: employeeNo={}", employeeNo);
@@ -46,7 +55,9 @@ public class ApprovalWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         // 연결 끊길 때 employeeNo 기준으로 세션 정리
-        Long employeeNo = (Long) session.getAttributes().get("employeeNo");
+    	String userId = session.getPrincipal().getName();
+        Employee employee = employeeService.findEmployeeByEmployeeId(userId);
+        Long employeeNo = employee.getEmployeeNo();
         if (employeeNo != null) {
             sessions.remove(employeeNo);
             log.info("웹소켓 연결 종료: employeeNo={}", employeeNo);

@@ -42,7 +42,7 @@ public class CalendarController {
 	private final DepartmentCalendarService departmentService;
 
 
-	@GetMapping("/calendar")
+	@GetMapping("/calendar/all")
 	public String calendarView() {
 		return "calendar/list";
 	}

@@ -7,6 +7,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 <head>
 <meta charset="UTF-8">
 <title>차량 목록</title>
+<style>
+	.table tbody > tr {
+	  height: 45px;  /* 또는 48px, 필요에 따라 조정 */
+	}
+</style>
 </head> 
 <body>
 <main class="main" id="top" layout:fragment="content">
@@ -17,7 +22,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		<span class="fw-bold fs-7"> 차량 목록</span>
 	</div>
 
-	<div id="vehicleTable" data-list='{"valueNames":["no","vehicle","passengers","date"], "page": 5, "pagination": true}'>
+	<div id="vehicleTable" data-list='{"valueNames":["no","vehicle","passengers","regDate","modDate"], "page": 5, "pagination": true}'>
 		<!-- 검색창 + 추가 버튼 영역 -->
 		<div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
 			<!-- 검색창 (가운데 정렬) -->
@@ -35,7 +40,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			</div>
 			<!-- 추가 버튼 (오른쪽 고정) -->
 			<button class="btn btn-sm btn-primary position-absolute top-0 end-0" type="button"
-				data-bs-toggle="modal" data-bs-target="#addVehicleModal">
+				data-bs-toggle="modal" data-bs-target="#createVehicleModal">
 			 	차량 등록
 			</button>
 		</div>
@@ -46,8 +51,9 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					<tr>
 						<th class="sort" data-sort="no" style="width: 5%;">번호</th>
 						<th class="sort" data-sort="vehicle" style="width: 25%;">차량</th>
-						<th class="sort" data-sort="passengers" style="width: 20%;">탑승 가능 인원</th>
-						<th class="sort" data-sort="date" style="width: 20%;">등록일</th>
+						<th class="sort" data-sort="passengers" style="width: 20%;">탑승 정원</th>
+						<th class="sort" data-sort="regDate" style="width: 20%;">등록일</th>
+						<th class="sort" data-sort="modDate" style="width: 20%;">수정일</th>
 						<th style="width: 10%;"></th>
 					</tr>
 				</thead>
@@ -56,23 +62,26 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					<tr th:if="${!#lists.isEmpty(vehicleList)}" th:each="vehicle, status : ${vehicleList}" class="align-middle">
 						<td class="no" th:text="${status.count}">번호</td>
 						<td class="vehicle" th:text="${vehicle.facilityName}">차량명</td>
-						<td class="passengers" th:text="|${vehicle.facilityCapacity}명|">탑승 가능 인원</td>
-						<td class="date" th:text="${#temporals.format(vehicle.facilityRegDate, 'yy.MM.dd')}">등록일</td>
+						<td class="passengers" th:text="|${vehicle.facilityCapacity}명|">탑승 정원</td>
+						<td class="regDate" th:text="${#temporals.format(vehicle.facilityRegDate, 'yy.MM.dd')}">등록일</td>
+						<td class="regDate" th:text="${vehicle.facilityModDate != null} ? ${#temporals.format(vehicle.facilityModDate, 'yyyy.MM.dd')} : '-'">수정일</td>
 						<td class="text-end pe-0">
 							<div class="btn-reveal-trigger position-static">
 								<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
 									<i class="fas fa-ellipsis fs-10"></i>
 								</button>
 								<div class="dropdown-menu dropdown-menu-end py-2">
-									<a class="dropdown-item" href="#!">수정</a>
+									<a class="dropdown-item editVehicleBtn" href="#!"
+										th:attr="data-facility-no=${vehicle.facilityNo}">수정</a>
 										<div class="dropdown-divider"></div>
-									<a class="dropdown-item text-danger" href="#!">삭제</a>
+									<a class="dropdown-item text-danger deleteVehicleBtn" href="#!"
+										th:attr="data-facility-no=${vehicle.facilityNo}">삭제</a>
 								</div>
 							</div>
 						</td>
 					</tr>
 					<tr th:if="${#lists.isEmpty(vehicleList)}">
-						<td colspan="5">등록된 차량이 없습니다.</td>
+						<td colspan="6">등록된 차량이 없습니다.</td>
 					</tr>
 				</tbody>
 			</table>
@@ -156,37 +165,612 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	</div> <!-- reservationTable -->   
 </div> <!-- mb-3 차량예약목록 -->      
 
-<!-- 차량 추가 모달 -->
-<div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
-			<!-- 헤더 -->
-			<div class="modal-header">
-			  <h5 class="modal-title" id="addVehicleModalLabel">차량 등록</h5>
-			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<!-- 바디 -->
-			<div class="modal-body">
-				<form id="addVehicleForm">
-					<div class="mb-3">
-					  <label for="vehicleName" class="form-label">차량[번호]</label>
-					  <input type="text" class="form-control form-control-sm" id="vehicleName" placeholder="예: k9[20마 9330]">
-					</div>
-					<div class="mb-3">
-					  <label for="vehicleCapacity" class="form-label">탑승 인원</label>
-					  <input type="number" class="form-control form-control-sm" id="vehicleCapacity" placeholder="예: 10">
-					</div>
-				</form>
-			</div>
-			<!-- 푸터 -->
-			<div class="modal-footer">
-			  <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">닫기</button>
-			  <button type="submit" class="btn btn-primary btn-sm" form="addVehicleForm">등록</button>
-			</div>
-		</div>
-	</div>
+<!-- 차량 등록 모달 -->
+<div class="modal fade" id="createVehicleModal" tabindex="-1" aria-labelledby="createVehicleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+    <div class="modal-content border border-secondary">
+      <form id="createVehicleForm" autocomplete="off">
+        <!-- 헤더 -->
+        <div class="modal-header bg-light">
+          <h5 class="modal-title" id="createVehicleModalLabel">차량 등록</h5>
+          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- 바디 -->
+        <div class="modal-body px-4 py-3">
+          <!-- 차량명 -->
+          <div class="mb-3">
+            <label for="createVehicleName" class="form-label fw-semibold">차량명</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="createVehicleName" name="facility_name" required placeholder="차량명 [00가 0000]">
+              <button type="button" class="btn btn-outline-secondary" id="checkVehicleNameBtn">중복확인</button>
+            </div>
+            <small id="vehicleNameCheckMsg" class="form-text d-none"></small>
+          </div>
+          <!-- 탑승 정원 -->
+          <div class="mb-3">
+            <label for="createVehicleCapacity" class="form-label fw-semibold">탑승 정원</label>
+            <input type="number" class="form-control" id="createVehicleCapacity" name="facility_capacity" required min="1" placeholder="숫자만 입력">
+          </div>
+        </div>
+
+        <!-- 푸터 -->
+        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="saveCreateVehicleBtn">등록</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
+<!-- 차량 수정 모달 -->
+<div class="modal fade" id="editVehicleModal" tabindex="-1" aria-labelledby="editVehicleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+    <div class="modal-content border border-secondary">
+      <form id="editVehicleForm" autocomplete="off">
+        <!-- 헤더 -->
+        <div class="modal-header bg-light">
+          <h5 class="modal-title" id="editVehicleModalLabel">차량 정보 수정</h5>
+          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- 바디 -->
+        <div class="modal-body px-4 py-3">
+          <!-- 차량명 -->
+          <div class="mb-3">
+            <label for="editVehicleName" class="form-label fw-semibold">차량명</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="editVehicleName" name="facility_name" required placeholder="차량명 [00가 0000]">
+              <button type="button" class="btn btn-outline-secondary" id="editCheckVehicleNameBtn">중복확인</button>
+            </div>
+            <small id="editVehicleNameCheckMsg" class="form-text d-none"></small>
+          </div>
+          <!-- 탑승 정원 -->
+          <div class="mb-3">
+            <label for="editVehicleCapacity" class="form-label fw-semibold">탑승 정원</label>
+            <input type="number" class="form-control" id="editVehicleCapacity" name="facility_capacity" required min="1">
+          </div>
+        </div>
+
+        <!-- 푸터 -->
+        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="saveEditVehicleBtn">저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 공통 저장 확인 모달 -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--  생성용 unsaved 모달 -->
+<div class="modal fade" id="unsavedCreateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 차량 등록 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmCreateCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 수정용 unsaved 모달 -->
+<div class="modal fade" id="unsavedEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 차량 수정 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmEditCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+
+document.addEventListener('DOMContentLoaded',function(){
+	
+	let currentMode = ''; // 동작 모드 : 'create', 'edit', 'delete'
+	let isCreateFormEdited = false; // 생성폼 수정 여부
+	let isEditFormEdited = false; // 수정폼 수정 여부
+	let currentFacilityNo = null; // 수정, 삭제용 차량 고유 번호
+	let isNameChecked = false; // 생성 모달에서 이름 중복확인 여부
+	let prevCreateName = ''; // 마지막 중복확인 통과한 차량명 저장	
+	let isEditNameChecked = false;
+	let prevEditName = '';
+	
+	// 모달 인스턴스 초기화(생성용)
+	const createVehicleModalEl = document.getElementById('createVehicleModal');
+	const createModal = bootstrap.Modal.getOrCreateInstance(createVehicleModalEl);
+	const unsavedCreateModal = new bootstrap.Modal(document.getElementById('unsavedCreateModal'));
+	// 생성 모달 필드 요소
+	const nameInput = document.getElementById('createVehicleName'); // 차량명
+	const capacityInput = document.getElementById('createVehicleCapacity'); // 탑승정원
+	const vehicleNameCheckMsg = document.getElementById('vehicleNameCheckMsg'); // 이름 중복확인 메세지
+	// 모달 인스턴스 초기화(수정용)
+	const editVehicleModalEl = document.getElementById('editVehicleModal');
+	const editModal = bootstrap.Modal.getOrCreateInstance(editVehicleModalEl);
+	const unsavedEditModal = new bootstrap.Modal(document.getElementById('unsavedEditModal'));
+	// 수정 모달 필드 요소
+	const editNameInput = document.getElementById('editVehicleName');
+	const editCapacityInput = document.getElementById('editVehicleCapacity');
+	const editVehicleNameCheckMsg = document.getElementById('editVehicleNameCheckMsg'); // 수정용 이름중복 메세지
+	
+	// 생성용 차량명 입력값 변경시 -> 변경 감지 플래그 ON + 중복확인 무효화 처리
+	nameInput.addEventListener('input',function(){
+		isCreateFormEdited = true; // 생성폼 수정 여부 true
+		// 중복 확인 했고, 기존 이름과 다르면 다시 확인
+		if(isNameChecked && nameInput.value.trim() !== prevCreateName){
+			isNameChecked = false;
+			vehicleNameCheckMsg.classList.add('text-danger');
+			vehicleNameCheckMsg.textContent = '다시 중복확인이 필요합니다.';
+			vehicleNameCheckMsg.classList.remove('d-none');
+		}
+	});	
+	// 생성용 탑승 정원 변경 시에도 변경 감지 플래그 ON
+	capacityInput.addEventListener('input',function(){
+		isCreateFormEdited = true;
+	});	
+	
+	// 생성 모달 닫기 : 변경사항 있으면 닫기 방지 -> unsaved 모달 띄움
+	createVehicleModalEl.addEventListener('hide.bs.modal',function(e){
+		if(isCreateFormEdited){ // 수정 여부 감지되면
+			e.preventDefault(); // 기본 닫기 방지
+			unsavedCreateModal.show(); // 수정 이력 감지 모달 열기
+		}
+	});	
+	
+	// unsavedCreateModal 확인 버튼 클릭시 -> 계속 닫기 , 값 초기화
+	document.getElementById('confirmCreateCloseBtn').addEventListener('click',function(){
+		isCreateFormEdited = false;
+		isNameChecked = false;
+		prevCreateName = '';
+		// 입력 필드 초기화
+		nameInput.value = '';
+		capacityInput.value = '';
+		// 메세지 초기화
+		vehicleNameCheckMsg.classList.add('d-none');
+		vehicleNameCheckMsg.textContent = '';
+		// 모달 닫기
+		unsavedCreateModal.hide();
+		createModal.hide();
+	});	
+	// 수정 모달 닫을때
+	editVehicleModalEl.addEventListener('hide.bs.modal',function(e){
+		if(isEditFormEdited){
+			e.preventDefault();
+			unsavedEditModal.show();
+		}
+	});	
+	
+	// unsavedEditModal 확인 버튼 클릭시 -> 계속 닫기 , 값 초기화
+	document.getElementById('confirmEditCloseBtn').addEventListener('click',function(){
+		isEditFormEdited = false;
+		isEditNameChecked = false;
+		prevEditName = '';
+		// 입력 필드 초기화
+		editNameInput.value = '';
+		editCapacityInput.value = '';
+		// 메세지 초기화
+		editVehicleNameCheckMsg.classList.add('d-none');
+		editVehicleNameCheckMsg.textContent = '';
+		// 모달 닫기
+		unsavedEditModal.hide();
+		editModal.hide();
+	});	
+	
+	// 차량명 중복 확인 버튼(생성용)
+	document.getElementById('checkVehicleNameBtn').addEventListener('click',function(){
+		const vehicleName = nameInput.value.trim().replace(/\s+/g, ''); // 모든 공백 제거
+		// 입력 없을 경우 경고
+		if(!vehicleName){
+			vehicleNameCheckMsg.textContent = '차량명을 입력해주세요.';
+			vehicleNameCheckMsg.classList.remove('d-none');
+			vehicleNameCheckMsg.classList.add('text-danger');
+			return;
+		}
+		
+		// fetch로 이름 중복 체크 서버 호출하기
+	fetch(`/admin/vehicle/checkDuplicate?vehicleName=${encodeURIComponent(vehicleName)}`)
+		.then(response => response.json())
+		.then(data => {
+			if (data.exists) {
+				isNameChecked = false;
+				vehicleNameCheckMsg.textContent = '이미 존재하는 차량명입니다.';
+				vehicleNameCheckMsg.classList.remove('text-success');
+				vehicleNameCheckMsg.classList.add('text-danger');
+			} else {
+				prevCreateName = vehicleName;
+				isNameChecked = true;
+				vehicleNameCheckMsg.textContent = '사용 가능한 차량명입니다.';
+				vehicleNameCheckMsg.classList.remove('text-danger');
+				vehicleNameCheckMsg.classList.add('text-success');
+			}
+			vehicleNameCheckMsg.classList.remove('d-none');
+		})
+		.catch(error => {
+			showAlertModal('중복 확인 중 오류가 발생했습니다.');
+			console.error(error);
+		});
+		
+	});	
+	
+	// confirmSaveModal 함수
+	function showConfirmModal(message){
+		const modalMessage = document.getElementById('confirmSaveModalMessage');
+		modalMessage.textContent = message;
+		const confirmModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+		confirmModal.show();
+	}	
+	
+	// alertModal 함수
+	function showAlertModal(message, callback) {
+		const alertMessageContent = document.getElementById('alertMessageContent');
+		const alertModalEl = document.getElementById('alertMessageModal');
+		const alertModal = bootstrap.Modal.getOrCreateInstance(alertModalEl);
+
+		alertMessageContent.textContent = message;
+
+		// 이전 이벤트 리스너 제거 (중복 방지)
+		const confirmBtn = alertModalEl.querySelector('.btn-primary');
+		const newConfirmBtn = confirmBtn.cloneNode(true);
+		confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+		// 확인 버튼에 콜백 연결
+		newConfirmBtn.addEventListener('click', function () {
+			if (callback) callback(); // 콜백이 있으면 실행
+		});
+
+		alertModal.show();
+	}		
+
+	// 생성 모달의 저장 버튼 클릭시
+	document.getElementById('saveCreateVehicleBtn').addEventListener('click',function(){
+		 currentMode = 'create';
+		 showConfirmModal('차량을 등록하시겠습니까?');
+	});
+	
+	// 수정 모달의 저장 버튼 클릭시
+	document.getElementById('saveEditVehicleBtn').addEventListener('click',function(){
+		  currentMode = 'edit';
+		  showConfirmModal('차량 정보를 수정하시겠습니까?');
+	});
+	
+	// 삭제버튼 클릭시
+	document.querySelectorAll('.deleteVehicleBtn').forEach(btn => {
+		btn.addEventListener('click',function(){
+		    currentFacilityNo = btn.dataset.facilityNo;
+		    currentMode = 'delete';
+		    showConfirmModal('정말 삭제하시겠습니까?');
+		});
+	});
+	
+	// comfirm 모달의 확인 버튼 클릭시
+	document.getElementById('confirmSaveBtn').addEventListener('click',function(){
+		  const confirmModalEl = document.getElementById('confirmSaveModal');
+		  const confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
+		  confirmModal.hide(); // 확인 버튼 누르면 confirm 모달 닫기
+		  if (currentMode === 'create') sendCreateVehicle(); // 생성 함수 호출
+		  else if (currentMode === 'edit') sendEditVehicle(); // 수정 함수 호출
+		  else if (currentMode === 'delete') sendDeleteVehicle(); // 삭제 함수 호출
+	});
+	
+	// 차량 생성 함수 -> confirm모달에서 save버튼 눌렀을때
+	function sendCreateVehicle(){
+		console.log("=== sendCreateVehicle() 호출됨 ===");
+		const form = document.getElementById('createVehicleForm');
+		const formData = new FormData(form);
+
+		const vehicleName = formData.get('facility_name')?.trim().replace(/\s+/g, '');
+		const vehicleCapacity = formData.get('facility_capacity')?.trim();
+		// 유효성 검사
+		if(!vehicleName){
+			showAlertModal('차량명을 입력해주세요.');
+			return;
+		}
+		if(!vehicleCapacity || isNaN(vehicleCapacity) || Number(vehicleCapacity) < 1){
+			showAlertModal('탑승 정원은 1 이상의 숫자로 입력해주세요.');
+			return;
+		}
+		// 중복확인 여부 확인
+		if (!isNameChecked || vehicleName !== prevCreateName) {
+			showAlertModal('차량명 중복 확인을 먼저 해주세요.');
+			return;
+		}
+		console.log("=== fetch 시작됨 ===");
+		// 서버 요청
+		fetch('/admin/vehicle/create', {
+			method: 'POST',
+			body: formData,
+			headers : {
+				'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+				'X-CSRF-HEADER': document.querySelector('meta[name="_csrf_header"]').getAttribute('content')
+			}
+		})
+		.then(response => response.json())
+		.then(data => {
+			console.log("=== 서버 응답 ===", data);
+			if (data.res_code === 200) {
+				showAlertModal(data.res_msg, function () {
+					// 초기화
+					form.reset();
+					vehicleNameCheckMsg.classList.add('d-none');
+					vehicleNameCheckMsg.textContent = '';
+					isCreateFormEdited = false;
+					isNameChecked = false;
+					prevCreateName = '';
+					createModal.hide();
+					location.reload();
+				});
+			} else {
+				showAlertModal(data.res_msg || '등록에 실패했습니다.');
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			showAlertModal('서버 오류가 발생했습니다.');
+		});
+	}	
+	
+	// 수정 모달 - 이름 입력 변경 감지
+	editNameInput.addEventListener('input',function(){
+		isEditFormEdited = true;
+		if(isEditNameChecked && editNameInput.value.trim() !== prevEditName){
+			isEditNameChecked = false;
+			editVehicleNameCheckMsg.classList.add('text-danger');
+			editVehicleNameCheckMsg.textContent = '다시 중복확인이 필요합니다.';
+			editVehicleNameCheckMsg.classList.remove('d-none');
+		}
+	});	
+	
+	// 수정 모달 - 탑승 정원 변경 감지
+	editCapacityInput.addEventListener('input',function(){
+		isEditFormEdited = true;
+	});	
+	// 수정 모달 이름 중복 확인 버튼 클릭
+	document.getElementById('editCheckVehicleNameBtn').addEventListener('click',function(){
+		const editName = editNameInput.value.trim().replace(/\s+/g, '');
+		if(!editName){
+			editVehicleNameCheckMsg.textContent = '차량명을 입력해주세요.';
+			editVehicleNameCheckMsg.classList.remove('d-none');
+			return;
+		}
+		// 기존 이름과 동일한 경우
+		if(editName == prevEditName.replace(/\s+/g, '')){
+			isEditNameChecked = true;
+			editVehicleNameCheckMsg.textContent = '기존 이름과 동일합니다.';
+			editVehicleNameCheckMsg.classList.remove('text-danger');
+			editVehicleNameCheckMsg.classList.add('text-success');
+			editVehicleNameCheckMsg.classList.remove('d-none');
+			return;
+		}
+		
+		// fetch부분 api
+		fetch(`/admin/vehicle/checkDuplicate?roomName=${encodeURIComponent(editName)}`)
+			.then(response => response.json())
+			.then(data => {
+				if(data.exists){
+					isEditNameChecked = false;
+					editVehicleNameCheckMsg.textContent = '이미 존재하는 차량명입니다.';
+					editVehicleNameCheckMsg.classList.remove('text-success');
+					editVehicleNameCheckMsg.classList.add('text-danger');
+				}else{
+					prevEditName = editName;
+					isEditNameChecked = true;
+					editVehicleNameCheckMsg.textContent = '사용 가능한 차량명입니다.';
+					editVehicleNameCheckMsg.classList.remove('text-danger');
+					editVehicleNameCheckMsg.classList.add('text-success');
+				}
+				editVehicleNameCheckMsg.classList.remove('d-none');
+			})
+			.catch(error => {
+				showAlertModal('중복 확인 중 오류가 발생했습니다.');
+				console.error(error);
+			});
+	});	
+	
+	// 목록의 수정 버튼 클릭시
+	document.querySelectorAll('.editVehicleBtn').forEach(btn => {
+		btn.addEventListener('click',function(){
+			const facilityNo = btn.getAttribute('data-facility-no');
+			currentFacilityNo = facilityNo;
+			currentMode = 'edit';
+			
+			// 서버에서 차량 정보 가져오기
+			fetch(`/admin/vehicle/get?facilityNo=${facilityNo}`)
+				.then(response => response.json())
+				.then(data => {
+					if(data.res_code == 200){
+						// 모달 필드 채우기
+						editNameInput.value = data.facility_name;
+						editCapacityInput.value = data.facility_capacity;
+						// 초기화
+						isEditFormEdited = false;
+						isEditNameChecked = false;
+						prevEditName = data.facility_name.trim().replace(/\s+/g, '');
+						editVehicleNameCheckMsg.classList.add('d-none');
+						editVehicleNameCheckMsg.textContent = '';
+						// 모달 열기
+						editModal.show();
+					}else{
+						showAlertModal('오류가 발생했습니다.');
+					}
+				})
+				.catch(error => {
+					showAlertModal('오류가 발생했습니다.');
+					console.error(error);
+				});
+		});
+	});	
+	
+	// 차량 수정 함수 
+	function sendEditVehicle(){
+		const form = document.getElementById('editVehicleForm');
+		const formData = new FormData(form);
+		
+		console.log("vehicle_name",formData.get("facility_name"));
+		console.log("vehicle_capacity",formData.get("facility_capacity"));
+		
+		const vehicleName = formData.get('facility_name')?.trim().replace(/\s+/g, '');
+		const vehicleCapacity = formData.get('facility_capacity')?.trim();
+		
+		console.log("🚨 vehicle_name:", vehicleName);  // 이거 찍어보자
+		console.log("🚨 vehicle_capacity:", vehicleCapacity);		
+
+		// 유효성 검사
+		if(!vehicleName){
+			showAlertModal('차량명을 입력해주세요.');
+			return;
+		}
+		if(!vehicleCapacity || isNaN(vehicleCapacity) || Number(vehicleCapacity) < 1){
+			showAlertModal('탑승 정원은 1 이상의 숫자로 입력해주세요.');
+			return;
+		}
+
+		// 중복 확인 여부 확인
+		if (!isEditNameChecked || vehicleName !== prevEditName) {
+			showAlertModal('차량명 중복 확인을 먼저 해주세요.');
+			return;
+		}
+
+		// 서버 요청
+		formData.append('facility_no', currentFacilityNo);
+
+		fetch('/admin/vehicle/edit', {
+			method: 'POST',
+			body: formData,
+			headers : {
+				'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+				'X-CSRF-HEADER': document.querySelector('meta[name="_csrf_header"]').getAttribute('content')
+			}
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.res_code === 200) {
+				showAlertModal(data.res_msg,function(){
+					// 초기화
+					isEditFormEdited = false;
+					isEditNameChecked = false;
+					prevEditName = '';
+					editModal.hide();
+					location.reload();
+				});			
+			} else {
+				showAlertModal(data.res_msg || '수정에 실패했습니다.');
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			showAlertModal('서버 오류가 발생했습니다.');
+		});		
+	}	
+	
+	// 차량 삭제	
+	function sendDeleteVehicle() {
+		if (!currentFacilityNo) {
+			showAlertModal('삭제할 차량 정보를 찾을 수 없습니다.');
+			return;
+		}
+	
+		const formData = new FormData();
+		formData.append('facility_no', currentFacilityNo);
+	
+		fetch('/admin/vehicle/delete', {
+			method: 'POST',
+			body: formData,
+			headers: {
+				'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+				'X-CSRF-HEADER': document.querySelector('meta[name="_csrf_header"]').getAttribute('content')
+			}
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.res_code === 200) {
+				showAlertModal(data.res_msg,function(){
+					location.reload(); 
+				});
+			} else {
+				showAlertModal(data.res_msg || '삭제에 실패했습니다.');
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			showAlertModal('서버 오류가 발생했습니다.');
+		});
+	}	
+	
+	
+	
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
 </main>
 </body>
 </html>
