@@ -33,7 +33,7 @@
 							<span class="fa-solid fa-file-export fs-9 me-2"></span>문서화
 						</button> -->
 						<th:block th:if="${isProjectMember}">
-						<button type="button" class="btn btn-primary" th:onclick="|location.href='/project/minute/create-page?projectNo=${project.project_no}'|">회의록 작성</button>
+							<button type="button" class="btn btn-primary" th:onclick="|location.href='/project/minute/create-page?projectNo=${project.project_no}'|">회의록 작성</button>
 						</th:block>
 					</div>
 				</div>
@@ -59,7 +59,7 @@
 										<td class="text-center" th:text="${minute.participants}+' 명'">회의 참여인원</td>
 										<td class="text-center" th:text="${minute.writer}">작성자</td>
 										<td class="text-center pe-1 text-body-tertiary" th:text="${#temporals.format(minute.meetingDate, 'yyyy.MM.dd&nbsp&nbsp&nbspHH시 mm분')}">회의일</td>
-										<td><a>요약</a></td>
+										<td><a href="javascript:void(0);" class="text-primary show-summary-link" th:data-minute-no="${minute.meetingMinuteNo}"> 요약 </a></td>
 									</tr>
 								</tbody>
 							</table>
@@ -85,9 +85,9 @@
 				<div class="col-md-4">
 					<div class="card shadow-sm">
 						<div class="card-header bg-light fw-bold">회의 내용 요약</div>
-						<div class="card-body p-2">
-							<!-- 여기에 요약 데이터 들어감 -->
-							회의록을 선택하세요.
+						<div class="card-body p-2" id="summary-content">
+							<div id="summary-placeholder">회의록을 선택하세요.</div>
+							<div id="summary-text" class="d-flex flex-column gap-2 fs-8 lh-base text-secondary" style="display: none;"></div>
 						</div>
 					</div>
 				</div>
@@ -106,6 +106,53 @@
 				</div>
 			</div>
 		</footer> -->
+
+		<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".show-summary-link").forEach(link => {
+      link.addEventListener("click", function () {
+        const minuteNo = this.getAttribute("data-minute-no");
+
+        fetch(`/project/minute/summary?minuteNo=${minuteNo}`)
+          .then(response => response.text())
+          .then(summary => {
+            const summaryText = document.getElementById("summary-text");
+            const placeholder = document.getElementById("summary-placeholder");
+
+            if (summary && summary.trim().length > 0) {
+              const formatted = summary
+                .split("\n")
+                .map(line => `
+                  <div class="ps-3 text-secondary fs-8 lh-base text-break" style="text-indent: -0.67rem;">
+                    ${line.trim()}
+                  </div>
+                `)
+                .join("");
+
+              summaryText.innerHTML = formatted;
+              summaryText.style.display = "flex";
+              placeholder.style.display = "none";
+            } else {
+              summaryText.style.display = "none";
+              placeholder.textContent = "요약이 존재하지 않습니다.";
+              placeholder.style.display = "block";
+            }
+          })
+          .catch(error => {
+            console.error("요약 불러오기 실패:", error);
+
+            const summaryText = document.getElementById("summary-text");
+            const placeholder = document.getElementById("summary-placeholder");
+
+            summaryText.style.display = "none";
+            placeholder.textContent = "요약 로딩 중 오류 발생";
+            placeholder.style.display = "block";
+          });
+      });
+    });
+  });
+</script>
+
 	</main>
 </body>
 </html>

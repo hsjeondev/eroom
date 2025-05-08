@@ -33,6 +33,12 @@ public class ProjectMinuteController {
 	private final ProjectService projectService;
 	private final ProjectMeetingMinuteService projectMeetingMinuteService;
 	
+	@GetMapping("/summary")
+	@ResponseBody
+	public String getMeetingSummary(@RequestParam("minuteNo") Long minuteNo) {
+	    return projectMeetingMinuteService.getSummaryByMinuteNo(minuteNo);
+	}
+	
 	@GetMapping("/create-page")
 	public String createMinutePage(@RequestParam("projectNo") Long projectNo, Model model) {
 	    List<Employee> projectEmployees = projectService.findEmployeesByProjectNo(projectNo);
@@ -50,14 +56,8 @@ public class ProjectMinuteController {
 	    EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	    minuteDto.setWriter(userDetails.getEmployee().getEmployeeName());
 
-	    // 회의록 저장
-	    Long savedMinuteNo = projectMeetingMinuteService.saveMinute(minuteDto);
-
-	    // 참여자 매핑 저장
-	    ProjectMeetingMinuteMappingDto mappingDto = new ProjectMeetingMinuteMappingDto();
-	    mappingDto.setMeetingMinuteNo(savedMinuteNo);
-	    mappingDto.setParticipants(participants);
-	    projectMeetingMinuteService.saveMappings(mappingDto);
+	    // 회의록 및 참여자 저장
+	    Long savedMinuteNo = projectMeetingMinuteService.saveMinuteAndMappings(minuteDto, participants);
 
 	    return "redirect:/project/minute/detail?minuteNo=" + savedMinuteNo + "&projectNo=" + minuteDto.getProjectNo();
 	}
