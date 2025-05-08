@@ -183,8 +183,11 @@ public class ChatController {
 	    // 3. 메시지 리스트 DTO 변환
 	    List<ChatMessage> messageList = chatMessageService.selectMessageByRoomNo(roomNo);
 	    List<ChatMessageDto> messageDtoList = new ArrayList<>();
+	    
 	    for (ChatMessage message : messageList) {
-	        messageDtoList.add(ChatMessageDto.toDto(message));
+	    	Long senderEmployeeNo = message.getSenderMember().getEmployeeNo();
+	        String profileUrl = profileService.getProfileImageUrl(senderEmployeeNo); 
+	        messageDtoList.add(ChatMessageDto.toDto(message,profileUrl));
 	    }
 
 	    // 4. 채팅방 DTO 생성
@@ -247,6 +250,7 @@ public class ChatController {
 	    }
 	    // ChatroomAttendee에서 참여자 정보 가져오기
 	    List<String> participantNames = new ArrayList<String>();
+	    
 	    for (ChatroomAttendee mapping : chatroom.getChatroomMapping()) {
 	        participantNames.add(mapping.getAttendee().getEmployeeName());
 	    }

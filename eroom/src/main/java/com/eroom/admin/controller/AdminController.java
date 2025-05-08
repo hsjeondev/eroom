@@ -283,7 +283,7 @@ public class AdminController {
 			}
 			if(selectedDept != null) {
 				// parentCode(=separatorCode)로 팀 목록 조회
-				teamList = structureService.selectTeamAll(selectedDept.getSeparatorCode());
+				teamList = structureService.selectTeamAllByParentCode(selectedDept.getSeparatorCode());
 			}
 		}else {
 			// 부서가 선택되지 않은 경우
@@ -555,7 +555,7 @@ public class AdminController {
 		Structure dept = structureService.getStructureById(deptId);
 		
 		if(dept != null) {
-			List<Structure> teamList = structureService.selectTeamAll(dept.getSeparatorCode());
+			List<Structure> teamList = structureService.selectTeamAllByParentCode(dept.getSeparatorCode());
 			for(Structure team : teamList) {
 				resultList.add(TeamDto.toDto(team)); 
 			}

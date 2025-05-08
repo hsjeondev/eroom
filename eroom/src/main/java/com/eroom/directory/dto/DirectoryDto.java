@@ -170,6 +170,42 @@ public class DirectoryDto {
 				.directory_address(entity.getDirectoryAddress())
 	            .build();
 	}
+	
+	public DirectoryDto toDto3(Directory entity) {
+	    Employee emp = entity.getEmployee();
+	    Separator separator = entity.getSeparator();
+
+	    return DirectoryDto.builder()
+	            .directory_no(entity.getDirectoryNo())
+	            .directory_email(entity.getDirectoryEmail())
+	            .directory_phone(entity.getDirectoryPhone())
+	            .directory_name(entity.getDirectoryName())
+	            .directory_company_name(entity.getDirectoryCompanyName())
+	            .directory_creator(entity.getDirectoryCreator())
+	            .directory_editor(entity.getDirectoryEditor())
+	            .visible_yn(entity.getVisibleYn())
+	            .directory_department(entity.getDirectoryDepartment())
+	            .directory_position(entity.getDirectoryPosition())
+	            .directory_team(entity.getDirectoryTeam())
+	            .directory_reg_date(entity.getDirectoryRegDate())
+	            .directory_mod_date(entity.getDirectoryModDate())
+	            
+	            .employee_no(emp != null ? emp.getEmployeeNo() : null)
+	            .employee_name(emp != null ? emp.getEmployeeName() : null)
+	            .employee_position(emp != null ? emp.getEmployeePosition() : null)
+	            .code_name(separator != null ? separator.getSeparatorName() : null)
+	            .separator_code(separator != null ? separator.getSeparatorCode() : null)
+
+	            .formatted_hire_date(emp != null && emp.getEmployeeHireDate() != null ? 
+	                                  emp.getEmployeeHireDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
+	            .formatted_end_date(emp != null && emp.getEmployeeEndDate() != null ? 
+	                                  emp.getEmployeeEndDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "-")
+
+	            .drive_attach_no(entity.getDriveAttachNo())
+	            .directory_zipcode(entity.getDirectoryZipcode())
+	            .directory_address(entity.getDirectoryAddress())
+	            .build();
+	}
 
 	
 	

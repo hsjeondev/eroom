@@ -43,7 +43,7 @@
 										<td class="job" th:text="${member.employee_position}">-</td>
 										<td class="dept" th:text="${member.department_name != null ? member.department_name : '-'}">부서명</td>
 										<td class="team" th:text="${member.team_name != null ? member.team_name : '-'}">팀명</td>
-										<td class="date" th:if="${member.employee.employeeEmploymentYn == 'Y'}" th:text="${member.formatted_hire_date}">입사일</td>
+										<td class="date" th:text="${member.formatted_hire_date != null ? member.formatted_hire_date : '-'}">입사일</td>
 										<!-- <td class="text-end pe-0">
 											<div class="btn-reveal-trigger position-static">
 												<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">

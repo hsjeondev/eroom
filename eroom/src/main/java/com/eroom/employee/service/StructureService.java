@@ -10,12 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eroom.directory.dto.AddDepartmentAndTeamDto;
+import com.eroom.directory.dto.DeleteDepartmentOrTeamDto;
 import com.eroom.directory.dto.DepartmentSortDto;
 import com.eroom.directory.dto.TeamSortDto;
 import com.eroom.directory.dto.UpdateSortOrderDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Separator;
 import com.eroom.employee.entity.Structure;
+import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.employee.repository.SeparatorRepository;
 import com.eroom.employee.repository.StructureRepository;
 
@@ -27,6 +29,7 @@ public class StructureService {
 	
 	private final StructureRepository structureRepository;
 	private final SeparatorRepository separatorRepository;
+	private final EmployeeRepository employeeRepository;
 	
 	// 부모 코드를 매개변수로 Structure 객체를 조회
 	public Structure selectStructureCodeNameByParentCodeEqualsSeparatorCode(String parentCode) {
@@ -38,7 +41,7 @@ public class StructureService {
 		return structureRepository.findByVisibleYnAndParentCodeIsNullOrderBySortOrderAsc("Y");
 	}
 	// 부서코드를 통한 부서 하위의 모든 팀 조회
-	public List<Structure> selectTeamAll(String parentCode) {
+	public List<Structure> selectTeamAllByParentCode(String parentCode) {
 //		return structureRepository.findByParentCode(parentCode);
 		return structureRepository.findByParentCodeAndVisibleYnOrderBySortOrderAsc(parentCode, "Y");
 	}
@@ -124,7 +127,7 @@ public class StructureService {
 				separator = Separator.builder()
 							.separatorCode(separatorCode)
 							.separatorName(dto.getCodeName())
-							.separatorYn("Y")
+							.visibleYn("Y")
 							.separatorCreator(employee.getEmployeeId())
 							.build();
 				structure = Structure.builder()
@@ -173,7 +176,7 @@ public class StructureService {
 						.separatorCode(separatorCode)
 						.separatorName(dto.getCodeName())
 						.separatorParentCode(dto.getParentCode())
-						.separatorYn("Y")
+						.visibleYn("Y")
 						.separatorCreator(employee.getEmployeeId())
 						.build();
 				structure = Structure.builder()
@@ -234,6 +237,72 @@ public class StructureService {
 		return result;
 	}
 	
+	// 부서, 팀 삭제 및 사원 팀 옮기기
+	@Transactional(rollbackFor = Exception.class)
+	public int deleteDepartmentOrTeam(DeleteDepartmentOrTeamDto dto, Employee employee) {
+		int result = 0;
+		try {
+			if(dto == null) {
+				return 0;
+			}
+			// 팀원들 먼저 이동
+			if(!dto.getEmployeeNoList().isEmpty() && dto.getEmployeeNoList().size() != 0) {
+				List<Long> employeeNoList = dto.getEmployeeNoList();
+				Structure structureRemainTeam = structureRepository.findBySeparatorCode(dto.getRemainTeamCode());
+				for(Long empNo : employeeNoList) {
+					Employee empEntity = employeeRepository.findById(empNo).orElse(null);
+					if(empEntity != null && structureRemainTeam != null) {
+						empEntity.setStructure(structureRemainTeam);
+						employeeRepository.save(empEntity);
+					} else {
+						return 0;
+					}
+				}
+			}
+			
+			Structure structureEntity = null;
+			Separator separatorEntity = null;
+			if(dto.getDeleteTeamCode() == null || dto.getDeleteTeamCode().equals("0")) {
+				// 부서인 경우
+				// 하위 팀 먼저 삭제 로직 필요
+				List<Structure> structureTeamInDeptList = structureRepository.findByParentCodeAndVisibleYnOrderBySortOrderAsc(dto.getDeleteDeptCode(), "Y");
+				for(Structure s : structureTeamInDeptList) {
+					s.setVisibleYn("N");
+					structureRepository.save(s);
+				}
+				List<Separator> separatorTeamInDeptList = separatorRepository.findBySeparatorParentCodeAndVisibleYn(dto.getDeleteDeptCode(), "Y");
+				for(Separator s : separatorTeamInDeptList) {
+					s.setVisibleYn("N");
+					separatorRepository.save(s);
+				}
+				
+				// 부서 삭제
+				structureEntity = structureRepository.findBySeparatorCode(dto.getDeleteDeptCode());
+				separatorEntity = separatorRepository.findById(dto.getDeleteDeptCode()).orElse(null);
+			} else {
+				// 팀인 경우
+				structureEntity = structureRepository.findBySeparatorCode(dto.getDeleteTeamCode());
+				separatorEntity = separatorRepository.findById(dto.getDeleteTeamCode()).orElse(null);
+			}
+			if(separatorEntity != null && structureEntity != null) {
+				structureEntity.setVisibleYn("N");
+				separatorEntity.setVisibleYn("N");
+				structureRepository.save(structureEntity);
+				separatorRepository.save(separatorEntity);
+			} else {
+				return 0;
+			}
+			result = 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	// 모든 팀 조회
+	public List<Structure> findOnlyTeamsVisibleY() {
+		return structureRepository.findOnlyTeamsVisibleY();
+	}
 	
 
 }
