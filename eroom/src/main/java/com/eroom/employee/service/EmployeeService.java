@@ -294,6 +294,45 @@ public class EmployeeService {
 					updated = true;
 				}
 			}
+			
+			// 부서 / 팀
+			Structure newStructure = employee.getStructure();
+			String newDepartmentName = "-";
+			String newTeamName = "-";
+			
+			if(newStructure != null) {
+				if(newStructure.getParentCode() == null) {
+					newDepartmentName = newStructure.getCodeName();
+				}else {
+					newTeamName = newStructure.getCodeName();
+					Structure parent = structureRepository.findBySeparatorCode(newStructure.getParentCode());
+					if(parent != null) {
+						newDepartmentName = parent.getCodeName();
+					}
+				}
+			}
+			
+			if(!newDepartmentName.equals(directory.getDirectoryDepartment())) {
+				directory.setDirectoryDepartment(newDepartmentName);
+				updated = true;
+			}
+			if(!newTeamName.equals(directory.getDirectoryTeam())) {
+				directory.setDirectoryTeam(newTeamName);
+				updated = true;
+			}
+			
+			// 직급 변경
+			if(dto.getEmployee_position() != null && !dto.getEmployee_position().equals(directory.getDirectoryPosition())) {
+				directory.setDirectoryPosition(dto.getEmployee_position());
+				updated = true;
+			}
+			
+			// 이름 변경
+//			if(dto.getEmployee_name() != null && !dto.getEmployee_name().equals(directory.getDirectoryName())) {
+//				directory.setDirectoryName(dto.getEmployee_name());
+//				updated = true;
+//			}
+			
 			if(updated) {
 				// 수정일자 갱신
 				directory.setDirectoryModDate(LocalDateTime.now());
