@@ -20,7 +20,7 @@ public interface AlarmRepository extends JpaRepository<Alarm,Long>, JpaSpecifica
             LEFT JOIN FETCH a.approvalAlarm
             LEFT JOIN FETCH a.chatAlarm
             WHERE a.employeeNo = :employeeNo
-            ORDER BY a.alarmNo DESC
+            ORDER BY a.regDate DESC
         """)
         List<Alarm> findAllWithDetailsByEmployeeNo(@Param("employeeNo") Long employeeNo);
     

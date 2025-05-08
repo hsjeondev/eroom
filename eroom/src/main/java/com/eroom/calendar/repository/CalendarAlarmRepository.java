@@ -1,4 +1,4 @@
-package com.eroom.notification.repository;
+package com.eroom.calendar.repository;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.eroom.notification.entity.CalendarAlarm;
+import com.eroom.calendar.entity.CalendarAlarm;
 
 public interface CalendarAlarmRepository extends JpaRepository<CalendarAlarm,Long>,JpaSpecificationExecutor<CalendarAlarm> {
 	 List<CalendarAlarm> findByEmployeeNoOrderByAlarmIdDesc(Long employeeNo);
