@@ -41,7 +41,13 @@ public class CalendarController {
 	private final EmployeeService employeeService;
 	private final DepartmentCalendarService departmentService;
 
-
+	
+	//HOME화면 테스트
+	@GetMapping("/calendartest")
+	    public String calendarTestPage() {	      
+	        return "hometest/calendartest"; 
+	}
+	
 	@GetMapping("/calendar/all")
 	public String calendarView() {
 		return "calendar/list";
