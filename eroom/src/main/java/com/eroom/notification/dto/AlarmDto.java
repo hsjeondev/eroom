@@ -62,7 +62,20 @@ public class AlarmDto {
 		} else if(("R002").equals(separatorCode)) {
 			return null;
 		} else if(("R003").equals(separatorCode)) {
-			return null;
+			return AlarmDto.builder()
+					//FK
+					.alarm_no(alarm.getAlarmNo())
+					// 메일 알람 PK
+					.param1(alarm.getParam1())
+					// 메일 알람 코드
+					.separator_code(alarm.getSeparatorCode())
+					// 메일 받은 사람 PK
+					.employee_no(alarm.getEmployeeNo())
+					// 읽음
+					.read_yn(alarm.getReadYn())
+					// 날짜
+					.reg_date(alarm.getRegDate())
+					.build();
 		} else if(("R004").equals(separatorCode)) {
 			return AlarmDto.builder()
 					.alarm_no(alarm.getAlarmNo())
