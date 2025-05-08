@@ -276,7 +276,7 @@
     			       let message = "";
 
 						if (notification.separator_code === 'R001') {
-						  const calendarSeparator = notification.calendarAlarm?.separator || "";
+						  const calendarSeparator = notification.calendarAlarm_separator || "";
 						
 						  if (calendarSeparator.startsWith("A")) {
 						    message = "📢 새로운 회사 일정이 등록되었습니다.";
@@ -285,6 +285,8 @@
 						  } else {
 						    message = "📅 새로운 일정 알림이 도착했습니다.";
 						  }
+						} else if(notification.separator_code === 'R004'){
+							message = notification.comment;
 						} else {
 						  switch (notification.separator_code) {
 						    case 'R002':
@@ -292,9 +294,6 @@
 						      break;
 						    case 'R003':
 						      message = "💬 새로운 채팅 메시지가 도착했습니다.";
-						      break;
-						    case 'R004':
-						      message = "📄 결재 요청이 도착했습니다.";
 						      break;
 						    default:
 						      message = "🔔 새로운 알림이 도착했습니다.";

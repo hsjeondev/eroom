@@ -41,15 +41,15 @@ public class AlarmService {
 	        for (Alarm alarm : alarms) {
 	            AlarmDto dto = new AlarmDto().toDto(alarm);
 
-	            if ("R001".equals(alarm.getSeparatorCode()) && alarm.getCalendarAlarm() != null) {
-	                dto.setCalendarAlarm(new CalendarAlarmDto().toDto(alarm.getCalendarAlarm()));
-	            } else if ("R002".equals(alarm.getSeparatorCode()) && alarm.getChatAlarm() != null) {
-	                dto.setChatAlarm(new ChatAlarmDto().toDto(alarm.getChatAlarm()));
-	            } else if ("R003".equals(alarm.getSeparatorCode()) && alarm.getMailAlarm() != null) {
-	                dto.setMailAlarm(new MailAlarmDto().toDto(alarm.getMailAlarm()));
-	            } else if ("R004".equals(alarm.getSeparatorCode()) && alarm.getApprovalAlarm() != null) {
-	                dto.setApprovalAlarm(new ApprovalAlarmDto().toDto(alarm.getApprovalAlarm()));
-	            }
+//	            if ("R001".equals(alarm.getSeparatorCode()) && alarm.getCalendarAlarm() != null) {
+//	                dto.setCalendarAlarm(new CalendarAlarmDto().toDto(alarm.getCalendarAlarm()));
+//	            } else if ("R002".equals(alarm.getSeparatorCode()) && alarm.getChatAlarm() != null) {
+//	                dto.setChatAlarm(new ChatAlarmDto().toDto(alarm.getChatAlarm()));
+//	            } else if ("R003".equals(alarm.getSeparatorCode()) && alarm.getMailAlarm() != null) {
+//	                dto.setMailAlarm(new MailAlarmDto().toDto(alarm.getMailAlarm()));
+//	            } else if ("R004".equals(alarm.getSeparatorCode()) && alarm.getApprovalAlarm() != null) {
+//	                dto.setApprovalAlarm(new ApprovalAlarmDto().toDto(alarm.getApprovalAlarm()));
+//	            }
 
 	            result.add(dto);
 	        }
@@ -112,15 +112,15 @@ public class AlarmService {
 	         AlarmDto dto = new AlarmDto().toDto(alarm);
 
 	         // 상세 알림 설정 
-	         if ("R001".equals(alarm.getSeparatorCode()) && alarm.getCalendarAlarm() != null) {
-	             dto.setCalendarAlarm(new CalendarAlarmDto().toDto(alarm.getCalendarAlarm()));
-	         } else if ("R002".equals(alarm.getSeparatorCode()) && alarm.getChatAlarm() != null) {
-	             dto.setChatAlarm(new ChatAlarmDto().toDto(alarm.getChatAlarm()));
-	         } else if ("R003".equals(alarm.getSeparatorCode()) && alarm.getMailAlarm() != null) {
-	             dto.setMailAlarm(new MailAlarmDto().toDto(alarm.getMailAlarm()));
-	         } else if ("R004".equals(alarm.getSeparatorCode()) && alarm.getApprovalAlarm() != null) {
-	             dto.setApprovalAlarm(new ApprovalAlarmDto().toDto(alarm.getApprovalAlarm()));
-	         }
+//	         if ("R001".equals(alarm.getSeparatorCode()) && alarm.getCalendarAlarm() != null) {
+//	             dto.setCalendarAlarm(new CalendarAlarmDto().toDto(alarm.getCalendarAlarm()));
+//	         } else if ("R002".equals(alarm.getSeparatorCode()) && alarm.getChatAlarm() != null) {
+//	             dto.setChatAlarm(new ChatAlarmDto().toDto(alarm.getChatAlarm()));
+//	         } else if ("R003".equals(alarm.getSeparatorCode()) && alarm.getMailAlarm() != null) {
+//	             dto.setMailAlarm(new MailAlarmDto().toDto(alarm.getMailAlarm()));
+//	         } else if ("R004".equals(alarm.getSeparatorCode()) && alarm.getApprovalAlarm() != null) {
+//	             dto.setApprovalAlarm(new ApprovalAlarmDto().toDto(alarm.getApprovalAlarm()));
+//	         }
 
 	         //날짜 키 (yyyy-MM-dd)
 	         String dateKey = dto.getReg_date().toLocalDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));

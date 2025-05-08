@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eroom.employee.repository.EmployeeRepository;
+import com.eroom.gpt.GptService;
 import com.eroom.project.dto.ProjectMeetingMinuteDto;
 import com.eroom.project.dto.ProjectMeetingMinuteMappingDto;
 import com.eroom.project.entity.ProjectMeetingMinute;
@@ -23,6 +24,7 @@ public class ProjectMeetingMinuteService {
 	private final EmployeeRepository employeeRepository;
     private final ProjectMeetingMinuteRepository projectMeetingMinuteRepository;
     private final ProjectMeetingMinuteMappingRepository projectMeetingMinuteMappingRepository;
+    private final GptService gptService;
 
     public List<ProjectMeetingMinuteDto> getMeetingMinutesByProject(Long projectNo) {
         List<ProjectMeetingMinute> entityList = projectMeetingMinuteRepository.findByProjectNo(projectNo);
@@ -42,15 +44,26 @@ public class ProjectMeetingMinuteService {
     }
 
     
-    public Long saveMinute(ProjectMeetingMinuteDto dto) {
-        ProjectMeetingMinute entity = dto.toEntity();
+    @Transactional
+    public Long saveMinuteAndMappings(ProjectMeetingMinuteDto minuteDto, List<Long> participants) {
+        // 1. GPT 요약 요청
+        String summary = gptService.summarizeMeetingContent(minuteDto.getMeetingContent());
+
+        // 2. DTO에 요약 결과 세팅
+        minuteDto.setMeetingContentSummary(summary);
+
+        // 3. Entity로 변환 후 저장
+        ProjectMeetingMinute entity = minuteDto.toEntity();
         ProjectMeetingMinute saved = projectMeetingMinuteRepository.save(entity);
-        return saved.getMeetingMinuteNo();
-    }
-    
-    public void saveMappings(ProjectMeetingMinuteMappingDto dto) {
-        List<ProjectMeetingMinuteMapping> mappings = dto.toEntityList();
+
+        // 4. 참여자 매핑 저장
+        ProjectMeetingMinuteMappingDto mappingDto = new ProjectMeetingMinuteMappingDto();
+        mappingDto.setMeetingMinuteNo(saved.getMeetingMinuteNo());
+        mappingDto.setParticipants(participants);
+        List<ProjectMeetingMinuteMapping> mappings = mappingDto.toEntityList();
         projectMeetingMinuteMappingRepository.saveAll(mappings);
+
+        return saved.getMeetingMinuteNo();
     }
     
     public ProjectMeetingMinuteDto findByMinuteNo(Long minuteNo) {
@@ -110,6 +123,12 @@ public class ProjectMeetingMinuteService {
 
 	public boolean isMinuteParticipant(Long minuteNo, Long employeeNo) {
 	    return projectMeetingMinuteMappingRepository.existsByMeetingMinuteNoAndEmployeeNo(minuteNo, employeeNo);
+	}
+
+
+	public String getSummaryByMinuteNo(Long minuteNo) {
+	    ProjectMeetingMinute minute = projectMeetingMinuteRepository.findById(minuteNo).orElse(null);
+	    return (minute != null) ? minute.getMeetingContentSummary() : "요약이 없습니다.";
 	}
 
 }
