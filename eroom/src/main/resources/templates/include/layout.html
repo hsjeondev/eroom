@@ -272,28 +272,21 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	
 	
 	
-	
+	<!-- 결재 등록시 header에 있는 종에 빨간점 표시 -->
 	<script>
-	fetch('/session/employeeNo')
-	  .then(response => response.json())
-	  .then(employeeNo => {   // 여기 data ❌ employeeNo ⭕
+    	const approvalSocket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/approval');
 
-	    const isApprovalPage = location.pathname.startsWith('/approval');
-
-	    if (employeeNo && isApprovalPage) {
-	      const approvalSocket = new WebSocket(
-	        (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/approval?employeeNo=' + employeeNo
-	      );
-
-	      approvalSocket.onopen = function() { console.log('웹소켓 연결 성공!'); };
-	      approvalSocket.onmessage = function(event) { alert(event.data); };
-	      approvalSocket.onclose = function() { console.log('웹소켓 연결 종료'); };
-	      approvalSocket.onerror = function(error) { console.error('웹소켓 에러 발생:', error); };
-	    }
-	  })
-	  .catch(error => {
-	    console.error('employeeNo 조회 실패:', error);
-	  });
+	      approvalSocket.onopen = function() { console.log('결재 웹소켓 연결 성공!'); };
+	      approvalSocket.onmessage = function(event) { 
+	    	  alert(event.data); 
+			  const notificationDot = document.getElementById('notificationDot');
+			  if (notificationDot) {
+			    notificationDot.style.display = 'block'; // 빨간 점 표시
+			  }
+	    	  
+	      };
+	      approvalSocket.onclose = function() { console.log('결재 웹소켓 연결 종료'); };
+	      approvalSocket.onerror = function(error) { console.error('결재 웹소켓 에러 발생:', error); };
 	</script>
 	
 	<!-- 회사 캘린더 등록시 header에 있는 종에 빨간점 표시 -->
@@ -312,6 +305,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 		  if (notificationDot) {
 		    notificationDot.style.display = 'block'; // 빨간 점 표시
 		  }
+		  
 		};
 		
 		companySocket.onclose = function() {
@@ -341,9 +335,9 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 		        notificationDot.style.display = 'block'; // ✅여기에서 빨간 점 표시
 		      }
 		
-		      if (typeof fetchTeamCalendarEvents === 'function') {
+		      /* if (typeof fetchTeamCalendarEvents === 'function') {
 		        fetchTeamCalendarEvents(); // 팀 캘린더 새로고침
-		      }
+		      } */
 		    };
 		
 		    teamSocket.onclose = () => console.log('팀 웹소켓 연결 종료');
