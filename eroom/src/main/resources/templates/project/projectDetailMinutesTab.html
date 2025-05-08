@@ -33,7 +33,7 @@
 							<span class="fa-solid fa-file-export fs-9 me-2"></span>문서화
 						</button> -->
 						<th:block th:if="${isProjectMember}">
-						<button type="button" class="btn btn-primary" th:onclick="|location.href='/project/minute/create-page?projectNo=${project.project_no}'|">회의록 작성</button>
+							<button type="button" class="btn btn-primary" th:onclick="|location.href='/project/minute/create-page?projectNo=${project.project_no}'|">회의록 작성</button>
 						</th:block>
 					</div>
 				</div>
@@ -59,7 +59,7 @@
 										<td class="text-center" th:text="${minute.participants}+' 명'">회의 참여인원</td>
 										<td class="text-center" th:text="${minute.writer}">작성자</td>
 										<td class="text-center pe-1 text-body-tertiary" th:text="${#temporals.format(minute.meetingDate, 'yyyy.MM.dd&nbsp&nbsp&nbspHH시 mm분')}">회의일</td>
-										<td><a>요약</a></td>
+										<td><a href="javascript:void(0);" class="text-primary show-summary-link" th:data-minute-no="${minute.meetingMinuteNo}"> 요약 </a></td>
 									</tr>
 								</tbody>
 							</table>
@@ -85,9 +85,9 @@
 				<div class="col-md-4">
 					<div class="card shadow-sm">
 						<div class="card-header bg-light fw-bold">회의 내용 요약</div>
-						<div class="card-body p-2">
-							<!-- 여기에 요약 데이터 들어감 -->
-							회의록을 선택하세요.
+						<div class="card-body p-2" id="summary-content">
+							<div id="summary-placeholder" class="d-flex justify-content-center align-items-center text-secondary fs-8 d-none" style="min-height: 300px;">회의록을 선택하세요.</div>
+							<div id="summary-text" class="d-flex flex-column gap-2 fs-8 lh-base text-secondary" style="display: none;"></div>
 						</div>
 					</div>
 				</div>
@@ -106,6 +106,80 @@
 				</div>
 			</div>
 		</footer> -->
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const summaryLinks = document.querySelectorAll(".show-summary-link");
+
+    summaryLinks.forEach(link => {
+      link.addEventListener("click", function () {
+        const minuteNo = this.getAttribute("data-minute-no");
+        const summaryTextEl = document.getElementById("summary-text");
+        const placeholderEl = document.getElementById("summary-placeholder");
+
+        // 초기화 및 로딩 스피너 표시
+        summaryTextEl.innerHTML = "";
+        summaryTextEl.style.display = "none";
+
+        placeholderEl.innerHTML = `
+          <div class="d-flex justify-content-center align-items-center w-100">
+            <div class="spinner-grow text-secondary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        `;
+        placeholderEl.classList.remove("d-none");
+        placeholderEl.classList.add("d-flex");
+        placeholderEl.style.display = "flex";
+
+        summaryTextEl.setAttribute("data-loading-minute-no", minuteNo);
+
+        fetch(`/project/minute/summary?minuteNo=${minuteNo}`)
+          .then(response => response.text())
+          .then(summary => {
+            const activeMinuteNo = summaryTextEl.getAttribute("data-loading-minute-no");
+            if (activeMinuteNo !== minuteNo) return;
+
+            if (summary && summary.trim().length > 0) {
+              const formattedSummary = summary
+                .split("\n")
+                .map(line => `
+                  <div class="ps-3 text-secondary fs-8 lh-base text-break" style="text-indent: -0.67rem;">
+                    ${line.trim()}
+                  </div>
+                `)
+                .join("");
+
+              summaryTextEl.innerHTML = formattedSummary;
+              summaryTextEl.style.display = "flex";
+
+              // placeholder 완전 제거
+              placeholderEl.innerHTML = "";
+              placeholderEl.style.display = "none";
+              placeholderEl.classList.remove("d-flex");
+              placeholderEl.classList.add("d-none");
+            } else {
+              summaryTextEl.innerHTML = "";
+              summaryTextEl.style.display = "none";
+              placeholderEl.innerHTML = `<div class="text-secondary fs-8">요약이 존재하지 않습니다.</div>`;
+              placeholderEl.classList.remove("d-none");
+              placeholderEl.classList.add("d-flex");
+              placeholderEl.style.display = "flex";
+            }
+          })
+          .catch(error => {
+            console.error("요약 불러오기 실패:", error);
+            summaryTextEl.innerHTML = "";
+            summaryTextEl.style.display = "none";
+            placeholderEl.innerHTML = `<div class="text-danger fs-8">요약 로딩 중 오류 발생</div>`;
+            placeholderEl.classList.remove("d-none");
+            placeholderEl.classList.add("d-flex");
+            placeholderEl.style.display = "flex";
+          });
+      });
+    });
+  });
+</script>
 	</main>
 </body>
 </html>

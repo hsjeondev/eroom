@@ -275,8 +275,8 @@
     			    	
     			       let message = "";
 
-						if (notification.separator_code == 'R001') {
-						  const calendarSeparator = notification.calendarAlarm?.separator || "";
+						if (notification.separator_code === 'R001') {
+						  const calendarSeparator = notification.calendarAlarm_separator || "";
 						
 						  if (calendarSeparator.startsWith("A")) {
 						    message = "📢 새로운 회사 일정이 등록되었습니다.";
@@ -285,7 +285,7 @@
 						  } else {
 						    message = "📅 새로운 일정 알림이 도착했습니다.";
 						  }
-						} else if(notification.separator_code == 'R004'){
+						} else if(notification.separator_code === 'R004'){
 							message = notification.comment;
 						} else {
 						  switch (notification.separator_code) {
@@ -408,7 +408,7 @@
     			          })
     			          .then(response => {
     			            if (response.ok) {   			          
-    			              location.href = "/calendar";
+    			              location.href = "/calendar/all";
     			            } else {
     			              console.error('읽음 처리 실패');
     			            }

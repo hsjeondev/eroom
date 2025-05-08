@@ -21,8 +21,8 @@
 					</div>
 					<!-- 회의 참여자 선택 -->
 					<div class="form-floating mt-4">
-						<p class="mb-2">
-							<b>참여자 선택</b>
+						<p class="mb-2 text-body-tertiary">
+							<b>회의 참여자</b>
 						</p>
 						<div class="d-flex flex-wrap gap-3">
 							<!-- 전체 선택 -->
@@ -36,7 +36,7 @@
 						</div>
 					</div>
 					<!-- 회의일 -->
-					<div class="form-floating mt-4">
+					<div class="form-floating mt-4 w-25">
 						<input class="form-control" type="datetime-local" name="meetingDate" id="create-minute-date" /> <label for="create-minute-date">회의일</label>
 					</div>
 					<!-- 내용 -->
@@ -104,7 +104,7 @@
 		    // 회의일
 		    if (!dateInput.value.trim()) {
 			  e.preventDefault();
-			  showValidationModal("", "회의일을 선택해주세요.", dateInput);
+			  showValidationModal("", "회의일을 선택해주세요.", null);
 			  return;
 			}
 		  });
