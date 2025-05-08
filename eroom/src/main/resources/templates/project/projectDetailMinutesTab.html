@@ -86,7 +86,7 @@
 					<div class="card shadow-sm">
 						<div class="card-header bg-light fw-bold">회의 내용 요약</div>
 						<div class="card-body p-2" id="summary-content">
-							<div id="summary-placeholder">회의록을 선택하세요.</div>
+							<div id="summary-placeholder" class="d-flex justify-content-center align-items-center text-secondary fs-8 d-none" style="min-height: 300px;">회의록을 선택하세요.</div>
 							<div id="summary-text" class="d-flex flex-column gap-2 fs-8 lh-base text-secondary" style="display: none;"></div>
 						</div>
 					</div>
@@ -107,64 +107,79 @@
 			</div>
 		</footer> -->
 
-		<script>
-		  document.addEventListener("DOMContentLoaded", function () {
-		    // 요약 링크 클릭 이벤트
-		    const summaryLinks = document.querySelectorAll(".show-summary-link");
-		
-		    summaryLinks.forEach(link => {
-		      link.addEventListener("click", function () {
-		        const minuteNo = this.getAttribute("data-minute-no"); // 클릭한 회의록 번호
-		
-		        // 요약 내용 요청
-		        fetch(`/project/minute/summary?minuteNo=${minuteNo}`)
-		          .then(response => response.text())
-		          .then(summary => {
-		            const summaryTextEl = document.getElementById("summary-text");
-		            const placeholderEl = document.getElementById("summary-placeholder");
-		
-		            // 요약이 존재하는 경우
-		            if (summary && summary.trim().length > 0) {
-		              // 줄바꿈 기준으로 요약 내용을 한 줄씩 처리
-		              const formattedSummary = summary
-		                .split("\n")
-		                .map(line => {
-		                  return `
-		                    <div 
-		                      class="ps-3 text-secondary fs-8 lh-base text-break" 
-		                      style="text-indent: -0.67rem;">
-		                      ${line.trim()}
-		                    </div>
-		                  `;
-		                })
-		                .join(""); // HTML 문자열로 병합
-		
-		              // 화면에 요약 삽입 및 표시
-		              summaryTextEl.innerHTML = formattedSummary;
-		              summaryTextEl.style.display = "flex";
-		              placeholderEl.style.display = "none";
-		            } else {
-		              // 요약이 비어있는 경우
-		              summaryTextEl.style.display = "none";
-		              placeholderEl.textContent = "요약이 존재하지 않습니다.";
-		              placeholderEl.style.display = "block";
-		            }
-		          })
-		          .catch(error => {
-		            console.error("요약 불러오기 실패:", error);
-		
-		            // 오류 시 기본 메시지 표시
-		            const summaryTextEl = document.getElementById("summary-text");
-		            const placeholderEl = document.getElementById("summary-placeholder");
-		
-		            summaryTextEl.style.display = "none";
-		            placeholderEl.textContent = "요약 로딩 중 오류 발생";
-		            placeholderEl.style.display = "block";
-		          });
-		      });
-		    });
-		  });
-		</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const summaryLinks = document.querySelectorAll(".show-summary-link");
+
+    summaryLinks.forEach(link => {
+      link.addEventListener("click", function () {
+        const minuteNo = this.getAttribute("data-minute-no");
+        const summaryTextEl = document.getElementById("summary-text");
+        const placeholderEl = document.getElementById("summary-placeholder");
+
+        // 초기화 및 로딩 스피너 표시
+        summaryTextEl.innerHTML = "";
+        summaryTextEl.style.display = "none";
+
+        placeholderEl.innerHTML = `
+          <div class="d-flex justify-content-center align-items-center w-100">
+            <div class="spinner-grow text-secondary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        `;
+        placeholderEl.classList.remove("d-none");
+        placeholderEl.classList.add("d-flex");
+        placeholderEl.style.display = "flex";
+
+        summaryTextEl.setAttribute("data-loading-minute-no", minuteNo);
+
+        fetch(`/project/minute/summary?minuteNo=${minuteNo}`)
+          .then(response => response.text())
+          .then(summary => {
+            const activeMinuteNo = summaryTextEl.getAttribute("data-loading-minute-no");
+            if (activeMinuteNo !== minuteNo) return;
+
+            if (summary && summary.trim().length > 0) {
+              const formattedSummary = summary
+                .split("\n")
+                .map(line => `
+                  <div class="ps-3 text-secondary fs-8 lh-base text-break" style="text-indent: -0.67rem;">
+                    ${line.trim()}
+                  </div>
+                `)
+                .join("");
+
+              summaryTextEl.innerHTML = formattedSummary;
+              summaryTextEl.style.display = "flex";
+
+              // placeholder 완전 제거
+              placeholderEl.innerHTML = "";
+              placeholderEl.style.display = "none";
+              placeholderEl.classList.remove("d-flex");
+              placeholderEl.classList.add("d-none");
+            } else {
+              summaryTextEl.innerHTML = "";
+              summaryTextEl.style.display = "none";
+              placeholderEl.innerHTML = `<div class="text-secondary fs-8">요약이 존재하지 않습니다.</div>`;
+              placeholderEl.classList.remove("d-none");
+              placeholderEl.classList.add("d-flex");
+              placeholderEl.style.display = "flex";
+            }
+          })
+          .catch(error => {
+            console.error("요약 불러오기 실패:", error);
+            summaryTextEl.innerHTML = "";
+            summaryTextEl.style.display = "none";
+            placeholderEl.innerHTML = `<div class="text-danger fs-8">요약 로딩 중 오류 발생</div>`;
+            placeholderEl.classList.remove("d-none");
+            placeholderEl.classList.add("d-flex");
+            placeholderEl.style.display = "flex";
+          });
+      });
+    });
+  });
+</script>
 	</main>
 </body>
 </html>
