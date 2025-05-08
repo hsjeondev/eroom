@@ -1,5 +1,6 @@
 package com.eroom.project.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,7 +8,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eroom.drive.dto.DriveDto;
-import com.eroom.drive.service.DriveService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
@@ -36,6 +35,7 @@ import com.eroom.project.service.ProjectService;
 import com.eroom.project.service.ProjectTodoService;
 import com.eroom.security.EmployeeDetails;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -127,13 +127,36 @@ public class ProjectController {
 	
 	@GetMapping("/detail/{project_no}/main")
 	public String detailMainProjectView(@PathVariable("project_no") Long project_no, Model model) {
-		
-		ProjectDto project = projectService.findByProjectNo(project_no);
-		model.addAttribute("project", project);
-		model.addAttribute("description", project.getDescription().replace("\n", "<br>"));
-		
-		return "project/projectDetailMain";
+
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Employee employee = employeeDetails.getEmployee();
+
+	    ProjectDto project = projectService.findByProjectNo(project_no);
+	    List<ProjectMemberDto> projectMembers = projectService.findByProjectMembersNo(project_no);
+
+	    boolean isProjectMember = false;
+	    boolean isManager = false;
+
+	    for (ProjectMemberDto member : projectMembers) {
+	        if (member.getProject_member().getEmployeeNo().equals(employee.getEmployeeNo())) {
+	            isProjectMember = true;
+
+	            if ("Y".equals(member.getProject_manager()) || "Y".equals(member.getIs_manager())) {
+	                isManager = true;
+	            }
+	            break;
+	        }
+	    }
+
+	    model.addAttribute("project", project);
+	    model.addAttribute("description", project.getDescription().replace("\n", "<br>"));
+	    model.addAttribute("isProjectMember", isProjectMember);
+	    model.addAttribute("isManager", isManager);
+
+	    return "project/projectDetailMain";
 	}
+
 	
 	@GetMapping("/detail/{project_no}/developmentTab")
 	public String detailDevelopmentTabProjectView(@PathVariable("project_no") Long project_no, Model model) {
@@ -202,7 +225,12 @@ public class ProjectController {
 	    @RequestParam(name = "category", defaultValue = "0") String category,
 	    Model model
 	) {
-	    // category -> separatorCode 매핑
+	    // 현재 로그인 사용자 정보
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Long currentEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
+
+	    // separatorCode 매핑
 	    String base = "FL006";
 	    String separatorCode = switch (category) {
 	        case "1" -> base + "1";
@@ -211,15 +239,28 @@ public class ProjectController {
 	        default  -> base;
 	    };
 
-	    List<DriveDto> fileList = 
-	        projectService.findProjectFiles(separatorCode, projectNo);
+	    // 프로젝트 정보와 파일 목록
+	    List<DriveDto> fileList = projectService.findProjectFiles(separatorCode, projectNo);
 	    ProjectDto project = projectService.findByProjectNo(projectNo);
+
+	    // 현재 사용자가 프로젝트 멤버인지 확인
+	    boolean isMember = false;
+	    for (ProjectMemberDto member : project.getProject_members()) {
+	        if ("Y".equals(member.getVisible_yn()) &&
+	            member.getProject_member().getEmployeeNo().equals(currentEmployeeNo)) {
+	            isMember = true;
+	            break;
+	        }
+	    }
 
 	    model.addAttribute("project", project);
 	    model.addAttribute("fileList", fileList);
 	    model.addAttribute("selectedCategory", category);
+	    model.addAttribute("isMember", isMember); // 🔥 추가된 부분
+
 	    return "project/projectDetailFilesTab";
 	}
+
 
 	@GetMapping("/detail/{project_no}/minutes")
 	public String detailProjectMinutesView(@PathVariable("project_no") Long project_no, Model model) {
@@ -324,8 +365,12 @@ public class ProjectController {
 }
 	
 	@GetMapping("/{project_no}/update")
-	public String updateProjectView(@PathVariable("project_no") Long projectNo, Model model) {
+	public String updateProjectView(@PathVariable("project_no") Long projectNo, Model model, HttpServletResponse response) throws IOException {
 	    
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Long currentEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
+
 	    ProjectDto project = projectService.findByProjectNo(projectNo);
 
 	    Long pmId = null;
@@ -335,26 +380,39 @@ public class ProjectController {
 	    List<Long> participantIds = new ArrayList<>();
 	    List<String> participantNames = new ArrayList<>();
 
+	    boolean hasAuthority = false;
+
 	    for (ProjectMemberDto dto : project.getProject_members()) {
-	        // visibleYn이 "Y"인 멤버만 처리
-	        if (!"Y".equals(dto.getVisible_yn())) {
-	            continue;
+	        if (!"Y".equals(dto.getVisible_yn())) continue;
+
+	        Long memberId = dto.getProject_member().getEmployeeNo();
+
+	        // PM 확인
+	        if ("Y".equals(dto.getProject_manager())) {
+	            pmId = memberId;
+	            pmName = dto.getProject_member().getEmployeeName();
 	        }
 
-	        // PM
-	        if ("Y".equals(dto.getProject_manager())) {
-	            pmId   = dto.getProject_member().getEmployeeNo();
-	            pmName = dto.getProject_member().getEmployeeName();
+	        // 권한 확인: PM이거나 is_manager == "Y"
+	        if (memberId.equals(currentEmployeeNo)) {
+	            if ("Y".equals(dto.getProject_manager()) || "Y".equals(dto.getIs_manager())) {
+	                hasAuthority = true;
+	            }
 	        }
 
 	        // 관리자 / 참가자 분류
 	        if ("Y".equals(dto.getIs_manager())) {
-	            managerIds.add(dto.getProject_member().getEmployeeNo());
+	            managerIds.add(memberId);
 	            managerNames.add(dto.getProject_member().getEmployeeName());
 	        } else if ("N".equals(dto.getIs_manager())) {
-	            participantIds.add(dto.getProject_member().getEmployeeNo());
+	            participantIds.add(memberId);
 	            participantNames.add(dto.getProject_member().getEmployeeName());
 	        }
+	    }
+
+	    if (!hasAuthority) {
+	        response.sendError(HttpServletResponse.SC_FORBIDDEN, "접근 권한이 없습니다.");
+	        return null;
 	    }
 
 	    model.addAttribute("pmId", pmId);
@@ -367,6 +425,7 @@ public class ProjectController {
 
 	    return "project/projectUpdate";
 	}
+
 
 
 	
