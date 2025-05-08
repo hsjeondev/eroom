@@ -1,6 +1,7 @@
 package com.eroom.notification.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.notification.entity.Alarm;
 
 public interface AlarmRepository extends JpaRepository<Alarm,Long>, JpaSpecificationExecutor<Alarm> {
@@ -32,4 +34,5 @@ public interface AlarmRepository extends JpaRepository<Alarm,Long>, JpaSpecifica
     @Modifying
     @Query("UPDATE Alarm a SET a.readYn = 'Y' WHERE a.employeeNo = :employeeNo AND a.readYn = 'N'")
     int updateAllToReadByEmployeeNo(@Param("employeeNo") Long employeeNo);
+    
 }
