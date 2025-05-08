@@ -107,7 +107,7 @@
 
 								<p class="text-body-secondary fs-9 mb-0">
 									<i class="fas fa-clock me-1"></i> <span class="fw-bold"
-										th:text="|${#temporals.format(alarm.reg_date, 'a h:mm')} / ${#temporals.format(alarm.calendarAlarm?.alarm_reg_date, 'yyyy.MM.dd')}|">
+										th:text="|${#temporals.format(alarm.reg_date, 'a h:mm')} / ${#temporals.format(alarm.reg_date, 'yyyy.MM.dd')}|">
 									</span>
 								</p>
 							</div>
@@ -163,7 +163,7 @@
 
 											<p class="text-body-secondary fs-9 mb-0">
 												<i class="fas fa-clock me-1"></i> <span class="fw-bold"
-													th:text="|${#temporals.format(alarm.reg_date,'a h:mm')} / ${#temporals.format(alarm.calendarAlarm?.alarm_reg_date, 'yyyy.MM.dd')}|">
+													th:text="|${#temporals.format(alarm.reg_date,'a h:mm')} / ${#temporals.format(alarm.reg_date, 'yyyy.MM.dd')}|">
 												</span>
 											</p>
 										</div>
