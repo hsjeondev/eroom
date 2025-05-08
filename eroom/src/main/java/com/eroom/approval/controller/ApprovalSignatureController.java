@@ -98,7 +98,7 @@ public class ApprovalSignatureController {
 		return map;
 	}
 	
-	@GetMapping("/approval/signature/search")
+	@GetMapping("/approval/signature")
 	@ResponseBody
 	public Map<String, Object> getSignature(@AuthenticationPrincipal EmployeeDetails user) {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -110,6 +110,7 @@ public class ApprovalSignatureController {
 				// Base64로 인코딩해서 반환
 				// "data:image/png;base64," + approvalSignatureService.encodeToBase64(approvalSignature.getApprovalSignatureBlob());
 				ApprovalSignatureDto dto = new ApprovalSignatureDto().toDto(approvalSignature);
+				System.out.println(dto.getSignature_data_url());
 				map.put("signatureDto", dto);
 			} else {
 				// 이미지가 없으면 빈 문자열 반환
