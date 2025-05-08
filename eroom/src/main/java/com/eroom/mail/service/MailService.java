@@ -35,6 +35,8 @@ import com.eroom.mail.repository.MailDraftRepository;
 import com.eroom.mail.repository.MailReceiverRepository;
 import com.eroom.mail.repository.MailRepository;
 import com.eroom.mail.repository.MailStatusRepository;
+import com.eroom.notification.entity.Alarm;
+import com.eroom.notification.repository.AlarmRepository;
 import com.eroom.websocket.MailAlarmWebSocketHandler;
 import com.eroom.websocket.MailWebSocketHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,6 +54,8 @@ public class MailService {
 	private final MailDraftRepository mailDraftRepository;
 	private final DriveRepository driveRepository;
 	private final MailAlarmRepository mailAlarmRepository;
+	
+	private final AlarmRepository alarmRepository;
 	
 	private final MailAlarmWebSocketHandler mailAlarmWebSocketHandler;
 	private final MailWebSocketHandler mailWebSocketHandler;
@@ -502,16 +506,34 @@ public class MailService {
 		            MailAlarmDto mailAlarmDto = new MailAlarmDto();
 		            mailAlarmDto.setMail_receiver_no(mailRecieverSaver.getMailReceiverNo());
 	            	MailAlarm mailAlarm = mailAlarmDto.toEntity();
-	            	mailAlarmRepository.save(mailAlarm);
+	            	MailAlarm savedMailAlarm =mailAlarmRepository.save(mailAlarm);
 	            	
-	            	/*
+	            	
 	            	Alarm alarm = Alarm.builder()
+	            			.employeeNo(mailRecieverSaver.getReceiver().getEmployeeNo())
+	            		    .separatorCode("R003")                    // 메일 알림 코드
+	            		    .readYn("N")
 	            		    .param1(savedMailAlarm.getMailAlarmNo())  // mail_alarm_no 저장
-	            		    .separatorCode("M001")                    // 메일 알림 코드
+	            		    .regDate(LocalDateTime.now())
 	            		    .build();
 
 	            	alarmRepository.save(alarm);
+	            	
+	            	/*
+	            	.alarm_no(alarm.getAlarmNo())
+					// 메일 알람 PK
+					.param1(alarm.getParam1())
+					// 메일 알람 코드
+					.separator_code(alarm.getSeparatorCode())
+					// 메일 받은 사람 PK
+					.employee_no(alarm.getEmployeeNo())
+					// 읽음
+					.read_yn(alarm.getReadYn())
+					// 날짜
+					.reg_date(alarm.getRegDate())
+					.build();
 	            	*/
+	            	
 		         /*
 		         try {
 		             Map<String, Object> message = new HashMap<>();

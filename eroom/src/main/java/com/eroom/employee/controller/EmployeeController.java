@@ -24,7 +24,7 @@ public class EmployeeController {
 	public String loginView(HttpServletRequest request, Model model) {
 	    String errorMsg = (String) request.getSession().getAttribute("loginErrorMsg");
 	    
-	    System.out.println("errorMsg " + errorMsg);
+//	    System.out.println("errorMsg " + errorMsg);
 
 	    if (errorMsg != null) {
 	        model.addAttribute("error", "true");
