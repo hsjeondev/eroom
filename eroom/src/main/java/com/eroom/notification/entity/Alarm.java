@@ -52,14 +52,15 @@ public class Alarm {
 	@CreationTimestamp
 	private LocalDateTime regDate;
 	
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "param1", insertable = false, updatable = false)
-    private CalendarAlarm calendarAlarm;
     
     //메일 알람
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "param1", referencedColumnName = "mail_alarm_no", insertable = false, updatable = false)
     private MailAlarm mailAlarm;
+    
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "param1", referencedColumnName = "alarm_id", insertable = false, updatable = false)
+    private CalendarAlarm calendarAlarm;
 
     //채팅 알람
     @OneToOne(fetch = FetchType.LAZY)

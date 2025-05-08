@@ -187,7 +187,7 @@ public class ArticleController {
 	    Map<String, String> resultMap = new HashMap<>();
 	    resultMap.put("res_code", "500");
 	    resultMap.put("res_msg", "공지 등록 중 오류가 발생했습니다.");
-
+	    
 	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
 
 	    int result = articleService.createArticle(articleDto, employeeNo,articleFiles);

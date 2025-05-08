@@ -448,7 +448,9 @@ td.name p {
 
 							<!-- 하단 버튼 영역 -->
 							<div class="d-flex justify-content-between">
-								<a href="#" class="btn btn-outline-primary flex-fill me-2"> <i class="fas fa-paper-plane me-1"></i> 1:1 채팅하기
+								<a href="#" id="startChatBtn" class="btn btn-outline-primary flex-fill me-2">
+								  <i class="fas fa-paper-plane me-1"></i> 1:1 채팅하기
+								</a>
 								</a> <a href="#" class="btn btn-outline-secondary flex-fill"> <i class="fas fa-envelope me-1"></i> 이메일 보내기
 								</a>
 							</div>
@@ -598,6 +600,11 @@ td.name p {
 					    const position = trigger.getAttribute('data-position') || '-';
 					    const memberDirectoryNo = trigger.getAttribute('data-memberDirectoryNo') || '-';
 					    
+					    // 1대1 채팅하기
+					    const chatBtn = modal.querySelector('#startChatBtn');
+					    if (chatBtn && targetEmpNo) {
+					      chatBtn.setAttribute('href', `/chat/room/${targetEmpNo}`);
+					    }
 					    
 						
 					    // 사원 메모 조회 (AJAX GET)
