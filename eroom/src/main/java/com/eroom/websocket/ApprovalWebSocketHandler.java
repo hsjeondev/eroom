@@ -60,7 +60,7 @@ public class ApprovalWebSocketHandler extends TextWebSocketHandler {
         Long employeeNo = employee.getEmployeeNo();
         if (employeeNo != null) {
             sessions.remove(employeeNo);
-            log.info("웹소켓 연결 종료: employeeNo={}", employeeNo);
+//            log.info("웹소켓 연결 종료: employeeNo={}", employeeNo);
         }
     }
 
