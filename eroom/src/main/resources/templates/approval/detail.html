@@ -11,6 +11,33 @@
   <meta name="_csrf" th:content="${_csrf.token}" />
   <meta name="_csrf_header" th:content="${_csrf.headerName}" />
   <title>결재 상세</title>
+  <style>
+  .myDataTable {
+    width: auto;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    margin-left: auto; /* 부모 기준으로 오른쪽으로 밀기 */
+  }
+
+  .table-wrapper {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+  }
+
+  .myDataTable thead th {
+    word-wrap: break-word;
+    text-align: center;
+    width: 100px !important;
+  }
+
+  .myDataTable tbody td {
+    word-wrap: break-word;
+    text-align: center;
+    vertical-align: middle;
+    width: 100px !important;
+  }
+  </style>
 </head>
 <body class="bg-light">
   <main class="main" id="top" layout:fragment="content">
@@ -78,10 +105,13 @@
         <!-- 결재라인 -->
         <div class="mb-3">
           <div class="fw-bold text-dark border-bottom pb-1 mb-2">결재 라인</div>
-          <table class="table table-bordered text-center align-middle mb-0" th:if="${#lists.size(approvalLineList.?[approval_line_step >= 1]) > 0}">
+          <table class="myDataTable table table-bordered text-center align-middle mb-0" th:if="${#lists.size(approvalLineList.?[approval_line_step >= 1]) > 0}">
+              <!-- <colgroup>
+			    <col th:each="line : ${approvalLineList}" th:if="${line.approval_line_step >= 1}" style="width: 100px;" />
+			  </colgroup> -->
             <thead class="table-light">
               <tr>
-                <th style="width: 100px;" th:each="line : ${approvalLineList}" th:if="${line.approval_line_step >= 1}"
+                <th th:each="line : ${approvalLineList}" th:if="${line.approval_line_step >= 1}"
                     th:utext="|${line.employee.employeePosition}<br>${line.employee.employeeName}|">
                   직급<br>결재자
                 </th>
@@ -108,10 +138,13 @@
         <!-- 합의라인 -->
         <div class="mb-3">
           <div class="fw-bold text-dark border-bottom pb-1 mb-2">합의 라인</div>
-          <table class="table table-bordered text-center align-middle mb-0" th:if="${#lists.size(approvalLineList.?[approval_line_step == 0]) > 0}">
+          <table class="myDataTable table table-bordered text-center align-middle mb-0" th:if="${#lists.size(approvalLineList.?[approval_line_step == 0]) > 0}">
+              <!-- <colgroup>
+			    <col th:each="line : ${approvalLineList}" th:if="${line.approval_line_step == 0}" style="width: 100px;" />
+			  </colgroup> -->
             <thead class="table-light">
               <tr>
-                <th style="width: 100px;" th:each="line : ${approvalLineList}" th:if="${line.approval_line_step == 0}" 
+                <th th:each="line : ${approvalLineList}" th:if="${line.approval_line_step == 0}" 
                     th:utext="|${line.employee.employeePosition}<br>${line.employee.employeeName}|">직급<br>합의자</th>
               </tr>
             </thead>
