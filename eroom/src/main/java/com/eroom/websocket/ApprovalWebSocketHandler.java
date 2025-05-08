@@ -37,12 +37,12 @@ public class ApprovalWebSocketHandler extends TextWebSocketHandler {
         Employee employee = employeeService.findEmployeeByEmployeeId(userId);
         Long employeeNo = employee.getEmployeeNo();
         
-        System.out.println("출력 테스트 : " + userId);
+//        System.out.println("출력 테스트 : " + userId);
         if (employeeNo != null) {
             sessions.put(employeeNo, session);
-            log.info("웹소켓 연결됨: employeeNo={}", employeeNo);
+//            log.info("웹소켓 연결됨: employeeNo={}", employeeNo);
         } else {
-            log.warn("employeeNo가 세션에 없음. 연결 세션ID={}", session.getId());
+//            log.warn("employeeNo가 세션에 없음. 연결 세션ID={}", session.getId());
         }
     }
 
@@ -70,7 +70,11 @@ public class ApprovalWebSocketHandler extends TextWebSocketHandler {
 
             try {
             	saveNotificationToDatabase(receiverNo, message, approval);
-                session.sendMessage(new TextMessage(message));
+//            	alert 보기 싫으면 주석처리
+            	if(session != null) {
+            		session.sendMessage(new TextMessage(message));
+            	}
+//            	alert 보기 싫으면 주석처리
                 log.info("알림 전송 성공: employeeNo={}", receiverNo);
             } catch (Exception e) {
                 log.error("알림 전송 실패: employeeNo=" + receiverNo, e);
