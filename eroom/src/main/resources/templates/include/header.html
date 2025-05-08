@@ -409,11 +409,16 @@
     			          .then(response => response.json())
     			          .then(data => {
     			        	  console.log(data.res_msg);
+    			        	  console.log("roomNo 확인:", data.roomNo);
     			        	  if (data != null && data.res_code == '200') {
     			        	    if (data.separator_code == 'R001') {
     			        	      location.href = "/calendar/all";
     			        	    } else if (data.separator_code == 'R002') {
-    			        	      // R002 처리 로직
+   			        	    	  if (data.roomNo) {
+		        	    		    location.href = `/chat/list?roomNo=${data.roomNo}`;
+		        	    		  } else {
+		        	    		    alert("채팅방 정보를 찾을 수 없습니다.");
+		        	    		  }
     			        	    } else if (data.separator_code == 'R003') {
     			        	      // R003 처리 로직
     			        	    } else if (data.separator_code == 'R004') {

@@ -35,6 +35,7 @@ public class AlarmDto {
 	private String comment; // 결재 알람 코멘트
 	private String calendarAlarm_separator;
 	private Long approval_no;
+	private Long roomNo; // 채팅방 번호 
 	
 	public Alarm toEntity() {
 		return Alarm.builder()
@@ -60,7 +61,17 @@ public class AlarmDto {
 					.calendarAlarm_separator((alarm.getCalendarAlarm() != null && alarm.getCalendarAlarm().getSeparator() != null) ? alarm.getCalendarAlarm().getSeparator() : "")
 					.build();
 		} else if(("R002").equals(separatorCode)) {
-			return null;
+			return AlarmDto.builder()
+			        .alarm_no(alarm.getAlarmNo())
+			        .param1(alarm.getParam1())
+			        .separator_code(alarm.getSeparatorCode())
+			        .employee_no(alarm.getEmployeeNo())
+			        .read_yn(alarm.getReadYn())
+			        .reg_date(alarm.getRegDate())
+			        .roomNo(alarm.getChatAlarm() != null && alarm.getChatAlarm().getChatMessage() != null
+		            ? alarm.getChatAlarm().getChatMessage().getChatroom().getChatroomNo()
+		            : null)
+			        .build();
 		} else if(("R003").equals(separatorCode)) {
 			return AlarmDto.builder()
 					//FK
