@@ -62,7 +62,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					<tr th:if="${!#lists.isEmpty(vehicleList)}" th:each="vehicle, status : ${vehicleList}" class="align-middle">
 						<td class="no" th:text="${status.count}">번호</td>
 						<td class="vehicle" th:text="${vehicle.facilityName}">차량명</td>
-						<td class="passengers" th:text="|${vehicle.facilityCapacity}명|">탑승 가능 인원</td>
+						<td class="passengers" th:text="|${vehicle.facilityCapacity}명|">탑승 정원</td>
 						<td class="regDate" th:text="${#temporals.format(vehicle.facilityRegDate, 'yy.MM.dd')}">등록일</td>
 						<td class="regDate" th:text="${vehicle.facilityModDate != null} ? ${#temporals.format(vehicle.facilityModDate, 'yyyy.MM.dd')} : '-'">수정일</td>
 						<td class="text-end pe-0">
@@ -182,7 +182,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
           <div class="mb-3">
             <label for="createVehicleName" class="form-label fw-semibold">차량명</label>
             <div class="input-group">
-              <input type="text" class="form-control" id="createVehicleName" name="vehicle_name" required placeholder="차량명 [00가 0000]">
+              <input type="text" class="form-control" id="createVehicleName" name="facility_name" required placeholder="차량명 [00가 0000]">
               <button type="button" class="btn btn-outline-secondary" id="checkVehicleNameBtn">중복확인</button>
             </div>
             <small id="vehicleNameCheckMsg" class="form-text d-none"></small>
@@ -190,7 +190,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
           <!-- 탑승 정원 -->
           <div class="mb-3">
             <label for="createVehicleCapacity" class="form-label fw-semibold">탑승 정원</label>
-            <input type="number" class="form-control" id="createVehicleCapacity" name="vehicle_capacity" required min="1" placeholder="숫자만 입력">
+            <input type="number" class="form-control" id="createVehicleCapacity" name="facility_capacity" required min="1" placeholder="숫자만 입력">
           </div>
         </div>
 
@@ -221,7 +221,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
           <div class="mb-3">
             <label for="editVehicleName" class="form-label fw-semibold">차량명</label>
             <div class="input-group">
-              <input type="text" class="form-control" id="editVehicleName" name="vehicle_name" required placeholder="차량명 [00가 0000]">
+              <input type="text" class="form-control" id="editVehicleName" name="facility_name" required placeholder="차량명 [00가 0000]">
               <button type="button" class="btn btn-outline-secondary" id="editCheckVehicleNameBtn">중복확인</button>
             </div>
             <small id="editVehicleNameCheckMsg" class="form-text d-none"></small>
@@ -229,7 +229,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
           <!-- 탑승 정원 -->
           <div class="mb-3">
             <label for="editVehicleCapacity" class="form-label fw-semibold">탑승 정원</label>
-            <input type="number" class="form-control" id="editVehicleCapacity" name="vehicle_capacity" required min="1">
+            <input type="number" class="form-control" id="editVehicleCapacity" name="facility_capacity" required min="1">
           </div>
         </div>
 
@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded',function(){
 	
 	// 모달 인스턴스 초기화(생성용)
 	const createVehicleModalEl = document.getElementById('createVehicleModal');
-	const createModal = bootstarp.Modal.getOrCreateInstance(createVehicleModalEl);
+	const createModal = bootstrap.Modal.getOrCreateInstance(createVehicleModalEl);
 	const unsavedCreateModal = new bootstrap.Modal(document.getElementById('unsavedCreateModal'));
 	// 생성 모달 필드 요소
 	const nameInput = document.getElementById('createVehicleName'); // 차량명
@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded',function(){
 	const editCapacityInput = document.getElementById('editVehicleCapacity');
 	const editVehicleNameCheckMsg = document.getElementById('editVehicleNameCheckMsg'); // 수정용 이름중복 메세지
 	
-	// 생성용 회의실명 입력값 변경시 -> 변경 감지 플래그 ON + 중복확인 무효화 처리
+	// 생성용 차량명 입력값 변경시 -> 변경 감지 플래그 ON + 중복확인 무효화 처리
 	nameInput.addEventListener('input',function(){
 		isCreateFormEdited = true; // 생성폼 수정 여부 true
 		// 중복 확인 했고, 기존 이름과 다르면 다시 확인
@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded',function(){
 			vehicleNameCheckMsg.classList.remove('d-none');
 		}
 	});	
-	// 생성용 수용 인원 변경 시에도 변경 감지 플래그 ON
+	// 생성용 탑승 정원 변경 시에도 변경 감지 플래그 ON
 	capacityInput.addEventListener('input',function(){
 		isCreateFormEdited = true;
 	});	
@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded',function(){
 	});
 	
 	// 삭제버튼 클릭시
-	document.querySelectorAll('.deleteRoomBtn').forEach(btn => {
+	document.querySelectorAll('.deleteVehicleBtn').forEach(btn => {
 		btn.addEventListener('click',function(){
 		    currentFacilityNo = btn.dataset.facilityNo;
 		    currentMode = 'delete';
@@ -516,20 +516,20 @@ document.addEventListener('DOMContentLoaded',function(){
 		const form = document.getElementById('createVehicleForm');
 		const formData = new FormData(form);
 
-		const vehicleName = formData.get('vehicle_name')?.trim().replace(/\s+/g, '');
-		const vehicleCapacity = formData.get('vehicle_capacity')?.trim();
+		const vehicleName = formData.get('facility_name')?.trim().replace(/\s+/g, '');
+		const vehicleCapacity = formData.get('facility_capacity')?.trim();
 		// 유효성 검사
 		if(!vehicleName){
-			showAlertModal('회의실명을 입력해주세요.');
+			showAlertModal('차량명을 입력해주세요.');
 			return;
 		}
 		if(!vehicleCapacity || isNaN(vehicleCapacity) || Number(vehicleCapacity) < 1){
-			showAlertModal('수용 인원은 1 이상의 숫자로 입력해주세요.');
+			showAlertModal('탑승 정원은 1 이상의 숫자로 입력해주세요.');
 			return;
 		}
 		// 중복확인 여부 확인
 		if (!isNameChecked || vehicleName !== prevCreateName) {
-			showAlertModal('회의실명 중복 확인을 먼저 해주세요.');
+			showAlertModal('차량명 중복 확인을 먼저 해주세요.');
 			return;
 		}
 		console.log("=== fetch 시작됨 ===");
@@ -578,7 +578,7 @@ document.addEventListener('DOMContentLoaded',function(){
 		}
 	});	
 	
-	// 수정 모달 - 수용 인원 변경 감지
+	// 수정 모달 - 탑승 정원 변경 감지
 	editCapacityInput.addEventListener('input',function(){
 		isEditFormEdited = true;
 	});	
@@ -586,7 +586,7 @@ document.addEventListener('DOMContentLoaded',function(){
 	document.getElementById('editCheckVehicleNameBtn').addEventListener('click',function(){
 		const editName = editNameInput.value.trim().replace(/\s+/g, '');
 		if(!editName){
-			editVehicleNameCheckMsg.textContent = '회의실명을 입력해주세요.';
+			editVehicleNameCheckMsg.textContent = '차량명을 입력해주세요.';
 			editVehicleNameCheckMsg.classList.remove('d-none');
 			return;
 		}
@@ -606,13 +606,13 @@ document.addEventListener('DOMContentLoaded',function(){
 			.then(data => {
 				if(data.exists){
 					isEditNameChecked = false;
-					editVehicleNameCheckMsg.textContent = '이미 존재하는 회의실명입니다.';
+					editVehicleNameCheckMsg.textContent = '이미 존재하는 차량명입니다.';
 					editVehicleNameCheckMsg.classList.remove('text-success');
 					editVehicleNameCheckMsg.classList.add('text-danger');
 				}else{
 					prevEditName = editName;
 					isEditNameChecked = true;
-					editVehicleNameCheckMsg.textContent = '사용 가능한 회의실명입니다.';
+					editVehicleNameCheckMsg.textContent = '사용 가능한 차량명입니다.';
 					editVehicleNameCheckMsg.classList.remove('text-danger');
 					editVehicleNameCheckMsg.classList.add('text-success');
 				}
@@ -631,7 +631,7 @@ document.addEventListener('DOMContentLoaded',function(){
 			currentFacilityNo = facilityNo;
 			currentMode = 'edit';
 			
-			// 서버에서 회의실 정보 가져오기
+			// 서버에서 차량 정보 가져오기
 			fetch(`/admin/vehicle/get?facilityNo=${facilityNo}`)
 				.then(response => response.json())
 				.then(data => {
@@ -662,23 +662,29 @@ document.addEventListener('DOMContentLoaded',function(){
 	function sendEditVehicle(){
 		const form = document.getElementById('editVehicleForm');
 		const formData = new FormData(form);
-
-		const vehicleName = formData.get('vehicle_name')?.trim().replace(/\s+/g, '');
-		const vehicleCapacity = formData.get('vehicle_capacity')?.trim();
+		
+		console.log("vehicle_name",formData.get("facility_name"));
+		console.log("vehicle_capacity",formData.get("facility_capacity"));
+		
+		const vehicleName = formData.get('facility_name')?.trim().replace(/\s+/g, '');
+		const vehicleCapacity = formData.get('facility_capacity')?.trim();
+		
+		console.log("🚨 vehicle_name:", vehicleName);  // 이거 찍어보자
+		console.log("🚨 vehicle_capacity:", vehicleCapacity);		
 
 		// 유효성 검사
 		if(!vehicleName){
-			showAlertModal('회의실명을 입력해주세요.');
+			showAlertModal('차량명을 입력해주세요.');
 			return;
 		}
 		if(!vehicleCapacity || isNaN(vehicleCapacity) || Number(vehicleCapacity) < 1){
-			showAlertModal('수용 인원은 1 이상의 숫자로 입력해주세요.');
+			showAlertModal('탑승 정원은 1 이상의 숫자로 입력해주세요.');
 			return;
 		}
 
 		// 중복 확인 여부 확인
 		if (!isEditNameChecked || vehicleName !== prevEditName) {
-			showAlertModal('회의실명 중복 확인을 먼저 해주세요.');
+			showAlertModal('차량명 중복 확인을 먼저 해주세요.');
 			return;
 		}
 
@@ -717,7 +723,7 @@ document.addEventListener('DOMContentLoaded',function(){
 	// 차량 삭제	
 	function sendDeleteVehicle() {
 		if (!currentFacilityNo) {
-			showAlertModal('삭제할 회의실 정보를 찾을 수 없습니다.');
+			showAlertModal('삭제할 차량 정보를 찾을 수 없습니다.');
 			return;
 		}
 	

@@ -44,6 +44,8 @@ public class FacilityDto {
 	    facility.setFacilityNo(this.facility_no);
 	    facility.setFacilityName(this.facility_name);
 	    facility.setFacilityCapacity(this.facility_capacity);
+	    facility.setSeparatorCode(this.separator_code);
+	    facility.setFacilityCreator(this.facility_creator); 
 	    facility.setFacilityEditor(this.facility_editor);
 	    return facility;
 	}

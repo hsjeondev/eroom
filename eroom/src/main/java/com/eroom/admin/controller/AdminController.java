@@ -90,21 +90,17 @@ public class AdminController {
 		return resultMap;
 	}
 
-	
 	// 회의실 생성
 	@PostMapping("/meetingroom/create")
 	@ResponseBody
-	public Map<String, Object> createMeetingRoom(
-	        @RequestParam("room_name") String roomName,
-	        @RequestParam("room_capacity") String roomCapacity,
-	        Authentication authentication) {
-		System.out.println("=== createMeetingRoom() 호출됨 ===");
+	public Map<String, Object> createMeetingRoom(@RequestParam("room_name") String roomName,
+	        									@RequestParam("room_capacity") String roomCapacity,
+	        									Authentication authentication) {
 	    Map<String, Object> resultMap = new HashMap<>();
 
 	    // 로그인한 사용자 정보
 	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 	    String employeeId = employeeDetails.getEmployee().getEmployeeId();
-
 	    // DTO 구성
 	    FacilityDto dto = FacilityDto.builder()
 	            .facility_name(roomName)
@@ -112,19 +108,17 @@ public class AdminController {
 	            .separator_code("F001")
 	            .visible_yn("Y")
 	            .facility_creator(employeeId)
-	            .facility_editor(employeeId)
 	            .build();
 
 	    try {
 	        facilityService.createMeetingroom(dto);
 	        resultMap.put("res_code", 200);
-	        resultMap.put("res_msg", "회의실 등록 성공");
+	        resultMap.put("res_msg", "회의실 등록이 성공적으로 완료되었습니다.");
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	        resultMap.put("res_code", 500);
 	        resultMap.put("res_msg", "서버 오류로 등록 실패: "+e.getMessage());
 	    }
-
 	    return resultMap;
 	}
 	
@@ -135,14 +129,10 @@ public class AdminController {
 	        									@RequestParam(value = "room_name", required = false) String roomName,
 	        									@RequestParam(value = "room_capacity", required = false) String roomCapacity,
 	        									Authentication authentication) {
-
-	    System.out.println("=== updateMeetingRoom() 호출됨 ===");
 	    Map<String, Object> resultMap = new HashMap<>();
-
 	    // 로그인 사용자
 	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 	    String employeeId = employeeDetails.getEmployee().getEmployeeId();
-
 	    // DTO 구성
 	    FacilityDto dto = FacilityDto.builder()
 	            .facility_no(facilityNo)
@@ -150,7 +140,6 @@ public class AdminController {
 	            .facility_capacity(roomCapacity)
 	            .facility_editor(employeeId)
 	            .build();
-
 	    try {
 	        Facility updated = facilityService.updateMeetingroom(dto);
 	        if (updated != null) {
@@ -165,7 +154,6 @@ public class AdminController {
 	        resultMap.put("res_code", 500);
 	        resultMap.put("res_msg", "서버 오류로 수정 실패: " + e.getMessage());
 	    }
-
 	    return resultMap;
 	}
 	
@@ -174,20 +162,16 @@ public class AdminController {
 	@ResponseBody
 	public Map<String, Object> deleteMeetingRoom(@RequestParam("facility_no") Long facilityNo,
 												Authentication authentication) {
-
 	    Map<String, Object> resultMap = new HashMap<>();
-
 	    // 로그인 사용자 정보
 	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 	    String employeeId = employeeDetails.getEmployee().getEmployeeId();
-
 	    // DTO 구성
 	    FacilityDto dto = FacilityDto.builder()
 	            .facility_no(facilityNo)
 	            .facility_editor(employeeId)
 	            .visible_yn("N") // 삭제는 visible_yn = N 처리
 	            .build();
-
 	    try {
 	        Facility deleted = facilityService.deleteMeetingroom(dto);
 	        if (deleted != null) {
@@ -202,10 +186,8 @@ public class AdminController {
 	        resultMap.put("res_code", 500);
 	        resultMap.put("res_msg", "서버 오류로 삭제 실패: " + e.getMessage());
 	    }
-
 	    return resultMap;
 	}	
-	
 	
 	// 회의실명 중복 체크
 	@GetMapping("/meetingroom/checkDuplicate")
@@ -235,7 +217,7 @@ public class AdminController {
 	// 차량 목록
 	@GetMapping("/vehicle")
 	public String selectVehicleList(Model model) {
-		List<Facility> resultList = facilityService.selectVehicleAll();
+		List<Facility> resultList = facilityService.selectVisibleVehicles();
 		// 전체 예약 현황
 		List<VehicleDto> reservationList = vehicleService.getAllReservations();
 		model.addAttribute("vehicleList",resultList);
@@ -259,6 +241,103 @@ public class AdminController {
 			resultMap.put("facility_capacity",dto.getFacility_capacity());
 		}
 		return resultMap;
+	}
+	
+	// 차량 생성
+	@PostMapping("/vehicle/create")
+	@ResponseBody
+	public Map<String,Object> createVehicle(@RequestParam("facility_name") String vehicleName,
+											@RequestParam("facility_capacity") String vehicleCapacity,
+											Authentication authentication){
+		Map<String,Object> resultMap = new HashMap<>();
+		
+		EmployeeDetails employee = (EmployeeDetails) authentication.getPrincipal();
+		String employeeId = employee.getEmployee().getEmployeeId();
+		
+		FacilityDto dto = FacilityDto.builder()
+						.facility_name(vehicleName)
+						.facility_capacity(vehicleCapacity)
+						.separator_code("F002")
+						.visible_yn("Y")
+						.facility_creator(employeeId)
+						.build();
+		try {
+			facilityService.createVehicle(dto);
+	        resultMap.put("res_code", 200);
+	        resultMap.put("res_msg", "차량 등록이 성공적으로 완료되었습니다.");			
+		}catch(Exception e) {
+			e.printStackTrace();
+			resultMap.put("res_code", 500);
+			resultMap.put("res_msg", "서버 오류로 등록 실패:"+e.getMessage());
+		}
+		return resultMap;
+	}
+	
+	// 차량 수정
+	@PostMapping("/vehicle/edit")
+	@ResponseBody
+	public Map<String,Object> updateVehicle(@RequestParam("facility_no") Long facilityNo,
+											@RequestParam(value="facility_name", required=false) String vehicleName,
+											@RequestParam(value="facility_capacity", required=false) String vehicleCapacity,
+											Authentication authentication) {
+		Map<String,Object> resultMap = new HashMap<>();
+		EmployeeDetails employee = (EmployeeDetails) authentication.getPrincipal();
+		String employeeId = employee.getEmployee().getEmployeeId();
+		
+		FacilityDto dto = FacilityDto.builder()
+						.facility_no(facilityNo)
+						.facility_name(vehicleName)
+						.facility_capacity(vehicleCapacity)
+						.facility_editor(employeeId)
+						.build();
+		
+		try {
+			Facility updated = facilityService.updateVehicle(dto);
+			if(updated != null) {
+		        resultMap.put("res_code", 200);
+		        resultMap.put("res_msg", "차량 정보가 성공적으로 수정되었습니다.");
+			}else {
+		        resultMap.put("res_code", 404);
+		        resultMap.put("res_msg", "수정할 차량을 찾을 수 없습니다.");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+	        resultMap.put("res_code", 500);
+	        resultMap.put("res_msg", "서버 오류로 수정 실패: " + e.getMessage());			
+		}
+		return resultMap;		
+	}
+	
+	// 차량 삭제
+	@PostMapping("/vehicle/delete")
+	@ResponseBody
+	public Map<String,Object> deleteVehicle(@RequestParam("facility_no") Long facilityNo,
+											Authentication authentication){
+	    Map<String, Object> resultMap = new HashMap<>();
+	    // 로그인 사용자 정보
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    String employeeId = employeeDetails.getEmployee().getEmployeeId();
+	    // DTO 구성
+	    FacilityDto dto = FacilityDto.builder()
+	            .facility_no(facilityNo)
+	            .facility_editor(employeeId)
+	            .visible_yn("N") // 삭제는 visible_yn = N 처리
+	            .build();
+	    try {
+	        Facility deleted = facilityService.deleteVehicle(dto);
+	        if (deleted != null) {
+	            resultMap.put("res_code", 200);
+	            resultMap.put("res_msg", "차량이 성공적으로 삭제되었습니다.");
+	        } else {
+	            resultMap.put("res_code", 404);
+	            resultMap.put("res_msg", "삭제할 차량을 찾을 수 없습니다.");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        resultMap.put("res_code", 500);
+	        resultMap.put("res_msg", "서버 오류로 삭제 실패: " + e.getMessage());
+	    }
+	    return resultMap;		
 	}
 	
 	// 회원 관리
@@ -291,7 +370,6 @@ public class AdminController {
 		}
 		model.addAttribute("teamList", teamList);
 		model.addAttribute("teamId",teamId);
-		
 		
 		// 드롭다운 버튼 라벨 텍스트 지정
 		String deptLabel = "부서";
@@ -507,10 +585,10 @@ public class AdminController {
 	@GetMapping("/attendanceDetail")
 	@ResponseBody
 	public AttendanceDto getAttendanceDetail(@RequestParam("attendanceNo") Long attendanceNo){
-	    System.out.println("받은 attendanceNo: " + attendanceNo);
 	    AttendanceDto dto = attendanceService.findAttendanceByNo(attendanceNo);
 	    return dto;
 	}
+	
 	// 회원 근태 정보 수정
 	@PostMapping("attendanceUpdate")
 	@ResponseBody
@@ -543,7 +621,6 @@ public class AdminController {
 		
 		resultMap.put("duplicate",isDuplicate);
 		return resultMap;
-	
 	}
 	
 	// 부서 선택에 따른 팀 리스트 반환
@@ -579,7 +656,6 @@ public class AdminController {
 			
 			resultMap.put("res_msg", "회원 등록에 실패했습니다.");
 		}
-		
 		return resultMap;
 	}
 	
@@ -715,6 +791,5 @@ public class AdminController {
 		
 		return resultMap;
 	}
-	
 	
 }
