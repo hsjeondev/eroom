@@ -723,6 +723,13 @@
 
 		    	  </div>
 		    	`;
+		    	const messageInput = document.getElementById("messageInput");
+				messageInput?.addEventListener("keydown", function (e) {
+				  if (e.key === "Enter" && !e.shiftKey) {
+				    e.preventDefault();
+				    sendMessage();
+				  }
+				});
 		    	bindFilePreview();
 		    // 수신자 employeeNo 가져오기
 		    if (!isGroup) {
