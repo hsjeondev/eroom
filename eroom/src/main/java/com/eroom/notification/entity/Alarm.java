@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.eroom.approval.entity.ApprovalAlarm;
+import com.eroom.calendar.entity.CalendarAlarm;
 import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.mail.entity.MailAlarm;
 

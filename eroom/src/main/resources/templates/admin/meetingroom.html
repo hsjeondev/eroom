@@ -7,6 +7,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 <head>
 <meta charset="UTF-8">
 <title>회의실 목록</title>
+<style>
+	.table tbody > tr {
+	  height: 45px;  /* 또는 48px, 필요에 따라 조정 */
+	}
+</style>
 </head> 
 <body>
 <main class="main" id="top" layout:fragment="content">
@@ -17,7 +22,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	    <span class="fw-bold fs-7">회의실 목록</span>
 	  </div>
 
-	<div id="meetingroomTable" data-list='{"valueNames":["no","meetingroom","capacity","date"], "page": 5, "pagination": true}'>
+	<div id="meetingroomTable" data-list='{"valueNames":["no","meetingroom","capacity","regDate","modDate"], "page": 5, "pagination": true}'>
 		<!-- 검색창 + 추가 버튼 영역 -->
 		<div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
 			<!-- 검색창 (가운데 정렬) -->
@@ -47,17 +52,19 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						<th class="sort" data-sort="no" style="width: 5%;">번호</th>
 						<th class="sort" data-sort="meetingroom" style="width: 25%;">회의실</th>
 						<th class="sort" data-sort="capacity" style="width: 20%;">수용 인원</th>
-						<th class="sort" data-sort="date" style="width: 20%;">등록일</th>
+						<th class="sort" data-sort="regDate" style="width: 20%;">등록일</th>
+						<th class="sort" data-sort="modDate" style="width: 20%;">수정일</th>
 						<th style="width: 10%;"></th>
 					</tr>
 				</thead>
 				<tbody class="list align-middle">
 					<!-- 회의실 1 -->
 					<tr th:if="${!#lists.isEmpty(meetingroomList)}" th:each="meetingroom, status : ${meetingroomList}">
-						<td class="no" th:text="${status.count}">1</td>
-						<td class="meetingroom" th:text="${meetingroom.facilityName}">회의실A</td>
-						<td class="capacity" th:text="|${meetingroom.facilityCapacity}명|"></td>
-						<td class="date" th:text="${#temporals.format(meetingroom.facilityRegDate, 'yy.MM.dd')}">2025-04-10</td>
+						<td class="no" th:text="${status.count}">번호</td>
+						<td class="meetingroom" th:text="${meetingroom.facilityName}">회의실</td>
+						<td class="capacity" th:text="|${meetingroom.facilityCapacity}명|">인원</td>
+						<td class="regDate" th:text="${#temporals.format(meetingroom.facilityRegDate, 'yyyy.MM.dd')}"></td>
+						<td class="modDate" th:text="${meetingroom.facilityModDate != null} ? ${#temporals.format(meetingroom.facilityModDate, 'yyyy.MM.dd')} : '-'"></td>
 						<td class="align-middle text-end pe-0">
 							<div class="btn-reveal-trigger position-static">
 								<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
@@ -74,7 +81,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						</td>
 					</tr>
 					<tr th:if="${#lists.isEmpty(meetingroomList)}">
-						<td colspan="5">등록된 회의실이 없습니다.</td>
+						<td colspan="6">등록된 회의실이 없습니다.</td>
 					</tr>
 				</tbody>
 			</table>
@@ -134,11 +141,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				<tbody class="list align-middle">
 					<tr th:if="${!#lists.isEmpty(meetingroomReservationList)}"
 						th:each="res, status : ${meetingroomReservationList}">
-						<td class="no" th:text="${status.count}">1</td>
-						<td class="meetingroom" th:text="${res.meetingRoomName}">회의실A</td>
-						<td class="reservation" th:text="${res.reserverName}">강성관</td>
-						<td class="date" th:text="${#temporals.format(res.reservation_start, 'yyyy.MM.dd')}">2025-04-10</td>
-						<td class="time" th:text="${#temporals.format(res.reservation_start, 'HH:mm')} + ' ~ ' + ${#temporals.format(res.reservation_end, 'HH:mm')}">10:00 ~ 12:00</td>
+						<td class="no" th:text="${status.count}">번호</td>
+						<td class="meetingroom" th:text="${res.meetingRoomName}">회의실</td>
+						<td class="reservation" th:text="${res.reserverName}">예약자</td>
+						<td class="date" th:text="${#temporals.format(res.reservation_start, 'yyyy.MM.dd')}">예약일</td>
+						<td class="time" th:text="${#temporals.format(res.reservation_start, 'HH:mm')} + ' ~ ' + ${#temporals.format(res.reservation_end, 'HH:mm')}">예약 시간</td>
 					</tr>
 					<tr th:if="${#lists.isEmpty(meetingroomReservationList)}">
 						<td colspan="5">예약된 회의실이 없습니다.</td>
@@ -683,18 +690,23 @@ document.addEventListener('DOMContentLoaded',function(){
 
 		fetch('/admin/meetingroom/edit', {
 			method: 'POST',
-			body: formData
+			body: formData,
+			headers : {
+				'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+				'X-CSRF-HEADER': document.querySelector('meta[name="_csrf_header"]').getAttribute('content')
+			}
 		})
 		.then(response => response.json())
 		.then(data => {
 			if (data.res_code === 200) {
-				showAlertModal('회의실 정보가 성공적으로 수정되었습니다.');
-				// 초기화
-				isEditFormEdited = false;
-				isEditNameChecked = false;
-				prevEditName = '';
-				editModal.hide();
-				location.reload();
+				showAlertModal(data.res_msg,function(){
+					// 초기화
+					isEditFormEdited = false;
+					isEditNameChecked = false;
+					prevEditName = '';
+					editModal.hide();
+					location.reload();
+				});			
 			} else {
 				showAlertModal(data.res_msg || '수정에 실패했습니다.');
 			}
@@ -705,8 +717,39 @@ document.addEventListener('DOMContentLoaded',function(){
 		});		
 	}
 	
+	// 회의실 삭제	
+	function sendDeleteRoom() {
+		if (!currentFacilityNo) {
+			showAlertModal('삭제할 회의실 정보를 찾을 수 없습니다.');
+			return;
+		}
 	
+		const formData = new FormData();
+		formData.append('facility_no', currentFacilityNo);
 	
+		fetch('/admin/meetingroom/delete', {
+			method: 'POST',
+			body: formData,
+			headers: {
+				'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+				'X-CSRF-HEADER': document.querySelector('meta[name="_csrf_header"]').getAttribute('content')
+			}
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.res_code === 200) {
+				showAlertModal(data.res_msg,function(){
+					location.reload(); 
+				});
+			} else {
+				showAlertModal(data.res_msg || '삭제에 실패했습니다.');
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			showAlertModal('서버 오류가 발생했습니다.');
+		});
+	}	
 	
 	
 	

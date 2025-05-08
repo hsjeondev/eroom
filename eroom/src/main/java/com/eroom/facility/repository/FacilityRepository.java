@@ -14,5 +14,9 @@ public interface FacilityRepository extends JpaRepository<Facility,Long> {
 	
 	//차량 이름을 가져옴
 	Facility findByFacilityNo(Long long1);
+	
+	// 삭제되지 않은 목록 조회
+	List<Facility> findBySeparatorCodeAndVisibleYn(String separatorCode, String visibleYn);
 
+	
 }

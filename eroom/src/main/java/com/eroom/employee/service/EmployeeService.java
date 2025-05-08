@@ -384,4 +384,9 @@ public class EmployeeService {
 		}
 	}
 	
+	// 아이디로 Employee 조회
+	public Employee findEmployeeByEmployeeId(String employeeId) {
+		return employeeRepository.findByEmployeeId(employeeId).orElse(null);
+	}
+	
 }
