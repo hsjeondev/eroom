@@ -56,9 +56,8 @@
 				</div>
 				<!-- 검색 입력란 -->
 				<div class="form-icon-container mb-4 d-sm-none d-xl-block">
-					<input class="form-control form-icon-input search" type="text"
-						placeholder="이름을 입력하세요" /> <span
-						class="fas fa-user text-body fs-9 form-icon"></span>
+					<input class="form-control form-icon-input search" type="text" placeholder="이름을 입력하세요" /> 
+					<span class="fas fa-user text-body fs-9 form-icon"></span>
 				</div>
 				<!-- 탭 메뉴 (전체, 읽지않음, 읽음) -->
 				<ul class="nav nav-phoenix-pills mb-5 d-sm-none d-xl-flex"
@@ -1548,6 +1547,15 @@ function loadChatroomDetail(chatroomNo) {
 			    tab.classList.add('active');
 			  });
 			});
+			document.querySelector('.search')?.addEventListener('input', function () {
+				  const keyword = this.value.trim().toLowerCase();
+				  const items = document.querySelectorAll('.chat_list .item');
+
+				  items.forEach(item => {
+				    const name = item.querySelector('.name')?.innerText.toLowerCase() || '';
+				    item.style.display = name.includes(keyword) ? '' : 'none';
+				  });
+				});
 
 		</script>
 	</main>
