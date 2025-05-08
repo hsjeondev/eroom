@@ -8,161 +8,175 @@
 <body>
 	<main class="main" id="top" layout:fragment="content">
 	<div class="content">
-<!-- 	  <div class="position-absolute top-0 start-0 p-3">
+ 	  <div class="position-absolute top-0 start-0 p-3">
 	    <h3 class="fw-bold fs-5 text-body-emphasis">알림</h3>
-	  </div> -->
-		
+	  </div>
+			<!-- 알림이 없을 때 -->
+			<div th:if="${#lists.isEmpty(alarmList)}">
+				<div class="col-12">
+					<div
+						class="alert alert-light text-center border border-secondary-light rounded py-4 fs-6 fw-semibold text-body-secondary">
+						<i class="fa-solid fa-circle-info me-2 text-secondary"></i>알림이
+						없습니다.
+					</div>
+				</div>
+			</div>
+
 
 			<!-- 오늘 알림 -->
-		<h5 class="fw-bold fs-6 mb-3">오늘</h5>
-		<div class="mx-n4 mx-lg-n6 mb-5 border-bottom">
-			<div th:each="alarm : ${alarmList}"
-				 th:if="${#temporals.format(alarm.reg_date,'yyyy.MM.dd')} == ${#temporals.format(#temporals.createNow(), 'yyyy.MM.dd')}"
-				 class="d-flex align-items-center justify-content-between py-3 px-lg-6 px-4 notification-card border-top"
-				 th:classappend="${alarm.read_yn == 'N'} ? ' unread' : ' read'">
+			<div th:if="${alarmList.?[#temporals.format(#this.reg_date,'yyyy.MM.dd') == #temporals.format(#temporals.createNow(), 'yyyy.MM.dd')].size() > 0}">
+				<h5 class="fw-bold fs-6 mb-3">오늘</h5>
+				<div class="mx-n4 mx-lg-n6 mb-5 border-bottom">
+					<div th:each="alarm : ${alarmList}"
+						th:if="${#temporals.format(alarm.reg_date,'yyyy.MM.dd')} == ${#temporals.format(#temporals.createNow(), 'yyyy.MM.dd')}"
+						class="d-flex align-items-center justify-content-between py-3 px-lg-6 px-4 notification-card border-top"
+						th:classappend="${alarm.read_yn == 'N'} ? ' unread' : ' read'">
 
-				<div class="d-flex">
-				
-					<div class="me-3 flex-1 mt-2">
-						<h4 class="fs-9 text-body-emphasis"
-							th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '회사 일정 공지' :
+						<div class="d-flex">
+							<div class="me-3 flex-1 mt-2">
+								<h4 class="fs-9 text-body-emphasis"
+									th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '회사 일정 공지' :
+                        alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '팀 일정 공지' :
+                        alarm.separator_code == 'R002' ? '채팅 알림' :
+                        alarm.separator_code == 'R003' ? '메일 알림' :
+                        alarm.separator_code == 'R004' ? '결재 알림' : '기타 알림'}">
+								</h4>
+
+								<p class="fs-9 text-body-highlight">
+									<span class="me-2"><i
+										class="fas fa-bullhorn text-primary"></i></span> <span
+										class="fw-bold text-dark"
+										th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '🧾 새로운 회사 일정 등록' :
+                            alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '👥 새로운 팀 일정 등록' :
+                            alarm.separator_code == 'R002' ? '💬 새로운 채팅 알림' :
+                            alarm.separator_code == 'R003' ? '📩 새로운 메일 알림' :
+                            alarm.separator_code == 'R004' ? '📋 새로운 결재 요청' : '새로운 알림'}">
+									</span> <span
+										class="ms-2 text-body-tertiary text-opacity-85 fw-bold fs-10 time-ago"
+										th:attr="data-time=${#temporals.format(alarm.reg_date, 'yyyy-MM-dd''T''HH:mm:ss')}">
+									</span>
+								</p>
+
+								<p class="text-body-secondary fs-9 mb-0">
+									<i class="fas fa-clock me-1"></i> <span class="fw-bold"
+										th:text="|${#temporals.format(alarm.reg_date,'a h:mm')} / ${#temporals.format(alarm.reg_date, 'yyyy.MM.dd')}|">
+									</span>
+								</p>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<!-- 어제 알림 -->
+			<div
+				th:if="${alarmList.?[#temporals.format(#this.reg_date,'yyyy.MM.dd') == #temporals.format(#temporals.createNow().minusDays(1), 'yyyy.MM.dd')].size() > 0}">
+				<h5 class="fw-bold fs-6 mb-3">어제</h5>
+				<div class="mx-n4 mx-lg-n6 mb-9 border-bottom">
+					<div th:each="alarm : ${alarmList}"
+						th:if="${#temporals.format(alarm.reg_date, 'yyyy-MM-dd')} == ${#temporals.format(#temporals.createNow().minusDays(1), 'yyyy-MM-dd')}"
+						class="d-flex align-items-center justify-content-between py-3 px-lg-6 px-4 notification-card border-top"
+						th:classappend="${alarm.read_yn == 'N'} ? ' unread' : ' read'">
+
+						<div class="d-flex">
+
+							<div class="me-3 flex-1 mt-2">
+								<h4 class="fs-9 text-body-emphasis"
+									th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '회사 일정 공지' :
 									  alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '팀 일정 공지' :
 									  alarm.separator_code == 'R002' ? '채팅 알림' :
 									  alarm.separator_code == 'R003' ? '메일 알림' :
 									  alarm.separator_code == 'R004' ? '결재 알림' : '기타 알림'}">
-						</h4>
+								</h4>
 
-						<p class="fs-9 text-body-highlight">
-							<span class="me-2"><i class="fas fa-bullhorn text-primary"></i></span>
-							<span class="fw-bold text-dark"
-								th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '🧾 새로운 회사 일정 등록' :
+								<p class="fs-9 text-body-highlight">
+									<span class="me-2"><i
+										class="fas fa-bullhorn text-primary"></i></span> <span
+										class="fw-bold text-dark"
+										th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '🧾 새로운 회사 일정 등록' :
 										  alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '👥 새로운 팀 일정 등록' :
 										  alarm.separator_code == 'R002' ? '💬 새로운 채팅 알림' :
 										  alarm.separator_code == 'R003' ? '📩 새로운 메일 알림' :
 										  alarm.separator_code == 'R004' ? '📋 새로운 결재 요청' : '새로운 알림'}">
-							</span>
-							<span class="ms-2 text-body-tertiary text-opacity-85 fw-bold fs-10 time-ago"
-								th:attr="data-time=${#temporals.format(alarm.reg_date, 'yyyy-MM-dd''T''HH:mm:ss')}">
-							</span>
-						</p>
+									</span> <span
+										class="ms-2 text-body-tertiary text-opacity-85 fw-bold fs-10 time-ago"
+										th:attr="data-time=${#temporals.format(alarm.reg_date, 'yyyy-MM-dd''T''HH:mm:ss')}">
+									</span>
+								</p>
 
-						<p class="text-body-secondary fs-9 mb-0">
-							<i class="fas fa-clock me-1"></i>
-							<span class="fw-bold"
-								  th:text="|${#temporals.format(alarm.reg_date,'a h:mm')} / ${#temporals.format(alarm.reg_date, 'yyyy.MM.dd')}|">
-							</span>
-						</p>
+								<p class="text-body-secondary fs-9 mb-0">
+									<i class="fas fa-clock me-1"></i> <span class="fw-bold"
+										th:text="|${#temporals.format(alarm.reg_date, 'a h:mm')} / ${#temporals.format(alarm.calendarAlarm?.alarm_reg_date, 'yyyy.MM.dd')}|">
+									</span>
+								</p>
+							</div>
+						</div>
+
+
 					</div>
 				</div>
 
-				
-			</div>
-		</div>
+				<div th:each="entry : ${groupedAlarms}">
+					<div
+						th:with="
+					      keyFormatted=${entry.key.replace('-', '.')},
+					      todayFormatted=${#temporals.format(#temporals.createNow(), 'yyyy.MM.dd')},
+					      yesterdayFormatted=${#temporals.format(#temporals.createNow().minusDays(1), 'yyyy.MM.dd')}">
 
-		<!-- 어제 알림 -->
-		<h5 class="fw-bold fs-6 mb-3">어제</h5>
-		<div class="mx-n4 mx-lg-n6 mb-9 border-bottom">
-			<div th:each="alarm : ${alarmList}"
-				 th:if="${#temporals.format(alarm.reg_date, 'yyyy-MM-dd')} == ${#temporals.format(#temporals.createNow().minusDays(1), 'yyyy-MM-dd')}"
-				 class="d-flex align-items-center justify-content-between py-3 px-lg-6 px-4 notification-card border-top"
-				 th:classappend="${alarm.read_yn == 'N'} ? ' unread' : ' read'">
+						<div
+							th:if="${keyFormatted != todayFormatted and keyFormatted != yesterdayFormatted}">
 
-				<div class="d-flex">
-				
-					<div class="me-3 flex-1 mt-2">
-						<h4 class="fs-9 text-body-emphasis"
-							th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '회사 일정 공지' :
-									  alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '팀 일정 공지' :
-									  alarm.separator_code == 'R002' ? '채팅 알림' :
-									  alarm.separator_code == 'R003' ? '메일 알림' :
-									  alarm.separator_code == 'R004' ? '결재 알림' : '기타 알림'}">
-						</h4>
+							<!-- 날짜 제목 -->
+							<h5 class="fw-bold fs-6 mb-3" th:text="${keyFormatted}"></h5>
 
-						<p class="fs-9 text-body-highlight">
-							<span class="me-2"><i class="fas fa-bullhorn text-primary"></i></span>
-							<span class="fw-bold text-dark"
-								th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '🧾 새로운 회사 일정 등록' :
-										  alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '👥 새로운 팀 일정 등록' :
-										  alarm.separator_code == 'R002' ? '💬 새로운 채팅 알림' :
-										  alarm.separator_code == 'R003' ? '📩 새로운 메일 알림' :
-										  alarm.separator_code == 'R004' ? '📋 새로운 결재 요청' : '새로운 알림'}">
-							</span>
-							<span class="ms-2 text-body-tertiary text-opacity-85 fw-bold fs-10 time-ago"
-								th:attr="data-time=${#temporals.format(alarm.reg_date, 'yyyy-MM-dd''T''HH:mm:ss')}">
-							</span>
-						</p>
+							<!-- 알림 카드 -->
+							<div class="mx-n4 mx-lg-n6 mb-5 border-bottom">
+								<div th:each="alarm : ${entry.value}"
+									class="d-flex align-items-center justify-content-between py-3 px-lg-6 px-4 notification-card border-top"
+									th:classappend="${alarm.read_yn == 'N'} ? ' unread' : ' read'">
 
-						<p class="text-body-secondary fs-9 mb-0">
-							<i class="fas fa-clock me-1"></i>
-							<span class="fw-bold"
-								  th:text="|${#temporals.format(alarm.reg_date, 'a h:mm')} / ${#temporals.format(alarm.calendarAlarm?.alarm_reg_date, 'yyyy.MM.dd')}|">
-							</span>
-						</p>
-					</div>
-				</div>
-
-			
-			</div>
-		</div>
-
-		<div th:each="entry : ${groupedAlarms}">
-  <div th:with="
-      keyFormatted=${entry.key.replace('-', '.')},
-      todayFormatted=${#temporals.format(#temporals.createNow(), 'yyyy.MM.dd')},
-      yesterdayFormatted=${#temporals.format(#temporals.createNow().minusDays(1), 'yyyy.MM.dd')}">
-
-    <div th:if="${keyFormatted != todayFormatted and keyFormatted != yesterdayFormatted}">
-      
-      <!-- 날짜 제목 -->
-      <h5 class="fw-bold fs-6 mb-3" th:text="${keyFormatted}"></h5>
-
-      <!-- 알림 카드 -->
-      <div class="mx-n4 mx-lg-n6 mb-5 border-bottom">
-        <div th:each="alarm : ${entry.value}"
-             class="d-flex align-items-center justify-content-between py-3 px-lg-6 px-4 notification-card border-top"
-             th:classappend="${alarm.read_yn == 'N'} ? ' unread' : ' read'">
-          
-          <div class="d-flex">
-            <div class="me-3 flex-1 mt-2">
-              <h4 class="fs-9 text-body-emphasis"
-                  th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '회사 일정 공지' :
+									<div class="d-flex">
+										<div class="me-3 flex-1 mt-2">
+											<h4 class="fs-9 text-body-emphasis"
+												th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '회사 일정 공지' :
                             alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '팀 일정 공지' :
                             alarm.separator_code == 'R002' ? '채팅 알림' :
                             alarm.separator_code == 'R003' ? '메일 알림' :
                             alarm.separator_code == 'R004' ? '결재 알림' : '기타 알림'}">
-              </h4>
+											</h4>
 
-              <p class="fs-9 text-body-highlight">
-                <span class="me-2"><i class="fas fa-bullhorn text-primary"></i></span>
-                <span class="fw-bold text-dark"
-                      th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '🧾 새로운 회사 일정 등록' :
+											<p class="fs-9 text-body-highlight">
+												<span class="me-2"><i
+													class="fas fa-bullhorn text-primary"></i></span> <span
+													class="fw-bold text-dark"
+													th:text="${alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('A') ? '🧾 새로운 회사 일정 등록' :
                                 alarm.separator_code == 'R001' and alarm.calendarAlarm?.separator?.startsWith('T') ? '👥 새로운 팀 일정 등록' :
                                 alarm.separator_code == 'R002' ? '💬 새로운 채팅 알림' :
                                 alarm.separator_code == 'R003' ? '📩 새로운 메일 알림' :
                                 alarm.separator_code == 'R004' ? '📋 새로운 결재 요청' : '새로운 알림'}">
-                </span>
-                <span class="ms-2 text-body-tertiary text-opacity-85 fw-bold fs-10 time-ago"
-                      th:attr="data-time=${#temporals.format(alarm.reg_date, 'yyyy-MM-dd''T''HH:mm:ss')}">
-                </span>
-              </p>
+												</span> <span
+													class="ms-2 text-body-tertiary text-opacity-85 fw-bold fs-10 time-ago"
+													th:attr="data-time=${#temporals.format(alarm.reg_date, 'yyyy-MM-dd''T''HH:mm:ss')}">
+												</span>
+											</p>
 
-              <p class="text-body-secondary fs-9 mb-0">
-                <i class="fas fa-clock me-1"></i>
-                <span class="fw-bold"
-                      th:text="|${#temporals.format(alarm.reg_date,'a h:mm')} / ${#temporals.format(alarm.calendarAlarm?.alarm_reg_date, 'yyyy.MM.dd')}|">
-                </span>
-              </p>
-            </div>
-          </div>
+											<p class="text-body-secondary fs-9 mb-0">
+												<i class="fas fa-clock me-1"></i> <span class="fw-bold"
+													th:text="|${#temporals.format(alarm.reg_date,'a h:mm')} / ${#temporals.format(alarm.calendarAlarm?.alarm_reg_date, 'yyyy.MM.dd')}|">
+												</span>
+											</p>
+										</div>
+									</div>
 
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
+
+		</div>
 
 			<!-- 시간 "방금전/1시간전" 스크립트 -->
 		<!-- 60초 미만 방금전
