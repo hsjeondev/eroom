@@ -63,6 +63,7 @@ public class NotificationController {
 	    try {
 	    	Map<String, Object> tempMap = alarmService.markAsRead(alarmId);  // ← calendarAlarmService → alarmService
 	    	if(tempMap != null && !tempMap.isEmpty()) {
+	    		result.put("separator", tempMap.get("separator"));
 	    		result.put("pk", tempMap.get("pk"));
 	    		result.put("separator_code", tempMap.get("separator_code"));
 	    	}
