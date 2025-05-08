@@ -800,6 +800,17 @@
 		    fetch('/chat/participants?chatroomNo=' + encodeURIComponent(chatroomNo))
 		      .then(response => response.json())
 		      .then(data => {
+		    	  const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+
+		    	    const other = data.find(user => String(user.employeeNo) !== String(myEmployeeNo));
+		    	    const imageUrl = other?.profileImageUrl || '/assets/img/profile/default-profile.png';
+
+		    	    const modalProfileImg = document.querySelector('#chatroomDetailModal img.rounded-circle');
+		    	    if (modalProfileImg) {
+		    	      modalProfileImg.src = imageUrl;
+		    	    }
+		    	  
+		    	  
 		        const participantList = document.getElementById('participantList');
 		        participantList.innerHTML = ''; // 초기화
 		        data.forEach(name => {
@@ -1223,6 +1234,9 @@ function sendMessage() {
     return;
   }
 
+  //프로필 이미지 URL을 가져오기
+  const myProfileImageUrl = document.querySelector('.chat_list [data-room-no="'+chatroomNo+'"] img')?.src 
+                            || '/assets/img/profile/default-profile.png';
   // 파일이 있는 경우
   if (fileInput.files.length > 0) {
     const formData = new FormData();
@@ -1261,7 +1275,9 @@ function sendMessage() {
         	    chatroomNo: Number(chatroomNo),
         	    receiverMember: isGroupChat ? null : receiverNo,
         	    driveOriName: fileName,
-        	    drivePath: drivePath  
+        	    drivePath: drivePath,
+        	    senderProfileImageUrl: myProfileImageUrl,
+                senderName: "나"
         	  };
 
         	  console.log("📤 WebSocket 전송:", chatData);
@@ -1290,7 +1306,9 @@ function sendMessage() {
       chatMessageContent: message,
       senderMember: Number(myEmployeeNo),
       chatroomNo: Number(chatroomNo),
-      receiverMember: isGroupChat ? null : receiverNo
+      receiverMember: isGroupChat ? null : receiverNo,
+      senderProfileImageUrl: myProfileImageUrl, 
+      senderName: "나"
     };
     socket.send(JSON.stringify(chatData));
     messageInput.value = "";
@@ -1313,17 +1331,25 @@ function loadChatroomDetail(chatroomNo) {
                 data.messageList.forEach(msg => {
                     const isMyMessage = (msg.senderMember == myEmployeeNo);
                     const senderDisplayName = isMyMessage ? '나' : (msg.senderName || '알 수 없음');
+                    const profileImageUrl = msg.senderProfileImageUrl || '/assets/img/profile/default-profile.png';
 
                     const messageDiv = document.createElement("div");
                     messageDiv.className = "mb-3";
 
-                    // 이름 추가 표시
-                    const senderNameDiv = document.createElement("div");
-                    senderNameDiv.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-1`;
-                    senderNameDiv.innerHTML = `<div class="small text-muted">${senderDisplayName}</div>`;
-
                     const messageWrapper = document.createElement("div");
-                    messageWrapper.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
+                    messageWrapper.className = `d-flex align-items-start ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-2`;
+
+                    // 프로필 이미지 추가 ✅
+                    const profileImg = document.createElement("img");
+                    profileImg.src = profileImageUrl;
+                    profileImg.className = "rounded-circle";
+                    profileImg.style.width = "35px";
+                    profileImg.style.height = "35px";
+
+                    if (!isMyMessage) {
+                        profileImg.classList.add("me-2");
+                        messageWrapper.appendChild(profileImg);
+                    }
 
                     const bubble = document.createElement("div");
                     bubble.className = `p-2 rounded-2 ${isMyMessage ? 'bg-primary text-white' : 'bg-light'}`;
@@ -1365,12 +1391,21 @@ function loadChatroomDetail(chatroomNo) {
                     }
 
                     messageWrapper.appendChild(bubble);
-                    messageDiv.appendChild(senderNameDiv); // 이름 표시 추가
+
+                    if (isMyMessage) {
+                        profileImg.classList.add("ms-2");
+                        messageWrapper.appendChild(profileImg);
+                    }
+
+                    const senderNameDiv = document.createElement("div");
+                    senderNameDiv.className = `d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-1`;
+                    senderNameDiv.innerHTML = `<div class="small text-muted">${senderDisplayName}</div>`;
+
+                    messageDiv.appendChild(senderNameDiv);
                     messageDiv.appendChild(messageWrapper);
                     chatHistory.appendChild(messageDiv);
                 });
 
-                // 스크롤을 아래로 이동
                 const chatArea = document.querySelector(".flex-grow-1.overflow-auto");
                 if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
             }
@@ -1379,6 +1414,7 @@ function loadChatroomDetail(chatroomNo) {
             console.error("채팅방 상세 조회 실패:", error);
         });
 }
+
 
 
 		function bindFilePreview() {

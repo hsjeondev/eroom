@@ -32,6 +32,7 @@ public class ChatMessageDto {
     private Long driveAttachNo;     // 드라이브 번호
     private String drivePath; 
     private String driveOriName;
+    private String senderProfileImageUrl;
     // DTO -> Entity
 	public ChatMessage toEntity() {
 		return ChatMessage.builder()
@@ -46,7 +47,7 @@ public class ChatMessageDto {
 			
 	}
     // Entity -> DTO
-	public static ChatMessageDto toDto(ChatMessage entity) {
+	public static ChatMessageDto toDto(ChatMessage entity,String profileUrl) {
 		return ChatMessageDto.builder().chatMessageNo(entity.getChatMessageNo())
 				.chatroomNo(entity.getChatroom().getChatroomNo())
 				.senderMember(entity.getSenderMember().getEmployeeNo())
@@ -57,6 +58,7 @@ public class ChatMessageDto {
 				.driveAttachNo(entity.getDrive() != null ? entity.getDrive().getDriveAttachNo() : null)
 		        .drivePath(entity.getDrive() != null ? entity.getDrive().getDrivePath() : null)
 		        .driveOriName(entity.getDrive() != null ? entity.getDrive().getDriveOriName() : null)
+		        .senderProfileImageUrl(profileUrl)
 				.build();
 	}
     
