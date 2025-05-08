@@ -41,6 +41,7 @@ public class DirectoryDto {
 	private String employee_position;
 	private String code_name;
 	private Employee employee;
+	private String profileImageUrl;
 	
 	// structure 변수 담기
 	private String department_name;

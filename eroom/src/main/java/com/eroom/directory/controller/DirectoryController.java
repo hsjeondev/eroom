@@ -22,6 +22,7 @@ import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.dto.UpdateSortOrderDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.DirectoryService;
+import com.eroom.drive.service.ProfileService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
@@ -38,6 +39,7 @@ public class DirectoryController {
 	private final DirectoryService directoryService;
 	private final StructureService structureService;
 	private final EmployeeService employeeService;
+	private final ProfileService profileService;
 	
 
 	@GetMapping("/directory/employee")
@@ -53,6 +55,10 @@ public class DirectoryController {
 		// 직원 리스트를 가져와서 DTO로 변환
 		for(Directory t : temp) {
 			DirectoryDto dto = new DirectoryDto().toDto(t);
+			// 프로필 이미지 url 조회
+			String profileUrl = profileService.getProfileImageUrl(t.getEmployee().getEmployeeNo());
+			dto.setProfileImageUrl(profileUrl);
+			
 			if (t.getEmployee().getStructure() != null) {
 			    Structure structure = t.getEmployee().getStructure();
 			    if (structure.getParentCode() != null) {
@@ -198,6 +204,9 @@ public class DirectoryController {
 		// 직원 리스트를 가져와서 DTO로 변환
 		for(Directory t : temp) {
 			DirectoryDto dto = new DirectoryDto().toDto3(t);
+			// 프로필 이미지 url 조회
+			String profileUrl = profileService.getProfileImageUrl(t.getEmployee().getEmployeeNo());
+			dto.setProfileImageUrl(profileUrl);
 			if (t.getEmployee().getStructure() != null) {
 				Structure structure = t.getEmployee().getStructure();
 				if (structure.getParentCode() != null) {

@@ -10,6 +10,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -614,6 +618,25 @@ public class DriveService {
 		
 		return result;
 	}
+	public List<DriveDto> findChatFilesByRoom(Long chatroomNo, int page, int size) {
+	    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "driveAttachNo"));
+
+	    Page<Drive> drivePage = driveRepository.findBySeparatorCodeAndParam1AndVisibleYn(
+	        "FL003", chatroomNo, "Y", pageable
+	    );
+
+	    List<DriveDto> result = new ArrayList<>();
+	    for (Drive drive : drivePage.getContent()) {
+	        result.add(DriveDto.toDto(drive));
+	    }
+
+	    return result;
+	}
+
+
+
+
+
 	
 	// ------------------------- 결재 파일 삭제 --------------------------
 	// bulkDeleteDriveFiles() 사용

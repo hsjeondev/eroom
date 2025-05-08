@@ -32,6 +32,7 @@ import com.eroom.chat.service.ChatMessageService;
 import com.eroom.chat.service.ChatroomService;
 import com.eroom.drive.dto.DriveDto;
 import com.eroom.drive.entity.Drive;
+import com.eroom.drive.service.DriveService;
 import com.eroom.drive.service.ProfileService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.entity.Employee;
@@ -54,6 +55,7 @@ public class ChatController {
 	private final ChatAlarmRepository chatAlarmRepository;
 	private final ChatWebSocketHandler webSocketHandler; 
 	private final ProfileService profileService;
+	private final DriveService driveService;
 	
 	@GetMapping("/test")
 	public String test123() {
@@ -96,9 +98,6 @@ public class ChatController {
 
 	    return "chat/list";
 	}
-
-
-	
 	@GetMapping("/employes")
 	@ResponseBody
 	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam(name = "separator_code") String separatorCode) {
@@ -417,6 +416,15 @@ public class ChatController {
 	    model.addAttribute("roomNo", roomNo);
 	    return "chat/list"; // 또는 실제 HTML/JSP 경로에 맞게 수정
 	}
-	
+	@GetMapping("/files")
+	@ResponseBody
+	public List<DriveDto> findFiles(
+	    @RequestParam("chatroomNo") Long chatroomNo,
+	    @RequestParam("page") int page,
+	    @RequestParam("size") int size
+	) {
+	    return driveService.findChatFilesByRoom(chatroomNo, page, size);
+	}
+
 
 }

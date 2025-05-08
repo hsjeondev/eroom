@@ -62,8 +62,10 @@ public class NotificationController {
 
 	    try {
 	    	Map<String, Object> tempMap = alarmService.markAsRead(alarmId);  // ← calendarAlarmService → alarmService
-	    	result.put("pk", tempMap.get("pk"));
-	    	result.put("separator_code", tempMap.get("separator_code"));
+	    	if(!tempMap.isEmpty() && tempMap != null) {
+	    		result.put("pk", tempMap.get("pk"));
+	    		result.put("separator_code", tempMap.get("separator_code"));
+	    	}
 	        result.put("res_code", "200");
 	        result.put("res_msg", "읽음 처리 성공");
 	    } catch (Exception e) {
