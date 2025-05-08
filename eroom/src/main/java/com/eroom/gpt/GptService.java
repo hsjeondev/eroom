@@ -183,7 +183,7 @@ public class GptService {
     public String summarizeMeetingContent(String meetingContent) {
         RestTemplate restTemplate = new RestTemplate();
 
-        // 프롬프트 (회의 요약 특화)
+        // 프롬프트
         String systemPrompt = """
 	    아래는 사내 회의에서 기록된 회의 내용입니다. 이 내용을 바탕으로 요점을 간결하게 요약해 주세요.
 	

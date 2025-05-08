@@ -108,51 +108,63 @@
 		</footer> -->
 
 		<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".show-summary-link").forEach(link => {
-      link.addEventListener("click", function () {
-        const minuteNo = this.getAttribute("data-minute-no");
-
-        fetch(`/project/minute/summary?minuteNo=${minuteNo}`)
-          .then(response => response.text())
-          .then(summary => {
-            const summaryText = document.getElementById("summary-text");
-            const placeholder = document.getElementById("summary-placeholder");
-
-            if (summary && summary.trim().length > 0) {
-              const formatted = summary
-                .split("\n")
-                .map(line => `
-                  <div class="ps-3 text-secondary fs-8 lh-base text-break" style="text-indent: -0.67rem;">
-                    ${line.trim()}
-                  </div>
-                `)
-                .join("");
-
-              summaryText.innerHTML = formatted;
-              summaryText.style.display = "flex";
-              placeholder.style.display = "none";
-            } else {
-              summaryText.style.display = "none";
-              placeholder.textContent = "요약이 존재하지 않습니다.";
-              placeholder.style.display = "block";
-            }
-          })
-          .catch(error => {
-            console.error("요약 불러오기 실패:", error);
-
-            const summaryText = document.getElementById("summary-text");
-            const placeholder = document.getElementById("summary-placeholder");
-
-            summaryText.style.display = "none";
-            placeholder.textContent = "요약 로딩 중 오류 발생";
-            placeholder.style.display = "block";
-          });
-      });
-    });
-  });
-</script>
-
+		  document.addEventListener("DOMContentLoaded", function () {
+		    // 요약 링크 클릭 이벤트
+		    const summaryLinks = document.querySelectorAll(".show-summary-link");
+		
+		    summaryLinks.forEach(link => {
+		      link.addEventListener("click", function () {
+		        const minuteNo = this.getAttribute("data-minute-no"); // 클릭한 회의록 번호
+		
+		        // 요약 내용 요청
+		        fetch(`/project/minute/summary?minuteNo=${minuteNo}`)
+		          .then(response => response.text())
+		          .then(summary => {
+		            const summaryTextEl = document.getElementById("summary-text");
+		            const placeholderEl = document.getElementById("summary-placeholder");
+		
+		            // 요약이 존재하는 경우
+		            if (summary && summary.trim().length > 0) {
+		              // 줄바꿈 기준으로 요약 내용을 한 줄씩 처리
+		              const formattedSummary = summary
+		                .split("\n")
+		                .map(line => {
+		                  return `
+		                    <div 
+		                      class="ps-3 text-secondary fs-8 lh-base text-break" 
+		                      style="text-indent: -0.67rem;">
+		                      ${line.trim()}
+		                    </div>
+		                  `;
+		                })
+		                .join(""); // HTML 문자열로 병합
+		
+		              // 화면에 요약 삽입 및 표시
+		              summaryTextEl.innerHTML = formattedSummary;
+		              summaryTextEl.style.display = "flex";
+		              placeholderEl.style.display = "none";
+		            } else {
+		              // 요약이 비어있는 경우
+		              summaryTextEl.style.display = "none";
+		              placeholderEl.textContent = "요약이 존재하지 않습니다.";
+		              placeholderEl.style.display = "block";
+		            }
+		          })
+		          .catch(error => {
+		            console.error("요약 불러오기 실패:", error);
+		
+		            // 오류 시 기본 메시지 표시
+		            const summaryTextEl = document.getElementById("summary-text");
+		            const placeholderEl = document.getElementById("summary-placeholder");
+		
+		            summaryTextEl.style.display = "none";
+		            placeholderEl.textContent = "요약 로딩 중 오류 발생";
+		            placeholderEl.style.display = "block";
+		          });
+		      });
+		    });
+		  });
+		</script>
 	</main>
 </body>
 </html>
