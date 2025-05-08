@@ -64,74 +64,48 @@
 			</div>
 		</footer>
 
-		<script>
-		// 유효성 검사
-		document.addEventListener("DOMContentLoaded", () => {
-		  const form = document.getElementById("createMinute");
-		  const titleInput = document.getElementById("create-minute-name");
-		  const contentInput = document.getElementById("create-minute-content");
-		  const dateInput = document.getElementById("create-minute-date");
-		  const participantCheckboxes = document.querySelectorAll(".participant-checkbox:not(#select-all)");
-		  const confirmButton = document.querySelector("#validationModal .btn[data-bs-dismiss]");
-		  const selectAll = document.getElementById("select-all");
-		  const checkboxes = document.querySelectorAll(".participant-checkbox:not(#select-all)");
-		
-		  let focusElement = null; // 유효성 실패 시 포커스할 요소
-		
-		  // 폼 유효성 검사
-		  form.addEventListener("submit", (e) => {
-		    // 제목
-		    if (!titleInput.value.trim()) {
-		      e.preventDefault();
-		      showValidationModal("", "제목을 입력해주세요.", titleInput);
-		      return;
-		    }
-		
-		    // 내용
-		    if (!contentInput.value.trim()) {
-		      e.preventDefault();
-		      showValidationModal("", "내용을 입력해주세요.", contentInput);
-		      return;
-		    }
-		
-		    // 참여자
-		    const isAnyChecked = Array.from(participantCheckboxes).some(cb => cb.checked);
-		    if (!isAnyChecked) {
-		      e.preventDefault();
-		      showValidationModal("", "참여자를 최소 1명 이상 선택해주세요.", null);
-		    }
-		    
-		    // 회의일
-		    if (!dateInput.value.trim()) {
-			  e.preventDefault();
-			  showValidationModal("", "회의일을 선택해주세요.", null);
-			  return;
-			}
-		  });
-		
-		  // 유효성 실패 시 모달창 표시
-		  function showValidationModal(title, message, target) {
-		    document.getElementById("validationModalTitle").textContent = title;
-		    document.getElementById("validationModalMessage").textContent = message;
-		    focusElement = target;
-		
-		    const modal = new bootstrap.Modal(document.getElementById("validationModal"));
-		    modal.show();
-		  }
-		
-		  // 모달 확인 클릭 시 지정된 요소로 포커스 이동
-		  confirmButton.addEventListener("click", () => {
-		    if (focusElement) {
-		      setTimeout(() => focusElement.focus(), 300);
-		    }
-		  });
-		
-		  // 참여자 전체 선택
-		  selectAll.addEventListener("change", () => {
-		    checkboxes.forEach(cb => cb.checked = selectAll.checked);
-		  });
-		});
-		</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  let isDirty = false;
+
+  // 감지할 입력 요소들
+  const inputs = document.querySelectorAll("#createMinute input, #createMinute textarea");
+  inputs.forEach(input => {
+    input.addEventListener("input", () => {
+      isDirty = true;
+    });
+  });
+
+  // 내부 링크 클릭 시 모달 확인
+  document.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", function (e) {
+      const href = this.getAttribute("href");
+
+      if (isDirty && href && !href.startsWith("#") && !this.hasAttribute("data-bs-toggle")) {
+        e.preventDefault();
+
+        const confirmModal = new bootstrap.Modal(document.getElementById("confirmCloseModal"));
+        confirmModal.show();
+
+        const confirmBtn = document.getElementById("confirmCloseBtn");
+        confirmBtn.onclick = function () {
+          confirmModal.hide();
+          isDirty = false;
+          window.location.href = href;
+        };
+      }
+    });
+  });
+
+  // 브라우저 뒤로가기 등 페이지 이탈 시 경고
+  window.addEventListener("beforeunload", function (e) {
+    if (isDirty) {
+      e.preventDefault();
+      e.returnValue = ""; // 일부 브라우저용
+    }
+  });
+});
+</script>
 
 		<!-- 유효성 검사 확인창 -->
 		<div class="modal fade" id="validationModal" tabindex="-1" aria-hidden="true">
@@ -149,7 +123,26 @@
 				</div>
 			</div>
 		</div>
-
+		
+		<!-- 회의록 작성 중 나가기 경고창 -->
+		<div class="modal fade" id="confirmCloseModal" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-sm">
+				<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+					<div class="modal-header border-0">
+						<h5 class="modal-title text-dark">주의</h5>
+					</div>
+					<div class="modal-body text-center">
+						<p class="mb-0 text-body">
+							작성 중인 내용이 사라집니다.<br>정말 나가시겠습니까?
+						</p>
+					</div>
+					<div class="modal-footer justify-content-center border-0">
+						<button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+						<button type="button" class="btn btn-danger" id="confirmCloseBtn">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	</main>
 </body>
 </html>

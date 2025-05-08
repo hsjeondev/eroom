@@ -86,7 +86,8 @@
 					<div class="card shadow-sm">
 						<div class="card-header bg-light fw-bold">회의 내용 요약</div>
 						<div class="card-body p-2" id="summary-content">
-							<div id="summary-placeholder" class="d-flex justify-content-center align-items-center text-secondary fs-8 d-none" style="min-height: 300px;">회의록을 선택하세요.</div>
+							<div id="summary-title" class="fw-semibold text-secondary fs-7 mb-2 d-none"></div>
+							<div id="summary-placeholder" class="d-flex justify-content-center align-items-center text-secondary fs-8" style="min-height: 500px;">회의록을 선택하세요.</div>
 							<div id="summary-text" class="d-flex flex-column gap-2 fs-8 lh-base text-secondary" style="display: none;"></div>
 						</div>
 					</div>
@@ -109,20 +110,25 @@
 
 		<script>
 		document.addEventListener("DOMContentLoaded", function () {
-		  // 요약 클릭 이벤트
 		  const summaryLinks = document.querySelectorAll(".show-summary-link");
 		
 		  summaryLinks.forEach(link => {
 		    link.addEventListener("click", function () {
-		      const minuteNo = this.getAttribute("data-minute-no"); // 선택한 회의록 번호
-		      const summaryTextEl = document.getElementById("summary-text"); // 요약 표시 영역
-		      const placeholderEl = document.getElementById("summary-placeholder"); // 스피너, 메시지 표시 영역
+		      const minuteNo = this.getAttribute("data-minute-no");
+		      const summaryTextEl = document.getElementById("summary-text");
+		      const placeholderEl = document.getElementById("summary-placeholder");
+		      const titleEl = document.getElementById("summary-title"); // 제목 표시 요소
 		
-		      // 기존 내용 초기화
+		      // 회의록 제목 추출
+		      const title = this.closest("tr").querySelector("td a").textContent.trim();
+		      titleEl.textContent = `📝 ${title}`;
+		      titleEl.classList.remove("d-none");
+		
+		      // 초기화
 		      summaryTextEl.innerHTML = "";
 		      summaryTextEl.style.display = "none";
 		
-		      // 로딩 스피너
+		      // 로딩 스피너 표시
 		      placeholderEl.innerHTML = `
 		        <div class="d-flex justify-content-center align-items-center w-100">
 		          <div class="spinner-grow text-secondary" role="status">
@@ -134,17 +140,14 @@
 		      placeholderEl.classList.add("d-flex");
 		      placeholderEl.style.display = "flex";
 		
-		      // 현재 요청한 회의록 번호
 		      summaryTextEl.setAttribute("data-loading-minute-no", minuteNo);
 		
-		      // 서버 요약 요청
 		      fetch(`/project/minute/summary?minuteNo=${minuteNo}`)
 		        .then(response => response.text())
 		        .then(summary => {
 		          const activeMinuteNo = summaryTextEl.getAttribute("data-loading-minute-no");
-		          if (activeMinuteNo !== minuteNo) return; // 다른 요청 도착 시 무시
+		          if (activeMinuteNo !== minuteNo) return;
 		
-		          // 요약 결과가 있을 때
 		          if (summary && summary.trim().length > 0) {
 		            const formattedSummary = summary
 		              .split("\n")
@@ -157,14 +160,10 @@
 		
 		            summaryTextEl.innerHTML = formattedSummary;
 		            summaryTextEl.style.display = "flex";
-		
-		            // 스피너/메시지 영역 숨김
 		            placeholderEl.innerHTML = "";
 		            placeholderEl.style.display = "none";
 		            placeholderEl.classList.remove("d-flex");
 		            placeholderEl.classList.add("d-none");
-		
-		          // 요약이 없는 경우
 		          } else {
 		            summaryTextEl.innerHTML = "";
 		            summaryTextEl.style.display = "none";
@@ -174,8 +173,6 @@
 		            placeholderEl.style.display = "flex";
 		          }
 		        })
-		
-		        // 요청 중 오류 발생 시
 		        .catch(error => {
 		          console.error("요약 불러오기 실패:", error);
 		          summaryTextEl.innerHTML = "";
