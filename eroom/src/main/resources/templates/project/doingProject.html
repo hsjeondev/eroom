@@ -3,7 +3,7 @@
 lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{/include/layout}">
+	  layout:decorate="~{include/layout}">
   <body>
     <main class="main" id="top" layout:fragment="content">
 		        <div class="mb-9">
@@ -83,13 +83,26 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					</td>
 
                     <td class="align-middle text-end white-space-nowrap pe-0 action">
-                      <div class="btn-reveal-trigger position-static">
-                        <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fas fa-ellipsis-h fs-10"></span></button>
-                        <div class="dropdown-menu dropdown-menu-end py-2"><a class="dropdown-item" href="#!">View</a><a class="dropdown-item" href="#!">Export</a>
-                          <div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="#!">Remove</a>
-                        </div>
-                      </div>
+                      <div class="btn-reveal-trigger position-static"
+					     th:if="${#lists.contains(
+					              project.project_members.?[is_manager == 'Y' or project_manager == 'Y']
+					                                       .![project_member.employeeNo],
+					              #authentication.principal.employee.employeeNo)}">
+					  <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10"
+					          type="button" data-bs-toggle="dropdown" data-boundary="window"
+					          aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+					    <span class="fas fa-ellipsis-h fs-10"></span>
+					  </button>
+					  <div class="dropdown-menu dropdown-menu-end py-2">
+					    <a class="dropdown-item text-danger"
+						   th:attr="onclick=|deleteProject(${project.project_no})|">
+						  삭제
+						</a>
+
+					  </div>
+					</div>
                     </td>
+
                   </tr>
 
                 </tbody>
@@ -107,6 +120,35 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             </div>
           </div>
         </div>
+        
+        <script>
+        function deleteProject(projectNo) {
+        	  if (!confirm("정말 이 프로젝트를 삭제하시겠습니까?")) return;
+        	  
+        	  console.log(projectNo);
+
+        	  fetch("/project/delete", {
+        	    method: "POST",
+        	    headers: {
+        	      "Content-Type": "application/json",
+        	      [document.querySelector('meta[name="_csrf_header"]').content]:
+        	        document.querySelector('meta[name="_csrf"]').content
+        	    },
+        	    body: JSON.stringify({ projectNo: projectNo })
+        	  })
+        	    .then(res => res.json())
+        	    .then(data => {
+        	      alert(data.res_msg);
+        	      if (data.res_code === "200") {
+        	        location.reload();
+        	      }
+        	    })
+        	    .catch(() => {
+        	      alert("프로젝트 삭제 중 오류가 발생하였습니다.");
+        	    });
+        	}
+
+        </script>
     </main>
   </body>
 </html>

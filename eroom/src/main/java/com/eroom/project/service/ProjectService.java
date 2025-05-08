@@ -51,6 +51,26 @@ public class ProjectService {
  	@Value("${ffupload.location}")
  	private String fileDir;
  	
+ 	public int deleteProjectById(Long projectNo) {
+ 	    int result = 0;
+ 	    
+ 	    try {
+ 	    	Project project = projectRepository.findById(projectNo).orElse(null);
+
+ 	 	    if (project != null) {
+ 	 	        project.setVisibleYn("N");
+ 	 	        projectRepository.save(project);
+ 	 	    }
+ 	 	    
+ 	 	    result = 1;
+ 	    }catch(Exception e) {
+ 	    	e.printStackTrace();
+ 	    }
+
+ 	    return result;
+ 	}
+
+ 	
  	public List<ProjectMemberDto> findByProjectMembersNo(Long projectNo) {
  	    List<ProjectMember> members = projectMemberRepository.findByProject_ProjectNo(projectNo);
  	    List<ProjectMemberDto> dtoList = new ArrayList<>();
@@ -84,8 +104,8 @@ public class ProjectService {
  	}
 
  	 
- 	public List<ProjectDto> getDoneProject(Long employeeNo) {
- 	    List<ProjectMember> memberList = projectMemberRepository.findByEmployeeEmployeeNo(employeeNo);
+ 	public List<ProjectDto> getMyDoneProject(Long employeeNo) {
+ 	    List<ProjectMember> memberList = projectMemberRepository.findVisibleByEmployeeNo(employeeNo);
 
  	    Set<Project> projectSet = new HashSet<>();
  	    for (ProjectMember pm : memberList) {
@@ -100,7 +120,7 @@ public class ProjectService {
  	        ProjectDto dto = new ProjectDto();
  	        dto.setProject_no(project.getProjectNo());
  	        dto.setProject_name(project.getProjectName());
- 	        dto.setProject_end(project.getProjectEnd()); // 완료된 프로젝트는 종료일
+ 	        dto.setProject_end(project.getProjectEnd());
  	        result.add(dto);
  	    }
 
@@ -108,7 +128,7 @@ public class ProjectService {
  	}
 
  	public List<ProjectDto> getMyDoingProject(Long employeeNo) {
- 	    List<ProjectMember> memberList = projectMemberRepository.findByEmployeeEmployeeNo(employeeNo);
+ 	    List<ProjectMember> memberList = projectMemberRepository.findVisibleByEmployeeNo(employeeNo);
 
  	    Set<Project> projectSet = new HashSet<>();
  	    for (ProjectMember pm : memberList) {
@@ -183,7 +203,7 @@ public class ProjectService {
     }
 
     public List<ProjectDto> findAllProject() {
-        List<Project> projects = projectRepository.findAll();
+        List<Project> projects = projectRepository.findByVisibleYnAndOptionalProceed(null);
         List<ProjectDto> projectDtos = new ArrayList<>();
 
         for (Project project : projects) {
@@ -194,7 +214,7 @@ public class ProjectService {
     }
         
     public List<ProjectDto> findAllProjectsByProceed(String proceed) {
-        List<Project> projects = projectRepository.findByProceed(proceed);
+        List<Project> projects = projectRepository.findByVisibleYnAndOptionalProceed(proceed);
         List<ProjectDto> projectDtos = new ArrayList<>();
 
         for (Project project : projects) {
@@ -205,11 +225,12 @@ public class ProjectService {
     }
 
     public Long getAllProjectCount() {
-        return projectRepository.count();
+        return projectRepository.countVisibleProjects();
     }
+
     
     public Long countAllProjectsByProceed(String proceed) {
-        return projectRepository.countByProceed(proceed);
+        return projectRepository.countByProceedVisibleOnly(proceed);
     }
 
     

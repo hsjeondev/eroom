@@ -128,8 +128,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
   </head>
 	<body>
 	<main class="main" id="top">
-	<th:block th:replace="~{/include/nav :: navLayout}"></th:block>
-	<th:block th:replace="~{/include/header :: headerLayout}"></th:block>
+	<th:block th:replace="~{include/nav :: navLayout}"></th:block>
+	<th:block th:replace="~{include/header :: headerLayout}"></th:block>
 	<div class="content">
 	<th:block layout:fragment="content"></th:block>
 	<!-- <th:block th:replace="~{include/footer :: footerLayout}"></th:block> -->
