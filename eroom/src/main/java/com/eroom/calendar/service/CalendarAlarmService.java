@@ -67,7 +67,13 @@ public class CalendarAlarmService {
 			    calendarAlarmRepository.saveAll(alarms); // 저장
 			    teamAlarmSocketHandler.broadcastToTeam(calendar.getSeparator(), "new"); // 팀 웹소켓 알림
 			}
+		  
+		  public CalendarAlarm findAlarmOne(Long param1) {
+			  return calendarAlarmRepository.findById(param1).orElse(null);
+		  }
 		}
+
+	
 
 //=======================================================================================================
 		  
