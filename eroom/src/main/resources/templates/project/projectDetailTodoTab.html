@@ -71,7 +71,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		          <!-- 태스크 개수 -->
 		          <span class="kanban-title-badge" th:text="${list.todoElementCount}">4</span>
 		        </h5>
-		        <div class="hover-actions-trigger">
+		        <div th:if="${isManager == true}" class="hover-actions-trigger">
 		          <button class="btn btn-sm btn-phoenix-default kanban-header-dropdown-btn hover-actions"
 		                  type="button" data-boundary="viewport" data-bs-toggle="dropdown"
 		                  aria-haspopup="true" aria-expanded="false">
@@ -102,10 +102,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		    </div>
 		
 				    <!-- Review 아이템 공간(예시) -->
-				    <div class="kanban-items-container" data-sortable="data-sortable">
+				    <div class="kanban-items-container" data-sortable="data-sortable" th:attr="data-is-member=${isMember}">
 					  <div th:each="element : ${list.projectTodoElements}" 
-					       class="sortable-item-wrapper border-bottom border-translucent px-2 py-2" th:attr="data-todo-no=${element.todo_no}">
-					       
+					     class="sortable-item-wrapper border-bottom border-translucent px-2 py-2"
+					     th:attr="data-todo-no=${element.todo_no}">
 					    <div class="card sortable-item hover-actions-trigger data-bs-target='#KanbanItemDetailsModal' data-bs-toggle='modal'" th:onclick="|showTodoDetail(${element.todo_no})|" >
 					      <div class="card-body py-3 px-3">
 					
@@ -126,7 +126,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 							</div>
 					
 			        <!-- 드롭다운 버튼 (긴급 여부와 상관없이 항상 존재) -->
-			        <button class="btn btn-sm btn-phoenix-default kanban-item-dropdown-btn hover-actions"
+			        <button th:if="${isMember == true}" class="btn btn-sm btn-phoenix-default kanban-item-dropdown-btn hover-actions"
 			                type="button" data-boundary="viewport" data-bs-toggle="dropdown"
 			                aria-haspopup="true" aria-expanded="false">
 			          <i class="fa-solid fa-ellipsis fa-rotate-90"></i>
@@ -191,7 +191,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
 		  </div>
   
-		  <div class="kanban-column scrollbar position-relative bg-transparent">
+		  <div th:if="${isManager == true}" class="kanban-column scrollbar position-relative bg-transparent">
 		     <div class="d-flex h-100 flex-center fw-bold bg-body-hover"><a class="text-decoration-none stretched-link text-body-secondary" href="#!" data-bs-toggle="modal" 
       			data-bs-target="#addEventModal">
 		        <div class="circle-btn bg-body-secondary mx-auto"><svg class="svg-inline--fa fa-plus" data-fa-transform="shrink-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style="transform-origin: 0.4375em 0.5em;"><g transform="translate(224 256)"><g transform="translate(0, 0)  scale(0.875, 0.875)  rotate(0 0 0)"><path fill="currentColor" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" transform="translate(-224 -256)"></path></g></g></svg></div><span>새로운 리스트 생성</span>
@@ -607,7 +607,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		              	<!-- 세부 할 일 -->
 					  	<div class="col-4 col-sm-3 d-flex align-items-start gap-2">
 						  <h6 class="text-body-tertiary fw-bolder lh-sm mt-1 mb-0">세부 할 일</h6>
-						  <i id="editIcon"
+						  <i th:if="${isMember == true}" id="editIcon"
 						   data-feather="edit-2"
 						   style="width:16px; height:16px; cursor:pointer; position: relative; top: 2px;"
 						   data-bs-toggle="tooltip"
@@ -855,6 +855,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		            }
 		
 		            // ✅ 세부 할 일 체크박스 리스트 - 수정한 부분
+		            const isMember = /*[[${isMember}]]*/ false;
 		            const detailContainer = document.getElementById('todoDetailList');
 		            if (detailContainer) {
 		                detailContainer.innerHTML = ""; // 먼저 비우고
@@ -866,7 +867,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		                        listHtml += `
 		                        	<li class="d-flex align-items-center border-bottom ${index === 0 ? 'pb-2 pt-0' : 'py-2'}">
 
-		                        		<input type="checkbox" class="me-2" value="${detail.todo_detail_no}" ${detail.status === 'Y' ? 'checked' : ''} onclick="detailCheck(this);">
+		                        		<input type="checkbox" class="me-2" value="${detail.todo_detail_no}" ${detail.status === 'Y' ? 'checked' : ''} ${isMember === false ? 'disabled' : ''}  onclick="detailCheck(this);">
 
 		                                <span>${detail.todo_content}</span>
 		                            </li>
