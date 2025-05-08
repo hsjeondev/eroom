@@ -44,6 +44,21 @@ td.name p {
 .treeview-row {
   pointer-events: none;
 }
+#searchEmployeeList {
+    white-space: nowrap; /* 줄바꿈 없이 한 줄로 정렬 */
+    overflow-x: auto;    /* 넘치면 가로 스크롤 */
+    display: flex;       /* 플렉스 레이아웃으로 정렬 */
+    gap: 10px;           /* 요소 간격 */
+    padding: 5px;        /* 약간의 패딩 */
+}
+.employee-list {
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    padding: 5px 10px;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 500;
+}
 </style>
 </head>
 <body>
@@ -186,8 +201,9 @@ td.name p {
 
 
 							<!-- 부서/팀 추가 버튼 -->
-							<div class="col-auto">
+							<div th:if="${#authentication.authorities.?[authority == 'ROLE_ADMIN'].size() > 0}" class="col-auto">
 								<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDepartmentAndTeamModal">부서/팀 추가</button>
+								<button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteDepartmentAndTeamModal">부서/팀 삭제</button>
 								<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sortOrderModal">부서/팀 정렬</button>
 							</div>
 
@@ -311,6 +327,51 @@ td.name p {
 					<div class="modal-footer py-2">
 						<button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
 						<button type="submit" class="btn btn-primary btn-sm" onclick="showConfirm()">등록</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
+		
+		<!-- 부서, 팀 삭제 모달 -->
+		<div class="modal fade" id="deleteDepartmentAndTeamModal" tabindex="-1" aria-labelledby="deleteDepartmentAndTeamModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+				<div class="modal-content">
+					<div class="modal-header py-2">
+						<h5 class="modal-title fw-bold" id="deleteDepartmentAndTeamModalLabel">부서/팀 삭제</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+					</div>
+					<div class="modal-body px-4">
+						<!-- 폼 -->
+						<form id="deleteForm">
+							<!-- 팀 선택 + 팀명 -->
+							<div id="teamInputs" class="mb-3">
+								<label for="parentDept" class="form-label fw-semibold">부서</label>
+								<select class="form-select form-select-sm mb-2" id="parentDeptDelete">
+									<option selected disabled value="0">선택</option>
+									<option th:each="dept : ${departmentList}" th:text="${dept.codeName}" th:value="${dept.separatorCode}">ㅇㅇ부</option>
+								</select>
+								<label for="teamDelete" class="form-label fw-semibold">팀명</label>
+								<select class="form-select form-select-sm mb-2" id="teamDelete">
+									<option selected value="0">선택</option>
+								</select>
+							</div>
+								<button type="button" style="width: 100%;" class="btn btn-primary mb-3" onclick="searchRemainEmployee()">사원 조회</button>
+							<label for="searchEmployeeListDiv" class="form-label fw-semibold">삭제 부서/팀의 사원 목록</label>
+							<div id="searchEmployeeListDiv" class="d-flex justify-content-center align-items-center border rounded mb-2">
+								<span id="searchEmployeeList">　</span>
+							</div>
+							<label for="teamRemain" class="form-label fw-semibold">이동할 팀</label>
+							<select class="form-select form-select-sm mb-2" id="teamRemain">
+								<option selected value="0">선택</option>
+								<option th:each="team : ${teamList}" th:text="${team.codeName}" th:value="${team.separatorCode}">ㅇㅇ팀</option>
+							</select>
+						</form>
+					</div>
+					<div class="modal-footer py-2">
+						<button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
+						<button type="submit" class="btn btn-danger btn-sm" onclick="deleteConfirm()">삭제</button>
 					</div>
 				</div>
 			</div>
@@ -519,7 +580,7 @@ td.name p {
 				</script>
 
 				
-				<!-- 해당 사원의 이름을 클릭시 해당 사원의 데이터를 모달 안으로 전달해주는 JS -->
+				<!-- 프로필카드 - 해당 사원의 이름을 클릭시 해당 사원의 데이터를 모달 안으로 전달해주는 JS -->
 				<script>
 					document.addEventListener('DOMContentLoaded', function () {
 					  const modal = document.getElementById('profileModal');
@@ -739,7 +800,7 @@ td.name p {
 					              }
 					            });
 
-					            // ✅ 드롭다운이 갱신된 후에 직원 리스트 불러오기
+					            // 드롭다운이 갱신된 후에 직원 리스트 불러오기
 					            treeSelectEmployee(teamSeparatorCode);
 					          });
 					      }
@@ -892,16 +953,16 @@ document.addEventListener("DOMContentLoaded", function () {
       
    		 if (teamSeparatorCode === '전체') {
     	  if (selectedDeptSeparatorCode && selectedDeptSeparatorCode !== '전체') {
-    	    fetchAndRenderEmployees(selectedDeptSeparatorCode);  // ✅ 해당 부서의 전체 팀
+    	    fetchAndRenderEmployees(selectedDeptSeparatorCode);  // 해당 부서의 전체 팀
     	  } else {
-    	    fetchAndRenderEmployees('selectAll'); // ✅ 모든 사원
+    	    fetchAndRenderEmployees('selectAll'); // 모든 사원
     	  }
     	  // 트리뷰에서 팀 강조 제거
     	  document.querySelectorAll('.treeview-team .treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
     	  document.querySelectorAll('.treeview-team .treeview-label-text.treeview-label-strong').forEach(el => el.classList.remove('treeview-label-strong'));
 
     	} else {
-    	  fetchAndRenderEmployees(teamSeparatorCode); // ✅ 특정 팀
+    	  fetchAndRenderEmployees(teamSeparatorCode); // 특정 팀
     	}
 
       
@@ -1022,7 +1083,7 @@ function showConfirm() {
 			return;
 		}
 
-		fetch('/admin/addDepartmentOrTeam', {
+		fetch('/admin/directory/addDepartmentOrTeam', {
 			method: 'POST',
 			headers: {
 			    'Content-Type': 'application/json',
@@ -1057,7 +1118,7 @@ function showConfirm() {
 			return;
 		}
 
-		fetch('/admin/addDepartmentOrTeam', {
+		fetch('/admin/directory/addDepartmentOrTeam', {
 			method: 'POST',
 			headers: {
 			    'Content-Type': 'application/json',
@@ -1141,7 +1202,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log('저장 데이터:', result);
 
-    fetch('/admin/updateSortOrder', {
+    fetch('/admin/directory/updateSortOrder', {
       method: 'PUT',
       headers: {
 	    'Content-Type': 'application/json',
@@ -1167,7 +1228,177 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 </script>
+<!-- 부서, 팀 이름 바꾸기 -->
+<script>
+	const editNameDeptSeparatorCode = deptEl.getAttribute('data-deptSeparatorCode');
+	const editNameTeamSeparatorCode = teamEl.getAttribute('data-teamseparatorcode');
+</script>
+<!-- 부서, 팀 삭제 -->
+<script th:inline="javascript">
+	let trigger01 = false;
+	let trigger02 = false;
+	
+    document.getElementById('parentDeptDelete').addEventListener('change', function() {
+        const deleteSeparatorCode = this.value;
+        trigger01 = true;
+        trigger02 = false;
 
+        // 팀 셀렉트박스 초기화
+        const teamSelect = document.getElementById('teamDelete');
+        teamSelect.innerHTML = '<option selected value="0">선택</option>';
+
+        if (deleteSeparatorCode !== '0') {
+            fetch(`/directory/teams?separatorCode=${encodeURIComponent(deleteSeparatorCode)}`)
+                .then(response => response.json())
+                .then(data => {
+                	console.log('123');
+                    data.forEach(team => {
+                        const option = document.createElement('option');
+                        option.value = team.separatorCode;
+                        option.textContent = team.codeName;
+                        teamSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    });
+    
+
+
+    // 사원 조회
+   	function searchRemainEmployee(){
+   		const searchDeptSepCode = document.getElementById('parentDeptDelete').value;
+   		const searchTeamSepCode = document.getElementById('teamDelete').value;
+   		const employeeListSpan = document.getElementById('searchEmployeeList');
+   		//console.log(deleteDeptSepCode);
+   		//console.log(deleteTeamSepCode);
+   		let searchCode;
+   		trigger02 = true;
+   		
+   		if(searchDeptSepCode == '0'){
+   			alert('부서를 선택해주세요.');
+   			return;
+   		}
+   		
+   		if(searchTeamSepCode == '0'){
+   			// 부서만 선택
+   			// console.log('부서만');
+   			searchCode = searchDeptSepCode;
+   		} else if(searchTeamSepCode != '0'){
+   			// 부서+팀 선택
+   			// console.log('팀까지');
+   			searchCode = searchTeamSepCode;
+   		}
+   		console.log(searchCode);
+   		
+   		// 삭제할 팀 disabled 처리
+   		const selectElement = document.getElementById("teamRemain");
+   		Array.from(selectElement.options).forEach(option => {
+   		    if (option.value === searchCode) {
+   		        option.disabled = true;
+   		     	option.style.backgroundColor = "#d3d3d3"; // 비활성화 시 배경색 변경
+   		    } else{
+   		    	option.disabled = false;
+	   		    option.style.backgroundColor = "#FFFFFF"; // 비활성화 시 배경색 변경
+   		    }
+   		    if(searchCode && option.value == '0'){
+   		    	option.disabled = true;
+   		     	option.style.backgroundColor = "#d3d3d3"; // 비활성화 시 배경색 변경
+   		    }
+   		});
+   		
+   		
+   		
+	   	 fetch(`/directory/searchEmployeeList?separatorCode=${encodeURIComponent(searchCode)}`)
+	     .then(response => response.json())
+	     .then(data => {
+	         if (data.res_code == '200') {
+	        	// 데이터를 제대로 받아왔는지 확인
+	        	 const employeeList = data.result.searchRemainEmployee;
+	        	 console.log(employeeList);
+
+	        	 // 요소를 담을 부모 엘리먼트 선택
+	        	 const employeeListSpan = document.getElementById('searchEmployeeList');
+
+	        	 // 기존 내용 초기화
+	        	 employeeListSpan.innerHTML = '';
+
+	        	 // 이름들을 반복문으로 하나씩 추가
+	        	/*  employeeList.forEach(name => {
+	        	     const span = document.createElement('span');
+	        	     span.className = 'employee-list';
+	        	     span.textContent = name;
+	        	     employeeListSpan.appendChild(span);
+	        	 }); */
+	        	 employeeList.forEach(emp => {
+        		    const span = document.createElement('span');
+        		    span.className = 'employee-list';
+        		    span.textContent = emp.employee_name;
+        		    span.setAttribute('data-emp-no', emp.employee_no);
+        		    employeeListSpan.appendChild(span);
+        		});
+	        	 
+	         } else {
+	             console.log(data.res_code);
+	             console.log(data.res_msg);
+	             employeeListSpan.textContent = "조회에 실패했습니다.";
+	         }
+	     })
+	     .catch(err => {
+	         console.error("직원 리스트 비동기 로딩 실패:", err);
+	         employeeListSpan.textContent = "로딩 중 오류가 발생했습니다.";
+	     });
+   	};
+   	
+   	// 삭제버튼
+   	function deleteConfirm(){
+   		const searchDeptSepCode = document.getElementById('parentDeptDelete').value;
+   		const searchTeamSepCode = document.getElementById('teamDelete').value;
+   		const selectElement = document.getElementById("teamRemain");
+   		const employees = document.querySelectorAll('.employee-list');
+   		// 각 사원들의 data-emp-no 값을 배열로 반환
+   		const employeeNos = Array.from(employees).map(span => span.getAttribute('data-emp-no'));
+   		
+   		// trigger01 부서선택, trigger02 사원 조회.
+   		if(!trigger01 || !trigger02){
+   			alert('부서/팀을 선택 후 \'사원 조회\' 버튼을 눌러주세요.');
+   			return;
+   		}
+   		if(selectElement.value == '0' && employees.length != 0){
+   			alert('이동할 팀을 선택해주세요.');
+   			return;
+   		}
+   		
+   		fetch('/admin/directory/deleteDepartmentOrTeam',{
+   			method: 'PUT',
+   			headers: {
+   	   		    'Content-Type': 'application/json',
+   	   		    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+   	   		    'header': document.querySelector('meta[name="_csrf_header"]').content
+   			},
+   			body: JSON.stringify({
+   				deleteDeptCode : searchDeptSepCode,
+   				deleteTeamCode : searchTeamSepCode,
+   				remainTeamCode : selectElement.value,
+   				employeeNoList : employeeNos
+   			})
+   		})
+   		.then(response => response.json())
+   		.then(data => {
+   			if(data.res_code == '200'){
+   				alert('삭제가 완료되었습니다.');
+   				location.reload();
+   			}
+   			console.warn(`삭제 요청 실패: ${data.res_msg}`);
+   		})
+   	    .catch(err => {
+     	      console.error('정렬 저장 오류:', err);
+     	      alert('오류가 발생했습니다.');
+   	    });
+   	};
+   	
+
+</script>
 
 								
 

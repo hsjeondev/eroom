@@ -21,7 +21,7 @@ public class SeparatorDto {
 	private String separator_code;
 	private String separator_parent_code;
 	private String separator_name;
-	private String separator_yn;
+	private String visible_yn;
 	private String separator_creator;
 	private String separator_editor;
 	private LocalDateTime separator_reg_date;
@@ -32,7 +32,7 @@ public class SeparatorDto {
 				.separatorCode(separator_code)
 				.separatorParentCode(separator_parent_code)
 				.separatorName(separator_name)
-				.separatorYn(separator_yn)
+				.visibleYn(visible_yn)
 				.separatorCreator(separator_creator)
 				.separatorEditor(separator_editor)
 				.separatorRegDate(separator_reg_date)
@@ -44,7 +44,7 @@ public class SeparatorDto {
 				.separator_code(entity.getSeparatorCode())
 				.separator_parent_code(entity.getSeparatorParentCode())
 				.separator_name(entity.getSeparatorName())
-				.separator_yn(entity.getSeparatorYn())
+				.visible_yn(entity.getVisibleYn())
 				.separator_creator(entity.getSeparatorCreator())
 				.separator_editor(entity.getSeparatorEditor())
 				.separator_reg_date(entity.getSeparatorRegDate())

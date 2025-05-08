@@ -45,7 +45,7 @@ public class TreeModalController {
 			// 부서명으로 팀 리스트를 가져와서 Map에 저장
 			List<Structure> teamList = new ArrayList<Structure>();
 			// separator_code로 팀 리스트를 조회 후 <부서명, 팀리스트> 형태로 Map에 저장
-			teamList = structureService.selectTeamAll(s.getSeparatorCode());
+			teamList = structureService.selectTeamAllByParentCode(s.getSeparatorCode());
 			teamMap.put(s.getCodeName(), teamList);
 			for(Structure team : teamList) {
 				 List<EmployeeDto> employeeList = new ArrayList<EmployeeDto>();

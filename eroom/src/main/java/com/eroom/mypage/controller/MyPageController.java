@@ -246,17 +246,13 @@ public class MyPageController {
 		EmployeeDetails employee = (EmployeeDetails) authentication.getPrincipal();
 		List<ApprovalDto> dtoList = approvalService.myPageMyApprovalsStatusIsA(employee.getEmployee().getEmployeeNo());
 		
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 		List<Map<String,Object>> resultList = new ArrayList<>();
 		for(ApprovalDto dto : dtoList) {
 			Map<String,Object> map = new HashMap<>();
 			map.put("approval_no",dto.getApproval_no());
 			map.put("approval_title",dto.getApproval_title());
-			if(dto.getApproval_completed_date() != null) {
-				map.put("approval_display_date", dto.getApproval_completed_date().format(formatter));
-			}else {
-				map.put("approval_display_date","-");
-			}
+			
+			map.put("approval_display_date", dto.getCompleted_date());
 			resultList.add(map);
 			
 		}
