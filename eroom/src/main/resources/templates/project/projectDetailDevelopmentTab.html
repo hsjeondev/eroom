@@ -2,18 +2,18 @@
 <html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
 <body>
 	<main class="main" id="top" layout:fragment="content">
-		<style>
-.popover {
-	max-width: 350px;
-	font-size: 0.875rem;
-}
-
-.popover .popover-body {
-	white-space: normal;
-	line-height: 1.4;
-	padding: 0.75rem;
-}
-</style>
+	<style>
+	.popover {
+		max-width: 350px;
+		font-size: 0.875rem;
+	}
+	
+	.popover .popover-body {
+		white-space: normal;
+		line-height: 1.4;
+		padding: 0.75rem;
+	}
+	</style>
 		<div class="d-flex align-items-center gap-2">
 			<a th:href="@{/project/all}" class="text-decoration-none text-dark me-2"> <i class="uil uil-angle-left-b fs-4"></i>
 			</a>
@@ -112,179 +112,177 @@
 		<!-- 분석 결과 Ajax 처리 스크립트 -->
 		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 		<script>
-document.addEventListener("DOMContentLoaded", function () {
-  let qualityChart;
-
-  const resultWrap = document.getElementById("quality-result"); // 테이블 + 차트 감싸는 div
-  const chartCanvas = document.getElementById("qualityChart");
-  const spinner = document.getElementById("sonar-loading-spinner");
-  const prNumberDisplay = document.getElementById("selected-pr-number");
-
-  document.querySelectorAll(".pr-row").forEach(row => {
-    row.addEventListener("click", function () {
-      const prNumber = this.dataset.prNumber;
-
-      // PR 번호 텍스트 표시
-      if (prNumberDisplay) {
-        prNumberDisplay.textContent = `PR #${prNumber}`;
-      }
-
-      // ✅ 기존 결과 숨기고 스피너 표시
-      if (resultWrap) resultWrap.style.display = "none";
-      if (spinner) {
-        spinner.classList.remove("d-none");
-        spinner.style.display = "flex";
-      }
-
-      fetch("/api/sonar/quality/pr/" + prNumber)
-        .then(res => res.json())
-        .then(data => {
-          const tbody = document.getElementById("sonar-result-body");
-          tbody.innerHTML = "";
-
-          if (!Array.isArray(data) || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" class="text-muted text-center">분석 결과가 없습니다.</td></tr>';
-            clearChart();
-            return;
-          }
-
-          const radarLabels = [];
-          const radarValues = [];
-
-          data.forEach(item => {
-            const tr = document.createElement("tr");
-
-            const metric = document.createElement("td");
-            const translated = translateMetric(item.metric);
-            metric.textContent = translated;
-            metric.className = "text-start px-3 py-2";
-
-            const value = document.createElement("td");
-            value.textContent = item.value;
-            value.className = "text-end px-3 py-2";
-
-            const status = document.createElement("td");
-            status.textContent = getStatus(item.metric, item.value);
-            status.className = "text-center px-3 py-2 fw-semibold " + (
-              status.textContent === "양호" ? "text-success" :
-              status.textContent === "주의" ? "text-danger" : "text-secondary"
-            );
-
-            tr.appendChild(metric);
-            tr.appendChild(value);
-            tr.appendChild(status);
-            tbody.appendChild(tr);
-
-            if (["coverage", "bugs", "vulnerabilities", "code_smells", "duplicated_lines_density"].includes(item.metric)) {
-              radarLabels.push(translated);
-              radarValues.push(parseFloat(item.value));
-            }
-          });
-
-          renderRadarChart(radarLabels, radarValues);
-        })
-        .catch(err => {
-          console.error("분석 결과 조회 실패", err);
-          const tbody = document.getElementById("sonar-result-body");
-          tbody.innerHTML = '<tr><td colspan="3" class="text-danger text-center">데이터를 불러올 수 없습니다.</td></tr>';
-          clearChart();
-        })
-        .finally(() => {
-          // ✅ 로딩 끝나면 스피너 숨기고 결과 다시 표시
-          if (spinner) {
-            spinner.style.display = "none";
-            spinner.classList.add("d-none");
-          }
-          if (resultWrap) resultWrap.style.display = "block";
-        });
-    });
-  });
-
-  function renderRadarChart(labels, values) {
-    const ctx = document.getElementById("qualityChart").getContext("2d");
-
-    if (qualityChart) {
-      qualityChart.destroy();
-    }
-
-    qualityChart = new Chart(ctx, {
-      type: 'radar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'PR 품질 지표',
-          data: values,
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgba(54, 162, 235, 1)',
-          pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          r: {
-            beginAtZero: true,
-            ticks: {
-              stepSize: 10
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                return context.formattedValue;
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-
-  function clearChart() {
-    if (qualityChart) {
-      qualityChart.destroy();
-      qualityChart = null;
-    }
-  }
-
-  function translateMetric(metric) {
-    const map = {
-      "coverage": "테스트 커버리지",
-      "bugs": "버그 수",
-      "code_smells": "코드 스멜",
-      "duplicated_lines_density": "중복 코드율",
-      "vulnerabilities": "보안 취약점",
-      "complexity": "복잡도",
-      "cognitive_complexity": "인지 복잡도",
-      "ncloc": "코드 라인 수"
-    };
-    return map[metric] || metric;
-  }
-
-  function getStatus(metric, value) {
-    if (["bugs", "vulnerabilities", "code_smells"].includes(metric)) {
-      return value === "0" ? "양호" : "주의";
-    }
-    if (metric === "coverage") {
-      return parseFloat(value) >= 80 ? "양호" : "주의";
-    }
-    if (metric === "duplicated_lines_density") {
-      return parseFloat(value) <= 10 ? "양호" : "주의";
-    }
-    if (["complexity", "cognitive_complexity", "ncloc"].includes(metric)) {
-      return "정보";
-    }
-    return "확인 필요";
-  }
-});
-</script>
-
+		document.addEventListener("DOMContentLoaded", function () {
+		  let qualityChart;
+		
+		  const resultWrap = document.getElementById("quality-result");
+		  const chartCanvas = document.getElementById("qualityChart");
+		  const spinner = document.getElementById("sonar-loading-spinner");
+		  const prNumberDisplay = document.getElementById("selected-pr-number");
+		
+		  document.querySelectorAll(".pr-row").forEach(row => {
+		    row.addEventListener("click", function () {
+		      const prNumber = this.dataset.prNumber;
+		
+		      // PR 번호 텍스트 표시
+		      if (prNumberDisplay) {
+		        prNumberDisplay.textContent = `PR #${prNumber}`;
+		      }
+		
+		      // 기존 결과 숨기고 스피너 표시
+		      if (resultWrap) resultWrap.style.display = "none";
+		      if (spinner) {
+		        spinner.classList.remove("d-none");
+		        spinner.style.display = "flex";
+		      }
+		
+		      fetch("/api/sonar/quality/pr/" + prNumber)
+		        .then(res => res.json())
+		        .then(data => {
+		          const tbody = document.getElementById("sonar-result-body");
+		          tbody.innerHTML = "";
+		
+		          if (!Array.isArray(data) || data.length === 0) {
+		            tbody.innerHTML = '<tr><td colspan="3" class="text-muted text-center">분석 결과가 없습니다.</td></tr>';
+		            clearChart();
+		            return;
+		          }
+		
+		          const radarLabels = [];
+		          const radarValues = [];
+		
+		          data.forEach(item => {
+		            const tr = document.createElement("tr");
+		
+		            const metric = document.createElement("td");
+		            const translated = translateMetric(item.metric);
+		            metric.textContent = translated;
+		            metric.className = "text-start px-3 py-2";
+		
+		            const value = document.createElement("td");
+		            value.textContent = item.value;
+		            value.className = "text-end px-3 py-2";
+		
+		            const status = document.createElement("td");
+		            status.textContent = getStatus(item.metric, item.value);
+		            status.className = "text-center px-3 py-2 fw-semibold " + (
+		              status.textContent === "양호" ? "text-success" :
+		              status.textContent === "주의" ? "text-danger" : "text-secondary"
+		            );
+		
+		            tr.appendChild(metric);
+		            tr.appendChild(value);
+		            tr.appendChild(status);
+		            tbody.appendChild(tr);
+		
+		            if (["coverage", "bugs", "vulnerabilities", "code_smells", "duplicated_lines_density"].includes(item.metric)) {
+		              radarLabels.push(translated);
+		              radarValues.push(parseFloat(item.value));
+		            }
+		          });
+		
+		          renderRadarChart(radarLabels, radarValues);
+		        })
+		        .catch(err => {
+		          console.error("분석 결과 조회 실패", err);
+		          const tbody = document.getElementById("sonar-result-body");
+		          tbody.innerHTML = '<tr><td colspan="3" class="text-danger text-center">데이터를 불러올 수 없습니다.</td></tr>';
+		          clearChart();
+		        })
+		        .finally(() => {
+		          if (spinner) {
+		            spinner.style.display = "none";
+		            spinner.classList.add("d-none");
+		          }
+		          if (resultWrap) resultWrap.style.display = "block";
+		        });
+		    });
+		  });
+		
+		  function renderRadarChart(labels, values) {
+		    const ctx = document.getElementById("qualityChart").getContext("2d");
+		
+		    if (qualityChart) {
+		      qualityChart.destroy();
+		    }
+		
+		    qualityChart = new Chart(ctx, {
+		      type: 'radar',
+		      data: {
+		        labels: labels,
+		        datasets: [{
+		          label: 'PR 품질 지표',
+		          data: values,
+		          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+		          borderColor: 'rgba(54, 162, 235, 1)',
+		          pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+		          borderWidth: 2
+		        }]
+		      },
+		      options: {
+		        responsive: true,
+		        scales: {
+		          r: {
+		            beginAtZero: true,
+		            ticks: {
+		              stepSize: 10
+		            }
+		          }
+		        },
+		        plugins: {
+		          legend: {
+		            display: false
+		          },
+		          tooltip: {
+		            callbacks: {
+		              label: function (context) {
+		                return context.formattedValue;
+		              }
+		            }
+		          }
+		        }
+		      }
+		    });
+		  }
+		
+		  function clearChart() {
+		    if (qualityChart) {
+		      qualityChart.destroy();
+		      qualityChart = null;
+		    }
+		  }
+		
+		  function translateMetric(metric) {
+		    const map = {
+		      "coverage": "테스트 커버리지",
+		      "bugs": "버그 수",
+		      "code_smells": "코드 스멜",
+		      "duplicated_lines_density": "중복 코드율",
+		      "vulnerabilities": "보안 취약점",
+		      "complexity": "복잡도",
+		      "cognitive_complexity": "인지 복잡도",
+		      "ncloc": "코드 라인 수"
+		    };
+		    return map[metric] || metric;
+		  }
+		
+		  function getStatus(metric, value) {
+		    if (["bugs", "vulnerabilities", "code_smells"].includes(metric)) {
+		      return value === "0" ? "양호" : "주의";
+		    }
+		    if (metric === "coverage") {
+		      return parseFloat(value) >= 80 ? "양호" : "주의";
+		    }
+		    if (metric === "duplicated_lines_density") {
+		      return parseFloat(value) <= 10 ? "양호" : "주의";
+		    }
+		    if (["complexity", "cognitive_complexity", "ncloc"].includes(metric)) {
+		      return "정보";
+		    }
+		    return "확인 필요";
+		  }
+		});
+		</script>
 	</main>
 </body>
 </html>

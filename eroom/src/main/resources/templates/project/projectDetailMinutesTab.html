@@ -9,7 +9,7 @@
 			<span class="badge badge-phoenix fs-10 badge-phoenix-success" th:text="${project.proceed}">completed</span>
 		</div>
 		<br>
-		<ul class="nav nav-phoenix-pills mt-3" role="tablist">
+		<ul class="nav nav-phoenix-pills mt-3 mb-4" role="tablist">
 			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/main(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/main')} ? ' active' : ''">메인</a></li>
 			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/developmentTab(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/developmentTab')} ? ' active' : ''">개발</a></li>
 			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/todo(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/todo')} ? ' active' : ''">할 일</a></li>
@@ -19,29 +19,15 @@
 
 		<!-- 본문 -->
 		<div id="members" data-list='{"valueNames":["customer","email","mobile_number","city","last_active","joined"],"page":15,"pagination":true}'>
-			<div class="row align-items-center justify-content-between g-3 mb-4 mt-2">
-				<div class="col col-auto">
-					<!-- <div class="search-box">
-						<form class="position-relative">
-							<input class="form-control search-input search" type="search" placeholder="제목 검색" aria-label="Search" /> <span class="fas fa-search search-box-icon"></span>
-						</form>
-					</div> -->
-				</div>
-				<div class="col-auto">
-					<div class="d-flex align-items-center">
-						<!-- <button class="btn btn-link text-body me-4 px-0">
-							<span class="fa-solid fa-file-export fs-9 me-2"></span>문서화
-						</button> -->
-						<th:block th:if="${isProjectMember}">
-							<button type="button" class="btn btn-primary" th:onclick="|location.href='/project/minute/create-page?projectNo=${project.project_no}'|">회의록 작성</button>
-						</th:block>
-					</div>
-				</div>
-			</div>
 			<div class="row g-4">
 				<div class="col-md-8">
 					<div class="card shadow-sm">
-						<div class="card-header bg-light fw-bold">회의록 목록</div>
+						<div class="card-header bg-light fw-bold d-flex justify-content-between align-items-center py-2">
+							<span>회의록 목록</span>
+							<th:block th:if="${isProjectMember}">
+								<button type="button" class="btn btn-secondary" th:onclick="|location.href='/project/minute/create-page?projectNo=${project.project_no}'|">회의록 작성</button>
+							</th:block>
+						</div>
 						<div class="table-responsive scrollbar ms-n1 ps-1">
 							<table class="table table-hover table-sm align-middle text-nowrap">
 								<thead class="table-light">
@@ -84,7 +70,7 @@
 				<!-- 회의 내용 요약 테이블 -->
 				<div class="col-md-4">
 					<div class="card shadow-sm">
-						<div class="card-header bg-light fw-bold">회의 내용 요약</div>
+						<div class="card-header bg-light fw-bold py-3">회의 내용 요약</div>
 						<div class="card-body p-2" id="summary-content">
 							<div id="summary-title" class="fw-semibold text-secondary fs-7 mb-2 d-none"></div>
 							<div id="summary-placeholder" class="d-flex justify-content-center align-items-center text-secondary fs-8" style="min-height: 500px;">회의록을 선택하세요.</div>

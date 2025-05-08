@@ -64,48 +64,48 @@
 			</div>
 		</footer>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  let isDirty = false;
-
-  // 감지할 입력 요소들
-  const inputs = document.querySelectorAll("#createMinute input, #createMinute textarea");
-  inputs.forEach(input => {
-    input.addEventListener("input", () => {
-      isDirty = true;
-    });
-  });
-
-  // 내부 링크 클릭 시 모달 확인
-  document.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", function (e) {
-      const href = this.getAttribute("href");
-
-      if (isDirty && href && !href.startsWith("#") && !this.hasAttribute("data-bs-toggle")) {
-        e.preventDefault();
-
-        const confirmModal = new bootstrap.Modal(document.getElementById("confirmCloseModal"));
-        confirmModal.show();
-
-        const confirmBtn = document.getElementById("confirmCloseBtn");
-        confirmBtn.onclick = function () {
-          confirmModal.hide();
-          isDirty = false;
-          window.location.href = href;
-        };
-      }
-    });
-  });
-
-  // 브라우저 뒤로가기 등 페이지 이탈 시 경고
-  window.addEventListener("beforeunload", function (e) {
-    if (isDirty) {
-      e.preventDefault();
-      e.returnValue = ""; // 일부 브라우저용
-    }
-  });
-});
-</script>
+		<script>
+		document.addEventListener("DOMContentLoaded", function () {
+		  let isDirty = false;
+		
+		  // 감지할 입력 요소들
+		  const inputs = document.querySelectorAll("#createMinute input, #createMinute textarea");
+		  inputs.forEach(input => {
+		    input.addEventListener("input", () => {
+		      isDirty = true;
+		    });
+		  });
+		
+		  // 내부 링크 클릭 시 모달 확인
+		  document.querySelectorAll("a").forEach(link => {
+		    link.addEventListener("click", function (e) {
+		      const href = this.getAttribute("href");
+		
+		      if (isDirty && href && !href.startsWith("#") && !this.hasAttribute("data-bs-toggle")) {
+		        e.preventDefault();
+		
+		        const confirmModal = new bootstrap.Modal(document.getElementById("confirmCloseModal"));
+		        confirmModal.show();
+		
+		        const confirmBtn = document.getElementById("confirmCloseBtn");
+		        confirmBtn.onclick = function () {
+		          confirmModal.hide();
+		          isDirty = false;
+		          window.location.href = href;
+		        };
+		      }
+		    });
+		  });
+		
+		  // 브라우저 뒤로가기 등 페이지 이탈 시 경고
+		  window.addEventListener("beforeunload", function (e) {
+		    if (isDirty) {
+		      e.preventDefault();
+		      e.returnValue = ""; // 일부 브라우저용
+		    }
+		  });
+		});
+		</script>
 
 		<!-- 유효성 검사 확인창 -->
 		<div class="modal fade" id="validationModal" tabindex="-1" aria-hidden="true">
