@@ -23,6 +23,21 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
 	
 	List<Project> findByProceed(String proceed);
 
-	Long countByProceed(String proceed);
+	@Query("SELECT COUNT(p) FROM Project p WHERE p.visibleYn = 'Y' AND p.proceed = :proceed")
+	Long countByProceedVisibleOnly(@Param("proceed") String proceed);
+
+	
+	@Query("""
+			SELECT p FROM Project p
+			WHERE p.visibleYn = 'Y'
+			AND (:proceed IS NULL OR p.proceed = :proceed)
+			ORDER BY p.projectNo ASC
+			""")
+			List<Project> findByVisibleYnAndOptionalProceed(@Param("proceed") String proceed);
+	
+	@Query("SELECT COUNT(p) FROM Project p WHERE p.visibleYn = 'Y'")
+	Long countVisibleProjects();
+
+
 
 }

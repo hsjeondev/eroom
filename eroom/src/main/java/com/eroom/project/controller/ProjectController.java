@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -47,9 +47,6 @@ public class ProjectController {
 	private final ProjectService projectService;
 	private final ProjectTodoService projectTodoService;
 	private final ProjectMeetingMinuteService projectMeetingMinuteService;
-	// 파일 저장 경로 
-			 @Value("${ffupload.location}")
-			 private String fileDir;
 
 	@GetMapping("/all")
 	public String allProjectView(Model model) {
@@ -559,7 +556,7 @@ public class ProjectController {
 	        Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
 
 	        List<ProjectDto> doingProject = projectService.getMyDoingProject(employeeNo);
-	        List<ProjectDto> doneProject = projectService.getDoneProject(employeeNo);
+	        List<ProjectDto> doneProject = projectService.getMyDoneProject(employeeNo);
 
 	        map.put("res_code", "200");
 	        map.put("res_msg", "내 프로젝트를 성공적으로 불러왔습니다.");
@@ -600,6 +597,24 @@ public class ProjectController {
 	    return map;
 	}
 
+	
+	@PostMapping("/delete")
+	@ResponseBody
+	public Map<String, String> deleteProject(@RequestBody Map<String, Long> request) {
+	    Long projectNo = request.get("projectNo");
+	    Map<String, String> resultMap = new HashMap<>();
+	    resultMap.put("res_code", "500");
+        resultMap.put("res_msg", "삭제 중 오류가 발생했습니다.");
+	    
+        int result = projectService.deleteProjectById(projectNo);
+	        
+        if(result > 0) {
+        	resultMap.put("res_code", "200");
+	        resultMap.put("res_msg", "삭제가 완료되었습니다.");
+        }
+	        
+	    return resultMap;
+	}
 
 
 	
