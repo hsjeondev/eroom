@@ -62,18 +62,17 @@
 				</div>
 				<!-- 탭 메뉴 (전체, 읽지않음, 읽음) -->
 				<ul class="nav nav-phoenix-pills mb-5 d-sm-none d-xl-flex"
-					id="contactListTab" data-chat-thread-tab="data-chat-thread-tab"
-					role="tablist">
+					id="contactListTab" data-chat-thread-tab role="tablist">
 					<li class="nav-item" role="presentation"><a
 						class="nav-link cursor-pointer active" data-bs-toggle="tab"
 						data-chat-thread-list="all" role="tab" aria-selected="true">전체</a>
 					</li>
-					<li class="nav-item" role="presentation"><a
+					<li class="nav-item item read" role="presentation"><a
 						class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab"
-						data-chat-thread-list="read" aria-selected="false">읽지않음</a></li>
-					<li class="nav-item" role="presentation"><a
+						data-chat-thread-list="read" aria-selected="false">읽음</a></li>
+					<li class="nav-item item unread" role="presentation"><a
 						class="nav-link cursor-pointer" data-bs-toggle="tab" role="tab"
-						data-chat-thread-list="unread" aria-selected="false">읽음</a></li>
+						data-chat-thread-list="unread" aria-selected="false">읽지않음</a></li>
 				</ul>
 				<!-- 채팅 목록 -->
 				<div class="scrollbar">
@@ -81,9 +80,9 @@
 						<div data-chat-thread-tab-content="data-chat-thread-tab-content">
 							<ul class="nav chat-thread-tab flex-column list chat_list">
 								<!-- 채팅방이 없을 경우 -->
-								<div th:if="${#lists.isEmpty(chatroomList)}">
+								<li th:if="${#lists.isEmpty(chatroomList)}">
 									<p class="text-center text-muted mt-4">참여 중인 채팅방이 없습니다.</p>
-								</div>
+								</li>
 								<!-- 채팅방 목록 -->
 								<li th:if="${!#lists.isEmpty(chatroomList)}"
 									th:each="chatroom : ${chatroomList}"
@@ -713,7 +712,6 @@
 		    	    </div>
 		    	    <div class="chat-footer border-top p-3 d-flex align-items-center flex-column bg-white">
 		    	    <div class="d-flex w-100 align-items-center mb-2">
-		    	      <button class="btn btn-light me-2"><i class="fas fa-smile"></i></button>
 		    	      <label for="chatFileInput" class="btn btn-light me-2">
 		    	        <i class="fa-solid fa-paperclip"></i>
 		    	      </label>
@@ -1522,6 +1520,35 @@ function loadChatroomDetail(chatroomNo) {
 				});
 
 			}
+		function applyChatroomFilter(type) {
+			  const allItems = document.querySelectorAll('.chat_list .item');
+
+			  allItems.forEach(item => {
+			    const isUnread = item.classList.contains('unread');
+			    if (type === 'all') {
+			      item.style.display = '';
+			    } else if (type === 'read' && isUnread) {
+			      item.style.display = 'none';
+			    } else if (type === 'unread' && !isUnread) {
+			      item.style.display = 'none';
+			    } else {
+			      item.style.display = '';
+			    }
+			  });
+			}
+
+			// 탭 버튼 클릭 이벤트 바인딩
+			document.querySelectorAll('[data-chat-thread-list]').forEach(tab => {
+			  tab.addEventListener('click', e => {
+			    const type = tab.getAttribute('data-chat-thread-list');
+			    applyChatroomFilter(type);
+
+			    // 탭 active 클래스 갱신
+			    document.querySelectorAll('[data-chat-thread-list]').forEach(t => t.classList.remove('active'));
+			    tab.classList.add('active');
+			  });
+			});
+
 		</script>
 	</main>
 </body>
