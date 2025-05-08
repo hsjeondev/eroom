@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import com.eroom.approval.entity.ApprovalAlarm;
 import com.eroom.approval.service.ApprovalAlarmService;
+import com.eroom.calendar.entity.CalendarAlarm;
+import com.eroom.calendar.service.CalendarAlarmService;
 import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.notification.dto.AlarmDto;
 import com.eroom.notification.entity.Alarm;
@@ -28,6 +30,7 @@ public class AlarmService {
 	
 	private final AlarmRepository alarmRepository;
 	private final ApprovalAlarmService approvalAlarmService;
+	private final CalendarAlarmService calendarAlarmService;
 	
 	 //알림 페이지 목록 조회
 	 @Transactional
@@ -91,11 +94,16 @@ public class AlarmService {
 	             .readYn("Y") // 읽음 처리
 	             .regDate(target.getRegDate())
 	             .build();
+	         
 
 	         alarmRepository.save(updated);
 	         // 확인용 이전 Alarm Entity 반환
 	         if("R001".equals(target.getSeparatorCode())) {
-	        	 return null;
+	        	 // pk 넣든 필요한 거 넣으세요
+	        	 CalendarAlarm calendarAlarm = calendarAlarmService.findAlarmOne(target.getParam1());
+	        	 map.put("separator", calendarAlarm.getSeparator());
+	        	 map.put("separator_code", "R001");
+	        	 return map;
 	         } else if("R002".equals(target.getSeparatorCode())) {
         	    System.out.println("chatAlarm: " + target.getChatAlarm());
         	    System.out.println("chatMessage: " + (target.getChatAlarm() != null ? target.getChatAlarm().getChatMessage() : "null"));
