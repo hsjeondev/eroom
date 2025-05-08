@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.eroom.notification.CalendarAlarmService;
+import com.eroom.calendar.dto.CalendarAlarmDto;
+import com.eroom.calendar.service.CalendarAlarmService;
 import com.eroom.notification.dto.AlarmDto;
-import com.eroom.notification.dto.CalendarAlarmDto;
 import com.eroom.notification.service.AlarmService;
 import com.eroom.security.EmployeeDetails;
 
@@ -25,15 +25,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotificationController {
 	
-	private final CalendarAlarmService calendarAlarmService;
 	private final AlarmService alarmService;
 
 	
 	//알림 페이지 목록조회
 	@GetMapping("/notification")
 	public String notificationView(Model model) {
+		//오늘,어제 기준으로만 날짜 목록 조회
 		List<AlarmDto> alarmList = alarmService.getMyAlarms();
+		//날짜별 그룹화로 알람 보기
+		Map<String,List<AlarmDto>> groupedAlarms = alarmService.getGroupedAlarms();
 		model.addAttribute("alarmList", alarmList);
+		model.addAttribute("groupedAlarms",groupedAlarms);
 		return "notification/notification";
 	}
 	

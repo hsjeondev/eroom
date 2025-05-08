@@ -55,7 +55,7 @@
 										<td class="room" th:text="${result.facilityName}"></td>
 										<td class="capacity" th:text="${result.facilityCapacity}"></td>
 										<td class="date"
-											th:text="${#temporals.format(result.facilityRegDate, 'yy-MM-dd')}"></td>
+											th:text="${#temporals.format(result.facilityRegDate, 'yy.MM.dd')}"></td>
 										<td class="text-end pe-0">
 											<button class="btn btn-sm btn-outline-primary"
 												data-bs-toggle="modal" data-bs-target="#addEventModal"
@@ -105,7 +105,7 @@
 									<td th:text="${res.meetingRoomName}"></td>
 									<td th:text="${res.reserverName}"></td>
 									<td
-										th:text="${#temporals.format(res.reservation_start, 'yyyy-MM-dd')}"></td>
+										th:text="${#temporals.format(res.reservation_start, 'yyyy.MM.dd')}"></td>
 									<td><span
 										th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span>
 										~ <span
