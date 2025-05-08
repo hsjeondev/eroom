@@ -172,14 +172,34 @@ public class ProjectController {
 	@GetMapping("/detail/{project_no}/todo")
 	public String detailProjectTodoView(@PathVariable("project_no") Long project_no, Model model) {
 	    
+	    // 로그인한 사용자 정보 가져오기
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Long currentEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
+
 	    ProjectDto project = projectService.findByProjectNo(project_no);
 	    List<ProjectTodoListDto> allLists = projectTodoService.findByProjectNoWithElementCount(project_no);
 
+	    // isMember / isManager 판별
+	    boolean isMember = false;
+	    boolean isManager = false;
+
+	    for (ProjectMemberDto member : project.getProject_members()) {
+	        if ("Y".equals(member.getVisible_yn()) &&
+	            member.getProject_member().getEmployeeNo().equals(currentEmployeeNo)) {
+	            isMember = true;
+	            if ("Y".equals(member.getProject_manager()) || "Y".equals(member.getIs_manager())) {
+	                isManager = true;
+	            }
+	            break;
+	        }
+	    }
+
+	    // 할 일 리스트 필터링
 	    List<ProjectTodoListDto> projectTodoList = new ArrayList<>();
 
 	    for (ProjectTodoListDto list : allLists) {
 	        if ("Y".equals(list.getVisible_yn())) {
-	            // 할 일 요소 중 visible_yn = "Y"인 것만 필터링
 	            List<ProjectTodoElementDto> visibleElements = new ArrayList<>();
 
 	            for (ProjectTodoElementDto element : list.getProjectTodoElements()) {
@@ -211,9 +231,12 @@ public class ProjectController {
 
 	    model.addAttribute("project", project);
 	    model.addAttribute("projectTodoList", projectTodoList);
+	    model.addAttribute("isMember", isMember);   // 🔥 추가
+	    model.addAttribute("isManager", isManager); // 🔥 추가
 
 	    return "project/projectDetailTodoTab";
 	}
+
 
 
 
