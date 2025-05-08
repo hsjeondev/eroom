@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -395,5 +396,27 @@ public class ChatController {
 
 	    return resultMap;
 	}
+	@GetMapping("/room/{targetEmpNo}")
+	public String goOneToOneChat(@PathVariable("targetEmpNo") Long targetEmpNo, Model model) {
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
+
+	    // 본인과의 채팅은 불가하도록 예외 처리
+	    if (myEmployeeNo.equals(targetEmpNo)) {
+	        return "redirect:/chat/list";
+	    }
+
+	    // 1:1 채팅방이 없으면 생성, 있으면 기존 채팅방 번호 반환
+	    Long chatroomNo = chatroomService.findOrCreateOneToOneChatroom(myEmployeeNo, targetEmpNo);
+
+	    return "redirect:/chat/list?roomNo=" + chatroomNo;
+	}
+	@GetMapping("/roomDetailView")
+	public String roomDetailView(@RequestParam("roomNo") Long roomNo, Model model) {
+	    model.addAttribute("roomNo", roomNo);
+	    return "chat/list"; // 또는 실제 HTML/JSP 경로에 맞게 수정
+	}
+	
 
 }

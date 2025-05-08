@@ -1547,6 +1547,7 @@ function loadChatroomDetail(chatroomNo) {
 			    tab.classList.add('active');
 			  });
 			});
+			// 1대1채팅 바로가기
 			document.querySelector('.search')?.addEventListener('input', function () {
 				  const keyword = this.value.trim().toLowerCase();
 				  const items = document.querySelectorAll('.chat_list .item');
@@ -1557,6 +1558,28 @@ function loadChatroomDetail(chatroomNo) {
 				  });
 				});
 
+			  document.addEventListener('DOMContentLoaded', function () {
+				    const urlParams = new URLSearchParams(window.location.search);
+				    const roomNo = urlParams.get('roomNo');
+
+				    if (roomNo) {
+				      openChatRoom(roomNo);
+				    }
+				  });
+			  function openChatRoom(roomNo) {
+				  const chatItem = document.querySelector(`[data-room-no="${roomNo}"]`);
+				  if (chatItem) {
+				    chatItem.click();
+				  }
+				}
+
+				document.addEventListener('DOMContentLoaded', function () {
+				  const urlParams = new URLSearchParams(window.location.search);
+				  const roomNo = urlParams.get('roomNo');
+				  if (roomNo) {
+				    openChatRoom(roomNo);
+				  }
+				});
 		</script>
 	</main>
 </body>
