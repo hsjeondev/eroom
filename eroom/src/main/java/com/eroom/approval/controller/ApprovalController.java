@@ -78,7 +78,11 @@ public class ApprovalController {
 		Employee employee = employeeDetails.getEmployee();
 		model.addAttribute("employee", employee);
 		ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(employee);
-		model.addAttribute("approvalSignature", approvalSignature);
+		String encodedBase64 = null;
+		if(approvalSignature != null) {
+			encodedBase64 = approvalSignatureService.encodeToBase64(approvalSignature.getApprovalSignatureBlob());
+			model.addAttribute("approvalSignature", encodedBase64);
+		}
 		// 관리자용 전체(visible Y) 결재 보기 - 회의시 필요없는 기능으로 판단. 필요할 수 있으니 주석으로 남겨두기
 //		if (employee.getEmployeeName().contains("admin")) {
 //			List<Approval> temp = approvalService.findAllApprovalsVisibleY("Y");
