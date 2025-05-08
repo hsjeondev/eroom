@@ -7,10 +7,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    @Override
+	@Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    	registry.addResourceHandler("/files/drive/chat/**") // 수정된 부분
-    		.addResourceLocations("file:///C:/dev/eroom/upload/drive/chat/");
+        // 채팅 첨부파일
+        registry.addResourceHandler("/files/drive/chat/**")
+                .addResourceLocations("file:///C:/dev/eroom/upload/drive/chat/");
 
+        // 프로필 이미지
+        registry.addResourceHandler("/files/profile/**")
+                .addResourceLocations("file:///C:/dev/eroom/upload/profile/");
     }
 }

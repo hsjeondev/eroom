@@ -3,6 +3,7 @@ package com.eroom.websocket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
@@ -97,13 +98,21 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     public void broadcastMessage(ChatMessageDto dto, ChatMessage savedMessage) throws Exception {
         Employee sender = employeeRepository.findById(dto.getSenderMember())
                 .orElseThrow(() -> new IllegalArgumentException("보낸 사람 없음"));
-
+        
+        Optional<Drive> profileDriveOpt = driveRepository
+                .findTopByUploaderAndSeparatorCodeOrderByDriveRegDateDesc(sender, "FL008");
+        
+        String profileImageUrl = profileDriveOpt
+        	    .map(drive -> "/files/" + drive.getDrivePath()) // 여기 수정!
+        	    .orElse("/assets/img/profile/default-profile.png");
+        
         Map<String, Object> sendData = new HashMap<>();
         sendData.put("chatMessageContent", dto.getChatMessageContent());
         sendData.put("senderMember", dto.getSenderMember());
         sendData.put("senderName", sender.getEmployeeName());
         sendData.put("chatroomNo", dto.getChatroomNo());
         sendData.put("receiverMember", dto.getReceiverMember());
+        sendData.put("senderProfileImageUrl", profileImageUrl);
 
         // [파일] 메시지일 경우 drive 정보 추가
         if (dto.getChatMessageContent().startsWith("[파일]")) {
