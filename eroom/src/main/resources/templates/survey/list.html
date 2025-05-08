@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{include/layout}">
 <th:block layout:fragment="content">
 	<style>
 /* 삭제 버튼 css */
@@ -76,6 +76,12 @@
 													<div class="row mb-3">
 														<label class="col-sm-2 col-form-label text-end" for="basic-form-dob">참여자</label>
 														<div class="col-8">
+															<!-- 참여자 전체선택 -->
+															<div class="col-12 mb-2">
+																<div class="form-check">
+																	<input class="form-check-input" type="checkbox" id="check-all-teams" onclick="toggleAllTeams(this)"> <label class="form-check-label" for="check-all-teams">전체 선택</label>
+																</div>
+															</div>
 															<!-- 참여자 선택 -->
 															<div class="row mb-3">
 																<div class="col-sm-10">
@@ -279,8 +285,19 @@
 	
 	
 	
-	// 설문 등록 유효성 검사
+	// 참여자 전체 선택
+	function toggleAllTeams(checkbox) {
+	  const teamCheckboxes = document.querySelectorAll('input[name="selectedTeamIds"]');
+	  teamCheckboxes.forEach(cb => cb.checked = checkbox.checked);
+	}
 	
+	
+	
+	
+	
+	
+	
+	// 설문 등록 유효성 검사
 	let focusTarget = null; // 포커스를 위한 변수
 	
 	document.addEventListener("DOMContentLoaded", function () {

@@ -1,6 +1,7 @@
 package com.eroom.chat.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.eroom.chat.entity.Chatroom;
-import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.employee.entity.Employee;
 
 public interface ChatroomRepository extends JpaRepository<Chatroom, Long>{
@@ -24,4 +24,14 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long>{
  
     @Query("SELECT c FROM Chatroom c JOIN FETCH c.chatroomMapping ca WHERE c.chatroomNo = :chatroomNo")
     Chatroom findByIdWithAttendees(@Param("chatroomNo") Long chatroomNo);
+    
+    @Query("SELECT c FROM Chatroom c " +
+    	       "JOIN c.chatroomMapping m1 " +
+    	       "JOIN c.chatroomMapping m2 " +
+    	       "WHERE c.chatIsGroupYn = 'N' " +
+    	       "AND m1.attendee.employeeNo = :emp1 " +
+    	       "AND m2.attendee.employeeNo = :emp2 " +
+    	       "AND SIZE(c.chatroomMapping) = 2")
+    	Optional<Chatroom> findOneToOneRoom(@Param("emp1") Long emp1, @Param("emp2") Long emp2);
+
 }

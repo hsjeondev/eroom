@@ -37,12 +37,12 @@ public class ApprovalWebSocketHandler extends TextWebSocketHandler {
         Employee employee = employeeService.findEmployeeByEmployeeId(userId);
         Long employeeNo = employee.getEmployeeNo();
         
-        System.out.println("출력 테스트 : " + userId);
+//        System.out.println("출력 테스트 : " + userId);
         if (employeeNo != null) {
             sessions.put(employeeNo, session);
-            log.info("웹소켓 연결됨: employeeNo={}", employeeNo);
+//            log.info("웹소켓 연결됨: employeeNo={}", employeeNo);
         } else {
-            log.warn("employeeNo가 세션에 없음. 연결 세션ID={}", session.getId());
+//            log.warn("employeeNo가 세션에 없음. 연결 세션ID={}", session.getId());
         }
     }
 
@@ -60,7 +60,7 @@ public class ApprovalWebSocketHandler extends TextWebSocketHandler {
         Long employeeNo = employee.getEmployeeNo();
         if (employeeNo != null) {
             sessions.remove(employeeNo);
-            log.info("웹소켓 연결 종료: employeeNo={}", employeeNo);
+//            log.info("웹소켓 연결 종료: employeeNo={}", employeeNo);
         }
     }
 
@@ -68,17 +68,17 @@ public class ApprovalWebSocketHandler extends TextWebSocketHandler {
     public void sendApprovalNotification(Long receiverNo, String message, Approval approval) {
         WebSocketSession session = sessions.get(receiverNo);
 
-        if (session != null && session.isOpen()) {
             try {
             	saveNotificationToDatabase(receiverNo, message, approval);
-                session.sendMessage(new TextMessage(message));
+//            	alert 보기 싫으면 주석처리
+            	if(session != null) {
+            		session.sendMessage(new TextMessage(message));
+            	}
+//            	alert 보기 싫으면 주석처리
                 log.info("알림 전송 성공: employeeNo={}", receiverNo);
             } catch (Exception e) {
                 log.error("알림 전송 실패: employeeNo=" + receiverNo, e);
             }
-        } else {
-            log.warn("알림 전송 실패: 세션이 존재하지 않거나 닫힘. employeeNo={}", receiverNo);
-        }
     }
     
     // 알람 저장용

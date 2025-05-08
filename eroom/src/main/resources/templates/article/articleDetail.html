@@ -3,15 +3,23 @@
 lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{/include/layout}">
+	  layout:decorate="~{include/layout}">
   <body>
     <main class="main" id="top" layout:fragment="content" style="background-color: #f8f9fa; min-height: 100vh; overflow-x: hidden;">
     	<!-- <div class="card-body overflow-hidden"> -->
+    	<div class="row align-items-center justify-content-between g-3 mb-4">
+			<!-- 상단 제목 -->
+			<div class="d-flex justify-content-start">
+				<span class="fw-bold fs-6">공지 게시판</span>
+			</div>
+			<input type="hidden" id="myEmployeeNo"
+				th:value="${#authentication.principal.employee.employeeNo}">
+		</div>
     	<div class="container d-flex justify-content-center py-0">
-    	<div class="bg-white shadow rounded-3 p-4" style="width: 100%; max-width: 1000px; min-width: 800px; border: 1px solid #dee2e6;">
-                  <div class="d-flex flex-between-center pb-3 border-bottom border-translucent mb-4"><a class="btn btn-link p-0 text-body-secondary me-3" href="../../apps/email/inbox.html"><span class="fa-solid fa-angle-left fw-bolder fs-8"></span></a>
+    	<div class="bg-white shadow rounded-3 p-4" style="width: 100%; max-width: 1400px; min-width: 800px; border: 1px solid #dee2e6;">
+                  <!-- <div class="d-flex flex-between-center pb-3 border-bottom border-translucent mb-4"><a class="btn btn-link p-0 text-body-secondary me-3" href="../../apps/email/inbox.html"><span class="fa-solid fa-angle-left fw-bolder fs-8"></span></a>
                     <h3 class="flex-1 mb-0 lh-sm line-clamp-1">공지 게시판</h3>
-                    <!-- <div class="btn-reveal-trigger">
+                    <div class="btn-reveal-trigger">
                       <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none d-flex btn-reveal" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fas fa-ellipsis-h"></span></button>
                       <div class="dropdown-menu dropdown-menu-end py-2">
 	                      <a class="dropdown-item" href="#!">수정</a>
@@ -19,12 +27,12 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	                      <a class="dropdown-item" href="#!">Download</a>
 	                      <a class="dropdown-item" href="#!">Report abuse</a>
                       </div>
-                    </div> -->
-                  </div>
+                    </div>
+                  </div> -->
                   <div class="overflow-x-hidden scrollbar email-detail-content">
                     <div class="d-grid mb-3" style="grid-template-columns: 1fr auto 1fr; align-items: center;">
 						  <!-- 왼쪽 빈공간 -->
-						  <div></div>
+						  <div><span th:if="${articleNotice.articleEmergencyYn == 'Y'}" class="badge bg-danger ms-2">긴급</span></div>
 						<input type="hidden" id="articleNo" th:value="${articleNotice.articleNo}" />
 						  <!-- 가운데 제목 -->
 						  <h4 class="text-center mb-5" 

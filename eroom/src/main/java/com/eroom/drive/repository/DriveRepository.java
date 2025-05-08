@@ -3,6 +3,8 @@ package com.eroom.drive.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -56,7 +58,13 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
 		    String separatorCode,
 		    String visibleYn
 		);
-	
+	Page<Drive> findBySeparatorCodeAndParam1AndVisibleYn(
+	        String separatorCode,
+	        Long param1,
+	        String visibleYn,
+	        Pageable pageable
+	    );
+
 	// ------- 결재 관련해서 생성한 JPA
 	// param1과 Drive_delete_yn N을 기준으로 조회
 	List<Drive> findByParam1AndVisibleYnAndSeparatorCode(Long param1, String visibleYn, String separatorCode);

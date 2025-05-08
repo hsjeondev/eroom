@@ -128,8 +128,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
   </head>
 	<body>
 	<main class="main" id="top">
-	<th:block th:replace="~{/include/nav :: navLayout}"></th:block>
-	<th:block th:replace="~{/include/header :: headerLayout}"></th:block>
+	<th:block th:replace="~{include/nav :: navLayout}"></th:block>
+	<th:block th:replace="~{include/header :: headerLayout}"></th:block>
 	<div class="content">
 	<th:block layout:fragment="content"></th:block>
 	<!-- <th:block th:replace="~{include/footer :: footerLayout}"></th:block> -->
@@ -267,18 +267,48 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 
 		
-		
+	<!-- 종 메일 표시 -->	
+	<script>
 	
+	const mailSocket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/mail');
+
+	mailSocket.onopen = function() {
+		console.log('📬 메일 웹소켓 연결 성공!');
+	};
 	
+	/* mailSocket.onmessage = function(event) {
+		alert(event.data); // 새 메일 알림
+		const notificationDot = document.getElementById('notificationDot');
+		if (notificationDot) {
+			notificationDot.style.display = 'block'; // 빨간 점 표시
+		}
+	}; 
+	*/
+	mailSocket.onmessage = function(event) {
+	    const data = JSON.parse(event.data);
+	    console.log(data); // 받은 데이터 확인
+	    if (data.type === "mail") {
+	        console.log("새 메일 도착", data);
+	        // 새 메일 알림 처리
+	    }
+	};
+	mailSocket.onclose = function() {
+		console.log('📬 메일 웹소켓 연결 종료');
+	};
+	mailSocket.onerror = function(error) {
+		console.error('📬 메일 웹소켓 에러 발생:', error);
+	};
 	
-	
+	</script>
 	<!-- 결재 등록시 header에 있는 종에 빨간점 표시 -->
 	<script>
     	const approvalSocket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/approval');
 
 	      approvalSocket.onopen = function() { console.log('결재 웹소켓 연결 성공!'); };
 	      approvalSocket.onmessage = function(event) { 
+	    	  // alert 보기 싫으면 주석처리
 	    	  alert(event.data); 
+	    	  // alert 보기 싫으면 주석처리
 			  const notificationDot = document.getElementById('notificationDot');
 			  if (notificationDot) {
 			    notificationDot.style.display = 'block'; // 빨간 점 표시

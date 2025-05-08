@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{include/layout}">
 <body>
 	<main class="main" id="top" layout:fragment="content">
 		<div class="d-flex align-items-center gap-2">
@@ -9,7 +9,7 @@
 			<span class="badge badge-phoenix fs-10 badge-phoenix-success" th:text="${project.proceed}">completed</span>
 		</div>
 		<br>
-		<ul class="nav nav-phoenix-pills mt-3" role="tablist">
+		<ul class="nav nav-phoenix-pills mt-3 mb-4" role="tablist">
 			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/main(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/main')} ? ' active' : ''">메인</a></li>
 			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/developmentTab(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/developmentTab')} ? ' active' : ''">개발</a></li>
 			<li class="nav-item"><a class="nav-link" th:href="@{/project/detail/{id}/todo(id=${project.project_no})}" th:classappend="${requestURI.endsWith('/todo')} ? ' active' : ''">할 일</a></li>
@@ -19,29 +19,15 @@
 
 		<!-- 본문 -->
 		<div id="members" data-list='{"valueNames":["customer","email","mobile_number","city","last_active","joined"],"page":15,"pagination":true}'>
-			<div class="row align-items-center justify-content-between g-3 mb-4 mt-2">
-				<div class="col col-auto">
-					<!-- <div class="search-box">
-						<form class="position-relative">
-							<input class="form-control search-input search" type="search" placeholder="제목 검색" aria-label="Search" /> <span class="fas fa-search search-box-icon"></span>
-						</form>
-					</div> -->
-				</div>
-				<div class="col-auto">
-					<div class="d-flex align-items-center">
-						<!-- <button class="btn btn-link text-body me-4 px-0">
-							<span class="fa-solid fa-file-export fs-9 me-2"></span>문서화
-						</button> -->
-						<th:block th:if="${isProjectMember}">
-							<button type="button" class="btn btn-primary" th:onclick="|location.href='/project/minute/create-page?projectNo=${project.project_no}'|">회의록 작성</button>
-						</th:block>
-					</div>
-				</div>
-			</div>
 			<div class="row g-4">
 				<div class="col-md-8">
 					<div class="card shadow-sm">
-						<div class="card-header bg-light fw-bold">회의록 목록</div>
+						<div class="card-header bg-light fw-bold d-flex justify-content-between align-items-center py-2">
+							<span>회의록 목록</span>
+							<th:block th:if="${isProjectMember}">
+								<button type="button" class="btn btn-secondary" th:onclick="|location.href='/project/minute/create-page?projectNo=${project.project_no}'|">회의록 작성</button>
+							</th:block>
+						</div>
 						<div class="table-responsive scrollbar ms-n1 ps-1">
 							<table class="table table-hover table-sm align-middle text-nowrap">
 								<thead class="table-light">
@@ -84,9 +70,10 @@
 				<!-- 회의 내용 요약 테이블 -->
 				<div class="col-md-4">
 					<div class="card shadow-sm">
-						<div class="card-header bg-light fw-bold">회의 내용 요약</div>
+						<div class="card-header bg-light fw-bold py-3">회의 내용 요약</div>
 						<div class="card-body p-2" id="summary-content">
-							<div id="summary-placeholder" class="d-flex justify-content-center align-items-center text-secondary fs-8 d-none" style="min-height: 300px;">회의록을 선택하세요.</div>
+							<div id="summary-title" class="fw-semibold text-secondary fs-7 mb-2 d-none"></div>
+							<div id="summary-placeholder" class="d-flex justify-content-center align-items-center text-secondary fs-8" style="min-height: 500px;">회의록을 선택하세요.</div>
 							<div id="summary-text" class="d-flex flex-column gap-2 fs-8 lh-base text-secondary" style="display: none;"></div>
 						</div>
 					</div>
@@ -107,79 +94,84 @@
 			</div>
 		</footer> -->
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const summaryLinks = document.querySelectorAll(".show-summary-link");
-
-    summaryLinks.forEach(link => {
-      link.addEventListener("click", function () {
-        const minuteNo = this.getAttribute("data-minute-no");
-        const summaryTextEl = document.getElementById("summary-text");
-        const placeholderEl = document.getElementById("summary-placeholder");
-
-        // 초기화 및 로딩 스피너 표시
-        summaryTextEl.innerHTML = "";
-        summaryTextEl.style.display = "none";
-
-        placeholderEl.innerHTML = `
-          <div class="d-flex justify-content-center align-items-center w-100">
-            <div class="spinner-grow text-secondary" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-          </div>
-        `;
-        placeholderEl.classList.remove("d-none");
-        placeholderEl.classList.add("d-flex");
-        placeholderEl.style.display = "flex";
-
-        summaryTextEl.setAttribute("data-loading-minute-no", minuteNo);
-
-        fetch(`/project/minute/summary?minuteNo=${minuteNo}`)
-          .then(response => response.text())
-          .then(summary => {
-            const activeMinuteNo = summaryTextEl.getAttribute("data-loading-minute-no");
-            if (activeMinuteNo !== minuteNo) return;
-
-            if (summary && summary.trim().length > 0) {
-              const formattedSummary = summary
-                .split("\n")
-                .map(line => `
-                  <div class="ps-3 text-secondary fs-8 lh-base text-break" style="text-indent: -0.67rem;">
-                    ${line.trim()}
-                  </div>
-                `)
-                .join("");
-
-              summaryTextEl.innerHTML = formattedSummary;
-              summaryTextEl.style.display = "flex";
-
-              // placeholder 완전 제거
-              placeholderEl.innerHTML = "";
-              placeholderEl.style.display = "none";
-              placeholderEl.classList.remove("d-flex");
-              placeholderEl.classList.add("d-none");
-            } else {
-              summaryTextEl.innerHTML = "";
-              summaryTextEl.style.display = "none";
-              placeholderEl.innerHTML = `<div class="text-secondary fs-8">요약이 존재하지 않습니다.</div>`;
-              placeholderEl.classList.remove("d-none");
-              placeholderEl.classList.add("d-flex");
-              placeholderEl.style.display = "flex";
-            }
-          })
-          .catch(error => {
-            console.error("요약 불러오기 실패:", error);
-            summaryTextEl.innerHTML = "";
-            summaryTextEl.style.display = "none";
-            placeholderEl.innerHTML = `<div class="text-danger fs-8">요약 로딩 중 오류 발생</div>`;
-            placeholderEl.classList.remove("d-none");
-            placeholderEl.classList.add("d-flex");
-            placeholderEl.style.display = "flex";
-          });
-      });
-    });
-  });
-</script>
+		<script>
+		document.addEventListener("DOMContentLoaded", function () {
+		  const summaryLinks = document.querySelectorAll(".show-summary-link");
+		
+		  summaryLinks.forEach(link => {
+		    link.addEventListener("click", function () {
+		      const minuteNo = this.getAttribute("data-minute-no");
+		      const summaryTextEl = document.getElementById("summary-text");
+		      const placeholderEl = document.getElementById("summary-placeholder");
+		      const titleEl = document.getElementById("summary-title"); // 제목 표시 요소
+		
+		      // 회의록 제목 추출
+		      const title = this.closest("tr").querySelector("td a").textContent.trim();
+		      titleEl.textContent = `📝 ${title}`;
+		      titleEl.classList.remove("d-none");
+		
+		      // 초기화
+		      summaryTextEl.innerHTML = "";
+		      summaryTextEl.style.display = "none";
+		
+		      // 로딩 스피너 표시
+		      placeholderEl.innerHTML = `
+		        <div class="d-flex justify-content-center align-items-center w-100">
+		          <div class="spinner-grow text-secondary" role="status">
+		            <span class="visually-hidden">Loading...</span>
+		          </div>
+		        </div>
+		      `;
+		      placeholderEl.classList.remove("d-none");
+		      placeholderEl.classList.add("d-flex");
+		      placeholderEl.style.display = "flex";
+		
+		      summaryTextEl.setAttribute("data-loading-minute-no", minuteNo);
+		
+		      fetch(`/project/minute/summary?minuteNo=${minuteNo}`)
+		        .then(response => response.text())
+		        .then(summary => {
+		          const activeMinuteNo = summaryTextEl.getAttribute("data-loading-minute-no");
+		          if (activeMinuteNo !== minuteNo) return;
+		
+		          if (summary && summary.trim().length > 0) {
+		            const formattedSummary = summary
+		              .split("\n")
+		              .map(line => `
+		                <div class="ps-3 text-secondary fs-8 lh-base text-break" style="text-indent: -0.67rem;">
+		                  ${line.trim()}
+		                </div>
+		              `)
+		              .join("");
+		
+		            summaryTextEl.innerHTML = formattedSummary;
+		            summaryTextEl.style.display = "flex";
+		            placeholderEl.innerHTML = "";
+		            placeholderEl.style.display = "none";
+		            placeholderEl.classList.remove("d-flex");
+		            placeholderEl.classList.add("d-none");
+		          } else {
+		            summaryTextEl.innerHTML = "";
+		            summaryTextEl.style.display = "none";
+		            placeholderEl.innerHTML = `<div class="text-secondary fs-8">요약이 존재하지 않습니다.</div>`;
+		            placeholderEl.classList.remove("d-none");
+		            placeholderEl.classList.add("d-flex");
+		            placeholderEl.style.display = "flex";
+		          }
+		        })
+		        .catch(error => {
+		          console.error("요약 불러오기 실패:", error);
+		          summaryTextEl.innerHTML = "";
+		          summaryTextEl.style.display = "none";
+		          placeholderEl.innerHTML = `<div class="text-danger fs-8">요약 로딩 중 오류 발생</div>`;
+		          placeholderEl.classList.remove("d-none");
+		          placeholderEl.classList.add("d-flex");
+		          placeholderEl.style.display = "flex";
+		        });
+		    });
+		  });
+		});
+		</script>
 	</main>
 </body>
 </html>

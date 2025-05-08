@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{/include/layout}">
+      layout:decorate="~{include/layout}">
 <head>
   <meta charset="UTF-8">
   <title>공지 작성</title>
@@ -22,7 +22,7 @@
           <div class="row g-3 mb-2">
             <!-- 긴급 공지 체크 -->
             <div class="form-check mb-0 fs-8">
-              <input class="form-check-input" type="checkbox" id="checkImportant" />
+              <input class="form-check-input" type="checkbox" id="checkImportant" value="Y" />
               <span class="text-danger" data-feather="bell" style="height: 30px; width: 30px;"></span>
               긴급 공지
             </div>
@@ -58,6 +58,8 @@
   </div>
 
   <script>
+
+  
   document.getElementById("submitBtn").addEventListener("click", function () {
 	  const form = document.notice_create_form;
 	  const title = form.article_title.value.trim();  // 제목
@@ -74,7 +76,15 @@
 	    alert("내용을 입력해주세요.");
 	    return;
 	  }
-
+	  let existingInput = document.querySelector('input[name="notice_emergency_yn"]');
+	  if (existingInput) {
+	    existingInput.remove(); // 중복 방지
+	  }
+	  const emergencyInput = document.createElement('input');
+	  emergencyInput.type = 'hidden';
+	  emergencyInput.name = 'article_emergency_yn';
+	  emergencyInput.value = document.getElementById('checkImportant').checked ? 'Y' : 'N';
+	  form.appendChild(emergencyInput);
 	  // 공지 등록을 확인하는 메시지
 	  if (confirm("공지를 등록하시겠습니까?")) {
 	    tinymce.triggerSave(); // TinyMCE 에디터의 내용을 폼 데이터에 저장

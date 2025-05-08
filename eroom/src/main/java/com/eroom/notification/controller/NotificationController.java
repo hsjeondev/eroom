@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.eroom.calendar.dto.CalendarAlarmDto;
 import com.eroom.calendar.service.CalendarAlarmService;
 import com.eroom.notification.dto.AlarmDto;
+import com.eroom.notification.entity.Alarm;
 import com.eroom.notification.service.AlarmService;
 import com.eroom.security.EmployeeDetails;
 
@@ -54,13 +55,17 @@ public class NotificationController {
 	//헤더 종 누르고, 목록 하나 하나 누르면 N에서 Y로 처리
 	@PatchMapping("/notification/read/{alarmId}")
 	@ResponseBody
-	public Map<String, String> readNotification(@PathVariable("alarmId") Long alarmId) {
-	    Map<String, String> result = new HashMap<>();
+	public Map<String, Object> readNotification(@PathVariable("alarmId") Long alarmId) {
+	    Map<String, Object> result = new HashMap<>();
 	    result.put("res_code", "500");
 	    result.put("res_msg", "읽음 처리 실패");
 
 	    try {
-	        alarmService.markAsRead(alarmId);  // ← calendarAlarmService → alarmService
+	    	Map<String, Object> tempMap = alarmService.markAsRead(alarmId);  // ← calendarAlarmService → alarmService
+	    	if(!tempMap.isEmpty() && tempMap != null) {
+	    		result.put("pk", tempMap.get("pk"));
+	    		result.put("separator_code", tempMap.get("separator_code"));
+	    	}
 	        result.put("res_code", "200");
 	        result.put("res_msg", "읽음 처리 성공");
 	    } catch (Exception e) {

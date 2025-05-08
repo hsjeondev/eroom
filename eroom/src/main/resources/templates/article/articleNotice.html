@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/include/layout}">
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{include/layout}">
 <head>
 <meta charset="UTF-8">
 <title>공지 게시판</title>
@@ -10,7 +10,8 @@
 		<div class="d-flex justify-content-start align-items-center mb-5">
 			<i class="fas fa-user-tie text-secondary me-2"></i> <span class="fw-bold fs-7">공지 게시판</span>
 		</div>
-		<div class="mb-9" data-collapse-filemanager-sidebar="data-collapse-filemanager-sidebar">
+		<div class="mb-9" data-collapse-filemanager-sidebar="data-collapse-filemanager-sidebar"
+			id="mailSummary" data-list='{"valueNames":["articleTitle"], "page":6, "pagination":true}'>
 			<div class="row gx-4">
 					<div class="mb-4">
 						<div class="row g-3">
@@ -29,12 +30,18 @@
 							  <div class="btn-group position-static" role="group">
 							  </div>
 							</div>
-								<div class="search-box">
+								<!-- <div class="search-box">
 										<input id="searchInput" class="form-control search-input search" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
 										<svg style="height: 40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
 											<path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path></svg>
-										<!-- <span class="fas fa-search search-box-icon"></span> Font Awesome fontawesome.com -->
-								</div>
+										<span class="fas fa-search search-box-icon"></span> Font Awesome fontawesome.com
+								</div> -->
+								<div class="search-box w-100" style="max-width: 250px; position: absolute; right: 20px;">
+              <form class="position-relative">
+                <input class="form-control search-input search" type="search" placeholder="검색" aria-label="Search" />
+                <span class="fas fa-search search-box-icon"></span>
+              </form>
+            </div>
 						</div>
 					</div>
 					<!-- 공지 게시판  -->
@@ -60,13 +67,21 @@
 							   th:data-href="@{/article/notice/detail/{id}(id=${notice.articleNo})}"
    								class="clickable-row">
 							    <td class="align-middle ps-3 name" th:text="${stat.index + 1}">1</td>
-							    <td class="align-middle email">
-							      <!-- <a th:href="@{/article/detail/{id}(id=${notice.articleNo})}" th:text="${notice.articleTitle}">제목</a> -->
+							    <!-- <td class="align-middle">
+							      <a th:href="@{/article/detail/{id}(id=${notice.articleNo})}" th:text="${notice.articleTitle}">제목</a>
 							    <div class="form-check mb-1 mb-md-0 d-flex align-items-center lh-1">
-				                    <label class="form-check-label mb-0 fs-8 me-2 line-clamp-1 flex-grow-1 flex-md-grow-0 cursor-pointer"><span th:text="${notice.articleTitle}"></span></label>
+				                    <label class="form-check-label mb-0 fs-8 me-2 line-clamp-1 flex-grow-1 flex-md-grow-0 cursor-pointer articleTitle"><span th:text="${notice.articleTitle}"></span></label>
 				                  </div>
-							    </td>
-							    
+							    </td> -->
+							    <td class="align-middle">
+						            <div class="form-check mb-1 mb-md-0 d-flex align-items-center lh-1">
+						                <label class="form-check-label mb-0 fs-8 me-2 line-clamp-1 flex-grow-1 flex-md-grow-0 cursor-pointer articleTitle">
+						                    <span th:text="${notice.articleTitle}"></span>
+						                    <!-- 긴급공지 표시 -->
+						                    <span th:if="${notice.articleEmergencyYn == 'Y'}" class="badge bg-danger ms-2">긴급</span>
+						                </label>
+						            </div>
+						        </td>
 							    <td class="align-middle age" >관리자</td>
 							    <td class="align-middle white-space-nowrap text-end pe-0" th:text="${#temporals.format(notice.articleRegDate, 'yyyy-MM-dd HH:mm')}">2025-05-03 14:00</td>
 							  </tr>

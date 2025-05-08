@@ -2,6 +2,7 @@ package com.eroom.notification.service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.eroom.approval.dto.ApprovalAlarmDto;
+import com.eroom.approval.entity.ApprovalAlarm;
+import com.eroom.approval.service.ApprovalAlarmService;
 import com.eroom.calendar.dto.CalendarAlarmDto;
 import com.eroom.chat.dto.ChatAlarmDto;
 import com.eroom.mail.dto.MailAlarmDto;
@@ -27,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class AlarmService {
 	
 	private final AlarmRepository alarmRepository;
+	private final ApprovalAlarmService approvalAlarmService;
 	
 	 //알림 페이지 목록 조회
 	 @Transactional
@@ -77,8 +81,8 @@ public class AlarmService {
 	 }
 	 
 	 //목록에서 일정 클릭하면 N을 Y로 변경
-	 @Transactional
-	 public void markAsRead(Long alarmId) {
+	 public Map<String, Object> markAsRead(Long alarmId) {
+		 Map<String, Object> map = new HashMap<String, Object>();
 	     Alarm target = alarmRepository.findById(alarmId).orElse(null);
 
 	     if (target != null && "N".equals(target.getReadYn())) {
@@ -92,6 +96,29 @@ public class AlarmService {
 	             .build();
 
 	         alarmRepository.save(updated);
+	         // 확인용 이전 Alarm Entity 반환
+	         if("R001".equals(target.getSeparatorCode())) {
+	        	 // pk 넣든 필요한 거 넣으세요
+	        	 map.put("separator_code", "R001");
+	        	 return map;
+	         } else if("R002".equals(target.getSeparatorCode())) {
+	        	 // pk 넣든 필요한 거 넣으세요
+	        	 map.put("separator_code", "R002");
+	        	 return map;
+	         } else if("R003".equals(target.getSeparatorCode())) {
+	        	 // pk 넣든 필요한 거 넣으세요
+	        	 map.put("separator_code", "R003");
+	        	 return map;
+	        	 
+	         } else if("R004".equals(target.getSeparatorCode())) {
+	        	 ApprovalAlarm approvalAlarm = approvalAlarmService.findAlarmOne(target.getParam1());
+	        	 map.put("pk", approvalAlarm.getApproval().getApprovalNo());
+	        	 map.put("separator_code", "R004");
+	        	 return map;
+	         }
+	         return null;
+	     } else {
+	    	 return null;
 	     }
 	 }
 	 
