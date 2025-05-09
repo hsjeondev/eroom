@@ -12,7 +12,7 @@
 		</div>
 		<div class="mb-9" data-collapse-filemanager-sidebar="data-collapse-filemanager-sidebar"
 			id="mailSummary" data-list='{"valueNames":["articleNo","articleTitle","name","articleRegDate"], "page":6, "pagination":true}'>
-			<div class="row gx-4">
+			<div class="row gx-0">
 					<div class="mb-4">
 						<div class="row g-3">
 							<div class="col-auto">
@@ -48,13 +48,15 @@
 					
                       <div id="tableExample2" data-list="{&quot;valueNames&quot;:[&quot;articleNo&quot;,&quot;articleTitle&quot;,&quot;name&quot;,articleRegDate&quot;],&quot;page&quot;:5,&quot;pagination&quot;:{&quot;innerWindow&quot;:2,&quot;left&quot;:1,&quot;right&quot;:1}}">
                         <div class="table-responsive">
-                          <table class="table table-striped table-sm fs-9 mb-0">
+                          <table class="table table-striped table-sm fs-9 mb-0 text-center align-middle"
+                          	data-list='{"valueNames":["articleNo","articleTitle","name","articleRegDate"], "page":6, "pagination":true}'>
                             <thead>
                               <tr>
-                                <th class="sort border-top border-translucent ps-3" data-sort="articleNo">번호</th>
+                                <th class="sort border-top border-translucent ps-0" data-sort="articleNo">번호</th>
+                                <th class="sort border-top">긴급</th>
                                 <th class="sort border-top" data-sort="articleTitle">제목</th>
                                 <th class="sort border-top" data-sort="name">작성자</th>
-                                <th class="sort text-end align-middle pe-0 border-top" scope="col" data-sort="articleRegDate">작성 시간</th>
+                                <th class="sort text-center  align-middle pe-0 border-top" scope="col" data-sort="articleRegDate">작성 시간</th>
                               </tr>
                             </thead>
                             <tbody class="list">
@@ -66,7 +68,7 @@
 							  <tr th:each="notice, stat : ${noticeList}"
 							   th:data-href="@{/article/notice/detail/{id}(id=${notice.articleNo})}"
    								class="clickable-row">
-							    <td class="align-middle ps-3 name" th:text="${stat.index + 1}">1</td>
+							    <td class="align-middle ps-0 name articleNo" th:text="${stat.index + 1}">1</td>
 							    <!-- <td class="align-middle">
 							      <a th:href="@{/article/detail/{id}(id=${notice.articleNo})}" th:text="${notice.articleTitle}">제목</a>
 							    <div class="form-check mb-1 mb-md-0 d-flex align-items-center lh-1">
@@ -74,16 +76,18 @@
 				                  </div>
 							    </td> -->
 							    <td class="align-middle">
-						            <div class="form-check mb-1 mb-md-0 d-flex align-items-center lh-1">
+							    	<span th:if="${notice.articleEmergencyYn == 'Y'}" class="badge bg-danger">긴급</span>
+							    </td>
+							    <td class="align-middle articleTitle">
 						                <label class="form-check-label mb-0 fs-8 me-2 line-clamp-1 flex-grow-1 flex-md-grow-0 cursor-pointer articleTitle">
 						                    <span th:text="${notice.articleTitle}"></span>
 						                    <!-- 긴급공지 표시 -->
-						                    <span th:if="${notice.articleEmergencyYn == 'Y'}" class="badge bg-danger ms-2">긴급</span>
 						                </label>
-						            </div>
+						            <!-- <div class="form-check mb-1 mb-md-0 d-flex align-items-center lh-1">
+						            </div> -->
 						        </td>
 							    <td class="align-middle age" >관리자</td>
-							    <td class="align-middle white-space-nowrap text-end pe-0" th:text="${#temporals.format(notice.articleRegDate, 'yyyy.MM.dd HH:mm')}">2025-05-03 14:00</td>
+							    <td class="align-middle white-space-nowrap text-center  pe-0" th:text="${#temporals.format(notice.articleRegDate, 'yyyy.MM.dd HH:mm')}">2025-05-03 14:00</td>
 							  </tr>
 							</tbody>
                           </table>
