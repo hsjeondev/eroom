@@ -131,19 +131,19 @@ public class AttendanceService {
 	
 	
 	// 근태 기록 전체 조회
-	public List<Attendance> selectAttendanceList(){
-		
-		// 현재 로그인한 정보
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		
-		EmployeeDetails employeeDetail = (EmployeeDetails)authentication.getPrincipal();
-		
-		Long employeeNo = employeeDetail.getEmployee().getEmployeeNo(); 
-		
-		return attendanceRepository.findByEmployee_EmployeeNoOrderByAttendanceCheckInTimeDesc(employeeNo);
-		
-		
-	}
+//	public List<Attendance> selectAttendanceList(){
+//		
+//		// 현재 로그인한 정보
+//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//		
+//		EmployeeDetails employeeDetail = (EmployeeDetails)authentication.getPrincipal();
+//		
+//		Long employeeNo = employeeDetail.getEmployee().getEmployeeNo(); 
+//		
+//		return attendanceRepository.findByEmployee_EmployeeNoOrderByAttendanceCheckInTimeDesc(employeeNo);
+//		
+//		
+//	}
 	// 연차 정보 조회
 	public AnnualLeave selectAnnualLeaveByEmployeeNo(Long employeeNo) {
 		
@@ -171,7 +171,7 @@ public class AttendanceService {
 		LocalDateTime end = yearMonth.atEndOfMonth().atTime(23, 59, 59);
 		
 		// 월별 출근 기록 조회
-		attendanceList = attendanceRepository.findByEmployee_EmployeeNoAndAttendanceCheckInTimeBetweenOrderByAttendanceCheckInTimeDesc(employeeNo, start, end);
+		attendanceList = attendanceRepository.findByEmployee_EmployeeNoAndAttendanceCheckInTimeBetweenOrderByAttendanceCheckInTimeAsc(employeeNo, start, end); 
 		
 		// 조회된 결과를 DTO로 변환
 		List<AttendanceDto> attendanceDtoList = new ArrayList<>();
