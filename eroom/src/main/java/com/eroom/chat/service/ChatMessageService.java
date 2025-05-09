@@ -80,5 +80,11 @@ public class ChatMessageService {
 	        e.printStackTrace();
 	    }
 	}
+
+	public ChatAlarm findOne(Long param1) {
+		return chatAlarmRepository.findById(param1).orElse(null);
+	}
+
+	
 	
 }

@@ -10,7 +10,7 @@
 <body>
 <main class="main" id="top" layout:fragment="content">
 	<div class="card-body overflow-hidden">
-                  <div class="d-flex flex-between-center pb-3 border-bottom border-translucent mb-4"><a class="btn btn-link p-0 text-body-secondary me-3" th:href="@{/mail}"><span class="fa-solid fa-angle-left fw-bolder fs-8"></span></a>
+                  <div class="d-flex flex-between-center pb-3 border-bottom border-translucent mb-4"><a class="btn btn-link p-0 text-body-secondary me-3" href="javascript:history.back()"><span class="fa-solid fa-angle-left fw-bolder fs-8"></span></a>
                     <h3 class="flex-1 mb-0 lh-sm line-clamp-1"
                     	th:text="${mail.mailTitle}">메일 제목</h3>
                     <!-- <div class="btn-reveal-trigger">

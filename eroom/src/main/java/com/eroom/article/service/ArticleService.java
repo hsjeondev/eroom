@@ -116,16 +116,18 @@ public class ArticleService {
 	 
 	 // 공지 디테일 
 	 public Article selectArticleNoticeOne(Long articleId) {
-	        return articleRepository.findByArticleNoAndVisibleYn(articleId, "Y")
+	        
+		 return articleRepository.findByArticleNoAndVisibleYn(articleId, "Y")
 	                .orElseThrow(() -> new EntityNotFoundException("존재하지 않거나 비공개된 공지사항입니다."));
 	    }
 	 
 	 // 공지 게시판 조회
+	 
 	 public List<Article> getNoticeArticles() {
-	        return articleRepository.findBySeparatorCodeAndVisibleYnOrderByArticleRegDateDesc("B001", "Y");
+	        return articleRepository.findNoticeBoard("B001", "Y");
 	    }
 	 
-	 // 공지 게시판 작성 
+	 // 공지 게시판 작성  
 	 public int createArticle(ArticleDto articleDto, Long employeeNo, List<MultipartFile> articleFiles) {
 		 int result = 0;
 	        Employee employee = employeeRepository.findById(employeeNo)

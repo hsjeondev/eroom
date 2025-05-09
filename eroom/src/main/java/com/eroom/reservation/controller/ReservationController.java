@@ -42,6 +42,8 @@ public class ReservationController {
 	private String tmapKey;
 
 	// ========================화면 전환 =============================
+	
+
 	@GetMapping("/reservation/sleep")
 	public String sleepReservationView() {
 		return "reservation/sleeprev";
@@ -60,6 +62,8 @@ public class ReservationController {
 		model.addAttribute("tmapKey", tmapKey);		
 		return "reservation/vehiclerev";
 	}
+	
+
 
 	@GetMapping("/reservation/meetingroom")
 	public String meetingroomReservationView(@RequestParam(name = "department" ,required = false) String department, Model model) {

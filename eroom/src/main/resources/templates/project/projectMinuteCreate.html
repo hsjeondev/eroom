@@ -65,46 +65,110 @@
 		</footer>
 
 		<script>
-		document.addEventListener("DOMContentLoaded", function () {
-		  let isDirty = false;
+		  document.addEventListener("DOMContentLoaded", () => {
+		    const form = document.getElementById("createMinute");
+		    const titleInput = document.getElementById("create-minute-name");
+		    const contentInput = document.getElementById("create-minute-content");
+		    const dateInput = document.getElementById("create-minute-date");
+		    const selectAll = document.getElementById("select-all");
+		    const checkboxes = document.querySelectorAll(".participant-checkbox:not(#select-all)");
+		    const confirmButton = document.querySelector("#validationModal .btn[data-bs-dismiss]");
 		
-		  // 감지할 입력 요소들
-		  const inputs = document.querySelectorAll("#createMinute input, #createMinute textarea");
-		  inputs.forEach(input => {
-		    input.addEventListener("input", () => {
+		    let focusElement = null;
+		    let isDirty = false;
+		
+		    // 입력 필드 변경 시 dirty 상태로 표시
+		    const inputs = document.querySelectorAll("#createMinute input, #createMinute textarea");
+		    inputs.forEach(input => {
+		      input.addEventListener("input", () => {
+		        isDirty = true;
+		      });
+		    });
+		
+		    // 작성 버튼 클릭 시 유효성 검사
+		    form.addEventListener("submit", (e) => {
+		      if (!titleInput.value.trim()) {
+		        e.preventDefault();
+		        showValidationModal("title", "제목을 입력해주세요.");
+		        return;
+		      }
+		
+		      if (!contentInput.value.trim()) {
+		        e.preventDefault();
+		        showValidationModal("content", "내용을 입력해주세요.");
+		        return;
+		      }
+		
+		      const isAnyChecked = Array.from(checkboxes).some(cb => cb.checked);
+		      if (!isAnyChecked) {
+		        e.preventDefault();
+		        showValidationModal("none", "참여자를 최소 1명 이상 선택해주세요.");
+		        return;
+		      }
+		
+		      if (!dateInput.value.trim()) {
+		        e.preventDefault();
+		        showValidationModal("none", "회의일을 선택해주세요.");
+		        return;
+		      }
+		
+		      // 유효성 통과 시 dirty 상태 해제
+		      isDirty = false;
+		    });
+		
+		    // 유효성 경고 모달 표시
+		    function showValidationModal(type, message) {
+		      document.getElementById("validationModalTitle").textContent = "입력 확인";
+		      document.getElementById("validationModalMessage").textContent = message;
+		      focusElement = type;
+		
+		      const modal = new bootstrap.Modal(document.getElementById("validationModal"));
+		      modal.show();
+		    }
+		
+		    // 모달 닫기 버튼 클릭 시 포커스 이동
+		    confirmButton.addEventListener("click", () => {
+		      if (focusElement === "title") {
+		        setTimeout(() => titleInput.focus(), 300);
+		      } else if (focusElement === "content") {
+		        setTimeout(() => contentInput.focus(), 300);
+		      }
+		    });
+		
+		    // 전체 선택 체크박스 동작
+		    selectAll.addEventListener("change", () => {
+		      checkboxes.forEach(cb => cb.checked = selectAll.checked);
 		      isDirty = true;
 		    });
-		  });
 		
-		  // 내부 링크 클릭 시 모달 확인
-		  document.querySelectorAll("a").forEach(link => {
-		    link.addEventListener("click", function (e) {
-		      const href = this.getAttribute("href");
+		    // 내부 링크 클릭 시 dirty 상태일 경우 경고 모달 표시
+		    document.querySelectorAll("a").forEach(link => {
+		      link.addEventListener("click", function (e) {
+		        const href = this.getAttribute("href");
 		
-		      if (isDirty && href && !href.startsWith("#") && !this.hasAttribute("data-bs-toggle")) {
+		        if (isDirty && href && !href.startsWith("#") && !this.hasAttribute("data-bs-toggle")) {
+		          e.preventDefault();
+		          const confirmModal = new bootstrap.Modal(document.getElementById("confirmCloseModal"));
+		          confirmModal.show();
+		
+		          const confirmBtn = document.getElementById("confirmCloseBtn");
+		          confirmBtn.onclick = function () {
+		            confirmModal.hide();
+		            isDirty = false;
+		            window.location.href = href;
+		          };
+		        }
+		      });
+		    });
+		
+		    // 브라우저 뒤로가기 또는 새로고침 시 경고
+		    window.addEventListener("beforeunload", function (e) {
+		      if (isDirty) {
 		        e.preventDefault();
-		
-		        const confirmModal = new bootstrap.Modal(document.getElementById("confirmCloseModal"));
-		        confirmModal.show();
-		
-		        const confirmBtn = document.getElementById("confirmCloseBtn");
-		        confirmBtn.onclick = function () {
-		          confirmModal.hide();
-		          isDirty = false;
-		          window.location.href = href;
-		        };
+		        e.returnValue = "";
 		      }
 		    });
 		  });
-		
-		  // 브라우저 뒤로가기 등 페이지 이탈 시 경고
-		  window.addEventListener("beforeunload", function (e) {
-		    if (isDirty) {
-		      e.preventDefault();
-		      e.returnValue = ""; // 일부 브라우저용
-		    }
-		  });
-		});
 		</script>
 
 		<!-- 유효성 검사 확인창 -->
@@ -123,7 +187,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<!-- 회의록 작성 중 나가기 경고창 -->
 		<div class="modal fade" id="confirmCloseModal" tabindex="-1" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered modal-sm">
@@ -133,7 +197,7 @@
 					</div>
 					<div class="modal-body text-center">
 						<p class="mb-0 text-body">
-							작성 중인 내용이 사라집니다.<br>정말 나가시겠습니까?
+							작성중인 내용은 저장되지 않습니다.<br>정말 나가시겠습니까?
 						</p>
 					</div>
 					<div class="modal-footer justify-content-center border-0">
@@ -143,6 +207,7 @@
 				</div>
 			</div>
 		</div>
+		
 	</main>
 </body>
 </html>
