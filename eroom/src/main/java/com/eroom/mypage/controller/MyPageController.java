@@ -23,6 +23,7 @@ import com.eroom.approval.service.ApprovalService;
 import com.eroom.attendance.dto.AnnualLeaveDto;
 import com.eroom.attendance.dto.AttendanceDto;
 import com.eroom.attendance.entity.AnnualLeave;
+import com.eroom.attendance.entity.Attendance;
 import com.eroom.attendance.service.AttendanceService;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
@@ -37,7 +38,18 @@ import com.eroom.employee.service.EmployeeService;
 import com.eroom.employee.service.StructureService;
 import com.eroom.security.EmployeeDetails;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
+import net.sf.dynamicreports.report.builder.DynamicReports;
+import net.sf.dynamicreports.report.builder.column.Columns;
+import net.sf.dynamicreports.report.builder.component.Components;
+import net.sf.dynamicreports.report.builder.datatype.DataTypes;
+import net.sf.dynamicreports.report.builder.style.Styles;
+import net.sf.dynamicreports.report.constant.PageOrientation;
+import net.sf.dynamicreports.report.constant.PageType;
+import net.sf.dynamicreports.report.datasource.DRDataSource;
+import net.sf.jasperreports.engine.JRDataSource;
 
 @Controller
 @RequestMapping("/mypage")
@@ -259,5 +271,52 @@ public class MyPageController {
 		return resultList;
 	}
 	
+	// 근태 기록 엑셀로 내보내기
+	@GetMapping("/attendanceExcel")
+	public void exportAttendanceExcel(@RequestParam("month") String month,
+									Authentication authentication,
+									HttpServletResponse response) throws Exception{
+		EmployeeDetails user = (EmployeeDetails) authentication.getPrincipal();
+		Long employeeNo = user.getEmployee().getEmployeeNo();		
+		// 해당 월의 근태 기록
+		List<AttendanceDto> records = attendanceService.selectAttendanceListByMonth(employeeNo, month);
+		// 리포트 생성
+		JasperReportBuilder report = DynamicReports.report();
+		report.columns(
+				Columns.column("번호", "no", DataTypes.integerType()),
+				Columns.column("근무일", "date", DataTypes.stringType()),
+				Columns.column("출근 시간", "checkin", DataTypes.stringType()),
+				Columns.column("퇴근 시간", "checkout", DataTypes.stringType()),
+				Columns.column("지각", "late", DataTypes.stringType()),
+				Columns.column("조퇴", "early", DataTypes.stringType())
+		)
+		.title(Components.text(month + " 근태기록")
+				.setStyle(Styles.style().bold().setFontSize(14)))
+				.setPageFormat(PageType.A4, PageOrientation.PORTRAIT).setDataSource(createDataSource(records));
+		// 응답 헤더 설정
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		response.setHeader("Content-Disposition", "attachment; filename=attendance_" + month + ".xlsx");
+		
+		// 출력
+//		report.toXlsxExporter(response.getOutputStream());
+		
+	}
+	// 리스트를 DynamicReports용 JRDataSource로 변환
+	private JRDataSource createDataSource(List<AttendanceDto> list) {
+		DRDataSource ds = new DRDataSource("no", "date", "checkin" ,"checkout", "late", "early");
+		int i = 1;
+		
+		for(AttendanceDto dto : list) {
+			String date = dto.getAttendance_check_in_time().toLocalDate().toString();
+			String checkin = dto.getAttendance_check_in_time().toLocalTime().toString();
+			String checkout = (dto.getAttendance_check_out_time() != null) 
+					? dto.getAttendance_check_out_time().toLocalTime().toString() : "-";
+			String late = "Y".equals(dto.getAttendance_late_yn()) ? "지각" : "-";
+			String early = "Y".equals(dto.getAttendance_early_leave_yn()) ? "조퇴" : "-";
+			ds.add(i++, date, checkin, checkout, late, early);
+		
+		}
+		return ds;
+	}
 
 }
