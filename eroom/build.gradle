@@ -25,6 +25,7 @@ repositories {
 	// JasperReports에 필요한 iText 라이브러리를 위한 저장소 추가
 	maven {
 		url "https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/"
+		allowInsecureProtocol = true
 	}
 }
 
@@ -74,6 +75,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'org.springframework.boot:spring-boot-starter'
 	
+	// Excel 출력을 위한 Apache POI 추가
+	implementation 'org.apache.poi:poi:5.2.5'
+	implementation 'org.apache.poi:poi-ooxml:5.2.5'
 	
 }
 
