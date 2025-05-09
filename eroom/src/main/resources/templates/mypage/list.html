@@ -411,17 +411,14 @@
   <div class="d-flex align-items-center gap-2">
     <!-- 엑셀 다운로드 버튼 -->
     <form th:action="@{/mypage/attendanceExcel}" method="get" class="me-2">
-      <input type="hidden" name="month" th:value="${selectedMonth}" />
-      <button type="submit" class="btn btn-link text-body px-0" title="엑셀로 내보내기">
-        <svg class="svg-inline--fa fa-file-export fs-9 me-1" aria-hidden="true" focusable="false"
-             data-prefix="fas" data-icon="file-export" role="img"
-             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="14" height="14" style="display: inline-block;">
-          <path fill="currentColor"
-                d="M0 64C0 28.7 28.7 0 64 0H224V128c0 17.7 14.3 32 32 32H384V288H216c-13.3 0-24 10.7-24 24s10.7 24 24 24H384V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64zM384 336V288H494.1l-39-39c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l39-39H384zm0-208H256V0L384 128z"/>
-        </svg>
-        Excel
-      </button>
-    </form>
+    	<input type="hidden" name="month" th:value="${selectedMonth}" />
+		<button type="submit" 
+		  class="btn border bg-white d-flex align-items-center px-2 py-0" 
+		  style="height: 32px; font-size: 0.875rem; line-height: 1;">
+		  <img src="/assets/img/icons/excel-icon1.png" alt="엑셀 아이콘" width="16" height="16" class="me-1">
+		  <span class="fw-normal small" style="position: relative; top: 1px;">내보내기</span>
+		</button>
+	</form>
 
     <!-- 월 선택 셀렉트 -->
     <form th:action="@{/mypage/list}" method="get" id="monthSelectForm" th:if="${monthList != null}">

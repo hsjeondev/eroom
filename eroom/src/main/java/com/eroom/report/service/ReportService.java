@@ -1,139 +1,104 @@
 package com.eroom.report.service;
 
 import static net.sf.dynamicreports.report.builder.DynamicReports.report;
+
 import static net.sf.dynamicreports.report.builder.DynamicReports.stl;
 import static net.sf.dynamicreports.report.builder.DynamicReports.type;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.List;
+import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 
+import com.eroom.attendance.dto.AttendanceDto;
+
 import net.sf.dynamicreports.report.builder.column.Columns;
 import net.sf.dynamicreports.report.builder.component.Components;
+import net.sf.dynamicreports.report.builder.datatype.DataTypes;
 import net.sf.dynamicreports.report.builder.style.StyleBuilder;
 import net.sf.dynamicreports.report.constant.HorizontalTextAlignment;
+import net.sf.dynamicreports.report.constant.VerticalTextAlignment;
 import net.sf.dynamicreports.report.datasource.DRDataSource;
 import net.sf.dynamicreports.report.exception.DRException;
 
 @Service
 public class ReportService {
 	
-	
-	StyleBuilder koreanFont = stl.style()
-			.setFont(stl.font()
-					.setFontName("Malgun Gothic") // 시스템 폰트명
-					.setPdfFontName("fonts/malgun.ttf") // resources 기준 상대 경로
-					.setPdfEncoding("Identity-H") // 유니코드
-					.setPdfEmbedded(true) // PDF 내에 폰트 포함
-					);
-	
-	StyleBuilder columnStyle = koreanFont
-			.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER) // 셀 가운데 정렬
-			.setBorder(stl.pen1Point()) // 테두리 추가
-			.setPadding(5); // 셀 안쪽 여백
-	
-	StyleBuilder columnTitleStyle = columnStyle
-									.bold()
-									.setBackgroundColor(Color.LIGHT_GRAY); // 컬럼 제목 강조
-	// Excel 리포트용 메소드
-	public ByteArrayOutputStream generateStyledTableExcelReport() throws Exception{
+	// 근태 기록 엑셀 리포트 생성용
+	public ByteArrayOutputStream generateAttendanceExcelReport(List<AttendanceDto> records, String month) throws DRException{
+		// 엑셀 데이터를 담을 출력 스트림 생성
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		// 데이터 소스 컬럼 정의
+		DRDataSource dataSource = new DRDataSource("no", "date", "checkin", "checkout", "late", "early");
+		int i = 1;
 		
-		// 한글 폰트 스타일 사용
-		StyleBuilder koreanFont = stl.style()
-				.setFont(stl.font()
-				.setFontName("Malgun Gothic")
-				.setPdfFontName("fonts/malgun.ttf") // Excel에서는 의미 없지만 스타일 통일
-				.setPdfEncoding("Identity-H")
-				.setPdfEmbedded(true)
-			);
-		
-		StyleBuilder columnStyle = koreanFont
-					.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER)
-					.setBorder(stl.pen1Point())
-					.setPadding(5);
-		
-		StyleBuilder columnTitleStyle = columnStyle
-					.bold()
-					.setBackgroundColor(Color.WHITE);
-		
-		DRDataSource dataSource = new DRDataSource("date","time");
-		dataSource.add("25.04.15","14:00");
-		dataSource.add("25.04.15","14:30");
-		dataSource.add("25.04.15","15:00");
-		dataSource.add("25.04.15","15:30");
-		
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+		// 데이터 소스에 행 추가 - 실제 데이터 넣기
+		for(AttendanceDto dto : records) {
+			LocalDateTime checkInTime = dto.getAttendance_check_in_time();
+			LocalDateTime checkOutTime = dto.getAttendance_check_out_time();
+			// 각 컬럼별 텍스트 가공
+//			String date = checkInTime != null ? checkInTime.toLocalDate().format(dateFormatter) : "-";
+			String date;
+			if(checkInTime != null) {
+				String baseDate = checkInTime.toLocalDate().format(dateFormatter); // 날짜
+				String dayOfWeek = checkInTime.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN); // 요일 한국어 변환
+				date = baseDate + " (" + dayOfWeek + ")"; // 날짜(요일) 
+			}else {
+				date = "-";
+			}
+			String checkin = checkInTime != null ? checkInTime.toLocalTime().format(timeFormatter) : "-";
+			String checkout = checkOutTime != null ? checkOutTime.toLocalTime().format(timeFormatter) : "-";
+			String late = "Y".equals(dto.getAttendance_late_yn()) ? "지각" : "";
+			String early = "Y".equals(dto.getAttendance_early_leave_yn()) ? "조퇴" : "";
+			// 행 데이터 추가
+			dataSource.add(i++, date, checkin, checkout, late, early);
+		}
+		// 기본 셀 스타일 정의
+		StyleBuilder baseStyle = stl.style()
+					.setFont(
+							stl.font() // 한글 폰트 설정
+							.setFontName("Malgun Gothic") // 맑은 고딕
+							.setFontSize(10) // 글자 크기
+					 )
+					.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER) // 글자 가운데 정렬(가로 가운데 정렬)
+					.setVerticalTextAlignment(VerticalTextAlignment.MIDDLE) // 셀 높이 대비 중앙 정렬(세로 가운데 정렬)
+					.setBorder(stl.pen1Point()) // 셀 테두리
+					.setPadding(3); // 셀 안 여백
+		// 타이틀 텍스트 스타일 (제목 영역)
+		StyleBuilder titleStyle = stl.style(baseStyle).bold() // 굵은 글씨
+							.setFontSize(12).setHorizontalTextAlignment(HorizontalTextAlignment.CENTER);
+		// 컬럼 제목 스타일
+		StyleBuilder columnHeaderStyle = stl.style(baseStyle).bold().setBackgroundColor(Color.LIGHT_GRAY);
+
+		// 리포트 생성
 		report()
-			.columns(
-					Columns.column("날짜","date",type.stringType())
-					.setStyle(columnStyle)
-					.setTitleStyle(columnTitleStyle),
-					
-					Columns.column("시간","time",type.stringType())
-					.setStyle(columnStyle)
-					.setTitleStyle(columnTitleStyle)
-			)
-			.title(
-					Components.text("날짜 시간 리포트")
-					.setStyle(koreanFont.bold().setFontSize(11))
-					.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER)
-			)
-			.setDataSource(dataSource)
-			.toXlsx(baos); // Excel로 출력
-		
-		return baos;
-			
-			
-		
+	    .setColumnStyle(baseStyle) 
+	    .setColumnTitleStyle(columnHeaderStyle) // 컬럼과 내용 기본 스타일 적용
+	    .addTitle( // 리포드 상단 타이틀 설정
+			Components.text(month + " 근태기록")
+				.setStyle(titleStyle) // 타이틀 스타일 적용
+				.setFixedHeight(30)
+		)
+	    .columns( // 표 컬럼 정의
+	        Columns.column("번호", "no", DataTypes.integerType()),
+	        Columns.column("근무일", "date", DataTypes.stringType()),
+	        Columns.column("출근 시간", "checkin", DataTypes.stringType()),
+	        Columns.column("퇴근 시간", "checkout", DataTypes.stringType()),
+	        Columns.column("지각", "late", DataTypes.stringType()),
+	        Columns.column("조퇴", "early", DataTypes.stringType())
+	    )
+	    .setDataSource(dataSource) // 데이터 바인딩
+	    .toXls(baos); // Excel로 출력
+
+			return baos;
 	}
-	
-	
-	// PDF 리포트용 메소드
-	public ByteArrayOutputStream generateSimplePdfReport() throws DRException{
-	
-		// PDF 데이터를 저장할 출력 스트림 생성
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		
-		// 리포트에 넣을 샘플 데이터를 정의함
-		// DRDataSource는 컬럼명 정의 -> add()로 행을 추가한다.
-		DRDataSource dataSource = new DRDataSource("name","position");
-		dataSource.add("전홍식","하면해");	
-		dataSource.add("이예준","응애");	
-		dataSource.add("강성관","닫은 식당");	
-		dataSource.add("조윤아","으앙");	
-		dataSource.add("권용규","국쏘?");	
-		dataSource.add("조은성","연식당");	
-		
-		// 리포트를 생성하는 main 코드 블록
-		report()
-			// 출력할 컬럼들을 정의 : 컬럼명, 필드명, 데이터 타입
-			.columns(
-				Columns.column("이름","name",type.stringType())
-					.setStyle(columnStyle)
-					.setTitleStyle(columnTitleStyle)
-					.setFixedWidth(100),
-				
-				Columns.column("역할","position",type.stringType())
-					.setStyle(columnStyle)
-					.setTitleStyle(columnTitleStyle)
-					.setFixedWidth(200)
-				
-				)
-			.title(
-					Components.text("샘플 리포트")
-					.setStyle(koreanFont.bold().setFontSize(14))
-					.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER)
-					.setFixedWidth(300)
-					)
-			.pageFooter(Components.pageXofY().setStyle(koreanFont))
-			.setDataSource(dataSource)
-			.toPdf(baos);
-		
-		return baos;
-		
-		
-		
-	}
+
 
 }
