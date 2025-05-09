@@ -3,107 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>날씨</title>
-    <style>
-        body {
-            background-color: #282c34;
-            color: white;
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .attendance-card {
-            max-width: 400px;
-            margin-top: 50px;
-        }
-
-        .card {
-            background-color: #3a3f47;
-            border-radius: 10px;
-        }
-
-        .card-body {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .card-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .card-content p {
-            margin: 5px 0;
-        }
-
-        #weather-icon {
-            width: 70px;
-            height: 70px;
-            margin-top: 15px;
-        }
-
-        .card-header {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .card-description {
-            margin-top: 15px;
-        }
-
-        .control-section {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        select, button {
-            padding: 10px;
-            background-color: #ffcc00;
-            color: black;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-
-        select {
-            margin-bottom: 15px;
-            width: 100%;
-        }
-
-        button {
-            width: 100%;
-        }
-
-        /* 스타일링 개선 */
-        select:focus, button:focus {
-            outline: none;
-            border: 2px solid #ff9900;
-        }
-
-        button:hover {
-            background-color: #ff9900;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
-    <div class="attendance-card mx-auto">
-        <div class="card shadow-sm border-0">
-            <div class="card-body">
-                <div class="card-content">
-                    <h3 id="city-name" class="card-header">도시명</h3>
-                    <p id="temperature">기온: --℃</p>
-                    <p id="description">날씨: --</p>
-                    <p id="humidity">습도: --%</p>
-                    <p id="wind">바람: -- m/s</p>
-                    <img id="weather-icon" src="" alt="날씨 아이콘" />
-                </div>
-                <div class="control-section">
-                    <select id="city-selector">
+    <div class="attendance-card mx-auto" style="max-width: 300px; margin-top: 50px;">
+        <div class="card shadow-sm border-0" style="background-color: white; border-radius: 10px; height: 250px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px; overflow: hidden;">
+            <div class="card-body" style="text-align: center;">
+                <!-- 도시명과 셀렉트 박스를 같은 줄에 배치 -->
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <h3 id="city-name" class="card-header" style="font-size: 1.5rem; font-weight: bold; color: black; margin: 0;">도시명</h3>
+                    <select id="city-selector" style="padding: 5px 10px; background-color: white; color: black; border: 2px solid #00bfff; border-radius: 12px; font-size: 0.9rem; width: 120px; margin-left: 10px; appearance: none; cursor: pointer; transition: all 0.3s ease-in-out; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
                         <option value="current">현재 위치</option>
                         <option value="Seoul">서울</option>
                         <option value="Busan">부산</option>
@@ -118,9 +26,15 @@
                         <option value="Cheongju">청주</option>
                         <option value="Jeju">제주</option>
                     </select>
-                    <button id="get-weather">
-                        날씨 정보 가져오기
-                    </button>
+                </div>
+                <div class="card-content" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; height: 100%;">
+                    <div class="weather-info" style="display: flex; flex-direction: column; align-items: flex-start;">
+                        <p id="temperature" style="margin: 5px 0; color: black;">기온: --℃</p>
+                        <p id="description" style="margin: 5px 0; color: black;">날씨: --</p>
+                        <p id="humidity" style="margin: 5px 0; color: black;">습도: --%</p>
+                        <p id="wind" style="margin: 5px 0; color: black;">바람: -- m/s</p>
+                    </div>
+                    <img id="weather-icon" src="" alt="날씨 아이콘" style="width: 80px; height: 80px; margin-top: 15px;" />
                 </div>
             </div>
         </div>
@@ -174,8 +88,8 @@
         }
 
         // 드롭다운에서 선택된 도시의 날씨 정보 가져오기
-        document.getElementById("get-weather").addEventListener("click", function () {
-            const city = document.getElementById("city-selector").value;
+        document.getElementById("city-selector").addEventListener("change", function () {
+            const city = this.value;
             if (city === "current") {
                 navigator.geolocation.getCurrentPosition(function (position) {
                     const lat = position.coords.latitude;
