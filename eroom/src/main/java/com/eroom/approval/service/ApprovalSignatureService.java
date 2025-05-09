@@ -36,8 +36,13 @@ public class ApprovalSignatureService {
 			    if (dto.getSignature_data_url() != null && dto.getSignature_data_url().contains(",")) {
 			      blob = Base64.getDecoder().decode(dto.getSignature_data_url().split(",", 2)[1]);
 			    }
-				entityList.get(entityList.size() - 1).setApprovalSignatureBlob(blob);
-				approvalSignatureRepository.save(entityList.get(entityList.size() - 1));
+				ApprovalSignature entity = entityList.get(entityList.size() - 1);
+				if(entity.getApprovalSignatureBlob().equals(blob)) {
+					return 0;
+				}
+			    entity.setApprovalSignatureBlob(blob);
+			    entity.setApprovalSignatureVisibleYn("Y");
+				approvalSignatureRepository.save(entity);
 				result = 1;
 			}
 		} catch (Exception e) {
@@ -112,4 +117,6 @@ public class ApprovalSignatureService {
 			return list.get(list.size() - 1);
 		}
 	}
+
+
 }

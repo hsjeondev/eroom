@@ -57,7 +57,9 @@ public class DirectoryController {
 			DirectoryDto dto = new DirectoryDto().toDto(t);
 			// 프로필 이미지 url 조회
 			String profileUrl = profileService.getProfileImageUrl(t.getEmployee().getEmployeeNo());
-			dto.setProfileImageUrl(profileUrl);
+			if(profileUrl != null) {
+				dto.setProfileImageUrl(profileUrl);
+			}
 			
 			if (t.getEmployee().getStructure() != null) {
 			    Structure structure = t.getEmployee().getStructure();

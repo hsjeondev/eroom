@@ -32,7 +32,7 @@
 <div layout:fragment="content">
 
 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#treeModal">트리 테스트</button>
-
+<!-- 트리구조시작 -->
 <div class="modal fade" id="treeModal" tabindex="-1" aria-labelledby="treeModalLabel" aria-hidden="true" data-bs-focus="false">
   <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 550px; height: 400px;">
     <div class="modal-content">
@@ -94,7 +94,7 @@
 			</li>
         </ul>
       </li>
-      <li class="treeview-list-item">
+      <!-- <li class="treeview-list-item">
         <p class="treeview-text ms-2">
           <input type="checkbox" class="form-check-input me-2" data-name="무소속" data-no="noTeam" onchange="handleCheck(this)">
           <a href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#noTeam">
@@ -111,7 +111,7 @@
             </p>
           </li>
         </ul>
-      </li>
+      </li> -->
     </ul>
   </li>
 </ul>
@@ -123,8 +123,8 @@
        class="border bg-white rounded p-2 mb-2 small"
        style="position: sticky; top: 0; z-index: 2; background-color: white; ">
     <strong>선택한 항목:</strong>
-    <div style="overflow-y: auto; max-height: 270px;" id="selectedTags" class="mt-1 d-flex flex-wrap gap-2"></div>
-  </div>
+    <div style="overflow-y: auto; max-height: 270px;" id="selectedTags" class="mt-1 flex-wrap gap-2"></div>
+  </div> 
 
   <!-- [2] 중간: 빈 영역 (스크롤 여유) -->
   <div class="flex-grow-1"></div>
@@ -147,6 +147,7 @@
     </div>
   </div>
 </div>
+<!-- 트리구조끝 -->
 
 <!-- 트리구조 JS -->
 <script>
@@ -238,13 +239,14 @@ function updateParents(checkbox) {
 
 
 
-function addTag(label, code) {
+/* function addTag(label, code) {
   const tagWrap = document.getElementById("selectedTags");
   if (document.getElementById(`tag-${code}`)) return;
 
   const tag = document.createElement("span");
   tag.className = "badge bg-primary text-white d-flex align-items-center";
   tag.id = `tag-${code}`;
+  tag.name = `tag-${label}`;
   tag.innerHTML = `${label} <button type="button" class="btn-close btn-close-white btn-sm ms-1" onclick="removeTag('${code}', true)"></button>`;
   tagWrap.appendChild(tag);
 }
@@ -260,12 +262,62 @@ function addTag(label, code) {
 	    checkbox.checked = false;
 	    handleCheck(checkbox); // 연쇄 동기화
 	  }
-	}
+	} */
+	function addTag(label, code) {
+		  const tagWrap = document.getElementById("selectedTags");
+		  if (document.getElementById(`tag-${code}`)) return;
+
+		  // Card 생성
+		  const card = document.createElement("div");
+		  card.className = "card mb-2"; // 여기서 flex는 제거됨
+		  card.id = `tag-${code}`;
+		  card.name = `tag-${label}`;
+		  card.style.borderRadius = "5px";
+		  card.style.padding = "8px";
+		  card.style.backgroundColor = "#f8f9fa";
+		  card.style.display = "block"; // 한 줄씩 표시
+
+		  // 이름 라벨
+		  const labelElement = document.createElement("span");
+		  labelElement.textContent = label;
+		  card.appendChild(labelElement);
+
+		  // 삭제 버튼
+		  const button = document.createElement("button");
+		  button.type = "button";
+		  button.className = "btn-close";
+		  button.style.float = "right"; // 오른쪽 정렬
+		  button.setAttribute("aria-label", "Remove");
+		  button.addEventListener("click", () => {
+		    card.remove();
+		    removeTag(code, true);  // 태그 삭제 시 체크박스도 해제
+		  });
+
+		  card.appendChild(button);
+
+		  // Card를 선택된 태그 컨테이너에 추가
+		  tagWrap.appendChild(card);
+		}
+
+	
+	function removeTag(code, skipCheckbox = false) {
+		  const tag = document.getElementById(`tag-${code}`);
+		  if (tag) tag.remove();
+
+		  if (!skipCheckbox) return;
+
+		  const checkbox = document.querySelector(`input[type="checkbox"][data-no="${code}"]`);
+		  if (checkbox && checkbox.checked) {
+		    checkbox.checked = false;
+		    handleCheck(checkbox); // 연쇄 동기화
+		  }
+		}
 
 
 function confirmSelection() {
   const selected = document.querySelectorAll("#selectedTags .badge");
-  const result = Array.from(selected).map(el => el.id.replace('tag-', ''));
+  const resultCodeAndNum = Array.from(selected).map(el => el.id.replace('tag-', ''));
+  const resultName = Array.from(selected).map(el => el.name.replace('tag-', ''));
   // 여기서 result 데이터 가지고 쓰시면 됩니다
   // 여기서 result 데이터 가지고 쓰시면 됩니다
   // 여기서 result 데이터 가지고 쓰시면 됩니다
@@ -277,7 +329,8 @@ function confirmSelection() {
   // 여기서 result 데이터 가지고 쓰시면 됩니다
   // 부서, 팀은 separatorCode 그리고 사원은 employeeNo가 result에 담깁니다~
   // JSON으로 보내고 Controller에서는 @ResponseBody + 매개변수에는 @RequestBody List<String> 사용해서 받아서 쓰시면 됩니다. 
-  console.log("확정된 선택:", result);
+  console.log("확정된 선택 codeAndNo:", resultCodeAndNum);
+  console.log("확정된 선택 name:", resultName);
   // 부서, 팀은 separatorCode 그리고 사원은 employeeNo가 result에 담깁니다~
   // JSON으로 보내고 Controller에서는 @ResponseBody + 매개변수에는 @RequestBody List<String> 사용해서 받아서 쓰시면 됩니다. 
   // 여기서 result 데이터 가지고 쓰시면 됩니다
