@@ -143,7 +143,7 @@ public class ApprovalController {
 		model.addAttribute("resultList", resultList);
 		
 		
-		return "/approval/myRequestedApprovals";
+		return "approval/myRequestedApprovals";
 	}
 	// 비동기 방식을 위한 메소드
 	@GetMapping("/approval/myRequestedApprovals/fragment")
@@ -296,7 +296,7 @@ public class ApprovalController {
 	        model.addAttribute("approval", new ApprovalDto());
 	    }
 	    
-		return "/approval/create";
+		return "approval/create";
 	}
 	
 	// 결재 생성 결재라인 추가를 위한 조회
@@ -503,7 +503,7 @@ public class ApprovalController {
 		model.addAttribute("driveList", driveList);
 //		파일 조회 - 해당 결재글이 드라이브의 param1에 들어있어야함.
 		
-		return "/approval/detail";
+		return "approval/detail";
 	}
 	
 	@DeleteMapping("/approval/{approvalNo}/delete")
@@ -729,7 +729,7 @@ public class ApprovalController {
 		model.addAttribute("resultList", resultApprovalListDto);
 		model.addAttribute("approvalLineMap", var1Map);
 		
-		return "/approval/receivedApprovals";
+		return "approval/receivedApprovals";
 	}
 	
 	
@@ -934,7 +934,7 @@ public class ApprovalController {
 		model.addAttribute("resultList", resultApprovalListDto);
 		model.addAttribute("approvalLineMap", var1Map);
 		
-		return "/approval/agreementApprovals";
+		return "approval/agreementApprovals";
 	}
 	// 비동기 방식을 위한 메소드
 	@GetMapping("/approval/agreementApprovals/fragment")
@@ -1091,7 +1091,7 @@ public class ApprovalController {
 		model.addAttribute("resultList", resultApprovalListDto);
 		model.addAttribute("approvalLineMap", var1Map);
 		
-		return "/approval/referencedApprovals";
+		return "approval/referencedApprovals";
 	}
 	
 	

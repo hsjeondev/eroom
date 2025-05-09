@@ -51,7 +51,7 @@ public class ArticleController {
 	@PostMapping("/article/notice/delete")
 	public String deleteArticleNotice(@RequestParam("articleNo") Long articleNo) {
 		articleService.deleteArticleNotice(articleNo);
-	    return "redirect:/article/notice";
+	    return "redirect:article/notice";
 	}
 	
 	// 게시글 수정중 기존 파일 삭제

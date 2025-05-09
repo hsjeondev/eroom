@@ -2,7 +2,7 @@
 <html lang="ko-KR" dir="ltr"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{/include/layout}">
+      layout:decorate="~{include/layout}">
 <head>
   <meta charset="UTF-8">
   <title>Home</title>
@@ -50,6 +50,67 @@
 	     border-radius: .25rem;
 	     box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
 	   }
+	
+
+
+	/* 스크롤 커스터마이징 선택사항 */
+	.fc-scroller {
+	    max-height: 330px !important;
+	    overflow-y: auto !important;
+	    padding-bottom: 12px; 
+	  }
+	
+	  #calendarContainer {
+	    overflow: hidden;
+	  }
+	
+	  .fc-scroller::-webkit-scrollbar {
+	    width: 6px;
+	  }
+	
+	  .fc-scroller::-webkit-scrollbar-thumb {
+	    background-color: rgba(0, 0, 0, 0.1);
+	    border-radius: 10px;
+	  }
+	
+	  /* 날짜 영역 제거 */
+	  .fc-list-day-text,
+	  .fc-list-day-cushion {
+	    display: none !important;
+	  }
+	
+	  /* 가운데 점 제거 */
+	  .fc-list-event-graphic {
+	    display: none !important;
+	  }
+	  
+	   
+	  .fc-list-event-time {
+	  width: 30% !important;
+	}
+	.fc-list-event-graphic {
+	  display: none !important;
+	  width: 0 !important;
+	}
+	.fc-list-event-title {
+	  width: 70% !important;
+	  overflow: hidden;
+	  text-align: center;
+	  text-overflow: ellipsis;
+	}
+	.fc-list-table {
+	  table-layout: fixed !important;
+	  width: 100%;
+	}
+	.fc-list-event-time {
+	  width: 30% !important;
+	  font-size: 11.5px;
+	  white-space: nowrap;
+	  overflow: hidden;
+	  text-overflow: ellipsis;
+	  text-align: left;
+	  padding-left: 6px;
+	}
   </style>
 </head>
 <body>
@@ -115,17 +176,28 @@
         </div>
 
         <!-- 1~2행·3열 (위 두 칸 합침) -->
-        <div class="text-white p-1 span-two-rows">
-			<div class="attendance-card mx-auto">
-				<div class="card shadow-sm border-0">
-					<div class="card-body text-center p-4" style="height: 447.62px;">
-						캘린더<br>(오늘 / 개인, 팀, 부서, 회사 중 하나)
+					<div class="text-white p-1 span-two-rows">
+						<div class="attendance-card mx-auto">
+							<div class="card shadow-sm border-0" style="height: 447.62px;">
+								<div class="card-body p-2 d-flex flex-column h-100"
+									style="overflow: hidden;">
+									<br>
+									<!-- 여기 overflow: hidden 추가 -->
+									<h5 class="fw-bold mb-3 text-left fs-5">오늘 일정</h5>
+									<div class="text-end mb-3" style="margin-top: 0.25rem;">
+										<a href="/calendar/all"
+											class="text-decoration-none text-primary"
+											style="font-size: 0.8rem;"> 캘린더로 가기 → </a>
+									</div>
+									<div id="calendarContainer" class="flex-grow-1">
+										<div id="appCalendar"></div>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
-				</div>
-			</div>
-		</div>
 
-        <!-- 2행·1열 -->
+					<!-- 2행·1열 -->
 		<div class="text-white p-1">
 		  <div class="attendance-card mx-auto">
 		    <div class="card shadow-sm border-0">
@@ -184,6 +256,120 @@
     </div>
 
     <script>
+    //캘린더
+   document.addEventListener('DOMContentLoaded', function () {
+			  setTimeout(() => {
+			    const todayStr = new Date().toISOString().slice(0, 10); // yyyy-MM-dd
+			    const calendarEl = document.getElementById('appCalendar');
+
+			    const insertedTables = new Set(); // colgroup 중복 삽입 방지
+
+			    const calendar = new FullCalendar.Calendar(calendarEl, {
+			      initialView: 'listDay',
+			      locale: 'ko',
+			      headerToolbar: false,
+			      eventTimeFormat: {
+			    	    hour: '2-digit',
+			    	    minute: '2-digit',
+			    	    hour12: false  // ✅ 24시간제로 설정!
+			    	  },
+			      validRange: {
+			        start: todayStr,
+			        end: todayStr
+			      },
+			      height: '100%',
+			      contentHeight: 'auto',
+			      eventSources: [
+			        {
+			          url: '/calendar/list/all',
+			          method: 'GET',
+			          failure: () => console.error('불러오기 실패'),
+			        }
+			      ],
+			      eventDidMount: function (info) {
+			        const separator = info.event.extendedProps.separator || "";
+			        const event = info.event;
+			        const teamName = event.extendedProps.teamName || '';
+			        const title = event.title;
+
+			        if (teamName && title && !title.startsWith(`[${teamName}]`)) {
+			          event.setProp("title", `[${teamName}] ${title}`);
+			        }
+
+			        // 색상 스타일 지정
+			        let backgroundColor = "#DDDDDD";
+			        let borderColor = "#CCCCCC";
+			        let textColor = "#000000";
+
+			        if (separator.startsWith("A")) {
+			          backgroundColor = "#F8D7DA";
+			          borderColor = "#F5C6CB";
+			          textColor = "#721C24";
+			        }
+
+			        if (separator.startsWith("T")) {
+			          backgroundColor = "#BDE0FE";
+			          borderColor = "#7FBFFF";
+			          textColor = "#003366";
+			        }
+
+			        const titleEl = info.el.querySelector('.fc-list-event-title');
+			        if (titleEl) {
+			          titleEl.style.backgroundColor = backgroundColor;
+			          titleEl.style.border = `1px solid ${borderColor}`;
+			          titleEl.style.color = textColor;
+			          titleEl.style.borderRadius = "8px";
+			          titleEl.style.padding = "4px 8px";
+			          titleEl.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)";
+			          titleEl.style.fontWeight = "500";
+			          titleEl.style.fontSize = "14px";
+			        }
+
+			        // ✅ colgroup 삽입 (한 번만)
+			        const table = document.querySelector('table.fc-list-table');
+			        if (table && !insertedTables.has(table)) {
+			          const colgroup = document.createElement('colgroup');
+
+			          const col1 = document.createElement('col');
+			          col1.style.width = '30%';
+
+			          const col2 = document.createElement('col');
+			          col2.style.width = '0';
+			          col2.style.display = 'none';
+
+			          const col3 = document.createElement('col');
+			          col3.style.width = '70%';
+
+			          colgroup.appendChild(col1);
+			          colgroup.appendChild(col2);
+			          colgroup.appendChild(col3);
+
+			          const thead = table.querySelector('thead');
+			          if (thead) {
+			            table.insertBefore(colgroup, thead);
+			          } else {
+			            table.prepend(colgroup);
+			          }
+
+			          insertedTables.add(table);
+			        }
+			      }
+			    });
+
+			    calendar.render();
+
+			    // 스크롤 조정
+			    setTimeout(() => {
+			      const scroller = document.querySelector('.fc-scroller');
+			      if (scroller) {
+			        scroller.style.maxHeight = '300px';
+			        scroller.style.overflowY = 'auto';
+			      }
+			    }, 300);
+			  }, 100);
+			});
+
+    
       document.addEventListener('DOMContentLoaded', function(){
         // 현재 시간 표시
         function updateCurrentTime() {

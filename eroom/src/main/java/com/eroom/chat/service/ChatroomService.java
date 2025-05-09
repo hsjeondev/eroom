@@ -25,6 +25,7 @@ import com.eroom.chat.repository.ChatroomRepository;
 import com.eroom.drive.dto.DriveDto;
 import com.eroom.drive.entity.Drive;
 import com.eroom.drive.repository.DriveRepository;
+import com.eroom.drive.service.DriveService;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.security.EmployeeDetails;
@@ -41,6 +42,7 @@ public class ChatroomService {
 	private final ChatroomAttendeeRepository chatroomAttendeeRepository;
 	private final ChatAlarmRepository chatAlarmRepository;
 	private final DriveRepository driveRepository;
+	private final DriveService driveService;
 	// 파일 저장 경로 
 		 @Value("${ffupload.location}")
 		 private String fileDir;
@@ -250,6 +252,11 @@ public class ChatroomService {
 
 	    return createdChatroom.getChatroomNo();
 	}
+
+	public List<DriveDto> getChatFilesByRoom(Long chatroomNo, int page, int size) {
+	    return driveService.findChatFilesByRoom(chatroomNo, page, size);
+	}
+
 
 
 
