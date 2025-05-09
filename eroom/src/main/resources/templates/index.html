@@ -305,7 +305,7 @@
         </div>
 
         <!-- 3행·2열 -->
-        <div class="text-white p-1">
+        <!-- <div class="text-white p-1">
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
 					<div class="card-body text-center p-4" style="height: 207.81px;">
@@ -313,7 +313,46 @@
 					</div>
 				</div>
 			</div>
-        </div>
+        </div> -->
+        <div class="text-white p-1">
+		  <div class="attendance-card mx-auto">
+		    <div class="attendance-card mx-auto">
+		      <div class="card shadow-sm border-0">
+		        <div class="card-body" style="text-align: center;">
+		          <!-- 도시명과 셀렉트 박스를 같은 줄에 배치 -->
+		          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+		            <h3 id="city-name" class="card-header" style="font-size: 1.5rem; font-weight: bold; color: black; margin: -10px 0 1rem 0;">도시명</h3>
+		            <select id="city-selector" style="padding: 5px 10px; background-color: white; color: black; border: 2px solid #00bfff; border-radius: 12px; font-size: 0.9rem; width: 120px; margin-left: 10px; appearance: none; cursor: pointer; transition: all 0.3s ease-in-out; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+		              <option value="current">현재 위치</option>
+		              <option value="Seoul">서울</option>
+		              <option value="Busan">부산</option>
+		              <option value="Incheon">인천</option>
+		              <option value="Daegu">대구</option>
+		              <option value="Daejeon">대전</option>
+		              <option value="Gwangju">광주</option>
+		              <option value="Suwon">수원</option>
+		              <option value="Changwon">창원</option>
+		              <option value="Gimhae">김해</option>
+		              <option value="Jeonju">전주</option>
+		              <option value="Cheongju">청주</option>
+		              <option value="Jeju">제주</option>
+		            </select>
+		          </div>
+		          <div class="card-content" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; height: 100%;">
+		            <div class="weather-info" style="display: flex; flex-direction: column; align-items: flex-start;">
+		              <p id="temperature" style="margin: 5px 0; color: black;">기온: --℃</p>
+		              <p id="description" style="margin: 5px 0; color: black;">날씨: --</p>
+		              <p id="humidity" style="margin: 5px 0; color: black;">습도: --%</p>
+		              <p id="wind" style="margin: 5px 0; color: black;">바람: -- m/s</p>
+		            </div>
+		            <img id="weather-icon" src="" alt="날씨 아이콘" style="width: 100px; height: 100px; " />
+		          </div>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
 
         <!-- 3행·3열 -->
         <div class="text-white p-1">
@@ -328,7 +367,6 @@
 
       </div>
     </div>
-
     <script>
     //캘린더
    document.addEventListener('DOMContentLoaded', function () {
@@ -593,6 +631,93 @@
     console.error("프로젝트 요약 불러오기 실패:", err);
   });
 </script>
+        <script>
+        // OpenWeatherMap API에서 지원하는 주요 한국 도시들을 한국어로 변환하는 함수
+        function mapCityName(cityName) {
+            const cityMap = {
+                "Seoul": "서울",
+                "Busan": "부산",
+                "Incheon": "인천",
+                "Daegu": "대구",
+                "Daejeon": "대전",
+                "Gwangju": "광주",
+                "Suwon": "수원",
+                "Changwon": "창원",
+                "Gimhae": "김해",
+                "Jeonju": "전주",
+                "Cheongju": "청주",
+                "Jeju": "제주"
+            };
+            return cityMap[cityName] || cityName;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // 기본적으로 서울의 날씨 정보
+            const city = "Seoul";
+            fetch(`/api/weather?city=${city}&lang=kr`)  // lang=kr 추가
+                .then(response => response.json())
+                .then(data => {
+                    // 초기 데이터로 서울 날씨를 보여줍니다.
+                    const cityName = mapCityName(data.name);  // 로마자 도시명 -> 한글로 변환
+                    displayWeatherData(data, cityName);  // 변환된 도시명 전달
+                })
+                .catch(err => {
+                    console.error("날씨 정보 불러오기 실패:", err);
+                });
+        });
+
+        // 날씨 데이터를 화면에 표시하는 함수
+        function displayWeatherData(data, cityName) {
+            document.getElementById("city-name").textContent = cityName;  // 변환된 도시명
+            document.getElementById("temperature").textContent = `기온: ${data.main.temp}℃`;
+            document.getElementById("description").textContent = `날씨: ${data.weather[0].description}`;
+            document.getElementById("humidity").textContent = `습도: ${data.main.humidity}%`;
+            document.getElementById("wind").textContent = `바람: ${data.wind.speed} m/s`;
+
+            const iconCode = data.weather[0].icon;
+            document.getElementById("weather-icon").src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+        }
+
+        // 드롭다운에서 선택된 도시의 날씨 정보 가져오기
+        document.getElementById("city-selector").addEventListener("change", function () {
+            const city = this.value;
+            if (city === "current") {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    getWeatherByCoords(lat, lon);  // 현재 위치 날씨
+                });
+            } else {
+                getWeatherByCity(city);  // 선택된 도시의 날씨
+            }
+        });
+
+        // GPS로 현재 위치의 날씨 정보를 가져오는 함수
+        function getWeatherByCoords(lat, lon) {
+            fetch(`/api/weather/coord?lat=${lat}&lon=${lon}&lang=kr`)  // lang=kr 추가
+                .then(response => response.json())
+                .then(data => {
+                    const cityName = mapCityName(data.name);  // 로마자 도시명 -> 한글로 변환
+                    displayWeatherData(data, cityName);  // 변환된 도시명 전달
+                })
+                .catch(err => {
+                    console.error("날씨 정보 불러오기 실패:", err);
+                });
+        }
+
+        // 도시명에 맞는 날씨 데이터를 가져오는 함수
+        function getWeatherByCity(city) {
+            fetch(`/api/weather?city=${city}&lang=kr`)  // lang=kr 추가
+                .then(response => response.json())
+                .then(data => {
+                    const cityName = mapCityName(data.name);  // 로마자 도시명 -> 한글로 변환
+                    displayWeatherData(data, cityName);  // 변환된 도시명 전달
+                })
+                .catch(err => {
+                    console.error("날씨 정보 불러오기 실패:", err);
+                });
+        }
+    </script>
     
 
   </div>
