@@ -422,11 +422,12 @@
 							        location.href = "/calendar/myteam";
 							      }
 							    } else if (data.separator_code === 'R002') {
-							      if (data.roomNo) {
-							        location.href = `/chat/list?roomNo=${data.roomNo}`;
-							      } else {
-							        alert("채팅방 정보를 찾을 수 없습니다.");
-							      }
+						    	  console.log("📦 이동할 roomNo:", data.roomNo);
+						    	  if (data.roomNo) {
+						    	    location.href = `/chat/list?roomNo=${data.roomNo}`;
+						    	  } else {
+						    	    alert("채팅방 정보가 없습니다. 알림 처리만 했습니다.");
+						    	  }
 							    } else if (data.separator_code === 'R003') {
 							      // R003 처리
 							    } else if (data.separator_code === 'R004') {
