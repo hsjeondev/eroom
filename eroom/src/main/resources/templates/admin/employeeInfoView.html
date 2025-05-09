@@ -60,9 +60,9 @@
           </div>
           <div class="card-footer border-top border-dashed pt-3">
    			<div class="d-flex align-items-center mb-2" th:if="${isAdmin}">
-				<!--  수정 버튼 -->
+				<!--  연차 수정 버튼 -->
 				<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0" id="editAnnualLeaveBtn"
-				        data-bs-toggle="modal" data-bs-target="#editInfoModal">
+				        data-bs-toggle="modal" data-bs-target="#annualLeaveEditModal">
 					<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
 					     focusable="false" data-prefix="fas" data-icon="pen" role="img"
 					     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -126,18 +126,6 @@
       <div class="col-md-4">
         <div class="card">
           <div class="card-body fs-9">
-			<div class="d-flex align-items-center mb-2" th:if="${isAdmin}">
-				<!--  수정 버튼 -->
-<!-- 				<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0" id="editDirectoryBtn"
-				        data-bs-toggle="modal" data-bs-target="#editInfoModal">
-					<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
-					     focusable="false" data-prefix="fas" data-icon="pen" role="img"
-					     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-						<path fill="currentColor"
-					        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
-					</svg>
-				</button> -->
-			</div>          
             <h5 class="text-body-secondary">사번</h5>
             <p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
 
@@ -329,6 +317,43 @@
 	  </div>
 	</div>
 </div>
+<!-- 연차 정보 수정 모달 -->
+<div class="modal fade" id="annualLeaveEditModal" tabindex="-1" aria-labelledby="annualLeaveEditModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
+    <div class="modal-content border border-secondary">
+      
+      <!-- 헤더 -->
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="annualLeaveEditModalLabel">연차 정보 수정</h5>
+        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <!-- 바디 -->
+      <div class="modal-body px-4 py-3">
+        <form id="annualLeaveEditForm">
+          <div class="mb-3">
+            <label for="annualLeaveTotal" class="form-label">총 연차</label>
+            <input type="number" class="form-control" id="annualLeaveTotal" name="annual_leave_total" min="0">
+          </div>
+          <div class="mb-3">
+            <label for="annualLeaveUsed" class="form-label">사용 연차</label>
+            <input type="number" class="form-control" id="annualLeaveUsed" name="annual_leave_used" min="0">
+          </div>
+          <div class="mb-3">
+            <label for="annualLeaveRemain" class="form-label">잔여 연차</label>
+            <input type="number" class="form-control" id="annualLeaveRemain" name="annual_leave_remain" readonly>
+          </div>
+        </form>
+      </div>
+
+      <!-- 푸터 -->
+      <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+        <button type="button" class="btn btn-light w-45" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary w-45" id="saveAnnualLeaveBtn">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- confirm Modal -->
 <div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
@@ -373,24 +398,6 @@
   </div>
 </div>
 
-<!-- 퇴근시간 유효성 경고 모달 -->
-<!-- <div class="modal fade" id="invalidCheckOutModal" tabindex="-1" aria-labelledby="invalidCheckOutModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border border-secondary">
-      <div class="modal-header bg-light text-white">
-        <h5 class="modal-title" id="invalidCheckOutModalLabel">입력 오류</h5>
-        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        퇴근 시간은 출근 시간보다 늦어야 합니다.<br>
-        다시 선택해 주세요.
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary" data-bs-dismiss="modal">확인</button>
-      </div>
-    </div>
-  </div>
-</div> -->
 <div class="modal fade" id="invalidCheckOutModal" tabindex="-1" aria-labelledby="invalidCheckOutModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
@@ -409,22 +416,6 @@
   </div>
 </div>
 <!-- 알림 모달 (성공/실패 공통) -->
-<!-- <div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border border-secondary">
-      <div class="modal-header bg-light">
-        <h5 class="modal-title" id="alertMessageModalLabel">알림</h5>
-        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
-      </div>
-      <div class="modal-body" id="alertMessageContent">
-        서버 응답 메시지가 들어갈 자리
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
-      </div>
-    </div>
-  </div>
-</div> -->
 <div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
@@ -769,6 +760,14 @@ document.addEventListener('DOMContentLoaded', function() {
 				showAlertModal("정보 수정 중 오류가 발생했습니다.");
 			});
 		});
+	
+	// 연차 정보 수정
+	
+	
+	
+	
+	
+	
 });
 </script>                         
 
