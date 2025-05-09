@@ -49,8 +49,9 @@ public class ProjectMeetingMinute {
     @Column(name = "meeting_content_summary")
     private String meetingContentSummary;
     
-    public void updateTitleAndContent(String title, String content) {
+    public void update(String title, String content, String summary) {
         this.meetingTitle = title;
         this.meetingContent = content;
+        this.meetingContentSummary = summary;
     }
 }
