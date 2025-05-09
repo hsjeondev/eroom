@@ -50,7 +50,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         String senderNo = getQueryParam(session, "senderNo");
         if (senderNo != null) {
             userSessions.put(Long.parseLong(senderNo), session);
-            System.out.println("WebSocket 연결: senderNo=" + senderNo);
+//            System.out.println("WebSocket 연결: senderNo=" + senderNo);
         }
     }
 
@@ -178,7 +178,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         String senderNo = getQueryParam(session, "senderNo");
         if (senderNo != null) {
             userSessions.remove(Long.parseLong(senderNo));
-            System.out.println("❌ WebSocket 연결 종료: senderNo=" + senderNo);
+//            System.out.println("❌ WebSocket 연결 종료: senderNo=" + senderNo);
         }
     }
 
