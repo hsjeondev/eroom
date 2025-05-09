@@ -95,6 +95,10 @@ public interface MailReceiverRepository extends JpaRepository<MailReceiver, Long
 	@Modifying
 	@Query("UPDATE MailReceiver mr SET mr.mailReceiverReadYn = 'Y' WHERE mr.mail.mailNo = :mailNo AND mr.receiver.employeeNo = :employeeNo")
 	void updateReadYn(@Param("employeeNo") Long employeeNo,@Param("mailNo") Long mailNo);
+	
+	int countByReceiverEmployeeNoAndMailReceiverReadYn(Long receiverNo, String readYn);
+
+    int countByReceiverEmployeeNo(Long receiverNo);
 /*테이블 바뀐 뒤 주석 처리		
 	@Transactional
 	@Modifying

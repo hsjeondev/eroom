@@ -70,6 +70,15 @@ public class MailService {
 	    return plainText.length() > 30 ? plainText.substring(0, 30) + "..." : plainText;
 	}
 	
+	// 홈 화면 카드 읽지 않은 메일/ 받은 메일
+	public int countUnreadMails(Long employeeNo) {
+	    return mailReceiverRepository.countByReceiverEmployeeNoAndMailReceiverReadYn(employeeNo, "N");
+	}
+
+	public int countAllReceivedMails(Long employeeNo) {
+	    return mailReceiverRepository.countByReceiverEmployeeNo(employeeNo);
+	}
+	
 	// AlarmService 알람 테이블 메소드
 	public MailAlarm findAlarmOne(Long mailAlarmNo) {
 	    return mailAlarmRepository.findById(mailAlarmNo).orElse(null);
