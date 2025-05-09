@@ -12,7 +12,6 @@
 		<!-- 본문 -->
 		<div class="tab-content">
 			<div class="tab-pane active" role="tabpanel" aria-labelledby="create-minute" id="create-minute">
-				<p class="mb-4">(회의록 작성 안내사항 문구)</p>
 				<form id="createMinute" method="post" th:action="@{/project/minute/create}" novalidate>
 					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> <input type="hidden" name="projectNo" th:value="${projectNo}" />
 					<!-- 제목 -->
