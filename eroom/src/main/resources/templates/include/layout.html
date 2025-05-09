@@ -265,30 +265,20 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 </script>
 
 
-
-		
+	<input type="hidden" id="myEmployeeNo" th:value="${#authentication.principal.employee.employeeNo}" />
 	<!-- 종 메일 표시 -->	
 	<script>
-	
-	const mailSocket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/mail');
-
+	const employeeNo = document.getElementById("myEmployeeNo")?.value;
+	const mailSocket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/mail?senderNo=' + employeeNo);
+	console.log(employeeNo);
 	mailSocket.onopen = function() {
 		console.log('📬 메일 웹소켓 연결 성공!');
 	};
-	
-	/* mailSocket.onmessage = function(event) {
-		alert(event.data); // 새 메일 알림
-		const notificationDot = document.getElementById('notificationDot');
-		if (notificationDot) {
-			notificationDot.style.display = 'block'; // 빨간 점 표시
-		}
-	}; 
-	*/
 	mailSocket.onmessage = function(event) {
 	    const data = JSON.parse(event.data);
 	    console.log(data); // 받은 데이터 확인
 	    if (data.type === "mail") {
-	        console.log("새 메일 도착", data);
+	        notificationDot.style.display = 'block';
 	        // 새 메일 알림 처리
 	    }
 	};
@@ -300,7 +290,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	};
 	</script>
 	<!-- 채팅 메시지 등록시 header에 있는 종에 빨간점 표시 -->
-	<input type="hidden" id="myEmployeeNo" th:value="${#authentication.principal.employee.employeeNo}" />
+
 	<script>
 		const senderNo = document.getElementById("myEmployeeNo")?.value;
 		
@@ -452,6 +442,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	<script th:src="@{/assets/js/pages/kanban.js}"></script>
     <script th:src="@{/vendors/sortablejs/Sortable.min.js}"></script>
     <script th:src="@{/vendors/dropzone/dropzone-min.js}"></script>
+   
     
    	<!--  SignaturePad 라이브러리 -->
 	<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>

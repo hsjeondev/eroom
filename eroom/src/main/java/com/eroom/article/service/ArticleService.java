@@ -116,7 +116,8 @@ public class ArticleService {
 	 
 	 // 공지 디테일 
 	 public Article selectArticleNoticeOne(Long articleId) {
-	        return articleRepository.findByArticleNoAndVisibleYn(articleId, "Y")
+	        
+		 return articleRepository.findByArticleNoAndVisibleYn(articleId, "Y")
 	                .orElseThrow(() -> new EntityNotFoundException("존재하지 않거나 비공개된 공지사항입니다."));
 	    }
 	 
