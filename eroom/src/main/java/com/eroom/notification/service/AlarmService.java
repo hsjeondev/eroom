@@ -15,7 +15,9 @@ import com.eroom.approval.entity.ApprovalAlarm;
 import com.eroom.approval.service.ApprovalAlarmService;
 import com.eroom.calendar.entity.CalendarAlarm;
 import com.eroom.calendar.service.CalendarAlarmService;
+import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.chat.entity.ChatroomAttendee;
+import com.eroom.chat.service.ChatMessageService;
 import com.eroom.notification.dto.AlarmDto;
 import com.eroom.notification.entity.Alarm;
 import com.eroom.notification.repository.AlarmRepository;
@@ -31,6 +33,7 @@ public class AlarmService {
 	private final AlarmRepository alarmRepository;
 	private final ApprovalAlarmService approvalAlarmService;
 	private final CalendarAlarmService calendarAlarmService;
+	private final ChatMessageService chatMessageService;
 	
 	 //알림 페이지 목록 조회
 	 @Transactional
@@ -104,42 +107,42 @@ public class AlarmService {
 	        	 map.put("separator", calendarAlarm.getSeparator());
 	        	 map.put("separator_code", "R001");
 	        	 return map;
-	         } else if("R002".equals(target.getSeparatorCode())) {
-        	    System.out.println("chatAlarm: " + target.getChatAlarm());
-        	    System.out.println("chatMessage: " + (target.getChatAlarm() != null ? target.getChatAlarm().getChatMessage() : "null"));
-        	    System.out.println("chatroom: " + (
-        	        target.getChatAlarm() != null && target.getChatAlarm().getChatMessage() != null
-        	            ? target.getChatAlarm().getChatMessage().getChatroom()
-        	            : "null"
-        	    ));
+	         } else if ("R002".equals(target.getSeparatorCode())) {
+        	    ChatAlarm chatAlarm = chatMessageService.findOne(target.getParam1());
 
-        	    if (target.getChatAlarm() != null
-        	        && target.getChatAlarm().getChatMessage() != null
-        	        && target.getChatAlarm().getChatMessage().getChatroom() != null) {
-        	        
-        	    	var chatroom = target.getChatAlarm().getChatMessage().getChatroom();
+        	    if (chatAlarm != null &&
+        	        chatAlarm.getChatMessage() != null &&
+        	        chatAlarm.getChatMessage().getChatroom() != null) {
+
+        	        Long chatRoomNo = chatAlarm.getChatMessage().getChatroom().getChatroomNo();
+        	        System.out.println("chatAlarm: " + chatAlarm);
+        	        System.out.println("chatMessageNo: " + chatAlarm.getChatMessage().getChatMessageNo());
+        	        System.out.println("chatroomNo: " + chatRoomNo);
+
         	        map.put("pk", target.getParam1()); // chat_alarm_no
         	        map.put("separator_code", "R002");
-        	        map.put("roomNo",chatroom.getChatroomNo());
-        	        
-        	        Long senderNo = target.getChatAlarm().getChatMessage().getSenderMember().getEmployeeNo();
+        	        map.put("roomNo", chatRoomNo); // ✅ 올바르게 할당
+
+        	        Long senderNo = chatAlarm.getChatMessage().getSenderMember().getEmployeeNo();
         	        Long targetEmpNo = null;
-        	        
+
+        	        var chatroom = chatAlarm.getChatMessage().getChatroom();
         	        if (chatroom.getChatroomMapping() != null) {
         	            for (ChatroomAttendee attendee : chatroom.getChatroomMapping()) {
-        	                if (attendee.getAttendee() != null && !attendee.getAttendee().getEmployeeNo().equals(senderNo)) {
+        	                if (attendee.getAttendee() != null &&
+        	                    !attendee.getAttendee().getEmployeeNo().equals(senderNo)) {
         	                    targetEmpNo = attendee.getAttendee().getEmployeeNo();
-        	                    break; // 상대방 찾았으면 중단
+        	                    break;
         	                }
         	            }
         	        }
-
         	        if (targetEmpNo != null) {
         	            map.put("targetEmpNo", targetEmpNo);
         	        }
         	    }
         	    return map;
-	        	} else if("R003".equals(target.getSeparatorCode())) {
+	        	    
+        	 } else if("R003".equals(target.getSeparatorCode())) {
 	        	 return null;
 	        	 
 	         } else if("R004".equals(target.getSeparatorCode())) {
