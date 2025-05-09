@@ -163,21 +163,42 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             <div class="mt-3">
               <button type="button" class="btn btn-secondary" id="clearSignature">패드 초기화</button>
               <button type="button" class="btn btn-primary" id="saveSignature">저장</button>
-              <button th:if="${approvalSignature != null}" type="button" class="btn btn-danger" id="deleteSignature">저장된 서명 삭제</button>
+              <!-- <button th:if="${approvalSignature != null}" type="button" class="btn btn-danger" id="deleteSignature">저장된 서명 삭제</button> -->
             </div>
           </div>
         </div>
       </div>
     </div>
-		
-		
-		
-		
-		    <!-- 시그니처 모달 작동 스크립트 -->
-		    <!-- 시그니처 모달 작동 스크립트 -->
-    <script th:inline="javascript">
+	<!-- Thymeleaf에서 base64 데이터 바인딩 -->
+	<input type="hidden" id="signatureImage" th:value="${approvalSignature}" />
+
+
+
+	<!-- 시그니처 모달 작동 스크립트 -->
+	<script>
     window.addEventListener('load', function () {
+    	let initialCanvasData = null;
       let signaturePad;
+  		function lastSignature() {
+  		    fetch('/approval/signature')
+  	        .then(response => response.json())
+  	        .then(data => {
+  	            if (data != null && data.res_code == '200' && data.signatureDto != '') {
+  	                const canvas = document.getElementById('signatureCanvas');
+  	                const ctx = canvas.getContext('2d');
+  	                const image = new Image();
+  	                
+  	                image.onload = function() {
+  	                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+	  	                initialCanvasData = canvas.toDataURL();
+  	                };
+  	                image.src = data.signatureDto.signature_data_url;
+  	            }
+  	        })
+  	        .catch(error => {
+  	            console.error('이미지 로딩 실패:', error);
+  	        });
+    	};
       const canvas = document.getElementById('signatureCanvas');
       const clearBtn = document.getElementById('clearSignature');
       const saveBtn = document.getElementById('saveSignature');
@@ -199,6 +220,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
       const signatureModal = document.getElementById('signatureModal');
       signatureModal.addEventListener('shown.bs.modal', function () {
         initSignaturePad();
+        lastSignature();
       });
 
       document.addEventListener('click', function(e) {
@@ -216,7 +238,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		
       if(saveBtn){
 	      saveBtn.addEventListener('click', function () {
-	        if (signaturePad && !signaturePad.isEmpty()) {
+	    	  const currentCanvasData = canvas.toDataURL();
+	    	  if (initialCanvasData === currentCanvasData) {
+	              // console.log("변경된 내용이 없습니다.");
+	              const modalInstance = bootstrap.Modal.getInstance(signatureModal);
+	              modalInstance.hide();
+	              return;
+	          }
+	        if (!signaturePad.isEmpty()) {
 	          const saveDataURL = signaturePad.toDataURL();
 	          console.log('서명 데이터 URL:', saveDataURL);
 	          
@@ -240,12 +269,31 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	          modalInstance.hide();
 	        } else {
 	       		// 서명 미입력시.
-	          alert('서명이 없습니다!');
+	          //alert('서명이 없습니다!');
+	       		// 서명이 없는 경우 지워버리기
+	    	  fetch('/approval/signature/delete', {
+	    		  method : 'PUT',
+	        	  headers : {
+	      	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+	      	        'header': document.querySelector('meta[name="_csrf_header"]').content
+	          	  }
+	    	  })
+	    	  .then(response => response.json())
+	    	  .then(data => {
+	    		  console.log(data.res_msg);
+	    	      location.reload();
+	    	  })
+	    	  .catch(error => {
+	    	        console.error('삭제 중 오류 발생:', error);
+	    	        alert('삭제 실패');
+	    	  });
+	       		
 	        }
 	      });
       }
       
-      if(deleteBtn){
+      // 사용자 편의성을 위해 지우기는 수정에 합치자
+      /* if(deleteBtn){
 	      deleteBtn.addEventListener('click', function(){
 	    	  fetch('/approval/signature/delete', {
 	    		  method : 'PUT',
@@ -264,7 +312,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	    	        alert('삭제 실패');
 	    	  });
 	      });
-      }
+      } */
       
       
       

@@ -16,9 +16,9 @@ public class FacilityService {
 	private final FacilityRepository repository;
 	
 	//차량 목록 조회
-	public List<Facility>selectVehicleAll(){
-		return repository.findBySeparatorCode("F002");
-	}
+//	public List<Facility>selectVehicleAll(){
+//		return repository.findBySeparatorCode("F002");
+//	}
 	
 	// 차량 목록(visible_yn = 'Y') 조회
 	public List<Facility> selectVisibleVehicles(){
@@ -26,9 +26,9 @@ public class FacilityService {
 	}
 	
 	//회의실 목록 조회
-	public List<Facility>selectMeetingRoomAll(){
-		return repository.findBySeparatorCode("F001");
-	}
+//	public List<Facility>selectMeetingRoomAll(){
+//		return repository.findBySeparatorCode("F001");
+//	}
 	
 	// 회의실 목록(visible_yn = 'Y') 조회
 	public List<Facility> selectVisibleMeetingRooms() {
