@@ -111,47 +111,6 @@
 	  text-align: left;
 	  padding-left: 6px;
 	}
-	
-	/* 뉴스 카드 스타일 */
-.news-card {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 380px; /* 기존 카드 사이즈와 맞추기 */
-  margin: 0 auto;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.news-card img {
-  width: 120px;  /* 이미지 너비 */
-  height: 100px;  /* 이미지 높이 */
-  object-fit: cover;  /* 이미지 비율을 맞추고 자르기 */
-  margin-right: 15px;  /* 이미지와 텍스트 간 간격 */
-  border-radius: 8px;
-}
-
-.news-card .card-body {
-  display: flex;
-  align-items: center;
-}
-
-.news-card .card-title {
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
-.news-card .card-text {
-  font-size: 0.9rem;
-  color: #666;
-  height: 60px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-
-	
   </style>
 </head>
 <body>
@@ -396,32 +355,17 @@
 		</div>
 
 
-        <!-- 3행·3열 뉴스 카드 -->
-		<div class="text-white p-1">
-		  <div class="attendance-card mx-auto">
-		    <div class="card shadow-sm border-0">
-		      <!-- 오늘의 IT 뉴스 제목 -->
-		      <div class="card-header" style="text-align: center; font-size: 1.5rem; font-weight: bold; padding: 15px;">
-		        오늘의 IT 뉴스
-		      </div>
-		      
-		      <div class="card-body p-4" style="display: flex; align-items: center; height: 207.81px;">
-		        <!-- 왼쪽: 이미지 -->
-		        <img id="newsImage" class="card-img-left" alt="News Image" style="width: 120px; height: 100px; object-fit: cover; margin-right: 15px; border-radius: 8px;">
-		        
-		        <!-- 오른쪽: 내용 -->
-		        <div>
-		          <h5 class="card-title" id="newsTitle">오늘의 IT 뉴스</h5>
-		          <p class="card-text" id="newsDescription" style="font-size: 0.9rem; color: #666; height: 60px; overflow: hidden; text-overflow: ellipsis;">뉴스 내용이 여기에 표시됩니다.</p>
-		        </div>
-		      </div>
-		    </div>
-		  </div>
-		</div>
+        <!-- 3행·3열 -->
+        <div class="text-white p-1">
+			<div class="attendance-card mx-auto">
+				<div class="card shadow-sm border-0">
+					<div class="card-body text-center p-4" style="height: 207.81px;">
+						뉴스<br>(오늘자 IT)
+					</div>
+				</div>
+			</div>
+        </div>
 
-
-
-        
       </div>
     </div>
     <script>
@@ -775,46 +719,6 @@
                 });
         }
     </script>
-   <script>
-   let currentPage = 1;  // 현재 페이지를 추적
-   const totalNews = 10; // 전체 뉴스 개수 (예시로 10개 뉴스 항목 사용)
-
-   // 뉴스 데이터를 가져오는 함수
-   function loadNews() {
-       fetch(`/api/news?query=IT&language=ko&page=${currentPage}&size=1`)  // IT 뉴스 1개만 가져오기
-           .then(response => response.json())
-           .then(data => {
-               const article = data.articles[0];  // 첫 번째 기사만 가져옴
-
-               // 뉴스 카드에 내용 채우기
-               const newsTitle = document.getElementById('newsTitle');
-               const newsDescription = document.getElementById('newsDescription');
-               const newsImage = document.getElementById('newsImage');
-               
-               newsTitle.innerHTML = article.title || '뉴스 제목';
-               newsDescription.innerHTML = article.description || '뉴스의 간략한 설명을 여기에 작성합니다.';
-               
-               // 이미지 URL이 있으면 사용하고, 없으면 기본 이미지 사용
-               newsImage.src = article.urlToImage || 'https://via.placeholder.com/150';
-           })
-           .catch(error => {
-               console.error('뉴스를 불러오는 중에 오류 발생:', error);
-           });
-
-       // 페이지 증가
-       currentPage++;
-       if (currentPage > totalNews) {
-           currentPage = 1;  // 페이지가 totalNews를 초과하면 첫 번째 페이지로 돌아가기
-       }
-   }
-
-   // 페이지 로드 시 첫 번째 뉴스 로드
-   window.onload = loadNews;
-
-   // 5초마다 뉴스가 넘어가도록 설정
-   setInterval(loadNews, 3000);  // 5초마다 loadNews 실행
-</script>
-
     
 
   </div>
