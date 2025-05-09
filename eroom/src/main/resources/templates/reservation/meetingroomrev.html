@@ -281,8 +281,57 @@
 							</div>
 						</div>
 						
-						
-						<script>
+							<!-- 커스텀 메시지 모달 -->
+							<div class="modal fade" id="messageModal" tabindex="-1"
+								aria-hidden="true">
+								<div class="modal-dialog modal-dialog-centered modal-sm">
+									<div
+										class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+										<div class="modal-header border-0">
+											<h5 class="modal-title text-dark" id="messageModalTitle">알림</h5>
+										</div>
+										<div class="modal-body text-center">
+											<p class="mb-0 text-body" id="messageModalBody">메시지 내용이
+												들어갑니다.</p>
+										</div>
+										<div class="modal-footer justify-content-center border-0">
+											<button type="button" class="btn btn-primary"
+												data-bs-dismiss="modal">확인</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							
+					
+							<script>
+							function showMessageModal(message, title = "알림", reloadOnClose = false) {
+								  const modalEl = document.getElementById("messageModal");
+								  const modal = new bootstrap.Modal(modalEl);
+
+								  document.getElementById("messageModalTitle").textContent = title;
+								  document.getElementById("messageModalBody").textContent = message;
+
+								  // 기존 확인 버튼 제거 후 다시 바인딩
+								  const oldBtn = modalEl.querySelector('button[data-bs-dismiss="modal"]');
+								  const newBtn = oldBtn.cloneNode(true);
+								  oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+
+								  if (reloadOnClose) {
+								    modalEl.addEventListener("hidden.bs.modal", function handler() {
+								      modalEl.removeEventListener("hidden.bs.modal", handler);
+								      location.reload();
+								    });
+								  }
+
+								  modal.show();
+								}
+								</script>
+					
+					
+					
+							<script>
+							
 							document.addEventListener("DOMContentLoaded", function () {
 							  const modal = document.getElementById("addEventModal");
 							  const form = document.forms["addEventForm"];
@@ -307,12 +356,12 @@
 							    const today = new Date().toISOString().split("T")[0]; // ✨ 오늘 날짜 구하기
 							
 							    if (startDate) {
-							      startDate.value = today;    // ✨ 시작날짜 기본값 세팅
-							      startDate.min = today;      // ✨ 과거 선택 금지
+							      startDate.value = today;    //  시작날짜 기본값 세팅
+							      startDate.min = today;      //  과거 선택 금지
 							    }
 							    if (endDate) {
-							      endDate.value = today;      // ✨ 종료날짜 기본값 세팅
-							      endDate.min = today;        // ✨ 과거 선택 금지
+							      endDate.value = today;      // 종료날짜 기본값 세팅
+							      endDate.min = today;        // 과거 선택 금지
 							    }
 							    if (startTime) startTime.selectedIndex = 0;
 							    if (endTime) endTime.selectedIndex = 0;
@@ -328,88 +377,88 @@
 							  });
 							
 							  // submit 처리
-							  form.addEventListener("submit", function (e) {
-							    e.preventDefault();
-							    submitBtn.disabled = true;
+							 form.addEventListener("submit", function (e) {
+							  e.preventDefault();
+							  submitBtn.disabled = true;
 							
-							    const today = new Date().toISOString().split("T")[0];
-							    form.reservation_start_date.min = today;
-							    form.reservation_end_date.min = today;
+							  const today = new Date().toISOString().split("T")[0];
+							  form.reservation_start_date.min = today;
+							  form.reservation_end_date.min = today;
 							
-							    const participantBadges = document.querySelectorAll('#selectedParticipants .badge');
-							    const participantIds = Array.from(participantBadges).map(badge => badge.dataset.id);
+							  const participantBadges = document.querySelectorAll('#selectedParticipants .badge');
+							  const participantIds = Array.from(participantBadges).map(badge => badge.dataset.id);
 							
-							    if (participantIds.length === 0) {
-							      alert("참여자를 1명 이상 선택해주세요!");
+							  if (participantIds.length === 0) {
+							    showMessageModal("참여자를 1명 이상 선택해주세요!");
+							    submitBtn.disabled = false;
+							    return;
+							  }
+							
+							  const startDate = form.reservation_start_date.value;
+							  const endDate = form.reservation_end_date.value;
+							  const startTime = form.startTime.value;
+							  const endTime = form.endTime.value;
+							
+							  if (!startDate || !endDate || !startTime || !endTime) {
+							    showMessageModal("날짜와 시간을 모두 선택해주세요!");
+							    submitBtn.disabled = false;
+							    return;
+							  }
+							
+							  const fullStart = `${startDate}T${startTime}`;
+							  const fullEnd = `${endDate}T${endTime}`;
+							
+							  if (fullStart >= fullEnd) {
+							    showMessageModal("종료일시는 시작일시보다 늦어야 합니다!");
+							    submitBtn.disabled = false;
+							    return;
+							  }
+							
+							  // 중복 시간 검사
+							  const startHour = parseInt(startTime.split(":")[0]);
+							  const endHour = parseInt(endTime.split(":")[0]);
+							  const bookedHours = [...form.startTime.options]
+							    .filter(opt => opt.disabled)
+							    .map(opt => parseInt(opt.value.split(":")[0]));
+							
+							  for (let hour = startHour; hour < endHour; hour++) {
+							    if (bookedHours.includes(hour)) {
+							      showMessageModal("선택한 시간 범위에 이미 예약된 시간이 포함되어 있습니다!");
 							      submitBtn.disabled = false;
 							      return;
 							    }
+							  }
 							
-							    const startDate = form.reservation_start_date.value;
-							    const endDate = form.reservation_end_date.value;
-							    const startTime = form.startTime.value;
-							    const endTime = form.endTime.value;
+							  form.calendarStartTime.value = fullStart;
+							  form.calendarEndTime.value = fullEnd;
 							
-							    if (!startDate || !endDate || !startTime || !endTime) {
-							      alert("날짜와 시간을 모두 선택해주세요!");
-							      submitBtn.disabled = false;
-							      return;
-							    }
+							  const payload = new FormData(form);
+							  participantIds.forEach(id => payload.append("participants", id));
 							
-							    const fullStart = `${startDate}T${startTime}`;
-							    const fullEnd = `${endDate}T${endTime}`;
-							
-							    if (fullStart >= fullEnd) {
-							      alert("종료일시는 시작일시보다 늦어야 합니다!");
-							      submitBtn.disabled = false;
-							      return;
-							    }
-							
-							    // 중복 시간 검사
-							    const startHour = parseInt(startTime.split(":")[0]);
-							    const endHour = parseInt(endTime.split(":")[0]);
-							    const bookedHours = [...form.startTime.options]
-							      .filter(opt => opt.disabled)
-							      .map(opt => parseInt(opt.value.split(":")[0]));
-							
-							    for (let hour = startHour; hour < endHour; hour++) {
-							      if (bookedHours.includes(hour)) {
-							        alert("선택한 시간 범위에 이미 예약된 시간이 포함되어 있습니다!");
-							        submitBtn.disabled = false;
-							        return;
-							      }
-							    }
-							
-							    form.calendarStartTime.value = fullStart;
-							    form.calendarEndTime.value = fullEnd;
-							
-							    const payload = new FormData(form);
-							    participantIds.forEach(id => payload.append("participants", id));
-							
-							    fetch('/reservation/meetingroom/reserve', {
-							      method: 'POST',
-							      headers: {
-							        'header': document.querySelector('meta[name="_csrf_header"]').content,
-							        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-							      },
-							      body: payload
-							    })
+							  fetch('/reservation/meetingroom/reserve', {
+							    method: 'POST',
+							    headers: {
+							      'header': document.querySelector('meta[name="_csrf_header"]').content,
+							      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+							    },
+							    body: payload
+							  })
 							    .then(response => response.json())
 							    .then(data => {
-							      alert(data.res_msg);
 							      if (data.res_code == "200") {
-							        location.reload();
+							        showMessageModal(data.res_msg || "회의실 예약이 완료되었습니다.", "알림", true); // ✅ 확인 후 새로고침
 							      } else {
+							        showMessageModal(data.res_msg || "회의실 예약에 실패했습니다.");
 							        submitBtn.disabled = false;
 							      }
 							    })
 							    .catch(error => {
 							      console.error(error);
-							      alert("요청 처리 중 오류 발생 😭");
+							      showMessageModal("요청 처리 중 오류가 발생했습니다. 다시 시도해주세요 😭");
 							      submitBtn.disabled = false;
-							    });
-							  });
-							});
+							    	});
+								});
+							}); 
 							</script>
 
 
@@ -569,7 +618,28 @@
 				</div>
 			</div>
  -->
-		
+				<!-- 삭제 모달 -->
+							<div class="modal fade" id="confirmDeleteModal" tabindex="-1"
+								aria-hidden="true">
+								<div class="modal-dialog modal-dialog-centered modal-sm">
+									<div
+										class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+										<div class="modal-header border-0">
+											<h5 class="modal-title text-dark">예약을 정말 취소하시겠습니까?</h5>
+										</div>
+										<div class="modal-body text-center">
+											<p class="mb-0 text-body">
+												예약을 취소하시겠습니까?<br>취소 후 자동으로 새로고침됩니다.
+											</p>
+										</div>
+										<div class="modal-footer justify-content-center border-0">
+											<button type="button" class="btn btn-phoenix-secondary"
+												data-bs-dismiss="modal">취소</button>
+											<button type="button" class="btn btn-danger" id="confirmDeleteBtn">삭제</button>
+										</div>
+									</div>
+								</div>
+							</div>
 
 
 		
@@ -674,11 +744,19 @@
 			    	}
 			  });
 			
+			// 삭제 버튼 누르면 모달 띄우기
 			  document.getElementById("deleteVehicleBtn").addEventListener("click", function () {
+			    const confirmModalEl = document.getElementById("confirmDeleteModal");
+			    const confirmModal = new bootstrap.Modal(confirmModalEl);
+			    confirmModal.show();
+			  });
+
+			  // 삭제 확인 버튼 누르면 처리
+			  document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
 			    const reservationNo = document.getElementById("detailReservationNo").value;
-			    const confirmDelete = confirm("회의실 예약을 취소하시겠습니까?");
-			    if (!confirmDelete) return;
-			
+			    const confirmModalEl = document.getElementById("confirmDeleteModal");
+			    const confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
+
 			    fetch('/meetingroom/delete/' + reservationNo, {
 			      method: "post",
 			      headers: {
@@ -686,17 +764,27 @@
 			        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
 			      }
 			    })
-			    .then(response => response.json())
-			    .then(data => {
-			      alert(data.res_msg);
-			      if (data.res_code == 200) {
-			        location.reload();
-			      }
-			    })
-			    .catch(error => {
-			      console.error("삭제 중 오류:", error);
-			      alert("삭제에 실패했습니다.");
-			    });
+			      .then(response => response.json())
+			      .then(data => {
+			        if (confirmModal) {
+			          // 모달 닫힌 후 showMessageModal 호출
+			          confirmModalEl.addEventListener("hidden.bs.modal", function handler() {
+			            confirmModalEl.removeEventListener("hidden.bs.modal", handler);
+			            showMessageModal(
+			              data.res_code === 200 ? "예약이 취소되었습니다." : (data.res_msg || "예약 취소에 실패했습니다."),
+			              "알림",
+			              data.res_code === 200 // 새로고침 여부
+			            );
+			          });
+
+			          confirmModal.hide();
+			        }
+			      })
+			      .catch(error => {
+			        console.error("삭제 중 오류:", error);
+			        if (confirmModal) confirmModal.hide();
+			        showMessageModal("삭제 중 오류가 발생했습니다. 다시 시도해주세요 😥");
+			      });
 			  });
 			
 			  setTimeout(() => {
