@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <title>회사 주소록</title>
 <style>
-.avatar img {
+/* .avatar img {
 	max-width: 32px;
 	height: auto;
-}
+} */
 
 td.name p {
 	max-width: 150px;
@@ -395,7 +395,7 @@ td.name p {
 				</div>
 
 				<!-- (이름 클릭시)회원 정보 모달 -->
-				<!-- 프로필 상세 모달 -->
+				<!-- 프로필 카드/상세 모달 -->
 				<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-dialog-centered">
 						<div class="modal-content p-4 position-relative">
@@ -411,7 +411,7 @@ td.name p {
 
 							<!-- 프로필 정보 -->
 							<div class="text-center mb-4">
-								<img src="/assets/img/team/23.webp" alt="프로필" class="rounded-circle mb-2" style="width: 100px; height: 100px;">
+								<img id="profileCardProfileImage" src="/assets/img/team/23.webp" alt="프로필" class="rounded-circle mb-2" style="width: 100px; height: 100px;">
 								<h5 id="modalName" class="fw-bold mb-0 profile-name">강성관</h5>
 								<p class="text-muted small mb-0 profile-dept-team">운영부 (경영지원팀)</p>
 								<input id="modalDept" type="hidden" class="profile-dept">
@@ -451,7 +451,7 @@ td.name p {
 								<a href="#" id="startChatBtn" class="btn btn-outline-primary flex-fill me-2">
 								  <i class="fas fa-paper-plane me-1"></i> 1:1 채팅하기
 								</a>
-								</a> <a href="#" class="btn btn-outline-secondary flex-fill"> <i class="fas fa-envelope me-1"></i> 이메일 보내기
+								<a href="#" id="startEmailBtn" class="btn btn-outline-secondary flex-fill"> <i class="fas fa-envelope me-1"></i> 이메일 보내기
 								</a>
 							</div>
 
@@ -599,11 +599,19 @@ td.name p {
 					    const email = trigger.getAttribute('data-email') || '-';
 					    const position = trigger.getAttribute('data-position') || '-';
 					    const memberDirectoryNo = trigger.getAttribute('data-memberDirectoryNo') || '-';
+					    const profileImageUrl = trigger.getAttribute('data-profileImageUrl') || '-';
 					    
+					    // 프로필카드에서
 					    // 1대1 채팅하기
 					    const chatBtn = modal.querySelector('#startChatBtn');
 					    if (chatBtn && targetEmpNo) {
 					      chatBtn.setAttribute('href', `/chat/room/${targetEmpNo}`);
+					    }
+					    // 프로필카드에서
+					    // 메일 보내기
+					    const emailBtn = modal.querySelector('#startEmailBtn');
+					    if (emailBtn && targetEmpNo) {
+					      chatBtn.setAttribute('href', `/mail/write/${targetEmpNo}`);
 					    }
 					    
 						
@@ -632,6 +640,7 @@ td.name p {
 					    modal.querySelector('.profile-phone').textContent = phone;
 					    modal.querySelector('.profile-email').textContent = email;
 					    modal.querySelector('.profile-position').textContent = position;
+					    modal.querySelector('#profileCardProfileImage').src = profileImageUrl;
 					    
 					    
 					  });
