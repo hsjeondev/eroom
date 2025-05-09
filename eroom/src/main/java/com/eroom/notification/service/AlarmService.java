@@ -18,6 +18,8 @@ import com.eroom.calendar.service.CalendarAlarmService;
 import com.eroom.chat.entity.ChatAlarm;
 import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.chat.service.ChatMessageService;
+import com.eroom.mail.entity.MailAlarm;
+import com.eroom.mail.service.MailService;
 import com.eroom.notification.dto.AlarmDto;
 import com.eroom.notification.entity.Alarm;
 import com.eroom.notification.repository.AlarmRepository;
@@ -34,6 +36,7 @@ public class AlarmService {
 	private final ApprovalAlarmService approvalAlarmService;
 	private final CalendarAlarmService calendarAlarmService;
 	private final ChatMessageService chatMessageService;
+	private final MailService mailService;
 	
 	 //알림 페이지 목록 조회
 	 @Transactional
@@ -143,7 +146,13 @@ public class AlarmService {
         	    return map;
 	        	    
         	 } else if("R003".equals(target.getSeparatorCode())) {
-	        	 return null;
+        		 MailAlarm mailAlarm= mailService.findAlarmOne(target.getParam1());
+        		 if (mailAlarm != null && mailAlarm.getMailAlarmNo() != null) {
+        		        map.put("pk", mailAlarm.getMailReceiver().getMail().getMailNo()); // 실제 메일 번호
+        		        map.put("separator_code", "R003");
+        		        System.out.println(map);
+        		        return map;
+        		    }
 	        	 
 	         } else if("R004".equals(target.getSeparatorCode())) {
 	        	 ApprovalAlarm approvalAlarm = approvalAlarmService.findAlarmOne(target.getParam1());
