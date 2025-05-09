@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,9 +25,12 @@ import com.eroom.employee.entity.Separator;
 import com.eroom.employee.repository.SeparatorRepository;
 import com.eroom.project.dto.GithubPullRequestDto;
 import com.eroom.project.dto.ProjectDto;
+import com.eroom.project.dto.ProjectMeetingMinuteDto;
 import com.eroom.project.dto.ProjectMemberDto;
 import com.eroom.project.entity.Project;
+import com.eroom.project.entity.ProjectMeetingMinute;
 import com.eroom.project.entity.ProjectMember;
+import com.eroom.project.repository.ProjectMeetingMinuteRepository;
 import com.eroom.project.repository.ProjectMemberRepository;
 import com.eroom.project.repository.ProjectRepository;
 import com.eroom.rsacryption.RSACryptor;
@@ -46,6 +48,7 @@ public class ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     private final DriveRepository driveRepository;
     private final SeparatorRepository separatorRepository;
+    private final ProjectMeetingMinuteRepository projectMeetingMinuteRepository;
     
     // 파일 저장 경로 
  	@Value("${ffupload.location}")
@@ -487,4 +490,28 @@ public class ProjectService {
 	    return false;
 	}
 	
+	// 프로젝트 메인 최근 파일 5개 조회
+	public List<DriveDto> findRecentFilesByProject(Long projectNo) {
+	    List<Drive> drives = driveRepository.findTop5RecentFilesByProject(projectNo);
+
+	    List<DriveDto> result = new ArrayList<>();
+	    for (Drive drive : drives) {
+	        result.add(DriveDto.toDto(drive));
+	    }
+
+	    return result;
+	}
+	
+	// 프로젝트 메인 최근 회의록 5개 조회
+	public List<ProjectMeetingMinuteDto> findRecentMinutesByProject(Long projectNo) {
+	    List<ProjectMeetingMinute> minutes = projectMeetingMinuteRepository.findTop5RecentMinuteByProject(projectNo);
+	    List<ProjectMeetingMinuteDto> result = new ArrayList<>();
+
+	    for (ProjectMeetingMinute minute : minutes) {
+	        result.add(ProjectMeetingMinuteDto.toDto(minute));
+	    }
+
+	    return result;
+	}
+
 }
