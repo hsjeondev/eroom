@@ -19,9 +19,28 @@ public interface ArticleRepository extends JpaRepository<Article, Long>{
 
 	
 	// 공지 게시판 조회
-	 List<Article> findBySeparatorCodeAndVisibleYnOrderByArticleRegDateDesc(String separatorCode, String visibleYn);
+	 // List<Article> findBySeparatorCodeAndVisibleYnOrderByArticleRegDateDesc(String separatorCode, String visibleYn);
 	//List<Article> findBySeparatorCodeAndVisibleYnOrderByArticleEmergencyYnDescArticleRegDateDesc(String separatorCode, String visibleYn);
-
+//	 @Query("SELECT a FROM Article a " +
+//		       "WHERE a.separatorCode = :separatorCode AND a.visibleYn = :visibleYn " +
+//		       "ORDER BY " +
+//		       "CASE WHEN a.articleEmergencyYn = 'Y' THEN 0 ELSE 1 END, " + // 긴급이면 0 → 먼저 정렬
+//		       "a.articleEmergencyYn DESC, " +                              // (안전장치)
+//		       "CASE WHEN a.articleEmergencyYn = 'Y' THEN a.articleModDate ELSE a.articleRegDate END DESC")
+//		List<Article> findOrderedArticles(@Param("separatorCode") String separatorCode, @Param("visibleYn") String visibleYn);
+//	@Query("SELECT a FROM Article a " +
+//		       "WHERE a.separatorCode = :separatorCode AND a.visibleYn = :visibleYn " +
+//		       "ORDER BY " +
+//		       "a.articleEmergencyYn DESC, " +                 // 긴급 여부 먼저 (Y > N)
+//		       "a.articleModDate DESC, " +                     // 이후 수정일 기준 정렬
+//		       "a.articleRegDate DESC")                        // 수정일이 같으면 등록일 기준
+//		List<Article> findOrderedArticles(@Param("separatorCode") String separatorCode, @Param("visibleYn") String visibleYn);
+	@Query("SELECT a FROM Article a " +
+		       "WHERE a.separatorCode = :separatorCode AND a.visibleYn = :visibleYn " +
+		       "ORDER BY " +
+		       "CASE WHEN a.articleEmergencyYn = 'Y' THEN 0 ELSE 1 END, " +
+		       "a.articleRegDate DESC")
+		List<Article> findNoticeBoard(@Param("separatorCode") String separatorCode, @Param("visibleYn") String visibleYn);
 	// 삭제 쿼리
     @Modifying
     @Transactional  // 트랜잭션 관리 추가

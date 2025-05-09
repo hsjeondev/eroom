@@ -442,6 +442,17 @@ public class MailController {
 		return "mail/mailCreateReply";
 	}
 	
+	// 주소록에서 메일쓰기
+	@GetMapping("/mail/write/{employeeNo}")
+	public String test(Model model,
+										@PathVariable("employeeNo") Long employeeNo) {
+		Employee sender = mailService.getEmployeeByNo(employeeNo);
+		model.addAttribute("sender", sender);
+		return "mail/mailCreateReply";
+	}
+	
+	
+	
 	// 메일 작성 페이지
 	@GetMapping("/mail/mailCreate")
 	public String createMailView(Model model

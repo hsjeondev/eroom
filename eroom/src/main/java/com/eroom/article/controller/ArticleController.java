@@ -44,7 +44,7 @@ public class ArticleController {
 	// 익명 게시판
 	@GetMapping("/article/anonymous")
 	public String selectBoardAnonymousAll() {
-		return "/article/articleAnonymous";
+		return "article/articleAnonymous";
 	}
 	
 	// 공지 게시판 삭제 버튼 클릭시
@@ -102,7 +102,7 @@ public class ArticleController {
 	    List<Drive> attachList = articleService.findArticleAttaNoticechments(id);
 	    model.addAttribute("article", article);
 	    model.addAttribute("attachList", attachList);
-	    return "/article/articleEdit"; // Thymeleaf 템플릿 경로
+	    return "article/articleEdit"; // Thymeleaf 템플릿 경로
 	}
 	
 	// 게시판 디테일 파일 다운로드
@@ -154,13 +154,13 @@ public class ArticleController {
 	    model.addAttribute("articleNotice", articleNotice);
 	    List<Drive> attachArticleNoticeList = articleService.findArticleAttaNoticechments(id);
 	    model.addAttribute("attachArticleNoticeList", attachArticleNoticeList);
-	    return "/article/articleDetail"; // Thymeleaf 템플릿 경로
+	    return "article/articleDetail"; // Thymeleaf 템플릿 경로
 	}
 	
 	
 	@GetMapping("/article/articleDetail")
 	public String test() {
-		return"/article/articleDetail";
+		return"article/articleDetail";
 	}
 	
 	// 공지 게시판 
@@ -168,14 +168,14 @@ public class ArticleController {
 	public String selectBoardNotice(Model model) {
 		List<Article> noticeList = articleService.getNoticeArticles();
         model.addAttribute("noticeList", noticeList);
-		return "/article/articleNotice";
+		return "article/articleNotice";
 	}
 	
 	// 게시판 작성 페이지
 	@GetMapping("/article/articleCreate")
 	public String articleCreateView() {
 		
-		return "/article/articleCreate";
+		return "article/articleCreate";
 	}
 	
 	// 작성 로직
