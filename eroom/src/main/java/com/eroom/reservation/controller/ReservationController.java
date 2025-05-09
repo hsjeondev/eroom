@@ -42,6 +42,8 @@ public class ReservationController {
 	private String tmapKey;
 
 	// ========================화면 전환 =============================
+	
+
 	@GetMapping("/reservation/sleep")
 	public String sleepReservationView() {
 		return "reservation/sleeprev";
@@ -50,7 +52,7 @@ public class ReservationController {
 	// facility 에서 F002 차량만 목록조회
 	@GetMapping("/reservation/vehicle")
 	public String vehicleReservationView(Model model) {
-		List<Facility> result = facilityService.selectVehicleAll();
+		List<Facility> result = facilityService.selectVisibleVehicles();
 		// 목록이 정상적으로 출력
 		// System.out.println(result);
 		model.addAttribute("list", result);		
@@ -60,10 +62,12 @@ public class ReservationController {
 		model.addAttribute("tmapKey", tmapKey);		
 		return "reservation/vehiclerev";
 	}
+	
+
 
 	@GetMapping("/reservation/meetingroom")
 	public String meetingroomReservationView(@RequestParam(name = "department" ,required = false) String department, Model model) {
-		List<Facility>result = facilityService.selectMeetingRoomAll();
+		List<Facility>result = facilityService.selectVisibleMeetingRooms();
 		List<MeetingRoomDto>todayReservations = meetingRoomService.getTodayReservations();
 	    model.addAttribute("structureList", employeeService.findDistinctStructureNames());
 		model.addAttribute("list",result);

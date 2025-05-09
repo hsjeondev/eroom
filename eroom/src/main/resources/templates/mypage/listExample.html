@@ -667,51 +667,111 @@ async function renderCharts() {
 }
 renderCharts();
 
-	/* 기본프로필 변경 */
-	function setDefaultProfile() {
-	  const profileImage = document.getElementById('profileImage');
-	  profileImage.src = '/assets/img/team/avatar.webp'; // 부트스트랩 기본 프로필 이미지
-	  const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
-	  modal.hide();
-	}
-	/* 프로필 사진 업로드 */
-	function previewProfileImage(event) {
-		const file = event.target.files[0];
-		if (file) {
-		  const profileImage = document.getElementById('profileImage');
-		  profileImage.src = URL.createObjectURL(file);
-		  const modal = bootstrap.Modal.getInstance(document.getElementById('profileUploadModal'));
-		  modal.hide();
-		}
-	}
-	// 모달 열릴 때 input에 기존 정보 세팅
-	  const editInfoModal = document.getElementById('editInfoModal');
-	  editInfoModal.addEventListener('show.bs.modal', function () {
-	    const email = document.getElementById('emailValue').textContent.trim();
-	    const phone = document.getElementById('phoneValue').textContent.trim();
-	    const address = document.getElementById('addressValue').textContent.trim();
-	
-	    document.getElementById('emailInput').value = email;
-	    document.getElementById('phoneInput').value = phone;
-	    document.getElementById('addressInput').value = address;
-	  });
-	
-	  // 저장 버튼 클릭 시 값 반영
-	  function saveInfo() {
-	    const email = document.getElementById('emailInput').value;
-	    const phone = document.getElementById('phoneInput').value;
-	    const address = document.getElementById('addressInput').value;
-	
-	    // 카드 안 텍스트 갱신
-	    document.getElementById('emailValue').textContent = email;
-	    document.getElementById('emailValue').href = "mailto:" + email;
-	    document.getElementById('phoneValue').textContent = phone;
-	    document.getElementById('addressValue').textContent = address;
-	
-	    // 모달 닫기
-	    const modal = bootstrap.Modal.getInstance(editInfoModal);
-	    modal.hide();
-	  }	
+const activeContainer = document.querySelector('#projectActiveCarousel .carousel-inner');
+const doneContainer = document.querySelector('#projectDoneCarousel .carousel-inner');
+const activeIndicators = document.querySelector('#projectActiveCarousel .carousel-indicators');
+const doneIndicators = document.querySelector('#projectDoneCarousel .carousel-indicators');
+
+const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}.${month}.${day}`;
+}
+
+fetch('/project/projectMypage', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    [csrfHeader]: csrfToken
+  }
+})
+.then(res => res.json())
+.then(data => {
+  const { activeProjects = [], doneProjects = [] } = data;
+
+  const renderCarousel = (list, container, indicators, carouselId, bgClass, isDone) => {
+  	  container.innerHTML = '';
+  	  indicators.innerHTML = '';
+
+  	  if (!list || list.length === 0) {
+  	    container.innerHTML = `
+  	      <div class="carousel-item active">
+  	        <div class="border rounded p-4 bg-light text-center">
+  	          <p class="mb-0 text-muted">프로젝트가 없습니다.</p>
+  	        </div>
+  	      </div>
+  	    `;
+  	    indicators.innerHTML = `
+  	      <button type="button" data-bs-target="#${carouselId}" data-bs-slide-to="0"
+  	        class="active" aria-current="true" aria-label="슬라이드 1"></button>
+  	    `;
+  	    return;
+  	  }
+
+  	  list.forEach((project, index) => {
+  	    const date = isDone ? formatDate(project.project_end) : formatDate(project.project_start);
+  	    const dateLabel = isDone ? '종료일' : '시작일';
+
+  	    const item = document.createElement('div');
+  	    item.className = `carousel-item ${index === 0 ? 'active' : ''}`;
+  	    item.innerHTML = `
+  	    	  <a href="/project/detail/${project.project_no}/main" class="text-decoration-none text-dark">
+  	    	    <div class="border rounded p-3 ${bgClass}">
+  	    	      <h5 class="mb-1 fw-bold">${project.project_name || ''}</h5>
+  	    	      <p class="mb-0 text-muted fs-9">${dateLabel} : ${date}</p>
+  	    	    </div>
+  	    	  </a>
+  	    	`;
+  	    container.appendChild(item);
+
+  	    const indicator = document.createElement('button');
+  	    indicator.type = 'button';
+  	    indicator.setAttribute('data-bs-target', `#${carouselId}`);
+  	    indicator.setAttribute('data-bs-slide-to', index.toString());
+  	    indicator.setAttribute('aria-label', `슬라이드 ${index + 1}`);
+  	    if (index === 0) {
+  	      indicator.className = 'active';
+  	      indicator.setAttribute('aria-current', 'true');
+  	    }
+  	    indicators.appendChild(indicator);
+  	  });
+  	};
+
+
+  renderCarousel(activeProjects, activeContainer, activeIndicators, 'projectActiveCarousel', 'bg-primary-soft', false);
+  renderCarousel(doneProjects, doneContainer, doneIndicators, 'projectDoneCarousel', 'bg-success-soft', true);
+})
+.catch(err => {
+  console.error('프로젝트 데이터 로딩 실패:', err);
+  activeContainer.innerHTML = `
+    <div class="carousel-item active">
+      <div class="border rounded p-4 bg-light text-center">
+        <p class="mb-0 text-danger">진행 중인 프로젝트 데이터를 불러올 수 없습니다.</p>
+      </div>
+    </div>
+  `;
+  doneContainer.innerHTML = `
+    <div class="carousel-item active">
+      <div class="border rounded p-4 bg-light text-center">
+        <p class="mb-0 text-danger">완료한 프로젝트 데이터를 불러올 수 없습니다.</p>
+      </div>
+    </div>
+  `;
+  activeIndicators.innerHTML = `
+    <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="0"
+      class="active" aria-current="true" aria-label="슬라이드 1"></button>
+  `;
+  doneIndicators.innerHTML = `
+    <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="0"
+      class="active" aria-current="true" aria-label="슬라이드 1"></button>
+  `;
+});
 </script>                
 			
 </main>

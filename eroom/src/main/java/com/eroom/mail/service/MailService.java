@@ -69,6 +69,12 @@ public class MailService {
 	    String plainText = content.replaceAll("<[^>]*>", ""); // HTML 태그 제거
 	    return plainText.length() > 30 ? plainText.substring(0, 30) + "..." : plainText;
 	}
+	
+	// AlarmService 알람 테이블 메소드
+	public MailAlarm findAlarmOne(Long mailAlarmNo) {
+	    return mailAlarmRepository.findById(mailAlarmNo).orElse(null);
+	}
+	
 	// 주소록에서 메일쓰기
 	public Employee getEmployeeByNo(Long employeeNo) {
 		

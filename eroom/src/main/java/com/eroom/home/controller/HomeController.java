@@ -1,6 +1,7 @@
 package com.eroom.home.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,10 @@ import com.eroom.attendance.dto.AttendanceDto;
 import com.eroom.attendance.entity.Attendance;
 import com.eroom.attendance.service.AttendanceService;
 import com.eroom.employee.entity.Employee;
+import com.eroom.reservation.dto.MeetingRoomDto;
+import com.eroom.reservation.dto.VehicleDto;
+import com.eroom.reservation.service.MeetingRoomService;
+import com.eroom.reservation.service.VehicleService;
 import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 public class HomeController {
 	
 	private final AttendanceService attendanceService;
+	private final VehicleService vehicleService;
+	private final MeetingRoomService meetingRoomService;
 
 	@GetMapping({"", "/"})
 	public String home(Model model, Authentication authentication) {
@@ -33,6 +40,12 @@ public class HomeController {
 		model.addAttribute("employee", employee);
 		// html에서 #authentication.principal.employee.employeeName 대신
 		// ${employee.employeeName}으로 사용 가능
+		
+	    List<VehicleDto> todayVehicleReservations = vehicleService.getTodayReservations();
+	    model.addAttribute("todayReservations", todayVehicleReservations);
+
+	    List<MeetingRoomDto> todayRoomReservations = meetingRoomService.getTodayReservations();
+	    model.addAttribute("todayRoomReservations", todayRoomReservations);
 		
 		Map<String,String> statusMap = attendanceService.getTodayAttendanceStatusAndTime(employeeNo);
 		model.addAttribute("attendanceStatus",statusMap.get("attendanceStatus"));
@@ -62,4 +75,5 @@ public class HomeController {
 		return resultMap;
 	}
 	
+
 }
