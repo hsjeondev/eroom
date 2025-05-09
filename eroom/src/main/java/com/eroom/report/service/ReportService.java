@@ -82,7 +82,7 @@ public class ReportService {
 	    .setColumnStyle(baseStyle) 
 	    .setColumnTitleStyle(columnHeaderStyle) // 컬럼과 내용 기본 스타일 적용
 	    .addTitle( // 리포드 상단 타이틀 설정
-			Components.text(month + " 근태기록")
+			Components.text(month + " 근태 기록")
 				.setStyle(titleStyle) // 타이틀 스타일 적용
 				.setFixedHeight(30)
 		)

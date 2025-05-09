@@ -126,8 +126,8 @@ public class ProjectService {
  	        dto.setProject_end(project.getProjectEnd());
  	        result.add(dto);
  	    }
-
- 	    return result;
+ 	    int limit = Math.min(result.size(), 5);
+ 	    return result.subList(0, limit);
  	}
 
  	public List<ProjectDto> getMyDoingProject(Long employeeNo) {
@@ -149,8 +149,9 @@ public class ProjectService {
  	        dto.setProject_start(project.getProjectStart()); // 진행 중인 프로젝트는 시작일
  	        result.add(dto);
  	    }
-
- 	    return result;
+ 	    // 최대 5개까지만 반환
+ 	    int limit = Math.min(result.size(), 5);
+ 	    return result.subList(0, limit);
  	}
 
 
