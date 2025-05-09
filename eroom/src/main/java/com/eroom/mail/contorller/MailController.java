@@ -627,9 +627,9 @@ public class MailController {
 	}
 	
 	// 주소록에서 메일쓰기
-	@GetMapping("/mail/write/{employeeNo}")
+	@GetMapping("/mail/write/{targetEmpNo}")
 	public String writeMailFromAddressBook(Model model,
-										@PathVariable("employeeNo") Long employeeNo) {
+										@PathVariable("targetEmpNo") Long employeeNo) {
 		Employee sender = mailService.getEmployeeByNo(employeeNo);
 		model.addAttribute("sender", sender);
 		return "mail/mailCreateReply";

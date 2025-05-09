@@ -16,4 +16,5 @@ public interface ApprovalSignatureRepository extends JpaRepository<ApprovalSigna
 	List<ApprovalSignature> findByEmployee_EmployeeNoAndApprovalSignatureVisibleYn(Long employeeNo, String string);
 
 
+
 }

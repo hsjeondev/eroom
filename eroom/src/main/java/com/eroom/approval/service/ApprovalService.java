@@ -375,22 +375,27 @@ public class ApprovalService {
 	public List<ApprovalDto> myPageMyApprovalsStatusIsA(Long employeeNo) {
 		List<Approval> list =  approvalRepository.findByEmployee_EmployeeNoAndApprovalStatusAndApprovalVisibleYnOrderByApprovalRegDateDesc(employeeNo, "A", "Y");
 		List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
-		for(Approval l : list) {
-			ApprovalDto dto = new ApprovalDto().toDto(l);
+		for(Approval a : list) {
+			ApprovalDto dto = new ApprovalDto().toDto(a);
 			resultList.add(dto);
 		}
-		return resultList;
+		
+		// 최대 5개까지만 반환
+		int limit = Math.min(resultList.size(), 5);
+		return resultList.subList(0, limit);
 	}
 	
 	// 마이페이지, 내 결재 조회 - 진행중
 	public List<ApprovalDto> myPageMyApprovalsStatusIsS(Long employeeNo) {
 		List<Approval> list =  approvalRepository.findByEmployee_EmployeeNoAndApprovalStatusAndApprovalVisibleYnOrderByApprovalRegDateDesc(employeeNo, "S", "Y");
 		List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
-		for(Approval l : list) {
-			ApprovalDto dto = new ApprovalDto().toDto(l);
+		for(Approval a : list) {
+			ApprovalDto dto = new ApprovalDto().toDto(a);
 			resultList.add(dto);
 		}
-		return resultList;
+		
+		int limit = Math.min(resultList.size(), 5);
+		return resultList.subList(0, limit);
 	}
 
 
