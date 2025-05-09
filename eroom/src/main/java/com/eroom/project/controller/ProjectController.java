@@ -146,6 +146,13 @@ public class ProjectController {
 	        }
 	    }
 
+	    // 최근 파일 5개 조회
+	    List<DriveDto> recentFiles = projectService.findRecentFilesByProject(project_no);
+	    model.addAttribute("fileList", recentFiles);
+	    // 최근 회의록 5개 조회
+	    List<ProjectMeetingMinuteDto> recentMinutes = projectService.findRecentMinutesByProject(project_no);
+	    model.addAttribute("minutes", recentMinutes);
+	    
 	    model.addAttribute("project", project);
 	    model.addAttribute("description", project.getDescription().replace("\n", "<br>"));
 	    model.addAttribute("isProjectMember", isProjectMember);

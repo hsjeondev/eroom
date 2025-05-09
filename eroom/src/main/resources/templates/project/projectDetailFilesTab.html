@@ -192,7 +192,6 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
 
 			   
-		  	<!-- 파일 수정 모달 -->
 			<!-- 파일 수정 모달 -->
 			<div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true">
 			  <div class="modal-dialog">
@@ -433,17 +432,17 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					    fileCategory: document.getElementById('fileCategory').value
 					  },
 					previewTemplate: `
-					  <div class="card shadow-sm mb-2 p-2 border d-flex flex-row align-items-center w-90 mx-3">
-					    <div class="me-2" style="width:48px;height:48px;">
-					      <img data-dz-thumbnail class="rounded file-icon" style="width:100%;height:100%;object-fit:cover;"/>
-					    </div>
-					    <div class="flex-grow-1">
-					      <div class="fw-bold text-truncate" data-dz-name></div>
-					      <small class="text-muted" data-dz-size></small>
-					      <input type="text" class="form-control form-control-sm mt-1" name="driveDescriptions" placeholder="파일 설명 입력"/>
-					    </div>
-					    <button data-dz-remove class="btn btn-sm btn-outline-danger ms-2"><i class="fas fa-times"></i></button>
-					  </div>`
+						<div class="card shadow-sm mb-2 p-2 border d-flex flex-row align-items-center w-90 mx-3 position-relative">
+						  <div class="me-2" style="width:48px;height:48px;">
+						    <img data-dz-thumbnail class="rounded file-icon" style="width:100%;height:100%;object-fit:cover;" />
+						  </div>
+						  <div class="flex-grow-1">
+						    <div class="fw-bold text-truncate" data-dz-name></div>
+						    <small class="text-muted" data-dz-size></small>
+						    <input type="text" class="form-control form-control-sm mt-1" name="driveDescriptions" placeholder="파일 설명 입력" />
+						  </div>
+						  <button data-dz-remove class="btn-close position-absolute top-0 end-0 m-2" type="button" aria-label="Close"></button>
+						</div>`
 
 			      });
 
