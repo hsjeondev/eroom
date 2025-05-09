@@ -57,7 +57,7 @@
 	.fc-scroller {
 	    max-height: 330px !important;
 	    overflow-y: auto !important;
-	    padding-bottom: 12px; 
+	     
 	  }
 	
 	  #calendarContainer {
@@ -208,16 +208,87 @@
 		</div>
 
 
-        <!-- 2행·2열 -->
-        <div class="text-white p-1">
-			<div class="attendance-card mx-auto">
-				<div class="card shadow-sm border-0">
-					<div class="card-body text-center p-4" style="height: 207.81px;">
-						예약<br>(오늘 / 차량, 회의실)
-					</div>
-				</div>
-			</div>
-        </div>
+        <!-- 2행·2열 예약하기 예약 현황 보기 -->
+	 <div class="attendance-card mx-auto">
+	  <div class="card shadow-sm border-0" style="width: 311.33px; height: 207.81px;">
+	    <div class="card-body p-2 d-flex flex-column justify-content-between" style="height: 100%;">
+	
+	      <!-- 상단: 제목 + 탭 버튼 -->
+	      <div class="d-flex justify-content-between align-items-center mb-2">
+	        <div class="fw-bold text-dark" style="font-size: 0.9rem;">오늘 예약 현황</div>
+	        <ul class="nav nav-underline fs-9" id="resTab" role="tablist" style="margin-bottom: 0;">
+	          <li class="nav-item" role="presentation">
+	            <a class="nav-link active" id="vehicle-tab" data-bs-toggle="tab" href="#tab-vehicle"
+	               role="tab" aria-controls="tab-vehicle" aria-selected="true">차량</a>
+	          </li>
+	          <li class="nav-item" role="presentation">
+	            <a class="nav-link" id="room-tab" data-bs-toggle="tab" href="#tab-room"
+	               role="tab" aria-controls="tab-room" aria-selected="false">회의실</a>
+	          </li>
+	        </ul>
+	      </div>
+	
+	      <!-- 탭 내용 (차량 / 회의실 목록) -->
+	      <div class="tab-content small flex-grow-1 overflow-auto" id="resTabContent" style="font-size: 0.7rem;">
+	        <!-- 차량 탭 -->
+	        <div class="tab-pane fade show active" id="tab-vehicle" role="tabpanel" aria-labelledby="vehicle-tab">
+	          <table class="table table-sm table-striped mb-0 text-center">
+	            <thead>
+	              <tr>
+	                <th style="font-size: 0.65rem;">차량</th>
+	                <th style="font-size: 0.65rem;">예약자</th>
+	                <th style="font-size: 0.65rem;">시간</th>
+	              </tr>
+	            </thead>
+	            <tbody>
+	              <tr th:if="${#lists.isEmpty(todayReservations)}">
+	                <td colspan="3">🚗 없음</td>
+	              </tr>
+	              <tr th:each="res : ${todayReservations}">
+	                <td th:text="${res.vehicleName}"></td>
+	                <td th:text="${res.reserverName}"></td>
+	                <td>
+	                  <span th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span> ~
+	                  <span th:text="${#temporals.format(res.reservation_end, 'HH:mm')}"></span>
+	                </td>
+	              </tr>
+	            </tbody>
+	          </table>
+	        </div>
+	
+	        <!-- 회의실 탭 -->
+	        <div class="tab-pane fade" id="tab-room" role="tabpanel" aria-labelledby="room-tab">
+	          <table class="table table-sm table-striped mb-0 text-center">
+	            <thead>
+	              <tr>
+	                <th style="font-size: 0.65rem;">회의실</th>
+	                <th style="font-size: 0.65rem;">예약자</th>
+	                <th style="font-size: 0.65rem;">시간</th>
+	              </tr>
+	            </thead>
+	            <tbody>
+	              <tr th:if="${#lists.isEmpty(todayRoomReservations)}">
+	                <td colspan="3">🏢 없음</td>
+	              </tr>
+	              <tr th:each="res : ${todayRoomReservations}">
+	                <td th:text="${res.meetingRoomName}"></td>
+	                <td th:text="${res.reserverName}"></td>
+	                <td>
+	                  <span th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span> ~
+	                  <span th:text="${#temporals.format(res.reservation_end, 'HH:mm')}"></span>
+	                </td>
+	              </tr>
+	            </tbody>
+	          </table>
+	        </div>
+	      </div>
+	
+	    </div>
+	  </div>
+	</div>
+
+
+
 
         <!-- 3행·1열 -->
         <div class="text-dark p-1">
@@ -271,7 +342,7 @@
 			      eventTimeFormat: {
 			    	    hour: '2-digit',
 			    	    minute: '2-digit',
-			    	    hour12: false  // ✅ 24시간제로 설정!
+			    	    hour12: false  // 24시간제로 설정
 			    	  },
 			      validRange: {
 			        start: todayStr,
@@ -284,7 +355,11 @@
 			          url: '/calendar/list/all',
 			          method: 'GET',
 			          failure: () => console.error('불러오기 실패'),
-			        }
+			          success: function (events) {
+			              //console.log("받아온 일정 목록:", events); // 응답 확인용
+			              return events;
+			        	}
+			         }
 			      ],
 			      eventDidMount: function (info) {
 			        const separator = info.event.extendedProps.separator || "";
@@ -315,17 +390,18 @@
 
 			        const titleEl = info.el.querySelector('.fc-list-event-title');
 			        if (titleEl) {
+			          
 			          titleEl.style.backgroundColor = backgroundColor;
 			          titleEl.style.border = `1px solid ${borderColor}`;
 			          titleEl.style.color = textColor;
-			          titleEl.style.borderRadius = "8px";
+			          titleEl.style.borderRadius = "8px";			          
 			          titleEl.style.padding = "4px 8px";
 			          titleEl.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)";
 			          titleEl.style.fontWeight = "500";
 			          titleEl.style.fontSize = "14px";
 			        }
 
-			        // ✅ colgroup 삽입 (한 번만)
+			        // colgroup 삽입 
 			        const table = document.querySelector('table.fc-list-table');
 			        if (table && !insertedTables.has(table)) {
 			          const colgroup = document.createElement('colgroup');
