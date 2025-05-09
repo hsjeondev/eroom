@@ -44,11 +44,13 @@
     <div class="container bg-white rounded shadow-sm p-4 mt-4" style="max-width: 1000px;">
 
       <!-- 상단 제목 + 목록 버튼 -->
-      <div class="d-flex mb-3">
-        <span class="fw-bold fs-6">결재서 상세</span>
-        <button class="btn btn-light btn-sm me-2" id="topdf" type="button">pdf만들기</button>
-        <button type="button" class="btn btn-light btn-sm" onclick="history.back()">목록으로</button>
-      </div>
+	<div class="d-flex justify-content-between mb-2">
+	  <span class="fw-bold fs-7">결재서 상세</span>
+	  <div class="ms-auto">
+	    <button class="btn btn-light btn-sm me-2" id="topdf" type="button">pdf만들기</button>
+	    <button type="button" class="btn btn-light btn-sm" onclick="history.back()">목록으로</button>
+	  </div>
+	</div>
 
       <!-- 기본 정보 + 결재선 테이블 병렬 정렬 -->
 <div class="card shadow-sm p-3 rounded-2xl mb-4">
