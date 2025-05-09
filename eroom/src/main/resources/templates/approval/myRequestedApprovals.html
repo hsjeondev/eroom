@@ -171,20 +171,23 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
 
 	<!-- 시그니처 모달 작동 스크립트 -->
-	<script th:inline="javascript">
+	<script>
+    window.addEventListener('load', function () {
+    	let initialCanvasData = null;
+      let signaturePad;
   		function lastSignature() {
-  		    fetch('/approval/signature/search')
+  		    fetch('/approval/signature')
   	        .then(response => response.json())
   	        .then(data => {
-  	            if (data != null && data.res_code == '200') {
+  	            if (data != null && data.res_code == '200' && data.signatureDto != '') {
   	                const canvas = document.getElementById('signatureCanvas');
   	                const ctx = canvas.getContext('2d');
   	                const image = new Image();
   	                
   	                image.onload = function() {
   	                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+	  	                initialCanvasData = canvas.toDataURL();
   	                };
-  	                
   	                image.src = data.signatureDto.signature_data_url;
   	            }
   	        })
@@ -192,12 +195,6 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
   	            console.error('이미지 로딩 실패:', error);
   	        });
     	};
-
-    
-    
-    
-    window.addEventListener('load', function () {
-      let signaturePad;
       const canvas = document.getElementById('signatureCanvas');
       const clearBtn = document.getElementById('clearSignature');
       const saveBtn = document.getElementById('saveSignature');
@@ -237,7 +234,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		
       if(saveBtn){
 	      saveBtn.addEventListener('click', function () {
-	        if (signaturePad && !signaturePad.isEmpty()) {
+	    	  const currentCanvasData = canvas.toDataURL();
+	    	  if (initialCanvasData === currentCanvasData) {
+	              // console.log("변경된 내용이 없습니다.");
+	              const modalInstance = bootstrap.Modal.getInstance(signatureModal);
+	              modalInstance.hide();
+	              return;
+	          }
+	        if (!signaturePad.isEmpty()) {
 	          const saveDataURL = signaturePad.toDataURL();
 	          console.log('서명 데이터 URL:', saveDataURL);
 	          

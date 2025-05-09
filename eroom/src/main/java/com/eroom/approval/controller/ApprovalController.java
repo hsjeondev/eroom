@@ -34,6 +34,7 @@ import com.eroom.approval.service.ApprovalFormatService;
 import com.eroom.approval.service.ApprovalLineService;
 import com.eroom.approval.service.ApprovalService;
 import com.eroom.approval.service.ApprovalSignatureService;
+import com.eroom.directory.controller.TreeModalController;
 import com.eroom.drive.dto.DriveDto;
 import com.eroom.drive.service.DriveService;
 import com.eroom.employee.dto.EmployeeDto;
@@ -65,6 +66,7 @@ public class ApprovalController {
 	private final DriveService driveService;
 	private final ApprovalWebSocketHandler approvalWebSocketHandler;
 	private final ApprovalSignatureService approvalSignatureService;
+	private final TreeModalController treeModalController;
 	
 	
 	// 내가 올린 결재 리스트 조회
@@ -300,6 +302,7 @@ public class ApprovalController {
 	        model.addAttribute("approval", new ApprovalDto());
 	    }
 	    
+	    treeModalController.treeControllerMethod(model);
 		return "approval/create";
 	}
 	
