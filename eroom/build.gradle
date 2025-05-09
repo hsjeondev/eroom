@@ -69,6 +69,12 @@ dependencies {
 	// puppeteer API
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	
+	// 날씨 API
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-configuration-processor'
+    implementation 'org.springframework.boot:spring-boot-starter'
+	
+	
 }
 
 tasks.named('test') {
