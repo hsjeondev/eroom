@@ -34,6 +34,7 @@ import com.eroom.approval.service.ApprovalFormatService;
 import com.eroom.approval.service.ApprovalLineService;
 import com.eroom.approval.service.ApprovalService;
 import com.eroom.approval.service.ApprovalSignatureService;
+import com.eroom.directory.controller.TreeModalController;
 import com.eroom.drive.dto.DriveDto;
 import com.eroom.drive.service.DriveService;
 import com.eroom.employee.dto.EmployeeDto;
@@ -65,6 +66,7 @@ public class ApprovalController {
 	private final DriveService driveService;
 	private final ApprovalWebSocketHandler approvalWebSocketHandler;
 	private final ApprovalSignatureService approvalSignatureService;
+	private final TreeModalController treeModalController;
 	
 	
 	// 내가 올린 결재 리스트 조회
@@ -78,7 +80,11 @@ public class ApprovalController {
 		Employee employee = employeeDetails.getEmployee();
 		model.addAttribute("employee", employee);
 		ApprovalSignature approvalSignature = approvalSignatureService.findMySignature(employee);
-		model.addAttribute("approvalSignature", approvalSignature);
+		String encodedBase64 = null;
+		if(approvalSignature != null) {
+			encodedBase64 = approvalSignatureService.encodeToBase64(approvalSignature.getApprovalSignatureBlob());
+			model.addAttribute("approvalSignature", encodedBase64);
+		}
 		// 관리자용 전체(visible Y) 결재 보기 - 회의시 필요없는 기능으로 판단. 필요할 수 있으니 주석으로 남겨두기
 //		if (employee.getEmployeeName().contains("admin")) {
 //			List<Approval> temp = approvalService.findAllApprovalsVisibleY("Y");
@@ -296,6 +302,7 @@ public class ApprovalController {
 	        model.addAttribute("approval", new ApprovalDto());
 	    }
 	    
+	    treeModalController.treeControllerMethod(model);
 		return "approval/create";
 	}
 	
@@ -1229,7 +1236,7 @@ public class ApprovalController {
 		model.addAttribute("resultList", resultList);
 		
 		
-		return "/approval/fallBackApprovals";
+		return "approval/fallBackApprovals";
 	}
 	// 비동기 방식을 위한 메소드
 	@GetMapping("/approval/fallBackApprovals/fragment")
