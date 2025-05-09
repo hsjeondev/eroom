@@ -112,176 +112,194 @@
 		<!-- 분석 결과 Ajax 처리 스크립트 -->
 		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 		<script>
-		document.addEventListener("DOMContentLoaded", function () {
-		  let qualityChart;
+		  document.addEventListener("DOMContentLoaded", function () {
+		    let qualityChart; // 현재 렌더링된 차트 인스턴스를 저장할 변수
 		
-		  const resultWrap = document.getElementById("quality-result");
-		  const chartCanvas = document.getElementById("qualityChart");
-		  const spinner = document.getElementById("sonar-loading-spinner");
-		  const prNumberDisplay = document.getElementById("selected-pr-number");
+		    const resultWrap = document.getElementById("quality-result"); // 결과 영역
+		    const chartCanvas = document.getElementById("qualityChart"); // 차트 캔버스
+		    const spinner = document.getElementById("sonar-loading-spinner"); // 로딩 스피너
+		    const prNumberDisplay = document.getElementById("selected-pr-number"); // PR 번호 표시 영역
 		
-		  document.querySelectorAll(".pr-row").forEach(row => {
-		    row.addEventListener("click", function () {
-		      const prNumber = this.dataset.prNumber;
+		    // PR 행 각각에 클릭 이벤트 등록
+		    document.querySelectorAll(".pr-row").forEach(row => {
+		      row.addEventListener("click", function () {
+		        const prNumber = this.dataset.prNumber; // 클릭한 PR 번호 가져오기
 		
-		      // PR 번호 텍스트 표시
-		      if (prNumberDisplay) {
-		        prNumberDisplay.textContent = `PR #${prNumber}`;
-		      }
+		        // PR 번호 화면에 표시
+		        if (prNumberDisplay) {
+		          prNumberDisplay.textContent = `PR #${prNumber}`;
+		        }
 		
-		      // 기존 결과 숨기고 스피너 표시
-		      if (resultWrap) resultWrap.style.display = "none";
-		      if (spinner) {
-		        spinner.classList.remove("d-none");
-		        spinner.style.display = "flex";
-		      }
+		        // 결과 숨기고 로딩 스피너 표시
+		        if (resultWrap) resultWrap.style.display = "none";
+		        if (spinner) {
+		          spinner.classList.remove("d-none");
+		          spinner.style.display = "flex";
+		        }
 		
-		      fetch("/api/sonar/quality/pr/" + prNumber)
-		        .then(res => res.json())
-		        .then(data => {
-		          const tbody = document.getElementById("sonar-result-body");
-		          tbody.innerHTML = "";
+		        // 품질 분석 API 호출
+		        fetch("/api/sonar/quality/pr/" + prNumber)
+		          .then(res => res.json())
+		          .then(data => {
+		            const tbody = document.getElementById("sonar-result-body");
+		            tbody.innerHTML = "";
 		
-		          if (!Array.isArray(data) || data.length === 0) {
-		            tbody.innerHTML = '<tr><td colspan="3" class="text-muted text-center">분석 결과가 없습니다.</td></tr>';
+		            // 결과가 없을 경우 메시지 출력
+		            if (!Array.isArray(data) || data.length === 0) {
+		              tbody.innerHTML = '<tr><td colspan="3" class="text-muted text-center">분석 결과가 없습니다.</td></tr>';
+		              clearChart();
+		              return;
+		            }
+		
+		            const radarLabels = []; // 차트에 들어갈 항목명
+		            const radarValues = []; // 차트에 들어갈 값
+		
+		            // 데이터 행 생성 및 차트 데이터 준비
+		            data.forEach(item => {
+		              const tr = document.createElement("tr");
+		
+		              const metric = document.createElement("td");
+		              const translated = translateMetric(item.metric);
+		              metric.textContent = translated;
+		              metric.className = "text-start px-3 py-2";
+		
+		              const value = document.createElement("td");
+		              value.textContent = item.value;
+		              value.className = "text-end px-3 py-2";
+		
+		              const status = document.createElement("td");
+		              status.textContent = getStatus(item.metric, item.value);
+		              status.className = "text-center px-3 py-2 fw-semibold " + (
+		                status.textContent === "양호" ? "text-success" :
+		                status.textContent === "주의" ? "text-danger" : "text-secondary"
+		              );
+		
+		              tr.appendChild(metric);
+		              tr.appendChild(value);
+		              tr.appendChild(status);
+		              tbody.appendChild(tr);
+		
+		              // 주요 지표만 차트에 포함
+		              const keyMetrics = [
+		                "coverage",
+		                "bugs",
+		                "vulnerabilities",
+		                "code_smells",
+		                "duplicated_lines_density"
+		              ];
+		
+		              if (keyMetrics.includes(item.metric)) {
+		                radarLabels.push(translated);
+		                radarValues.push(parseFloat(item.value));
+		              }
+		            });
+		
+		            renderRadarChart(radarLabels, radarValues); // 차트 렌더링
+		          })
+		          .catch(err => {
+		            console.error("분석 결과 조회 실패", err);
+		            const tbody = document.getElementById("sonar-result-body");
+		            tbody.innerHTML = '<tr><td colspan="3" class="text-danger text-center">데이터를 불러올 수 없습니다.</td></tr>';
 		            clearChart();
-		            return;
-		          }
-		
-		          const radarLabels = [];
-		          const radarValues = [];
-		
-		          data.forEach(item => {
-		            const tr = document.createElement("tr");
-		
-		            const metric = document.createElement("td");
-		            const translated = translateMetric(item.metric);
-		            metric.textContent = translated;
-		            metric.className = "text-start px-3 py-2";
-		
-		            const value = document.createElement("td");
-		            value.textContent = item.value;
-		            value.className = "text-end px-3 py-2";
-		
-		            const status = document.createElement("td");
-		            status.textContent = getStatus(item.metric, item.value);
-		            status.className = "text-center px-3 py-2 fw-semibold " + (
-		              status.textContent === "양호" ? "text-success" :
-		              status.textContent === "주의" ? "text-danger" : "text-secondary"
-		            );
-		
-		            tr.appendChild(metric);
-		            tr.appendChild(value);
-		            tr.appendChild(status);
-		            tbody.appendChild(tr);
-		
-		            if (["coverage", "bugs", "vulnerabilities", "code_smells", "duplicated_lines_density"].includes(item.metric)) {
-		              radarLabels.push(translated);
-		              radarValues.push(parseFloat(item.value));
+		          })
+		          .finally(() => {
+		            // 로딩 완료 후 UI 복구
+		            if (spinner) {
+		              spinner.style.display = "none";
+		              spinner.classList.add("d-none");
 		            }
+		            if (resultWrap) resultWrap.style.display = "block";
 		          });
-		
-		          renderRadarChart(radarLabels, radarValues);
-		        })
-		        .catch(err => {
-		          console.error("분석 결과 조회 실패", err);
-		          const tbody = document.getElementById("sonar-result-body");
-		          tbody.innerHTML = '<tr><td colspan="3" class="text-danger text-center">데이터를 불러올 수 없습니다.</td></tr>';
-		          clearChart();
-		        })
-		        .finally(() => {
-		          if (spinner) {
-		            spinner.style.display = "none";
-		            spinner.classList.add("d-none");
-		          }
-		          if (resultWrap) resultWrap.style.display = "block";
-		        });
+		      });
 		    });
-		  });
 		
-		  function renderRadarChart(labels, values) {
-		    const ctx = document.getElementById("qualityChart").getContext("2d");
+		    // 레이더 차트를 생성하거나 갱신하는 함수
+		    function renderRadarChart(labels, values) {
+		      const ctx = document.getElementById("qualityChart").getContext("2d");
 		
-		    if (qualityChart) {
-		      qualityChart.destroy();
-		    }
+		      if (qualityChart) {
+		        qualityChart.destroy(); // 기존 차트 제거
+		      }
 		
-		    qualityChart = new Chart(ctx, {
-		      type: 'radar',
-		      data: {
-		        labels: labels,
-		        datasets: [{
-		          label: 'PR 품질 지표',
-		          data: values,
-		          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-		          borderColor: 'rgba(54, 162, 235, 1)',
-		          pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-		          borderWidth: 2
-		        }]
-		      },
-		      options: {
-		        responsive: true,
-		        scales: {
-		          r: {
-		            beginAtZero: true,
-		            ticks: {
-		              stepSize: 10
-		            }
-		          }
+		      qualityChart = new Chart(ctx, {
+		        type: 'radar',
+		        data: {
+		          labels: labels,
+		          datasets: [{
+		            label: 'PR 품질 지표',
+		            data: values,
+		            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+		            borderColor: 'rgba(54, 162, 235, 1)',
+		            pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+		            borderWidth: 2
+		          }]
 		        },
-		        plugins: {
-		          legend: {
-		            display: false
+		        options: {
+		          responsive: true,
+		          scales: {
+		            r: {
+		              beginAtZero: true,
+		              ticks: {
+		                stepSize: 10
+		              }
+		            }
 		          },
-		          tooltip: {
-		            callbacks: {
-		              label: function (context) {
-		                return context.formattedValue;
+		          plugins: {
+		            legend: {
+		              display: false
+		            },
+		            tooltip: {
+		              callbacks: {
+		                label: function (context) {
+		                  return context.formattedValue;
+		                }
 		              }
 		            }
 		          }
 		        }
+		      });
+		    }
+		
+		    // 차트 제거 함수
+		    function clearChart() {
+		      if (qualityChart) {
+		        qualityChart.destroy();
+		        qualityChart = null;
 		      }
-		    });
-		  }
+		    }
 		
-		  function clearChart() {
-		    if (qualityChart) {
-		      qualityChart.destroy();
-		      qualityChart = null;
+		    // 지표명을 한글로 번역하는 함수
+		    function translateMetric(metric) {
+		      const map = {
+		        "coverage": "테스트 커버리지",
+		        "bugs": "버그 수",
+		        "code_smells": "코드 스멜",
+		        "duplicated_lines_density": "중복 코드율",
+		        "vulnerabilities": "보안 취약점",
+		        "complexity": "복잡도",
+		        "cognitive_complexity": "인지 복잡도",
+		        "ncloc": "코드 라인 수"
+		      };
+		      return map[metric] || metric;
 		    }
-		  }
 		
-		  function translateMetric(metric) {
-		    const map = {
-		      "coverage": "테스트 커버리지",
-		      "bugs": "버그 수",
-		      "code_smells": "코드 스멜",
-		      "duplicated_lines_density": "중복 코드율",
-		      "vulnerabilities": "보안 취약점",
-		      "complexity": "복잡도",
-		      "cognitive_complexity": "인지 복잡도",
-		      "ncloc": "코드 라인 수"
-		    };
-		    return map[metric] || metric;
-		  }
-		
-		  function getStatus(metric, value) {
-		    if (["bugs", "vulnerabilities", "code_smells"].includes(metric)) {
-		      return value === "0" ? "양호" : "주의";
+		    // 각 지표에 따른 상태값 반환 함수
+		    function getStatus(metric, value) {
+		      if (["bugs", "vulnerabilities", "code_smells"].includes(metric)) {
+		        return value === "0" ? "양호" : "주의";
+		      }
+		      if (metric === "coverage") {
+		        return parseFloat(value) >= 80 ? "양호" : "주의";
+		      }
+		      if (metric === "duplicated_lines_density") {
+		        return parseFloat(value) <= 10 ? "양호" : "주의";
+		      }
+		      if (["complexity", "cognitive_complexity", "ncloc"].includes(metric)) {
+		        return "정보";
+		      }
+		      return "확인 필요";
 		    }
-		    if (metric === "coverage") {
-		      return parseFloat(value) >= 80 ? "양호" : "주의";
-		    }
-		    if (metric === "duplicated_lines_density") {
-		      return parseFloat(value) <= 10 ? "양호" : "주의";
-		    }
-		    if (["complexity", "cognitive_complexity", "ncloc"].includes(metric)) {
-		      return "정보";
-		    }
-		    return "확인 필요";
-		  }
-		});
+		  });
 		</script>
 	</main>
 </body>

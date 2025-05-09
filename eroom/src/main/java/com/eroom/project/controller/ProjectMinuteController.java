@@ -1,6 +1,5 @@
 package com.eroom.project.controller;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.project.dto.ProjectMeetingMinuteDto;
-import com.eroom.project.dto.ProjectMeetingMinuteMappingDto;
 import com.eroom.project.service.ProjectMeetingMinuteService;
 import com.eroom.project.service.ProjectService;
 import com.eroom.security.EmployeeDetails;
@@ -114,18 +112,7 @@ public class ProjectMinuteController {
 	                         @RequestParam("participants") List<Long> participants,
 	                         @RequestParam("projectNo") Long projectNo) {
 
-	    // 제목/내용만 추출해서 전달
-	    projectMeetingMinuteService.updateMinute(
-	        minuteDto.getMeetingMinuteNo(),
-	        minuteDto.getMeetingTitle(),
-	        minuteDto.getMeetingContent()
-	    );
-
-	    // 참여자 목록 재설정
-	    ProjectMeetingMinuteMappingDto mappingDto = new ProjectMeetingMinuteMappingDto();
-	    mappingDto.setMeetingMinuteNo(minuteDto.getMeetingMinuteNo());
-	    mappingDto.setParticipants(participants);
-	    projectMeetingMinuteService.updateMappings(mappingDto);
+	    projectMeetingMinuteService.updateMinute(minuteDto, participants);
 
 	    return "redirect:/project/minute/detail?minuteNo=" + minuteDto.getMeetingMinuteNo() + "&projectNo=" + projectNo;
 	}
