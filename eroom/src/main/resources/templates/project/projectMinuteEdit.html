@@ -3,7 +3,7 @@
 <body>
 	<main class="main" id="top" layout:fragment="content">
 		<div class="d-flex align-items-center gap-2">
-			<a th:href="@{/project/detail/{projectNo}/minutes(projectNo=${projectNo})}" class="text-decoration-none text-dark me-2"> <i class="uil uil-angle-left-b fs-4"></i>
+			<a th:href="@{/project/minute/detail(minuteNo=${minute.meetingMinuteNo}, projectNo=${projectNo})}" class="text-decoration-none text-dark me-2"> <i class="uil uil-angle-left-b fs-4"></i>
 			</a>
 			<h1 class="text-body mb-0 fs-4">회의록 수정</h1>
 		</div>
@@ -65,65 +65,64 @@
 
 		<script>
 		  document.addEventListener("DOMContentLoaded", function () {
+		    let isDirty = false;
+		
+		    const form = document.getElementById("editMinute");
+		    const inputs = document.querySelectorAll("#editMinute input, #editMinute textarea");
 		    const selectAll = document.getElementById("select-all");
 		    const checkboxes = document.querySelectorAll(".participant-checkbox:not(#select-all)");
 		
-		    selectAll.addEventListener("change", function () {
-		      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+		    // 입력 감지
+		    inputs.forEach(input => {
+		      input.addEventListener("input", () => {
+		        isDirty = true;
+		      });
 		    });
+		
+		    // 링크 클릭 시 경고 모달
+		    document.querySelectorAll("a").forEach(link => {
+		      link.addEventListener("click", function (e) {
+		        const href = this.getAttribute("href");
+		
+		        if (isDirty && href && !href.startsWith("#") && !this.hasAttribute("data-bs-toggle")) {
+		          e.preventDefault();
+		
+		          const confirmModal = new bootstrap.Modal(document.getElementById("confirmCloseModal"));
+		          confirmModal.show();
+		
+		          const confirmBtn = document.getElementById("confirmCloseBtn");
+		          confirmBtn.onclick = function () {
+		            confirmModal.hide();
+		            isDirty = false;
+		            window.location.href = href;
+		          };
+		        }
+		      });
+		    });
+		
+		    // 브라우저 이탈 경고
+		    window.addEventListener("beforeunload", function (e) {
+		      if (isDirty) {
+		        e.preventDefault();
+		        e.returnValue = "";
+		      }
+		    });
+		
+		    // 전체 선택 체크박스 기능
+		    if (selectAll) {
+		      selectAll.addEventListener("change", function () {
+		        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+		        isDirty = true;
+		      });
+		    }
+		
+		    // 제출 시 isDirty 초기화
+		    if (form) {
+		      form.addEventListener("submit", function () {
+		        isDirty = false;
+		      });
+		    }
 		  });
-		  
-		document.addEventListener("DOMContentLoaded", function () {
-		   let isDirty = false;
-		
-		   // 입력 감지
-		   const inputs = document.querySelectorAll("#editMinute input, #editMinute textarea");
-		   inputs.forEach(input => {
-		     input.addEventListener("input", () => {
-		       isDirty = true;
-		     });
-		   });
-		
-		   // 링크 클릭 시 모달 확인
-		   document.querySelectorAll("a").forEach(link => {
-		     link.addEventListener("click", function (e) {
-		       const href = this.getAttribute("href");
-		
-		       if (isDirty && href && !href.startsWith("#") && !this.hasAttribute("data-bs-toggle")) {
-		         e.preventDefault();
-		
-		         const confirmModal = new bootstrap.Modal(document.getElementById("confirmCloseModal"));
-		         confirmModal.show();
-		
-		         const confirmBtn = document.getElementById("confirmCloseBtn");
-		         confirmBtn.onclick = function () {
-		           confirmModal.hide();
-		           isDirty = false;
-		           window.location.href = href;
-		         };
-		       }
-		     });
-		   });
-		
-		   // 브라우저 이탈 감지
-		   window.addEventListener("beforeunload", function (e) {
-		     if (isDirty) {
-		       e.preventDefault();
-		       e.returnValue = "";
-		     }
-		   });
-		
-		   // 기존 전체 선택 체크박스 동작 유지
-		   const selectAll = document.getElementById("select-all");
-		   const checkboxes = document.querySelectorAll(".participant-checkbox:not(#select-all)");
-		
-		   if (selectAll) {
-		     selectAll.addEventListener("change", function () {
-		       checkboxes.forEach(cb => cb.checked = selectAll.checked);
-		       isDirty = true;
-		     });
-		   }
-		 });
 		</script>
 
 		<!-- 회의록 수정 중 나가기 경고창 -->
