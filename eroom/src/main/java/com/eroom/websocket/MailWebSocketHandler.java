@@ -99,6 +99,9 @@ public class MailWebSocketHandler extends TextWebSocketHandler {
         WebSocketSession session = userSessions.get(userNo);
         if (session != null && session.isOpen()) {
             session.sendMessage(new TextMessage(message));
+        }else {
+            // 세션이 없거나 연결이 끊어진 경우 처리
+            System.out.println("세션이 없거나 연결이 끊어졌습니다.");
         }
     }
 

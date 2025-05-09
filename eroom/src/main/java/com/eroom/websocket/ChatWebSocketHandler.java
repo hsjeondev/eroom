@@ -1,5 +1,7 @@
 package com.eroom.websocket;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,8 @@ import com.eroom.drive.entity.Drive;
 import com.eroom.drive.repository.DriveRepository;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.repository.EmployeeRepository;
+import com.eroom.notification.entity.Alarm;
+import com.eroom.notification.repository.AlarmRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -37,6 +41,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final EmployeeRepository employeeRepository;
     private final ChatAlarmRepository chatAlarmRepository;
     private final DriveRepository driveRepository;
+    private final AlarmRepository alarmRepository;
     
     private static final Map<Long, WebSocketSession> userSessions = new ConcurrentHashMap<>();
 
@@ -88,13 +93,30 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void saveAlarm(ChatMessage message, Long receiverNo) {
-        ChatAlarm alarm = ChatAlarm.builder()
-                .chatMessage(message)
-                .employee(Employee.builder().employeeNo(receiverNo).build())
-                .chatAlarmReadYn("N")
-                .build();
-        chatAlarmRepository.save(alarm);
+        // 1. ChatAlarm 저장
+        ChatAlarm chatAlarm = chatAlarmRepository.save(ChatAlarm.builder()
+            .chatMessage(message)
+            .employee(Employee.builder().employeeNo(receiverNo).build())
+            .chatAlarmReadYn("N")
+            .build());
+
+        // 2. Alarm(R002) 저장
+        alarmRepository.save(Alarm.builder()
+            .employeeNo(receiverNo)
+            .param1(chatAlarm.getChatAlarmNo()) // 이 시점이면 OK
+            .separatorCode("R002")
+            .readYn("N")
+            .regDate(java.time.LocalDateTime.now())
+            .build());
+
+        // 3. WebSocket 알림 전송
+        try {
+            sendToUser(receiverNo, "{\"type\":\"alarm\",\"message\":\"채팅 알림\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
     public void broadcastMessage(ChatMessageDto dto, ChatMessage savedMessage) throws Exception {
         Employee sender = employeeRepository.findById(dto.getSenderMember())
                 .orElseThrow(() -> new IllegalArgumentException("보낸 사람 없음"));
@@ -104,7 +126,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         
         String profileImageUrl = profileDriveOpt
         	    .map(drive -> "/files/" + drive.getDrivePath()) // 여기 수정!
-        	    .orElse("/assets/img/profile/default-profile.png");
+        	    .orElse("/assets/img/team/avatar.webp");
         
         Map<String, Object> sendData = new HashMap<>();
         sendData.put("chatMessageContent", dto.getChatMessageContent());
@@ -122,7 +144,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
             if (!drives.isEmpty()) {
                 Drive drive = drives.get(0); // 첫 번째 드라이브 선택 (또는 여러 드라이브 처리)
-                sendData.put("drivePath", "/files/drive/chat/" + drive.getDrivePath().replaceFirst("^drive/chat/", ""));
+                String encodedFileName = URLEncoder.encode(drive.getDriveNewName(), StandardCharsets.UTF_8).replace("+", "%20");;
+                sendData.put("drivePath", "/files/drive/chat/" + encodedFileName);
                 sendData.put("driveOriName", drive.getDriveOriName());
             }
         }

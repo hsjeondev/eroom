@@ -245,6 +245,7 @@
     		<script>
     		function fetchNotificationList() {
     		const loginEmployeeNo = document.getElementById("loginEmployeeNo").value;
+    		
     	
     		//console.log(loginEmployeeNo+"!!!!!!!!!!!!!!!!!!!");
     			  fetch("/notification/data")
@@ -271,8 +272,9 @@
     			      let hasUnread = false;
 
     			      data.forEach(notification => {
-    			    	  //console.log(" hasUnread:", hasUnread);
     			    	
+    			    	  //console.log(" hasUnread:", hasUnread);
+    			    	//onsole.log("알림 sender:", notification.employee_no, "로그인 사용자:", loginEmployeeNo);
     			       let message = "";
 
 						if (notification.separator_code === 'R001') {
@@ -290,10 +292,10 @@
 						} else {
 						  switch (notification.separator_code) {
 						    case 'R002':
-						      message = "✉️ 새로운 메일이 도착했습니다.";
+						      message = "💬 새로운 채팅 메시지가 도착했습니다.";
 						      break;
 						    case 'R003':
-						      message = "💬 새로운 채팅 메시지가 도착했습니다.";
+						      message = "✉️ 새로운 메일이 도착했습니다.";
 						      break;
 						    default:
 						      message = "🔔 새로운 알림이 도착했습니다.";
@@ -307,7 +309,7 @@
     			              const minutes = date.getMinutes().toString().padStart(2, '0');
     			              const period = hours >= 12 ? '오후' : '오전';
     			              const hour12 = hours % 12 === 0 ? 12 : hours % 12;
-    			              const datePart = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    			              const datePart = `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')}`;
     			              return `${period} ${hour12}:${minutes} / ${datePart}`;
     			            })()
     			          : "시간 정보 없음";
@@ -408,19 +410,30 @@
     			          })
     			          .then(response => response.json())
     			          .then(data => {
-    			        	  console.log(data.res_msg);
-    			        	  if (data != null && data.res_code == '200') {
-    			        	    if (data.separator_code == 'R001') {
-    			        	      location.href = "/calendar/all";
-    			        	    } else if (data.separator_code == 'R002') {
-    			        	      // R002 처리 로직
-    			        	    } else if (data.separator_code == 'R003') {
-    			        	      // R003 처리 로직
-    			        	    } else if (data.separator_code == 'R004') {
-    			        	      location.href = `/approval/${data.pk}/detail`;
-    			        	    }
-    			        	  }
-    			        	})
+							  console.log(data.res_msg);
+							  console.log("roomNo 확인:", data.roomNo);
+							
+							  if (data != null && data.res_code == '200') {
+							    if (data.separator_code === 'R001') {
+							      const sep = data.separator;
+							      if (sep?.startsWith('A')) {
+							        location.href = "/calendar/all";
+							      } else if (sep?.startsWith('T')) {
+							        location.href = "/calendar/myteam";
+							      }
+							    } else if (data.separator_code === 'R002') {
+							      if (data.roomNo) {
+							        location.href = `/chat/list?roomNo=${data.roomNo}`;
+							      } else {
+							        alert("채팅방 정보를 찾을 수 없습니다.");
+							      }
+							    } else if (data.separator_code === 'R003') {
+							      // R003 처리
+							    } else if (data.separator_code === 'R004') {
+							      location.href = `/approval/${data.pk}/detail`;
+							    }
+							  }
+							})
     			        	.catch(error => console.error('읽음 처리 에러:', error));
     			        }
     			      }

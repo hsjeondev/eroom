@@ -11,12 +11,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.eroom.approval.dto.ApprovalAlarmDto;
 import com.eroom.approval.entity.ApprovalAlarm;
 import com.eroom.approval.service.ApprovalAlarmService;
-import com.eroom.calendar.dto.CalendarAlarmDto;
-import com.eroom.chat.dto.ChatAlarmDto;
-import com.eroom.mail.dto.MailAlarmDto;
+import com.eroom.calendar.entity.CalendarAlarm;
+import com.eroom.calendar.service.CalendarAlarmService;
+import com.eroom.chat.entity.ChatroomAttendee;
 import com.eroom.notification.dto.AlarmDto;
 import com.eroom.notification.entity.Alarm;
 import com.eroom.notification.repository.AlarmRepository;
@@ -31,6 +30,7 @@ public class AlarmService {
 	
 	private final AlarmRepository alarmRepository;
 	private final ApprovalAlarmService approvalAlarmService;
+	private final CalendarAlarmService calendarAlarmService;
 	
 	 //알림 페이지 목록 조회
 	 @Transactional
@@ -94,14 +94,52 @@ public class AlarmService {
 	             .readYn("Y") // 읽음 처리
 	             .regDate(target.getRegDate())
 	             .build();
+	         
 
 	         alarmRepository.save(updated);
 	         // 확인용 이전 Alarm Entity 반환
 	         if("R001".equals(target.getSeparatorCode())) {
-	        	 return null;
+	        	 // pk 넣든 필요한 거 넣으세요
+	        	 CalendarAlarm calendarAlarm = calendarAlarmService.findAlarmOne(target.getParam1());
+	        	 map.put("separator", calendarAlarm.getSeparator());
+	        	 map.put("separator_code", "R001");
+	        	 return map;
 	         } else if("R002".equals(target.getSeparatorCode())) {
-	        	 return null;
-	         } else if("R003".equals(target.getSeparatorCode())) {
+        	    System.out.println("chatAlarm: " + target.getChatAlarm());
+        	    System.out.println("chatMessage: " + (target.getChatAlarm() != null ? target.getChatAlarm().getChatMessage() : "null"));
+        	    System.out.println("chatroom: " + (
+        	        target.getChatAlarm() != null && target.getChatAlarm().getChatMessage() != null
+        	            ? target.getChatAlarm().getChatMessage().getChatroom()
+        	            : "null"
+        	    ));
+
+        	    if (target.getChatAlarm() != null
+        	        && target.getChatAlarm().getChatMessage() != null
+        	        && target.getChatAlarm().getChatMessage().getChatroom() != null) {
+        	        
+        	    	var chatroom = target.getChatAlarm().getChatMessage().getChatroom();
+        	        map.put("pk", target.getParam1()); // chat_alarm_no
+        	        map.put("separator_code", "R002");
+        	        map.put("roomNo",chatroom.getChatroomNo());
+        	        
+        	        Long senderNo = target.getChatAlarm().getChatMessage().getSenderMember().getEmployeeNo();
+        	        Long targetEmpNo = null;
+        	        
+        	        if (chatroom.getChatroomMapping() != null) {
+        	            for (ChatroomAttendee attendee : chatroom.getChatroomMapping()) {
+        	                if (attendee.getAttendee() != null && !attendee.getAttendee().getEmployeeNo().equals(senderNo)) {
+        	                    targetEmpNo = attendee.getAttendee().getEmployeeNo();
+        	                    break; // 상대방 찾았으면 중단
+        	                }
+        	            }
+        	        }
+
+        	        if (targetEmpNo != null) {
+        	            map.put("targetEmpNo", targetEmpNo);
+        	        }
+        	    }
+        	    return map;
+	        	} else if("R003".equals(target.getSeparatorCode())) {
 	        	 return null;
 	        	 
 	         } else if("R004".equals(target.getSeparatorCode())) {
