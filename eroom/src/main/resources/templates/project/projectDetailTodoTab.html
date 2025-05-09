@@ -634,7 +634,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		        <button class="btn p-1" type="button" data-bs-dismiss="modal" aria-label="Close">
 		          <span class="fas fa-times fs-10 me-1" data-fa-transform="up-1"></span>닫기
 		        </button>
-		        <button class="btn btn-phoenix-primary px-6" type="button" id="updateTodoButton">
+		        <button th:if="${isMember == true}" class="btn btn-phoenix-primary px-6" type="button" id="updateTodoButton">
 		          할 일 수정<span class="fas fa-edit ms-2" data-fa-transform="shrink-3"></span>
 		        </button>
 		      </div>
