@@ -369,98 +369,139 @@
 				</div>
 			</div>
 
+			<!-- 커스텀 메시지 모달 -->
+			<div class="modal fade" id="messageModal" tabindex="-1"
+				aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered modal-sm">
+					<div
+						class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+						<div class="modal-header border-0">
+							<h5 class="modal-title text-dark" id="messageModalTitle">알림</h5>
+						</div>
+						<div class="modal-body text-center">
+							<p class="mb-0 text-body" id="messageModalBody">메시지 내용이
+								들어갑니다.</p>
+						</div>
+						<div class="modal-footer justify-content-center border-0">
+							<button type="button" class="btn btn-primary"
+								data-bs-dismiss="modal">확인</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<script>
+			  function showMessageModal(message, title = "알림", reloadOnClose = false) {
+				    document.getElementById("messageModalTitle").textContent = title;
+				    document.getElementById("messageModalBody").textContent = message;
 
-					<!-- 등록을 위한 fetch -->
-					<script>
-					document.addEventListener("DOMContentLoaded", function () {
-					  const form = document.addEventForm;
-					  const modal = document.getElementById("addEventModal");
-					  const facilityInput = document.getElementById("modalFacilityNo");
-					  const today = new Date().toISOString().split("T")[0];
-					  form.reservation_start_date.min = today;
-					  form.reservation_end_date.min = today;
-					
-					  const submitBtn = form.querySelector('button[type="submit"]');
-					
-					  form.addEventListener("submit", async function (e) {
-					    e.preventDefault();
-					
-					    submitBtn.disabled = true; // 버튼만 비활성화
-					
-					    const startDate = form.reservation_start_date.value;
-					    const endDate = form.reservation_end_date.value;
-					    const startTime = form.startTime.value;
-					    const endTime = form.endTime.value;
-					
-					    if (!form.reservation_location.value) {
-					      alert("목적지를 입력해주세요!");
-					      resetForm();
-					      return;
-					    }
-					
-					    if (!startDate || !endDate || !startTime || !endTime) {
-					      alert("날짜와 시간을 모두 선택해주세요!");
-					      resetForm();
-					      return;
-					    }
-					
-					    const fullStart = `${startDate}T${startTime}`;
-					    const fullEnd = `${endDate}T${endTime}`;
-					
-					    if (fullStart >= fullEnd) {
-					      alert("종료일시는 시작일시보다 늦어야 합니다!");
-					      resetForm();
-					      return;
-					    }
-					
-					    const startHour = parseInt(startTime.split(":")[0]);
-					    const endHour = parseInt(endTime.split(":")[0]);
-					
-					    const bookedHours = [...form.startTime.options]
-					      .filter(opt => opt.disabled)
-					      .map(opt => parseInt(opt.value.split(":")[0]));
-					
-					    for (let hour = startHour; hour < endHour; hour++) {
-					      if (bookedHours.includes(hour)) {
-					        alert("선택한 시간 범위에 이미 예약된 시간이 포함되어 있습니다!");
-					        resetForm();
-					        return;
-					      }
-					    }
-					
-					    form.calendarStartTime.value = fullStart;
-					    form.calendarEndTime.value = fullEnd;
-					
-					    const payload = new FormData(form);
-					
-					    try {
-					      const response = await fetch('/resvehicle/reservation', {
-					        method: 'POST',
-					        headers: {
-					          'header': document.querySelector('meta[name="_csrf_header"]').content,
-					          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-					        },
-					        body: payload
-					      });
-					
-					      const data = await response.json();
-					      if (data.res_code == 200) {
-					        alert(data.res_msg);
-					        location.reload();
-					      } else {
-					        alert(data.res_msg);
-					        resetForm();
-					      }
-					    } catch (error) {
-					      alert("예약 중 오류 발생했습니다 😭");
-					      resetForm();
-					    }
-					  });
-					
-					  function resetForm() {
-					    submitBtn.disabled = false; // 에러나 실패하면 다시 버튼 활성화
-					  }
-					});
+				    const modalEl = document.getElementById("messageModal");
+				    const modal = new bootstrap.Modal(modalEl);
+				    modal.show();
+
+				    const confirmBtn = modalEl.querySelector('button[data-bs-dismiss="modal"]');
+
+				    // 기존 이벤트 제거하고 새로 바인딩 (중복 방지)
+				    const newBtn = confirmBtn.cloneNode(true);
+				    confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+
+				    if (reloadOnClose) {
+				      newBtn.addEventListener("click", () => location.reload());
+				    }
+				  }
+			</script>
+
+
+			<!-- 등록을 위한 fetch -->
+				<script>
+				  document.addEventListener("DOMContentLoaded", function () {
+				    const form = document.addEventForm;
+				    const modal = document.getElementById("addEventModal");
+				    const facilityInput = document.getElementById("modalFacilityNo");
+				    const today = new Date().toISOString().split("T")[0];
+				    form.reservation_start_date.min = today;
+				    form.reservation_end_date.min = today;
+				
+				    const submitBtn = form.querySelector('button[type="submit"]');
+				
+				    form.addEventListener("submit", async function (e) {
+				      e.preventDefault();
+				      submitBtn.disabled = true;
+				
+				      const startDate = form.reservation_start_date.value;
+				      const endDate = form.reservation_end_date.value;
+				      const startTime = form.startTime.value;
+				      const endTime = form.endTime.value;
+				
+				      if (!form.reservation_location.value) {
+				        showMessageModal("목적지를 입력해주세요!");
+				        resetForm();
+				        return;
+				      }
+				
+				      if (!startDate || !endDate || !startTime || !endTime) {
+				        showMessageModal("날짜와 시간을 모두 선택해주세요!");
+				        resetForm();
+				        return;
+				      }
+				
+				      const fullStart = `${startDate}T${startTime}`;
+				      const fullEnd = `${endDate}T${endTime}`;
+				
+				      if (fullStart >= fullEnd) {
+				        showMessageModal("종료일시는 시작일시보다 늦어야 합니다!");
+				        resetForm();
+				        return;
+				      }
+				
+				      const startHour = parseInt(startTime.split(":")[0]);
+				      const endHour = parseInt(endTime.split(":")[0]);
+				
+				      const bookedHours = [...form.startTime.options]
+				        .filter(opt => opt.disabled)
+				        .map(opt => parseInt(opt.value.split(":")[0]));
+				
+				      for (let hour = startHour; hour < endHour; hour++) {
+				        if (bookedHours.includes(hour)) {
+				          showMessageModal("선택한 시간 범위에 이미 예약된 시간이 포함되어 있습니다!");
+				          resetForm();
+				          return;
+				        }
+				      }
+				
+				      form.calendarStartTime.value = fullStart;
+				      form.calendarEndTime.value = fullEnd;
+				
+				      const payload = new FormData(form);
+				
+				      try {
+				        const response = await fetch('/resvehicle/reservation', {
+				          method: 'POST',
+				          headers: {
+				            'header': document.querySelector('meta[name="_csrf_header"]').content,
+				            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+				          },
+				          body: payload
+				        });
+				
+				        const data = await response.json();
+				        if (data.res_code == 200) {
+				          showMessageModal(data.res_msg);
+				          setTimeout(() => location.reload(), 1500); // 약간의 시간 후 새로고침
+				        } else {
+				          showMessageModal(data.res_msg);
+				          resetForm();
+				        }
+				      } catch (error) {
+				        showMessageModal("예약 중 오류 발생했습니다 😭");
+				        resetForm();
+				      }
+				    });
+				
+				    function resetForm() {
+				      submitBtn.disabled = false;
+				    }
+				  });
 				</script>
 
 
@@ -470,267 +511,171 @@
 					style="height: 400px;"></div>
 			</div>
 		</div>
+
+		
+		<!-- 삭제 모달 -->
+		<div class="modal fade" id="confirmDeleteModal" tabindex="-1"
+			aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-sm">
+				<div
+					class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+					<div class="modal-header border-0">
+						<h5 class="modal-title text-dark">예약을 정말 취소하시겠습니까?</h5>
+					</div>
+					<div class="modal-body text-center">
+						<p class="mb-0 text-body">
+							예약을 취소하시겠습니까?<br>취소 후 자동으로 새로고침됩니다.
+						</p>
+					</div>
+					<div class="modal-footer justify-content-center border-0">
+						<button type="button" class="btn btn-phoenix-secondary"
+							data-bs-dismiss="modal">취소</button>
+						<button type="button" class="btn btn-danger" id="confirmDeleteBtn">삭제</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	
+
+
+
+
 		<!-- 캘린더 script -->
 		<script>
-		document.addEventListener('DOMContentLoaded', function () {
+		document.addEventListener("DOMContentLoaded", function () {
 			  const calendarEl = document.getElementById('appCalendar');
 			  const separator = document.getElementById('separator').value;
 			  const loginEmployeeId = document.getElementById("loginEmployeeId").value;
-			  //console.log(separator+"!!!!!!!!!!!!!!!");
+
 			  const calendar = new FullCalendar.Calendar(calendarEl, {
-			      initialView: 'listMonth',
-			      locale: 'ko',		      
-			      headerToolbar: {
-			        left: 'prev,next today',
-			        center: 'title',
-			        right: ''
-			      },
-			      validRange: {           
-				        start: new Date()      
-				      },
-				  noEventsContent: '예약이 없습니다',
-			      buttonText: {
-			    	    today: '오늘' 
-			    	  },
-			      dayMaxEventRows: true,
-			      views: {
-			        dayGridMonth: {
-			          dayMaxEventRows: 3,
-			          moreLinkText: "더보기"		       
-			          }
-			      },
-			      eventSources: [
-			    	  {
-			    	    events: function (fetchInfo, successCallback, failureCallback) {
-			    	      fetch('/resvehicle/list/' + separator)
-			    	        .then(response => response.json())
-			    	        .then(events => successCallback(events))
-			    	        .catch(error => {
-			    	          console.error("차량 예약 불러오기 실패", error);
-			    	          failureCallback(error);
-			    	        });
-			    	    }
-			    	  }
-			    	],
-				    	  
-			      eventDisplay: 'block',
-			      dayCellContent: function (info) {
-			        return info.date.getDate();
-			      },
-			      eventClick: function(info) {
-			    	  const event = info.event;
+			    initialView: 'listMonth',
+			    locale: 'ko',
+			    headerToolbar: {
+			      left: 'prev,next today',
+			      center: 'title',
+			      right: ''
+			    },
+			    validRange: {
+			      start: new Date()
+			    },
+			    noEventsContent: '예약이 없습니다',
+			    buttonText: {
+			      today: '오늘'
+			    },
+			    dayMaxEventRows: true,
+			    views: {
+			      dayGridMonth: {
+			        dayMaxEventRows: 3,
+			        moreLinkText: "더보기"
+			      }
+			    },
+			    eventSources: [
+			      {
+			        events: function (fetchInfo, successCallback, failureCallback) {
+			          fetch('/resvehicle/list/' + separator)
+			            .then(response => response.json())
+			            .then(events => successCallback(events))
+			            .catch(error => {
+			              console.error("차량 예약 불러오기 실패", error);
+			              failureCallback(error);
+			            });
+			        }
+			      }
+			    ],
+			    eventDisplay: 'block',
+			    dayCellContent: function (info) {
+			      return info.date.getDate();
+			    },
+			    eventClick: function (info) {
+			      const event = info.event;
+			      const isOwner = loginEmployeeId === event.extendedProps.reservationCreator;
 
-			    	  // 날짜 포맷 옵션
-			    	  const options = {
-			    	    year: 'numeric',
-			    	    month: 'long',
-			    	    day: 'numeric',
-			    	    weekday: 'short',
-			    	    hour: '2-digit',
-			    	    minute: '2-digit',
-			    	    hour12: false
-			    	  };
-			    	  
-			    	  //로그인한 사람과 예약한 사람의 id가 같다면 수정/삭제
-			    	  const isOwner = loginEmployeeId === event.extendedProps.reservationCreator;
-			    	  //document.getElementById("editVehicleBtn").style.display = isOwner ? 'inline-block' : 'none';
-			    	  document.getElementById("deleteVehicleBtn").style.display = isOwner ? 'inline-block' : 'none';
+			      document.getElementById("deleteVehicleBtn").style.display = isOwner ? 'inline-block' : 'none';
 
+			      document.getElementById("detailReservationNo").value = event.extendedProps.reservation_no || '';
+			      document.getElementById("detailVehicleName").textContent = event.extendedProps.vehicleName || '';
+			      document.getElementById("detailReserverName").textContent = event.extendedProps.reserverName || '';
+			      document.getElementById("detailLocation").textContent = event.extendedProps.reservationLocation || '';
 
-			    	  // 상세 모달 값 채우기
-			    	  document.getElementById("detailReservationNo").value = event.extendedProps.reservation_no || '';
-			    	  document.getElementById("detailVehicleName").textContent = event.extendedProps.vehicleName || '';
-			    	  document.getElementById("detailReserverName").textContent = event.extendedProps.reserverName || '';
-			    	  document.getElementById("detailLocation").textContent = event.extendedProps.reservationLocation || '';
-			    	  
-			    	  // 날짜 형식 정리해서 표시
-			    	  document.getElementById("detailStartTime").textContent = 
-			    	    new Intl.DateTimeFormat('ko-KR', options).format(new Date(event.start));
+			      const options = {
+			        year: 'numeric', month: 'long', day: 'numeric',
+			        weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false
+			      };
 
-			    	  document.getElementById("detailEndTime").textContent = 
-			    	    new Intl.DateTimeFormat('ko-KR', options).format(new Date(event.end));
-			    	  
-			    	  
-			    	  
+			      document.getElementById("detailStartTime").textContent = new Intl.DateTimeFormat('ko-KR', options).format(new Date(event.start));
+			      document.getElementById("detailEndTime").textContent = new Intl.DateTimeFormat('ko-KR', options).format(new Date(event.end));
 
-
-			    	  // 모달 열기
-			    	  const modalElement = document.getElementById('vehicleDetailModal');
-			    	  if (modalElement) {
-			    	    const modal = new bootstrap.Modal(modalElement);
-			    	    modal.show();
-			    	  } else {
-			    	    console.error("모달이 없습니다.");
-			    	  }
-			    	},
-			    	eventDidMount: function(info) {
-			    		  const el = info.el;
-			    		  const eventDate = new Date(info.event.start);
-			    		  const today = new Date();
-
-			   
-
-			    		  // 기본 스타일 먼저 적용
-			    		  el.style.setProperty("background-color", "#F9F9F9", "important");
-			    		  el.style.setProperty("border", "1px solid #DDD", "important");
-			    		  el.style.setProperty("color", "#000", "important");
-			    		  el.style.setProperty("font-size", "12px", "important");
-			    		  el.style.setProperty("font-weight", "700", "important");
-			    		  el.style.setProperty("padding", "6px 10px", "important");
-			    		  el.style.setProperty("margin", "4px 0", "important");
-			    		  el.style.setProperty("border-radius", "6px", "important");
-			    		  el.style.setProperty("box-shadow", "0 2px 5px rgba(0,0,0,0.05)", "important");
-			    		  el.style.setProperty("transition", "background-color 0.2s ease", "important");
-			    		  el.style.setProperty("white-space", "nowrap", "important");
-			    		  el.style.setProperty("overflow", "hidden", "important");
-			    		  el.style.setProperty("text-overflow", "ellipsis", "important");
-
-			    		
-			    		
-
-			    		
-			    		 
-			    		}
+			      const modalElement = document.getElementById('vehicleDetailModal');
+			      if (modalElement) {
+			        const modal = new bootstrap.Modal(modalElement);
+			        modal.show();
+			      }
+			    },
+			    eventDidMount: function (info) {
+			      const el = info.el;
+			      el.style.setProperty("background-color", "#F9F9F9", "important");
+			      el.style.setProperty("border", "1px solid #DDD", "important");
+			      el.style.setProperty("color", "#000", "important");
+			      el.style.setProperty("font-size", "12px", "important");
+			      el.style.setProperty("font-weight", "700", "important");
+			      el.style.setProperty("padding", "6px 10px", "important");
+			      el.style.setProperty("margin", "4px 0", "important");
+			      el.style.setProperty("border-radius", "6px", "important");
+			      el.style.setProperty("box-shadow", "0 2px 5px rgba(0,0,0,0.05)", "important");
+			      el.style.setProperty("white-space", "nowrap", "important");
+			      el.style.setProperty("overflow", "hidden", "important");
+			      el.style.setProperty("text-overflow", "ellipsis", "important");
+			    }
 			  });
-			  
-			  //수정 모달에 값 채워넣기 + resvationNo 기준
-			/* document.getElementById("editVehicleBtn").addEventListener("click", function () {
+
+			  // 중첩 말고 여기서 바로 삭제 관련 이벤트 등록
+			 const deleteBtn = document.getElementById("deleteVehicleBtn");
+			const confirmModalEl = document.getElementById("confirmDeleteModal");
+			
+			if (deleteBtn && confirmModalEl) {
+			  deleteBtn.addEventListener("click", function () {
+			    const modal = new bootstrap.Modal(confirmModalEl);
+			    modal.show();
+			  });
+			}
+			
+			document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
 			  const reservationNo = document.getElementById("detailReservationNo").value;
 			
-			  // 상세 모달 닫기
-			  const detailModalEl = document.getElementById("vehicleDetailModal");
-			  const detailModal = bootstrap.Modal.getInstance(detailModalEl);
-			  if (detailModal) {
-			    detailModal.hide();
-			  }
-			
-			  // 서버에서 수정할 데이터 가져오기
-			  fetch('/resvehicle/detail/' + reservationNo)
+			  fetch('/resvehicle/delete/' + reservationNo, {
+			    method: "post",
+			    headers: {
+			      'header': document.querySelector('meta[name="_csrf_header"]').content,
+			      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			    }
+			  })
 			    .then(response => response.json())
 			    .then(data => {
-			      // 수정 모달 데이터 채우기
-			      document.getElementById("editReservationNo").value = data.reservation_no;
-			      document.getElementById("editFacilityNo").value = data.facility_no;
-			      document.getElementById("editLocation").value = data.reservation_location;
+			      const confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
+			      if (confirmModal) confirmModal.hide();
 			
-			      const startDate = data.reservation_start.split("T")[0];
-			      const endDate = data.reservation_end.split("T")[0];
+			      if (data.res_code == 200) {
+			        // ✅ 모달 확인 버튼 눌렀을 때만 reload
+			        showMessageModal("예약이 취소되었습니다.", "알림", true);
+			      } else {
+			        showMessageModal(data.res_msg || "삭제에 실패했습니다.");
+			      }
+			    })
+			    .catch(error => {
+			      console.error("삭제 중 오류:", error);
 			
-			      document.getElementById("editStartDate").value = startDate;
-			      document.getElementById("editEndDate").value = endDate;
-			      document.getElementById("editEndDate").min = startDate; 
-			      const today = new Date().toISOString().split("T")[0];
-			      document.getElementById("editStartDate").min = today;
-			      document.getElementById("editStartTime").value = data.reservation_start.split("T")[1].substring(0, 5);
-			      document.getElementById("editEndTime").value = data.reservation_end.split("T")[1].substring(0, 5);
-
-			      //수정 모달 열기
-			      const editModal = new bootstrap.Modal(document.getElementById("editVehicleModal"));
-			      editModal.show();
+			      const confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
+			      if (confirmModal) confirmModal.hide();
+			
+			      showMessageModal("삭제 중 오류가 발생했습니다. 다시 시도해주세요 😥");
 			    });
 			});
-			  
-			  //수정용 모달에서 수정완료 버튼을 눌러 UPDATE
-			  document.getElementById("editVehicleForm").addEventListener("submit", function (e) {
-				  e.preventDefault();
 
-				  // 입력값 가져오기
-				  const reservationNo = document.getElementById("detailReservationNo").value;
-				  const startDate = document.getElementById("editStartDate").value;
-				  const startTime = document.getElementById("editStartTime").value;
-				  const endDate = document.getElementById("editEndDate").value;
-				  const endTime = document.getElementById("editEndTime").value;
-				  const locationValue = document.getElementById("editLocation").value.trim();
-
-				  const startDateTime = `${startDate}T${startTime}`;
-				  const endDateTime = `${endDate}T${endTime}`;
-				  
-				  //console.log(reservationNo+"!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-				  //목적지 유효성 검사
-				  if (!locationValue) {
-				    alert("목적지를 입력해주세요!");
-				    return;
-				  }
-
-				  const now = new Date();
-				  const today = now.toISOString().split("T")[0];
-				  if (startDate === today) {
-				    const startDateTimeObj = new Date(startDateTime);
-				    if (startDateTimeObj < now) {
-				      alert("지나간 시간으로는 예약할 수 없습니다!");
-				      return;
-				    }
-				  }
-
-				  //시간 유효성 검사
-				  if (new Date(startDateTime) >= new Date(endDateTime)) {
-				    alert("종료 시간은 시작 시간 이후여야 합니다.");
-				    return;
-				  }
-
-				  // datetime-local 값 hidden input에 넣기
-				  document.getElementById("editCalendarStartTime").value = startDateTime;
-				  document.getElementById("editCalendarEndTime").value = endDateTime;
-
-				  // fetch 전송
-				  const form = e.target;
-				  const formData = new FormData(form);
-
-				  fetch("/resvehicle/update/" + reservationNo, {
-				    method: "post",
-				    headers: {
-				      'header': document.querySelector('meta[name="_csrf_header"]').content,
-				      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-				    },
-				    body: formData
-				  })
-				    .then(response => response.json())
-				    .then(data => {
-					   alert(data.res_msg); 
-					  if (data.res_code == 200) {
-					    location.reload();   
-					  } 
-					})
-
-				    .catch(error => {
-				      console.error("수정 중 오류:", error);
-				      alert("수정에 실패했습니다.");
-				    });
-				}); */
-			  	//예약 삭제
-			  	document.getElementById("deleteVehicleBtn").addEventListener("click", function () {
-				    const reservationNo = document.getElementById("detailReservationNo").value;
-
-				    const confirmDelete = confirm("차량 예약을 취소하시겠습니까?");
-				    if (!confirmDelete) return;
-
-				    fetch('/resvehicle/delete/'+reservationNo, {
-				      method: "post",
-				      headers: {
-				        'header': document.querySelector('meta[name="_csrf_header"]').content,
-				        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-				      }
-				    })
-				    .then(response => response.json())
-				    .then(data => {
-				      alert(data.res_msg);
-				      if (data.res_code == 200) {
-				        location.reload();
-				      }
-				    })
-				    .catch(error => {
-				      console.error("삭제 중 오류:", error);
-				      alert("삭제에 실패했습니다.");
-				    });
-				  });
-			  	// setTimeout 사용
-				/* <head>에 있는 FullCalendar CSS 파일이 아직 로드 중이라
-				캘린더는 그려졌지만 스타일이 적용되지 않은 상태로 나와버림. */
-			  setTimeout(() => {
-			    calendar.render();
-			  }, 0); 
+			  // ✅ 캘린더 렌더링은 마지막에!
+			  calendar.render();
 			});
+
 		</script>
 		
 		<script th:inline="javascript">
@@ -770,7 +715,7 @@
 		          const time = data?.features?.[0]?.properties?.totalTime;
 		
 		          if (distance != null && time != null) {
-		            onAddressSelected(distance, time);  // 여기서 호출할 수 있도록 함수 만들어줄 거야
+		            onAddressSelected(distance, time);  
 		          } else {
 		            alert("거리 계산 실패 😭");
 		          }
@@ -810,6 +755,8 @@
 		    }).open();
 		  }
 		</script>
+		
+		
 
 		
 		
