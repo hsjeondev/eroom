@@ -209,83 +209,86 @@
 
 
         <!-- 2행·2열 예약하기 예약 현황 보기 -->
-	 <div class="attendance-card mx-auto">
-	  <div class="card shadow-sm border-0" style="width: 311.33px; height: 207.81px;">
-	    <div class="card-body p-2 d-flex flex-column justify-content-between" style="height: 100%;">
-	
-	      <!-- 상단: 제목 + 탭 버튼 -->
-	      <div class="d-flex justify-content-between align-items-center mb-2">
-	        <div class="fw-bold text-dark" style="font-size: 0.9rem;">오늘 예약 현황</div>
-	        <ul class="nav nav-underline fs-9" id="resTab" role="tablist" style="margin-bottom: 0;">
-	          <li class="nav-item" role="presentation">
-	            <a class="nav-link active" id="vehicle-tab" data-bs-toggle="tab" href="#tab-vehicle"
-	               role="tab" aria-controls="tab-vehicle" aria-selected="true">차량</a>
-	          </li>
-	          <li class="nav-item" role="presentation">
-	            <a class="nav-link" id="room-tab" data-bs-toggle="tab" href="#tab-room"
-	               role="tab" aria-controls="tab-room" aria-selected="false">회의실</a>
-	          </li>
-	        </ul>
-	      </div>
-	
-	      <!-- 탭 내용 (차량 / 회의실 목록) -->
-	      <div class="tab-content small flex-grow-1 overflow-auto" id="resTabContent" style="font-size: 0.7rem;">
-	        <!-- 차량 탭 -->
-	        <div class="tab-pane fade show active" id="tab-vehicle" role="tabpanel" aria-labelledby="vehicle-tab">
-	          <table class="table table-sm table-striped mb-0 text-center">
-	            <thead>
-	              <tr>
-	                <th style="font-size: 0.65rem;">차량</th>
-	                <th style="font-size: 0.65rem;">예약자</th>
-	                <th style="font-size: 0.65rem;">시간</th>
-	              </tr>
-	            </thead>
-	            <tbody>
-	              <tr th:if="${#lists.isEmpty(todayReservations)}">
-	                <td colspan="3">🚗 없음</td>
-	              </tr>
-	              <tr th:each="res : ${todayReservations}">
-	                <td th:text="${res.vehicleName}"></td>
-	                <td th:text="${res.reserverName}"></td>
-	                <td>
-	                  <span th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span> ~
-	                  <span th:text="${#temporals.format(res.reservation_end, 'HH:mm')}"></span>
-	                </td>
-	              </tr>
-	            </tbody>
-	          </table>
-	        </div>
-	
-	        <!-- 회의실 탭 -->
-	        <div class="tab-pane fade" id="tab-room" role="tabpanel" aria-labelledby="room-tab">
-	          <table class="table table-sm table-striped mb-0 text-center">
-	            <thead>
-	              <tr>
-	                <th style="font-size: 0.65rem;">회의실</th>
-	                <th style="font-size: 0.65rem;">예약자</th>
-	                <th style="font-size: 0.65rem;">시간</th>
-	              </tr>
-	            </thead>
-	            <tbody>
-	              <tr th:if="${#lists.isEmpty(todayRoomReservations)}">
-	                <td colspan="3">🏢 없음</td>
-	              </tr>
-	              <tr th:each="res : ${todayRoomReservations}">
-	                <td th:text="${res.meetingRoomName}"></td>
-	                <td th:text="${res.reserverName}"></td>
-	                <td>
-	                  <span th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span> ~
-	                  <span th:text="${#temporals.format(res.reservation_end, 'HH:mm')}"></span>
-	                </td>
-	              </tr>
-	            </tbody>
-	          </table>
-	        </div>
-	      </div>
-	
-	    </div>
-	  </div>
-	</div>
+		  <div class="text-white p-1">
+		  <div class="attendance-card mx-auto">
+		    <div class="card shadow-sm border-0">
+		      <div class="card-body p-4" style="height: 207.81px;">
+		
+		        <!-- 제목(왼쪽) + 탭버튼(오른쪽) -->
+		        <div class="d-flex justify-content-between align-items-center mb-2">
+		          <div class="fw-bold text-dark" style="font-size: 0.9rem;">오늘 예약 현황</div>
+		          <ul class="nav nav-underline fs-9" id="resTab" role="tablist" style="margin-bottom: 0;">
+		            <li class="nav-item" role="presentation">
+		              <a class="nav-link active" id="vehicle-tab" data-bs-toggle="tab" href="#tab-vehicle"
+		                 role="tab" aria-controls="tab-vehicle" aria-selected="true">차량</a>
+		            </li>
+		            <li class="nav-item" role="presentation">
+		              <a class="nav-link" id="room-tab" data-bs-toggle="tab" href="#tab-room"
+		                 role="tab" aria-controls="tab-room" aria-selected="false">회의실</a>
+		            </li>
+		          </ul>
+		        </div>
+		
+		        <!-- 목록 테이블 중앙 정렬 -->
+		        <div class="tab-content small d-flex justify-content-center" id="resTabContent"
+		             style="font-size: 0.7rem; height: 110px; overflow-y: auto;">
+		          <div class="tab-pane fade show active w-100" id="tab-vehicle" role="tabpanel" aria-labelledby="vehicle-tab">
+		            <table class="table table-sm table-striped mb-0 text-center" style="font-size: 0.65rem;">
+		              <thead>
+		                <tr>
+		                  <th>차량</th>
+		                  <th>예약자</th>
+		                  <th>시간</th>
+		                </tr>
+		              </thead>
+		              <tbody>
+		                <tr th:if="${#lists.isEmpty(todayReservations)}">
+		                  <td colspan="3">🚗 없음</td>
+		                </tr>
+		                <tr th:each="res : ${todayReservations}">
+		                  <td th:text="${res.vehicleName}"></td>
+		                  <td th:text="${res.reserverName}"></td>
+		                  <td>
+		                    <span th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span> ~
+		                    <span th:text="${#temporals.format(res.reservation_end, 'HH:mm')}"></span>
+		                  </td>
+		                </tr>
+		              </tbody>
+		            </table>
+		          </div>
+		
+		          <div class="tab-pane fade w-100" id="tab-room" role="tabpanel" aria-labelledby="room-tab">
+		            <table class="table table-sm table-striped mb-0 text-center" style="font-size: 0.65rem;">
+		              <thead>
+		                <tr>
+		                  <th>회의실</th>
+		                  <th>예약자</th>
+		                  <th>시간</th>
+		                </tr>
+		              </thead>
+		              <tbody>
+		                <tr th:if="${#lists.isEmpty(todayRoomReservations)}">
+		                  <td colspan="3">🏢 없음</td>
+		                </tr>
+		                <tr th:each="res : ${todayRoomReservations}">
+		                  <td th:text="${res.meetingRoomName}"></td>
+		                  <td th:text="${res.reserverName}"></td>
+		                  <td>
+		                    <span th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span> ~
+		                    <span th:text="${#temporals.format(res.reservation_end, 'HH:mm')}"></span>
+		                  </td>
+		                </tr>
+		              </tbody>
+		            </table>
+		          </div>
+		        </div>
+		
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+
 
 
 
