@@ -31,7 +31,7 @@ public class DirectoryBookmarkService {
 		}
 	}
 
-	public DirectoryBookmark changeBookmark(DirectoryBookmarkDto dto, Employee employee) {
+	public DirectoryBookmark changeBookmark(Employee employee, DirectoryBookmarkDto dto) {
 		DirectoryBookmark result = null;
 		try {
 			Directory directoryEntity = directoryRepository.findById(dto.getDirectory_no()).orElse(null);
@@ -62,6 +62,19 @@ public class DirectoryBookmarkService {
 			result = saved;
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	// 북마크 우선 조회 기능
+	public String findBookmarkYnByEmployeeNo(Long employeeNo, Long id) {
+		String result = null;
+		List<DirectoryBookmark> directoryBookmarkList = directoryBookmarkRepository.findByEmployee_employeeNoAndDirectory_Employee_employeeNoAndVisibleYnAndDirectoryBookmarkYn(employeeNo, id, "Y", "Y");
+		if(directoryBookmarkList.isEmpty()) {
+			return null;
+		} else {
+			DirectoryBookmark directoryBookmark = directoryBookmarkList.get(directoryBookmarkList.size() - 1);
+			result = directoryBookmark.getDirectoryBookmarkYn();
 		}
 		return result;
 	}

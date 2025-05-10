@@ -75,10 +75,10 @@ public class DirectoryBookmarkController {
 		
 //		System.out.println("주소록번호 체크 : " + dto.getDirectory_no());
 //		System.out.println("메모 체크 : " + dto.getDirectory_memo_content());
-		DirectoryBookmark result = directoryBookmarkService.changeBookmark(dto, employee);
+		DirectoryBookmark result = directoryBookmarkService.changeBookmark(employee, dto);
 		
 		if(result != null) {
-			map.put("targetDirectoryNo", String.valueOf(result.getDirectory().getDirectoryNo()));
+			map.put("targetEmployeeNo", String.valueOf(result.getDirectory().getEmployee().getEmployeeNo()));
 			map.put("res_code", "200");
 			map.put("res_msg", "북마크 저장 성공");
 		}

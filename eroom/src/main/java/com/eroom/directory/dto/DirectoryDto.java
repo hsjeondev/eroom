@@ -58,6 +58,10 @@ public class DirectoryDto {
 	private String directory_zipcode; // 우편번호
 	private String directory_address; // 주소
 	
+	// 북마크 여부
+	private String bookmark_yn;
+	private String star_mark_html;
+	
 	
 //	private String employee_name;
 //	private String department_name;
