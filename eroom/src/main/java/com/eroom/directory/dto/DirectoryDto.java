@@ -2,8 +2,10 @@ package com.eroom.directory.dto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import com.eroom.directory.entity.Directory;
+import com.eroom.directory.entity.DirectoryBookmark;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Separator;
 
@@ -55,6 +57,7 @@ public class DirectoryDto {
 	// 주소 정보
 	private String directory_zipcode; // 우편번호
 	private String directory_address; // 주소
+	
 	
 //	private String employee_name;
 //	private String department_name;
