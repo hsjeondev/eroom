@@ -1,6 +1,7 @@
 package com.eroom.chat.controller;
 
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -425,6 +426,24 @@ public class ChatController {
 	) {
 	    return driveService.findChatFilesByRoom(chatroomNo, page, size);
 	}
+	@PostMapping("/leave")
+	@ResponseBody
+	public Map<String, Object> leaveChatroom(@RequestBody Map<String, Object> request) {
+	    // 로그인한 사용자 정보 추출
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();  // 로그인한 사용자의 employeeNo
+
+	    // 채팅방 번호 가져오기
+	    Long chatroomNo = Long.valueOf(request.get("chatroomNo").toString());
+
+	    // 채팅방 나가기 처리
+	    chatroomService.leaveChatroom(chatroomNo, myEmployeeNo);
+
+	    return Map.of("res_code", "200", "res_msg", "채팅방에서 나갔습니다.");
+	}
+
+
 
 
 }
