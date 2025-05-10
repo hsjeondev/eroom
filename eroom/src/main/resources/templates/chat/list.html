@@ -235,7 +235,7 @@
 								<ul class="list-unstyled mb-4">
 									<li data-action="rename" class="cursor-pointer">채팅방 이름 변경</li>
 									<li data-action="add" class="cursor-pointer">참여자 추가하기</li>
-									<li data-action="delete" class="cursor-pointer">채팅방 삭제</li>
+									<li data-action="delete" class="cursor-pointer d-none" id="deleteChatroomBtn">채팅방 삭제</li>
 								</ul>
 
 							</div>
@@ -439,6 +439,18 @@
 		    const chatContent = document.getElementById("chat-content");
 		    const myEmployeeNo = document.getElementById("myEmployeeNo").value;
 		    
+		 // 삭제 버튼 노출 여부 제어
+			fetch('/chat/roomDetail?roomNo=' + chatroomNo)
+			  .then(response => response.json())
+			  .then(detail => {
+			    const myEmployeeNo = document.getElementById("myEmployeeNo").value;
+			    const deleteBtn = document.getElementById("deleteChatroomBtn");
+
+			    if (deleteBtn) {
+			      const isOwner = detail.creater === Number(myEmployeeNo);
+			      deleteBtn.classList.toggle("d-none", !isOwner);
+			    }
+			  });
 		    chatContent.innerHTML = `
 		    	  <div class="tab-pane h-100 fade show active d-flex flex-column">
 		    	    <div class="d-flex align-items-center justify-content-between px-4 pt-3">
