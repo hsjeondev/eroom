@@ -35,6 +35,7 @@ public class ApprovalDto {
     private String completed_date; // 완료일 (String)
     
     private Employee employee; // 기안자
+    private String employee_name; // 기안자
     private ApprovalFormat approval_format; // 결재 양식
     private String approval_visible_yn; // 결재 사용여부
     
