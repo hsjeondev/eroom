@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -475,7 +476,7 @@ public class ApprovalService {
 	
 	// 마이페이지, 내 결재 조회 - 진행중
 	public List<ApprovalDto> myPageMyApprovalsStatusIsS(Long employeeNo) {
-		List<Approval> list =  approvalRepository.findByEmployee_EmployeeNoAndApprovalStatusAndApprovalVisibleYnOrderByApprovalRegDateDesc(employeeNo, "S", "Y");
+		List<Approval> list =  approvalRepository.findTop5ByApprovalStatusAndApprovalVisibleYnAndEmployee_EmployeeNoOrderByApprovalRegDateDesc("S", "Y", employeeNo);
 		List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
 		for(Approval a : list) {
 			ApprovalDto dto = new ApprovalDto().toDto(a);
@@ -485,6 +486,27 @@ public class ApprovalService {
 		int limit = Math.min(resultList.size(), 5);
 		return resultList.subList(0, limit);
 	}
+	
+	// mainpage Approval 리스트 조회1
+	public List<Approval> getOngoingApprovals(Long employeeNo) {
+	    return approvalRepository.findTop5ByApprovalStatusAndApprovalVisibleYnAndEmployee_EmployeeNoOrderByApprovalRegDateDesc("S", "Y", employeeNo);
+	}
+
+	// mainpage Approval 리스트 조회2
+	public List<Approval> getPendingApprovals(Long employeeNo) {
+		// 내가 합의나 결재 순번인 경우 가져와야하니 ApprovalLineService에 접근해보자.
+	    //return approvalRepository.findTop5ByStatusOrderByCreatedDateDesc("PENDING");
+		return null;
+	}
+
+	// mainpage Approval 리스트 조회3
+	public List<Approval> getCompletedApprovals(Long employeeNo) {
+		List<String> statuses = Arrays.asList("A", "D");
+	    return approvalRepository.findTop5ByApprovalStatusInAndApprovalVisibleYnAndEmployee_EmployeeNoOrderByApprovalRegDateDesc(statuses, "Y", employeeNo);
+	}
+
+	
+	
 
 
 
