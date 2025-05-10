@@ -235,6 +235,7 @@
 								<ul class="list-unstyled mb-4">
 									<li data-action="rename" class="cursor-pointer">채팅방 이름 변경</li>
 									<li data-action="add" class="cursor-pointer">참여자 추가하기</li>
+									<li data-action="leave" class="cursor-pointer">채팅방 나가기</li>
 									<li data-action="delete" class="cursor-pointer d-none" id="deleteChatroomBtn">채팅방 삭제</li>
 								</ul>
 
@@ -271,6 +272,7 @@
 		  bindParticipantAdd(); // 참여자 추가
 		  bindChatTypeChange(); // 채팅 종류 변경시
 		  bindChatroomDelete(); // 채팅방 삭제
+		  bindChatroomLeave();  // 채팅방 나가기
 		  connectWebSocket(); // 웹소켓 연결
 		  bindFilePreview(); // 채팅 파일 
 		});
@@ -713,6 +715,43 @@
 		    }
 		  });
 		}
+		// 채팅방 나가기
+		function bindChatroomLeave() {
+			  const detailModal = document.getElementById("chatroomDetailModal");
+			  if (!detailModal) return;
+
+			  detailModal.addEventListener("click", function (e) {
+			    const li = e.target.closest("li");
+			    if (!li || li.dataset.action !== "leave") return;
+
+			    const chatroomNo = document.getElementById("modalChatroomName").dataset.roomNo;
+			    if (!chatroomNo) return;
+
+			    if (confirm("채팅방에서 나가시겠습니까?")) {
+			      fetch("/chat/leave", {
+			        method: "POST",
+			        headers: {
+			          "Content-Type": "application/json",
+			          "X-CSRF-Token": document.querySelector('meta[name="_csrf"]').content
+			        },
+			        body: JSON.stringify({ chatroomNo: chatroomNo })
+			      })
+			      .then(res => res.json())
+			      .then(data => {
+			        if (data.res_code === "200") {
+			          alert("채팅방에서 나갔습니다.");
+			          location.href = "/chat/list";
+			        } else {
+			          alert("나가기 실패: " + data.res_msg);
+			        }
+			      })
+			      .catch(err => {
+			        console.error("나가기 요청 실패:", err);
+			        alert("서버 오류가 발생했습니다.");
+			      });
+			    }
+			  });
+			}
 		// 채팅방 삭제
 		function bindChatroomDelete() {
           const detailModal = document.getElementById("chatroomDetailModal");
