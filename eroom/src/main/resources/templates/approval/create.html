@@ -71,7 +71,7 @@
 								<div class="fw-bold text-dark border-bottom pb-1 mb-2">결재 라인</div>
 								<div id="approvelLineTemp1" 
 								     class="text-center text-secondary small border py-3 rounded"
-								     th:attr="style=${mode == 'edit'} ? 'display: none;' : 'display: block;'">
+								     th:attr="style=${mode == 'edit' and approvalLineList.?[approval_line_step >= 1].size() > 0 ? 'display: none;' : 'display: block;'}">
 								    선택된 결재자가 없습니다.
 								</div>
 								<div class="text-end text-body-secondary fs-8 mt-1 d-flex gap-2" style="display: flex; overflow-x: auto; gap: 5px; max-width: 100%; white-space: nowrap;" id="approveLine1">
@@ -93,7 +93,7 @@
 								<div class="fw-bold text-dark border-bottom pb-1 mb-2">합의 라인</div>
 								<div id="approvelLineTemp2" 
 								     class="text-center text-secondary small border py-3 rounded"
-								     th:attr="style=${mode == 'edit'} ? 'display: none;' : 'display: block;'">
+								     th:attr="style=${mode == 'edit' and approvalLineList.?[approval_line_step == 0].size() > 0 ? 'display: none;' : 'display: block;'}">
 								    선택된 합의자가 없습니다.
 								</div>
 								<div class="text-end text-body-secondary fs-8 mt-1 d-flex gap-2" style="display: flex; overflow-x: auto; gap: 5px; max-width: 100%; white-space: nowrap;" id="approveLine2">
@@ -116,7 +116,7 @@
 								<div class="fw-bold text-dark border-bottom pb-1 mb-2">참조 라인</div>
 								<div id="approvelLineTemp3" 
 								     class="text-center text-secondary small border py-3 rounded"
-								     th:attr="style=${mode == 'edit'} ? 'display: none;' : 'display: block;'">
+								     th:attr="style=${mode == 'edit' and approvalLineList.?[approval_line_step == -1].size() > 0 ? 'display: none;' : 'display: block;'}">
 								    선택된 참조자가 없습니다.
 								</div>
 								<div class="text-end text-body-secondary fs-8 mt-1 d-flex gap-2" style="display: flex; overflow-x: auto; gap: 5px; max-width: 100%; white-space: nowrap;" id="approveLine3">
@@ -757,7 +757,7 @@ document.querySelectorAll('[data-bs-target="#selectApproveLineModal"]').forEach(
 	          const parentNode = parentCheckbox.closest('li.treeview-list-item');
 
 	          if (parentNode) {
-	            // 🔎 모든 하위 treeview-list-item의 employee 타입 체크박스 탐색 (깊이 탐색으로 수정)
+	            // 모든 하위 treeview-list-item의 employee 타입 체크박스 탐색 (깊이 탐색으로 수정)
 	            const childCheckboxes = parentNode.querySelectorAll('input[data-type="employee"]'); // 더 깊이 탐색
 	            // const childCheckboxes = parentNode.querySelectorAll('li.treeview-list-item input[data-type="employee"]');
 	         // console.log("하위 직원 탐색 완료:", childCheckboxes);
@@ -780,6 +780,12 @@ document.querySelectorAll('[data-bs-target="#selectApproveLineModal"]').forEach(
 	          }
 	        }
 	      });
+	    } else{
+	    	// else문이 제일 나중에 추가한 곳!!! 오류 생기면 여기부터 의심하기!!!!
+	    	const checkBoxTemp = document.querySelector('input[data-no="root"]');
+	    	if(checkBoxTemp){
+	    		checkBoxTemp.style.visibility = 'hidden';
+	    	}
 	    }
 	    [...agreerIds, ...approverIds].forEach(id => {
 	    	// console.log(`선택된 직원 ID 탐색: ${id}`);
@@ -794,7 +800,7 @@ document.querySelectorAll('[data-bs-target="#selectApproveLineModal"]').forEach(
 	              parentCheckbox.style.visibility = 'hidden';
 	            }
 	            
-	            // 🚀 최상위 "이룸 컴퍼니" 체크박스 숨기기
+	            // 최상위 "이룸 컴퍼니" 체크박스 숨기기
 	            const companyCheckbox = parentLi.querySelector(':scope > .treeview-text input[data-type="company"]');
 	            if (companyCheckbox) {
 	            	// console.log("최상위 이룸 컴퍼니 숨김 처리");
@@ -1142,10 +1148,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	  };
 	
 	  const targetDiv = document.getElementById(`approveLine${targetPrefix === 'approver' ? 1 : targetPrefix === 'agreer' ? 2 : 3}`);
-	  
 	  // 남은 뱃지 개수 확인
 	  const remainingBadges = targetDiv.querySelectorAll('.badge').length;
-	
+		console.log(remainingBadges);
 	  // 만약 0개라면 임시 표시를 다시 보여줌
 	  if (remainingBadges === 0) {
 	    lineMap[targetPrefix].style.display = 'block';
@@ -1339,7 +1344,7 @@ function handleHighlight(li) {
 		  });
 		  
 		
-		  // [5] 서버 전송
+		  // [5-1] 서버 전송
 		  /* fetch('/approval/create', {
 		    method: 'POST',
 		    headers: {
@@ -1379,7 +1384,7 @@ function handleHighlight(li) {
 		  
 		  
 
-		  // 파일 기능 추가를 위한 formData 추가 버전
+		  // [5-2] 파일 기능 추가를 위한 formData 추가 버전
 		  const fileFormData = new FormData();
 		  // 기본 데이터
 		  fileFormData.append("title", approvalTitle);
