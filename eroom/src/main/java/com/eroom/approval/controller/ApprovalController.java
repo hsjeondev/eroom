@@ -406,13 +406,13 @@ public class ApprovalController {
 	    List<Integer> approverSteps = mapper.readValue(approverStepsJson, new TypeReference<List<Integer>>() {});
 	    List<Long> agreerIds = mapper.readValue(agreerIdsJson, new TypeReference<List<Long>>() {});
 	    List<Integer> agreerSteps = mapper.readValue(agreerStepsJson, new TypeReference<List<Integer>>() {});
-	    List<Long> refererIds = mapper.readValue(refererIdsJson, new TypeReference<List<Long>>() {});
+//	    List<Long> refererIds = mapper.readValue(refererIdsJson, new TypeReference<List<Long>>() {});
+	    // 트리 구조 추가로 separatorCode를 받을 수 있게 Long->String
+	    List<String> refererIds = mapper.readValue(refererIdsJson, new TypeReference<List<String>>() {});
 	    List<Integer> refererSteps = mapper.readValue(refererStepsJson, new TypeReference<List<Integer>>() {});
 	    List<Long> approvalAttachFileIds = mapper.readValue(approvalAttachFileIdsJson, new TypeReference<List<Long>>() {});
 	    
-	    Long parsedEditApprovalNo = (editApprovalNo == null || editApprovalNo.isEmpty()) 
-                ? null 
-                : Long.valueOf(editApprovalNo);
+	    Long parsedEditApprovalNo = (editApprovalNo == null || editApprovalNo.isEmpty()) ? null  : Long.valueOf(editApprovalNo);
 	    
 	    ApprovalRequestDto dto = ApprovalRequestDto.builder()
 	    						.title(title)
