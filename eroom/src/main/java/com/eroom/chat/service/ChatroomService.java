@@ -256,6 +256,24 @@ public class ChatroomService {
 	public List<DriveDto> getChatFilesByRoom(Long chatroomNo, int page, int size) {
 	    return driveService.findChatFilesByRoom(chatroomNo, page, size);
 	}
+    // 채팅방 나가기
+    public void leaveChatroom(Long chatroomNo, Long employeeNo) {
+        // 채팅방과 해당 참여자 확인
+        ChatroomAttendee attendee = chatroomAttendeeRepository.findByChatroomNoAndAttendeeEmployeeNo(chatroomNo, employeeNo);
+
+        if (attendee != null) {
+            // 참여자 제거
+            chatroomAttendeeRepository.delete(attendee);
+
+            // 만약 채팅방에 참여자가 1명도 없으면 채팅방 삭제
+            if (chatroomAttendeeRepository.countByChatroomNo(chatroomNo) == 0) {
+                repository.deleteById(chatroomNo);
+            }
+        } else {
+            throw new RuntimeException("참여자가 아니거나 잘못된 채팅방입니다.");
+        }
+	}
+
 
 
 

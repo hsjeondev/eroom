@@ -708,18 +708,19 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            // 기본적으로 서울의 날씨 정보
-            const city = "Seoul";
-            fetch(`/api/weather?city=${city}&lang=kr`)  // lang=kr 추가
-                .then(response => response.json())
-                .then(data => {
-                    // 초기 데이터로 서울 날씨를 보여줍니다.
-                    const cityName = mapCityName(data.name);  // 로마자 도시명 -> 한글로 변환
-                    displayWeatherData(data, cityName);  // 변환된 도시명 전달
-                })
-                .catch(err => {
-                    console.error("날씨 정보 불러오기 실패:", err);
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    getWeatherByCoords(lat, lon);  // 현재 위치 기준으로 호출
+                }, function (error) {
+                    console.warn("위치 정보를 가져올 수 없습니다. 서울로 대체합니다.");
+                    getWeatherByCity("Seoul"); // 위치 실패 시 fallback
                 });
+            } else {
+                console.warn("Geolocation을 지원하지 않습니다. 서울로 대체합니다.");
+                getWeatherByCity("Seoul");
+            }
         });
 
         // 날씨 데이터를 화면에 표시하는 함수
