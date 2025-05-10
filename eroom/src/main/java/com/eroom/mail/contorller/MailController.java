@@ -752,6 +752,8 @@ public class MailController {
         }
     }
 	
+	
+	
 	 /*@GetMapping("/mail/detail/{mailNo}")
 	    public String viewMailDetail(@PathVariable Long mailNo, Model model) {
 	        // mailNo로 메일 조회

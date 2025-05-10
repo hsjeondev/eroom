@@ -405,7 +405,7 @@ function removeSelectedFile(index) {
 					  const name = checkbox.getAttribute('data-name');
 					  const code = checkbox.getAttribute('data-no');
 					  const li = checkbox.closest('li.treeview-list-item');
-
+					
 					  if (checkbox.checked) {
 					    addTag(name, code);
 					    handleHighlight(li);
