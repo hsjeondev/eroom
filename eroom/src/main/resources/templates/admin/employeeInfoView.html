@@ -61,8 +61,9 @@
           <div class="card-footer border-top border-dashed pt-3">
    			<div class="d-flex align-items-center mb-2" th:if="${isAdmin}">
 				<!--  연차 수정 버튼 -->
-				<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0" id="editAnnualLeaveBtn"
-				        data-bs-toggle="modal" data-bs-target="#annualLeaveEditModal">
+				<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0 edit-annual-btn" id="editAnnualLeaveBtn"
+				        data-bs-toggle="modal" data-bs-target="#annualLeaveEditModal"
+				        th:attr="data-employee-no=${employee.employeeNo}">
 					<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
 					     focusable="false" data-prefix="fas" data-icon="pen" role="img"
 					     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -761,7 +762,46 @@ document.addEventListener('DOMContentLoaded', function() {
 			});
 		});
 	
-	// 연차 정보 수정
+	const annualEditModalEl = document.getElementById('annualLeaveEditModal');
+	const annualEditModal = bootstrap.Modal.getInstance(annualEditModalEl) || new bootstrap.Modal(annualEditModalEl);
+	let originAnnualLeave = {};
+	// 연차 정보 모달에 불러오기
+	document.querySelectorAll('.edit-annual-btn').forEach(btn => {
+		btn.addEventListener('click', function () {
+		  const employeeNo = this.getAttribute('data-employee-no');
+		  openAnnualLeaveModal(employeeNo);
+		});
+	});
+	
+	
+	function openAnnualLeaveModal(employeeNo){
+		fetch(`/admin/getAnnualLeave?employeeNo=${employeeNo}`)
+			.then(response => {
+				if(!response.ok) throw new Error('서버 응답 오류');
+				return response.json();
+			})
+			.then(data => {
+				if(data.res_code == 200){
+					document.getElementById('annualLeaveTotal').value = data.annual_leave_total ?? '';
+					document.getElementById('annualLeaveUsed').value = data.annual_leave_used ?? '';
+					document.getElementById('annualLeaveRemain').value = data.annual_leave_remain ?? '';
+					// originAnnualLeave 에 저장
+					originAnnualLeave = {
+							annual_leave_total : data.annual_leave_total || '',
+							annual_leave_used : data.annual_leave_used || '',
+							annual_leave_remain : data.annual_leave_remain || ''
+					};
+					// 모달 열기
+					annualEditModal.show();
+				}else{
+					showAlertModal(data.res_msg);
+				}
+			})
+			.catch(error => {
+				console.error(error);
+				showAlertModal("연차 정보 조회 중 오류가 발생했습니다.");
+			})
+	}
 	
 	
 	
