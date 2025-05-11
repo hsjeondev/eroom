@@ -202,9 +202,9 @@ td.name p {
 
 							<!-- 부서/팀 추가 버튼 -->
 							<div th:if="${#authentication.authorities.?[authority == 'ROLE_ADMIN'].size() > 0}" class="col-auto">
-								<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDepartmentAndTeamModal">부서/팀 추가</button>
-								<button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteDepartmentAndTeamModal">부서/팀 삭제</button>
 								<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sortOrderModal">부서/팀 정렬</button>
+								<button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addDepartmentAndTeamModal">부서/팀 추가</button>
+								<button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteDepartmentAndTeamModal">부서/팀 삭제</button>
 							</div>
 
 
