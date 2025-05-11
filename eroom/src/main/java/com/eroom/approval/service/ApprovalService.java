@@ -5,9 +5,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -119,21 +124,105 @@ public class ApprovalService {
 			// 3. 참조자 저장
 			// 없는 경우 예외처리
 			for (int i = 0; i < dto.getRefererIds().size(); i++) {
+//				트리구조 적용 전 로직
+//						approvalLine = ApprovalLine.builder()
+//						.approval(approval)
+//						.approvalLineStatus("A")
+//						.employee(Employee.builder().employeeNo(dto.getRefererIds().get(i)).build())
+//						.approvalLineStep(-1) // 참조자 고정값 -1
+//						.build();
+//					approvalLineRepository.save(approvalLine);
+//					
+//					// 새 결재글 생성시 참조자들에게 알림
+//					// 웹소켓 알림 기능. 알림 받는 사람의 EmployeeNo를 보내준다.
+//					message = "[결재] 참조 알림이 도착했습니다.";
+//			        if(approvalResultNo != null) {
+//			        	approvalWebSocketHandler.sendApprovalNotification(dto.getRefererIds().get(i), message, approvalResult);
+//			        }
 				
-						approvalLine = ApprovalLine.builder()
-						.approval(approval)
-						.approvalLineStatus("A")
-						.employee(Employee.builder().employeeNo(dto.getRefererIds().get(i)).build())
-						.approvalLineStep(-1) // 참조자 고정값 -1
-						.build();
-					approvalLineRepository.save(approvalLine);
-					
-					// 새 결재글 생성시 참조자들에게 알림
-					// 웹소켓 알림 기능. 알림 받는 사람의 EmployeeNo를 보내준다.
-					message = "[결재] 참조 알림이 도착했습니다.";
+				
+				// 트리구조 적용 후 로직
+				// 참조자 요소 반복
+				// 참조자 ids가 문자열로 시작하는 경우? 아니면 ADT 로 시작하는 경우?
+				// 숫자인 경우
+				// 정규식 써보자
+
+			    // 숫자인 경우 정규식으로 조건문
+			    if (dto.getRefererIds().get(i).matches("\\d+")) {
+			        Long refererIdsToLong = Long.parseLong(dto.getRefererIds().get(i));
+			        approvalLine = ApprovalLine.builder()
+			            .approval(approval)
+			            .approvalLineStatus("A")
+			            .employee(Employee.builder().employeeNo(refererIdsToLong).build())
+			            .approvalLineStep(-1)
+			            .build();
+//				// 새 결재글 생성시 참조자들에게 알림
+//				// 웹소켓 알림 기능. 알림 받는 사람의 EmployeeNo를 보내준다.
+			        message = "[결재] 참조 알림이 도착했습니다.";
 			        if(approvalResultNo != null) {
-			        	approvalWebSocketHandler.sendApprovalNotification(dto.getRefererIds().get(i), message, approvalResult);
+			        	approvalWebSocketHandler.sendApprovalNotification(refererIdsToLong, message, approvalResult);
 			        }
+				    approvalLineRepository.save(approvalLine);
+			    } 
+			    // 2️⃣ 시작 문자가 A, D, T인 경우 (문자열로 판단)
+			    else if (dto.getRefererIds().get(i).startsWith("D")) {
+			    	// 부서 separatorCode를 사용하여 하위 사원들 번호 조회해오기
+			    	// 부서(소속) 코드(separatorCode) 기준으로 조회
+			    	List<Employee> refererEmployeeList01 = employeeRepository.findByStructure_SeparatorCode(dto.getRefererIds().get(i));
+			    	// 특정 소속 (부모 코드)에 속한 직원 조회 | :parentCode(파라미터 값으로 가져오는것)
+			    	List<Employee> refererEmployeeList02 = employeeRepository.findByStructureParentCode(dto.getRefererIds().get(i));
+			    	// 혹시나 중복 employeeNo를 제거하기 위해 Set으로 필터링
+			    	Set<Employee> mergedSet = new HashSet<>(refererEmployeeList01);
+			    	mergedSet.addAll(refererEmployeeList02);
+			    	List<Employee> mergedList = new ArrayList<>(mergedSet);
+			    	for(Employee e : mergedList) {
+			    		Long refererIds = e.getEmployeeNo();
+				        approvalLine = ApprovalLine.builder()
+				            .approval(approval)
+				            .approvalLineStatus("A")
+				            .employee(Employee.builder().employeeNo(refererIds).build())
+				            .approvalLineStep(-1)
+				            .build();
+//						// 새 결재글 생성시 참조자들에게 알림
+//						// 웹소켓 알림 기능. 알림 받는 사람의 EmployeeNo를 보내준다.
+				        message = "[결재] 참조 알림이 도착했습니다.";
+				        if(approvalResultNo != null) {
+				        	approvalWebSocketHandler.sendApprovalNotification(refererIds, message, approvalResult);
+				        }
+					    approvalLineRepository.save(approvalLine);
+			    	}
+			    } else if(dto.getRefererIds().get(i).startsWith("T")) {
+			    	// 팀 separatorCode를 사용하여 하위 사원들 번호 조회해오기
+			    	// 부서(소속) 코드(separatorCode) 기준으로 조회
+			    	List<Employee> refererEmployeeList01 = employeeRepository.findByStructure_SeparatorCode(dto.getRefererIds().get(i));
+			    	for(Employee e : refererEmployeeList01) {
+			    		Long refererIds = e.getEmployeeNo();
+				        approvalLine = ApprovalLine.builder()
+				            .approval(approval)
+				            .approvalLineStatus("A")
+				            .employee(Employee.builder().employeeNo(refererIds).build())
+				            .approvalLineStep(-1)
+				            .build();
+//						// 새 결재글 생성시 참조자들에게 알림
+//						// 웹소켓 알림 기능. 알림 받는 사람의 EmployeeNo를 보내준다.
+				        message = "[결재] 참조 알림이 도착했습니다.";
+				        if(approvalResultNo != null) {
+				        	approvalWebSocketHandler.sendApprovalNotification(refererIds, message, approvalResult);
+				        }
+					    approvalLineRepository.save(approvalLine); 
+			    	}
+			    	
+			    } else {
+			        // 예상치 못한 값이 들어온 경우
+			        throw new IllegalArgumentException("Invalid Referer ID: " + dto.getRefererIds().get(i));
+			    }
+			    
+				
+				
+				
+				
+
+				
 			}
 
 			// 2. 합의자 저장
@@ -387,7 +476,7 @@ public class ApprovalService {
 	
 	// 마이페이지, 내 결재 조회 - 진행중
 	public List<ApprovalDto> myPageMyApprovalsStatusIsS(Long employeeNo) {
-		List<Approval> list =  approvalRepository.findByEmployee_EmployeeNoAndApprovalStatusAndApprovalVisibleYnOrderByApprovalRegDateDesc(employeeNo, "S", "Y");
+		List<Approval> list =  approvalRepository.findTop5ByApprovalStatusAndApprovalVisibleYnAndEmployee_EmployeeNoOrderByApprovalRegDateDesc("S", "Y", employeeNo);
 		List<ApprovalDto> resultList = new ArrayList<ApprovalDto>();
 		for(Approval a : list) {
 			ApprovalDto dto = new ApprovalDto().toDto(a);
@@ -397,6 +486,27 @@ public class ApprovalService {
 		int limit = Math.min(resultList.size(), 5);
 		return resultList.subList(0, limit);
 	}
+	
+	// mainpage Approval 리스트 조회1
+	public List<Approval> getOngoingApprovals(Long employeeNo) {
+	    return approvalRepository.findTop5ByApprovalStatusAndApprovalVisibleYnAndEmployee_EmployeeNoOrderByApprovalRegDateDesc("S", "Y", employeeNo);
+	}
+
+	// mainpage Approval 리스트 조회2
+	public List<Approval> getPendingApprovals(Long employeeNo) {
+		// 내가 합의나 결재 순번인 경우 가져와야하니 ApprovalLineService에 접근해보자.
+	    //return approvalRepository.findTop5ByStatusOrderByCreatedDateDesc("PENDING");
+		return null;
+	}
+
+	// mainpage Approval 리스트 조회3
+	public List<Approval> getCompletedApprovals(Long employeeNo) {
+		List<String> statuses = Arrays.asList("A", "D");
+	    return approvalRepository.findTop5ByApprovalStatusInAndApprovalVisibleYnAndEmployee_EmployeeNoOrderByApprovalRegDateDesc(statuses, "Y", employeeNo);
+	}
+
+	
+	
 
 
 

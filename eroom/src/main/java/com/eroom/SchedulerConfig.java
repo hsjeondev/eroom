@@ -34,5 +34,12 @@ public class SchedulerConfig {
 	    LocalDateTime limitDate = LocalDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(15);
 	    mailStatusRepository.updateVisibilityOfOldTrash(limitDate);
 	}
-	
+	@Scheduled(cron = "0 0 0 1 1 *", zone = "Asia/Seoul")
+	public void runEveryYear() {
+	    // System.out.println("새해 첫날 실행됨!");
+	}
+	@Scheduled(cron = "0 0 0 1 * *", zone = "Asia/Seoul")
+	public void runEveryMonth() {
+	    // System.out.println("매달 1일 00시에 실행됨!");
+	}
  }
