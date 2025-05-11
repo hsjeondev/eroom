@@ -336,7 +336,7 @@
 			  <label class="form-label">총 연차 (현재: <span id="currentTotalDays">15</span>일)</label>
 			  <div class="input-group">
 			    <button class="btn btn-outline-secondary" type="button" id="btnTotalMinus">-</button>
-			    <input type="number" class="form-control text-center" name="annualLeaveTotalDelta" id="annualLeaveTotalDelta" value="0">
+			    <input type="number" class="form-control text-center" id="annualLeaveTotalDelta" value="0">
 			    <button class="btn btn-outline-secondary" type="button" id="btnTotalPlus">+</button>
 			  </div>
 			</div>
@@ -346,7 +346,7 @@
 			  <label class="form-label">사용 연차 (현재: <span id="currentUsedDays">3</span>일)</label>
 			  <div class="input-group">
 			    <button class="btn btn-outline-secondary" type="button" id="btnUsedMinus">-</button>
-			    <input type="number" class="form-control text-center" name="annualLeaveUsedDelta" id="annualLeaveUsedDelta" value="0">
+			    <input type="number" class="form-control text-center" id="annualLeaveUsedDelta" value="0">
 			    <button class="btn btn-outline-secondary" type="button" id="btnUsedPlus">+</button>
 			  </div>
 			</div>
@@ -363,7 +363,7 @@
       </div>
 
       <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
-        <button type="button" class="btn btn-light w-45" id="cancelAnnualBtn">취소</button>
+        <button type="button" class="btn btn-light w-45" data-bs-dismiss="modal">취소</button>
         <button type="button" class="btn btn-primary w-45" id="saveAnnualLeaveBtn">저장</button>
       </div>
     </div>
@@ -402,7 +402,7 @@
       </div>
       <div class="modal-body text-center">
         <p class="mb-0 text-body">
-          작성 중인 정보가 사라집니다.<br>정말 닫으시겠습니까?
+          작성 중인 회원 수정 정보가 사라집니다.<br>정말 닫으시겠습니까?
         </p>
       </div>
       <div class="modal-footer justify-content-center border-0">
@@ -450,6 +450,38 @@
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
+	// 상단에 현재 날짜 표시
+/* 	function updateCurrentTime() {
+		const now = new Date();
+		const year = now.getFullYear();
+		const month = String(now.getMonth() + 1).padStart(2, '0');
+		const date = String(now.getDate()).padStart(2, '0');
+		document.getElementById('currentTime').innerText = `${year}.${month}.${date}`;
+	}
+	updateCurrentTime(); */
+
+	//서버 응답 메시지를 모달에 표시하고 확인 시 콜백 실행
+	function showAlertModal(message, callback) {
+	  // 메시지를 알림 모달 본문에 삽입
+	  document.getElementById('alertMessageContent').textContent = message;
+
+	  // 알림 모달 인스턴스 생성 또는 가져오기
+	  const alertModal = new bootstrap.Modal(document.getElementById('alertMessageModal'));
+	  alertModal.show();
+
+	  // 확인 버튼 클릭 시 실행할 콜백 등록
+	  const confirmBtn = document.querySelector('#alertMessageModal .btn-primary');
+
+	  // 한 번만 실행되도록 리스너 등록
+	  const handler = () => {
+	    if (callback) callback(); // 예: location.reload()
+	    confirmBtn.removeEventListener('click', handler); // 중복 방지
+	  };
+
+	  confirmBtn.addEventListener('click', handler);
+	}
+	
 	// 차트 데이터를 받아서 각 차트를 렌더링하는 함수
 	async function renderCharts() {
 		
@@ -579,141 +611,153 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 	renderCharts();
 
-  // 공통 모달 요소
-	const confirmModalEl = document.getElementById('confirmSaveModal');
-	const confirmModal = bootstrap.Modal.getOrCreateInstance(confirmModalEl);
-	const unsavedAlertModal = new bootstrap.Modal(document.getElementById('unsavedAlertModal')); // 닫기 확인용 모달
-	const invalidModal = new bootstrap.Modal(document.getElementById('invalidCheckOutModal')); // 시간 유효성 확인 모달
-	//서버 응답 메시지를 모달에 표시하고 확인 시 콜백 실행
-	function showAlertModal(message, callback) {
-	  // 메시지를 알림 모달 본문에 삽입
-	  document.getElementById('alertMessageContent').textContent = message;
-	  // 알림 모달 인스턴스 생성 또는 가져오기
-	  const alertModalEl = document.getElementById('alertMessageModal');
-	  const alertModal = bootstrap.Modal.getOrCreateInstance(alertModalEl);
-	  alertModal.show();
-	  // 확인 버튼 클릭 시 실행할 콜백 등록
-	  const confirmBtn = alertModalEl.querySelector('.btn-primary');
-	  // 한 번만 실행되도록 리스너 등록
-	  const handler = () => {
-	    if (callback) callback(); // 예: location.reload()
-	    confirmBtn.removeEventListener('click', handler); // 중복 방지
-	  };
-	  confirmBtn.addEventListener('click', handler);
-	}
+	// 수정 버튼 클릭 시 모달 열기 및 데이터 채우기
+
+
+  const editModal = document.getElementById('editAttendanceModal');
+  const bsEditModal = bootstrap.Modal.getOrCreateInstance(editModal); // 모달 인스턴스 가져오기 or 생성
+  const alertModal = new bootstrap.Modal(document.getElementById('unsavedAlertModal')); // 닫기 확인용 모달
+  const invalidModal = new bootstrap.Modal(document.getElementById('invalidCheckOutModal')); // 시간 유효성 확인 모달
+
+  const checkInInput = document.getElementById('editCheckInTime');
+  const checkOutInput = document.getElementById('editCheckOutTime');
+
+  // 수정 모드 설정
+  let currentMode = ''; // 'attendanceEdit' | 'annualLeaveEdit'
   
-	// 근태수정
-	const editModal = document.getElementById('editAttendanceModal');
-	const bsEditModal = bootstrap.Modal.getOrCreateInstance(editModal); // 모달 인스턴스 가져오기 or 생성
-	const checkInInput = document.getElementById('editCheckInTime');
-	const checkOutInput = document.getElementById('editCheckOutTime');
-	// 수정 모드 설정
-	let currentMode = ''; // 'attendanceEdit' | 'annualLeaveEdit'
-	// 수정 여부 감지
-	let isAttendanceEdited = false; // 근태정보 수정 여부
-	// 원래 값을 저장하여 모달 닫기 전 비교용으로 사용
-	let originalData = {checkInTime: '', checkOutTime: ''};
+  // 수정 여부 감지
+  let isAttendanceEdited = false; // 근태정보 수정 여부
+  // 원래 값을 저장하여 모달 닫기 전 비교용으로 사용
+  let originalData = {
+    checkInTime: '',
+    checkOutTime: ''
+  };
 
-	// 수정 버튼 클릭 시 해당 attendanceNo 기반으로 데이터 fetch
-	document.querySelectorAll('.edit-attendance-btn').forEach(button => {
-	  button.addEventListener('click', () => {
-	  	currentMode = 'attendanceEdit';
-	    const attendanceNo = button.getAttribute('data-attendance-no');
-	
-	    document.getElementById('attendanceNo').value = attendanceNo; // attendanceNo input에 값 세팅
-	    
-	    fetch(`/admin/attendanceDetail?attendanceNo=${attendanceNo}`)
-	      .then(res => res.json())
-	      .then(data => {
-	        // 날짜+시간 값을 input[type="datetime-local"]에 맞춰 세팅
-	        const checkIn = data.attendance_check_in_time?.replace(' ', 'T') || '';
-	        const checkOut = data.attendance_check_out_time?.replace(' ', 'T') || '';
-	
-	        // input 값 세팅
-	        checkInInput.value = checkIn;
-	        checkOutInput.value = checkOut;
-	
-	        // originalData 설정 (나중에 비교 용도)
-	        originalData.checkInTime = checkIn;
-	        originalData.checkOutTime = checkOut;
-	
-	        // 상태 표시 텍스트 설정
-	        document.getElementById('lateStatus').textContent = data.attendance_late_yn === 'Y' ? '지각' : '';
-	        document.getElementById('earlyLeaveStatus').textContent = data.attendance_early_leave_yn === 'Y' ? '조퇴' : '';
-	        isAttendanceEdited = false;
-	      });
-	  });
-	});
+  // 수정 버튼 클릭 시 해당 attendanceNo 기반으로 데이터 fetch
+  document.querySelectorAll('.edit-attendance-btn').forEach(button => {
+    button.addEventListener('click', () => {
+    	currentMode = 'attendanceEdit';
+      const attendanceNo = button.getAttribute('data-attendance-no');
 
-	// 퇴근시간이 출근시간보다 이전이면 오류 모달 표시
-	checkOutInput.addEventListener('change', () => {
-	  const inTime = checkInInput.value;
-	  const outTime = checkOutInput.value;
-	
-	  if (inTime && outTime && new Date(outTime) < new Date(inTime)) {
-	    // 유효하지 않은 경우 경고 모달 표시, 입력값 초기화 
-	    invalidModal.show();
-	    checkOutInput.value = ''; // 퇴근시간 초기화
-	  }
-	});
+      document.getElementById('attendanceNo').value = attendanceNo; // attendanceNo input에 값 세팅
+      
+      fetch(`/admin/attendanceDetail?attendanceNo=${attendanceNo}`)
+        .then(res => res.json())
+        .then(data => {
+          // 날짜+시간 값을 input[type="datetime-local"]에 맞춰 세팅
+          const checkIn = data.attendance_check_in_time?.replace(' ', 'T') || '';
+          const checkOut = data.attendance_check_out_time?.replace(' ', 'T') || '';
 
-	// 근태 수정 모달 닫기 또는 취소 시 변경 여부 확인
-	const attendanceCloseBtns = [
-		editModal.querySelector('.btn-close'), // 모달 상단의 X버튼
-		document.getElementById('cancelEditBtn') // 푸터의 취소 버튼
-	];
-	// 근태 수정 모달에서 닫기 버튼 클릭시
-	attendanceCloseBtns.forEach(btn => {
-	  btn.addEventListener('click', (e) => {
-	    e.preventDefault(); // 기본 닫기 방지
-	    // 초 단위를 제거해서 datetime 값을 비교하기 위한 헬퍼 함수
-	    // datetime-local input의 값은 'yyyy-MM-ddTHH:mm' 형식이며, 일부 상황에서 초(:ss)까지 붙는 경우가 있음
-	    // substring(0, 16)을 사용하면 'yyyy-MM-ddTHH:mm'까지만 잘라서 비교할 수 있음
-	    const trimSeconds = (datetimeStr) => datetimeStr.length >= 16 ? datetimeStr.substring(0, 16) : datetimeStr;
-	    // 현재 입력된 출근 시간과 퇴근 시간을 input에서 가져와 초 단위를 제거한 문자열로 변환
-	    const nowIn = trimSeconds(checkInInput.value);
-	    const nowOut = trimSeconds(checkOutInput.value);
-	    
-	    const originalIn = trimSeconds(originalData.checkInTime);
-	    const originalOut = trimSeconds(originalData.checkOutTime);     
-	   // 초 단위 차이(예: 09:00:00 vs 09:00)로 인해 false positives를 방지
-	  const isModified = (nowIn !== originalIn || nowOut !== originalOut);
-	    if (isModified) {
-	  	  // e.preventDefault(); // 기본 동작 방지
-	  	// 변경 내역이 있을 경우 경고 모달 표시  
-	      unsavedAlertModal.show();
-	      // 현재 editModal에 prevent-close 클래스를 추가하여 닫기 방지
-	      editModal.classList.add('prevent-close');
-	    } else {
-	  	// 변경 없으면 모달 닫기
-	      bsEditModal.hide();
-	    }
-	  });
-	});
+          // input 값 세팅
+          checkInInput.value = checkIn;
+          checkOutInput.value = checkOut;
+
+          // originalData 설정 (나중에 비교 용도)
+          originalData.checkInTime = checkIn;
+          originalData.checkOutTime = checkOut;
+
+          // 상태 표시 텍스트 설정
+          document.getElementById('lateStatus').textContent = data.attendance_late_yn === 'Y' ? '지각' : '';
+          document.getElementById('earlyLeaveStatus').textContent = data.attendance_early_leave_yn === 'Y' ? '조퇴' : '';
+          isAttendanceEdited = false;
+        });
+    });
+  });
+
+  // 퇴근시간이 출근시간보다 이전이면 오류 모달 표시
+  checkOutInput.addEventListener('change', () => {
+    const inTime = checkInInput.value;
+    const outTime = checkOutInput.value;
+
+    if (inTime && outTime && new Date(outTime) < new Date(inTime)) {
+      // 유효하지 않은 경우 경고 모달 표시, 입력값 초기화 
+      invalidModal.show();
+      checkOutInput.value = ''; // 퇴근시간 초기화
+    }
+  });
+
+  // 닫기 또는 취소 시 변경 여부 확인
+  const closeBtns = [
+    editModal.querySelector('.btn-close'), // 모달 상단의 X버튼
+   document.getElementById('cancelEditBtn') // 푸터의 취소 버튼
+  ];
+  
+  
+// 근태 수정 모달에서 닫기 버튼 클릭시
+  closeBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault(); // 기본 닫기 방지
+      // 초 단위를 제거해서 datetime 값을 비교하기 위한 헬퍼 함수
+      // datetime-local input의 값은 'yyyy-MM-ddTHH:mm' 형식이며, 일부 상황에서 초(:ss)까지 붙는 경우가 있음
+      // substring(0, 16)을 사용하면 'yyyy-MM-ddTHH:mm'까지만 잘라서 비교할 수 있음
+      const trimSeconds = (datetimeStr) => datetimeStr.length >= 16 ? datetimeStr.substring(0, 16) : datetimeStr;
+      // 현재 입력된 출근 시간과 퇴근 시간을 input에서 가져와 초 단위를 제거한 문자열로 변환
+      const nowIn = trimSeconds(checkInInput.value);
+      const nowOut = trimSeconds(checkOutInput.value);
+      
+      const originalIn = trimSeconds(originalData.checkInTime);
+      const originalOut = trimSeconds(originalData.checkOutTime);     
+     // 초 단위 차이(예: 09:00:00 vs 09:00)로 인해 false positives를 방지
+    const isModified = (nowIn !== originalIn || nowOut !== originalOut);
+
+      if (isModified) {
+    	  // e.preventDefault(); // 기본 동작 방지
+    	// 변경 내역이 있을 경우 경고 모달 표시  
+        alertModal.show();
+        // 현재 editModal에 prevent-close 클래스를 추가하여 닫기 방지
+        editModal.classList.add('prevent-close');
+      } else {
+    	// 변경 없으면 모달 닫기
+        bsEditModal.hide();
+      }
+    });
+  });
 
   // 경고 모달 "예" → 닫기 실행
-	document.getElementById('confirmCloseBtn').addEventListener('click', () => {
-		unsavedAlertModal.hide();
-	   if (currentMode === 'attendanceEdit') {
-	     bsEditModal.hide();
-	     editModal.classList.remove('prevent-close');
-	   } else if (currentMode === 'annualLeaveEdit') {
-	     annualEditModal.hide();
-	     annualEditModalEl.classList.remove('prevent-close');
-	   }
+/*   document.getElementById('confirmCloseBtn').addEventListener('click', () => {
+    alertModal.hide();
+    bsEditModal.hide();
+    editModal.classList.remove('prevent-close');
+  }); */
+  	document.getElementById('confirmCloseBtn').addEventListener('click', () => {
+	    alertModal.hide();
+	    if (currentMode === 'attendanceEdit') {
+	      bsEditModal.hide();
+	      editModal.classList.remove('prevent-close');
+	    } else if (currentMode === 'annualLeaveEdit') {
+	      annualEditModal.hide();
+	      annualEditModalEl.classList.remove('prevent-close');
+	    }
 	});
-	
+
   // 경고 모달 "아니오" → 수정 모달 유지
-	document.getElementById('stayModalBtn').addEventListener('click', () => {
-		unsavedAlertModal.hide();
-	   if (currentMode === 'attendanceEdit') {
-	     bsEditModal.show();
-	     editModal.classList.remove('prevent-close');
-	   } else if (currentMode === 'annualLeaveEdit') {
-	     annualEditModal.show();
-	     annualEditModalEl.classList.remove('prevent-close');
-	   }
-	});
+/*   document.getElementById('stayModalBtn').addEventListener('click', () => {
+    alertModal.hide();
+    // 닫혔을 경우에 대비해 prevent-close 클래스를 제거하고 다시 열기
+    if (editModal.classList.contains('prevent-close')) {
+      bsEditModal.show();
+      editModal.classList.remove('prevent-close');
+    }
+  }); */
+  	document.getElementById('stayModalBtn').addEventListener('click', () => {
+	    alertModal.hide();
+	    if (currentMode === 'attendanceEdit') {
+	      bsEditModal.show();
+	      editModal.classList.remove('prevent-close');
+	    } else if (currentMode === 'annualLeaveEdit') {
+	      annualEditModal.show();
+	      annualEditModalEl.classList.remove('prevent-close');
+	    }
+	 });
+	// 수정 모달의 수정하기 버튼 클릭 -> confirm모달 열기
+	// const editSubmitBtn = document.getElementById('editSubmitBtn');
+	const confirmModalEl = document.getElementById('confirmSaveModal');
+	const confirmModal = bootstrap.Modal.getOrCreateInstance(confirmModalEl);
+/* 	editSubmitBtn.addEventListener('click', function (e) {
+		e.preventDefault(); // 기본 동작 방지
+		// 모달 열기
+		confirmModal.show();
+	}); */
 	  // ====================== 저장 버튼 핸들러 ======================
 	  document.getElementById('editSubmitBtn').addEventListener('click', e => {
 	    e.preventDefault();
@@ -731,63 +775,70 @@ document.addEventListener('DOMContentLoaded', function() {
 	  confirmModal.hide();
 	 // bsEditModal.hide(); // 수정 모달도 함께 닫기
 	});
-	
 	// confirm모달 확인 버튼 클릭 -> fetch요청
-	document.getElementById('confirmSaveBtn').addEventListener('click', e => {
-		e.preventDefault();
-		confirmModal.hide();
-		if (currentMode === 'attendanceEdit') {
-		  sendAttendanceUpdate();
-		} else if (currentMode === 'annualLeaveEdit') {
-		  sendAnnualLeaveUpdate();
-		}
-	});
 	// 수정하기 버튼 클릭 시 폼 제출
-	function sendAttendanceUpdate(){
-		// confirm 모달 닫기
-		confirmModal.hide();
-		
-		const form = document.getElementById('editAttendanceForm');
-		const payload = new FormData(form);
-		console.log("폼 데이터:", [...payload.entries()]);
-		fetch('/admin/attendanceUpdate',{
-			method: 'POST',
-			headers:{
-			      'header': document.querySelector('meta[name="_csrf_header"]').content,
-			      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content			
-			},
-			body: payload
-		})
-		.then(response => response.json())
-		.then(data => {
-			  console.log(data);
-			// 알림 메세지 모달에 서버응답(res_msg) 출력
-			showAlertModal(data.res_msg, function(){
-				if(data.res_code == 200){
-					const employeeNo = document.getElementById('employeeNo').value;
-					location.reload(); // 페이지 새로고침
-				}
+		document.getElementById('confirmSaveBtn').addEventListener('click',function(e){
+			 console.log("수정 버튼 클릭됨");
+			 e.preventDefault();
+			// confirm 모달 닫기
+			confirmModal.hide();
+		    let url = '', formData;
+		    if (currentMode === 'attendanceEdit') {
+		      url = '/admin/attendanceUpdate';
+		      formData = new FormData(document.getElementById('editAttendanceForm'));
+		    } else {
+		      url = '/admin/annualLeaveUpdate';
+		      formData = new FormData(document.getElementById('annualLeaveEditForm'));
+		    }
+			
+			//const form = document.getElementById('editAttendanceForm');
+			//const payload = new FormData(form);
+			console.log("폼 데이터:", [...payload.entries()]);
+			fetch(url,{
+				method: 'POST',
+				headers:{
+				      'header': document.querySelector('meta[name="_csrf_header"]').content,
+				      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content			
+				},
+				body: formData
+			})
+			.then(response => response.json())
+			.then(data => {
+				
+				console.log("=== 서버 응답 ===");
+				  console.log(data);
+				// 알림 메세지 모달에 서버응답(res_msg) 출력
+				showAlertModal(data.res_msg, function(){
+					if(data.res_code == 200){
+						const employeeNo = document.getElementById('employeeNo').value;
+						location.reload(); // 페이지 새로고침
+						 console.log("페이지 리로드됨");
+					}
+				});
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				showAlertModal("정보 수정 중 오류가 발생했습니다.");
 			});
-		})
-		.catch(error => {
-			console.error('Error:', error);
-			showAlertModal("정보 수정 중 오류가 발생했습니다.");
 		});
-	}	
 	// 연차 수정 모달 요소
 	const annualEditModalEl = document.getElementById('annualLeaveEditModal');
 	const annualEditModal = bootstrap.Modal.getInstance(annualEditModalEl) || new bootstrap.Modal(annualEditModalEl);
 	// 현재 연차 값 저장용
-	let annualOrigin = {total : 0, used : 0};
+	let annualOrigin = {
+			total : 0,
+			used : 0
+	};
 	let isAnnualEdited = false;
 	// 연차 수정 버튼 클릭 시 employeeNo 가져와서 모달 오픈
 	document.querySelectorAll('.edit-annual-btn').forEach(btn => {
 		btn.addEventListener('click', function () {
-		  currentMode = 'annualLeaveEdit';	// 연차 수정 모드 설정
+		  currentMode = 'annualLeaveEdit';	
 		  const employeeNo = this.getAttribute('data-employee-no');
 		  openAnnualLeaveModal(employeeNo);
 		});
 	});
+	
 	// 연차 정보 조회 -> 모달 열기 + 현재값 출력 + 입력 초기화
 	function openAnnualLeaveModal(employeeNo){
 		fetch(`/admin/getAnnualLeave?employeeNo=${employeeNo}`)
@@ -808,6 +859,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					document.getElementById('annualLeaveUsedDelta').value = 0;
 					document.getElementById('editAnnualEmployeeNo').value = employeeNo;
 					
+					isAnnualEdited = false;
 					// 잔여 연차 초기값 계산 함수 호출
 					updateAnnualRemain();
 					// 모달 열기
@@ -859,45 +911,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	// 직접 입력해도 계산되도록 input 이벤트 추가
 	document.getElementById('annualLeaveTotalDelta').addEventListener('input',updateAnnualRemain);
 	document.getElementById('annualLeaveUsedDelta').addEventListener('input',updateAnnualRemain);
-	// 연차 수정에서 닫기 버튼
-	const annualCloseBtns = [
-	   annualEditModalEl.querySelector('.btn-close'),
-	   document.getElementById('cancelAnnualBtn') // cancel button
-	 ];
 	
-	 annualCloseBtns.forEach(btn => {
-	   btn.addEventListener('click', e => {
-	     e.preventDefault();
-	     if (isAnnualEdited) {
-	    	 unsavedAlertModal.show();
-	       annualEditModalEl.classList.add('prevent-close');
-	     } else {
-	       annualEditModal.hide();
-	     }
-	   });
-	});	
-	// 연차 수정 요청 함수
-	function sendAnnualLeaveUpdate() {
-	   const formData = new FormData(document.getElementById('annualLeaveEditForm'));
-	   fetch('/admin/annualLeaveUpdate', {
-	     method: 'POST',
-	     headers: {
-	       'header': document.querySelector('meta[name="_csrf_header"]').content,
-	       'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-	     },
-	     body: formData
-	   })
-	     .then(response => response.json())
-	     .then(data => {
-	       showAlertModal(data.res_msg, () => {
-	         if (data.res_code === 200) location.reload();
-	       });
-	     })
-	     .catch(err => {
-	       console.error(err);
-	       showAlertModal('정보 수정 중 오류가 발생했습니다.');
-	     });
-	}	
+	
+	
 	
 });
 </script>                         

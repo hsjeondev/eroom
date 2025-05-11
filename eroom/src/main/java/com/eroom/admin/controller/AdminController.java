@@ -826,4 +826,23 @@ public class AdminController {
 		return result;
 	}
 	
+	// 회원 연차 수정하기
+	@PostMapping("/annualLeaveUpdate")
+	@ResponseBody
+	public Map<String,Object> updateAnnualLeave(@RequestParam("employeeNo") Long employeeNo,
+												@RequestParam("annualLeaveTotalDelta") double totalDelta,
+												@RequestParam("annualLeaveUsedDelta") double usedDelta){
+		Map<String,Object> resultMap = new HashMap<>();
+		try {
+			AnnualLeaveDto updated = annualLeaveService.updateAnnualLeave(employeeNo, totalDelta, usedDelta);
+	        resultMap.put("res_code", 200);
+	        resultMap.put("res_msg", "연차 정보가 성공적으로 수정되었습니다.");
+	        resultMap.put("updateAnnualLeave", updated);
+		}catch(Exception e) {
+			e.printStackTrace();
+			resultMap.put("res_code", 500);
+	        resultMap.put("res_msg", "연차 정보 수정 중 오류가 발생했습니다.");
+		}
+		return resultMap;
+	}
 }
