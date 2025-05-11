@@ -117,7 +117,14 @@ public class MailService {
 	            .orElseThrow(() -> new RuntimeException("메일을 찾을 수 없습니다."));
 	}
 	
-	
+	@Transactional
+	 public void markAsDeleted(Long attachNo) {
+	     Drive drive = driveRepository.findById(attachNo)
+	             .orElseThrow(() -> new IllegalArgumentException("해당 첨부파일을 찾을 수 없습니다."));
+
+	     drive.setVisibleYn("N");
+	     driveRepository.save(drive); 
+	 }
 	
 	
 	
@@ -587,47 +594,74 @@ public class MailService {
                         e.printStackTrace(); // 웹소켓 전송 실패해도 메일 저장은 정상 진행
                     }
 		         // 발송된 메일만 파일 저장
-		         for (MultipartFile file : mailFiles) {
-			            if (!file.isEmpty()) {
-			                // DriveDto 생성
-			                String oriName = file.getOriginalFilename();
-					        String ext = oriName.substring(oriName.lastIndexOf("."));
-					        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
-					        String path = fileDir + "mail/" + newName;
-			                DriveDto driveDto = new DriveDto();
-			                
-			                File savedFile = new File(path);
-					        if (!savedFile.getParentFile().exists()) {
-					            savedFile.getParentFile().mkdirs();
-					        }
-					        file.transferTo(savedFile);
-					        
-					        
-			                driveDto.setDriveOriName(oriName);
-			                driveDto.setDriveSize(file.getSize());
-			                
-			                
-			               
-			                // Drive 엔티티로 변환
-			                Drive drive = new Drive();
-			                drive.setDriveOriName(driveDto.getDriveOriName());
-			                drive.setDriveNewName(newName); // 파일 고유 이름 생성
-			                drive.setDriveSize(driveDto.getDriveSize());
-			                drive.setDriveType(ext);
-			                drive.setDrivePath("mail/" + newName); // 실제 저장 경로로 변경 필요
-			                drive.setUploader(Employee.builder().employeeNo(mailDto.getEmployee_no()).build());
-			                drive.setParam1(mailSaver.getMailNo()); // 메일 참조 연결
-			                drive.setSeparatorCode("FL002");
-			                drive.setVisibleYn("Y");
-			                // DB에 저장
-			                driveRepository.save(drive);
-			                
-			            }
-			        }
+					/*
+					 * for (MultipartFile file : mailFiles) { if (!file.isEmpty()) { // DriveDto 생성
+					 * String oriName = file.getOriginalFilename(); String ext =
+					 * oriName.substring(oriName.lastIndexOf(".")); String newName =
+					 * UUID.randomUUID().toString().replace("-", "") + ext; String path = fileDir +
+					 * "mail/" + newName; DriveDto driveDto = new DriveDto();
+					 * 
+					 * File savedFile = new File(path); if (!savedFile.getParentFile().exists()) {
+					 * savedFile.getParentFile().mkdirs(); } file.transferTo(savedFile);
+					 * 
+					 * 
+					 * driveDto.setDriveOriName(oriName); driveDto.setDriveSize(file.getSize());
+					 * 
+					 * 
+					 * 
+					 * // Drive 엔티티로 변환 Drive drive = new Drive();
+					 * drive.setDriveOriName(driveDto.getDriveOriName());
+					 * drive.setDriveNewName(newName); // 파일 고유 이름 생성
+					 * drive.setDriveSize(driveDto.getDriveSize()); drive.setDriveType(ext);
+					 * drive.setDrivePath("mail/" + newName); // 실제 저장 경로로 변경 필요
+					 * drive.setUploader(Employee.builder().employeeNo(mailDto.getEmployee_no()).
+					 * build()); drive.setParam1(mailSaver.getMailNo()); // 메일 참조 연결
+					 * drive.setSeparatorCode("FL002"); drive.setVisibleYn("Y"); // DB에 저장
+					 * driveRepository.save(drive);
+					 * 
+					 * } }
+					 */
 		            
 		        }
 			 }
 			}
+			for (MultipartFile file : mailFiles) {
+	            if (!file.isEmpty()) {
+	                // DriveDto 생성
+	                String oriName = file.getOriginalFilename();
+			        String ext = oriName.substring(oriName.lastIndexOf("."));
+			        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+			        String path = fileDir + "mail/" + newName;
+	                DriveDto driveDto = new DriveDto();
+	                
+	                File savedFile = new File(path);
+			        if (!savedFile.getParentFile().exists()) {
+			            savedFile.getParentFile().mkdirs();
+			        }
+			        file.transferTo(savedFile);
+			        
+			        
+	                driveDto.setDriveOriName(oriName);
+	                driveDto.setDriveSize(file.getSize());
+	                
+	                
+	               
+	                // Drive 엔티티로 변환
+	                Drive drive = new Drive();
+	                drive.setDriveOriName(driveDto.getDriveOriName());
+	                drive.setDriveNewName(newName); // 파일 고유 이름 생성
+	                drive.setDriveSize(driveDto.getDriveSize());
+	                drive.setDriveType(ext);
+	                drive.setDrivePath("mail/" + newName); // 실제 저장 경로로 변경 필요
+	                drive.setUploader(Employee.builder().employeeNo(mailDto.getEmployee_no()).build());
+	                drive.setParam1(mailSaver.getMailNo()); // 메일 참조 연결
+	                drive.setSeparatorCode("FL002");
+	                drive.setVisibleYn("Y");
+	                // DB에 저장
+	                driveRepository.save(drive);
+	                
+	            }
+	        }
 			if (mailDraftYn.equals("Y")) {
 	            MailDraftDto mailDraftDto = new MailDraftDto();
 	            mailDraftDto.setMail_no(mailSaver.getMailNo()); // 메일 번호
@@ -637,6 +671,7 @@ public class MailService {
 	            MailDraft mailDraft = mailDraftDto.toEntity();
 	            mailDraftRepository.save(mailDraft); // 새로 저장
             }
+			
 			result =1;
 		}catch (Exception e) {
 			e.printStackTrace();

@@ -543,6 +543,22 @@ public class MailController {
 		
 		return "mail/mailDetail";
 	}
+	@PostMapping("/mail/file/delete/{attachNo}")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> deleteAttachedFile(@PathVariable("attachNo") Long attachNo) {
+		System.out.println("attachNo received: " + attachNo);
+		Map<String, Object> result = new HashMap<>();
+	    try {
+	    	mailService.markAsDeleted(attachNo);  // visibleYn = "N" 처리 등
+	        result.put("res_code", 200);
+	        result.put("res_msg", "파일이 삭제되었습니다.");
+	    } catch (Exception e) {
+	        result.put("res_code", 500);
+	        result.put("res_msg", "삭제 실패: " + e.getMessage());
+	    }
+	    return ResponseEntity.ok(result);
+	}
+	
 	// 파일 숨기기
 	/*
 	 * @DeleteMapping("/delete/{attachNo}")
@@ -579,14 +595,18 @@ public class MailController {
 //    }
 	
 	
-	// 임시 저장 페이지
+	// 임시 저장 수정 페이지
 	@GetMapping("/mail/mailCreateDraft/{id}")
 	public String createMailDraftView(Model model,
 									@PathVariable("id") Long id) {
 		List<Employee> employeeList = mailService.selectEmployeeAll();
 		List<SeparatorDto> departments = employeeService.findDistinctStructureNames(); // 부서/팀 리스트 가져오기
+		// 임시 저장 파일 찾기
+		//List<Drive> attachList = mailService.findFilesByMailNo(id);
 		model.addAttribute("employeeList",employeeList);
 		model.addAttribute("departments", departments); // 부서 드롭다운용
+		// 파일 불러오기 
+		//model.addAttribute("attachList", attachList);
 		// 가져온 값은 mail_no값 이걸로 mail조회하여 보낸 사람 no값 찾기
 		Employee sender = mailService.getSenderInfoByMailNo(id);
 		if(id != null) {
@@ -597,17 +617,19 @@ public class MailController {
 		        List<MailDraft> draft = mailService.findReceiversByMailNo(id);
 
 		        // (3) drive 테이블에서 첨부파일 리스트 불러오기
-		       // List<Drive> mailFiles = mailService.findFilesByMailNo(id);
-
+		        List<Drive> attachList = mailService.findFilesByMailNo(id);
+		        
 		        // (4) 모델에 담기
 		        // mail 정보 2개 들어갔음
 		        model.addAttribute("mail", mail);
 		        model.addAttribute("draft", draft);
 		       // model.addAttribute("mailFiles", mailFiles);
+		        model.addAttribute("attachList", attachList);
 		}
 		
 		model.addAttribute("sender", sender);
-		return "mail/mailCreateDraft";
+		// return "mail/mailCreateDraft";
+		return "mail/mailDraftUpdate";
 	}
 	
 	// 답장 페이지

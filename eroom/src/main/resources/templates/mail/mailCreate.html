@@ -362,10 +362,13 @@ function renderFilePreview() {
             : file.name;
 
         li.innerHTML = `
-            <span class="badge bg-light text-dark d-flex align-items-center justify-content-between px-2 py-1" style="font-size: 0.85rem; min-width: 180px;">
-                ${fileNameHtml} <small>(${(file.size / 1024).toFixed(1)} KB)</small>
-                <button type="button" class="btn btn-sm btn-outline-secondary ms-2 py-0 px-1" style="font-size: 0.7rem; line-height: 1;" onclick="removeSelectedFile(${index})">✕</button>
-            </span>
+        	<span class="badge bg-light text-dark d-flex align-items-center justify-content-between px-2 py-1"
+            style="font-size: 0.85rem; min-width: 180px;">
+        ${fileNameHtml} <small>(${(file.size / 1024).toFixed(1)} KB)</small>
+        
+                <button type="button" class="btn btn-sm btn-outline-danger ms-2 py-0 px-1"
+                    style="font-size: 0.7rem;" onclick="removeSelectedFile(${index})">✕</button>
+      </span>
         `;
         ul.appendChild(li);
     });

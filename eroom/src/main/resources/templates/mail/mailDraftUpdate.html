@@ -148,13 +148,51 @@
          				 	th:text="${mail != null} ? ${mail.mailContent} : ''"></textarea>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
-                      <div class="d-flex">
+                    <!-- 수정중 -->
+                      <!-- <div class="d-flex">
                         <label class="btn btn-link py-0 px-2 text-body fs-9" for="emailAttachment"> <span class="fa-solid fa-paperclip"></span></label>
                         <input class="d-none" id="emailAttachment" name="mail_files" type="file" multiple/>
                         <div id="filePreview" class="mt-2"></div>
-                        <!-- <label class="btn btn-link py-0 px-2 text-body fs-9" for="emailPhotos"><span class="fa-solid fa-image"></span></label>
-                        <input class="d-none" id="emailPhotos" type="file" accept="image/*" /> -->
-                      </div>
+                        <label class="btn btn-link py-0 px-2 text-body fs-9" for="emailPhotos"><span class="fa-solid fa-image"></span></label>
+                        <input class="d-none" id="emailPhotos" type="file" accept="image/*" />
+                      </div> -->
+                      <!-- 수정중 -->
+                      <!-- 파일 업데이트중 -->
+                      <div id="filePreview" class="mt-2">
+                      <div class="d-flex">
+				        <label class="btn btn-link py-0 px-2 text-body fs-9" for="noticeAttachment">
+				            <span class="fa-solid fa-paperclip"></span>
+				        </label>
+				        <input class="d-none" id="noticeAttachment" name="mail_files" type="file" multiple />
+				        <div id="filePreview" class="mt-2" th:if="${attachList == null or attachList.isEmpty()}">
+				            <!-- 파일을 선택하지 않은 경우, 아무것도 표시되지 않음 -->
+				            <ul id="newFileList" class="list-unstyled" style="margin-top: 0;"></ul>
+				        </div>
+				        <div id="filePreview" class="mt-2" th:if="${attachList != null and !attachList.isEmpty()}">
+				            <!-- 기존 첨부파일 목록 표시 -->
+				            <ul class="list-unstyled" style="margin-bottom: 0;">
+				  <th:block th:each="file : ${attachList}">
+				    <li class="mb-1">
+				      <span class="badge bg-light text-dark d-flex align-items-center justify-content-between px-2 py-1"
+				            style="font-size: 0.85rem; min-width: 180px; ">
+				        <span>
+				          <a th:href="@{${file.drivePath}}" target="_blank"
+				             th:text="${file.driveOriName}" 
+				             class="me-2 text-decoration-none text-dark"></a>
+				          <small th:text="|(${#numbers.formatDecimal(file.driveSize / 1024, 1, 1)} KB)|"></small>
+				        </span>
+				        <button type="button" class="btn btn-sm btn-outline-danger ms-2 py-0 px-1"
+				                th:onclick="'removeFile(' + ${file.driveAttachNo} + ', this)'" aria-label="삭제"
+				                style="font-size: 0.7rem;">✕</button>
+				      </span>
+				    </li>
+				  </th:block>
+				</ul>
+			    <ul id="newFileList" class="list-unstyled" style="margin-top: 0;"></ul>
+				        </div>
+				    </div>
+				    </div>
+				    <!-- 파일 업데이트중 -->
                       <div class="d-flex">
                         <button class="btn btn-link text-body fs-10 text-decoration-none" type="button" id="draftBtn">임시저장</button>
                         <button class="btn btn-primary fs-10" type="button" id="sendBtn">발송<span class="fa-solid fa-paper-plane ms-1"></span></button>
@@ -253,7 +291,7 @@
             	})
             	*/
             	
-            	const selectedFiles = [];
+            	/*const selectedFiles = [];
 
 				document.getElementById('emailAttachment').addEventListener('change', function(event) {
 				    const fileList = Array.from(event.target.files);
@@ -302,9 +340,87 @@
 				function removeSelectedFile(index) {
 				    selectedFiles.splice(index, 1);
 				    renderFilePreview();
-				}
+				}*/
 				
-				
+				 const selectedFiles = [];
+
+			    document.getElementById('noticeAttachment').addEventListener('change', function(event) {
+			      const fileList = Array.from(event.target.files);
+			      const previewContainer = document.getElementById('filePreview');
+
+			      fileList.forEach(file => {
+			        const exists = selectedFiles.some(f => f.name === file.name && f.size === file.size);
+			        if (!exists) selectedFiles.push(file);
+			      });
+
+			      renderFilePreview();
+			      event.target.value = "";
+			    });
+
+			    function renderFilePreview() {
+			    	  const newFileList = document.getElementById('newFileList');
+			    	  if (!newFileList) return;
+
+			    	  newFileList.innerHTML = ''; // 새 파일 목록만 초기화
+
+			    	  if (selectedFiles.length === 0) return;
+
+			    	  selectedFiles.forEach((file, index) => {
+			    	    const li = document.createElement('li');
+			    	    li.className = 'mb-1';
+
+			    	    const fileNameHtml = file.downloadUrl
+			    	      ? `<a href="${file.downloadUrl}" target="_blank">${file.name}</a>`
+			    	      : file.name;
+
+			    	    li.innerHTML = `
+			    	      <span class="badge bg-light text-dark d-flex align-items-center justify-content-between px-2 py-1"
+			    	            style="font-size: 0.85rem; min-width: 180px;">
+			    	        ${fileNameHtml} <small>(${(file.size / 1024).toFixed(1)} KB)</small>
+			    	        
+			    	                <button type="button" class="btn btn-sm btn-outline-danger ms-2 py-0 px-1"
+			    	                    style="font-size: 0.7rem;" onclick="removeSelectedFile(${index})">✕</button>
+			    	      </span>
+			    	    `;
+			    	    newFileList.appendChild(li);
+			    	  });
+			    	}
+
+			    function removeSelectedFile(index) {
+			      selectedFiles.splice(index, 1);
+			      renderFilePreview();
+			    }
+			    
+			    function removeFile(attachNo,btn) {
+			        if (!confirm("정말 삭제하시겠습니까?\n※기존에 있던 파일입니다.\n")) return;
+			        console.log('삭제할 파일의 attachNo:', attachNo);
+			        fetch('/mail/file/delete/' + attachNo, {
+			          method: 'POST',
+			          headers: {
+			            'header': document.querySelector('meta[name="_csrf_header"]').content,
+				        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			          }
+			        
+			        })
+			        .then(res => res.json())
+			        .then(data => {
+			          alert(data.res_msg);
+			          if (data.res_code == 200) {
+			            // 페이지 새로고침 또는 해당 파일 DOM에서 제거
+			            // location.reload(); // 또는 직접 해당 li 제거 처리
+			            
+			            // 12 : 51 추가한 한줄
+			        	//  fileElement.remove();
+			        	  const li = btn.closest('li');
+			              if (li) li.remove();
+			           
+			          }
+			        })
+			        .catch(err => {
+			          console.error(err);
+			          alert("파일 삭제 중 오류가 발생했습니다.");
+			        });
+			      }
 				
 				
 				
