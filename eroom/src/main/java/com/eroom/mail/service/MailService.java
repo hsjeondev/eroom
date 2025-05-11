@@ -2,6 +2,7 @@ package com.eroom.mail.service;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -508,14 +509,52 @@ public class MailService {
 	@Transactional
 	public int createMail(MailDto mailDto,List<MultipartFile> mailFiles, String mailDraftYn) {
 		int result = 0;
+		List<Long> receiverNos = new ArrayList<>();
 		try {
 			// 보낸 메일 저장 ( mail에 제목, 내용 저장)
 			Mail mailEntity = mailDto.toEntity();
 			mailEntity.setMailSentTime(LocalDateTime.now());
 			Mail mailSaver = mailRepository.save(mailEntity);
-			 
 			
-			List<Long> receiverNos = mailDto.getReceiver_no();
+			String receiverType = mailDto.getReceiver_type(); 
+			
+			if ("root".equals(receiverType)) {
+				List<Employee> allEmployees = employeeRepository.findAll();
+			    for (Employee e : allEmployees) {
+			        receiverNos.add(e.getEmployeeNo());
+			    }
+			}  else if (receiverType.startsWith("D")) {
+			    // 부서 코드
+			    List<Employee> deptEmployees = employeeRepository.findByStructureParentCode(receiverType);
+			    for (Employee e : deptEmployees) {
+			        receiverNos.add(e.getEmployeeNo());
+			    }
+			} else if (receiverType.startsWith("T")) {
+			    // 팀 ID
+			    List<Employee> teamEmployees = employeeRepository.findByStructure_SeparatorCode(receiverType);
+			    for (Employee e : teamEmployees) {
+			        receiverNos.add(e.getEmployeeNo());
+			    }
+			}else {
+				String[] empNoArray = receiverType.split(",");
+			    for (String empNoStr : empNoArray) {
+			        try {
+			            Long empNo = Long.parseLong(empNoStr.trim());
+			            receiverNos.add(empNo);
+			        } catch (NumberFormatException e) {
+			            throw new IllegalArgumentException("잘못된 직원 번호입니다: " + empNoStr);
+			        }
+			    }
+			}
+			
+			// 부서
+			/*List<Employee> receiverEmployees = employeeRepository.findByStructureParentCode(mailDto.getReceiver_type());
+			for(Employee re : receiverEmployees) {
+				
+				receiverNos.add(re.getEmployeeNo());
+			}*/
+			
+			//List<Long> receiverNos = mailDto.getReceiver_no();
 			if(mailDraftYn.equals("N")) {
 			// 수신자 ( mail_receiver 받는 사람 mail_no값으로 저장 )
 			 if (receiverNos != null && !receiverNos.isEmpty()) {

@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.eroom.drive.entity.Drive;
 import com.eroom.drive.service.DriveService;
+import com.eroom.drive.service.ProfileService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.entity.Employee;
@@ -37,6 +38,7 @@ import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.employee.service.StructureService;
 import com.eroom.mail.dto.MailDto;
+import com.eroom.mail.dto.MailReceiverDto;
 import com.eroom.mail.entity.Mail;
 import com.eroom.mail.entity.MailDraft;
 import com.eroom.mail.entity.MailReceiver;
@@ -53,7 +55,7 @@ public class MailController {
 	private final MailService mailService;
 	private final EmployeeService employeeService;
 	private final DriveService driveService;
-	
+	private final ProfileService profileService;
 	private final StructureService structureService;
 	@Value("${ffupload.location}")
 	 private String fileDir;
@@ -277,12 +279,36 @@ public class MailController {
 	    
 	    List<MailReceiver> received = mailService.getReceivedMailsByEmployee(employeeNo, sortOrder); 
 	   
+	    List<MailReceiverDto> mailReceiverDtoList = new ArrayList<>();
+
+	    // 수신자 목록을 반복하면서 DTO로 변환하고 프로필 이미지 URL을 추가하기
+	    for (MailReceiver mailReceiver : received) {
+	    	MailReceiverDto dto = new MailReceiverDto();
+
+	        // 필요한 정보를 DTO에 세팅
+	        dto.setMail_receiver_no(mailReceiver.getMailReceiverNo());
+
+	        Long receiverEmployeeNo = mailReceiver.getReceiver().getEmployeeNo(); // 수신자 employeeNo
+
+	        // 수신자 프로필 이미지 URL 가져오기
+	        String profileUrl = profileService.getProfileImageUrl(receiverEmployeeNo); // profileService에서 프로필 이미지 URL을 가져오는 메서드
+
+	        // DTO에 프로필 이미지 URL 설정
+	        dto.setProfile_image_url(profileUrl);
+
+	        // DTO 리스트에 추가
+	        mailReceiverDtoList.add(dto);
+	    }
+	    
+	    
 	    Map<Long, MailStatus> mailStatusMap = mailService.getStatusMapForMailRecevier(received);
 
+	    
+	    System.out.println(mailReceiverDtoList);
+	    
 		model.addAttribute("mailStatusMap", mailStatusMap);
-	    
-	    
 	    model.addAttribute("receivedMails", received);
+	    model.addAttribute("profiles",mailReceiverDtoList);
 	    return "mail/mailReceiverTo";
 	}
 	
@@ -668,7 +694,6 @@ public class MailController {
 		List<SeparatorDto> departments = employeeService.findDistinctStructureNames(); // 부서/팀 리스트 가져오기
 		model.addAttribute("employeeList",employeeList);
 		model.addAttribute("departments", departments); // 부서 드롭다운용
-		
 		if(mailNo != null) {
 			
 			 Mail mail = mailService.findMailByMailNo(mailNo);
@@ -746,6 +771,7 @@ public class MailController {
 											 @RequestParam(name="mail_files") List<MultipartFile> mailFiles,
 											 @RequestParam(name="mail_draft_yn") String mailDraftYn
 											 ) {
+		System.out.println(mailDto);
 		Map<String, String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "메일 등록중 오류가 발생하였습니다.");
