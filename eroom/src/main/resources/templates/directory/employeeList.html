@@ -165,7 +165,7 @@ td.name p {
 								</div>
 							</div> -->
 							<!-- 부서/팀 필터 -->
-							<div class="col-auto scrollbar overflow-hidden-y flex-grow-1">
+							<div id="problemBtn" class="col-auto scrollbar overflow-hidden-y flex-grow-1" style="display: none;">
 							  <div class="btn-group position-static" role="group">
 							    <!-- 부서 드롭다운 -->
 							    <div class="btn-group position-static text-nowrap">
@@ -911,50 +911,39 @@ td.name p {
 
 <!-- 직원 리스트 불러오기 -->
 <script>
+// 스피너 필요하시면 이 부분 참고하세요
+// 스피너 필요하시면 이 부분 참고하세요
+// 스피너 필요하시면 이 부분 참고하세요
 	function toggleEmployeeTableDisplay(isLoading) {
 		  const employeeTable = document.getElementById('employeeTable');
+		  const problemBtn = document.getElementById('problemBtn');
 		  if (!employeeTable) return;
 	
 		  if (isLoading) {
 		    // 로딩 중일 때
 		    employeeTable.style.display = 'none';
 		    document.getElementById('loadingSpinner').style.display = 'block';
+			  document.getElementById('problemBtn').style.display = 'none';
 			  document.getElementById('employeeListInsert').style.display = 'none';
 		  } else {
 		    // 로딩이 완료되었을 때
 		    employeeTable.style.display = 'block';
 		    document.getElementById('loadingSpinner').style.display = 'none';
+			  document.getElementById('problemBtn').style.display = 'block';
 			  document.getElementById('employeeListInsert').style.display = 'block';
 		  }
-	}
+	};
 	
 	
 	document.addEventListener("DOMContentLoaded", function() {
-
-	    fetch(`/directory/employeeList?separatorCode=selectAll`)
-	      .then(res => res.text())
-	      .then(html => {
-	        document.getElementById('employeeListInsert').innerHTML = html;
-	
-	        const targetEl = document.getElementById('employeeTable');
-	        if (!targetEl) return;
-	
-	        if (targetEl.listjsInstance && typeof targetEl.listjsInstance.destroy === 'function') {
-	          targetEl.listjsInstance.destroy();
-	          delete targetEl.listjsInstance;
-	        }
-	
-	        const options = JSON.parse(targetEl.getAttribute('data-list'));
-	        const newList = new List(targetEl, options);
-	        targetEl.listjsInstance = newList;
+			
 	        toggleEmployeeTableDisplay(false);
-	        
-	      })
-	      .catch(err => console.error("직원 리스트 비동기 로딩 실패:", err));
-	
 	    	resetSearchInput();
 	
 	});
+// 스피너 필요하시면 이 부분 참고하세요
+// 스피너 필요하시면 이 부분 참고하세요
+// 스피너 필요하시면 이 부분 참고하세요
 	
 
 
