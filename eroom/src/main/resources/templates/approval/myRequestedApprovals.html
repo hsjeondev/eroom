@@ -13,7 +13,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			<i class="uil uil-file-check text-secondary me-2"></i><span class="fw-bold fs-7">작성 문서</span>
 		</div>
 			<div class="pb-8">
-				<div id="reports" data-list='{
+				<div id="reports" style="display: none;" data-list='{
 										       "valueNames": ["writer", "text1", "text2", "text3", "title", "state", "date", "reports"],
 										       "page": 10,
 										       "pagination": true
@@ -86,12 +86,31 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 															<label class="fw-bold mb-2 text-body-highlight" for="approvalStatus">진행여부</label>
 															<select class="form-select" id="approvalStatus">
 																<option th:value="0">전체 보기</option>
-																<option th:value="A">승인</option>
-																<option th:value="S">진행</option>
-																<option th:value="D">반려</option>
-																<option th:value="F">회수</option>
+																<option th:value="A">🟢 승인</option>
+																<option th:value="S">🔵 진행</option>
+																<option th:value="D">🔴 반려</option>
+																<option th:value="F">🟠 회수</option>
 															</select>
 														</div>
+														
+														
+													  <!-- <div class="mb-3">
+									                      <div class="dropdown">
+									
+															<label class="fw-bold mb-2 text-body-highlight" for="dropdownMenuButton">진행여부</label>
+									                        <button style="width: 100%; border: solid 1px; border-radius: 1ex;" class="btn bg-white bt- dropdown-toggle" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown button</button><span class="caret"> </span>
+									                        <div class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="dropdownMenuButton" style="width: 100%">
+									                          <div class="dropdown-divider"></div>
+									                          <a class="dropdown-item">승인</a>
+									                          <a class="dropdown-item">진행</a>
+									                          <a class="dropdown-item">반려</a>
+									                          <a class="dropdown-item">회수</a>
+									                          <div class="dropdown-divider"></div>
+									
+									                        </div>
+									                      </div>
+								                      </div> -->
+								                    
 													</div>
 												<div class="modal-footer d-flex justify-content-end align-items-center px-4 pb-4 border-0 pt-3">
 												  <button id="filterBtn" class="btn btn-sm btn-primary px-9 fs-10 my-0" type="button">확인</button>
@@ -108,7 +127,9 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					</div><!-- row g-3 justify-content-between mb-2 끝 -->
 					
 					<!-- 카드 전체 -->
-					<div class="row g-3 list" id="reportsList">
+					
+					
+					<div class="row g-3 list" id="reportsList" >
 					  <!-- 비어있을 경우에도 .list-item 하나는 있어야 함 -->
 					  <div th:if="${#lists.isEmpty(resultList)}" class="list-item">
 					  
@@ -145,6 +166,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				  </div>
 				
 				</div> <!-- reports 끝 -->
+				<div id="loadingSpinner" class="text-center py-3"  style="display: block;">
+				   <div class="spinner-border" role="status">
+				  	<span class="visually-hidden">Loading...</span>
+				  </div>
+				</div>
 			
 			</div><!-- pb-8 끝 -->
 			
@@ -172,6 +198,13 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	<!-- Thymeleaf에서 base64 데이터 바인딩 -->
 	<input type="hidden" id="signatureImage" th:value="${approvalSignature}" />
 
+
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+	   document.getElementById('loadingSpinner').style.display = 'none';
+	   document.getElementById('reports').style.display = 'block';
+	});
+</script>
 
 
 	<!-- 시그니처 모달 작동 스크립트 -->
