@@ -821,6 +821,208 @@
    // 페이지 로드 시 뉴스 데이터 로드
    window.onload = loadNews;  // 초기 로딩 시에도 뉴스 한 개를 불러옴
 </script>
+<!-- 결재 관련 비동기 -->
+<script>
+//탭 요소들 가져오기
+const approvalOngoingTab = document.getElementById('approvalOngoingInner');
+const approvalPendingTab = document.getElementById('approvalPendingInner');
+const approvalCompletedTab = document.getElementById('approvalCompletedInner');
+
+
+//✅ Carousel 로딩 함수
+async function loadApprovalCarousel(target, endpoint, indicators) {
+    try {
+        const res = await fetch(endpoint);
+        if (!res.ok) throw new Error('서버 오류: ' + res.status);
+
+        const data = await res.json();
+        console.log(`✅ ${endpoint} 응답 결과:`, data);
+
+        // ✅ 초기화
+        target.innerHTML = '';
+        indicators.innerHTML = '';
+
+        if (!data || !Array.isArray(data) || data.length === 0) {
+        	nothingHtmlFormS = `
+                <div class="carousel-item active">
+            	<div class="text-center mb-2">
+				<svg style="height: 12px;" class="svg-inline--fa fa-circle fs-10 text-primary me-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path></svg><!-- <i class="fas fa-circle fs-10 text-primary me-1"></i> Font Awesome fontawesome.com -->
+				<span class="fw-bold fs-9">진행 중 결재</span>
+			</div>
+                    <div class="border rounded p-3 bg-primary-soft cursor-pointer">
+                        <h5 class="mb-1 fw-bold text-dark text-decoration-none">
+                          진행중인 결재가 없습니다.
+                        </h5>
+                    </div>
+                </div>
+            `;
+        	nothingHtmlFormToMe = `
+                <div class="carousel-item active">
+            	<div class="text-center mb-2">
+            	<svg style="height: 12px;" class="svg-inline--fa fa-circle fs-10 mt-n1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" ><path fill="#FFD700" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path></svg><!-- <i class="fas fa-circle fs-10 text-success mt-n1"></i> Font Awesome fontawesome.com -->
+				<span class="fw-bold fs-9">내게 온 결재</span>
+			</div>
+                    <div class="border rounded p-3 bg-warning-soft cursor-pointer">
+                        <h5 class="mb-1 fw-bold text-dark text-decoration-none">
+                        	내게 온 결재가 없습니다.
+                        </h5>
+                    </div>
+                </div>
+            `;
+        	nothingHtmlFormAD = `
+                <div class="carousel-item active">
+            	<div class="text-center mb-2">
+            	<svg style="height: 12px;" class="svg-inline--fa fa-circle fs-10 text-success mt-n1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path></svg><!-- <i class="fas fa-circle fs-10 text-success mt-n1"></i> Font Awesome fontawesome.com -->
+            	<svg style="height: 12px;" class="svg-inline--fa fa-circle fs-10 text-danger mt-n1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path></svg><!-- <i class="fas fa-circle fs-10 text-success mt-n1"></i> Font Awesome fontawesome.com -->
+				<span class="fw-bold fs-9">완료된 결재</span>
+			</div>
+                    <div class="border rounded p-3 bg-success-soft cursor-pointer">
+                        <h5 class="mb-1 fw-bold text-dark text-decoration-none">
+                        	완료된 결재가 없습니다.
+                        </h5>
+                    </div>
+                </div>
+            `;
+            
+            
+
+			if(endpoint == '/mainpage/approval/ongoing'){
+				target.innerHTML += nothingHtmlFormS
+			} else if(endpoint == '/mainpage/approval/pending'){
+				target.innerHTML += nothingHtmlFormToMe
+			} else if(endpoint == '/mainpage/approval/completed'){
+				target.innerHTML += nothingHtmlFormAD
+			} 
+            return;
+        }
+
+        // ✅ 슬라이드 생성
+        data.forEach((item, index) => {
+            const approvalTitle = item.approval_title ?? '제목 없음';
+            const approvalNo = item.approval_no ?? 0;
+            const displayDate = item.approval_display_date ?? '-';
+            const completedDate = item.approval_completed_date ?? '-';
+			const approvalStatus = item.approval_status ?? '-';
+			const approvalWriter = item.approval_writer ?? '-';
+            // 슬라이드 항목 
+            const htmlFormS = `
+                <div class="carousel-item ${index === 0 ? 'active' : ''}">
+            	<div class="text-center mb-2">
+				<svg style="height: 12px;" class="svg-inline--fa fa-circle fs-10 text-primary me-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path></svg><!-- <i class="fas fa-circle fs-10 text-primary me-1"></i> Font Awesome fontawesome.com -->
+				<span class="fw-bold fs-9">진행 중 결재</span>
+			</div>
+                    <div class="border rounded p-3 bg-primary-soft cursor-pointer"
+                        onclick="location.href='/approval/${approvalNo}/detail'">
+                        <h5 class="mb-1 fw-bold text-dark text-decoration-none">
+                          ${approvalTitle}
+                        </h5>
+                        <p class="mb-0 text-muted fs-9">기안일 : ${displayDate}</p>
+                    </div>
+                </div>
+            `;
+            const htmlFormA = `
+                <div class="carousel-item ${index === 0 ? 'active' : ''}">
+            	<div class="text-center mb-2">
+				<svg style="height: 12px;" class="svg-inline--fa fa-circle fs-10 text-success mt-n1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path></svg><!-- <i class="fas fa-circle fs-10 text-success mt-n1"></i> Font Awesome fontawesome.com -->
+				<span class="fw-bold fs-9">승인된 결재</span>
+			</div>
+                    <div class="border rounded p-3 bg-success-soft cursor-pointer"
+                        onclick="location.href='/approval/${approvalNo}/detail'">
+                        <h5 class="mb-1 fw-bold text-dark text-decoration-none">
+                          ${approvalTitle}
+                        </h5>
+                        <p class="mb-0 text-muted fs-9">완료일 : ${completedDate}</p>
+                    </div>
+                </div>
+            `;
+            const htmlFormD = `
+                <div class="carousel-item ${index === 0 ? 'active' : ''}">
+            	<div class="text-center mb-2">
+            	<svg style="height: 12px;" class="svg-inline--fa fa-circle fs-10 text-danger mt-n1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path></svg><!-- <i class="fas fa-circle fs-10 text-success mt-n1"></i> Font Awesome fontawesome.com -->
+				<span class="fw-bold fs-9">반려된 결재</span>
+			</div>
+                    <div class="border rounded p-3 bg-fail-soft cursor-pointer"
+                        onclick="location.href='/approval/${approvalNo}/detail'">
+                        <h5 class="mb-1 fw-bold text-dark text-decoration-none">
+                          ${approvalTitle}
+                        </h5>
+                        <p class="mb-0 text-muted fs-9">완료일 : ${completedDate}</p>
+                    </div>
+                </div>
+            `;
+            const htmlFormToMe = `
+                <div class="carousel-item ${index === 0 ? 'active' : ''}">
+            	<div class="text-center mb-2">
+            	<svg style="height: 12px;" class="svg-inline--fa fa-circle fs-10 mt-n1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" ><path fill="#FFD700" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path></svg><!-- <i class="fas fa-circle fs-10 text-success mt-n1"></i> Font Awesome fontawesome.com -->
+				<span class="fw-bold fs-9">내게 온 결재</span>
+			</div>
+                    <div class="border rounded p-3 bg-warning-soft cursor-pointer"
+                        onclick="location.href='/approval/${approvalNo}/detail'">
+                        <h5 class="mb-1 fw-bold text-dark text-decoration-none">
+                          ${approvalTitle}
+                        </h5>
+                        <p class="mb-0 text-muted fs-9">기안일 : ${displayDate} / 기안자 : ${approvalWriter}</p>
+                    </div>
+                </div>
+            `;
+			/* if (approvalStatus === 'S') {
+			    if (approval_toMe) {
+			        target.innerHTML += htmlFormToMe;
+			    } else {
+			        target.innerHTML += htmlFormS;
+			    }
+			} else if (approvalStatus === 'A') {
+			    target.innerHTML += htmlFormA;
+			} else if (approvalStatus === 'D') {
+			    target.innerHTML += htmlFormD;
+			} */
+			if(endpoint == '/mainpage/approval/ongoing'){
+				target.innerHTML += htmlFormS
+			} else if(endpoint == '/mainpage/approval/pending'){
+				target.innerHTML += htmlFormToMe
+			} else if(endpoint == '/mainpage/approval/completed'){
+				if(approvalStatus === 'A'){
+					target.innerHTML += htmlFormA
+				} else if(approvalStatus === 'D'){
+					target.innerHTML += htmlFormD
+				}
+			} 
+
+            // 인디케이터 생성
+            indicators.innerHTML += `
+                <button type="button" data-bs-target="#${target.id}" data-bs-slide-to="${index}"
+                        class="${index === 0 ? 'active' : ''}" aria-label="슬라이드 ${index + 1}"></button>
+            `;
+            
+            
+            
+        });
+        
+
+    } catch (error) {
+        console.error(`❌ ${endpoint} 데이터 로딩 오류:`, error);
+    }
+}
+
+// ✅ 로딩 실행
+loadApprovalCarousel(
+    document.getElementById('ongoingCarouselInner'), 
+    '/mainpage/approval/ongoing', 
+    document.getElementById('ongoingCarouselIndicators')
+);
+
+loadApprovalCarousel(
+    document.getElementById('pendingCarouselInner'), 
+    '/mainpage/approval/pending', 
+    document.getElementById('pendingCarouselIndicators')
+);
+
+loadApprovalCarousel(
+    document.getElementById('completedCarouselInner'), 
+    '/mainpage/approval/completed', 
+    document.getElementById('completedCarouselIndicators')
+);
+</script>
 
     
 

@@ -79,8 +79,10 @@ public class Directory {
 	@ManyToOne
 	@JoinColumn(name = "separator_code")
 	private Separator separator;
-	
+
 	@OneToMany(mappedBy = "directory")
 	private List<DirectoryMemo> directoryMemos;
+	@OneToMany(mappedBy = "directory")
+	private List<DirectoryMemo> directoryBookmarks;
 
 }
