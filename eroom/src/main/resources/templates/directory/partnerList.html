@@ -43,7 +43,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 </div>
 
     <!-- 테이블 본문 -->
-    <div class="table-responsive">
+    <div class="table-responsive" id="partnerContainer" style="display: none;">
       <table class="table table-striped table-sm fs-9 mb-0 text-center">
         <thead class="text-center align-middle">
 			<tr>
@@ -61,7 +61,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
         <tbody class="list align-middle">
 
 		<!-- 외부업체 인원 1 -->
-		<tr th:each="list, listStatus : ${resultList}" th:if="${not #lists.isEmpty(resultList)}">
+		<tr   th:each="list, listStatus : ${resultList}" th:if="${not #lists.isEmpty(resultList)}">
 			<td class="no" th:text="${listStatus.count}">1</td>
 			<td class="name" th:text="${list.directory_name}">정재익</td>
 			<td class="companyName" th:text="${list.directory_company_name}">에이스솔루션</td>
@@ -96,6 +96,13 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
         </tbody>
       </table>
     </div>
+	<div id="loadingSpinner" class="text-center py-3"  style="display: block;">
+	   <div class="spinner-border" role="status">
+	  	<span class="visually-hidden">Loading...</span>
+	  </div>
+	</div> 
+    
+    
 
     <!-- 페이징? -->
     <div class="d-flex justify-content-center mt-3">
@@ -223,7 +230,12 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 </div>
 
 
-
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+	   document.getElementById('partnerContainer').style.display = 'block';
+	   document.getElementById('loadingSpinner').style.display = 'none';
+	});
+</script>
 
 
 <!-- create 메소드 -->
