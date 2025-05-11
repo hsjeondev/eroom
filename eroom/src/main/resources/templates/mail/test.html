@@ -41,7 +41,9 @@
 						<input type="hidden" name="mail_no" th:value="${mail != null} ? ${mail.mailNo} : ''" />
                     <div class="row g-3 mb-2">
 	                    <div class="col-4">
-	                   		<input class="form-control" type="text" name="receiver_type" placeholder="받는 사람" id="receiverInput" readonly data-bs-toggle="modal" data-bs-target="#treeModal" />
+	                   		<input class="form-control" type="text" name="receiver_type_test" placeholder="받는 사람" id="receiverInput" readonly data-bs-toggle="modal" data-bs-target="#treeModal" />
+	                   		<!-- 숨길 태그하나 -->
+	                   		<input type="hidden" name="receiver_type" id="receiverTypeInput" />
 	                   </div>
 	                   <div>
 	                   	
@@ -523,11 +525,15 @@ function removeSelectedFile(index) {
 					  const result = Array.from(selected).map(el => el.id.replace('tag-', ''));
 					  // 여기서 result 데이터 가지고 쓰시면 됩니다
 					  // 여기서 result 데이터 가지고 쓰시면 됩니다
+					  const displayNames = Array.from(selected).map(el => el.dataset.name || el.textContent);
 					  // 여기서 result 데이터 가지고 쓰시면 됩니다
 					  // 여기서 result 데이터 가지고 쓰시면 됩니다
+					  document.getElementById('receiverInput').value = displayNames.join(', ');
 					  // 여기서 result 데이터 가지고 쓰시면 됩니다
+					  document.getElementById('receiverTypeInput').value = result.join(',');
 					  // 여기서 result 데이터 가지고 쓰시면 됩니다
-					  document.getElementById('receiverInput').value = result.join(', ');
+					  
+					  // document.getElementById('receiverInput').value = result.join(', ');
 					  // 여기서 result 데이터 가지고 쓰시면 됩니다
 					  // 여기서 result 데이터 가지고 쓰시면 됩니다
 					  // 여기서 result 데이터 가지고 쓰시면 됩니다

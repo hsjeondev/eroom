@@ -517,26 +517,28 @@ public class MailService {
 			Mail mailSaver = mailRepository.save(mailEntity);
 			
 			String receiverType = mailDto.getReceiver_type(); 
-			
-			if ("root".equals(receiverType)) {
+			String[] typeArray = receiverType.split(",");
+			for (String type : typeArray) {
+				type = type.trim();
+			if ("root".equals(type)) {
 				List<Employee> allEmployees = employeeRepository.findAll();
 			    for (Employee e : allEmployees) {
 			        receiverNos.add(e.getEmployeeNo());
 			    }
-			}  else if (receiverType.startsWith("D")) {
+			}  else if (type.startsWith("D")) {
 			    // 부서 코드
-			    List<Employee> deptEmployees = employeeRepository.findByStructureParentCode(receiverType);
+			    List<Employee> deptEmployees = employeeRepository.findByStructureParentCode(type);
 			    for (Employee e : deptEmployees) {
 			        receiverNos.add(e.getEmployeeNo());
 			    }
-			} else if (receiverType.startsWith("T")) {
+			} else if (type.startsWith("T")) {
 			    // 팀 ID
-			    List<Employee> teamEmployees = employeeRepository.findByStructure_SeparatorCode(receiverType);
+			    List<Employee> teamEmployees = employeeRepository.findByStructure_SeparatorCode(type);
 			    for (Employee e : teamEmployees) {
 			        receiverNos.add(e.getEmployeeNo());
 			    }
 			}else {
-				String[] empNoArray = receiverType.split(",");
+				String[] empNoArray = type.split(",");
 			    for (String empNoStr : empNoArray) {
 			        try {
 			            Long empNo = Long.parseLong(empNoStr.trim());
@@ -546,7 +548,7 @@ public class MailService {
 			        }
 			    }
 			}
-			
+			}
 			// 부서
 			/*List<Employee> receiverEmployees = employeeRepository.findByStructureParentCode(mailDto.getReceiver_type());
 			for(Employee re : receiverEmployees) {
