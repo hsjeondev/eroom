@@ -25,6 +25,7 @@ import com.eroom.attendance.dto.AttendanceDto;
 import com.eroom.attendance.entity.AnnualLeave;
 import com.eroom.attendance.service.AnnualLeaveService;
 import com.eroom.attendance.service.AttendanceService;
+import com.eroom.common.AnnualPolicyUtil;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.DirectoryService;
@@ -62,6 +63,7 @@ public class AdminController {
 	private final MeetingRoomService meetingRoomService;
 	private final VehicleService vehicleService;
 	private final AnnualLeaveService annualLeaveService;
+	private final AnnualPolicyUtil annualPolicyUtil;
 	
 	// 회의실 목록
 	@GetMapping("/meetingroom")
@@ -453,8 +455,11 @@ public class AdminController {
 				}
 			}
 			
-			AnnualLeave annualLeave = attendanceService.selectAnnualLeaveByEmployeeNo(employee.getEmployeeNo());
-			
+			// 현재 년도
+			//Long currentYear = Long.valueOf(LocalDate.now().getYear());
+			// 기준일 기반 연차 연도 계산
+	        Long targetYear = annualPolicyUtil.getTargetYearByPolicy();
+			AnnualLeave annualLeave = annualLeaveService.selectAnnualLeaveByEmployeeNoAndYear(employee.getEmployeeNo(),targetYear);
 			// 연차 정보 조회
 			AnnualLeaveDto annualLeaveDto = null;
 			if(annualLeave != null) {
@@ -536,9 +541,13 @@ public class AdminController {
 			DirectoryDto directoryDto = new DirectoryDto().toDto(directory);
 			model.addAttribute("directory", directoryDto);
 		}
-
+		// 현재 년도
+		//Long currentYear = Long.valueOf(LocalDate.now().getYear());
+		// 기준일 기반 연차 연도 계산
+        Long targetYear = annualPolicyUtil.getTargetYearByPolicy();
 		// 연차 정보 조회
-		AnnualLeave annualLeave = attendanceService.selectAnnualLeaveByEmployeeNo(employeeNo);
+		//AnnualLeave annualLeave = attendanceService.selectAnnualLeaveByEmployeeNo(employeeNo);
+		AnnualLeave annualLeave = annualLeaveService.selectAnnualLeaveByEmployeeNoAndYear(employeeNo,targetYear);
 		AnnualLeaveDto annualLeaveDto;
 		if (annualLeave != null) {
 			annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);

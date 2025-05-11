@@ -125,28 +125,11 @@ public class AttendanceService {
 			}
 		}
 		
-
 		return resultMap;
 	}
 	
-	
-	// 근태 기록 전체 조회
-//	public List<Attendance> selectAttendanceList(){
-//		
-//		// 현재 로그인한 정보
-//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//		
-//		EmployeeDetails employeeDetail = (EmployeeDetails)authentication.getPrincipal();
-//		
-//		Long employeeNo = employeeDetail.getEmployee().getEmployeeNo(); 
-//		
-//		return attendanceRepository.findByEmployee_EmployeeNoOrderByAttendanceCheckInTimeDesc(employeeNo);
-//		
-//		
-//	}
 	// 연차 정보 조회
 	public AnnualLeave selectAnnualLeaveByEmployeeNo(Long employeeNo) {
-		
 		return annualLeaveRepository.findByEmployee_EmployeeNo(employeeNo);
 	}
 	
@@ -228,7 +211,6 @@ public class AttendanceService {
 //					(checkOut.getHour() - checkIn.getHour()) + ((checkOut.getMinute() - checkIn.getMinute()) / 60.0);
 			
 			workTimePerDay.put(checkIn.toLocalDate().toString(), workTime); // 날짜별 근무시간 저장
-
 			
 			// 요일별 근무시간 분류
 			// getDayOfWeek() -> 요일을 반환 -> toString() -> 요일을 문자열로 변환
