@@ -15,9 +15,17 @@ public interface ApprovalRepository extends JpaRepository<Approval, Long> {
 
 	List<Approval> findAllByApprovalVisibleYn(String string);
 
-	// 마이페이지 사용. 내가 올린 결재 중 진행상태와 visible 매개변수로 사용.
+	// mainpage Approval 리스트 조회1
 	List<Approval> findByEmployee_EmployeeNoAndApprovalStatusAndApprovalVisibleYnOrderByApprovalRegDateDesc(Long employeeNo,
 			String approvalStatus, String approvalVisibleYn);
+	// 마이페이지용 결재 불러오기
+	List<Approval> findTop5ByApprovalStatusAndApprovalVisibleYnAndEmployee_EmployeeNoOrderByApprovalRegDateDesc(String approvalStatus, String approvalVisibleYn, Long employeeNo);
+	// mainpage Approval 리스트 조회3
+	List<Approval> findTop5ByApprovalStatusInAndApprovalVisibleYnAndEmployee_EmployeeNoOrderByApprovalRegDateDesc(
+		    List<String> approvalStatuses, String approvalVisibleYn, Long employeeNo
+		);
+
+
 
 
 	

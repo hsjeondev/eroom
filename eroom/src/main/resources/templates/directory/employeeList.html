@@ -402,10 +402,12 @@ td.name p {
 
 							<!-- 닫기 & 별표 버튼 -->
 							<div class="position-absolute top-0 end-0 mt-2 me-2 d-flex gap-2">
-								<a href="#" class="text-warning" title="즐겨찾기"> 
-								<i class="far fa-star"></i>
-								<i class="fas fa-star"></i>
-								</a>
+								<span>
+									<a id="bookmarkATag" href="#" class="text-warning" title="즐겨찾기"> 
+										<!-- <i class="far fa-star"></i>
+										<i class="fas fa-star"></i> -->
+									</a>
+								</span>
 								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
 
@@ -600,6 +602,8 @@ td.name p {
 					    const position = trigger.getAttribute('data-position') || '-';
 					    const memberDirectoryNo = trigger.getAttribute('data-memberDirectoryNo') || '-';
 					    const profileImageUrl = trigger.getAttribute('data-profileImageUrl') || '-';
+					    const bookmark = trigger.getAttribute('data-bookmark') || '-';
+					    const bookmarkATag = document.getElementById('bookmarkATag');
 					    
 					    // 프로필카드에서
 					    // 1대1 채팅하기
@@ -629,7 +633,11 @@ td.name p {
 					        .catch(() => {
 					          modal.querySelector('#memo').value = '';
 					        });
+					    // 북마크 조회
+					    myBookmark(targetEmpNo);
 					    }
+					    
+
 					    
 					    // 모달 안의 요소에 값 넣기
 					    modal.querySelector('.profile-name').textContent = name;
@@ -688,7 +696,65 @@ td.name p {
 								  console.log('요청 중 오류가 발생했습니다.');
 							  })
 						  });
+					    
+					    
+					    
+					      // 북마크 변경
+						  bookmarkATag.addEventListener('click', function(){
+							  const modalDirectoryNo = document.getElementById('modalDirectoryNo').value;
+							  console.log(modalDirectoryNo);
+							  
+							  fetch('/directoryBookmark/change',{
+								  method: 'POST',
+								  headers: {
+								    'Content-Type': 'application/json',
+								    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+								    'header': document.querySelector('meta[name="_csrf_header"]').content
+								  },
+								  body : JSON.stringify({
+									  directory_no : modalDirectoryNo
+								  })
+							  })
+							  .then(res => res.json())
+							  .then(data => {
+								  console.log(data.res_code);
+								  myBookmark(data.targetEmployeeNo);
+							  })
+							  .catch(err =>{
+								  console.error(err);
+								  console.log('요청 중 오류가 발생했습니다..');
+							  })
+						  });
+					    
+					    
+					    
+					    
+					    
+					    
 					});
+				</script>
+				<script>
+				    // 사원 북마크 조회
+				    const modal = document.getElementById('profileModal');
+				    function myBookmark(targetEmpNo){
+				      fetch(`/directoryBookmark/${targetEmpNo}`)
+				        .then(res => res.json())
+				        .then(data => {
+				        	if(data.bookmark === 'Y'){
+				        		modal.querySelector('#bookmarkATag').innerHTML = `
+						    		<i class="fas fa-star"></i>
+						    	`;
+						    } else{
+						    	modal.querySelector('#bookmarkATag').innerHTML = `
+						    		<i class="far fa-star"></i>
+						    	`;
+						    }
+						    
+				        })
+				        .catch(() => {
+				          // modal.querySelector('#memo').value = '';
+				        });
+				    };
 				</script>
 				
 				<!-- 트리구조 최상위 클릭시 전 사원 조회 -->
@@ -831,6 +897,9 @@ td.name p {
 					    document.getElementById('searchInput').value = '';
 					  };
 					});
+				
+				
+
 
 </script>
 
@@ -1245,10 +1314,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 <!-- 부서, 팀 이름 바꾸기 -->
-<script>
+<!-- <script>
 	const editNameDeptSeparatorCode = deptEl.getAttribute('data-deptSeparatorCode');
 	const editNameTeamSeparatorCode = teamEl.getAttribute('data-teamseparatorcode');
-</script>
+</script> -->
 <!-- 부서, 팀 삭제 -->
 <script th:inline="javascript">
 	let trigger01 = false;

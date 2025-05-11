@@ -30,12 +30,13 @@
 </head>
 <body>
 	<main class="main" id="top" layout:fragment="content">
-		<div class="col-8 mx-auto">
+		<div class="container bg-white rounded shadow-sm p-4 mt-4" style="max-width: 1000px;">
 			<!-- <h2 class="mb-2 mx-auto">결재서 양식을 선택해주세요.</h2> -->
-			<div class="d-flex justify-content-start">
+			<div class="d-flex justify-content-start mb-2">
 				<span th:if="${mode == 'create'}" class="fw-bold fs-7" id="approvalPageTitle">결재서 양식을 선택해주세요.</span>
 				<span th:if="${mode == 'edit'}" th:text="|${approval.approval_format.approvalFormatTitle} 결재서 작성|" class="fw-bold fs-7" id="approvalPageTitle">결재서 양식을 선택해주세요.</span>
 			</div>
+		<div class="card shadow-sm p-3 rounded-2xl mb-4">
 			<!-- 결재 form -->
 			<form id="approvalWriter">
 				<div class="row">
@@ -63,58 +64,75 @@
 					</div>
 					<div class="col-7">
 						
-						<!-- 결재자 추가 -->
-						<!-- <div class="gap-2 mb-3 ms-right-2 d-flex justify-content-end">
-							<span>결재자 : </span>
-							<div th:each="approveMember, approveMemberStatus : ${approvalLineList}" class="text-end text-body-secondary fs-8 mt-1" th:id="|approveLine${approveMemberStatus.count}|">
-								<span th:text="${approveMember.employee.employeeName}" class="badge bg-info text-dark me-2 mb-2">결재자이름
-									<button type="button" class="btn-close btn-close-white ms-1" aria-label="Remove"></button>
-									<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}">
-									<input type="hidden" name="approverSteps" th:value="${approveMemberStatus.count}">
-								</span>
-							</div>
-						</div> -->
-						<div class="gap-2 mb-3 ms-right-2 d-flex justify-content-end align-items-center">
-							<span>결재자 : </span>
-							<div class="text-end text-body-secondary fs-8 mt-1" id="approveLine1">
-								<!-- 결재자 불러오기 -->
-								<div th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step >= 1}" class="position-relative me-2 mb-2 d-inline">
-									<span th:text="${approveMember.employee.employeeName}" class="badge bg-info text-dark pe-4"> </span>
-									<button type="button" class="btn-close btn-close-white position-absolute top-0 end-0" th:attr="data-idx=${stat.count}"
-										aria-label="Remove" style="scale: 0.8;">
-									</button>
-									<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="approverSteps" th:value="${approveMember.approval_line_step}">
+						<label for="temp">　</label>
+						<div id="temp" class="gap-2 mb-3 ms-right-2 d-flex justify-content-end flex-column align-items-end">
+							<!-- <span style="vertical-align: middle;">결재자 :</span> -->
+							<div class="mb-0" style="max-width: 73.337674%;">
+								<div class="fw-bold text-dark border-bottom pb-1 mb-2">결재 라인</div>
+								<div id="approvelLineTemp1" 
+								     class="text-center text-secondary small border py-3 rounded"
+								     th:attr="style=${mode == 'edit' and approvalLineList.?[approval_line_step >= 1].size() > 0 ? 'display: none;' : 'display: block;'}">
+								    선택된 결재자가 없습니다.
+								</div>
+								<div class="text-end text-body-secondary fs-8 mt-1 d-flex gap-2" style="display: flex; overflow-x: auto; gap: 5px; max-width: 100%; white-space: nowrap;" id="approveLine1">
+									<!-- 결재자 불러오기 -->
+									<div th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step >= 1}" class="position-relative d-inline">
+										<span class="badge border text-dark d-flex justify-content-end align-items-center" 
+											style="background-color: rgb(248, 249, 250);">
+											<span th:text="${approveMember.employee.employeeName}"></span>
+											<button type="button" class="btn-close" th:attr="data-idx=${stat.count}"
+												aria-label="Remove" style="scale: 0.8;" data-prefix="approver">
+											</button>
+											<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="approverSteps" th:value="${approveMember.approval_line_step}">
+										</span>
+									</div>
 								</div>
 							</div>
-						</div>
-
-
-						<div class="gap-2 mb-3 ms-right-2 d-flex justify-content-end align-items-center">
-							<span>합의자 : </span>
-							<div class="text-end text-body-secondary fs-8 mt-1" id="approveLine2">
-								<!-- 합의자 불러오기 -->
-								<div th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step == 0}" class="position-relative me-2 mb-2 d-inline">
-									<span th:text="${approveMember.employee.employeeName}" class="badge bg-info text-dark pe-4"> </span>
-									<button type="button" class="btn-close btn-close-white position-absolute top-0 end-0" th:attr="data-idx=${stat.count}"
-										aria-label="Remove" style="scale: 0.8;">
-									</button>
-									<input type="hidden" name="agreerIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="agreerSteps" th:value="0">
-								</div>							
-							</div>
-						</div>
-						<div class="gap-2 mb-3 ms-right-2 d-flex justify-content-end align-items-center">
-							<span>참조자 : </span>
-								<div class="text-end text-body-secondary fs-8 mt-1" id="approveLine3">
+							<!-- <span style="vertical-align: middle;">합의자 :</span> -->
+							<div class="mb-0" style="max-width: 73.337674%;">
+								<div class="fw-bold text-dark border-bottom pb-1 mb-2">합의 라인</div>
+								<div id="approvelLineTemp2" 
+								     class="text-center text-secondary small border py-3 rounded"
+								     th:attr="style=${mode == 'edit' and approvalLineList.?[approval_line_step == 0].size() > 0 ? 'display: none;' : 'display: block;'}">
+								    선택된 합의자가 없습니다.
+								</div>
+								<div class="text-end text-body-secondary fs-8 mt-1 d-flex gap-2" style="display: flex; overflow-x: auto; gap: 5px; max-width: 100%; white-space: nowrap;" id="approveLine2">
 									<!-- 합의자 불러오기 -->
-									<div th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step == -1}" class="position-relative me-2 mb-2 d-inline">
-										<span th:text="${approveMember.employee.employeeName}" class="badge bg-info text-dark pe-4"> </span>
-										<button type="button" class="btn-close btn-close-white position-absolute top-0 end-0" th:attr="data-idx=${stat.count}"
-											aria-label="Remove" style="scale: 0.8;">
-										</button>
-										<input type="hidden" name="refererIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="refererSteps" th:value="-1">
+									<div th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step == 0}" class="position-relative d-inline">
+										<span class="badge border text-dark d-flex justify-content-end align-items-center"
+										      style="background-color: rgb(248, 249, 250);">
+										    <span th:text="${approveMember.employee.employeeName}"></span>
+										    <button type="button" class="btn-close" th:attr="data-idx=${stat.count}"
+										            aria-label="Remove" style="scale: 0.8;" data-prefix="agreer">
+										    </button>
+										    <input type="hidden" name="agreerIds" th:value="${approveMember.employee.employeeNo}">
+										    <input type="hidden" name="agreerSteps" th:value="0">
+										</span>
 									</div>							
 								</div>
 							</div>
+							<!-- <span style="vertical-align: middle;">참조자 :</span> -->
+							<div class="mb-0" style="max-width: 73.337674%;">
+								<div class="fw-bold text-dark border-bottom pb-1 mb-2">참조 라인</div>
+								<div id="approvelLineTemp3" 
+								     class="text-center text-secondary small border py-3 rounded"
+								     th:attr="style=${mode == 'edit' and approvalLineList.?[approval_line_step == -1].size() > 0 ? 'display: none;' : 'display: block;'}">
+								    선택된 참조자가 없습니다.
+								</div>
+								<div class="text-end text-body-secondary fs-8 mt-1 d-flex gap-2" style="display: flex; overflow-x: auto; gap: 5px; max-width: 100%; white-space: nowrap;" id="approveLine3">
+									<!-- 합의자 불러오기 -->
+									<div th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step == -1}" class="position-relative d-inline">
+										<span class="badge border text-dark d-flex justify-content-end align-items-center" style="background-color: rgb(248, 249, 250);">
+											<span th:text="${approveMember.employee.employeeName}"></span>
+											<button type="button" class="btn-close" th:attr="data-idx=${stat.count}"
+												aria-label="Remove" style="scale: 0.8;" data-prefix="referer">
+											</button>
+											<input type="hidden" name="refererIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="refererSteps" th:value="-1">
+										</span>
+									</div>							
+								</div>
+							</div>
+						</div>
 						
 						<!-- 추가 버튼 -->
 						<div class="gap-2 mb-3 ms-right-2 d-flex justify-content-end" id="approveLineModalDiv">
@@ -155,31 +173,35 @@
 				</div>
 				<!-- 결재 내용3(기존 첨부파일) -->
 				<div class="mb-3" th:if="${mode == 'edit'}">
-					<h6 class="mb-2">기존 첨부 파일</h6>
-					<ul class="ps-3">
-						<li th:each="approvalAttachFile : ${driveList}">
-							<a th:href="@{'/drive/download/approval/' + ${approvalAttachFile.driveAttachNo}}" th:text="${approvalAttachFile.driveOriName}" class="text-primary text-decoration-underline" onmouseover="this.style.textDecoration='none'" onmouseout="this.style.textDecoration='underline'">첨부된 파일이 없습니다.
-							</a>
-							<input type="hidden" name="approvalAttachFileIds" th:value="${approvalAttachFile.driveAttachNo}">
-							<!-- 삭제 뱃지 넣을 곳 -->
-						    <span class="badge bg-danger ms-2" style="cursor: pointer;" onclick="removeFile(this)">
-						      삭제
-						    </span>
-							<!-- 삭제 뱃지 넣을 곳 -->
-						</li>
-						<li th:if="${#lists.isEmpty(driveList)}" class="text-muted">기존 첨부 파일이 없습니다.</li>
-					</ul>
-					
+					<label for="lastFiles" class="form-label">기존 첨부 파일</label>
+					<div class="form-control" id="lastFiles">
+						<ul style="margin-bottom: 0;" class="ps-3">
+							<li th:each="approvalAttachFile : ${driveList}">
+								<a th:href="@{'/drive/download/approval/' + ${approvalAttachFile.driveAttachNo}}" th:text="${approvalAttachFile.driveOriName}" class="text-primary text-decoration-underline" onmouseover="this.style.textDecoration='none'" onmouseout="this.style.textDecoration='underline'">첨부된 파일이 없습니다.
+								</a>
+								<input type="hidden" name="approvalAttachFileIds" th:value="${approvalAttachFile.driveAttachNo}">
+								<!-- 삭제 뱃지 넣을 곳 -->
+							    <span class="badge bg-danger ms-1" style="cursor: pointer;" onclick="removeFile(this)">
+							      X
+							    </span>
+								<!-- 삭제 뱃지 넣을 곳 -->
+							</li>
+							<li th:if="${#lists.isEmpty(driveList)}" class="text-muted">기존 첨부 파일이 없습니다.</li>
+						</ul>
+					</div>
 				</div>
 				<!-- 결재 내용3(파일 업로드) -->
 				<div class="mb-3">
 					<label class="form-label">파일 업로드</label> <input id="approvalAttachFiles" class="form-control" type="file" multiple>
 				</div>
-				<button type="button" class="btn btn-light" onclick="history.back()">취소</button>
-				<button id="approvalSubmitBtn" class="btn btn-primary" type="submit">등록</button>
+				<div class="d-flex justify-content-end">
+					<button type="button" class="btn btn-light" onclick="history.back()">취소</button>
+					<button id="approvalSubmitBtn" class="btn btn-primary ms-2" type="submit">등록</button>
+				</div>
 			</form>
 			
 			
+		</div>
 		</div>
 		
 		<!-- 결재자 생성 모달 -->
@@ -301,52 +323,6 @@
   </div>
 </div>
 <!-- 트리구조끝 -->
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       
       
       
@@ -523,7 +499,8 @@
 	<!-- 결재자 추가 스크립트 -->
 <!-- 트리구조 JS -->
 <script>
-let targetDiv = null;
+// 1차 로직
+/* let targetDiv = null;
 let targetPrefix = null;
 document.querySelectorAll('[data-bs-target="#selectApproveLineModal"]').forEach(button => {
   button.addEventListener('click', function() {
@@ -531,20 +508,322 @@ document.querySelectorAll('[data-bs-target="#selectApproveLineModal"]').forEach(
     targetDiv = this.dataset.targetDiv; // data-target-div 값 추출
     targetPrefix = this.dataset.targetPrefix; // data-target-prefix 값 추출
     resetTree(); // 모달 진입시 초기화
+	
+    // 결재자, 합의자, 참조자 각각의 ID 가져오기
+    const approverIds = new Set(Array.from(document.querySelectorAll('input[name="approverIds"]')).map(el => el.value));
+    const agreerIds = new Set(Array.from(document.querySelectorAll('input[name="agreerIds"]')).map(el => el.value));
+    const refererIds = new Set(Array.from(document.querySelectorAll('input[name="refererIds"]')).map(el => el.value));
+      
+      
     // 모달 진입 시 회사/부서/팀 체크박스 숨김 처리
     const checkboxes = document.querySelectorAll('#treeviewTree input[type="checkbox"]');
     checkboxes.forEach(checkbox => {
       const type = checkbox.getAttribute('data-type');
       
-      if ((targetPrefix === 'approver' || targetPrefix === 'agreer') && type !== 'employee') {
-        checkbox.style.visibility = 'hidden';
-      } else {
-        checkbox.style.visibility = 'visible';
-      }
+      // 결재자, 합의자, 참조자 겹치면 visible hidden
+      const id = checkbox.getAttribute('data-no');
+      	// 조건 1: 결재자 모달인데 합의자나 참조자에 이미 포함된 경우
+      if (targetPrefix === 'approver' && (agreerIds.has(id) || refererIds.has(id))) {
+          checkbox.style.visibility = 'hidden';
+        } 
+        // 조건 2: 합의자 모달인데 결재자나 참조자에 이미 포함된 경우
+        else if (targetPrefix === 'agreer' && (approverIds.has(id) || refererIds.has(id))) {
+          checkbox.style.visibility = 'hidden';
+        } 
+        // 조건 3: 참조자 모달인데 결재자나 합의자에 이미 포함된 경우
+        else if (targetPrefix === 'referer' && (approverIds.has(id) || agreerIds.has(id))) {
+          checkbox.style.visibility = 'hidden';
+        } 
+        // 조건 4: 결재자나 합의자인 경우 회사/부서/팀은 숨김 처리
+        else if ((targetPrefix === 'approver' || targetPrefix === 'agreer') && type !== 'employee') {
+          checkbox.style.visibility = 'hidden';
+        } 
+        else {
+          checkbox.style.visibility = 'visible';
+        }
     });
     
   });
-});
+}); */
+
+// 2차 로직(결재자,합의자 선택시 참조자에서 체크박스 안보이게)
+/* let targetDiv = null;
+let targetPrefix = null;
+
+document.querySelectorAll('[data-bs-target="#selectApproveLineModal"]').forEach(button => {
+  button.addEventListener('click', function() {
+    
+    targetDiv = this.dataset.targetDiv; // data-target-div 값 추출
+    targetPrefix = this.dataset.targetPrefix; // data-target-prefix 값 추출
+    resetTree(); // 모달 진입시 초기화
+
+    // 결재자, 합의자, 참조자 각각의 ID 가져오기
+    const approverIds = new Set(Array.from(document.querySelectorAll('input[name="approverIds"]')).map(el => el.value));
+    const agreerIds = new Set(Array.from(document.querySelectorAll('input[name="agreerIds"]')).map(el => el.value));
+    const refererIds = new Set(Array.from(document.querySelectorAll('input[name="refererIds"]')).map(el => el.value));
+
+    // console.log("[디버그] 모달 열릴 때 정보 로딩");
+    // console.log("결재자 목록: ", Array.from(approverIds));
+    // console.log("합의자 목록: ", Array.from(agreerIds));
+    // console.log("참조자 목록: ", Array.from(refererIds));
+
+    // 모달 진입 시 회사/부서/팀 체크박스 숨김 처리
+    const checkboxes = document.querySelectorAll('#treeviewTree input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+      const type = checkbox.getAttribute('data-type');
+      const id = checkbox.getAttribute('data-no');
+
+      // console.log(`[디버그] 체크박스 탐색 중: ${id} (${type})`);
+
+      // 조건 1: 결재자 모달인데 합의자나 참조자에 이미 포함된 경우
+      if (targetPrefix === 'approver' && (agreerIds.has(id) || refererIds.has(id))) {
+          checkbox.style.visibility = 'hidden';
+       // console.log(`[숨김 처리] 결재자 모달 - 이미 합의자 또는 참조자에 있음: ${id}`);
+      } 
+      // 조건 2: 합의자 모달인데 결재자나 참조자에 이미 포함된 경우
+      else if (targetPrefix === 'agreer' && (approverIds.has(id) || refererIds.has(id))) {
+          checkbox.style.visibility = 'hidden';
+       // console.log(`[숨김 처리] 합의자 모달 - 이미 결재자 또는 참조자에 있음: ${id}`);
+      } 
+      // 조건 3: 참조자 모달인데 결재자나 합의자에 이미 포함된 경우
+      else if (targetPrefix === 'referer' && (approverIds.has(id) || agreerIds.has(id))) {
+          checkbox.style.visibility = 'hidden';
+       // console.log(`[숨김 처리] 참조자 모달 - 이미 결재자 또는 합의자에 있음: ${id}`);
+      } 
+      // 조건 4: 결재자나 합의자인 경우 회사/부서/팀은 숨김 처리
+      else if ((targetPrefix === 'approver' || targetPrefix === 'agreer') && type !== 'employee') {
+          checkbox.style.visibility = 'hidden';
+       // console.log(`[숨김 처리] 회사/부서/팀 - 결재자 또는 합의자는 직원만 선택 가능: ${id}`);
+      } 
+      else {
+          checkbox.style.visibility = 'visible';
+       // console.log(`[보임 처리] 선택 가능: ${id}`);
+      }
+    });
+
+    // 상위 조직이 참조자로 들어갔으면 하위 직원 체크박스 숨기기
+    // console.log("==== 참조자 트리 디버그 시작 ====");
+    refererIds.forEach(refId => {
+    	// console.log(`상위 조직 ID: ${refId}`);
+      
+      const parentNode = document.querySelector(`input[data-no="${refId}"]`);
+   // console.log("찾은 상위 조직 노드:", parentNode);
+
+      if (parentNode) {
+        const childNodes = parentNode.closest('li').querySelectorAll('input[data-type="employee"]');
+     // console.log("찾은 하위 직원들:");
+        childNodes.forEach(child => console.log("->", child.getAttribute('data-no')));
+
+        childNodes.forEach(child => {
+          child.style.display = 'none';
+       // console.log(`숨김 처리된 직원: ${child.getAttribute('data-no')}`);
+        });
+      }
+    });
+ // console.log("==== 참조자 트리 디버그 종료 ====");
+  });
+}); */
+// 3차 로직(결재,합의 선택된 경우 참조에서 상위 부서 숨기기)
+/* let targetDiv = null;
+let targetPrefix = null;
+
+document.querySelectorAll('[data-bs-target="#selectApproveLineModal"]').forEach(button => {
+  button.addEventListener('click', function() {
+    targetDiv = this.dataset.targetDiv;
+    targetPrefix = this.dataset.targetPrefix;
+    resetTree(); // 모달 진입시 초기화
+    
+    // 1. 결재자, 합의자, 참조자 각각의 ID 가져오기
+    const approverIds = new Set(Array.from(document.querySelectorAll('input[name="approverIds"]')).map(el => el.value));
+    const agreerIds = new Set(Array.from(document.querySelectorAll('input[name="agreerIds"]')).map(el => el.value));
+    const refererIds = new Set(Array.from(document.querySelectorAll('input[name="refererIds"]')).map(el => el.value));
+
+    console.log("현재 선택된 결재자 목록:", approverIds);
+    console.log("현재 선택된 합의자 목록:", agreerIds);
+    console.log("현재 선택된 참조자 목록:", refererIds);
+
+    // 2. 트리의 모든 체크박스 탐색
+    const checkboxes = document.querySelectorAll('#treeviewTree input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+      const type = checkbox.getAttribute('data-type');
+      const id = checkbox.getAttribute('data-no');
+
+      // 조건 1: 결재자 모달인데 합의자나 참조자에 이미 포함된 경우
+      if (targetPrefix === 'approver' && (agreerIds.has(id) || refererIds.has(id))) {
+        checkbox.style.visibility = 'hidden';
+      } 
+      // 조건 2: 합의자 모달인데 결재자나 참조자에 이미 포함된 경우
+      else if (targetPrefix === 'agreer' && (approverIds.has(id) || refererIds.has(id))) {
+        checkbox.style.visibility = 'hidden';
+      } 
+      // 조건 3: 참조자 모달인데 결재자나 합의자에 이미 포함된 경우
+      else if (targetPrefix === 'referer' && (approverIds.has(id) || agreerIds.has(id))) {
+        checkbox.style.visibility = 'hidden';
+      } 
+      // 조건 4: 결재자나 합의자인 경우 회사/부서/팀은 숨김 처리
+      else if ((targetPrefix === 'approver' || targetPrefix === 'agreer') && type !== 'employee') {
+        checkbox.style.visibility = 'hidden';
+      } 
+      else {
+        checkbox.style.visibility = 'visible';
+      }
+    });
+
+    // 3. 상위 조직 체크박스 숨기기
+    console.log("상위 조직 체크박스 숨기기");
+
+    // 선택된 합의자와 결재자에 대해 상위 조직 숨기기
+    [...agreerIds, ...approverIds].forEach(id => {
+      console.log(`선택된 직원 ID 탐색: ${id}`);
+      const employeeCheckbox = document.querySelector(`input[data-no="${id}"]`);
+      if (employeeCheckbox) {
+        let parentLi = employeeCheckbox.closest('li.treeview-list-item');
+        while (parentLi) {
+          const parentCheckbox = parentLi.querySelector(':scope > .treeview-text input[data-type="department"], :scope > .treeview-text input[data-type="team"]');
+          
+          if (parentCheckbox) {
+            console.log(`숨김 처리된 상위 조직: ${parentCheckbox.getAttribute('data-no')}`);
+            parentCheckbox.style.visibility = 'hidden';
+          }
+          
+          // 최상위 "이룸 컴퍼니" 체크박스 숨기기
+          const companyCheckbox = parentLi.querySelector(':scope > .treeview-text input[data-type="company"]');
+          if (companyCheckbox) {
+            console.log("최상위 이룸 컴퍼니 숨김 처리");
+            companyCheckbox.style.visibility = 'hidden';
+          }
+          
+          parentLi = parentLi.parentElement.closest('li.treeview-list-item');
+        }
+      }
+    });
+
+  });
+}); */
+// 4차 로직(결재,합의 선택된 경우 참조에서 상위 부서 숨기기 + 상위 부서 참조 넣으면 결재,합의에 직원들 체크박스 안보이게)
+let targetDiv = null;
+let targetPrefix = null;
+document.querySelectorAll('[data-bs-target="#selectApproveLineModal"]').forEach(button => {
+	  button.addEventListener('click', function() {
+		// console.clear(); // 콘솔 정리
+	    // console.log("모달 열림 - Target Prefix:", targetPrefix);
+	    targetDiv = this.dataset.targetDiv;
+	    targetPrefix = this.dataset.targetPrefix;
+	    resetTree();
+
+	    // 결재자, 합의자, 참조자 각각의 ID 가져오기
+	    const approverIds = new Set(Array.from(document.querySelectorAll('input[name="approverIds"]')).map(el => el.value));
+	    const agreerIds = new Set(Array.from(document.querySelectorAll('input[name="agreerIds"]')).map(el => el.value));
+	    const refererIds = new Set(Array.from(document.querySelectorAll('input[name="refererIds"]')).map(el => el.value));
+
+	 	// console.log("Approver IDs:", [...approverIds]);
+	    // console.log("Agreer IDs:", [...agreerIds]);
+	    // console.log("Referer IDs:", [...refererIds]);
+
+	    // 모달 진입 시 체크박스 숨김 처리
+	    const checkboxes = document.querySelectorAll('#treeviewTree input[type="checkbox"]');
+	    checkboxes.forEach(checkbox => {
+	      const id = checkbox.getAttribute('data-no');
+	      const type = checkbox.getAttribute('data-type');
+
+	   // console.log(`🔎 체크박스 탐색 중... ID: ${id}, Type: ${type}`);
+	      
+	      if (targetPrefix === 'approver' && (agreerIds.has(id) || refererIds.has(id))) {
+	    	// console.log(`[HIDE] 결재자 모달 - 숨김 처리된 ID: ${id}`);
+	        checkbox.style.visibility = 'hidden';
+	      } else if (targetPrefix === 'agreer' && (approverIds.has(id) || refererIds.has(id))) {
+	    	// console.log(`[HIDE] 합의자 모달 - 숨김 처리된 ID: ${id}`);
+	        checkbox.style.visibility = 'hidden';
+	      } else if (targetPrefix === 'referer' && (approverIds.has(id) || agreerIds.has(id))) {
+	    	// console.log(`[HIDE] 참조자 모달 - 숨김 처리된 ID: ${id}`);
+	        checkbox.style.visibility = 'hidden';
+	      } else if ((targetPrefix === 'approver' || targetPrefix === 'agreer') && type !== 'employee') {
+	    	// console.log(`[HIDE] 회사/부서/팀 숨김 처리된 ID: ${id}`);
+	        checkbox.style.visibility = 'hidden';
+	      } else {
+	    	// console.log(`[SHOW] 보이는 ID: ${id}`);
+	        checkbox.style.visibility = 'visible';
+	      }
+	    });
+
+	 // 참조자로 선택된 상위 조직의 하위 직원 숨기기
+	    if (targetPrefix !== 'referer') {
+	      refererIds.forEach(id => {
+	        const parentCheckbox = document.querySelector(`input[data-no="${id}"]`);
+	     // console.log("참조자로 선택된 조직 탐색 ID:", id);
+
+	        if (parentCheckbox) {
+	        	// console.log("참조자로 선택된 조직 발견:", id);
+	          const parentNode = parentCheckbox.closest('li.treeview-list-item');
+
+	          if (parentNode) {
+	            // 모든 하위 treeview-list-item의 employee 타입 체크박스 탐색 (깊이 탐색으로 수정)
+	            const childCheckboxes = parentNode.querySelectorAll('input[data-type="employee"]'); // 더 깊이 탐색
+	            // const childCheckboxes = parentNode.querySelectorAll('li.treeview-list-item input[data-type="employee"]');
+	         // console.log("하위 직원 탐색 완료:", childCheckboxes);
+
+	            if (childCheckboxes.length > 0) {
+	            	// console.log(`하위 직원 ${childCheckboxes.length}명 발견`);
+	            } else {
+	            	// console.log("하위 직원이 없습니다.");
+	            }
+
+	            childCheckboxes.forEach(child => {
+	            	// console.log(`[HIDE] 참조자 상위 선택에 따른 하위 숨김: ${child.getAttribute('data-no')}`);
+	              child.style.visibility = 'hidden';
+
+	              // 혹시 visibility가 안 먹으면 display로 전환
+	              if (child.style.visibility !== 'hidden') {
+	                child.style.display = 'none';
+	              }
+	            });
+	          }
+	        }
+	      });
+	    } else{
+	    	// else문이 제일 나중에 추가한 곳!!! 오류 생기면 여기부터 의심하기!!!!
+	    	const checkBoxTemp = document.querySelector('input[data-no="root"]');
+	    	if(checkBoxTemp){
+	    		checkBoxTemp.style.visibility = 'hidden';
+	    	}
+	    }
+	    [...agreerIds, ...approverIds].forEach(id => {
+	    	// console.log(`선택된 직원 ID 탐색: ${id}`);
+	        const employeeCheckbox = document.querySelector(`input[data-no="${id}"]`);
+	        if (employeeCheckbox) {
+	          let parentLi = employeeCheckbox.closest('li.treeview-list-item');
+	          while (parentLi) {
+	            const parentCheckbox = parentLi.querySelector(':scope > .treeview-text input[data-type="department"], :scope > .treeview-text input[data-type="team"]');
+	            
+	            if (parentCheckbox) {
+	            	// console.log(`숨김 처리된 상위 조직: ${parentCheckbox.getAttribute('data-no')}`);
+	              parentCheckbox.style.visibility = 'hidden';
+	            }
+	            
+	            // 최상위 "이룸 컴퍼니" 체크박스 숨기기
+	            const companyCheckbox = parentLi.querySelector(':scope > .treeview-text input[data-type="company"]');
+	            if (companyCheckbox) {
+	            	// console.log("최상위 이룸 컴퍼니 숨김 처리");
+	              companyCheckbox.style.visibility = 'hidden';
+	            }
+	            
+	            parentLi = parentLi.parentElement.closest('li.treeview-list-item');
+	          }
+	        }
+	      });
+
+
+
+
+	  });
+	});
+
+
+
+
+
+
+
 
 function handleCheck(checkbox) {
   const name = checkbox.getAttribute('data-name');
@@ -743,7 +1022,26 @@ function confirmSelection() {
   // 이미 존재하는 뱃지 및 히든 인풋 초기화
   const targetContainer = document.getElementById(targetDiv);
   targetContainer.innerHTML = "";
-  
+  const element1 = document.getElementById("approvelLineTemp1");
+  const element2 = document.getElementById("approvelLineTemp2");
+  const element3 = document.getElementById("approvelLineTemp3");
+	if (selected.length !== 0) {
+	  if (targetPrefix === 'approver' && element1) {
+	    element1.style.display = 'none';
+	  } else if (targetPrefix === 'agreer' && element2) {
+	    element2.style.display = 'none';
+	  } else if (targetPrefix === 'referer' && element3) {
+	    element3.style.display = 'none';
+	  }
+	} else{
+	  if (targetPrefix === 'approver' && element1) {
+	    element1.style.display = 'block';
+	  } else if (targetPrefix === 'agreer' && element2) {
+	    element2.style.display = 'block';
+	  } else if (targetPrefix === 'referer' && element3) {
+	    element3.style.display = 'block';
+	  }
+	}
   
   const resultCodeAndNum = Array.from(selected).map(el => el.id.replace('tag-', ''));
   const resultName = Array.from(selected).map(el => el.name.replace('tag-', ''));
@@ -765,37 +1063,53 @@ function confirmSelection() {
   // JSON으로 보내고 Controller에서는 @ResponseBody + 매개변수에는 @RequestBody List<String> 사용해서 받아서 쓰시면 됩니다. 
   console.log("확정된 선택 바구니:", result);
 //반복문을 통해 뱃지 및 히든 인풋 생성
-  result.forEach(({ code, name, step }) => {
-    // 뱃지 생성
-    const badge = document.createElement("span");
-    badge.className = 'badge bg-info text-dark me-2 mb-2';
-    badge.innerHTML = `${name} <button type="button" class="btn-close btn-close-white ms-1" aria-label="Remove"></button>`;
-
-    // 닫기 버튼 이벤트 추가
-    // badge.querySelector("button").addEventListener("click", () => badge.remove());
-    badge.querySelector("button").addEventListener("click", () => {
-	  badge.remove();
-	  // 관련된 hidden input도 함께 제거
-	  badge.querySelectorAll("input").forEach(input => input.remove());
+	result.forEach(({ code, name, step }) => {
+	  // 뱃지 생성
+	  const badge = document.createElement("span");
+	  badge.className = 'badge border text-dark d-flex justify-content-end align-items-center';
+	  badge.style.backgroundColor = "#f8f9fa";
+	
+	  // 텍스트 영역 생성
+	  const nameSpan = document.createElement("span");
+	  nameSpan.textContent = name;
+	
+	  // 닫기 버튼 생성
+	  const button = document.createElement("button");
+	  button.type = "button";
+	  button.className = "btn-close";
+	  button.setAttribute("aria-label", "Remove");
+	  button.setAttribute("data-prefix", targetPrefix);
+	  button.style.scale = "0.8";
+	
+	  // 닫기 이벤트 설정
+	  button.addEventListener("click", () => {
+	    badge.remove();
+	    // 관련된 hidden input도 함께 제거
+	    badge.querySelectorAll("input").forEach(input => input.remove());
+	  });
+	
+	  // Hidden input - ID
+	  const hiddenId = document.createElement("input");
+	  hiddenId.type = "hidden";
+	  hiddenId.name = targetPrefix + "Ids";
+	  hiddenId.value = code;
+	
+	  // Hidden input - Step
+	  const hiddenStep = document.createElement("input");
+	  hiddenStep.type = "hidden";
+	  hiddenStep.name = targetPrefix + "Steps";
+	  hiddenStep.value = step;
+	
+	  // 요소 추가
+	  badge.appendChild(nameSpan);    // 이름
+	  badge.appendChild(button);      // 닫기 버튼
+	  badge.appendChild(hiddenId);    // 숨겨진 ID
+	  badge.appendChild(hiddenStep);  // 숨겨진 Step
+	
+	  // 최종 추가
+	  targetContainer.appendChild(badge);
 	});
-
-    // Hidden input - ID
-    const hiddenId = document.createElement("input");
-    hiddenId.type = "hidden";
-    hiddenId.name = targetPrefix + "Ids";
-    hiddenId.value = code;
-
-    // Hidden input - Step
-    const hiddenStep = document.createElement("input");
-    hiddenStep.type = "hidden";
-    hiddenStep.name = targetPrefix + "Steps";
-    hiddenStep.value = step;
-
-    // 요소 추가
-    badge.appendChild(hiddenId);
-    badge.appendChild(hiddenStep);
-    targetContainer.appendChild(badge);
-  });
+	console.log(result);
   // 부서, 팀은 separatorCode 그리고 사원은 employeeNo가 result에 담깁니다~
   // JSON으로 보내고 Controller에서는 @ResponseBody + 매개변수에는 @RequestBody List<String> 사용해서 받아서 쓰시면 됩니다. 
   // 여기서 result 데이터 가지고 쓰시면 됩니다
@@ -822,6 +1136,39 @@ document.addEventListener('DOMContentLoaded', function () {
     handleHighlight(clickedLi);
   });
 });
+
+
+
+	// 뱃지 x 눌러서 삭제시 처리 방법
+	function removeBadgeAndCheck(targetPrefix) {
+	  const lineMap = {
+	    'approver': document.getElementById("approvelLineTemp1"),
+	    'agreer': document.getElementById("approvelLineTemp2"),
+	    'referer': document.getElementById("approvelLineTemp3")
+	  };
+	
+	  const targetDiv = document.getElementById(`approveLine${targetPrefix === 'approver' ? 1 : targetPrefix === 'agreer' ? 2 : 3}`);
+	  // 남은 뱃지 개수 확인
+	  const remainingBadges = targetDiv.querySelectorAll('.badge').length;
+		console.log(remainingBadges);
+	  // 만약 0개라면 임시 표시를 다시 보여줌
+	  if (remainingBadges === 0) {
+	    lineMap[targetPrefix].style.display = 'block';
+	  }
+	}
+	
+	// 뱃지 x 눌러서 삭제시 처리하는 이벤트
+	document.addEventListener('click', (event) => {
+	  if (event.target.classList.contains('btn-close')) {
+	    const badge = event.target.closest('.badge');
+	    const targetPrefix = event.target.getAttribute('data-prefix');
+	    if(targetPrefix){
+		    removeBadgeAndCheck(targetPrefix);
+	    }
+	  }
+	});
+	
+	
 </script>
 
 <!-- 비우기 버튼 -->
@@ -997,7 +1344,7 @@ function handleHighlight(li) {
 		  });
 		  
 		
-		  // [5] 서버 전송
+		  // [5-1] 서버 전송
 		  /* fetch('/approval/create', {
 		    method: 'POST',
 		    headers: {
@@ -1037,7 +1384,7 @@ function handleHighlight(li) {
 		  
 		  
 
-		  // 파일 기능 추가를 위한 formData 추가 버전
+		  // [5-2] 파일 기능 추가를 위한 formData 추가 버전
 		  const fileFormData = new FormData();
 		  // 기본 데이터
 		  fileFormData.append("title", approvalTitle);
@@ -1100,7 +1447,7 @@ function handleHighlight(li) {
 	</script>
 	
     <!-- edit모드로 들어왔을 때 결재자 삭제 스크립트 -->	
-	<script>
+	<!-- <script>
 	  document.addEventListener("DOMContentLoaded", function () {
 	    const closeButtons = document.querySelectorAll(".btn-close");
 	
@@ -1111,8 +1458,9 @@ function handleHighlight(li) {
 	      });
 	    });
 	  });
-	</script>
+	</script> -->
 	<!-- 기존 파일 삭제 뱃지 -->
+	
 	<script>
 	function removeFile(element) {
 	  const li = element.closest('li');
