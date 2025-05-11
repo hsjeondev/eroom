@@ -994,7 +994,7 @@ async function loadApprovalCarousel(target, endpoint, indicators) {
                 <div class="carousel-item active">
             	<div class="text-center mb-2">
 				<svg style="height: 12px;" class="svg-inline--fa fa-circle fs-10 text-primary me-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path></svg><!-- <i class="fas fa-circle fs-10 text-primary me-1"></i> Font Awesome fontawesome.com -->
-				<span class="fw-bold fs-9">진행 중인 결재</span>
+				<span class="fw-bold fs-9">진행 중 결재</span>
 			</div>
                     <div class="border rounded p-3 bg-primary-soft cursor-pointer">
                         <h5 class="mb-1 fw-bold text-dark text-decoration-none">
@@ -1056,7 +1056,7 @@ async function loadApprovalCarousel(target, endpoint, indicators) {
                 <div class="carousel-item ${index === 0 ? 'active' : ''}">
             	<div class="text-center mb-2">
 				<svg style="height: 12px;" class="svg-inline--fa fa-circle fs-10 text-primary me-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path></svg><!-- <i class="fas fa-circle fs-10 text-primary me-1"></i> Font Awesome fontawesome.com -->
-				<span class="fw-bold fs-9">진행 중인 결재</span>
+				<span class="fw-bold fs-9">진행 중 결재</span>
 			</div>
                     <div class="border rounded p-3 bg-primary-soft cursor-pointer"
                         onclick="location.href='/approval/${approvalNo}/detail'">
@@ -1108,8 +1108,7 @@ async function loadApprovalCarousel(target, endpoint, indicators) {
                         <h5 class="mb-1 fw-bold text-dark text-decoration-none">
                           ${approvalTitle}
                         </h5>
-                        <p class="mb-0 text-muted fs-9">기안자 : ${approvalWriter}</p>
-                        <p class="mb-0 text-muted fs-9">기안일 : ${displayDate}</p>
+                        <p class="mb-0 text-muted fs-9">기안일 : ${displayDate} / 기안자 : ${approvalWriter}</p>
                     </div>
                 </div>
             `;
