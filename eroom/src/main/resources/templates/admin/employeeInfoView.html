@@ -322,32 +322,43 @@
 <div class="modal fade" id="annualLeaveEditModal" tabindex="-1" aria-labelledby="annualLeaveEditModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
     <div class="modal-content border border-secondary">
-      
-      <!-- 헤더 -->
       <div class="modal-header bg-light">
         <h5 class="modal-title" id="annualLeaveEditModalLabel">연차 정보 수정</h5>
         <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      
-      <!-- 바디 -->
+
       <div class="modal-body px-4 py-3">
         <form id="annualLeaveEditForm">
-          <div class="mb-3">
-            <label for="annualLeaveTotal" class="form-label">총 연차</label>
-            <input type="number" class="form-control" id="annualLeaveTotal" name="annual_leave_total" min="0">
-          </div>
-          <div class="mb-3">
-            <label for="annualLeaveUsed" class="form-label">사용 연차</label>
-            <input type="number" class="form-control" id="annualLeaveUsed" name="annual_leave_used" min="0">
-          </div>
-          <div class="mb-3">
-            <label for="annualLeaveRemain" class="form-label">잔여 연차</label>
-            <input type="number" class="form-control" id="annualLeaveRemain" name="annual_leave_remain" readonly>
-          </div>
+          <input type="hidden" id="editAnnualEmployeeNo" name="employeeNo"/>
+
+			<!-- 총 연차 -->
+			<div class="mb-3">
+			  <label class="form-label">총 연차 (현재: <span id="currentTotalDays">15</span>일)</label>
+			  <div class="input-group">
+			    <button class="btn btn-outline-secondary" type="button" id="btnTotalMinus">-</button>
+			    <input type="number" class="form-control text-center" id="annualLeaveTotalDelta" value="0">
+			    <button class="btn btn-outline-secondary" type="button" id="btnTotalPlus">+</button>
+			  </div>
+			</div>
+			
+			<!-- 사용 연차 -->
+			<div class="mb-3">
+			  <label class="form-label">사용 연차 (현재: <span id="currentUsedDays">3</span>일)</label>
+			  <div class="input-group">
+			    <button class="btn btn-outline-secondary" type="button" id="btnUsedMinus">-</button>
+			    <input type="number" class="form-control text-center" id="annualLeaveUsedDelta" value="0">
+			    <button class="btn btn-outline-secondary" type="button" id="btnUsedPlus">+</button>
+			  </div>
+			</div>
+			
+			<!-- 잔여 연차 -->
+			<div class="mb-3">
+			  <label class="form-label">잔여 연차</label>
+			  <input type="number" class="form-control" id="annualLeaveRemain" readonly>
+			</div>
         </form>
       </div>
 
-      <!-- 푸터 -->
       <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
         <button type="button" class="btn btn-light w-45" data-bs-dismiss="modal">취소</button>
         <button type="button" class="btn btn-primary w-45" id="saveAnnualLeaveBtn">저장</button>
@@ -761,11 +772,15 @@ document.addEventListener('DOMContentLoaded', function() {
 				showAlertModal("정보 수정 중 오류가 발생했습니다.");
 			});
 		});
-	
+	// 연차 수정 모달 요소
 	const annualEditModalEl = document.getElementById('annualLeaveEditModal');
 	const annualEditModal = bootstrap.Modal.getInstance(annualEditModalEl) || new bootstrap.Modal(annualEditModalEl);
-	let originAnnualLeave = {};
-	// 연차 정보 모달에 불러오기
+	// 현재 연차 값 저장용
+	let annualOrigin = {
+			total : 0,
+			used : 0
+	};
+	// 연차 수정 버튼 클릭 시 employeeNo 가져와서 모달 오픈
 	document.querySelectorAll('.edit-annual-btn').forEach(btn => {
 		btn.addEventListener('click', function () {
 		  const employeeNo = this.getAttribute('data-employee-no');
@@ -773,7 +788,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	});
 	
-	
+	// 연차 정보 조회 -> 모달 열기 + 현재값 출력 + 입력 초기화
 	function openAnnualLeaveModal(employeeNo){
 		fetch(`/admin/getAnnualLeave?employeeNo=${employeeNo}`)
 			.then(response => {
@@ -782,15 +797,18 @@ document.addEventListener('DOMContentLoaded', function() {
 			})
 			.then(data => {
 				if(data.res_code == 200){
-					document.getElementById('annualLeaveTotal').value = data.annual_leave_total ?? '';
-					document.getElementById('annualLeaveUsed').value = data.annual_leave_used ?? '';
-					document.getElementById('annualLeaveRemain').value = data.annual_leave_remain ?? '';
-					// originAnnualLeave 에 저장
-					originAnnualLeave = {
-							annual_leave_total : data.annual_leave_total || '',
-							annual_leave_used : data.annual_leave_used || '',
-							annual_leave_remain : data.annual_leave_remain || ''
-					};
+					// origin 값 저장
+					annualOrigin.total = data.annual_leave_total || 0;
+					annualOrigin.used = data.annual_leave_used || 0;
+					// 현재값 표시(라벨용)
+					document.getElementById('currentTotalDays').textContent = annualOrigin.total;
+					document.getElementById('currentUsedDays').textContent = annualOrigin.used;
+					// delta 입력 초기화
+					document.getElementById('annualLeaveTotalDelta').value = 0;
+					document.getElementById('annualLeaveUsedDelta').value = 0;
+					document.getElementById('editAnnualEmployeeNo').value = employeeNo;
+					// 잔여 연차 초기값 계산 함수 호출
+					updateAnnualRemain();
 					// 모달 열기
 					annualEditModal.show();
 				}else{
@@ -802,8 +820,33 @@ document.addEventListener('DOMContentLoaded', function() {
 				showAlertModal("연차 정보 조회 중 오류가 발생했습니다.");
 			})
 	}
-	
-	
+	// delta 값 입력 시 잔여 연차 자동 계산
+	function updateAnnualRemain(){
+		const deltaTotal = parseFloat(document.getElementById('annualLeaveTotalDelta').value) || 0;
+		const deltaUsed = parseFloat(document.getElementById('annualLeaveUsedDelta').value) || 0;
+		
+		const newTotal = annualOrigin.total + deltaTotal;
+		const newUsed = annualOrigin.used + deltaUsed;
+		const newRemain = newTotal - newUsed;
+		
+		document.getElementById('annualLeaveRemain').value = newRemain;
+	}
+	// + - 버튼 클릭 시 delta 값 조정
+	function adjustDelta(type,amount){
+		const inputId = type === 'total' ? 'annualLeaveTotalDelta' : 'annualLeaveUsedDelta';
+		const input = document.getElementById(inputId);
+		let current = parseFloat(input.value) || 0;
+		input.value = current + amount;
+		updateAnnualRemain(); // 값 변경되면 잔여 연차 재계산
+	}
+	// + - 버큰 클릭시 이벤트
+	document.getElementById('btnTotalPlus').addEventListener('click', () => adjustDelta('total', 1));
+	document.getElementById('btnTotalMinus').addEventListener('click', () => adjustDelta('total', -1));
+	document.getElementById('btnUsedPlus').addEventListener('click', () => adjustDelta('used', 1));
+	document.getElementById('btnUsedMinus').addEventListener('click', () => adjustDelta('used', -1));
+	// 직접 입력해도 계산되도록 input 이벤트 추가
+	document.getElementById('annualLeaveTotalDelta').addEventListener('input',updateAnnualRemain);
+	document.getElementById('annualLeaveUsedDelta').addEventListener('input',updateAnnualRemain);
 	
 	
 	
