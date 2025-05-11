@@ -150,7 +150,39 @@
   text-overflow: ellipsis;
 }
 
+/* 결재 관련 스타일 태그 */
+.bg-primary-soft {
+  background-color: rgba(13, 110, 253, 0.1); /* Bootstrap primary with 투명도 */
+}
+.bg-success-soft {
+  background-color: rgba(25, 135, 84, 0.1); /* Bootstrap success with 투명도 */
+}
+.bg-fail-soft {
+  background-color: rgba(253, 175, 171, 0.5); /* 50% 투명도 적용 */
+}
+.bg-warning-soft {
+    background-color: rgba(255, 193, 7, 0.1); /* Bootstrap Warning 색상에 투명도 적용 */
+}
 
+
+.carousel-indicators {
+  bottom: -26px; /* ✅ 기본보다 아래로 내림 */
+  justify-content: center; /* ✅ 가운데 정렬 (기본) */
+} 
+
+.carousel-indicators [data-bs-target] {
+  width: 10px;
+  height: 3px;
+/*   background-color: rgba(13, 110, 253, 0.5); */ /* 반투명 primary */
+  background-color: rgba(108, 117, 125, 0.5); /* secondary 반투명 */  
+  border: none;
+}
+
+.carousel-indicators .active {
+ /*  background-color: #0d6efd; */ /* 활성화된 점 */
+  background-color: #6c757d; /* secondary 진한 색 */  
+}
+/* 결재 관련 스타일 태그 */
 	
   </style>
 </head>
@@ -205,12 +237,131 @@
           </div>
         </div>
 
-        <!-- 1행·2열 -->
+        <!-- 1행·2열 결재 -->
         <div class="text-white p-1">
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
 					<div class="card-body text-center p-4" style="height: 207.81px;">
-						결재<br>(요청한, 대기(요청받은), 승인 / 개수)
+						
+
+	
+
+<!-- Tab 메뉴 -->
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <div class="fw-bold text-dark" style="font-size: 0.9rem;">결재</div>
+  <ul class="nav nav-underline fs-9" id="resTab" role="tablist" style="margin-bottom: 0;">
+    <li class="nav-item" role="presentation">
+      <a class="nav-link active" id="approvalPending-tab" data-bs-toggle="tab" href="#approvalPendingTab"
+         role="tab" aria-controls="approvalPendingTab" aria-selected="true">내게 온 결재</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" id="approvalOngoing-tab" data-bs-toggle="tab" href="#approvalOngoingTab"
+         role="tab" aria-controls="approvalOngoingTab" aria-selected="false">진행 중 결재</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" id="approvalCompleted-tab" data-bs-toggle="tab" href="#approvalCompletedTab"
+         role="tab" aria-controls="approvalCompletedTab" aria-selected="false">완료된 결재</a>
+    </li>
+  </ul>
+</div>
+
+<!-- 탭 내용 -->
+<div class="tab-content">
+
+  <!-- 승인/반려 대기 -->
+  <div class="tab-pane fade show active" id="approvalPendingTab">
+    <div class="carousel slide" id="approvalPendingCarousel">
+
+      <!-- ✅ 인디케이터 -->
+      <div class="carousel-indicators" id="pendingCarouselIndicators">
+        <!-- JavaScript에서 동적 로딩 -->
+      </div>
+
+      <!-- ✅ 슬라이드 항목 -->
+      <div class="carousel-inner px-4 text-center" id="pendingCarouselInner">
+        <!-- JavaScript에서 동적 로딩 -->
+      </div>
+
+      <!-- ✅ 이전/다음 버튼 -->
+      <button class="position-absolute border-0 bg-transparent text-secondary"
+        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="prev"
+        style="top: 65%; left: -10px; transform: translateY(-50%); z-index: 2;">
+        <i class="fas fa-chevron-left fs-7"></i>
+      </button>
+      <button class="position-absolute border-0 bg-transparent text-secondary"
+              type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="next"
+              style="top: 65%; right: -10px; transform: translateY(-50%); z-index: 2;">
+        <i class="fas fa-chevron-right fs-7"></i>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- 진행 중 결재 -->
+  <div class="tab-pane fade" id="approvalOngoingTab">
+    <div class="carousel slide" id="approvalOngoingCarousel">
+
+      <!-- ✅ 인디케이터 -->
+      <div class="carousel-indicators" id="ongoingCarouselIndicators">
+        <!-- JavaScript에서 동적 로딩 -->
+      </div>
+
+      <!-- ✅ 슬라이드 항목 -->
+      <div class="carousel-inner px-4 text-center" id="ongoingCarouselInner">
+        <!-- JavaScript에서 동적 로딩 -->
+      </div>
+
+      <!-- ✅ 이전/다음 버튼 -->
+      <button class="position-absolute border-0 bg-transparent text-secondary"
+        type="button" data-bs-target="#approvalOngoingCarousel" data-bs-slide="prev"
+        style="top: 65%; left: -10px; transform: translateY(-50%); z-index: 2;">
+        <i class="fas fa-chevron-left fs-7"></i>
+      </button>
+      <button class="position-absolute border-0 bg-transparent text-secondary"
+              type="button" data-bs-target="#approvalOngoingCarousel" data-bs-slide="next"
+              style="top: 65%; right: -10px; transform: translateY(-50%); z-index: 2;">
+        <i class="fas fa-chevron-right fs-7"></i>
+      </button>
+
+    </div>
+  </div>
+
+
+  <!-- 승인된 결재 -->
+  <div class="tab-pane fade" id="approvalCompletedTab">
+    <div class="carousel slide" id="approvalCompletedCarousel">
+
+      <!-- ✅ 인디케이터 -->
+      <div class="carousel-indicators" id="completedCarouselIndicators">
+        <!-- JavaScript에서 동적 로딩 -->
+      </div>
+
+      <!-- ✅ 슬라이드 항목 -->
+      <div class="carousel-inner px-4 text-center" id="completedCarouselInner">
+        <!-- JavaScript에서 동적 로딩 -->
+      </div>
+
+      <!-- ✅ 이전/다음 버튼 -->
+      <button class="position-absolute border-0 bg-transparent text-secondary"
+        type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide="prev"
+        style="top: 65%; left: -10px; transform: translateY(-50%); z-index: 2;">
+        <i class="fas fa-chevron-left fs-7"></i>
+      </button>
+      <button class="position-absolute border-0 bg-transparent text-secondary"
+              type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide="next"
+              style="top: 65%; right: -10px; transform: translateY(-50%); z-index: 2;">
+        <i class="fas fa-chevron-right fs-7"></i>
+      </button>
+
+    </div>
+  </div>
+
+</div>
+
+				        
+				        
+				        
+				        
 					</div>
 				</div>
 			</div>
@@ -778,7 +929,8 @@
    <script>
    let currentPage = 1;  // 현재 페이지를 추적
    const totalNews = 10; // 전체 뉴스 개수 (예시로 10개 뉴스 항목 사용)
-
+	
+	   
    function loadNews() {
        fetch('/api/news?query=IT&language=ko&page=' + currentPage + '&size=1')  // IT 뉴스 1개만 가져오기
            .then(response => response.json())
@@ -1023,6 +1175,7 @@ loadApprovalCarousel(
     document.getElementById('completedCarouselIndicators')
 );
 </script>
+
 
     
 
