@@ -23,6 +23,7 @@ import com.eroom.admin.dto.EmployeeManageDto;
 import com.eroom.attendance.dto.AnnualLeaveDto;
 import com.eroom.attendance.dto.AttendanceDto;
 import com.eroom.attendance.entity.AnnualLeave;
+import com.eroom.attendance.service.AnnualLeaveService;
 import com.eroom.attendance.service.AttendanceService;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
@@ -60,6 +61,7 @@ public class AdminController {
 	private final FacilityService facilityService;
 	private final MeetingRoomService meetingRoomService;
 	private final VehicleService vehicleService;
+	private final AnnualLeaveService annualLeaveService;
 	
 	// 회의실 목록
 	@GetMapping("/meetingroom")
@@ -792,4 +794,55 @@ public class AdminController {
 		return resultMap;
 	}
 	
+	// 회원 연차정보 불러오기
+	@GetMapping("/getAnnualLeave")
+	@ResponseBody
+	public Map<String,Object> getAnnualLeave(@RequestParam("employeeNo") Long employeeNo){
+		Map<String,Object> result = new HashMap<>();
+		
+		try {
+			AnnualLeave leave = annualLeaveService.findByEmployeeNo(employeeNo);
+			
+			if(leave == null) {
+				result.put("res_code", 404);
+				result.put("res_msg", "해당 사원의 연차 정보가 없습니다.");
+			}else {
+				double total = leave.getAnnualLeaveTotal();
+				double used = leave.getAnnualLeaveUsed();
+				double remain = total - used;
+				
+	            result.put("res_code", 200);
+	            result.put("annual_leave_total", total);
+	            result.put("annual_leave_used", used);
+	            result.put("annual_leave_remain", remain);				
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			
+			result.put("res_code", 500);
+			result.put("res_msg","연차 정보를 가져오는 중 오류가 발생했습니다.");
+		}
+		
+		return result;
+	}
+	
+	// 회원 연차 수정하기
+	@PostMapping("/annualLeaveUpdate")
+	@ResponseBody
+	public Map<String,Object> updateAnnualLeave(@RequestParam("employeeNo") Long employeeNo,
+												@RequestParam("annualLeaveTotalDelta") double totalDelta,
+												@RequestParam("annualLeaveUsedDelta") double usedDelta){
+		Map<String,Object> resultMap = new HashMap<>();
+		try {
+			AnnualLeaveDto updated = annualLeaveService.updateAnnualLeave(employeeNo, totalDelta, usedDelta);
+	        resultMap.put("res_code", 200);
+	        resultMap.put("res_msg", "연차 정보가 성공적으로 수정되었습니다.");
+	        resultMap.put("updateAnnualLeave", updated);
+		}catch(Exception e) {
+			e.printStackTrace();
+			resultMap.put("res_code", 500);
+	        resultMap.put("res_msg", "연차 정보 수정 중 오류가 발생했습니다.");
+		}
+		return resultMap;
+	}
 }
