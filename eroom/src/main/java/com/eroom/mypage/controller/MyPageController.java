@@ -24,7 +24,9 @@ import com.eroom.approval.service.ApprovalService;
 import com.eroom.attendance.dto.AnnualLeaveDto;
 import com.eroom.attendance.dto.AttendanceDto;
 import com.eroom.attendance.entity.AnnualLeave;
+import com.eroom.attendance.service.AnnualLeaveService;
 import com.eroom.attendance.service.AttendanceService;
+import com.eroom.common.AnnualPolicyUtil;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.DirectoryService;
@@ -41,8 +43,6 @@ import com.eroom.security.EmployeeDetails;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import net.sf.dynamicreports.report.datasource.DRDataSource;
-import net.sf.jasperreports.engine.JRDataSource;
 
 @Controller
 @RequestMapping("/mypage")
@@ -56,6 +56,8 @@ public class MyPageController {
 	private final ProfileService profileService;
 	private final ApprovalService approvalService;
 	private final ReportService reportService;
+	private final AnnualLeaveService annualLeaveService;
+	private final AnnualPolicyUtil annualPolicyUtil;
 	
 	// 마이페이지
 	@GetMapping("/list")
@@ -95,9 +97,12 @@ public class MyPageController {
         	DirectoryDto directoryDto = new DirectoryDto().toDto(directory);
         	model.addAttribute("directory", directoryDto);
         }
-        
+        // 현재 년도
+		// Long currentYear = Long.valueOf(LocalDate.now().getYear());
+		// 기준일 기반 연차 연도 계산
+        Long targetYear = annualPolicyUtil.getTargetYearByPolicy();
         // 연차 정보 조회
-        AnnualLeave annualLeave = attendanceService.selectAnnualLeaveByEmployeeNo(employeeNo);
+        AnnualLeave annualLeave = annualLeaveService.selectAnnualLeaveByEmployeeNoAndYear(employee.getEmployeeNo(),targetYear);
         AnnualLeaveDto annualLeaveDto;
         if (annualLeave != null) {
         	annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
