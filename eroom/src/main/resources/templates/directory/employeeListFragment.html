@@ -39,7 +39,7 @@
 												<p class="mb-0 fw-bold text-truncate" th:text="${member.employee_name}">이름없음</p>
 
 										</a></td>
-										<td class="mail"><a class="fw-semibold" href="/mail/mailCreate" th:text="${member.directory_email != null ? member.directory_email : '-'}"></a></td>
+										<td class="mail"><a class="fw-semibold" th:href="@{/mail/write/{id}(id=${member.employee_no})}" th:text="${member.directory_email != null ? member.directory_email : '-'}"></a></td>
 										<td class="phone" th:text="${member.directory_phone}">-</td>
 										<td class="job" th:text="${member.employee_position}">-</td>
 										<td class="dept" th:text="${member.department_name != null ? member.department_name : '-'}">부서명</td>
