@@ -298,6 +298,12 @@
                 if (confirm("메일을 발송하시겠습니까?")) {
                     tinymce.triggerSave();
                     const form = document.mail_create_form;
+                    const receiver = form.receiver_type.value;
+                    if(!receiver){
+                    console.log(receiver);
+                    alert("받는사람을 한 명 이상 지정해야 합니다.");
+            	    return;
+                    }
                     const payload = new FormData(form);
                     payload.append("mail_draft_yn", "N"); // 발송할 때는 mail_status = N
 

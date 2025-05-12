@@ -964,14 +964,14 @@
 	}
 
    // 슬라이드 기능 (5초마다)
-   setInterval(function() {
+/*    setInterval(function() {
        loadNews();
    }, 5000);  // 5초마다 뉴스가 변경됨
-
+ */
    // 20분마다 새로운 뉴스 가져오기
    setInterval(function() {
        loadNews();
-   }, 1200000);  // 20분 = 1200000ms
+   }, 120000000);  // 20분 = 1200000ms
 
    // 페이지 로드 시 뉴스 데이터 로드
    window.onload = loadNews;  // 초기 로딩 시에도 뉴스 한 개를 불러옴
