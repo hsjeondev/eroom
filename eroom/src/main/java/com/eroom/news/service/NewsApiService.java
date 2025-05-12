@@ -1,24 +1,47 @@
 package com.eroom.news.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import java.util.Map;
 
 @Service
 public class NewsApiService {
 
     @Value("${newsapi.key}")
-    private String apiKey;  // application.properties에서 가져온 NewsAPI 키
+    private String apiKey;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public Map<String, Object> getNews(String query, String language, int page, int size) {
-        // NewsAPI URL 구성
-        String url = String.format("https://newsapi.org/v2/everything?q=%s&language=%s&page=%d&pageSize=%d&apiKey=%s", 
-                                    query, language, page, size, apiKey);
+    private List<Map<String, Object>> cachedArticles = new ArrayList<>();
+    private LocalDateTime lastFetchTime = null;
 
-        // API 요청하여 JSON 데이터를 Map으로 변환
-        return restTemplate.getForObject(url, Map.class);
+    public synchronized List<Map<String, Object>> getNews(String query, String language, int page, int size) {
+        if (lastFetchTime == null || lastFetchTime.plusHours(1).isBefore(LocalDateTime.now())) {
+            String url = String.format("https://newsapi.org/v2/everything?q=%s&language=%s&page=%d&pageSize=%d&apiKey=%s",
+                    query, language, page, size, apiKey);
+            try {
+                Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+                List<Map<String, Object>> articles = (List<Map<String, Object>>) response.get("articles");
+                if (articles != null && !articles.isEmpty()) {
+                    cachedArticles = articles;
+                    lastFetchTime = LocalDateTime.now();
+                }
+            } catch (HttpClientErrorException.TooManyRequests e) {
+                System.err.println("뉴스 API 호출 횟수 초과(429): 기존 뉴스 유지");
+                // 캐시 유지
+            } catch (Exception e) {
+                System.err.println("뉴스 API 호출 실패: " + e.getMessage());
+            }
+        }
+
+        return cachedArticles;
     }
 }
+
+
