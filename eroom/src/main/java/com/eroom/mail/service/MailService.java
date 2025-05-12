@@ -662,7 +662,13 @@ public class MailService {
 					 * 
 					 * } }
 					 */
-		            
+	            	Optional<MailDraft> optionalDraft = mailDraftRepository.findByMail_MailNo(
+	            	        mailSaver.getMailNo());
+	            	    if (optionalDraft.isPresent()) {
+	            	        MailDraft existingDraft = optionalDraft.get();
+	            	        existingDraft.setMailDraftVisibleYn("N"); // 숨김 처리
+	            	        mailDraftRepository.save(existingDraft);
+	            	    }
 		        }
 			 }
 			}
@@ -704,6 +710,15 @@ public class MailService {
 	            }
 	        }
 			if (mailDraftYn.equals("Y")) {
+				Optional<MailDraft> optionalDraft = mailDraftRepository.findByMail_MailNo(mailSaver.getMailNo());
+				
+				if (optionalDraft.isPresent()) {
+			        // 기존 임시저장 메일 업데이트
+			        MailDraft existingDraft = optionalDraft.get();
+			        existingDraft.setMailDraftTime(LocalDateTime.now());
+			        // 필요 시 다른 필드도 업데이트
+			        mailDraftRepository.save(existingDraft);
+			    } else {
 	            MailDraftDto mailDraftDto = new MailDraftDto();
 	            mailDraftDto.setMail_no(mailSaver.getMailNo()); // 메일 번호
 	            //mailDraftDto.setEmployee_no(receiverNo); // 수신자
@@ -711,7 +726,8 @@ public class MailService {
 	
 	            MailDraft mailDraft = mailDraftDto.toEntity();
 	            mailDraftRepository.save(mailDraft); // 새로 저장
-            }
+			    }
+			}
 			
 			result =1;
 		}catch (Exception e) {

@@ -653,6 +653,78 @@ public class MailController {
 		        model.addAttribute("attachList", attachList);
 		}
 		
+		 Map<String, List<EmployeeDto>> teamEmployeeMap = new HashMap<>();
+		 List<Employee> empEntityList = employeeService.findAllEmployee();
+		 // 팀 조회
+		 
+		
+		// 부서 리스트와 팀 리스트를 가져와서 Map에 저장
+		List<Structure> departmentList = new ArrayList<Structure>();
+		Map<String, List<Structure>> teamMap = new HashMap<String, List<Structure>>();
+		departmentList = structureService.selectDepartmentAll();
+		for (Structure s : departmentList) {
+			// 부서명으로 팀 리스트를 가져와서 Map에 저장
+			List<Structure> teamList = new ArrayList<Structure>();
+			// separator_code로 팀 리스트를 조회 후 <부서명, 팀리스트> 형태로 Map에 저장
+			teamList = structureService.selectTeamAllByParentCode(s.getSeparatorCode());
+			teamMap.put(s.getCodeName(), teamList);
+			for(Structure team : teamList) {
+				 List<EmployeeDto> employeeLists = new ArrayList<EmployeeDto>();
+				for(Employee empEntity : empEntityList) {
+					if(empEntity.getStructure() != null 
+						    && empEntity.getStructure().getSeparatorCode().equals(team.getSeparatorCode())) {
+						employeeLists.add(new EmployeeDto().toDto(empEntity));
+					}
+				}
+				teamEmployeeMap.put(team.getSeparatorCode(), employeeLists);
+			}
+		}
+		// 부서&&팀 없는 사람
+		List<EmployeeDto> noTeamList = new ArrayList<>();
+		for (Employee empEntity : empEntityList) {
+			if (empEntity.getStructure() == null) {
+				EmployeeDto dto = new EmployeeDto().toDto(empEntity);
+				noTeamList.add(dto);
+			}
+		}
+		teamEmployeeMap.put("noTeam", noTeamList);
+		
+		// 부서는 있지만 팀이 없는 사람
+		for (Structure dept : departmentList) {
+		    List<EmployeeDto> notAssignedList = new ArrayList<>();
+		    for (Employee empEntity : empEntityList) {
+		        Structure empStruct = empEntity.getStructure();
+
+		        if (empStruct != null) {
+		            // ① 구조 자체가 부서에 해당 (즉, 구조 자체가 이 부서와 동일)
+		            if (empStruct.getSeparatorCode().equals(dept.getSeparatorCode())) {
+		                notAssignedList.add(new EmployeeDto().toDto(empEntity));
+		            }
+
+		            // ② 혹은 이 부서의 자식인데 팀 소속이 아님
+		            else if (empStruct.getParentCode() != null &&
+		                     empStruct.getParentCode().equals(dept.getSeparatorCode())) {
+		                List<Structure> teamList = teamMap.get(dept.getCodeName());
+		                boolean isTeam = teamList.stream()
+		                    .anyMatch(t -> t.getSeparatorCode().equals(empStruct.getSeparatorCode()));
+		                if (!isTeam) {
+		                    notAssignedList.add(new EmployeeDto().toDto(empEntity));
+		                }
+		            }
+		        }
+		    }
+
+		    if (!notAssignedList.isEmpty()) {
+		        teamEmployeeMap.put(dept.getSeparatorCode() + "_notAssigned", notAssignedList);
+		    }
+		}
+
+		
+		model.addAttribute("departmentList", departmentList);
+		model.addAttribute("teamMap", teamMap);
+		model.addAttribute("teamEmployeeMap", teamEmployeeMap);
+		
+		
 		model.addAttribute("sender", sender);
 		// return "mail/mailCreateDraft";
 		return "mail/mailDraftUpdate";
@@ -668,9 +740,8 @@ public class MailController {
 		model.addAttribute("departments", departments); // 부서 드롭다운용
 		// 가져온 값은 mail_no값 이걸로 mail조회하여 보낸 사람 no값 찾기
 		Employee sender = mailService.getSenderInfoByMailNo(id);
-		
-		
 		model.addAttribute("sender", sender);
+		
 		return "mail/mailCreateReply";
 	}
 	
@@ -686,7 +757,7 @@ public class MailController {
 	
 	
 	// 메일 작성 페이지
-	@GetMapping("/mail/mailCreate")
+	/*@GetMapping("/mail/mailCreate")
 	public String createMailView(Model model
 			,@RequestParam(name = "mailNo", required = false) Long mailNo
 			) {
@@ -711,7 +782,7 @@ public class MailController {
 		        model.addAttribute("mailFiles", mailFiles);
 		}
 		return "mail/mailCreate";
-	}
+	}*/
 	
 	// 임시 저장 눌렀을때 ( 메일 작성 페이지처럼 보이게 폐기 예정
 //	@GetMapping("/mail/draft/update")
@@ -799,6 +870,88 @@ public class MailController {
             return employeeService.findEmployeesByParentCode(separatorCode);
         }
     }
+	
+	
+	
+	@GetMapping("/mail/mailCreate")
+	public String mailCreateView(Model model) {
+		 Map<String, List<EmployeeDto>> teamEmployeeMap = new HashMap<>();
+		 List<Employee> empEntityList = employeeService.findAllEmployee();
+		 // 팀 조회
+		 
+		
+		// 부서 리스트와 팀 리스트를 가져와서 Map에 저장
+		List<Structure> departmentList = new ArrayList<Structure>();
+		Map<String, List<Structure>> teamMap = new HashMap<String, List<Structure>>();
+		departmentList = structureService.selectDepartmentAll();
+		for (Structure s : departmentList) {
+			// 부서명으로 팀 리스트를 가져와서 Map에 저장
+			List<Structure> teamList = new ArrayList<Structure>();
+			// separator_code로 팀 리스트를 조회 후 <부서명, 팀리스트> 형태로 Map에 저장
+			teamList = structureService.selectTeamAllByParentCode(s.getSeparatorCode());
+			teamMap.put(s.getCodeName(), teamList);
+			for(Structure team : teamList) {
+				 List<EmployeeDto> employeeList = new ArrayList<EmployeeDto>();
+				for(Employee empEntity : empEntityList) {
+					if(empEntity.getStructure() != null 
+						    && empEntity.getStructure().getSeparatorCode().equals(team.getSeparatorCode())) {
+						employeeList.add(new EmployeeDto().toDto(empEntity));
+					}
+				}
+				teamEmployeeMap.put(team.getSeparatorCode(), employeeList);
+			}
+		}
+		// 부서&&팀 없는 사람
+		List<EmployeeDto> noTeamList = new ArrayList<>();
+		for (Employee empEntity : empEntityList) {
+			if (empEntity.getStructure() == null) {
+				EmployeeDto dto = new EmployeeDto().toDto(empEntity);
+				noTeamList.add(dto);
+			}
+		}
+		teamEmployeeMap.put("noTeam", noTeamList);
+		
+		// 부서는 있지만 팀이 없는 사람
+		for (Structure dept : departmentList) {
+		    List<EmployeeDto> notAssignedList = new ArrayList<>();
+		    for (Employee empEntity : empEntityList) {
+		        Structure empStruct = empEntity.getStructure();
+
+		        if (empStruct != null) {
+		            // ① 구조 자체가 부서에 해당 (즉, 구조 자체가 이 부서와 동일)
+		            if (empStruct.getSeparatorCode().equals(dept.getSeparatorCode())) {
+		                notAssignedList.add(new EmployeeDto().toDto(empEntity));
+		            }
+
+		            // ② 혹은 이 부서의 자식인데 팀 소속이 아님
+		            else if (empStruct.getParentCode() != null &&
+		                     empStruct.getParentCode().equals(dept.getSeparatorCode())) {
+		                List<Structure> teamList = teamMap.get(dept.getCodeName());
+		                boolean isTeam = teamList.stream()
+		                    .anyMatch(t -> t.getSeparatorCode().equals(empStruct.getSeparatorCode()));
+		                if (!isTeam) {
+		                    notAssignedList.add(new EmployeeDto().toDto(empEntity));
+		                }
+		            }
+		        }
+		    }
+
+		    if (!notAssignedList.isEmpty()) {
+		        teamEmployeeMap.put(dept.getSeparatorCode() + "_notAssigned", notAssignedList);
+		    }
+		}
+
+		
+		model.addAttribute("departmentList", departmentList);
+		model.addAttribute("teamMap", teamMap);
+		model.addAttribute("teamEmployeeMap", teamEmployeeMap);
+		
+		
+		return "mail/mailCreate";
+	}
+	
+	
+	
 	
 	
 	
