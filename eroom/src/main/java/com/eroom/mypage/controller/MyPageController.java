@@ -92,7 +92,6 @@ public class MyPageController {
         
         // 주소록 정보 조회
         Directory directory = employeeDirectoryService.selectDirectoryByEmployeeNo(employeeNo);
-//        System.out.println("directory 정보 : " + directory);
         if(directory != null) {
         	DirectoryDto directoryDto = new DirectoryDto().toDto(directory);
         	model.addAttribute("directory", directoryDto);

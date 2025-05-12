@@ -51,10 +51,10 @@ public class AnnualLeaveService {
 	    //  퇴사자 제외 처리
 	    if (employee.getEmployeeEndDate() != null) return;	    
 	    // 입사일 기준 1년 미만이면 연차 부여 제외
-	    LocalDate hireDate = employee.getEmployeeHireDate().toLocalDate();
-	    LocalDate referenceDate = LocalDate.of(year.intValue(), 5, 12); // 연차 부여 기준일
-	    					//	= LocalDate.of(year.intValue(), 1, 1); 
-	    if(hireDate.isAfter(referenceDate.minusYears(1))) return; // 입사일이 기준일 기준 1년 이내면 제외
+//	    LocalDate hireDate = employee.getEmployeeHireDate().toLocalDate();
+//	    LocalDate referenceDate = LocalDate.of(year.intValue(), 5, 12); // 연차 부여 기준일
+//	    					//	= LocalDate.of(year.intValue(), 1, 1); 
+//	    if(hireDate.isAfter(referenceDate.minusYears(1))) return; // 입사일이 기준일 기준 1년 이내면 제외
 	    
 		// 기존 연차 정보가 있는지 확인
 		AnnualLeave existing = annualLeaveRepository.findByEmployee_EmployeeNoAndYear(employeeNo, year);
