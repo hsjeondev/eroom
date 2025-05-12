@@ -103,6 +103,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		
 				    <!-- Review 아이템 공간(예시) -->
 				    <div class="kanban-items-container" data-sortable="data-sortable" th:attr="data-is-member=${isMember}">
+				    <input type="hidden" id="isMember" th:value="${isMember}" />
 					  <div th:each="element : ${list.projectTodoElements}" 
 					     class="sortable-item-wrapper border-bottom border-translucent px-2 py-2"
 					     th:attr="data-todo-no=${element.todo_no}">
@@ -634,7 +635,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		        <button class="btn p-1" type="button" data-bs-dismiss="modal" aria-label="Close">
 		          <span class="fas fa-times fs-10 me-1" data-fa-transform="up-1"></span>닫기
 		        </button>
-		        <button class="btn btn-phoenix-primary px-6" type="button" id="updateTodoButton">
+		        <button th:if="${isMember == true}" class="btn btn-phoenix-primary px-6" type="button" id="updateTodoButton">
 		          할 일 수정<span class="fas fa-edit ms-2" data-fa-transform="shrink-3"></span>
 		        </button>
 		      </div>
@@ -855,7 +856,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		            }
 		
 		            // ✅ 세부 할 일 체크박스 리스트 - 수정한 부분
-		            const isMember = /*[[${isMember}]]*/ false;
+		            const isMember = document.getElementById("isMember").value;
+		            console.log("isMember" + isMember);
 		            const detailContainer = document.getElementById('todoDetailList');
 		            if (detailContainer) {
 		                detailContainer.innerHTML = ""; // 먼저 비우고
@@ -867,7 +869,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		                        listHtml += `
 		                        	<li class="d-flex align-items-center border-bottom ${index === 0 ? 'pb-2 pt-0' : 'py-2'}">
 
-		                        		<input type="checkbox" class="me-2" value="${detail.todo_detail_no}" ${detail.status === 'Y' ? 'checked' : ''} ${isMember === false ? 'disabled' : ''}  onclick="detailCheck(this);">
+		                        		<input type="checkbox" class="me-2" value="${detail.todo_detail_no}" ${detail.status === 'Y' ? 'checked' : ''} ${isMember == 'false' ? 'disabled' : ''}  onclick="detailCheck(this);">
 
 		                                <span>${detail.todo_content}</span>
 		                            </li>
@@ -1342,7 +1344,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			           if (!hiddenInputTodo) {
 			        	   hiddenInputTodo = document.createElement("input");
 			        	   hiddenInputTodo.type = "hidden";
-			        	   hiddenInputTodo.name = "todo_no"; // 👈 이걸로 통일
+			        	   hiddenInputTodo.name = "todo_no";
 			        	   hiddenInputTodo.value = todo.todo_no;
 			             document.getElementById("updateTodoForm").appendChild(hiddenInputTodo);
 			           } else {
@@ -1412,8 +1414,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			     .then(data => {
 			       alert(data.res_msg);
 			       if (data.res_code === "200") {
-			         // 모달 닫기
-			         location.reload(); // 또는 데이터 갱신만
+			         location.reload();
 			       }
 			     })
 			     .catch(() => {
