@@ -1,5 +1,6 @@
 package com.eroom.mypage.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -23,7 +24,9 @@ import com.eroom.approval.service.ApprovalService;
 import com.eroom.attendance.dto.AnnualLeaveDto;
 import com.eroom.attendance.dto.AttendanceDto;
 import com.eroom.attendance.entity.AnnualLeave;
+import com.eroom.attendance.service.AnnualLeaveService;
 import com.eroom.attendance.service.AttendanceService;
+import com.eroom.common.AnnualPolicyUtil;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.DirectoryService;
@@ -35,8 +38,10 @@ import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.EmployeeService;
 import com.eroom.employee.service.StructureService;
+import com.eroom.report.service.ReportService;
 import com.eroom.security.EmployeeDetails;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -50,6 +55,9 @@ public class MyPageController {
 	private final DriveRepository driveRepository;
 	private final ProfileService profileService;
 	private final ApprovalService approvalService;
+	private final ReportService reportService;
+	private final AnnualLeaveService annualLeaveService;
+	private final AnnualPolicyUtil annualPolicyUtil;
 	
 	// 마이페이지
 	@GetMapping("/list")
@@ -89,9 +97,12 @@ public class MyPageController {
         	DirectoryDto directoryDto = new DirectoryDto().toDto(directory);
         	model.addAttribute("directory", directoryDto);
         }
-        
+        // 현재 년도
+		// Long currentYear = Long.valueOf(LocalDate.now().getYear());
+		// 기준일 기반 연차 연도 계산
+        Long targetYear = annualPolicyUtil.getTargetYearByPolicy();
         // 연차 정보 조회
-        AnnualLeave annualLeave = attendanceService.selectAnnualLeaveByEmployeeNo(employeeNo);
+        AnnualLeave annualLeave = annualLeaveService.selectAnnualLeaveByEmployeeNoAndYear(employee.getEmployeeNo(),targetYear);
         AnnualLeaveDto annualLeaveDto;
         if (annualLeave != null) {
         	annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
@@ -259,5 +270,25 @@ public class MyPageController {
 		return resultList;
 	}
 	
+	// 근태 기록 엑셀로 다운로드
+	@GetMapping("/attendanceExcel")
+	public void exportAttendanceExcel(@RequestParam("month") String month,
+									Authentication authentication,
+									HttpServletResponse response) throws Exception{
+		EmployeeDetails user = (EmployeeDetails) authentication.getPrincipal();
+		Long employeeNo = user.getEmployee().getEmployeeNo();		
+		// 해당 월의 근태 기록
+		List<AttendanceDto> records = attendanceService.selectAttendanceListByMonth(employeeNo, month);
+		// 엑셀 생성
+		ByteArrayOutputStream excelFile = reportService.generateAttendanceExcelReport(records, month);
+		
+		// 응답 설정
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		response.setHeader("Content-Disposition", "attachment; filename=attendance_"+month+".xls");
+		response.getOutputStream().write(excelFile.toByteArray());
+		response.getOutputStream().flush();
+		
+	}
+
 
 }

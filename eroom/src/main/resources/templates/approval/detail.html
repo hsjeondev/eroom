@@ -37,6 +37,18 @@
     vertical-align: middle;
     width: 100px !important;
   }
+   .btn-hover-effect {
+       background-color: white;      /* 기본 색상 */
+       color: black;                 /* 글자 색상 */
+       border: 1px solid #ccc;       /* 테두리 */
+       padding: 10px 20px;           /* 여백 */
+       cursor: pointer;              /* 커서 변경 */
+       transition: background-color 0.3s ease; /* 부드러운 전환 */
+   }
+
+   .btn-hover-effect:hover {
+       background-color: #f2f2f2;    /* 마우스 올리면 연한 회색 */
+   }
   </style>
 </head>
 <body class="bg-light">
@@ -44,11 +56,24 @@
     <div class="container bg-white rounded shadow-sm p-4 mt-4" style="max-width: 1000px;">
 
       <!-- 상단 제목 + 목록 버튼 -->
-      <div class="d-flex mb-3">
-        <span class="fw-bold fs-6">결재서 상세</span>
-        <button class="btn btn-light btn-sm me-2" id="topdf" type="button">pdf만들기</button>
-        <button type="button" class="btn btn-light btn-sm" onclick="history.back()">목록으로</button>
-      </div>
+	<div class="d-flex justify-content-between mb-2">
+	  <span class="fw-bold fs-7">결재서 상세</span>
+	  <div class="ms-auto">
+	    <!-- <button class="btn btn-light btn-sm me-2" id="topdf" type="button">pdf만들기</button> -->
+	    <!-- <button type="button" class="btn btn-light btn-sm" onclick="history.back()">목록으로</button> -->
+	    <button id="topdf" type="button" class="btn border align-items-center px-2 py-0 btn-hover-effect" style="height: 32px; font-size: 0.875rem; line-height: 1;">
+		  <img src="/assets/img/icons/pdf-icon1.png" alt="pdf 아이콘" class="me-1" style="height: 90%; width: auto;">
+		  <span class="fw-normal small" style="position: relative; top: 1px;">다운로드</span>
+		</button>
+	    <!-- <button id="topdf" type="button" class="btn border align-items-center px-2 py-0 btn-hover-effect" style="height: 32px; font-size: 0.875rem; line-height: 1;">
+		  <img src="/assets/img/icons/pdf-icon2.png" alt="pdf 아이콘" class="me-1" style="height: 80%; width: auto;">
+		  <span class="fw-normal small" style="position: relative; top: 1px;">다운로드</span>
+		</button> -->
+	    <button onclick="history.back()" type="button" class="btn border align-items-center px-2 py-0 btn-hover-effect" style="height: 32px; font-size: 0.875rem; line-height: 1;">
+		  <span class="fw-normal small" style="position: relative;">뒤로가기</span>
+		</button>
+	  </div>
+	</div>
 
       <!-- 기본 정보 + 결재선 테이블 병렬 정렬 -->
 <div class="card shadow-sm p-3 rounded-2xl mb-4">

@@ -1,6 +1,10 @@
 package com.eroom.chat.service;
 
 import java.io.File;
+import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,6 +14,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -256,10 +265,68 @@ public class ChatroomService {
 	public List<DriveDto> getChatFilesByRoom(Long chatroomNo, int page, int size) {
 	    return driveService.findChatFilesByRoom(chatroomNo, page, size);
 	}
+    // 채팅방 나가기
+    public void leaveChatroom(Long chatroomNo, Long employeeNo) {
+        // 채팅방과 해당 참여자 확인
+        ChatroomAttendee attendee = chatroomAttendeeRepository.findByChatroomNoAndAttendeeEmployeeNo(chatroomNo, employeeNo);
 
+        if (attendee != null) {
+            // 참여자 제거
+            chatroomAttendeeRepository.delete(attendee);
 
+            // 만약 채팅방에 참여자가 1명도 없으면 채팅방 삭제
+            if (chatroomAttendeeRepository.countByChatroomNo(chatroomNo) == 0) {
+                repository.deleteById(chatroomNo);
+            }
+        } else {
+            throw new RuntimeException("참여자가 아니거나 잘못된 채팅방입니다.");
+        }
+	}
 
+    @Transactional
+ // 채팅방 파일 다운로드 처리
+    public ResponseEntity<Resource> downloadFile(Long driveAttachNo) {
+        try {
+            // DB에서 파일 정보 가져오기 (driveAttachNo로 파일 조회)
+            Drive drive = driveService.findByDriveAttachNo(driveAttachNo);
+            if (drive == null) {
+                System.out.println("해당 파일을 찾을 수 없음");
+                return ResponseEntity.notFound().build(); // 파일을 찾을 수 없으면 404 응답
+            }
 
+            // 파일이 FL003 세퍼레이터 코드인지 확인
+            if (!"FL003".equals(drive.getSeparatorCode())) {
+                System.out.println("이 파일은 다운로드할 수 없습니다. 세퍼레이터 코드가 맞지 않습니다.");
+                return ResponseEntity.badRequest().build(); // 잘못된 파일 요청
+            }
 
+            // 실제 파일 경로
+            Path filePath = Paths.get(fileDir + drive.getDrivePath()); // 파일 경로 생성
+            System.out.println("파일 경로: " + filePath.toString());
+            System.out.println("파일 존재 여부: " + Files.exists(filePath));
+
+            if (!Files.exists(filePath)) {
+                return ResponseEntity.notFound().build(); // 파일이 존재하지 않으면 404 응답
+            }
+
+            // 파일명 한글 깨짐 방지 (UTF-8 인코딩)
+            String encodedFileName = URLEncoder.encode(drive.getDriveOriName(), "UTF-8")
+                                               .replaceAll("\\+", "%20");
+
+            // 파일 스트림 준비
+            Resource resource = new InputStreamResource(Files.newInputStream(filePath));
+
+            // 다운로드 응답
+            return ResponseEntity.ok()
+                                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+                                 .contentType(MediaType.APPLICATION_OCTET_STREAM) // 파일 종류에 상관없이 모든 파일을 처리
+                                 .body(resource);
+
+        } catch (Exception e) {
+            System.out.println("파일 다운로드 중 예외 발생: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build(); // 예외가 발생하면 400 오류 반환
+        }
+    }
 
 }

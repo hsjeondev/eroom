@@ -13,7 +13,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		</div>
 			<div class="pb-8">
 				<!-- &quot;page&quot;: 여기 숫자 바꾸면 한 페이지 컨텐츠 수 조절 가능 -->
-				<div id="reports" data-list='{
+				<div id="reports" style="display: none;" data-list='{
 										       "valueNames": ["writer", "text1", "text2", "text3", "title", "state", "date", "reports"],
 										       "page": 10,
 										       "pagination": true
@@ -60,7 +60,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 											<div class="modal-content border border-translucent">
 												<form id="addEventForm" autocomplete="off">
 													<div class="modal-header justify-content-between border-translucent p-4">
-														<h5 class="modal-title text-body-highlight fs-6 lh-sm">Filter</h5>
+														<h5 class="modal-title text-body-highlight fs-6 lh-sm">필터/정렬</h5>
 														<button class="btn p-1 text-danger" type="button" data-bs-dismiss="modal" aria-label="Close"><svg class="svg-inline--fa fa-xmark fs-9" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"></path></svg><!-- <span class="fas fa-times fs-9"> 				</span> Font Awesome fontawesome.com --></button>
 													</div>
 													<div class="modal-body pt-4 pb-2 px-4">
@@ -86,10 +86,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 															<label class="fw-bold mb-2 text-body-highlight" for="approvalStatus">진행여부</label>
 															<select class="form-select" id="approvalStatus">
 																<option th:value="0">전체 보기</option>
-																<option th:value="A">승인</option>
-																<option th:value="S">진행</option>
-																<option th:value="D">반려</option>
-																<option th:value="F">회수</option>
+																<option th:value="A">🟢 승인</option>
+																<option th:value="S">🔵 진행</option>
+																<option th:value="D">🔴 반려</option>
+																<option th:value="F">🟠 회수</option>
 															</select>
 														</div>
 													</div>
@@ -136,41 +136,24 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				<div class="row align-items-center justify-content-center py-2 pe-0 fs-9 mt-2">
 					<div class="col-auto d-flex">
 						<button class="page-link disabled" data-list-pagination="prev" disabled=""><svg class="svg-inline--fa fa-chevron-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"></path></svg><!-- <span class="fas fa-chevron-left"></span> Font Awesome fontawesome.com --></button>
-							<ul class="mb-0 pagination"><li class="active"><button class="page" type="button" data-i="1" data-page="10">1</button></li><li><button class="page" type="button" data-i="2" data-page="10">2</button></li></ul>
+							<ul class="mb-0 pagination">
+								<li class="active">
+									<button class="page" type="button" data-i="1" data-page="10">1</button>
+								</li>
+							</ul>
 						<button class="page-link pe-0" data-list-pagination="next"><svg class="svg-inline--fa fa-chevron-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"></path></svg><!-- <span class="fas fa-chevron-right"></span> Font Awesome fontawesome.com --></button>
 					</div>
 				  </div>
 				
 				</div> <!-- reports 끝 -->
+				<div id="loadingSpinner" class="text-center py-3"  style="display: block;">
+				   <div class="spinner-border" role="status">
+				  	<span class="visually-hidden">Loading...</span>
+				  </div>
+				</div>
 			
 			</div><!-- pb-8 끝 -->
 			
-		
-		
-		
-		
-		
-		    <!-- 시그니처패드 모달 구조 -->
-    <div class="modal fade" id="signatureModal" tabindex="-1" aria-labelledby="signatureModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="signatureModalLabel">서명</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-          </div>
-          <div class="modal-body text-center">
-            <canvas id="signatureCanvas" width="400" height="200" style="border:1px solid #000; background:#fff;"></canvas>
-            <div class="mt-3">
-              <button type="button" class="btn btn-secondary" id="clearSignature">패드 초기화</button>
-              <button type="button" class="btn btn-primary" id="saveSignature">저장</button>
-              <button th:if="${approvalSignature != null}" type="button" class="btn btn-danger" id="deleteSignature">저장된 서명 삭제</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-		
-		
 		
 		
 		    <!-- 시그니처패드 모달 구조 -->
@@ -186,22 +169,49 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             <div class="mt-3">
               <button type="button" class="btn btn-secondary" id="clearSignature">초기화</button>
               <button type="button" class="btn btn-primary" id="saveSignature">저장</button>
-              <button th:if="${approvalSignature != null}" type="button" class="btn btn-primary" id="updateSignature">수정</button>
-              <button th:if="${approvalSignature != null}" type="button" class="btn btn-primary" id="deleteSignature">삭제</button>
+              <!-- <button th:if="${approvalSignature != null}" type="button" class="btn btn-primary" id="updateSignature">수정</button> -->
+              <!-- <button th:if="${approvalSignature != null}" type="button" class="btn btn-primary" id="deleteSignature">삭제</button> -->
             </div>
           </div>
         </div>
       </div>
     </div>
-		
-		
-		
-		
-		    <!-- 시그니처 모달 작동 스크립트 -->
-		    <!-- 시그니처 모달 작동 스크립트 -->
-    <script th:inline="javascript">
+	<!-- Thymeleaf에서 base64 데이터 바인딩 -->
+	<input type="hidden" id="signatureImage" th:value="${approvalSignature}" />
+
+
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+	   document.getElementById('loadingSpinner').style.display = 'none';
+	   document.getElementById('reports').style.display = 'block';
+	});
+</script>
+
+	<!-- 시그니처 모달 작동 스크립트 -->
+	<script>
     window.addEventListener('load', function () {
+    	let initialCanvasData = null;
       let signaturePad;
+  		function lastSignature() {
+  		    fetch('/approval/signature')
+  	        .then(response => response.json())
+  	        .then(data => {
+  	            if (data != null && data.res_code == '200' && data.signatureDto != '') {
+  	                const canvas = document.getElementById('signatureCanvas');
+  	                const ctx = canvas.getContext('2d');
+  	                const image = new Image();
+  	                
+  	                image.onload = function() {
+  	                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+	  	                initialCanvasData = canvas.toDataURL();
+  	                };
+  	                image.src = data.signatureDto.signature_data_url;
+  	            }
+  	        })
+  	        .catch(error => {
+  	            console.error('이미지 로딩 실패:', error);
+  	        });
+    	};
       const canvas = document.getElementById('signatureCanvas');
       const clearBtn = document.getElementById('clearSignature');
       const saveBtn = document.getElementById('saveSignature');
@@ -223,6 +233,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
       const signatureModal = document.getElementById('signatureModal');
       signatureModal.addEventListener('shown.bs.modal', function () {
         initSignaturePad();
+        lastSignature();
       });
 
       document.addEventListener('click', function(e) {
@@ -240,7 +251,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		
       if(saveBtn){
 	      saveBtn.addEventListener('click', function () {
-	        if (signaturePad && !signaturePad.isEmpty()) {
+	    	  const currentCanvasData = canvas.toDataURL();
+	    	  if (initialCanvasData === currentCanvasData) {
+	              // console.log("변경된 내용이 없습니다.");
+	              const modalInstance = bootstrap.Modal.getInstance(signatureModal);
+	              modalInstance.hide();
+	              return;
+	          }
+	        if (!signaturePad.isEmpty()) {
 	          const saveDataURL = signaturePad.toDataURL();
 	          console.log('서명 데이터 URL:', saveDataURL);
 	          
@@ -264,12 +282,31 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	          modalInstance.hide();
 	        } else {
 	       		// 서명 미입력시.
-	          alert('서명이 없습니다!');
+	          //alert('서명이 없습니다!');
+	       		// 서명이 없는 경우 지워버리기
+	    	  fetch('/approval/signature/delete', {
+	    		  method : 'PUT',
+	        	  headers : {
+	      	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+	      	        'header': document.querySelector('meta[name="_csrf_header"]').content
+	          	  }
+	    	  })
+	    	  .then(response => response.json())
+	    	  .then(data => {
+	    		  console.log(data.res_msg);
+	    	      location.reload();
+	    	  })
+	    	  .catch(error => {
+	    	        console.error('삭제 중 오류 발생:', error);
+	    	        alert('삭제 실패');
+	    	  });
+	       		
 	        }
 	      });
       }
       
-      if(deleteBtn){
+      // 사용자 편의성을 위해 지우기는 수정에 합치자
+      /* if(deleteBtn){
 	      deleteBtn.addEventListener('click', function(){
 	    	  fetch('/approval/signature/delete', {
 	    		  method : 'PUT',
@@ -288,7 +325,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	    	        alert('삭제 실패');
 	    	  });
 	      });
-      }
+      } */
       
       
       

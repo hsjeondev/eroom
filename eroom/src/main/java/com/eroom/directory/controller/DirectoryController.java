@@ -21,6 +21,7 @@ import com.eroom.directory.dto.DeleteDepartmentOrTeamDto;
 import com.eroom.directory.dto.DirectoryDto;
 import com.eroom.directory.dto.UpdateSortOrderDto;
 import com.eroom.directory.entity.Directory;
+import com.eroom.directory.service.DirectoryBookmarkService;
 import com.eroom.directory.service.DirectoryService;
 import com.eroom.drive.service.ProfileService;
 import com.eroom.employee.dto.EmployeeDto;
@@ -40,15 +41,15 @@ public class DirectoryController {
 	private final StructureService structureService;
 	private final EmployeeService employeeService;
 	private final ProfileService profileService;
+	private final DirectoryBookmarkService directoryBookmarkService;
 	
 
 	@GetMapping("/directory/employee")
 	public String selectDirectoryEmployeeList(@RequestParam(name="deptId",required=false) Long deptId, @RequestParam(name="teamId",required=false) Long teamId,Model model, @AuthenticationPrincipal EmployeeDetails user) {
-//		EmployeeDetails employeeDetail = (EmployeeDetails)authentication.getPrincipal();
-//		Employee employee = employeeDetail.getEmployee();
+		Employee employee = user.getEmployee();
 //		model.addAttribute("employee", employee);
 		model.addAttribute("employeeDetails", user);
-		System.out.println(user.getAuthorities() + "123");
+//		System.out.println(user.getAuthorities() + "123");
 		List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
 		List<Directory> temp = directoryService.selectDirectoryEmployeeAllBySeparatorCode();
 		
@@ -57,7 +58,9 @@ public class DirectoryController {
 			DirectoryDto dto = new DirectoryDto().toDto(t);
 			// 프로필 이미지 url 조회
 			String profileUrl = profileService.getProfileImageUrl(t.getEmployee().getEmployeeNo());
-			dto.setProfileImageUrl(profileUrl);
+			if(profileUrl != null) {
+				dto.setProfileImageUrl(profileUrl);
+			}
 			
 			if (t.getEmployee().getStructure() != null) {
 			    Structure structure = t.getEmployee().getStructure();
@@ -82,6 +85,9 @@ public class DirectoryController {
 			}
 			// 재직중인 사람만 리스트에 추가
 			if (t.getEmployee().getEmployeeEmploymentYn().equals("Y")) {
+				String bookmarkYn = directoryBookmarkService.findBookmarkYnByEmployeeNo(employee.getEmployeeNo(), dto.getEmployee_no());
+				dto.setBookmark_yn(bookmarkYn);
+				dto.setStar_mark_html("<i class=\"fas fa-star\"></i>");
 				employeeList.add(dto);
 			} 
 		}
@@ -111,7 +117,7 @@ public class DirectoryController {
 	}
 	// 트리 선택시 비동기 방식으로 회원 리스트 조회
 	@GetMapping("/directory/employeeList")
-	public String getEmployeeListFragment(@RequestParam("separatorCode") String separatorCode, Model model) {
+	public String getEmployeeListFragment(@RequestParam("separatorCode") String separatorCode, Model model, @AuthenticationPrincipal EmployeeDetails user) {
 //	    List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
 //		List<Directory> temp = directoryService.selectDirectoryEmployeeAllBySeparatorCode();
 //		
@@ -167,7 +173,7 @@ public class DirectoryController {
 //		model.addAttribute("employeeList", employeeList);
 		
 		try {
-			getEmployeeListBySeparatorCodeMethod(separatorCode, model);
+			getEmployeeListBySeparatorCodeMethod(separatorCode, model, user);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -179,12 +185,12 @@ public class DirectoryController {
 	// fragment 말고 model로 비동기 반환
 	@GetMapping("/directory/searchEmployeeList")
 	@ResponseBody
-	public Map<String, Object> getEmployeeListBySeparatorCode(@RequestParam("separatorCode") String separatorCode, Model model){
+	public Map<String, Object> getEmployeeListBySeparatorCode(@RequestParam("separatorCode") String separatorCode, Model model, @AuthenticationPrincipal EmployeeDetails user){
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("res_code", "500");
 		map.put("res_msg", "조회 실패");
 		try {
-			Map<String, Object> result = getEmployeeListBySeparatorCodeMethod(separatorCode, model);
+			Map<String, Object> result = getEmployeeListBySeparatorCodeMethod(separatorCode, model, user);
 			map.put("res_code", "200");
 			map.put("res_msg", "조회 성공");
 			map.put("result", result);
@@ -195,7 +201,9 @@ public class DirectoryController {
 	}
 	
 	// 비동기 방식으로 회원 리스트 조회하는 공용 메소드
-	public Map<String, Object> getEmployeeListBySeparatorCodeMethod(String separatorCode, Model model) {
+	public Map<String, Object> getEmployeeListBySeparatorCodeMethod(String separatorCode, Model model, @AuthenticationPrincipal EmployeeDetails user) {
+		Employee employee = user.getEmployee();
+		
 		List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
 		List<Directory> temp = directoryService.selectDirectoryEmployeeAllBySeparatorCode();
 		List<EmployeeDto> searchRemainEmployee = new ArrayList<EmployeeDto>();
@@ -230,10 +238,16 @@ public class DirectoryController {
 			if (t.getEmployee().getEmployeeEmploymentYn().equals("Y")
 					&& targetCodeName != null
 					&& (targetCodeName.equals(dto.getTeam_name()) || targetCodeName.equals(dto.getDepartment_name()))) {
+				String bookmarkYn = directoryBookmarkService.findBookmarkYnByEmployeeNo(employee.getEmployeeNo(), dto.getEmployee_no());
+				dto.setBookmark_yn(bookmarkYn);
+				dto.setStar_mark_html("<i class=\"fas fa-star\"></i>");
 				employeeList.add(dto);
 				searchRemainEmployee.add(new EmployeeDto().toDto(t.getEmployee()));
 			} else if(t.getEmployee().getEmployeeEmploymentYn().equals("Y")
 					&& separatorCode.equals("selectAll")) {
+				String bookmarkYn = directoryBookmarkService.findBookmarkYnByEmployeeNo(employee.getEmployeeNo(), dto.getEmployee_no());
+				dto.setBookmark_yn(bookmarkYn);
+				dto.setStar_mark_html("<i class=\"fas fa-star\"></i>");
 				employeeList.add(dto);
 				searchRemainEmployee.add(new EmployeeDto().toDto(t.getEmployee()));
 				

@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <title>회사 주소록</title>
 <style>
-.avatar img {
+/* .avatar img {
 	max-width: 32px;
 	height: auto;
-}
+} */
 
 td.name p {
 	max-width: 150px;
@@ -165,7 +165,7 @@ td.name p {
 								</div>
 							</div> -->
 							<!-- 부서/팀 필터 -->
-							<div class="col-auto scrollbar overflow-hidden-y flex-grow-1">
+							<div id="problemBtn" class="col-auto scrollbar overflow-hidden-y flex-grow-1" style="display: none;">
 							  <div class="btn-group position-static" role="group">
 							    <!-- 부서 드롭다운 -->
 							    <div class="btn-group position-static text-nowrap">
@@ -202,9 +202,9 @@ td.name p {
 
 							<!-- 부서/팀 추가 버튼 -->
 							<div th:if="${#authentication.authorities.?[authority == 'ROLE_ADMIN'].size() > 0}" class="col-auto">
-								<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDepartmentAndTeamModal">부서/팀 추가</button>
-								<button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteDepartmentAndTeamModal">부서/팀 삭제</button>
 								<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sortOrderModal">부서/팀 정렬</button>
+								<button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addDepartmentAndTeamModal">부서/팀 추가</button>
+								<button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteDepartmentAndTeamModal">부서/팀 삭제</button>
 							</div>
 
 
@@ -218,9 +218,15 @@ td.name p {
 					<!-- 회원 목록 테이블 -->
 					<div class="bg-body-emphasis border-top border-bottom">
 					
-					<div id="employeeListInsert">
+					<div id="employeeListInsert" style="display: none;">
 						<div th:replace="~{directory/employeeListFragment :: employeeListFragment}"></div>
 					</div>	
+					<div id="loadingSpinner" class="text-center py-3">
+                      <div class="spinner-border" role="status">
+                      	<span class="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+                    
 						
 						
 						
@@ -234,7 +240,7 @@ td.name p {
 								</button>
 								<ul class="mb-0 pagination">
 									<li class="active"><button class="page" type="button" data-i="1">1</button></li>
-									<li><button class="page" type="button" data-i="2">2</button></li>
+									<!-- <li><button class="page" type="button" data-i="2">2</button></li> -->
 								</ul>
 								<button class="page-link" data-list-pagination="next">
 									<i class="fas fa-chevron-right"></i>
@@ -395,23 +401,25 @@ td.name p {
 				</div>
 
 				<!-- (이름 클릭시)회원 정보 모달 -->
-				<!-- 프로필 상세 모달 -->
+				<!-- 프로필 카드/상세 모달 -->
 				<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-dialog-centered">
 						<div class="modal-content p-4 position-relative">
 
 							<!-- 닫기 & 별표 버튼 -->
 							<div class="position-absolute top-0 end-0 mt-2 me-2 d-flex gap-2">
-								<a href="#" class="text-warning" title="즐겨찾기"> 
-								<i class="far fa-star"></i>
-								<i class="fas fa-star"></i>
-								</a>
+								<span>
+									<a id="bookmarkATag" href="#" class="text-warning" title="즐겨찾기"> 
+										<!-- <i class="far fa-star"></i>
+										<i class="fas fa-star"></i> -->
+									</a>
+								</span>
 								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
 
 							<!-- 프로필 정보 -->
 							<div class="text-center mb-4">
-								<img src="/assets/img/team/23.webp" alt="프로필" class="rounded-circle mb-2" style="width: 100px; height: 100px;">
+								<img id="profileCardProfileImage" src="/assets/img/team/23.webp" alt="프로필" class="rounded-circle mb-2" style="width: 100px; height: 100px;">
 								<h5 id="modalName" class="fw-bold mb-0 profile-name">강성관</h5>
 								<p class="text-muted small mb-0 profile-dept-team">운영부 (경영지원팀)</p>
 								<input id="modalDept" type="hidden" class="profile-dept">
@@ -451,7 +459,7 @@ td.name p {
 								<a href="#" id="startChatBtn" class="btn btn-outline-primary flex-fill me-2">
 								  <i class="fas fa-paper-plane me-1"></i> 1:1 채팅하기
 								</a>
-								</a> <a href="#" class="btn btn-outline-secondary flex-fill"> <i class="fas fa-envelope me-1"></i> 이메일 보내기
+								<a href="#" id="startEmailBtn" class="btn btn-outline-secondary flex-fill"> <i class="fas fa-envelope me-1"></i> 이메일 보내기
 								</a>
 							</div>
 
@@ -599,11 +607,21 @@ td.name p {
 					    const email = trigger.getAttribute('data-email') || '-';
 					    const position = trigger.getAttribute('data-position') || '-';
 					    const memberDirectoryNo = trigger.getAttribute('data-memberDirectoryNo') || '-';
+					    const profileImageUrl = trigger.getAttribute('data-profileImageUrl') || '-';
+					    const bookmark = trigger.getAttribute('data-bookmark') || '-';
+					    const bookmarkATag = document.getElementById('bookmarkATag');
 					    
+					    // 프로필카드에서
 					    // 1대1 채팅하기
 					    const chatBtn = modal.querySelector('#startChatBtn');
 					    if (chatBtn && targetEmpNo) {
 					      chatBtn.setAttribute('href', `/chat/room/${targetEmpNo}`);
+					    }
+					    // 프로필카드에서
+					    // 메일 보내기
+					    const emailBtn = modal.querySelector('#startEmailBtn');
+					    if (emailBtn && targetEmpNo) {
+					    	emailBtn.setAttribute('href', `/mail/write/${targetEmpNo}`);
 					    }
 					    
 						
@@ -621,7 +639,11 @@ td.name p {
 					        .catch(() => {
 					          modal.querySelector('#memo').value = '';
 					        });
+					    // 북마크 조회
+					    myBookmark(targetEmpNo);
 					    }
+					    
+
 					    
 					    // 모달 안의 요소에 값 넣기
 					    modal.querySelector('.profile-name').textContent = name;
@@ -632,6 +654,7 @@ td.name p {
 					    modal.querySelector('.profile-phone').textContent = phone;
 					    modal.querySelector('.profile-email').textContent = email;
 					    modal.querySelector('.profile-position').textContent = position;
+					    modal.querySelector('#profileCardProfileImage').src = profileImageUrl;
 					    
 					    
 					  });
@@ -679,7 +702,65 @@ td.name p {
 								  console.log('요청 중 오류가 발생했습니다.');
 							  })
 						  });
+					    
+					    
+					    
+					      // 북마크 변경
+						  bookmarkATag.addEventListener('click', function(){
+							  const modalDirectoryNo = document.getElementById('modalDirectoryNo').value;
+							  console.log(modalDirectoryNo);
+							  
+							  fetch('/directoryBookmark/change',{
+								  method: 'POST',
+								  headers: {
+								    'Content-Type': 'application/json',
+								    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+								    'header': document.querySelector('meta[name="_csrf_header"]').content
+								  },
+								  body : JSON.stringify({
+									  directory_no : modalDirectoryNo
+								  })
+							  })
+							  .then(res => res.json())
+							  .then(data => {
+								  console.log(data.res_code);
+								  myBookmark(data.targetEmployeeNo);
+							  })
+							  .catch(err =>{
+								  console.error(err);
+								  console.log('요청 중 오류가 발생했습니다..');
+							  })
+						  });
+					    
+					    
+					    
+					    
+					    
+					    
 					});
+				</script>
+				<script>
+				    // 사원 북마크 조회
+				    const modal = document.getElementById('profileModal');
+				    function myBookmark(targetEmpNo){
+				      fetch(`/directoryBookmark/${targetEmpNo}`)
+				        .then(res => res.json())
+				        .then(data => {
+				        	if(data.bookmark === 'Y'){
+				        		modal.querySelector('#bookmarkATag').innerHTML = `
+						    		<i class="fas fa-star"></i>
+						    	`;
+						    } else{
+						    	modal.querySelector('#bookmarkATag').innerHTML = `
+						    		<i class="far fa-star"></i>
+						    	`;
+						    }
+						    
+				        })
+				        .catch(() => {
+				          // modal.querySelector('#memo').value = '';
+				        });
+				    };
 				</script>
 				
 				<!-- 트리구조 최상위 클릭시 전 사원 조회 -->
@@ -822,14 +903,59 @@ td.name p {
 					    document.getElementById('searchInput').value = '';
 					  };
 					});
+				
+				
+
 
 </script>
 
 <!-- 직원 리스트 불러오기 -->
 <script>
+// 스피너 필요하시면 이 부분 참고하세요
+// 스피너 필요하시면 이 부분 참고하세요
+// 스피너 필요하시면 이 부분 참고하세요
+	function toggleEmployeeTableDisplay(isLoading) {
+		  const employeeTable = document.getElementById('employeeTable');
+		  const problemBtn = document.getElementById('problemBtn');
+		  if (!employeeTable) return;
+	
+		  if (isLoading) {
+		    // 로딩 중일 때
+		    employeeTable.style.display = 'none';
+		    document.getElementById('loadingSpinner').style.display = 'block';
+			  document.getElementById('problemBtn').style.display = 'none';
+			  document.getElementById('employeeListInsert').style.display = 'none';
+		  } else {
+		    // 로딩이 완료되었을 때
+		    employeeTable.style.display = 'block';
+		    document.getElementById('loadingSpinner').style.display = 'none';
+			  document.getElementById('problemBtn').style.display = 'block';
+			  document.getElementById('employeeListInsert').style.display = 'block';
+		  }
+	};
+	
+	
+	document.addEventListener("DOMContentLoaded", function() {
+			
+	        toggleEmployeeTableDisplay(false);
+	    	resetSearchInput();
+	
+	});
+// 스피너 필요하시면 이 부분 참고하세요
+// 스피너 필요하시면 이 부분 참고하세요
+// 스피너 필요하시면 이 부분 참고하세요
+	
+
+
 
 	// 직원 리스트 비동기 호출 함수
 	window.treeSelectEmployee = function (separatorCode) {
+		  // 로딩 중 UI
+		  document.getElementById('loadingSpinner').style.display = 'block';
+		  document.getElementById('employeeListInsert').style.display = 'none';
+	      
+		  
+		  
 	  fetch(`/directory/employeeList?separatorCode=${separatorCode}`)
 	    .then(response => response.text())
 	    .then(html => {
@@ -837,7 +963,8 @@ td.name p {
 			
 	      const targetEl = document.getElementById('employeeTable');
 	      if (!targetEl) return;
-	
+			
+	      // List.js 페이징 초기화
 	      if (targetEl.listjsInstance && typeof targetEl.listjsInstance.destroy === 'function') {
 	        targetEl.listjsInstance.destroy();
 	        delete targetEl.listjsInstance;
@@ -847,7 +974,16 @@ td.name p {
 	      const newList = new List(targetEl, options);
 	      targetEl.listjsInstance = newList;
 	
-	      resetSearchInput();
+	      
+	      
+	      // 3️⃣ 페이징 완료되면 UI 전환
+	      setTimeout(() => {
+	        document.getElementById('loadingSpinner').style.display = 'none';
+	        document.getElementById('employeeListInsert').style.display = 'block';
+		      resetSearchInput();
+	      }, 1); // 0.3초 딜레이 후 전환
+	      
+	      
 	    })
 	    .catch(err => {
 	      console.error('직원 리스트 불러오기 실패:', err);
@@ -1236,10 +1372,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 <!-- 부서, 팀 이름 바꾸기 -->
-<script>
+<!-- <script>
 	const editNameDeptSeparatorCode = deptEl.getAttribute('data-deptSeparatorCode');
 	const editNameTeamSeparatorCode = teamEl.getAttribute('data-teamseparatorcode');
-</script>
+</script> -->
 <!-- 부서, 팀 삭제 -->
 <script th:inline="javascript">
 	let trigger01 = false;

@@ -1,11 +1,21 @@
 package com.eroom.chat.controller;
 
 
+import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -57,10 +67,9 @@ public class ChatController {
 	private final ProfileService profileService;
 	private final DriveService driveService;
 	
-	@GetMapping("/test")
-	public String test123() {
-		return "chat/test";
-	}
+	
+	@Value("${ffupload.location}")
+	private String fileDir;
 	
 	@GetMapping("/list")
 	public String selectChatRoomAll(@RequestParam(name = "department", required = false) String department, Model model) {
@@ -424,6 +433,58 @@ public class ChatController {
 	    @RequestParam("size") int size
 	) {
 	    return driveService.findChatFilesByRoom(chatroomNo, page, size);
+	}
+	// 채팅방 나가기
+	@PostMapping("/leave")
+	@ResponseBody
+	public Map<String, Object> leaveChatroom(@RequestBody Map<String, Object> request) {
+	    // 로그인한 사용자 정보 추출
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
+	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();  // 로그인한 사용자의 employeeNo
+
+	    // 채팅방 번호 가져오기
+	    Long chatroomNo = Long.valueOf(request.get("chatroomNo").toString());
+
+	    // 채팅방 나가기 처리
+	    chatroomService.leaveChatroom(chatroomNo, myEmployeeNo);
+
+	    return Map.of("res_code", "200", "res_msg", "채팅방에서 나갔습니다.");
+	}
+	// 채팅방 파일 다운로드 API
+	@GetMapping("/download/chat")
+	@ResponseBody
+	public ResponseEntity<Resource> downloadFile(@RequestParam Long driveAttachNo) {
+	    try {
+	        // DB에서 파일 정보 가져오기
+	        Drive drive = driveService.findByDriveAttachNo(driveAttachNo); 
+	        if (drive == null) {
+	            return ResponseEntity.notFound().build(); // 파일을 찾을 수 없으면 404 응답
+	        }
+
+	        // 실제 파일 경로
+	        String filePathString = "/files/drive/chat/" + drive.getDriveNewName();
+	        Path filePath = Paths.get(filePathString);
+	        System.out.println("파일 경로: " + filePath.toString());
+
+	        if (!Files.exists(filePath)) {
+	            return ResponseEntity.notFound().build(); // 파일이 존재하지 않으면 404 응답
+	        }
+
+	        // 파일명 한글 깨짐 방지 (UTF-8 인코딩)
+	        String encodedFileName = URLEncoder.encode(drive.getDriveOriName(), "UTF-8").replaceAll("\\+", "%20");
+
+	        // 파일 스트림 준비
+	        Resource resource = new InputStreamResource(Files.newInputStream(filePath));
+
+	        return ResponseEntity.ok()
+	                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+	                             .contentType(MediaType.APPLICATION_OCTET_STREAM) // 파일 종류에 상관없이 모든 파일을 처리
+	                             .body(resource);
+
+	    } catch (Exception e) {
+	        return ResponseEntity.badRequest().build(); // 예외 발생시 400 오류 반환
+	    }
 	}
 
 
