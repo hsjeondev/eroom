@@ -3,10 +3,14 @@ package com.eroom;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
+// @EnableScheduling
 public class EroomApplication implements WebMvcConfigurer {
 
 	@Value("${ffupload.location}")
@@ -24,4 +28,8 @@ public class EroomApplication implements WebMvcConfigurer {
          .addResourceLocations("classpath:/static/");
 	}
 	
+//    @Bean
+//    public RestTemplate restTemplate() {
+//        return new RestTemplate();
+//    }
 }
