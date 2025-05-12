@@ -46,6 +46,7 @@ public class WeatherDto {
     public static class Wind {
         private double speed;         // 바람 속도 (m/s)
         private int deg;              // 바람 방향 (도)
+        private Double gust;  // gust는 필수 값이 아닐 수 있으므로 `Double`로 선언
     }
 
     @Data

@@ -61,7 +61,6 @@ public class ArticleController {
 		System.out.println("attachNo received: " + attachNo);
 		Map<String, Object> result = new HashMap<>();
 	    try {
-	    	System.out.println(attachNo);
 	    	articleService.markAsDeleted(attachNo);  // visibleYn = "N" 처리 등
 	        result.put("res_code", 200);
 	        result.put("res_msg", "파일이 삭제되었습니다.");

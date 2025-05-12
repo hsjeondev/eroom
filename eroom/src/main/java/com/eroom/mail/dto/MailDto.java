@@ -33,6 +33,9 @@ public class MailDto {
 	// 받는 사람 나중에 List로 바꿀 예정
 	//private Employee receiver;
 	
+	// 받는 사람 타입
+	private String receiver_type;
+	
 	private List<Long> receiver_no; // 수신자 no값
 	private List<Long> cc_no;  // 참조자 no값
 	
