@@ -58,27 +58,27 @@
 										</div>
 										<!-- 작성자 -->
 											<br>
-										<p class="fs-9 fw-semibold text-body ms-4 text mb-4 ps-2" th:text="|작성자 : ${list.employee.employeeName}|">
+										<p class="fs-9 fw-semibold text-body ms-4 text mb-4 ps-2 writer" th:text="|작성자 : ${list.employee.employeeName}|">
 											작성자
 										</p>
 									</div>
 									<!-- 결재자, 참조자, 합의자 + 날짜 칸 -->
 									<div class="row g-1 g-sm-3 mt-2 lh-1">
-										<div class="col-12 col-sm-auto flex-1 text-truncate">
+										<div class="col-12 col-sm-auto flex-1 text-truncate text1">
 											<a class="fw-semibold fs-9">
 												결재자 : 
 											</a>
-											<span class="fw-semibold fs-9 text1" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step >= 1}"  th:text="|${member.employee.employeeName} |">결재자목록</span>
+											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step >= 1}"  th:text="|${member.employee.employeeName} |">결재자목록</span>
 											<br>
 											<a class="fw-semibold fs-9">
 												합의자 : 
 											</a>
-											<span class="fw-semibold fs-9 text2" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == 0}"  th:text="|${member.employee.employeeName} |">합의자목록</span>
+											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == 0}"  th:text="|${member.employee.employeeName} |">합의자목록</span>
 											<br>
 											<a class="fw-semibold fs-9">
 												참조자 : 
 											</a>
-											<span class="fw-semibold fs-9 text3" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == -1}"  th:text="|${member.employee.employeeName} |">참조자목록</span>
+											<span class="fw-semibold fs-9" th:each="member : ${approvalLineMap[list.approval_no]}" th:if="${member.approval_line_step == -1}"  th:text="|${member.employee.employeeName} |">참조자목록</span>
 										</div>
 										
 										<!-- 결재양식  -->
