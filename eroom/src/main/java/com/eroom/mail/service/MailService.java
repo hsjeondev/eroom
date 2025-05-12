@@ -57,7 +57,7 @@ public class MailService {
 	private final MailAlarmRepository mailAlarmRepository;
 	
 	private final AlarmRepository alarmRepository;
-	
+	//private final MailStatusMappingRepository mailStatusMappingRepository;
 	private final MailAlarmWebSocketHandler mailAlarmWebSocketHandler;
 	private final MailWebSocketHandler mailWebSocketHandler;
 	@Value("${ffupload.location}")
@@ -362,7 +362,14 @@ public class MailService {
 	        //mailStatusDto.setMail_status_deleted_time(LocalDateTime.now());
 	        MailStatus mailStatusEntity = mailStatusDto.toEntity();
 	        //mailStatusEntity.setMailStatusDeletedTime(LocalDateTime.now());
-	        mailStatusRepository.save(mailStatusEntity);
+	        MailStatus mailStatusSave = mailStatusRepository.save(mailStatusEntity);
+	        
+	        // System.out.println(mailStatusSave.getMailStatusNo());
+	        
+//	        MailStatusMapping mapping = new MailStatusMapping();
+//	        mapping.setMail(Mail.builder().mailNo(mailNo).build());
+//	        mapping.setMailStatus(MailStatus.builder().mailStatusNo(mailStatusSave.getMailStatusNo()).build()); // 저장된 상태의 `mailStatusNo`
+//	        mailStatusMappingRepository.save(mapping);
         }
     }
 	public Map<Long, MailStatus> getStatusMapForMailRecevier(List<MailReceiver> mails) {
@@ -540,6 +547,10 @@ public class MailService {
 			}else {
 				String[] empNoArray = type.split(",");
 			    for (String empNoStr : empNoArray) {
+			    	empNoStr = empNoStr.trim();
+			        if (empNoStr.isEmpty()) {
+			            continue; // 빈 값은 무시
+			        }
 			        try {
 			            Long empNo = Long.parseLong(empNoStr.trim());
 			            receiverNos.add(empNo);
