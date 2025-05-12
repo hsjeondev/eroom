@@ -173,6 +173,9 @@
 											<div class="modal-content">
 												<div class="modal-header">
 													<h5 class="modal-title" id="scrollingLongModalLabel2" th:text="${survey.surveyTitle}">Modal title</h5>
+													<div class="ms-2">
+														<span class="badge bg-secondary text-white me-1" th:if="${survey.allowMultiple}">복수</span> <span class="badge bg-secondary text-white" th:if="${survey.anonymousVote}">익명</span>
+													</div>
 													<button class="btn btn-close p-1" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
 												</div>
 												<div class="modal-body">
