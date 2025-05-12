@@ -48,7 +48,7 @@ public interface MailRepository extends JpaRepository<Mail, Long>{
 	@Query("SELECT m FROM Mail m " +
 		       "WHERE m.sender.employeeNo = :employeeNo " +
 		       "AND m.mailVisibleYn = 'Y' " +
-		       "AND m.mailNo NOT IN (SELECT d.mail.mailNo FROM MailDraft d) " +
+		       "AND m.mailNo NOT IN (SELECT d.mail.mailNo FROM MailDraft d WHERE d.mailDraftVisibleYn = 'Y') " +
 		       "AND m.mailNo NOT IN (SELECT s.mail.mailNo FROM MailStatus s WHERE s.employee.employeeNo = :employeeNo AND s.mailStatusDeletedYn = 'Y') " +
 		       "ORDER BY m.mailSentTime DESC")
 		List<Mail> findSentMailsLatest(@Param("employeeNo") Long employeeNo);
@@ -56,7 +56,7 @@ public interface MailRepository extends JpaRepository<Mail, Long>{
 	@Query("SELECT m FROM Mail m " +
 		       "WHERE m.sender.employeeNo = :employeeNo " +
 		       "AND m.mailVisibleYn = 'Y' " +
-		       "AND m.mailNo NOT IN (SELECT d.mail.mailNo FROM MailDraft d) " +
+		       "AND m.mailNo NOT IN (SELECT d.mail.mailNo FROM MailDraft d WHERE d.mailDraftVisibleYn = 'Y') " +
 		       "AND m.mailNo NOT IN (SELECT s.mail.mailNo FROM MailStatus s WHERE s.employee.employeeNo = :employeeNo AND s.mailStatusDeletedYn = 'Y') " +
 		       "ORDER BY m.mailSentTime ASC")
 		List<Mail> findSentMailsOldest(@Param("employeeNo") Long employeeNo);
@@ -76,7 +76,7 @@ public interface MailRepository extends JpaRepository<Mail, Long>{
 	@Query("SELECT m FROM Mail m " +
 		       "WHERE m.sender.employeeNo = :employeeNo " +
 		       "AND m.mailVisibleYn = 'Y' " +
-		       "AND m.mailNo IN (SELECT d.mail.mailNo FROM MailDraft d) " +  // 임시 저장된 메일
+		       "AND m.mailNo IN (SELECT d.mail.mailNo FROM MailDraft d WHERE d.mailDraftVisibleYn = 'Y') " +  // 임시 저장된 메일
 		       "AND m.mailNo NOT IN (" +
 		       "   SELECT s.mail.mailNo FROM MailStatus s " +
 		       "   WHERE s.employee.employeeNo = :employeeNo " +
@@ -88,7 +88,7 @@ public interface MailRepository extends JpaRepository<Mail, Long>{
 		@Query("SELECT m FROM Mail m " +
 		       "WHERE m.sender.employeeNo = :employeeNo " +
 		       "AND m.mailVisibleYn = 'Y' " +
-		       "AND m.mailNo IN (SELECT d.mail.mailNo FROM MailDraft d) " +  // 임시 저장된 메일
+		       "AND m.mailNo IN (SELECT d.mail.mailNo FROM MailDraft d WHERE d.mailDraftVisibleYn = 'Y') " +  // 임시 저장된 메일
 		       "AND m.mailNo NOT IN (" +
 		       "   SELECT s.mail.mailNo FROM MailStatus s " +
 		       "   WHERE s.employee.employeeNo = :employeeNo " +
