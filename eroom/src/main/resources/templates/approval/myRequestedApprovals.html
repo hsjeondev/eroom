@@ -13,7 +13,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			<i class="uil uil-file-check text-secondary me-2"></i><span class="fw-bold fs-7">작성 문서</span>
 		</div>
 			<div class="pb-8">
-				<div id="reports" data-list='{
+				<div id="reports" style="display: none;" data-list='{
 										       "valueNames": ["writer", "text1", "text2", "text3", "title", "state", "date", "reports"],
 										       "page": 10,
 										       "pagination": true
@@ -60,7 +60,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 											<div class="modal-content border border-translucent">
 												<form id="addEventForm" autocomplete="off">
 													<div class="modal-header justify-content-between border-translucent p-4">
-														<h5 class="modal-title text-body-highlight fs-6 lh-sm">Filter</h5>
+														<h5 class="modal-title text-body-highlight fs-6 lh-sm">필터/정렬</h5>
 														<button class="btn p-1 text-danger" type="button" data-bs-dismiss="modal" aria-label="Close"><svg class="svg-inline--fa fa-xmark fs-9" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"></path></svg><!-- <span class="fas fa-times fs-9"> 				</span> Font Awesome fontawesome.com --></button>
 													</div>
 													<div class="modal-body pt-4 pb-2 px-4">
@@ -86,12 +86,31 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 															<label class="fw-bold mb-2 text-body-highlight" for="approvalStatus">진행여부</label>
 															<select class="form-select" id="approvalStatus">
 																<option th:value="0">전체 보기</option>
-																<option th:value="A">승인</option>
-																<option th:value="S">진행</option>
-																<option th:value="D">반려</option>
-																<option th:value="F">회수</option>
+																<option th:value="A">🟢 승인</option>
+																<option th:value="S">🔵 진행</option>
+																<option th:value="D">🔴 반려</option>
+																<option th:value="F">🟠 회수</option>
 															</select>
 														</div>
+														
+														
+													  <!-- <div class="mb-3">
+									                      <div class="dropdown">
+									
+															<label class="fw-bold mb-2 text-body-highlight" for="dropdownMenuButton">진행여부</label>
+									                        <button style="width: 100%; border: solid 1px; border-radius: 1ex;" class="btn bg-white bt- dropdown-toggle" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown button</button><span class="caret"> </span>
+									                        <div class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="dropdownMenuButton" style="width: 100%">
+									                          <div class="dropdown-divider"></div>
+									                          <a class="dropdown-item">승인</a>
+									                          <a class="dropdown-item">진행</a>
+									                          <a class="dropdown-item">반려</a>
+									                          <a class="dropdown-item">회수</a>
+									                          <div class="dropdown-divider"></div>
+									
+									                        </div>
+									                      </div>
+								                      </div> -->
+								                    
 													</div>
 												<div class="modal-footer d-flex justify-content-end align-items-center px-4 pb-4 border-0 pt-3">
 												  <button id="filterBtn" class="btn btn-sm btn-primary px-9 fs-10 my-0" type="button">확인</button>
@@ -108,7 +127,9 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					</div><!-- row g-3 justify-content-between mb-2 끝 -->
 					
 					<!-- 카드 전체 -->
-					<div class="row g-3 list" id="reportsList">
+					
+					
+					<div class="row g-3 list" id="reportsList" >
 					  <!-- 비어있을 경우에도 .list-item 하나는 있어야 함 -->
 					  <div th:if="${#lists.isEmpty(resultList)}" class="list-item">
 					  
@@ -135,12 +156,21 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				<div class="row align-items-center justify-content-center py-2 pe-0 fs-9 mt-2">
 					<div class="col-auto d-flex">
 						<button class="page-link disabled" data-list-pagination="prev" disabled=""><svg class="svg-inline--fa fa-chevron-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"></path></svg><!-- <span class="fas fa-chevron-left"></span> Font Awesome fontawesome.com --></button>
-							<ul class="mb-0 pagination"><li class="active"><button class="page" type="button" data-i="1" data-page="10">1</button></li><li><button class="page" type="button" data-i="2" data-page="10">2</button></li></ul>
+							<ul class="mb-0 pagination">
+								<li class="active">
+									<button class="page" type="button" data-i="1" data-page="10">1</button>
+								</li>
+							</ul>
 						<button class="page-link pe-0" data-list-pagination="next"><svg class="svg-inline--fa fa-chevron-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"></path></svg><!-- <span class="fas fa-chevron-right"></span> Font Awesome fontawesome.com --></button>
 					</div>
 				  </div>
 				
 				</div> <!-- reports 끝 -->
+				<div id="loadingSpinner" class="text-center py-3"  style="display: block;">
+				   <div class="spinner-border" role="status">
+				  	<span class="visually-hidden">Loading...</span>
+				  </div>
+				</div>
 			
 			</div><!-- pb-8 끝 -->
 			
@@ -168,6 +198,13 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	<!-- Thymeleaf에서 base64 데이터 바인딩 -->
 	<input type="hidden" id="signatureImage" th:value="${approvalSignature}" />
 
+
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+	   document.getElementById('loadingSpinner').style.display = 'none';
+	   document.getElementById('reports').style.display = 'block';
+	});
+</script>
 
 
 	<!-- 시그니처 모달 작동 스크립트 -->
@@ -343,43 +380,78 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	</script>
 
     <!-- 필터 모달 값 비동기로 적용하기 -->
-    <script>
-    document.getElementById("filterBtn").addEventListener("click", function () {
-    	  const formatNo = document.getElementById("formatNo").value;
-    	  const status = document.getElementById("approvalStatus").value;
-    	  const dateSort = document.getElementById("dateSort").value;
+<script>
+document.getElementById("filterBtn").addEventListener("click", function () {
+  const formatNo = document.getElementById("formatNo").value;
+  const status = document.getElementById("approvalStatus").value;
+  const dateSort = document.getElementById("dateSort").value;
 
-    	  const query = new URLSearchParams();
-    	  if (formatNo) query.append("formatNo", formatNo);
-    	  if (status) query.append("approvalStatus", status);
-    	  if (dateSort) query.append("dateSort", dateSort);
+  const query = new URLSearchParams();
+  if (formatNo) query.append("formatNo", formatNo);
+  if (status) query.append("approvalStatus", status);
+  if (dateSort) query.append("dateSort", dateSort);
 
-    	  fetch("/approval/myRequestedApprovals/fragment?" + query.toString())
-    	    .then(response => {
-    	      if (!response.ok) throw new Error("서버 오류 발생");
-    	      return response.text();
-    	    })
-    	    .then(html => {
-    	      document.getElementById("reportsList").innerHTML = html;
-        	  // 모달 닫기
-    	      const filterModal = bootstrap.Modal.getInstance(document.getElementById('reportsFilterModal'));
-    	      if (filterModal) {
-    	        filterModal.hide();
-    	      }
-    	      // 검색창 초기화
-    	      const searchInput = document.querySelector('.search-input');
-    	      if (searchInput) {
-    	        searchInput.value = '';
-    	      }
-				
-    	      bindSearch()
-    	    })
-    	    .catch(error => {
-    	      alert("필터링 실패: " + error.message);
-    	    });
-    	});
+  fetch("/approval/myRequestedApprovals/fragment?" + query.toString())
+    .then(response => {
+      if (!response.ok) throw new Error("서버 오류 발생");
+      return response.text();
+    })
+    .then(html => {
+      document.getElementById("reportsList").innerHTML = html;
 
-	</script>
+      requestAnimationFrame(() => {
+        const hasItems = document.querySelector('#reportsList .col-12');
+        if (!hasItems) {
+          document.getElementById("reportsList").innerHTML =
+            `<div class="text-center text-muted py-5">검색 결과가 없습니다.</div>`;
+          closeFilterModal();
+          resetSearchInput();
+          bindSearch();
+          return;
+        }
+
+        // 기존 리스트 제거 (destroy가 더 안전)
+        if (window.reportsListObj && typeof window.reportsListObj.destroy === 'function') {
+          window.reportsListObj.destroy();
+        }
+        window.reportsListObj = null;
+
+        // 리스트 새로 초기화
+        try {
+          const options = {
+            valueNames: ['title', 'text', 'date', 'reports', 'state'],
+            page: 6,
+            pagination: true
+          };
+          window.reportsListObj = new List('reports', options);
+        } catch (e) {
+          console.error("List.js 초기화 실패", e);
+          alert("리스트 초기화 중 오류 발생");
+          return;
+        }
+
+        closeFilterModal();
+        resetSearchInput();
+        bindSearch();
+      });
+    })
+    .catch(error => {
+      console.error("필터링 중 예외:", error);
+      alert("필터링 실패: " + error.message);
+      closeFilterModal();
+    });
+
+  function closeFilterModal() {
+    const filterModal = bootstrap.Modal.getInstance(document.getElementById('reportsFilterModal'));
+    if (filterModal) filterModal.hide();
+  }
+
+  function resetSearchInput() {
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) searchInput.value = '';
+  }
+});
+</script>
 	    
 		
 		
