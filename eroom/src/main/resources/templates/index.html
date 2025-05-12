@@ -6,15 +6,48 @@
 <head>
   <meta charset="UTF-8">
   <title>Home</title>
-  <style>
-    .attendance-card {
-      max-width: 380px;
-      margin: 0 auto;
-    }
-    .attendance-card .card-body {
-      padding: 1.5rem;
-    }
-    .current-time {
+<style>
+  .custom-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 12px;
+    height: 83vh;
+    box-sizing: border-box;
+  }
+
+  .custom-grid > div {
+    display: flex;
+  }
+
+  .attendance-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .card-body {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* 오늘 일정: 2행 병합 */
+  .card-tall {
+    grid-column: 3;
+    grid-row: span 2;
+  }
+  
+  .current-time {
       font-size: 0.9rem;
       color: #6c757d;
       text-align: center;
@@ -32,28 +65,8 @@
     .btn-wrap .btn {
       min-width: 120px;
     }
-
-    /* ▶ Grid 레이아웃 정의 */
-    .custom-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-auto-rows: 239.81px;
-    }
-    .span-two-rows {
-      grid-row: span 2; /* 세로로 2칸 합치기 */
-    }
-	
-	.fixed-card {
-	     width: 311.33px;
-	     height: 207.81px;
-	     background: #fff; /* 필요에 따라 배경색 지정 */
-	     border-radius: .25rem;
-	     box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
-	   }
-	
-
-
-	/* 스크롤 커스터마이징 선택사항 */
+    
+    /* 스크롤 커스터마이징 선택사항 */
 	.fc-scroller {
 	    max-height: 330px !important;
 	    overflow-y: auto !important;
@@ -183,8 +196,10 @@
   background-color: #6c757d; /* secondary 진한 색 */  
 }
 /* 결재 관련 스타일 태그 */
-	
-  </style>
+    
+    
+</style>
+
 </head>
 <body>
 <main class="main" id="top">
@@ -205,7 +220,7 @@
                   <div id="currentTime" class="current-time fw-semibold mb-2"></div>
                   <div class="d-flex justify-content-center mb-3">
                     <img id="profileImage" class="rounded-circle me-3 profile-img"
-                         src="" alt="프로필" style="display: none;">
+                         src="" alt="프로필" style="display: none; height: 50px; width:50px">
                     <div class="text-start">
                       <p class="fw-semibold fs-8 mb-0" th:text="${employee.employeeName}">이름</p>
                       <small th:if="${employee.structure != null}"
@@ -237,145 +252,135 @@
           </div>
         </div>
 
-        <!-- 1행·2열 결재 -->
+                <!-- 1행·2열 결재 -->
         <div class="text-white p-1">
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
-					<div class="card-body text-center p-4" style="height: 207.81px;">
+					<div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
+			          결재
+			        </div>
+						<!-- Tab 메뉴 -->
+						<div class="d-flex justify-content-between align-items-center mb-2">
+						  <div class="fw-bold text-dark" style="font-size: 0.9rem;"></div>
+						  <ul class="nav nav-underline fs-9" id="resTab" role="tablist" style="margin-bottom: 0;">
+						    <li class="nav-item" role="presentation">
+						      <a class="nav-link active" id="approvalPending-tab" data-bs-toggle="tab" href="#approvalPendingTab"
+						         role="tab" aria-controls="approvalPendingTab" aria-selected="true">내게 온 결재</a>
+						    </li>
+						    <li class="nav-item" role="presentation">
+						      <a class="nav-link" id="approvalOngoing-tab" data-bs-toggle="tab" href="#approvalOngoingTab"
+						         role="tab" aria-controls="approvalOngoingTab" aria-selected="false">진행 중 결재</a>
+						    </li>
+						    <li class="nav-item" role="presentation">
+						      <a class="nav-link" id="approvalCompleted-tab" data-bs-toggle="tab" href="#approvalCompletedTab"
+						         role="tab" aria-controls="approvalCompletedTab" aria-selected="false">완료된 결재</a>
+						    </li>
+						  </ul>
+						</div>
 						
-
-	
-
-<!-- Tab 메뉴 -->
-<div class="d-flex justify-content-between align-items-center mb-2">
-  <div class="fw-bold text-dark" style="font-size: 0.9rem;">결재</div>
-  <ul class="nav nav-underline fs-9" id="resTab" role="tablist" style="margin-bottom: 0;">
-    <li class="nav-item" role="presentation">
-      <a class="nav-link active" id="approvalPending-tab" data-bs-toggle="tab" href="#approvalPendingTab"
-         role="tab" aria-controls="approvalPendingTab" aria-selected="true">내게 온 결재</a>
-    </li>
-    <li class="nav-item" role="presentation">
-      <a class="nav-link" id="approvalOngoing-tab" data-bs-toggle="tab" href="#approvalOngoingTab"
-         role="tab" aria-controls="approvalOngoingTab" aria-selected="false">진행 중 결재</a>
-    </li>
-    <li class="nav-item" role="presentation">
-      <a class="nav-link" id="approvalCompleted-tab" data-bs-toggle="tab" href="#approvalCompletedTab"
-         role="tab" aria-controls="approvalCompletedTab" aria-selected="false">완료된 결재</a>
-    </li>
-  </ul>
-</div>
-
-<!-- 탭 내용 -->
-<div class="tab-content">
-
-  <!-- 승인/반려 대기 -->
-  <div class="tab-pane fade show active" id="approvalPendingTab">
-    <div class="carousel slide" id="approvalPendingCarousel">
-
-      <!-- ✅ 인디케이터 -->
-      <div class="carousel-indicators" id="pendingCarouselIndicators">
-        <!-- JavaScript에서 동적 로딩 -->
-      </div>
-
-      <!-- ✅ 슬라이드 항목 -->
-      <div class="carousel-inner px-4 text-center" id="pendingCarouselInner">
-        <!-- JavaScript에서 동적 로딩 -->
-      </div>
-
-      <!-- ✅ 이전/다음 버튼 -->
-      <button class="position-absolute border-0 bg-transparent text-secondary"
-        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="prev"
-        style="top: 65%; left: -10px; transform: translateY(-50%); z-index: 2;">
-        <i class="fas fa-chevron-left fs-7"></i>
-      </button>
-      <button class="position-absolute border-0 bg-transparent text-secondary"
-              type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="next"
-              style="top: 65%; right: -10px; transform: translateY(-50%); z-index: 2;">
-        <i class="fas fa-chevron-right fs-7"></i>
-      </button>
-
-    </div>
-  </div>
-
-  <!-- 진행 중 결재 -->
-  <div class="tab-pane fade" id="approvalOngoingTab">
-    <div class="carousel slide" id="approvalOngoingCarousel">
-
-      <!-- ✅ 인디케이터 -->
-      <div class="carousel-indicators" id="ongoingCarouselIndicators">
-        <!-- JavaScript에서 동적 로딩 -->
-      </div>
-
-      <!-- ✅ 슬라이드 항목 -->
-      <div class="carousel-inner px-4 text-center" id="ongoingCarouselInner">
-        <!-- JavaScript에서 동적 로딩 -->
-      </div>
-
-      <!-- ✅ 이전/다음 버튼 -->
-      <button class="position-absolute border-0 bg-transparent text-secondary"
-        type="button" data-bs-target="#approvalOngoingCarousel" data-bs-slide="prev"
-        style="top: 65%; left: -10px; transform: translateY(-50%); z-index: 2;">
-        <i class="fas fa-chevron-left fs-7"></i>
-      </button>
-      <button class="position-absolute border-0 bg-transparent text-secondary"
-              type="button" data-bs-target="#approvalOngoingCarousel" data-bs-slide="next"
-              style="top: 65%; right: -10px; transform: translateY(-50%); z-index: 2;">
-        <i class="fas fa-chevron-right fs-7"></i>
-      </button>
-
-    </div>
-  </div>
-
-
-  <!-- 승인된 결재 -->
-  <div class="tab-pane fade" id="approvalCompletedTab">
-    <div class="carousel slide" id="approvalCompletedCarousel">
-
-      <!-- ✅ 인디케이터 -->
-      <div class="carousel-indicators" id="completedCarouselIndicators">
-        <!-- JavaScript에서 동적 로딩 -->
-      </div>
-
-      <!-- ✅ 슬라이드 항목 -->
-      <div class="carousel-inner px-4 text-center" id="completedCarouselInner">
-        <!-- JavaScript에서 동적 로딩 -->
-      </div>
-
-      <!-- ✅ 이전/다음 버튼 -->
-      <button class="position-absolute border-0 bg-transparent text-secondary"
-        type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide="prev"
-        style="top: 65%; left: -10px; transform: translateY(-50%); z-index: 2;">
-        <i class="fas fa-chevron-left fs-7"></i>
-      </button>
-      <button class="position-absolute border-0 bg-transparent text-secondary"
-              type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide="next"
-              style="top: 65%; right: -10px; transform: translateY(-50%); z-index: 2;">
-        <i class="fas fa-chevron-right fs-7"></i>
-      </button>
-
-    </div>
-  </div>
-
-</div>
-
-				        
-				        
-				        
-				        
-					</div>
+						<!-- 탭 내용 -->
+						<div class="tab-content">
+						
+						  <!-- 승인/반려 대기 -->
+						  <div class="tab-pane fade show active" id="approvalPendingTab">
+						    <div class="carousel slide" id="approvalPendingCarousel">
+						
+						      <!-- ✅ 인디케이터 -->
+						      <div class="carousel-indicators" id="pendingCarouselIndicators">
+						        <!-- JavaScript에서 동적 로딩 -->
+						      </div>
+						
+						      <!-- ✅ 슬라이드 항목 -->
+						      <div class="carousel-inner px-4 text-center" id="pendingCarouselInner">
+						        <!-- JavaScript에서 동적 로딩 -->
+						      </div>
+						
+						      <!-- ✅ 이전/다음 버튼 -->
+						      <button class="position-absolute border-0 bg-transparent text-secondary"
+						        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="prev"
+						        style="top: 65%; left: -10px; transform: translateY(-50%); z-index: 2;">
+						        <i class="fas fa-chevron-left fs-7"></i>
+						      </button>
+						      <button class="position-absolute border-0 bg-transparent text-secondary"
+						              type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="next"
+						              style="top: 65%; right: -10px; transform: translateY(-50%); z-index: 2;">
+						        <i class="fas fa-chevron-right fs-7"></i>
+						      </button>
+						
+						    </div>
+						  </div>
+						
+						  <!-- 진행 중 결재 -->
+						  <div class="tab-pane fade" id="approvalOngoingTab">
+						    <div class="carousel slide" id="approvalOngoingCarousel">
+						
+						      <!-- ✅ 인디케이터 -->
+						      <div class="carousel-indicators" id="ongoingCarouselIndicators">
+						        <!-- JavaScript에서 동적 로딩 -->
+						      </div>
+						
+						      <!-- ✅ 슬라이드 항목 -->
+						      <div class="carousel-inner px-4 text-center" id="ongoingCarouselInner">
+						        <!-- JavaScript에서 동적 로딩 -->
+						      </div>
+						
+						      <!-- ✅ 이전/다음 버튼 -->
+						      <button class="position-absolute border-0 bg-transparent text-secondary"
+						        type="button" data-bs-target="#approvalOngoingCarousel" data-bs-slide="prev"
+						        style="top: 65%; left: -10px; transform: translateY(-50%); z-index: 2;">
+						        <i class="fas fa-chevron-left fs-7"></i>
+						      </button>
+						      <button class="position-absolute border-0 bg-transparent text-secondary"
+						              type="button" data-bs-target="#approvalOngoingCarousel" data-bs-slide="next"
+						              style="top: 65%; right: -10px; transform: translateY(-50%); z-index: 2;">
+						        <i class="fas fa-chevron-right fs-7"></i>
+						      </button>
+						
+						    </div>
+						  </div>
+						
+						
+						  <!-- 승인된 결재 -->
+						  <div class="tab-pane fade" id="approvalCompletedTab">
+						    <div class="carousel slide" id="approvalCompletedCarousel">
+						
+						      <!-- ✅ 인디케이터 -->
+						      <div class="carousel-indicators" id="completedCarouselIndicators">
+						        <!-- JavaScript에서 동적 로딩 -->
+						      </div>
+						
+						      <!-- ✅ 슬라이드 항목 -->
+						      <div class="carousel-inner px-4 text-center" id="completedCarouselInner">
+						        <!-- JavaScript에서 동적 로딩 -->
+						      </div>
+						
+						      <!-- ✅ 이전/다음 버튼 -->
+						      <button class="position-absolute border-0 bg-transparent text-secondary"
+						        type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide="prev"
+						        style="top: 65%; left: -10px; transform: translateY(-50%); z-index: 2;">
+						        <i class="fas fa-chevron-left fs-7"></i>
+						      </button>
+						      <button class="position-absolute border-0 bg-transparent text-secondary"
+						              type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide="next"
+						              style="top: 65%; right: -10px; transform: translateY(-50%); z-index: 2;">
+						        <i class="fas fa-chevron-right fs-7"></i>
+						      </button>
+						    </div>
+						  </div>
+						</div>
 				</div>
 			</div>
         </div>
 
         <!-- 1~2행·3열 (위 두 칸 합침) -->
-					<div class="text-white p-1 span-two-rows">
+					<div class="text-white p-1 card-tall">
 						<div class="attendance-card mx-auto">
 							<div class="card shadow-sm border-0" style="height: 447.62px;">
+							<div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
+						          오늘 일정
+						        </div>
 								<div class="card-body p-2 d-flex flex-column h-100"
 									style="overflow: hidden;">
-									<br>
-									<!-- 여기 overflow: hidden 추가 -->
-									<h3 class="fw-bold text-dark mb-2 text-start"  >오늘 일정</h3>
 									<div class="text-end mb-3" style="margin-top: 0.25rem;">
 										<a href="/calendar/all"
 											class="text-decoration-none text-primary"
@@ -393,8 +398,9 @@
 		<div class="text-white p-1">
 		  <div class="attendance-card mx-auto">
 		    <div class="card shadow-sm border-0">
-		      <div id="projectSummary" class="card-body text-start p-4" style="height: 207.81px;">
-		      </div>
+		      <div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
+			          프로젝트
+			        </div>
 		    </div>
 		  </div>
 		</div>
@@ -404,11 +410,13 @@
 		  <div class="text-white p-1">
 		  <div class="attendance-card mx-auto">
 		    <div class="card shadow-sm border-0">
-		      <div class="card-body p-4" style="height: 207.81px;">
+		      <div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
+			     예약
+			  </div>
 		
 		        <!-- 제목(왼쪽) + 탭버튼(오른쪽) -->
 		        <div class="d-flex justify-content-between align-items-center mb-2">
-		          <div class="fw-bold text-dark" style="font-size: 0.9rem;">오늘 예약 현황</div>
+		          <div class="fw-bold text-dark" style="font-size: 0.9rem;"></div>
 		          <ul class="nav nav-underline fs-9" id="resTab" role="tablist" style="margin-bottom: 0;">
 		            <li class="nav-item" role="presentation">
 		              <a class="nav-link active" id="vehicle-tab" data-bs-toggle="tab" href="#tab-vehicle"
@@ -474,8 +482,6 @@
 		            </table>
 		          </div>
 		        </div>
-		
-		      </div>
 		    </div>
 		  </div>
 		</div>
@@ -489,74 +495,32 @@
         <div class="text-dark p-1">
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
-					<div class="card-body text-center p-4" style="height: 207.81px;">
-						메일<br>(읽지 않은 메일 / 개수)
-					</div>
+					<div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
+			          메일
+			        </div>
 				</div>
 			</div>
         </div>
 
         <!-- 3행·2열 -->
-        <!-- <div class="text-white p-1">
+        <div class="text-white p-1">
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
-					<div class="card-body text-center p-4" style="height: 207.81px;">
-						날씨<br>(오늘)
-					</div>
+					<div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
+			          날씨
+			        </div>
 				</div>
 			</div>
-        </div> -->
+        </div>
+
+        <!-- 3행·3열 -->
         <div class="text-white p-1">
-		  <div class="attendance-card mx-auto">
-		    <div class="attendance-card mx-auto">
-		      <div class="card shadow-sm border-0">
-		        <div class="card-body" style="text-align: center;">
-		          <!-- 도시명과 셀렉트 박스를 같은 줄에 배치 -->
-		          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-		            <h3 id="city-name" class="card-header" style="font-size: 1.5rem; font-weight: bold; color: black; margin: -10px 0 1rem 0;">도시명</h3>
-		            <select id="city-selector" style="padding: 5px 10px; background-color: white; color: black; border: 2px solid #00bfff; border-radius: 12px; font-size: 0.9rem; width: 120px; margin-left: 10px; appearance: none; cursor: pointer; transition: all 0.3s ease-in-out; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-		              <option value="current">현재 위치</option>
-		              <option value="Seoul">서울</option>
-		              <option value="Busan">부산</option>
-		              <option value="Incheon">인천</option>
-		              <option value="Daegu">대구</option>
-		              <option value="Daejeon">대전</option>
-		              <option value="Gwangju">광주</option>
-		              <option value="Suwon">수원</option>
-		              <option value="Changwon">창원</option>
-		              <option value="Gimhae">김해</option>
-		              <option value="Jeonju">전주</option>
-		              <option value="Cheongju">청주</option>
-		              <option value="Jeju">제주</option>
-		            </select>
-		          </div>
-		          <div class="card-content" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; height: 100%;">
-		            <div class="weather-info" style="display: flex; flex-direction: column; align-items: flex-start;">
-		              <p id="temperature" style="margin: 5px 0; color: black;">기온: --℃</p>
-		              <p id="description" style="margin: 5px 0; color: black;">날씨: --</p>
-		              <p id="humidity" style="margin: 5px 0; color: black;">습도: --%</p>
-		              <p id="wind" style="margin: 5px 0; color: black;">바람: -- m/s</p>
-		            </div>
-		            <img id="weather-icon" src="" alt="날씨 아이콘" style="width: 100px; height: 100px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer;" 
-   						 onmouseover="this.style.transform = 'scale(1.1)'; this.style.boxShadow = '0 6px 15px rgba(0, 0, 0, 0.2)';" onmouseout="this.style.transform = 'scale(1)'; this.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';" />
-		          </div>
-		        </div>
-		      </div>
-		    </div>
-		  </div>
-		</div>
-
-
-        <!-- 3행·3열 뉴스 카드 -->
-		<div class="text-white p-1">
-		  <div class="attendance-card mx-auto">
-		    <div class="card shadow-sm border-0">
-		      <!-- 오늘의 IT 뉴스 제목 -->
-		      <div class="card-header" style="text-align: center; font-size: 1.5rem; font-weight: bold; padding: 15px;">
-		        오늘의 IT 뉴스
-		      </div>
-		      
-		      <a id="newsLink" href="#" target="_blank">
+			<div class="attendance-card mx-auto">
+				<div class="card shadow-sm border-0">
+					<div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
+			          오늘자 IT 뉴스
+			        </div>
+			        <a id="newsLink" href="#" target="_blank">
 		        <div class="card-body p-4" style="display: flex; align-items: center; height: 207.81px;">
 		          <!-- 왼쪽: 이미지 -->
 		          <img id="newsImage" class="card-img-left" alt="News Image" style="width: 120px; height: 100px; object-fit: cover; margin-right: 15px; border-radius: 8px;">
@@ -568,12 +532,13 @@
 		          </div>
 		        </div>
 		      </a>
-		    </div>
-		  </div>
-		</div>
+				</div>
+			</div>
+        </div>
 
       </div>
     </div>
+
     <script>
     //캘린더
    document.addEventListener('DOMContentLoaded', function () {
@@ -839,144 +804,7 @@
     console.error("프로젝트 요약 불러오기 실패:", err);
   });
 </script>
-        <script>
-        // OpenWeatherMap API에서 지원하는 주요 한국 도시들을 한국어로 변환하는 함수
-        function mapCityName(cityName) {
-            const cityMap = {
-                "Seoul": "서울",
-                "Busan": "부산",
-                "Incheon": "인천",
-                "Daegu": "대구",
-                "Daejeon": "대전",
-                "Gwangju": "광주",
-                "Suwon": "수원",
-                "Changwon": "창원",
-                "Gimhae": "김해",
-                "Jeonju": "전주",
-                "Cheongju": "청주",
-                "Jeju": "제주"
-            };
-            return cityMap[cityName] || cityName;
-        }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    getWeatherByCoords(lat, lon);  // 현재 위치 기준으로 호출
-                }, function (error) {
-                    console.warn("위치 정보를 가져올 수 없습니다. 서울로 대체합니다.");
-                    getWeatherByCity("Seoul"); // 위치 실패 시 fallback
-                });
-            } else {
-                console.warn("Geolocation을 지원하지 않습니다. 서울로 대체합니다.");
-                getWeatherByCity("Seoul");
-            }
-        });
-
-        // 날씨 데이터를 화면에 표시하는 함수
-        function displayWeatherData(data, cityName) {
-            document.getElementById("city-name").textContent = cityName;  // 변환된 도시명
-            document.getElementById("temperature").textContent = `기온: ${data.main.temp}℃`;
-            document.getElementById("description").textContent = `날씨: ${data.weather[0].description}`;
-            document.getElementById("humidity").textContent = `습도: ${data.main.humidity}%`;
-            document.getElementById("wind").textContent = `바람: ${data.wind.speed} m/s`;
-
-            const iconCode = data.weather[0].icon;
-            document.getElementById("weather-icon").src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-        }
-
-        // 드롭다운에서 선택된 도시의 날씨 정보 가져오기
-        document.getElementById("city-selector").addEventListener("change", function () {
-            const city = this.value;
-            if (city === "current") {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    getWeatherByCoords(lat, lon);  // 현재 위치 날씨
-                });
-            } else {
-                getWeatherByCity(city);  // 선택된 도시의 날씨
-            }
-        });
-
-        // GPS로 현재 위치의 날씨 정보를 가져오는 함수
-        function getWeatherByCoords(lat, lon) {
-            fetch(`/api/weather/coord?lat=${lat}&lon=${lon}&lang=kr`)  // lang=kr 추가
-                .then(response => response.json())
-                .then(data => {
-                    const cityName = mapCityName(data.name);  // 로마자 도시명 -> 한글로 변환
-                    displayWeatherData(data, cityName);  // 변환된 도시명 전달
-                })
-                .catch(err => {
-                    console.error("날씨 정보 불러오기 실패:", err);
-                });
-        }
-
-        // 도시명에 맞는 날씨 데이터를 가져오는 함수
-        function getWeatherByCity(city) {
-            fetch(`/api/weather?city=${city}&lang=kr`)  // lang=kr 추가
-                .then(response => response.json())
-                .then(data => {
-                    const cityName = mapCityName(data.name);  // 로마자 도시명 -> 한글로 변환
-                    displayWeatherData(data, cityName);  // 변환된 도시명 전달
-                })
-                .catch(err => {
-                    console.error("날씨 정보 불러오기 실패:", err);
-                });
-        }
-    </script>
-   <script>
-   let currentPage = 1;  // 현재 페이지를 추적
-   const totalNews = 10; // 전체 뉴스 개수 (예시로 10개 뉴스 항목 사용)
-	
-   function loadNews() {
-    fetch('/api/news?query=IT&language=ko&page=' + currentPage + '&size=1')
-        .then(response => response.json())
-        .then(data => {
-            const article = data.articles[0];
-
-            const newsTitle = document.getElementById('newsTitle');
-            const newsDescription = document.getElementById('newsDescription');
-            const newsImage = document.getElementById('newsImage');
-            const newsLink = document.getElementById('newsLink');
-
-            newsTitle.innerHTML = article.title || '뉴스 제목';
-            newsDescription.innerHTML = article.description || '뉴스의 간략한 설명을 여기에 작성합니다.';
-            newsImage.src = article.urlToImage || 'https://via.placeholder.com/150';
-            newsLink.href = article.url || '#';
-
-            currentPage = (currentPage % totalNews) + 1;
-        })
-        .catch(error => {
-            console.error('뉴스를 불러오는 중에 오류 발생:', error);
-
-            const newsTitle = document.getElementById('newsTitle');
-            const newsDescription = document.getElementById('newsDescription');
-            const newsImage = document.getElementById('newsImage');
-            const newsLink = document.getElementById('newsLink');
-
-            newsTitle.innerHTML = '“눈 감았다 뜨니 세상 바뀌어 있었다”';
-            newsDescription.innerHTML = 'AI 임팩트, 두려움과 기대 속에 다가온 기술 혁명… GPT가 만든 세계, 우리는 준비됐나?';
-            newsImage.src = 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=640';
-            newsLink.href = 'https://www.kmib.co.kr/article/view.asp?arcid=0028078159&code=61141111&cp=nv';
-        });
-	}
-
-   // 슬라이드 기능 (5초마다)
-/*    setInterval(function() {
-       loadNews();
-   }, 5000);  // 5초마다 뉴스가 변경됨
- */
-   // 20분마다 새로운 뉴스 가져오기
-   setInterval(function() {
-       loadNews();
-   }, 120000000);  // 20분 = 1200000ms
-
-   // 페이지 로드 시 뉴스 데이터 로드
-   window.onload = loadNews;  // 초기 로딩 시에도 뉴스 한 개를 불러옴
-</script>
 <!-- 결재 관련 비동기 -->
 <script>
 //탭 요소들 가져오기
@@ -1183,8 +1011,56 @@ loadApprovalCarousel(
 );
 </script>
 
+   <script>
+   let currentPage = 1;  // 현재 페이지를 추적
+   const totalNews = 10; // 전체 뉴스 개수 (예시로 10개 뉴스 항목 사용)
+	
+   function loadNews() {
+    fetch('/api/news?query=IT&language=ko&page=' + currentPage + '&size=1')
+        .then(response => response.json())
+        .then(data => {
+            const article = data.articles[0];
 
-    
+            const newsTitle = document.getElementById('newsTitle');
+            const newsDescription = document.getElementById('newsDescription');
+            const newsImage = document.getElementById('newsImage');
+            const newsLink = document.getElementById('newsLink');
+
+            newsTitle.innerHTML = article.title || '뉴스 제목';
+            newsDescription.innerHTML = article.description || '뉴스의 간략한 설명을 여기에 작성합니다.';
+            newsImage.src = article.urlToImage || 'https://via.placeholder.com/150';
+            newsLink.href = article.url || '#';
+
+            currentPage = (currentPage % totalNews) + 1;
+        })
+        .catch(error => {
+            console.error('뉴스를 불러오는 중에 오류 발생:', error);
+
+            const newsTitle = document.getElementById('newsTitle');
+            const newsDescription = document.getElementById('newsDescription');
+            const newsImage = document.getElementById('newsImage');
+            const newsLink = document.getElementById('newsLink');
+
+            newsTitle.innerHTML = '“눈 감았다 뜨니 세상 바뀌어 있었다”';
+            newsDescription.innerHTML = 'AI 임팩트, 두려움과 기대 속에 다가온 기술 혁명… GPT가 만든 세계, 우리는 준비됐나?';
+            newsImage.src = 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=640';
+            newsLink.href = 'https://www.kmib.co.kr/article/view.asp?arcid=0028078159&code=61141111&cp=nv';
+        });
+	}
+
+   // 슬라이드 기능 (5초마다)
+/*    setInterval(function() {
+       loadNews();
+   }, 5000);  // 5초마다 뉴스가 변경됨
+ */
+   // 20분마다 새로운 뉴스 가져오기
+   setInterval(function() {
+       loadNews();
+   }, 120000000);  // 20분 = 1200000ms
+
+   // 페이지 로드 시 뉴스 데이터 로드
+   window.onload = loadNews;  // 초기 로딩 시에도 뉴스 한 개를 불러옴
+</script>
 
   </div>
 </main>
