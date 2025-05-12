@@ -452,48 +452,40 @@ public class ChatController {
 	    return Map.of("res_code", "200", "res_msg", "채팅방에서 나갔습니다.");
 	}
 	// 채팅방 파일 다운로드 API
-	@GetMapping("/download/chat")
+	@GetMapping("/download/chat/{driveAttachNo}")
 	@ResponseBody
-	public ResponseEntity<Resource> downloadFile(@RequestParam Long driveAttachNo) {
+	public ResponseEntity<Resource> downloadFile(@PathVariable("driveAttachNo") Long driveAttachNo) {
 	    try {
-	        // DB에서 파일 정보 가져오기 (driveAttachNo로 파일 조회)
+	        // DB에서 파일 정보 가져오기
 	        Drive drive = driveService.findByDriveAttachNo(driveAttachNo); 
 	        if (drive == null) {
-	            System.out.println("해당 파일을 찾을 수 없음");
 	            return ResponseEntity.notFound().build(); // 파일을 찾을 수 없으면 404 응답
 	        }
 
 	        // 실제 파일 경로
-	        Path filePath = Paths.get(fileDir + drive.getDrivePath()); // 파일 경로 생성
+	        String filePathString = "/files/drive/chat/" + drive.getDriveNewName();
+	        Path filePath = Paths.get(filePathString);
 	        System.out.println("파일 경로: " + filePath.toString());
-	        System.out.println("파일 존재 여부: " + Files.exists(filePath));
 
 	        if (!Files.exists(filePath)) {
 	            return ResponseEntity.notFound().build(); // 파일이 존재하지 않으면 404 응답
 	        }
 
 	        // 파일명 한글 깨짐 방지 (UTF-8 인코딩)
-	        String encodedFileName = URLEncoder.encode(drive.getDriveOriName(), "UTF-8")
-	                                               .replaceAll("\\+", "%20");
+	        String encodedFileName = URLEncoder.encode(drive.getDriveOriName(), "UTF-8").replaceAll("\\+", "%20");
 
 	        // 파일 스트림 준비
 	        Resource resource = new InputStreamResource(Files.newInputStream(filePath));
-	        
-	        // 다운로드 응답
+
 	        return ResponseEntity.ok()
 	                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
 	                             .contentType(MediaType.APPLICATION_OCTET_STREAM) // 파일 종류에 상관없이 모든 파일을 처리
 	                             .body(resource);
 
 	    } catch (Exception e) {
-	        System.out.println("파일 다운로드 중 예외 발생: " + e.getMessage());
-	        e.printStackTrace();
-	        return ResponseEntity.badRequest().build(); // 예외가 발생하면 400 오류 반환
+	        return ResponseEntity.badRequest().build(); // 예외 발생시 400 오류 반환
 	    }
 	}
-
-
-
 
 
 }

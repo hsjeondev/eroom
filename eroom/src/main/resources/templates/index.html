@@ -930,45 +930,48 @@
    let currentPage = 1;  // 현재 페이지를 추적
    const totalNews = 10; // 전체 뉴스 개수 (예시로 10개 뉴스 항목 사용)
 	
-	   
    function loadNews() {
-       fetch('/api/news?query=IT&language=ko&page=' + currentPage + '&size=1')  // IT 뉴스 1개만 가져오기
-           .then(response => response.json())
-           .then(data => {
-               const article = data.articles[0];  // 첫 번째 기사만 가져옴
+    fetch('/api/news?query=IT&language=ko&page=' + currentPage + '&size=1')
+        .then(response => response.json())
+        .then(data => {
+            const article = data.articles[0];
 
-               // 뉴스 카드에 내용 채우기
-               const newsTitle = document.getElementById('newsTitle');
-               const newsDescription = document.getElementById('newsDescription');
-               const newsImage = document.getElementById('newsImage');
-               const newsLink = document.getElementById('newsLink');
-               
-               newsTitle.innerHTML = article.title || '뉴스 제목';
-               newsDescription.innerHTML = article.description || '뉴스의 간략한 설명을 여기에 작성합니다.';
-               
-               // 이미지 URL이 있으면 사용하고, 없으면 기본 이미지 사용
-               newsImage.src = article.urlToImage || 'https://via.placeholder.com/150';
-               
-               // 뉴스 링크 설정
-               newsLink.href = article.url || '#';  // 뉴스 URL이 없으면 기본값 '#'
+            const newsTitle = document.getElementById('newsTitle');
+            const newsDescription = document.getElementById('newsDescription');
+            const newsImage = document.getElementById('newsImage');
+            const newsLink = document.getElementById('newsLink');
 
-               // 페이지 번호를 증가시켜서 다음 뉴스로 이동
-               currentPage = (currentPage % totalNews) + 1; // 페이지 번호 순환
-           })
-           .catch(error => {
-               console.error('뉴스를 불러오는 중에 오류 발생:', error);
-           });
-   }
+            newsTitle.innerHTML = article.title || '뉴스 제목';
+            newsDescription.innerHTML = article.description || '뉴스의 간략한 설명을 여기에 작성합니다.';
+            newsImage.src = article.urlToImage || 'https://via.placeholder.com/150';
+            newsLink.href = article.url || '#';
+
+            currentPage = (currentPage % totalNews) + 1;
+        })
+        .catch(error => {
+            console.error('뉴스를 불러오는 중에 오류 발생:', error);
+
+            const newsTitle = document.getElementById('newsTitle');
+            const newsDescription = document.getElementById('newsDescription');
+            const newsImage = document.getElementById('newsImage');
+            const newsLink = document.getElementById('newsLink');
+
+            newsTitle.innerHTML = '“눈 감았다 뜨니 세상 바뀌어 있었다”';
+            newsDescription.innerHTML = 'AI 임팩트, 두려움과 기대 속에 다가온 기술 혁명… GPT가 만든 세계, 우리는 준비됐나?';
+            newsImage.src = 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=640';
+            newsLink.href = 'https://www.kmib.co.kr/article/view.asp?arcid=0028078159&code=61141111&cp=nv';
+        });
+	}
 
    // 슬라이드 기능 (5초마다)
-   setInterval(function() {
+/*    setInterval(function() {
        loadNews();
    }, 5000);  // 5초마다 뉴스가 변경됨
-
+ */
    // 20분마다 새로운 뉴스 가져오기
    setInterval(function() {
        loadNews();
-   }, 1200000);  // 20분 = 1200000ms
+   }, 120000000);  // 20분 = 1200000ms
 
    // 페이지 로드 시 뉴스 데이터 로드
    window.onload = loadNews;  // 초기 로딩 시에도 뉴스 한 개를 불러옴

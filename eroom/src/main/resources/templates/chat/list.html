@@ -1420,19 +1420,19 @@ function loadChatroomDetail(chatroomNo) {
 
 				    	  const html = `
 				    		  <a href="/chat/download/chat/${file.driveAttachNo}" download="${file.driveOriName}" class="text-decoration-none d-flex align-items-center py-3 w-100">
-				    		    <div class="btn-icon btn-icon-lg border rounded-3 text-body-quaternary flex-column me-2">
-				    		        <i class="fa-solid ${icon} fs-8 mb-1"></i>
-				    		        <p class="mb-0 fs-10 fw-bold lh-1">${ext}</p>
+				    		  <div class="btn-icon btn-icon-lg border rounded-3 text-body-quaternary flex-column me-2">
+				    		    <i class="fa-solid ${icon} fs-8 mb-1"></i>
+				    		    <p class="mb-0 fs-10 fw-bold lh-1">${ext}</p>
+				    		  </div>
+				    		  <div class="flex-1">
+				    		    <h6 class="text-body line-clamp-1">${name}</h6>
+				    		    <div class="d-flex align-items-center lh-1">
+				    		      <p class="fs-10 mb-0 text-body-tertiary fw-semibold">${file.size || ''}</p>
+				    		      <span class="fa-solid fa-circle text-body-quaternary fs-10 mx-1"></span>
+				    		      <p class="fs-10 mb-0 text-body-tertiary fw-semibold">${file.regDate || ''}</p>
 				    		    </div>
-				    		    <div class="flex-1">
-				    		        <h6 class="text-body line-clamp-1">${name}</h6>
-				    		        <div class="d-flex align-items-center lh-1">
-				    		            <p class="fs-10 mb-0 text-body-tertiary fw-semibold">${file.size || ''}</p>
-				    		            <span class="fa-solid fa-circle text-body-quaternary fs-10 mx-1"></span>
-				    		            <p class="fs-10 mb-0 text-body-tertiary fw-semibold">${file.regDate || ''}</p>
-				    		        </div>
-				    		    </div>
-				    		    <i class="fa-regular fa-circle-down fs-8 text-body-tertiary ms-auto"></i>
+				    		  </div>
+				    		  <i class="fa-regular fa-circle-down fs-8 text-body-tertiary ms-auto"></i>
 				    		</a>
 				    	    </div>`;
 				    	  

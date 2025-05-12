@@ -17,8 +17,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
 	@Modifying
 	@Transactional
 	@Query("UPDATE Project p " +
-		       " SET p.proceed = :proceed " +
-		       " WHERE p.projectEnd = :projectEnd")
+	       "SET p.proceed = :proceed " +
+	       "WHERE p.projectEnd = :projectEnd AND p.proceed <> '보류'")
 	int updateProceedByEndDate(@Param("proceed") String proceed, @Param("projectEnd") LocalDate projectEnd);
 	
 	List<Project> findByProceed(String proceed);

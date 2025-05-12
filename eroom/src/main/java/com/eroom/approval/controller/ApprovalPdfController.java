@@ -133,7 +133,7 @@ public class ApprovalPdfController {
 
 	    HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
 	    ResponseEntity<byte[]> response = restTemplate.postForEntity(
-	        "http://localhost:3001/generate-pdf", entity, byte[].class
+	    		"http://pdf-server:3001/generate-pdf", entity, byte[].class
 	    );
 	    
 	    return ResponseEntity.ok()

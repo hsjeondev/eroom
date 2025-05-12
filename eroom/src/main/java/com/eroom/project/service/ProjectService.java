@@ -187,6 +187,8 @@ public class ProjectService {
             } else {
             	projectDto.setProceed("진행 예정");
             }
+            
+            projectDto.setVisible_yn("Y");
     		
     		Project project = projectRepository.save(projectDto.toEntity());
     		
