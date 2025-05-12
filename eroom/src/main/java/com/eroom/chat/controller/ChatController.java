@@ -452,9 +452,9 @@ public class ChatController {
 	    return Map.of("res_code", "200", "res_msg", "채팅방에서 나갔습니다.");
 	}
 	// 채팅방 파일 다운로드 API
-	@GetMapping("/download/chat")
+	@GetMapping("/download/chat/{driveAttachNo}")
 	@ResponseBody
-	public ResponseEntity<Resource> downloadFile(@RequestParam Long driveAttachNo) {
+	public ResponseEntity<Resource> downloadFile(@PathVariable("driveAttachNo") Long driveAttachNo) {
 	    try {
 	        // DB에서 파일 정보 가져오기
 	        Drive drive = driveService.findByDriveAttachNo(driveAttachNo); 
