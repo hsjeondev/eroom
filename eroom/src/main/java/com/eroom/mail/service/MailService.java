@@ -2,6 +2,7 @@ package com.eroom.mail.service;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +71,15 @@ public class MailService {
 	    return plainText.length() > 30 ? plainText.substring(0, 30) + "..." : plainText;
 	}
 	
+	// 홈 화면 카드 읽지 않은 메일/ 받은 메일
+	public int countUnreadMails(Long employeeNo) {
+	    return mailReceiverRepository.countByReceiverEmployeeNoAndMailReceiverReadYn(employeeNo, "N");
+	}
+
+	public int countAllReceivedMails(Long employeeNo) {
+	    return mailReceiverRepository.countByReceiverEmployeeNo(employeeNo);
+	}
+	
 	// AlarmService 알람 테이블 메소드
 	public MailAlarm findAlarmOne(Long mailAlarmNo) {
 	    return mailAlarmRepository.findById(mailAlarmNo).orElse(null);
@@ -108,7 +118,14 @@ public class MailService {
 	            .orElseThrow(() -> new RuntimeException("메일을 찾을 수 없습니다."));
 	}
 	
-	
+	@Transactional
+	 public void markAsDeleted(Long attachNo) {
+	     Drive drive = driveRepository.findById(attachNo)
+	             .orElseThrow(() -> new IllegalArgumentException("해당 첨부파일을 찾을 수 없습니다."));
+
+	     drive.setVisibleYn("N");
+	     driveRepository.save(drive); 
+	 }
 	
 	
 	
@@ -492,14 +509,54 @@ public class MailService {
 	@Transactional
 	public int createMail(MailDto mailDto,List<MultipartFile> mailFiles, String mailDraftYn) {
 		int result = 0;
+		List<Long> receiverNos = new ArrayList<>();
 		try {
 			// 보낸 메일 저장 ( mail에 제목, 내용 저장)
 			Mail mailEntity = mailDto.toEntity();
 			mailEntity.setMailSentTime(LocalDateTime.now());
 			Mail mailSaver = mailRepository.save(mailEntity);
-			 
 			
-			List<Long> receiverNos = mailDto.getReceiver_no();
+			String receiverType = mailDto.getReceiver_type(); 
+			String[] typeArray = receiverType.split(",");
+			for (String type : typeArray) {
+				type = type.trim();
+			if ("root".equals(type)) {
+				List<Employee> allEmployees = employeeRepository.findAll();
+			    for (Employee e : allEmployees) {
+			        receiverNos.add(e.getEmployeeNo());
+			    }
+			}  else if (type.startsWith("D")) {
+			    // 부서 코드
+			    List<Employee> deptEmployees = employeeRepository.findByStructureParentCode(type);
+			    for (Employee e : deptEmployees) {
+			        receiverNos.add(e.getEmployeeNo());
+			    }
+			} else if (type.startsWith("T")) {
+			    // 팀 ID
+			    List<Employee> teamEmployees = employeeRepository.findByStructure_SeparatorCode(type);
+			    for (Employee e : teamEmployees) {
+			        receiverNos.add(e.getEmployeeNo());
+			    }
+			}else {
+				String[] empNoArray = type.split(",");
+			    for (String empNoStr : empNoArray) {
+			        try {
+			            Long empNo = Long.parseLong(empNoStr.trim());
+			            receiverNos.add(empNo);
+			        } catch (NumberFormatException e) {
+			            throw new IllegalArgumentException("잘못된 직원 번호입니다: " + empNoStr);
+			        }
+			    }
+			}
+			}
+			// 부서
+			/*List<Employee> receiverEmployees = employeeRepository.findByStructureParentCode(mailDto.getReceiver_type());
+			for(Employee re : receiverEmployees) {
+				
+				receiverNos.add(re.getEmployeeNo());
+			}*/
+			
+			//List<Long> receiverNos = mailDto.getReceiver_no();
 			if(mailDraftYn.equals("N")) {
 			// 수신자 ( mail_receiver 받는 사람 mail_no값으로 저장 )
 			 if (receiverNos != null && !receiverNos.isEmpty()) {
@@ -578,48 +635,90 @@ public class MailService {
                         e.printStackTrace(); // 웹소켓 전송 실패해도 메일 저장은 정상 진행
                     }
 		         // 발송된 메일만 파일 저장
-		         for (MultipartFile file : mailFiles) {
-			            if (!file.isEmpty()) {
-			                // DriveDto 생성
-			                String oriName = file.getOriginalFilename();
-					        String ext = oriName.substring(oriName.lastIndexOf("."));
-					        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
-					        String path = fileDir + "mail/" + newName;
-			                DriveDto driveDto = new DriveDto();
-			                
-			                File savedFile = new File(path);
-					        if (!savedFile.getParentFile().exists()) {
-					            savedFile.getParentFile().mkdirs();
-					        }
-					        file.transferTo(savedFile);
-					        
-					        
-			                driveDto.setDriveOriName(oriName);
-			                driveDto.setDriveSize(file.getSize());
-			                
-			                
-			               
-			                // Drive 엔티티로 변환
-			                Drive drive = new Drive();
-			                drive.setDriveOriName(driveDto.getDriveOriName());
-			                drive.setDriveNewName(newName); // 파일 고유 이름 생성
-			                drive.setDriveSize(driveDto.getDriveSize());
-			                drive.setDriveType(ext);
-			                drive.setDrivePath("mail/" + newName); // 실제 저장 경로로 변경 필요
-			                drive.setUploader(Employee.builder().employeeNo(mailDto.getEmployee_no()).build());
-			                drive.setParam1(mailSaver.getMailNo()); // 메일 참조 연결
-			                drive.setSeparatorCode("FL002");
-			                drive.setVisibleYn("Y");
-			                // DB에 저장
-			                driveRepository.save(drive);
-			                
-			            }
-			        }
-		            
+					/*
+					 * for (MultipartFile file : mailFiles) { if (!file.isEmpty()) { // DriveDto 생성
+					 * String oriName = file.getOriginalFilename(); String ext =
+					 * oriName.substring(oriName.lastIndexOf(".")); String newName =
+					 * UUID.randomUUID().toString().replace("-", "") + ext; String path = fileDir +
+					 * "mail/" + newName; DriveDto driveDto = new DriveDto();
+					 * 
+					 * File savedFile = new File(path); if (!savedFile.getParentFile().exists()) {
+					 * savedFile.getParentFile().mkdirs(); } file.transferTo(savedFile);
+					 * 
+					 * 
+					 * driveDto.setDriveOriName(oriName); driveDto.setDriveSize(file.getSize());
+					 * 
+					 * 
+					 * 
+					 * // Drive 엔티티로 변환 Drive drive = new Drive();
+					 * drive.setDriveOriName(driveDto.getDriveOriName());
+					 * drive.setDriveNewName(newName); // 파일 고유 이름 생성
+					 * drive.setDriveSize(driveDto.getDriveSize()); drive.setDriveType(ext);
+					 * drive.setDrivePath("mail/" + newName); // 실제 저장 경로로 변경 필요
+					 * drive.setUploader(Employee.builder().employeeNo(mailDto.getEmployee_no()).
+					 * build()); drive.setParam1(mailSaver.getMailNo()); // 메일 참조 연결
+					 * drive.setSeparatorCode("FL002"); drive.setVisibleYn("Y"); // DB에 저장
+					 * driveRepository.save(drive);
+					 * 
+					 * } }
+					 */
+	            	Optional<MailDraft> optionalDraft = mailDraftRepository.findByMail_MailNo(
+	            	        mailSaver.getMailNo());
+	            	    if (optionalDraft.isPresent()) {
+	            	        MailDraft existingDraft = optionalDraft.get();
+	            	        existingDraft.setMailDraftVisibleYn("N"); // 숨김 처리
+	            	        mailDraftRepository.save(existingDraft);
+	            	    }
 		        }
 			 }
 			}
+			for (MultipartFile file : mailFiles) {
+	            if (!file.isEmpty()) {
+	                // DriveDto 생성
+	                String oriName = file.getOriginalFilename();
+			        String ext = oriName.substring(oriName.lastIndexOf("."));
+			        String newName = UUID.randomUUID().toString().replace("-", "") + ext;
+			        String path = fileDir + "mail/" + newName;
+	                DriveDto driveDto = new DriveDto();
+	                
+	                File savedFile = new File(path);
+			        if (!savedFile.getParentFile().exists()) {
+			            savedFile.getParentFile().mkdirs();
+			        }
+			        file.transferTo(savedFile);
+			        
+			        
+	                driveDto.setDriveOriName(oriName);
+	                driveDto.setDriveSize(file.getSize());
+	                
+	                
+	               
+	                // Drive 엔티티로 변환
+	                Drive drive = new Drive();
+	                drive.setDriveOriName(driveDto.getDriveOriName());
+	                drive.setDriveNewName(newName); // 파일 고유 이름 생성
+	                drive.setDriveSize(driveDto.getDriveSize());
+	                drive.setDriveType(ext);
+	                drive.setDrivePath("mail/" + newName); // 실제 저장 경로로 변경 필요
+	                drive.setUploader(Employee.builder().employeeNo(mailDto.getEmployee_no()).build());
+	                drive.setParam1(mailSaver.getMailNo()); // 메일 참조 연결
+	                drive.setSeparatorCode("FL002");
+	                drive.setVisibleYn("Y");
+	                // DB에 저장
+	                driveRepository.save(drive);
+	                
+	            }
+	        }
 			if (mailDraftYn.equals("Y")) {
+				Optional<MailDraft> optionalDraft = mailDraftRepository.findByMail_MailNo(mailSaver.getMailNo());
+				
+				if (optionalDraft.isPresent()) {
+			        // 기존 임시저장 메일 업데이트
+			        MailDraft existingDraft = optionalDraft.get();
+			        existingDraft.setMailDraftTime(LocalDateTime.now());
+			        // 필요 시 다른 필드도 업데이트
+			        mailDraftRepository.save(existingDraft);
+			    } else {
 	            MailDraftDto mailDraftDto = new MailDraftDto();
 	            mailDraftDto.setMail_no(mailSaver.getMailNo()); // 메일 번호
 	            //mailDraftDto.setEmployee_no(receiverNo); // 수신자
@@ -627,7 +726,9 @@ public class MailService {
 	
 	            MailDraft mailDraft = mailDraftDto.toEntity();
 	            mailDraftRepository.save(mailDraft); // 새로 저장
-            }
+			    }
+			}
+			
 			result =1;
 		}catch (Exception e) {
 			e.printStackTrace();

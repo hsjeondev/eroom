@@ -49,7 +49,7 @@ public class MailReceiverDto {
 	// 사용자 정보
 	private Long employee_no;
 	
-	
+	private String profile_image_url;
 //	public MailReceiver toEntity() {
 //		return MailReceiver.builder()
 //				.mailReceiverNo(mail_receiver_no)
