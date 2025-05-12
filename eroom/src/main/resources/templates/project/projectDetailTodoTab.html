@@ -103,6 +103,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		
 				    <!-- Review 아이템 공간(예시) -->
 				    <div class="kanban-items-container" data-sortable="data-sortable" th:attr="data-is-member=${isMember}">
+				    <input type="hidden" id="isMember" th:value="${isMember}" />
 					  <div th:each="element : ${list.projectTodoElements}" 
 					     class="sortable-item-wrapper border-bottom border-translucent px-2 py-2"
 					     th:attr="data-todo-no=${element.todo_no}">
@@ -855,7 +856,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		            }
 		
 		            // ✅ 세부 할 일 체크박스 리스트 - 수정한 부분
-		            const isMember = /*[[${isMember}]]*/ false;
+		            const isMember = document.getElementById("isMember").value;
+		            console.log("isMember" + isMember);
 		            const detailContainer = document.getElementById('todoDetailList');
 		            if (detailContainer) {
 		                detailContainer.innerHTML = ""; // 먼저 비우고
@@ -867,7 +869,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		                        listHtml += `
 		                        	<li class="d-flex align-items-center border-bottom ${index === 0 ? 'pb-2 pt-0' : 'py-2'}">
 
-		                        		<input type="checkbox" class="me-2" value="${detail.todo_detail_no}" ${detail.status === 'Y' ? 'checked' : ''} ${isMember === false ? 'disabled' : ''}  onclick="detailCheck(this);">
+		                        		<input type="checkbox" class="me-2" value="${detail.todo_detail_no}" ${detail.status === 'Y' ? 'checked' : ''} ${isMember == 'false' ? 'disabled' : ''}  onclick="detailCheck(this);">
 
 		                                <span>${detail.todo_content}</span>
 		                            </li>

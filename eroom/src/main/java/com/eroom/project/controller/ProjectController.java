@@ -235,8 +235,8 @@ public class ProjectController {
 
 	    model.addAttribute("project", project);
 	    model.addAttribute("projectTodoList", projectTodoList);
-	    model.addAttribute("isMember", isMember);   // 🔥 추가
-	    model.addAttribute("isManager", isManager); // 🔥 추가
+	    model.addAttribute("isMember", isMember);
+	    model.addAttribute("isManager", isManager);
 
 	    return "project/projectDetailTodoTab";
 	}
