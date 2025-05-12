@@ -1342,7 +1342,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			           if (!hiddenInputTodo) {
 			        	   hiddenInputTodo = document.createElement("input");
 			        	   hiddenInputTodo.type = "hidden";
-			        	   hiddenInputTodo.name = "todo_no"; // 👈 이걸로 통일
+			        	   hiddenInputTodo.name = "todo_no";
 			        	   hiddenInputTodo.value = todo.todo_no;
 			             document.getElementById("updateTodoForm").appendChild(hiddenInputTodo);
 			           } else {
@@ -1412,8 +1412,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			     .then(data => {
 			       alert(data.res_msg);
 			       if (data.res_code === "200") {
-			         // 모달 닫기
-			         location.reload(); // 또는 데이터 갱신만
+			         location.reload();
 			       }
 			     })
 			     .catch(() => {
