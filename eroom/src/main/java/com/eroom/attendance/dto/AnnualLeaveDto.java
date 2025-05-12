@@ -39,9 +39,10 @@ public class AnnualLeaveDto {
 	}
 	
 	
-	public AnnualLeaveDto toDto(AnnualLeave annualLeave) {
+	public static AnnualLeaveDto toDto(AnnualLeave annualLeave) {
 		return AnnualLeaveDto.builder()
 				            .annual_leave_no(annualLeave.getAnnualLeaveNo())
+				            .employee_no(annualLeave.getEmployee().getEmployeeNo())
 				            .year(annualLeave.getYear())
 							.annual_leave_total(annualLeave.getAnnualLeaveTotal())
 							.annual_leave_used(annualLeave.getAnnualLeaveUsed())
