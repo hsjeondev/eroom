@@ -502,42 +502,104 @@
 			</div>
         </div>
 
-        <!-- 3행·2열 -->
-        <div class="text-white p-1">
-			<div class="attendance-card mx-auto">
-				<div class="card shadow-sm border-0">
-					<div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
-			          날씨
-			        </div>
+        <!-- 3행·2열: 날씨 카드 -->
+		<div class="text-white p-1">
+		  <div class="attendance-card mx-auto">
+		    <div class="card shadow-sm border-0">
+		      
+		      <!-- 🔵 헤더 (오늘 날씨) -->
+		      <div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
+		        오늘 날씨
+		      </div>
+		
+		      <!-- 🔵 날씨 본문 -->
+		      <div class="card-body">
+			  <!-- 상단: 도시명과 셀렉트 박스 -->
+			  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+			    <h3 id="city-name" style="font-size: 1.1rem; font-weight: bold; color: black;">도시명</h3>
+			    <select id="city-selector" style="padding: 6px 12px; font-size: 0.95rem; border-radius: 8px; border: 1px solid #00bfff;">
+			      <option value="current">현재 위치</option>
+			      <option value="Seoul">서울</option>
+			      <option value="Busan">부산</option>
+			      <option value="Incheon">인천</option>
+			      <option value="Daegu">대구</option>
+			      <option value="Daejeon">대전</option>
+			      <option value="Gwangju">광주</option>
+			      <option value="Suwon">수원</option>
+			      <option value="Changwon">창원</option>
+			      <option value="Gimhae">김해</option>
+			      <option value="Jeonju">전주</option>
+			      <option value="Cheongju">청주</option>
+			      <option value="Jeju">제주</option>
+			    </select>
+			  </div>
+			
+			  <!-- 하단: 날씨 정보 + 아이콘 정렬 -->
+			  <div style="display: flex; justify-content: space-between; align-items: center;">
+			    <div style="color: black;">
+			      <p id="temperature">기온: --℃</p>
+			      <p id="description">날씨: --</p>
+			      <p id="humidity">습도: --%</p>
+			      <p id="wind">바람: -- m/s</p>
+			    </div>
+			    <div>
+			      <img id="weather-icon"
+					     src=""
+					     alt="날씨 아이콘"
+					     style="
+					        width: 120px;
+					        height: 120px;
+					        border-radius: 20px;
+					        background-color: #f8f9fa;
+					        padding: 12px;
+					        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+					        transition: transform 0.3s ease, box-shadow 0.3s ease;
+					        cursor: pointer;
+					     "
+					     onmouseover="this.style.transform='scale(1.08)'; this.style.boxShadow='0 8px 22px rgba(0, 0, 0, 0.2)';"
+					     onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 6px 18px rgba(0, 0, 0, 0.15)';"/>				 
 				</div>
+			  </div>
 			</div>
-        </div>
+		
+		    </div>
+		  </div>
+		</div>
 
-        <!-- 3행·3열 -->
-        <div class="text-white p-1">
-			<div class="attendance-card mx-auto">
-				<div class="card shadow-sm border-0">
-					<div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
-			          오늘자 IT 뉴스
-			        </div>
-			        <a id="newsLink" href="#" target="_blank">
-		        <div class="card-body p-4" style="display: flex; align-items: center; height: 207.81px;">
-		          <!-- 왼쪽: 이미지 -->
-		          <img id="newsImage" class="card-img-left" alt="News Image" style="width: 120px; height: 100px; object-fit: cover; margin-right: 15px; border-radius: 8px;">
-		          
-		          <!-- 오른쪽: 내용 -->
-		          <div>
-		            <h5 class="card-title" id="newsTitle">오늘의 IT 뉴스</h5>
-		            <p class="card-text" id="newsDescription" style="font-size: 0.9rem; color: #666; height: 60px; overflow: hidden; text-overflow: ellipsis;">뉴스 내용이 여기에 표시됩니다.</p>
-		          </div>
-		        </div>
-		      </a>
-				</div>
+        <!-- 3행·3열: IT 뉴스 -->
+		<div class="text-white p-1">
+		  <div class="attendance-card mx-auto">
+		    <div class="card shadow-sm border-0">
+			  <!-- 헤더 -->
+			  <div class="card-header text-center fw-bold" style="font-size: 1.2rem; padding: 15px;">
+			    오늘자 IT 뉴스
+			  </div>
+			
+			  <a id="newsLink" href="#" target="_blank" class="text-decoration-none">
+			    
+			    <!-- ✅ 이미지: 깔끔하게 테두리 둥글림 + 여백 최소화 -->
+			    <div style="padding: 5px 15px;">
+			      <img id="newsImage"
+			           src=""
+			           alt="뉴스 이미지"
+			           style="width: 100%; height: 160px; object-fit: cover;
+			                  border-radius: 12px;
+			                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
+			    </div>
+			
+			    <!-- ✅ 내용: 제목과 설명 여백 정리 -->
+			    <div class="px-3 pt-3 pb-2">
+			      <h6 id="newsTitle" class="fw-semibold text-dark mb-1" style="font-size: 1rem;">뉴스 제목</h6>
+			      <p id="newsDescription" class="text-muted mb-0" style="font-size: 0.85rem; height: 48px; overflow: hidden; text-overflow: ellipsis;">
+			        뉴스 요약
+			      </p>
+			    </div>
+			    
+			  </a>
 			</div>
-        </div>
+		  </div>
+		</div>
 
-      </div>
-    </div>
 
     <script>
     //캘린더
@@ -1010,57 +1072,126 @@ loadApprovalCarousel(
 );
 </script>
 
-   <script>
-   let currentPage = 1;  // 현재 페이지를 추적
-   const totalNews = 10; // 전체 뉴스 개수 (예시로 10개 뉴스 항목 사용)
-	
-   function loadNews() {
-    fetch('/api/news?query=IT&language=ko&page=' + currentPage + '&size=1')
-        .then(response => response.json())
-        .then(data => {
-            const article = data.articles[0];
+ <script>
+  let cachedNews = [];
+  let currentNewsIndex = 0;
 
-            const newsTitle = document.getElementById('newsTitle');
-            const newsDescription = document.getElementById('newsDescription');
-            const newsImage = document.getElementById('newsImage');
-            const newsLink = document.getElementById('newsLink');
+  function setDefaultNews() {
+    document.getElementById("newsTitle").innerText = "“눈 감았다 뜨니 세상 바뀌어 있었다”";
+    document.getElementById("newsDescription").innerText = "AI 임팩트, 두려움과 기대 속에 다가온 기술 혁명… GPT가 만든 세계, 우리는 준비됐나?";
+    document.getElementById("newsImage").src = "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=640";
+    document.getElementById("newsLink").href = "https://www.kmib.co.kr/article/view.asp?arcid=0028078159&code=61141111&cp=nv";
+  }
 
-            newsTitle.innerHTML = article.title || '뉴스 제목';
-            newsDescription.innerHTML = article.description || '뉴스의 간략한 설명을 여기에 작성합니다.';
-            newsImage.src = article.urlToImage || 'https://via.placeholder.com/150';
-            newsLink.href = article.url || '#';
+  function showNews(index) {
+    if (cachedNews.length === 0) return setDefaultNews();
 
-            currentPage = (currentPage % totalNews) + 1;
-        })
-        .catch(error => {
-            console.error('뉴스를 불러오는 중에 오류 발생:', error);
+    const article = cachedNews[index];
+    document.getElementById("newsTitle").innerText = article.title || "뉴스 제목";
+    document.getElementById("newsDescription").innerText = article.description || "뉴스 설명 없음";
+    document.getElementById("newsImage").src = article.urlToImage || "https://via.placeholder.com/150";
+    document.getElementById("newsLink").href = article.url || "#";
+  }
 
-            const newsTitle = document.getElementById('newsTitle');
-            const newsDescription = document.getElementById('newsDescription');
-            const newsImage = document.getElementById('newsImage');
-            const newsLink = document.getElementById('newsLink');
+  function loadNewsOnce() {
+    fetch('/api/news?query=IT&language=ko&page=1&size=10')
+      .then(res => {
+        if (!res.ok) throw new Error(`뉴스 API 오류: ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        if (!data.articles || data.articles.length === 0) {
+          console.warn("받은 뉴스 없음 → 기본 뉴스 사용");
+          return setDefaultNews();
+        }
+        cachedNews = data.articles;
+        currentNewsIndex = 0;
+        showNews(currentNewsIndex);
+      })
+      .catch(error => {
+        console.error("뉴스 불러오기 실패:", error);
+        setDefaultNews();
+      });
+  }
 
-            newsTitle.innerHTML = '“눈 감았다 뜨니 세상 바뀌어 있었다”';
-            newsDescription.innerHTML = 'AI 임팩트, 두려움과 기대 속에 다가온 기술 혁명… GPT가 만든 세계, 우리는 준비됐나?';
-            newsImage.src = 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=640';
-            newsLink.href = 'https://www.kmib.co.kr/article/view.asp?arcid=0028078159&code=61141111&cp=nv';
-        });
-	}
+  // 5초마다 캐시된 뉴스 슬라이드
+  setInterval(() => {
+    if (cachedNews.length === 0) return;
+    currentNewsIndex = (currentNewsIndex + 1) % cachedNews.length;
+    showNews(currentNewsIndex);
+  }, 5000);
 
-   // 슬라이드 기능 (5초마다)
-/*    setInterval(function() {
-       loadNews();
-   }, 5000);  // 5초마다 뉴스가 변경됨
- */
-   // 20분마다 새로운 뉴스 가져오기
-   setInterval(function() {
-       loadNews();
-   }, 120000000);  // 20분 = 1200000ms
+  // 2시간마다 새로운 뉴스 갱신
+  setInterval(loadNewsOnce, 2 * 60 * 60 * 1000);
 
-   // 페이지 로드 시 뉴스 데이터 로드
-   window.onload = loadNews;  // 초기 로딩 시에도 뉴스 한 개를 불러옴
+  // 최초 로딩 시 1회 실행
+  window.onload = loadNewsOnce;
 </script>
 
+	<script>
+		function mapCityName(cityName) {
+		  const cityMap = {
+		    "Seoul": "서울", "Busan": "부산", "Incheon": "인천", "Daegu": "대구",
+		    "Daejeon": "대전", "Gwangju": "광주", "Suwon": "수원", "Changwon": "창원",
+		    "Gimhae": "김해", "Jeonju": "전주", "Cheongju": "청주", "Jeju": "제주"
+		  };
+		  return cityMap[cityName] || cityName;
+		}
+		
+		function displayWeatherData(data, cityName) {
+		  document.getElementById("city-name").textContent = cityName;
+		  document.getElementById("temperature").textContent = `기온: ${data.main.temp}℃`;
+		  document.getElementById("description").textContent = `날씨: ${data.weather[0].description}`;
+		  document.getElementById("humidity").textContent = `습도: ${data.main.humidity}%`;
+		  document.getElementById("wind").textContent = `바람: ${data.wind.speed} m/s`;
+		
+		  const iconCode = data.weather[0].icon;
+		  document.getElementById("weather-icon").src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+		}
+		
+		function getWeatherByCoords(lat, lon) {
+		  fetch(`/api/weather/coord?lat=${lat}&lon=${lon}&lang=kr`)
+		    .then(res => res.json())
+		    .then(data => displayWeatherData(data, mapCityName(data.name)))
+		    .catch(err => console.error("위치 기반 날씨 오류:", err));
+		}
+		
+		function getWeatherByCity(city) {
+		  fetch(`/api/weather?city=${city}&lang=kr`)
+		    .then(res => res.json())
+		    .then(data => displayWeatherData(data, mapCityName(data.name)))
+		    .catch(err => console.error("도시 기반 날씨 오류:", err));
+		}
+		
+		document.addEventListener("DOMContentLoaded", () => {
+		  if (navigator.geolocation) {
+		    navigator.geolocation.getCurrentPosition(
+		      pos => getWeatherByCoords(pos.coords.latitude, pos.coords.longitude),
+		      err => {
+		        console.warn("위치 실패, 서울로 대체");
+		        getWeatherByCity("Seoul");
+		      }
+		    );
+		  } else {
+		    console.warn("Geolocation 미지원, 서울로 대체");
+		    getWeatherByCity("Seoul");
+		  }
+		
+		  document.getElementById("city-selector").addEventListener("change", e => {
+		    const city = e.target.value;
+		    if (city === "current") {
+		      navigator.geolocation.getCurrentPosition(
+		        pos => getWeatherByCoords(pos.coords.latitude, pos.coords.longitude)
+		      );
+		    } else {
+		      getWeatherByCity(city);
+		    }
+		  });
+		});
+		</script>
+	
+	
+	
   </div>
 </main>
 </body>
