@@ -235,8 +235,8 @@ public class ProjectController {
 
 	    model.addAttribute("project", project);
 	    model.addAttribute("projectTodoList", projectTodoList);
-	    model.addAttribute("isMember", isMember);   // 🔥 추가
-	    model.addAttribute("isManager", isManager); // 🔥 추가
+	    model.addAttribute("isMember", isMember);
+	    model.addAttribute("isManager", isManager);
 
 	    return "project/projectDetailTodoTab";
 	}
@@ -397,6 +397,7 @@ public class ProjectController {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 	    Long currentEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	    
 
 	    ProjectDto project = projectService.findByProjectNo(projectNo);
 
@@ -410,7 +411,6 @@ public class ProjectController {
 	    boolean hasAuthority = false;
 
 	    for (ProjectMemberDto dto : project.getProject_members()) {
-	        if (!"Y".equals(dto.getVisible_yn())) continue;
 
 	        Long memberId = dto.getProject_member().getEmployeeNo();
 
