@@ -15,7 +15,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				<!-- &quot;page&quot;: 여기 숫자 바꾸면 한 페이지 컨텐츠 수 조절 가능 -->
 				<div id="reports" style="display: none;" data-list='{
 										       "valueNames": ["writer", "text1", "title", "state", "date", "reports"],
-										       "page": 10,
+										       "page": 6,
 										       "pagination": true
 										     }'>
 					<div class="row g-3 justify-content-between mb-2">
@@ -37,12 +37,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 								<div class="d-flex mb-3">
 									<!-- 검색창 -->
 									<div class="search-box me-2">
-										<form class="position-relative">
-										  <input class="form-control search-input search" type="search" placeholder="Search by name" aria-label="Search">
+										  <input class="form-control search-input search" type="search" placeholder="검색어를 입력해주세요." aria-label="Search">
 										  <svg style="height: 30%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
 										  	<path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
 										  </svg><!-- <span class="fas fa-search search-box-icon"></span> Font Awesome fontawesome.com -->
-										</form>
 									</div>
 									<!-- 필터 버튼  -->
 									<button class="btn px-3 btn-phoenix-secondary" type="button" data-bs-toggle="modal" data-bs-target="#reportsFilterModal" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
@@ -165,7 +163,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
           </div>
           <div class="modal-body text-center">
-            <canvas id="signatureCanvas" width="400" height="200" style="border:1px solid #000; background:#fff;"></canvas>
+				        <div class="canvas-wrapper" style="position: relative; width: 100%; max-width: 500px; margin: 0 auto;">
+				          <canvas id="signatureCanvas" style="border: 1px solid #000; background: #fff; width: 100%; height: auto;"></canvas>
+				        </div>            
+
             <div class="mt-3">
               <button type="button" class="btn btn-secondary" id="clearSignature">패드 초기화</button>
               <button type="button" class="btn btn-primary" id="saveSignature">저장</button>

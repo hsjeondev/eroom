@@ -33,7 +33,7 @@ public class TreeModalController {
 	@GetMapping("/tree")
 	public String treeTest(Model model) {
 		 Map<String, List<EmployeeDto>> teamEmployeeMap = new HashMap<>();
-		 List<Employee> empEntityList = employeeService.findAllEmployee();
+		 List<Employee> empEntityList = employeeService.findAllEmployee_EmployeeEmploymentYn();
 		 // 팀 조회
 		 
 		
@@ -109,7 +109,7 @@ public class TreeModalController {
 	public void treeControllerMethod(Model model) {
 
 		 Map<String, List<EmployeeDto>> teamEmployeeMap = new HashMap<>();
-		 List<Employee> empEntityList = employeeService.findAllEmployee();
+		 List<Employee> empEntityList = employeeService.findAllEmployee_EmployeeEmploymentYn();
 		 // 팀 조회
 		 
 		
