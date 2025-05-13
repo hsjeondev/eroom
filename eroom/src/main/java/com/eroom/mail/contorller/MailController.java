@@ -263,7 +263,7 @@ public class MailController {
 	    try {
 	        // 받은 메일과 상태 맵을 가져옵니다.
 	        List<MailReceiver> received = mailService.getReceivedMailsByEmployee(employeeNo, sortOrder);
-	        Map<Long, MailStatus> mailStatusMap = mailService.getStatusMapForMailRecevier(received);
+	        Map<String, MailStatus> mailStatusMap = mailService.getStatusMapForMailRecevier(received);
 
 	        // 받은 메일이 없거나 null인 경우를 체크
 	        if (received == null || received.isEmpty()) {
@@ -316,10 +316,18 @@ public class MailController {
 	    }
 	    
 	    
-	    Map<Long, MailStatus> mailStatusMap = mailService.getStatusMapForMailRecevier(received);
+	    Map<String, MailStatus> mailStatusMap = mailService.getStatusMapForMailRecevier(received);
 
-	    
-	    System.out.println(mailReceiverDtoList);
+	    for (Map.Entry<String, MailStatus> entry : mailStatusMap.entrySet()) {
+	        String test = entry.getKey();
+	        MailStatus status = entry.getValue();
+
+	        System.out.println("EmployeeNo: " + test);
+	        System.out.println("MailNo: " + status.getMail().getMailNo());
+	        System.out.println("중요 여부(importantYn): " + status.getMailStatusImportantYn());
+	        System.out.println("삭제 여부(deletedYn): " + status.getMailStatusDeletedYn());
+	        System.out.println("-------------");
+	    }
 	    
 		model.addAttribute("mailStatusMap", mailStatusMap);
 	    model.addAttribute("receivedMails", received);
@@ -345,7 +353,7 @@ public class MailController {
 	  List<Mail> sentMailList = mailService.findMailsBySender(employeeNo,sortOrder);
 	  //List<Mail> sentMailList = mailService.findMailsBySender(myEmployeeNo);
 	  model.addAttribute("sentMailList", sentMailList);
-	  Map<Long, MailStatus> mailStatusMap = mailService.getStatusMapForMails(sentMailList);
+	  Map<String, MailStatus> mailStatusMap = mailService.getStatusMapForMails(sentMailList);
 
 	  model.addAttribute("mailStatusMap", mailStatusMap);
 	  return "mail/mailSent"; // 뷰 파일 이름 
@@ -483,7 +491,7 @@ public class MailController {
 		Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
 
 		List<Mail> importantMailList = mailService.getImportantMailsByEmployee(employeeNo, sortOrder);
-		Map<Long, MailStatus> mailStatusMap = mailService.getStatusMapForMails(importantMailList);
+		Map<String, MailStatus> mailStatusMap = mailService.getStatusMapForMails(importantMailList);
 	    model.addAttribute("importantMailList", importantMailList);
 	    model.addAttribute("mailStatusMap", mailStatusMap);
 		return "mail/mailImportant";
