@@ -7,8 +7,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -53,6 +55,24 @@ public class ProjectService {
     // 파일 저장 경로 
  	@Value("${ffupload.location}")
  	private String fileDir;
+ 	
+ 	public List<Map<String, Object>> findMyProjectsMapByProceed(Long employeeNo, String proceed) {
+ 	    List<Project> projects = projectRepository.findByEmployeeAndProceed(employeeNo, proceed);
+ 	    List<Map<String, Object>> resultList = new ArrayList<>();
+
+ 	    for (Project project : projects) {
+ 	        Map<String, Object> map = new HashMap<>();
+ 	        map.put("project_no", project.getProjectNo());
+ 	        map.put("project_name", project.getProjectName());
+ 	        map.put("project_start", project.getProjectStart());
+ 	        map.put("project_end", project.getProjectEnd());
+ 	        map.put("proceed", project.getProceed());
+ 	        resultList.add(map);
+ 	    }
+
+ 	    return resultList;
+ 	}
+
  	
  	public int deleteProjectById(Long projectNo) {
  	    int result = 0;
