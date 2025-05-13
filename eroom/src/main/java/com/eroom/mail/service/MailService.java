@@ -380,7 +380,7 @@ public class MailService {
 	    List<MailStatus> statusList = mailStatusRepository.findByMailMailNoIn(mailNos);
 
 	    return statusList.stream()
-	            .collect(Collectors.toMap(ms -> ms.getMail().getMailNo(), Function.identity()));
+	            .collect(Collectors.toMap(ms -> ms.getMail().getMailNo(), Function.identity(), (oldval, newval) -> newval));
 	}
 	
 	public Map<Long, MailStatus> getStatusMapForMails(List<Mail> mails) {
