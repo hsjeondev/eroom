@@ -68,8 +68,8 @@
     
     /* 스크롤 커스터마이징 선택사항 */
 	.fc-scroller {
-	    max-height: 330px !important;
-	    overflow-y: auto !important;
+	    max-height: 390px !important; /* 🔥 기존보다 넉넉하게 */
+  		overflow-y: auto !important;
 	     
 	  }
 	
@@ -383,12 +383,7 @@
 			      </div>
 			      
 			      <!-- 바디 -->
-			      <div class="card-body d-flex flex-column">
-			        <div class="text-end mb-2">
-			          <a href="/calendar/all" class="text-decoration-none text-primary" style="font-size: 0.8rem;">
-			            캘린더로 가기 →
-			          </a>
-			        </div>
+			      <div class="card-body d-flex flex-column">			      
 			        <div id="calendarContainer" class="flex-grow-1">
 			          <div id="appCalendar"></div>
 			        </div>
@@ -768,6 +763,10 @@
 			        start: todayStr,
 			        end: todayStr
 			      },
+			      eventClick: function(info) {
+			    	    info.jsEvent.preventDefault();
+			    	    location.href = "/calendar/all"; 
+			    	  },
 			      height: '100%',
 			      contentHeight: 'auto',
 			      eventSources: [
@@ -782,74 +781,105 @@
 			         }
 			      ],
 			      eventDidMount: function (info) {
-			        const separator = info.event.extendedProps.separator || "";
-			        const event = info.event;
-			        const teamName = event.extendedProps.teamName || '';
-			        const title = event.title;
+			    	  const separator = info.event.extendedProps.separator || "";
+			    	  const event = info.event;
+			    	  const teamName = event.extendedProps.teamName || '';
+			    	  const title = event.title;
+			    	  
+			    	  
 
-			        if (teamName && title && !title.startsWith(`[${teamName}]`)) {
-			          event.setProp("title", `[${teamName}] ${title}`);
-			        }
+			    	  // 제목에 팀명 붙이기
+			    	  if (teamName && title && !title.startsWith(`[${teamName}]`)) {
+			    	    event.setProp("title", `[${teamName}] ${title}`);
+			    	  }
 
-			        // 색상 스타일 지정
-			        let backgroundColor = "#DDDDDD";
-			        let borderColor = "#CCCCCC";
-			        let textColor = "#000000";
+			    	  // 색상 스타일 지정
+			    	  let backgroundColor = "#DDDDDD";
+			    	  let borderColor = "#CCCCCC";
+			    	  let textColor = "#000000";
 
-			        if (separator.startsWith("A")) {
-			          backgroundColor = "#F8D7DA";
-			          borderColor = "#F5C6CB";
-			          textColor = "#721C24";
-			        }
+			    	  if (separator.startsWith("A")) {
+			    	    backgroundColor = "#F8D7DA";
+			    	    borderColor = "#F5C6CB";
+			    	    textColor = "#721C24";
+			    	  }
 
-			        if (separator.startsWith("T")) {
-			          backgroundColor = "#BDE0FE";
-			          borderColor = "#7FBFFF";
-			          textColor = "#003366";
-			        }
+			    	  if (separator.startsWith("T")) {
+			    	    backgroundColor = "#BDE0FE";
+			    	    borderColor = "#7FBFFF";
+			    	    textColor = "#003366";
+			    	  }
 
-			        const titleEl = info.el.querySelector('.fc-list-event-title');
-			        if (titleEl) {
-			          
-			          titleEl.style.backgroundColor = backgroundColor;
-			          titleEl.style.border = `1px solid ${borderColor}`;
-			          titleEl.style.color = textColor;
-			          titleEl.style.borderRadius = "8px";			          
-			          titleEl.style.padding = "4px 8px";
-			          titleEl.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)";
-			          titleEl.style.fontWeight = "500";
-			          titleEl.style.fontSize = "14px";
-			        }
+			    	  const titleEl = info.el.querySelector('.fc-list-event-title');
+			    	  const timeEl = info.el.querySelector('.fc-list-event-time');
+			    	  const rowEl = info.el.closest('tr');
+			    	  
+			    	  
 
-			        // colgroup 삽입 
-			        const table = document.querySelector('table.fc-list-table');
-			        if (table && !insertedTables.has(table)) {
-			          const colgroup = document.createElement('colgroup');
+			    	  // 제목 스타일
+			    	  if (titleEl) {
+			    	    titleEl.style.backgroundColor = backgroundColor;
+			    	    titleEl.style.border = `1px solid ${borderColor}`;
+			    	    titleEl.style.color = textColor;
+			    	    titleEl.style.borderRadius = "8px";
+			    	    titleEl.style.padding = "6px 10px";     
+			    	    titleEl.style.margin = "6px 0";         
+			    	    titleEl.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)";
+			    	    titleEl.style.fontWeight = "500";
+			    	    titleEl.style.fontSize = "14px";
+			    	  }
+			    	  
+			    	 
+			    	  if (rowEl) {
+			    	    rowEl.style.cursor = "pointer";
+			    	    rowEl.style.height = "48px"; // 🔥 높이 주기
+			    	    rowEl.style.borderBottom = "4px solid transparent"; // 🔥 아래 여백 느낌
+			    	    rowEl.addEventListener("click", () => {
+			    	      location.href = "/calendar/all";
+			    	    });
+			    	  }
 
-			          const col1 = document.createElement('col');
-			          col1.style.width = '30%';
+			    	  // 시간 셀 스타일 (여유 주기)
+			    	  if (timeEl) {
+			    	    timeEl.style.paddingTop = "6px";
+			    	    timeEl.style.paddingBottom = "6px";
+			    	  }
 
-			          const col2 = document.createElement('col');
-			          col2.style.width = '0';
-			          col2.style.display = 'none';
+			    	  // 각 전체 행에 마우스 커서 변경 + 클릭 이동
+			    	  rowEl.style.cursor = "pointer";
+			    	  rowEl.addEventListener("click", () => {
+			    	    location.href = "/calendar/all";
+			    	  });
 
-			          const col3 = document.createElement('col');
-			          col3.style.width = '70%';
+			    	  // colgroup 삽입
+			    	  const table = document.querySelector('table.fc-list-table');
+			    	  if (table && !insertedTables.has(table)) {
+			    	    const colgroup = document.createElement('colgroup');
 
-			          colgroup.appendChild(col1);
-			          colgroup.appendChild(col2);
-			          colgroup.appendChild(col3);
+			    	    const col1 = document.createElement('col');
+			    	    col1.style.width = '30%';
 
-			          const thead = table.querySelector('thead');
-			          if (thead) {
-			            table.insertBefore(colgroup, thead);
-			          } else {
-			            table.prepend(colgroup);
-			          }
+			    	    const col2 = document.createElement('col');
+			    	    col2.style.width = '0';
+			    	    col2.style.display = 'none';
 
-			          insertedTables.add(table);
-			        }
-			      }
+			    	    const col3 = document.createElement('col');
+			    	    col3.style.width = '70%';
+
+			    	    colgroup.appendChild(col1);
+			    	    colgroup.appendChild(col2);
+			    	    colgroup.appendChild(col3);
+
+			    	    const thead = table.querySelector('thead');
+			    	    if (thead) {
+			    	      table.insertBefore(colgroup, thead);
+			    	    } else {
+			    	      table.prepend(colgroup);
+			    	    }
+
+			    	    insertedTables.add(table);
+			    	  }
+			    	}
 			    });
 
 			    calendar.render();
