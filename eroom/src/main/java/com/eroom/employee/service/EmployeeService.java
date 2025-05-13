@@ -20,9 +20,13 @@ import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.dto.EmployeeUpdateDto;
 import com.eroom.employee.dto.SeparatorDto;
 import com.eroom.employee.dto.StructureDto;
+import com.eroom.employee.entity.Authority;
+import com.eroom.employee.entity.AuthorityMapping;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.entity.Separator;
 import com.eroom.employee.entity.Structure;
+import com.eroom.employee.repository.AuthorityMappingRepository;
+import com.eroom.employee.repository.AuthorityRepository;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.employee.repository.SeparatorRepository;
 import com.eroom.employee.repository.StructureRepository;
@@ -37,6 +41,8 @@ public class EmployeeService {
 	private final StructureRepository structureRepository;
 	private final DirectoryRepository employeeDirectoryRepository;
 	private final SeparatorRepository separatorRepository;
+	private final AuthorityRepository authorityRepository;
+	private final AuthorityMappingRepository authorityMappingRepository;
 	private final PasswordEncoder passwordEncoder;
 	
 	// 전체 직원 조회
@@ -202,6 +208,14 @@ public class EmployeeService {
 		
 		employeeDirectoryRepository.save(directory);
 		
+		// 권한 엔티티 조회(ROLE_USER)
+		Authority userAuthority = authorityRepository.findById(1L).orElse(null);
+		// 권한 매핑 생성 및 저장
+		AuthorityMapping authorityMapping = AuthorityMapping.builder()
+										.employee(employee)
+										.authority(userAuthority)
+										.build();
+		authorityMappingRepository.save(authorityMapping);
 	}
 	
 	// 회원 정보 수정(관리자)

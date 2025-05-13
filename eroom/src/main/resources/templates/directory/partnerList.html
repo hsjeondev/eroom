@@ -51,7 +51,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				<th class="sort" data-sort="name" style="width: 12%;">이름</th>
 				<th class="sort" data-sort="companyName" style="width: 15%;">회사명</th>
 				<th class="sort" data-sort="email" style="width: 17%;">이메일</th>
-				<th class="sort" data-sort="phone" style="width: 12%;">전화번호</th>
+				<th class="sort" data-sort="phone" style="width: 12%;">연락처</th>
 				<th class="sort" data-sort="department" style="width: 12%;">부서명</th>
 				<th class="sort" data-sort="team" style="width: 12%;">팀명</th>
 				<th class="sort" data-sort="position" style="width: 10%;">직급</th>
@@ -98,7 +98,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
     </div>
 	<div id="loadingSpinner" class="text-center py-3"  style="display: block;">
 	   <div class="spinner-border" role="status">
-	  	<span class="visually-hidden">Loading...</span>
+	  	<span class="visually-hidden">로딩중...</span>
 	  </div>
 	</div> 
     
@@ -123,51 +123,51 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 <!-- 협력업체 인원 추가 모달 -->
 <div class="modal fade" id="addPartnerDirectoryModal" tabindex="-1" aria-labelledby="addPartnerDirectoryModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
+    <div class="modal-content border border-secondary">
 
       <!-- 헤더 -->
-      <div class="modal-header">
+      <div class="modal-header bg-light">
         <h5 class="modal-title" id="addPartnerDirectoryModalLabel">협력업체 인원 추가</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
       <!-- 바디 -->
-      <div class="modal-body">
+      <div class="modal-body px-4 py-3">
         <form id="addPartnerDirectoryForm">
           <div class="mb-3">
-            <label for="name" class="form-label">이름</label>
-            <input type="text" class="form-control form-control-sm" id="name" placeholder="예: 홍길동">
+            <label for="name" class="form-label fw-semibold">이름</label>
+            <input type="text" class="form-control" id="name" placeholder="예: 홍길동">
           </div>
           <div class="mb-3">
-            <label for="companyName" class="form-label">회사명</label>
-            <input type="text" class="form-control form-control-sm" id="companyName" placeholder="예: 이룸컴퍼니">
+            <label for="companyName" class="form-label fw-semibold">회사명</label>
+            <input type="text" class="form-control" id="companyName" placeholder="예: 이룸컴퍼니">
           </div>
           <div class="mb-3">
-            <label for="email" class="form-label">이메일</label>
-            <input type="email" class="form-control form-control-sm" id="email" placeholder="예: example@exp.co.kr">
+            <label for="email" class="form-label fw-semibold">이메일</label>
+            <input type="email" class="form-control" id="email" placeholder="예: example@eroom.it.kr">
           </div>
           <div class="mb-3">
-            <label for="phone" class="form-label">전화번호</label>
-            <input type="text" class="form-control form-control-sm" id="phone" placeholder="예: 010-1234-5678">
+            <label for="phone" class="form-label fw-semibold">연락처</label>
+            <input type="text" class="form-control" id="phone" placeholder="예: 010-1234-5678">
           </div>
           <div class="mb-3">
-            <label for="department" class="form-label">부서명</label>
-            <input type="text" class="form-control form-control-sm" id="department" placeholder="예: OO부">
+            <label for="department" class="form-label fw-semibold">부서명</label>
+            <input type="text" class="form-control" id="department" placeholder="예: OO부">
           </div>
           <div class="mb-3">
-            <label for="team" class="form-label">팀명</label>
-            <input type="text" class="form-control form-control-sm" id="team" placeholder="예: OO팀">
+            <label for="team" class="form-label fw-semibold">팀명</label>
+            <input type="text" class="form-control" id="team" placeholder="예: OO팀">
           </div>
           <div class="mb-3">
-            <label for="position" class="form-label">직급</label>
-            <input type="text" class="form-control form-control-sm" id="position" placeholder="예: 부장">
+            <label for="position" class="form-label fw-semibold">직급</label>
+            <input type="text" class="form-control" id="position" placeholder="예: 부장">
           </div>
         </form>
       </div>
 
       <!-- 푸터 -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+      <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
         <button type="submit" class="btn btn-primary btn-sm" id="submitBtn">등록</button>
       </div>
     </div>
@@ -176,7 +176,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
 <!-- 수정 모달 -->
 <div class="modal fade" id="editPartnerDirectoryModal" tabindex="-1" aria-labelledby="editPartnerDirectoryModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border border-secondary">
         <!-- 헤더 -->
         <div class="modal-header bg-light">
@@ -186,36 +186,36 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
         </div>
 
 	      <!-- 바디 -->
-	      <div class="modal-body">
+	      <div class="modal-body px-4 py-3">
 	        <form id="editPartnerDirectoryForm">
 	        <input type="hidden" id="editNo">
 	          <div class="mb-3">
-	            <label for="editName" class="form-label">이름</label>
-	            <input type="text" class="form-control form-control-sm" id="editName" placeholder="예: 홍길동">
+	            <label for="editName" class="form-label fw-semibold">이름</label>
+	            <input type="text" class="form-control" id="editName" placeholder="예: 홍길동">
 	          </div>
 	          <div class="mb-3">
-	            <label for="editCompanyName" class="form-label">회사명</label>
-	            <input type="text" class="form-control form-control-sm" id="editCompanyName" placeholder="예: 이룸컴퍼니">
+	            <label for="editCompanyName" class="form-label fw-semibold">회사명</label>
+	            <input type="text" class="form-control" id="editCompanyName" placeholder="예: 이룸컴퍼니">
 	          </div>
 	          <div class="mb-3">
-	            <label for="editEmail" class="form-label">이메일</label>
-	            <input type="email" class="form-control form-control-sm" id="editEmail" placeholder="예: example@exp.co.kr">
+	            <label for="editEmail" class="form-label fw-semibold">이메일</label>
+	            <input type="email" class="form-control" id="editEmail" placeholder="예: example@exp.co.kr">
 	          </div>
 	          <div class="mb-3">
-	            <label for="editPhone" class="form-label">전화번호</label>
-	            <input type="text" class="form-control form-control-sm" id="editPhone" placeholder="예: 010-1234-5678">
+	            <label for="editPhone" class="form-label fw-semibold">연락처</label>
+	            <input type="text" class="form-control" id="editPhone" placeholder="예: 010-1234-5678">
 	          </div>
 	          <div class="mb-3">
-	            <label for="editDepartment" class="form-label">부서명</label>
-	            <input type="text" class="form-control form-control-sm" id="editDepartment" placeholder="예: OO부">
+	            <label for="editDepartment" class="form-label fw-semibold">부서명</label>
+	            <input type="text" class="form-control" id="editDepartment" placeholder="예: OO부">
 	          </div>
 	          <div class="mb-3">
-	            <label for="editTeam" class="form-label">팀명</label>
-	            <input type="text" class="form-control form-control-sm" id="editTeam" placeholder="예: OO팀">
+	            <label for="editTeam" class="form-label fw-semibold">팀명</label>
+	            <input type="text" class="form-control" id="editTeam" placeholder="예: OO팀">
 	          </div>
 	          <div class="mb-3">
-	            <label for="editPosition" class="form-label">직급</label>
-	            <input type="text" class="form-control form-control-sm" id="editPosition" placeholder="예: 부장">
+	            <label for="editPosition" class="form-label fw-semibold">직급</label>
+	            <input type="text" class="form-control" id="editPosition" placeholder="예: 부장">
 	          </div>
 	        </form>
 	      </div>
@@ -248,7 +248,7 @@ document.getElementById("submitBtn").addEventListener('click', function(e){
         { id: "name", message: "이름을 입력해주세요." },
         { id: "companyName", message: "회사명을 입력해주세요." },
         { id: "email", message: "이메일을 입력해주세요." },
-        { id: "phone", message: "전화번호를 입력해주세요." },
+        { id: "phone", message: "연락처를 입력해주세요." },
         { id: "department", message: "부서명을 입력해주세요." },
         { id: "team", message: "팀명을 입력해주세요." },
         { id: "position", message: "직급을 입력해주세요." }
@@ -276,7 +276,7 @@ document.getElementById("submitBtn").addEventListener('click', function(e){
             isValid = false;
         } else if (field.id === 'phone' && !phoneRegex.test(value)) {
             if (isValid) {
-                alert("전화번호는 010-1234-5678 형식으로 입력해주세요.");
+                alert("연락처는 010-1234-5678 형식으로 입력해주세요.");
                 input.focus();
             }
             input.style.border = "1px solid red";
@@ -344,7 +344,7 @@ document.getElementById("editPartnerBtn").addEventListener('click', function(e){
     	  { idEdit: "editName", message: "이름을 입력해주세요." },
     	  { idEdit: "editCompanyName", message: "회사명을 입력해주세요." },
     	  { idEdit: "editEmail", message: "이메일을 입력해주세요." },
-    	  { idEdit: "editPhone", message: "전화번호를 입력해주세요." },
+    	  { idEdit: "editPhone", message: "연락처를 입력해주세요." },
     	  { idEdit: "editDepartment", message: "부서명을 입력해주세요." },
     	  { idEdit: "editTeam", message: "팀명을 입력해주세요." },
     	  { idEdit: "editPosition", message: "직급을 입력해주세요." }
@@ -373,7 +373,7 @@ document.getElementById("editPartnerBtn").addEventListener('click', function(e){
             isValidEdit = false;
         } else if (fieldEdit.idEdit === 'phone' && !phoneRegexEdit.test(valueEdit)) {
             if (isValidEdit) {
-                alert("전화번호는 010-1234-5678 형식으로 입력해주세요.");
+                alert("연락처는 010-1234-5678 형식으로 입력해주세요.");
                 inputEdit.focus();
             }
             inputEdit.style.border = "1px solid red";

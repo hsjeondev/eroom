@@ -223,7 +223,7 @@ td.name p {
 					</div>	
 					<div id="loadingSpinner" class="text-center py-3">
                       <div class="spinner-border" role="status">
-                      	<span class="visually-hidden">Loading...</span>
+                      	<span class="visually-hidden">로딩중...</span>
                       </div>
                     </div>
                     
@@ -258,24 +258,24 @@ td.name p {
 
 				<!-- Sortable JS 모달 -->
 				<div class="modal fade" id="sortOrderModal" tabindex="-1" aria-labelledby="sortOrderModalLabel" aria-hidden="true">
-				  <div class="modal-dialog modal-lg modal-dialog-centered">
+				  <div class="modal-dialog modal-dialog-centered">
 				    <div class="modal-content border border-secondary" style="height: 100%;">
 				      <div class="modal-header bg-light">
 				        <h5 class="modal-title" id="sortOrderModalLabel">부서 및 팀 정렬</h5>
 				        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
 				      </div>
-				      <div class="modal-body">
+				      <div class="modal-body px-4 py-3">
 				        <!-- 부서 및 팀 정렬 리스트 -->
 				        <ul id="departmentList" class="list-group" >
 				          <li class="list-group-item department-item" th:each="dept, deptStatus : ${departmentList}" th:attr="data-order=${deptStatus.count}">
-				            <div class="fw-bold department-header" th:text="${dept.codeName}">부서명</div>
+				            <div class="fw-bold department-header " th:text="${dept.codeName}">부서명</div>
 				            <ul class="list-group ms-3 sortable-team" th:attr="data-department-id=${dept.separatorCode}">
 				              <li th:each="team, teamStatus : ${teamMap[dept.codeName]}" class="list-group-item team-item" th:attr="data-team-id=${team.separatorCode}" th:text="${team.codeName}">팀명</li>
 				            </ul>
 				          </li>
 				        </ul>
 				      </div>
-				      <div class="modal-footer">
+				      <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
 				        <button class="btn btn-light" data-bs-dismiss="modal">닫기</button>
 				        <button class="btn btn-primary" id="saveSortOrderBtn">저장</button>
 				      </div>
@@ -292,12 +292,12 @@ td.name p {
 				<!-- 부서, 팀 추가 모달 -->
 		<div class="modal fade" id="addDepartmentAndTeamModal" tabindex="-1" aria-labelledby="addDepartmentAndTeamModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
-				<div class="modal-content">
-					<div class="modal-header py-2">
-						<h5 class="modal-title fw-bold" id="addDepartmentAndTeamModalLabel">부서/팀 추가</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+				<div class="modal-content border border-secondary">
+					<div class="modal-header bg-light">
+						<h5 class="modal-title" id="addDepartmentAndTeamModalLabel">부서/팀 추가</h5>
+						<button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
 					</div>
-					<div class="modal-body px-4">
+					<div class="modal-body px-4 py-3">
 						<!-- 라디오 전환 -->
 						<div class="mb-3">
 							<div class="form-check form-check-inline">
@@ -330,7 +330,7 @@ td.name p {
 							</div>
 						</form>
 					</div>
-					<div class="modal-footer py-2">
+					<div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
 						<button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
 						<button type="submit" class="btn btn-primary btn-sm" onclick="showConfirm()">등록</button>
 					</div>
@@ -343,12 +343,12 @@ td.name p {
 		<!-- 부서, 팀 삭제 모달 -->
 		<div class="modal fade" id="deleteDepartmentAndTeamModal" tabindex="-1" aria-labelledby="deleteDepartmentAndTeamModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
-				<div class="modal-content">
-					<div class="modal-header py-2">
-						<h5 class="modal-title fw-bold" id="deleteDepartmentAndTeamModalLabel">부서/팀 삭제</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+				<div class="modal-content border border-secondary">
+					<div class="modal-header bg-light">
+						<h5 class="modal-title" id="deleteDepartmentAndTeamModalLabel">부서/팀 삭제</h5>
+						<button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
 					</div>
-					<div class="modal-body px-4">
+					<div class="modal-body px-4 py-3">
 						<!-- 폼 -->
 						<form id="deleteForm">
 							<!-- 팀 선택 + 팀명 -->
@@ -375,7 +375,7 @@ td.name p {
 							</select>
 						</form>
 					</div>
-					<div class="modal-footer py-2">
+					<div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
 						<button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
 						<button type="submit" class="btn btn-danger btn-sm" onclick="deleteConfirm()">삭제</button>
 					</div>
@@ -430,7 +430,7 @@ td.name p {
 							<!-- 전화번호 / 이메일 / 직급 -->
 							<div class="border rounded p-3 mb-4 bg-light-subtle">
 								<div class="mb-2">
-									<label class="form-label fw-semibold mb-0">휴대전화번호</label>
+									<label class="form-label fw-semibold mb-0">연락처</label>
 									<div id="modalPhone" class="ps-2 profile-phone">010-1234-1234</div>
 								</div>
 								<div class="mb-2">
