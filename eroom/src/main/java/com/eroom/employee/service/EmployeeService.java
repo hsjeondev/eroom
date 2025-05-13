@@ -442,4 +442,10 @@ public class EmployeeService {
 		return employeeRepository.findByEmployeeId(employeeId).orElse(null);
 	}
 	
+	
+	// 전체 직원 조회
+	public List<Employee> findAllEmployee_EmployeeEmploymentYn() {
+		return employeeRepository.findAllByEmployeeEmploymentYn("Y");
+	}
+	
 }

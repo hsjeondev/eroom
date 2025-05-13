@@ -76,16 +76,18 @@
 								</div>
 								<div class="text-end text-body-secondary fs-8 mt-1 d-flex gap-2" style="display: flex; overflow-x: auto; gap: 5px; max-width: 100%; white-space: nowrap;" id="approveLine1">
 									<!-- 결재자 불러오기 -->
-									<div th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step >= 1}" class="position-relative d-inline">
-										<span class="badge border text-dark d-flex justify-content-end align-items-center" 
-											style="background-color: rgb(248, 249, 250);">
-											<span th:text="${approveMember.employee.employeeName}"></span>
-											<button type="button" class="btn-close" th:attr="data-idx=${stat.count}"
-												aria-label="Remove" style="scale: 0.8;" data-prefix="approver">
-											</button>
-											<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="approverSteps" th:value="${approveMember.approval_line_step}">
-										</span>
-									</div>
+									<span th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step >= 1}" class="badge border text-dark d-flex justify-content-end align-items-center" style="background-color: rgb(248, 249, 250);">
+										<span th:text="${approveMember.employee.employeeName}"></span>
+										<button type="button" class="btn-close" aria-label="Remove" data-prefix="approver" style="scale: 0.8;"></button>
+										<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}">
+										<input type="hidden" name="approverSteps" th:value="${approveMember.approval_line_step}">
+									</span>
+									<!-- <span class="badge border text-dark d-flex justify-content-end align-items-center" style="background-color: rgb(248, 249, 250);">
+										<span>오진석</span>
+										<button type="button" class="btn-close" aria-label="Remove" data-prefix="approver" style="scale: 0.8;"></button>
+										<input type="hidden" name="approverIds" value="4">
+										<input type="hidden" name="approverSteps" value="1">
+									</span> -->
 								</div>
 							</div>
 							<!-- <span style="vertical-align: middle;">합의자 :</span> -->
@@ -97,7 +99,7 @@
 								    선택된 합의자가 없습니다.
 								</div>
 								<div class="text-end text-body-secondary fs-8 mt-1 d-flex gap-2" style="display: flex; overflow-x: auto; gap: 5px; max-width: 100%; white-space: nowrap;" id="approveLine2">
-									<!-- 합의자 불러오기 -->
+									<!-- 합의자 불러오기 --><!-- 
 									<div th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step == 0}" class="position-relative d-inline">
 										<span class="badge border text-dark d-flex justify-content-end align-items-center"
 										      style="background-color: rgb(248, 249, 250);">
@@ -108,7 +110,13 @@
 										    <input type="hidden" name="agreerIds" th:value="${approveMember.employee.employeeNo}">
 										    <input type="hidden" name="agreerSteps" th:value="0">
 										</span>
-									</div>							
+									</div>	 -->	
+									<span th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step == 0}" class="badge border text-dark d-flex justify-content-end align-items-center" style="background-color: rgb(248, 249, 250);">
+										<span th:text="${approveMember.employee.employeeName}"></span>
+										<button type="button" class="btn-close" aria-label="Remove" data-prefix="agreer" style="scale: 0.8;"></button>
+										<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}">
+										<input type="hidden" name="approverSteps" th:value="0">
+									</span>					
 								</div>
 							</div>
 							<!-- <span style="vertical-align: middle;">참조자 :</span> -->
@@ -121,7 +129,7 @@
 								</div>
 								<div class="text-end text-body-secondary fs-8 mt-1 d-flex gap-2" style="display: flex; overflow-x: auto; gap: 5px; max-width: 100%; white-space: nowrap;" id="approveLine3">
 									<!-- 합의자 불러오기 -->
-									<div th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step == -1}" class="position-relative d-inline">
+									<!-- <div th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step == -1}" class="position-relative d-inline">
 										<span class="badge border text-dark d-flex justify-content-end align-items-center" style="background-color: rgb(248, 249, 250);">
 											<span th:text="${approveMember.employee.employeeName}"></span>
 											<button type="button" class="btn-close" th:attr="data-idx=${stat.count}"
@@ -129,7 +137,13 @@
 											</button>
 											<input type="hidden" name="refererIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="refererSteps" th:value="-1">
 										</span>
-									</div>							
+									</div> -->		
+									<span th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step == -1}" class="badge border text-dark d-flex justify-content-end align-items-center" style="background-color: rgb(248, 249, 250);">
+										<span th:text="${approveMember.employee.employeeName}"></span>
+										<button type="button" class="btn-close" aria-label="Remove" data-prefix="referer" style="scale: 0.8;"></button>
+										<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}">
+										<input type="hidden" name="approverSteps" th:value="-1">
+									</span>										
 								</div>
 							</div>
 						</div>
@@ -196,7 +210,7 @@
 				</div>
 				<div class="d-flex justify-content-end">
 					<button type="button" class="btn btn-light" onclick="history.back()">취소</button>
-					<button id="approvalSubmitBtn" class="btn btn-primary ms-2" type="submit">등록</button>
+					<button id="approvalSubmitBtn" class="btn btn-primary ms-2" type="button">등록</button>
 				</div>
 			</form>
 			
@@ -455,7 +469,7 @@
 	        const mode = data.mode;
 	        const approvalContent = data.approvalContent;
 	
-	        if (mode === 'edit' && approvalContent) {
+/* 	        if (mode === 'edit' && approvalContent) {
 	          setTimeout(() => {
 	            for (const key in approvalContent) {
 	              const inputField = document.querySelector(`#basic-form-edit [name="${key}"]`);
@@ -464,8 +478,26 @@
 	              }
 	            }
 	            
-	          }, 0);
-	        }
+	          }, 0); */
+	          if (mode === 'edit' && approvalContent) {
+	        	  setTimeout(() => {
+	        	    for (const key in approvalContent) {
+	        	      const inputFields = document.querySelectorAll(`#basic-form-edit [name="${key}"]`);
+
+	        	      inputFields.forEach((inputField) => {
+	        	        if (inputField.type === "radio") {
+	        	          // 라디오 버튼일 경우, value 값을 비교해서 체크하기
+	        	          if (inputField.value === approvalContent[key]) {
+	        	            inputField.checked = true;
+	        	          }
+	        	        } else {
+	        	          // 일반 input일 경우
+	        	          inputField.value = approvalContent[key];
+	        	        }
+	        	      });
+	        	    }
+	        	  }, 0);
+	        	}
 	        
 	        
 
@@ -1162,8 +1194,13 @@ document.addEventListener('DOMContentLoaded', function () {
 	  if (event.target.classList.contains('btn-close')) {
 	    const badge = event.target.closest('.badge');
 	    const targetPrefix = event.target.getAttribute('data-prefix');
-	    if(targetPrefix){
-		    removeBadgeAndCheck(targetPrefix);
+	    
+	    if (badge) {
+	      badge.remove();  // ✅ 화면에서 뱃지 삭제
+	    }
+
+	    if (targetPrefix) {
+	      removeBadgeAndCheck(targetPrefix);  // ✅ 남은 개수 확인
 	    }
 	  }
 	});
@@ -1283,7 +1320,13 @@ function handleHighlight(li) {
 		    const value = el.value?.trim();
 		
 		    if (!name) return;
-		
+		    
+		    // ✅ [라디오 버튼 체크 여부 확인]
+		    if (el.type === "radio") {
+		      if (el.checked) {
+		        approvalContent[name] = el.value;
+		      }
+		    } else{
 		    if (!value) {
 		      hasEmpty = true;
 		      el.classList.add("is-invalid");
@@ -1292,6 +1335,7 @@ function handleHighlight(li) {
 		      el.classList.remove("is-invalid");
 		      el.style.border = "";
 		      approvalContent[name] = value;
+		    }
 		    }
 		  });
 		
