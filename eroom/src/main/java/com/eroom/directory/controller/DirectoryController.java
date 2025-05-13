@@ -51,6 +51,7 @@ public class DirectoryController {
 		model.addAttribute("employeeDetails", user);
 //		System.out.println(user.getAuthorities() + "123");
 		List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
+		List<DirectoryDto> employeeListBookmark = new ArrayList<DirectoryDto>();
 		List<Directory> temp = directoryService.selectDirectoryEmployeeAllBySeparatorCode();
 		
 		// 직원 리스트를 가져와서 DTO로 변환
@@ -86,9 +87,13 @@ public class DirectoryController {
 			// 재직중인 사람만 리스트에 추가
 			if (t.getEmployee().getEmployeeEmploymentYn().equals("Y")) {
 				String bookmarkYn = directoryBookmarkService.findBookmarkYnByEmployeeNo(employee.getEmployeeNo(), dto.getEmployee_no());
-				dto.setBookmark_yn(bookmarkYn);
-				dto.setStar_mark_html("<i class=\"fas fa-star\"></i>");
-				employeeList.add(dto);
+				if(bookmarkYn != null && bookmarkYn.equals("Y")) {
+					dto.setBookmark_yn(bookmarkYn);
+					dto.setStar_mark_html("<i class=\"fas fa-star\"></i>");
+					employeeListBookmark.add(dto);
+				} else {
+					employeeList.add(dto);
+				}
 			} 
 		}
 		
@@ -112,6 +117,7 @@ public class DirectoryController {
 		model.addAttribute("departmentList", departmentList);
 		model.addAttribute("teamMap", teamMap);
 		model.addAttribute("employeeList", employeeList);
+		model.addAttribute("employeeListBookmark", employeeListBookmark);
 		
 		return "directory/employeeList";
 	}
@@ -205,6 +211,7 @@ public class DirectoryController {
 		Employee employee = user.getEmployee();
 		
 		List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
+		List<DirectoryDto> employeeListBookmark = new ArrayList<DirectoryDto>();
 		List<Directory> temp = directoryService.selectDirectoryEmployeeAllBySeparatorCode();
 		List<EmployeeDto> searchRemainEmployee = new ArrayList<EmployeeDto>();
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -239,16 +246,24 @@ public class DirectoryController {
 					&& targetCodeName != null
 					&& (targetCodeName.equals(dto.getTeam_name()) || targetCodeName.equals(dto.getDepartment_name()))) {
 				String bookmarkYn = directoryBookmarkService.findBookmarkYnByEmployeeNo(employee.getEmployeeNo(), dto.getEmployee_no());
-				dto.setBookmark_yn(bookmarkYn);
-				dto.setStar_mark_html("<i class=\"fas fa-star\"></i>");
-				employeeList.add(dto);
+				if(bookmarkYn != null && bookmarkYn.equals("Y")) {
+					dto.setBookmark_yn(bookmarkYn);
+					dto.setStar_mark_html("<i class=\"fas fa-star\"></i>");
+					employeeListBookmark.add(dto);
+				} else {
+					employeeList.add(dto);
+				}
 				searchRemainEmployee.add(new EmployeeDto().toDto(t.getEmployee()));
 			} else if(t.getEmployee().getEmployeeEmploymentYn().equals("Y")
 					&& separatorCode.equals("selectAll")) {
 				String bookmarkYn = directoryBookmarkService.findBookmarkYnByEmployeeNo(employee.getEmployeeNo(), dto.getEmployee_no());
-				dto.setBookmark_yn(bookmarkYn);
-				dto.setStar_mark_html("<i class=\"fas fa-star\"></i>");
-				employeeList.add(dto);
+				if(bookmarkYn != null && bookmarkYn.equals("Y")) {
+					dto.setBookmark_yn(bookmarkYn);
+					dto.setStar_mark_html("<i class=\"fas fa-star\"></i>");
+					employeeListBookmark.add(dto);
+				} else {
+					employeeList.add(dto);
+				}
 				searchRemainEmployee.add(new EmployeeDto().toDto(t.getEmployee()));
 				
 			}
@@ -270,6 +285,7 @@ public class DirectoryController {
 		model.addAttribute("departmentList", departmentList);
 		model.addAttribute("teamMap", teamMap);
 		model.addAttribute("employeeList", employeeList);
+		model.addAttribute("employeeListBookmark", employeeListBookmark);
 		model.addAttribute("searchRemainEmployee", searchRemainEmployee);
 		result.put("searchRemainEmployee", searchRemainEmployee);
 		return result;

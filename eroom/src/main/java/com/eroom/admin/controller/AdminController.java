@@ -810,7 +810,9 @@ public class AdminController {
 		Map<String,Object> result = new HashMap<>();
 		
 		try {
-			AnnualLeave leave = annualLeaveService.findByEmployeeNo(employeeNo);
+			// 기준일 정책 기준으로 연도 계산
+			Long targetYear = annualPolicyUtil.getTargetYearByPolicy();
+			AnnualLeave leave = annualLeaveService.selectAnnualLeaveByEmployeeNoAndYear(employeeNo, targetYear);
 			
 			if(leave == null) {
 				result.put("res_code", 404);

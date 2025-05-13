@@ -14,7 +14,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		</div>
 			<div class="pb-8">
 				<div id="reports" style="display: none;" data-list='{
-										       "valueNames": ["writer", "text1", "text2", "text3", "title", "state", "date", "reports"],
+										       "valueNames": ["writer", "text1", "title", "state", "date", "reports"],
 										       "page": 10,
 										       "pagination": true
 										     }'>
@@ -57,15 +57,15 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 									<!-- 필터 모달 -->
 									<div class="modal fade" id="reportsFilterModal" tabindex="-1">
 										<div class="modal-dialog modal-dialog-centered">
-											<div class="modal-content border border-translucent">
+											<div class="modal-content border border-secondary">
 												<form id="addEventForm" autocomplete="off">
-													<div class="modal-header justify-content-between border-translucent p-4">
-														<h5 class="modal-title text-body-highlight fs-6 lh-sm">필터/정렬</h5>
-														<button class="btn p-1 text-danger" type="button" data-bs-dismiss="modal" aria-label="Close"><svg class="svg-inline--fa fa-xmark fs-9" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"></path></svg><!-- <span class="fas fa-times fs-9"> 				</span> Font Awesome fontawesome.com --></button>
+													<div class="modal-header bg-light">
+														<h5 class="modal-title">필터/정렬</h5>
+														<button class="btn-close btn-close-secondary" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
 													</div>
 													<div class="modal-body pt-4 pb-2 px-4">
 														<div class="mb-3">
-															<label class="fw-bold mb-2 text-body-highlight" for="formatNo">결재양식</label>
+															<label class="form-label fw-semibold" for="formatNo">결재양식</label>
 															<select class="form-select" id="formatNo">
 																<option th:value="0">전체 보기</option>
 																<option 
@@ -76,14 +76,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 															</select>
 														</div>
 														<div class="mb-3">
-															<label class="fw-bold mb-2 text-body-highlight" for="dateSort">날짜</label>
+															<label class="form-label fw-semibold" for="dateSort">날짜</label>
 															<select class="form-select" id="dateSort">
 																<option value="DESC">최신순</option>
 																<option value="ASC">오래된순</option>
 															</select>
 														</div>
 														<div class="mb-3">
-															<label class="fw-bold mb-2 text-body-highlight" for="approvalStatus">진행여부</label>
+															<label class="form-label fw-semibold" for="approvalStatus">진행여부</label>
 															<select class="form-select" id="approvalStatus">
 																<option th:value="0">전체 보기</option>
 																<option th:value="A">🟢 승인</option>
@@ -168,7 +168,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				</div> <!-- reports 끝 -->
 				<div id="loadingSpinner" class="text-center py-3"  style="display: block;">
 				   <div class="spinner-border" role="status">
-				  	<span class="visually-hidden">Loading...</span>
+				  	<span class="visually-hidden">로딩중...</span>
 				  </div>
 				</div>
 			
@@ -179,10 +179,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		    <!-- 시그니처패드 모달 구조 -->
     <div class="modal fade" id="signatureModal" tabindex="-1" aria-labelledby="signatureModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
+        <div class="modal-content border border-secondary">
+          <div class="modal-header bg-light">
             <h5 class="modal-title" id="signatureModalLabel">서명</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
           </div>
           <div class="modal-body text-center">
             <canvas id="signatureCanvas" width="400" height="200" style="border:1px solid #000; background:#fff;"></canvas>
@@ -199,18 +199,93 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	<input type="hidden" id="signatureImage" th:value="${approvalSignature}" />
 
 
+
+
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 공통 저장 확인 모달 -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2차 모달 -->
 <script>
-	document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() {
+
+	// 저장 확인 모달 (공통)
+	const confirmSaveModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+	// 알림 모달(공통)
+	const alertModal = new bootstrap.Modal(document.getElementById('alertMessageModal'));
+	// 공통 알림 모달
+	function showAlert(message, callback){
+		document.getElementById('alertMessageContent').innerText = message;
+		alertModal.show();
+		
+		if(callback){
+			const modalEl = document.getElementById('alertMessageModal');
+			modalEl.addEventListener('hidden.bs.modal',function handler(){
+				callback();
+				modalEl.removeEventListener('hidden.bs.modal',handler);
+			});
+		}
+	}
+	// 공통 confirm 모달
+	function showConfirmModal(message, onConfirm){
+		const msgElement = document.getElementById('confirmSaveModalMessage');
+		const confirmBtn = document.getElementById('confirmSaveBtn');
+		
+		msgElement.innerHTML = message;
+		const modalInstance = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+		modalInstance.show();
+		
+		const handler = function(){
+			modalInstance.hide();
+			onConfirm(); // 확인 클릭 시 실행할 콜백
+			confirmBtn.removeEventListener('click',handler); // 중복 방지
+		};
+		
+		confirmBtn.addEventListener('click',handler);
+	}
+
+		/* 로딩 스피너 */
 	   document.getElementById('loadingSpinner').style.display = 'none';
 	   document.getElementById('reports').style.display = 'block';
-	});
-</script>
 
 
-	<!-- 시그니처 모달 작동 스크립트 -->
-	<script>
-    window.addEventListener('load', function () {
-    	let initialCanvasData = null;
+	/* 시그니처 모달 작동 스크립트 */
+	
+   	let initialCanvasData = null;
       let signaturePad;
   		function lastSignature() {
   		    fetch('/approval/signature')
@@ -281,45 +356,54 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	        if (!signaturePad.isEmpty()) {
 	          const saveDataURL = signaturePad.toDataURL();
 	          console.log('서명 데이터 URL:', saveDataURL);
+	          showConfirmModal('서명을 저장하시겠습니까?', signatureCreate);
 	          
-	          fetch('/approval/signature/create', {
-	        	  method : 'POST',
-	        	  headers : {
-	      	        'Content-Type': 'application/json',
-	    	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
-	    	        'header': document.querySelector('meta[name="_csrf_header"]').content
-	        	  },
-	        	  body : JSON.stringify({
-	        		  signature_data_url : saveDataURL
-	        	  })
-	          })
-	          .then(response => response.json())
-	          .then(data => {
-	        		  alert(data.res_msg);
-	          })
+	          function signatureCreate(){
+		          fetch('/approval/signature/create', {
+		        	  method : 'POST',
+		        	  headers : {
+		      	        'Content-Type': 'application/json',
+		    	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+		    	        'header': document.querySelector('meta[name="_csrf_header"]').content
+		        	  },
+		        	  body : JSON.stringify({
+		        		  signature_data_url : saveDataURL
+		        	  })
+		          })
+		          .then(response => response.json())
+		          .then(data => {
+	        		  // alert(data.res_msg);
+	        	  	  showAlert('서명 저장 완료되었습니다.');
+		        	  const modalInstance = bootstrap.Modal.getInstance(signatureModal);
+		  	          modalInstance.hide();
+		          })
+	          }
 	          
-	          const modalInstance = bootstrap.Modal.getInstance(signatureModal);
-	          modalInstance.hide();
+	          
 	        } else {
 	       		// 서명 미입력시.
 	          //alert('서명이 없습니다!');
 	       		// 서명이 없는 경우 지워버리기
-	    	  fetch('/approval/signature/delete', {
-	    		  method : 'PUT',
-	        	  headers : {
-	      	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
-	      	        'header': document.querySelector('meta[name="_csrf_header"]').content
-	          	  }
-	    	  })
-	    	  .then(response => response.json())
-	    	  .then(data => {
-	    		  console.log(data.res_msg);
-	    	      location.reload();
-	    	  })
-	    	  .catch(error => {
-	    	        console.error('삭제 중 오류 발생:', error);
-	    	        alert('삭제 실패');
-	    	  });
+	       		showConfirmModal('서명 정보를 삭제하시겠습니까?', signatureDelete);
+	       		
+	       		function signatureDelete(){
+		    	  fetch('/approval/signature/delete', {
+		    		  method : 'PUT',
+		        	  headers : {
+		      	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+		      	        'header': document.querySelector('meta[name="_csrf_header"]').content
+		          	  }
+		    	  })
+		    	  .then(response => response.json())
+		    	  .then(data => {
+		    		  console.log(data.res_msg);
+		    	      location.reload();
+		    	  })
+		    	  .catch(error => {
+		    	        console.error('삭제 중 오류 발생:', error);
+		    	        alert('삭제 실패');
+		    	  });
+	       		}
 	       		
 	        }
 	      });
@@ -347,9 +431,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	      });
       } */
       
+});
       
-      
-    });
     
     
     </script>
@@ -419,7 +502,7 @@ document.getElementById("filterBtn").addEventListener("click", function () {
         // 리스트 새로 초기화
         try {
           const options = {
-            valueNames: ['title', 'text', 'date', 'reports', 'state'],
+            valueNames: ["writer", "text1", "title", "state", "date", "reports"],
             page: 6,
             pagination: true
           };
