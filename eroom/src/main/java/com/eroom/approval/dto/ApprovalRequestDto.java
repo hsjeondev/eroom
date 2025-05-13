@@ -27,7 +27,7 @@ public class ApprovalRequestDto {
     private EmployeeDto writer;
     private String title;
     private Long format_no;
-    private Map<String, String> content;
+    private Map<String, Object> content;
     private LocalDateTime approval_reg_date;
     
     private List<Long> approverIds;

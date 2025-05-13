@@ -365,7 +365,7 @@ public class ApprovalService {
 						// 연차 관련 결재
 						if(approvalEmployee != null) {
 							// 연차일
-							Map<String, String> approvalContent = approval.getApprovalContent();
+							Map<String, Object> approvalContent = approval.getApprovalContent();
 							DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 							DateTimeFormatter dtfFull = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 							
@@ -393,8 +393,8 @@ public class ApprovalService {
 								if(approval.getApprovalFormat().getApprovalFormatNo() == 7) {
 									// 연차의 경우
 									// 날짜값 가져와야함
-									vacationStart = approvalContent.get("vacationStart");
-									vacationEnd = approvalContent.get("vacationEnd");
+									vacationStart = (String)approvalContent.get("vacationStart");
+									vacationEnd = (String)approvalContent.get("vacationEnd");
 									LocalDate vacationStartFormatted = LocalDate.parse(vacationStart, dtf);
 									LocalDate vacationEndFormatted = LocalDate.parse(vacationEnd, dtf);
 									Long diffDays = ChronoUnit.DAYS.between(vacationStartFormatted, vacationEndFormatted);
@@ -407,8 +407,8 @@ public class ApprovalService {
 									
 								} else if(approval.getApprovalFormat().getApprovalFormatNo() == 8) {
 									// 반차의 경우
-									String vacation = approvalContent.get("vacation");
-									String delimeter = approvalContent.get("amPm");
+									String vacation = (String)approvalContent.get("vacation");
+									String delimeter = (String)approvalContent.get("amPm");
 //									LocalDate vacationStartFormatted = LocalDate.parse(vacation, dtf);
 									annualLeaveUsed = annualLeaveUsed + 0.5;
 									// 연차 정보 캘린더 기입
@@ -454,6 +454,7 @@ public class ApprovalService {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+	        System.out.println("💥 에러 발생: " + e.getMessage());
 			result = 0;
 			throw e; // 이렇게 해줘야 트랙잭션 롤백 가능!! 
 		}

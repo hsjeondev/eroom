@@ -10,7 +10,7 @@
               <th class="bg-light">휴가 기간</th>
               <td>
 				  <span th:text="|*{approval_content['vacation']} |"></span>
-				  <span th:text="*{approval_content['amPm']} == 'AM' ? '오전' : '오후'"></span>
+				  <span th:text="*{approval_content['amPm']} == 'am' ? '오전' : '오후'"></span>
 			  </td>
             </tr>
             <tr>
