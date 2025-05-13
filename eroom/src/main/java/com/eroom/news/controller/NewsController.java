@@ -21,8 +21,10 @@ public class NewsController {
     public ResponseEntity<?> getNews(
             @RequestParam(name = "query", defaultValue = "IT") String query,
             @RequestParam(name = "language", defaultValue = "ko") String language) {
+
         List<Map<String, Object>> newsList = newsApiService.getNews(query, language, 1, 10);
-        return ResponseEntity.ok(newsList);
+        return ResponseEntity.ok(Map.of("articles", newsList)); 
     }
+
 
 }
