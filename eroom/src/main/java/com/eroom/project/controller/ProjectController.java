@@ -576,33 +576,27 @@ public class ProjectController {
 	    return map;
 	}
 	
-	@PostMapping("/myProjectCount")
+	@GetMapping("/mainpage/{proceed}")
 	@ResponseBody
-	public Map<String, Object> projectMypageCountsApi() {
-	    Map<String, Object> map = new HashMap<>();
-	    map.put("res_code", "500");
-	    map.put("res_msg", "프로젝트 개수를 불러오는 중 오류가 발생하였습니다.");
+	public List<Map<String, Object>> getMyProjectsByProceed(
+	        @PathVariable("proceed") String proceed,
+	        Authentication authentication) {
 
-	    try {
-	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	        EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
-	        Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	    EmployeeDetails employee = (EmployeeDetails) authentication.getPrincipal();
+	    Long employeeNo = employee.getEmployee().getEmployeeNo();
 
-	        int doingCount = projectService.countMyDoingProject(employeeNo); // 진행 중
-	        int upcomingCount = projectService.countMyUpcomingProject(employeeNo); // 진행 예정
-	        int doneCount = projectService.countMyDoneProject(employeeNo); // 완료
-	        
-	        map.put("res_code", "200");
-	        map.put("res_msg", "프로젝트 개수를 성공적으로 불러왔습니다.");
-	        map.put("doingCount", doingCount);
-	        map.put("upcomingCount", upcomingCount);
-	        map.put("doneCount", doneCount);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+	    String mappedProceed = switch (proceed) {
+	        case "doing" -> "진행 중";
+	        case "yet" -> "진행 예정";
+	        case "done" -> "완료";
+	        default -> throw new IllegalArgumentException("잘못된 프로젝트 상태: " + proceed);
+	    };
 
-	    return map;
+	    return projectService.findMyProjectsMapByProceed(employeeNo, mappedProceed);
 	}
+
+
+
 
 	
 	@PostMapping("/delete")
