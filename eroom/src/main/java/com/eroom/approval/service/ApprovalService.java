@@ -494,11 +494,11 @@ public class ApprovalService {
 	}
 
 	// mainpage Approval 리스트 조회2
-	public List<Approval> getPendingApprovals(Long employeeNo) {
-		// 내가 합의나 결재 순번인 경우 가져와야하니 ApprovalLineService에 접근해보자.
-	    //return approvalRepository.findTop5ByStatusOrderByCreatedDateDesc("PENDING");
-		return null;
-	}
+//	public List<Approval> getPendingApprovals(Long employeeNo) {
+//		// 내가 합의나 결재 순번인 경우 가져와야하니 ApprovalLineService에 접근해보자.
+//	    //return approvalRepository.findTop5ByStatusOrderByCreatedDateDesc("PENDING");
+//		return null;
+//	}
 
 	// mainpage Approval 리스트 조회3
 	public List<Approval> getCompletedApprovals(Long employeeNo) {
