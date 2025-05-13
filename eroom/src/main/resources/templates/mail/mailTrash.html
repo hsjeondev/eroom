@@ -15,7 +15,6 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	<div id="mailSummary" data-list='{"valueNames":["senderName", "mailTitle", "mailContent", "sendTime"], "page":6, "pagination":true}'>   
       <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
             <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mailCreate}">메일 쓰기</a>
-              <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button>
             </div>
             <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" th:href="@{mailCreate}"> <span class="d-none d-sm-inline-block">메일 쓰기</span><span class="d-sm-none fas fa-plus"></span></a></div>
             <div class="col-auto flex-1">
@@ -45,7 +44,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                 <div class="border-top border-translucent py-2 d-flex justify-content-between">
                   <div class="form-check mb-0 fs-8">
                     <input class="form-check-input" type="checkbox" data-bulk-select-row="data-bulk-select-row" id="chechAll"/>
+	                    <label class="form-check-label ms-2 text-muted" for="checkAll">
+					    전체 선택
+					  </label>
                   </div>
+                  <small class="text-muted ms-4">휴지통의 메일은 15일 후에 자동 삭제됩니다.</small>
                   <div>
                     <button id="deleteBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="삭제"><span class="fas fa-trash fs-10"></span></button>
                   	<button id="removeBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="복구">
@@ -86,7 +89,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                       </div>
                     </div>
                     <div class="col-auto">
-                    	휴지통 아이콘 같은거
+                    🗑️
+                    	
 					  <a class="inbox-link fs-9 senderName"
 					     th:href="@{/mail/detail/{id}(id=${trashMail.mailNo})}"
 					     th:text="${trashMail != null and trashMail.sender != null ? trashMail.sender.employeeName : '알 수 없음'}">
