@@ -37,25 +37,21 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
 				  <div class="card-header" style="text-align: center; font-size: 1.5rem; font-weight: bold; padding: 15px;">
-			        <!-- <a th:href="@{/mail/receiverTo}">
-		               	<i class="fas fa-envelope fa-1x mb-0 text-primary"></i>
-					</a> -->
 					<span>메일</span>
 			      </div>
-			      
 				  <div class="card-body text-center p-4" style="height: 207.81px;">
 				  	<a th:href="@{/mail/receiverTo}">
 		               	<i class="fas fa-envelope fa-3x mb-0 text-primary"></i>
 					</a>
-				  			<div>
-			                    <span style="font-size: 1.5rem; color: red; font-weight: 700;" th:text="${unreadMailCount}">0</span>
-			                    <span style="font-size: 1rem; color: gray;"> / </span>
-			                    <span style="font-size: 1rem; color: gray;" th:text="${totalMailCount}">0</span>
-			                </div>
-			                
-							<div style="font-size: 0.9rem; margin-top: 5px; color: #888;">
-			                    읽지 않은 메일 / 총 메일
-			                </div>
+			  			<div>
+		                    <span style="font-size: 1.5rem; color: red; font-weight: 700;" th:text="${unreadMailCount}">0</span>
+		                    <span style="font-size: 1rem; color: gray;"> / </span>
+		                    <span style="font-size: 1rem; color: gray;" th:text="${totalMailCount}">0</span>
+		                </div>
+		                
+						<div style="font-size: 0.9rem; margin-top: 5px; color: #888;">
+		                    읽지 않은 메일 / 총 메일
+		                </div>
 				  </div>
 				</div>
 			</div>
