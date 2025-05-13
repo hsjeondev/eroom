@@ -305,27 +305,29 @@
 							
 					
 							<script>
-							function showMessageModal(message, title = "알림", reloadOnClose = false) {
+							function showMessageModal(message, title = "알림", reload = false) {
+								  const modalTitle = document.getElementById("messageModalTitle");
+								  const modalBody = document.getElementById("messageModalBody");
+								  modalTitle.textContent = title;
+								  modalBody.textContent = message;
+
 								  const modalEl = document.getElementById("messageModal");
 								  const modal = new bootstrap.Modal(modalEl);
-
-								  document.getElementById("messageModalTitle").textContent = title;
-								  document.getElementById("messageModalBody").textContent = message;
-
-								  // 기존 확인 버튼 제거 후 다시 바인딩
-								  const oldBtn = modalEl.querySelector('button[data-bs-dismiss="modal"]');
-								  const newBtn = oldBtn.cloneNode(true);
-								  oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-
-								  if (reloadOnClose) {
-								    modalEl.addEventListener("hidden.bs.modal", function handler() {
-								      modalEl.removeEventListener("hidden.bs.modal", handler);
-								      location.reload();
-								    });
-								  }
-
 								  modal.show();
+
+								  const confirmBtn = modalEl.querySelector('button[data-bs-dismiss="modal"]');
+
+								  // ✅ 기존 이벤트 제거
+								  const newBtn = confirmBtn.cloneNode(true);
+								  confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+
+								  // ✅ reload 조건 처리
+								  if (reload) {
+								    newBtn.addEventListener("click", () => location.reload());
+								  }
 								}
+
+
 								</script>
 					
 					
@@ -596,37 +598,13 @@
 							</div>
 						</div>
 
-						<!-- 페이징 -->
-	<!-- 					<div class="d-flex justify-content-center mt-3">
-							<div class="d-flex">
-								<button class="page-link disabled" data-list-pagination="prev"
-									disabled>
-									<i class="fas fa-chevron-left"></i>
-								</button>
-								<ul class="mb-0 pagination">
-									<li class="active">
-										<button class="page" type="button" data-i="1" data-page="5">1</button>
-									</li>
-								</ul>
-								<button class="page-link pe-0" data-list-pagination="next"
-									disabled>
-									<i class="fas fa-chevron-right"></i>
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
- -->
 				<!-- 삭제 모달 -->
 							<div class="modal fade" id="confirmDeleteModal" tabindex="-1"
 								aria-hidden="true">
 								<div class="modal-dialog modal-dialog-centered modal-sm">
 									<div
 										class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
-										<div class="modal-header border-0">
-											<h5 class="modal-title text-dark">예약을 정말 취소하시겠습니까?</h5>
-										</div>
+									
 										<div class="modal-body text-center">
 											<p class="mb-0 text-body">
 												예약을 취소하시겠습니까?<br>취소 후 자동으로 새로고침됩니다.
@@ -752,40 +730,43 @@
 			  });
 
 			  // 삭제 확인 버튼 누르면 처리
-			  document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
-			    const reservationNo = document.getElementById("detailReservationNo").value;
-			    const confirmModalEl = document.getElementById("confirmDeleteModal");
-			    const confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
-
-			    fetch('/meetingroom/delete/' + reservationNo, {
-			      method: "post",
-			      headers: {
-			        'header': document.querySelector('meta[name="_csrf_header"]').content,
-			        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-			      }
+				document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
+			  const reservationNo = document.getElementById("detailReservationNo").value;
+			  const confirmModalEl = document.getElementById("confirmDeleteModal");
+			  const confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
+			
+			  console.log("🧨 삭제 요청 시작:", reservationNo);
+			
+			  fetch('/meetingroom/delete/' + reservationNo, {
+			    method: "post",
+			    headers: {
+			      'header': document.querySelector('meta[name="_csrf_header"]').content,
+			      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			    }
+			  })
+			    .then(response => response.json())
+			    .then(data => {
+			      const resultMsg = data.res_code == 200
+			        ? "예약을 취소하였습니다!"
+			        : (data.res_msg || "예약 취소에 실패했습니다.");
+			
+			      // ✅ confirmModal 닫기
+			      document.activeElement.blur();
+			      if (confirmModal) confirmModal.hide();
+			
+			      // ✅ alert로 메시지 띄우고 새로고침
+			      alert(resultMsg);
+			      if (data.res_code == 200) location.reload();
 			    })
-			      .then(response => response.json())
-			      .then(data => {
-			        if (confirmModal) {
-			          // 모달 닫힌 후 showMessageModal 호출
-			          confirmModalEl.addEventListener("hidden.bs.modal", function handler() {
-			            confirmModalEl.removeEventListener("hidden.bs.modal", handler);
-			            showMessageModal(
-			              data.res_code === 200 ? "예약이 취소되었습니다." : (data.res_msg || "예약 취소에 실패했습니다."),
-			              "알림",
-			              data.res_code === 200 // 새로고침 여부
-			            );
-			          });
+			    .catch(error => {
+			      console.error("❌ 삭제 중 오류:", error);
+			      if (confirmModal) confirmModal.hide();
+			      alert("삭제 중 오류가 발생했습니다. 다시 시도해주세요 😥");
+			    });
+			});
 
-			          confirmModal.hide();
-			        }
-			      })
-			      .catch(error => {
-			        console.error("삭제 중 오류:", error);
-			        if (confirmModal) confirmModal.hide();
-			        showMessageModal("삭제 중 오류가 발생했습니다. 다시 시도해주세요 😥");
-			      });
-			  });
+
+
 			
 			  setTimeout(() => {
 			    calendar.render();

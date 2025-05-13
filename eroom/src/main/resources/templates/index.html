@@ -373,26 +373,30 @@
         </div>
 
         <!-- 1~2행·3열 (위 두 칸 합침) -->
-					<div class="text-white p-1 card-tall">
-						<div class="attendance-card mx-auto">
-							<div class="card shadow-sm border-0" style="height: 447.62px;">
-							<div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
-						          오늘 일정
-						        </div>
-								<div class="card-body p-2 d-flex flex-column h-100"
-									style="overflow: hidden;">
-									<div class="text-end mb-3" style="margin-top: 0.25rem;">
-										<a href="/calendar/all"
-											class="text-decoration-none text-primary"
-											style="font-size: 0.8rem;"> 캘린더로 가기 → </a>
-									</div>
-									<div id="calendarContainer" class="flex-grow-1">
-										<div id="appCalendar"></div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
+			<div class="text-white p-1 card-tall">
+			  <div class="attendance-card mx-auto">
+			    <div class="card shadow-sm border-0">
+			      
+			      <!-- 헤더 -->
+			      <div class="card-header text-center py-3" style="font-size: 1.2rem; font-weight: bold;">
+			        오늘 일정
+			      </div>
+			      
+			      <!-- 바디 -->
+			      <div class="card-body d-flex flex-column">
+			        <div class="text-end mb-2">
+			          <a href="/calendar/all" class="text-decoration-none text-primary" style="font-size: 0.8rem;">
+			            캘린더로 가기 →
+			          </a>
+			        </div>
+			        <div id="calendarContainer" class="flex-grow-1">
+			          <div id="appCalendar"></div>
+			        </div>
+			      </div>
+			
+			    </div>
+			  </div>
+			</div>
 
 					<!-- 2행·1열 -->
 		<div class="text-white p-1">
@@ -408,82 +412,99 @@
 
         <!-- 2행·2열 예약하기 예약 현황 보기 -->
 		  <div class="text-white p-1">
-		  <div class="attendance-card mx-auto">
-		    <div class="card shadow-sm border-0">
-		      <div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
-			     예약
+			<div class="attendance-card mx-auto">
+			  <div class="card shadow-sm border-0">
+			
+			    <!-- 상단 제목 -->
+			    <div class="card-header text-center py-3" style="font-size: 1.2rem; font-weight: bold;">
+			      예약
+			    </div>
+			
+			    <!-- 탭 버튼 -->
+			    <div class="d-flex justify-content-between align-items-center px-3 pt-2">
+			      <div class="fw-bold text-dark" style="font-size: 0.9rem;"></div>
+			      <ul class="nav nav-underline fs-9 w-100" id="resTab" role="tablist">
+			        <li class="nav-item flex-grow-1 text-center" role="presentation">
+			          <a class="nav-link active" id="vehicle-tab" data-bs-toggle="tab" href="#tab-vehicle"
+			             role="tab" aria-controls="tab-vehicle" aria-selected="true">차량</a>
+			        </li>
+			        <li class="nav-item flex-grow-1 text-center" role="presentation">
+			          <a class="nav-link" id="room-tab" data-bs-toggle="tab" href="#tab-room"
+			             role="tab" aria-controls="tab-room" aria-selected="false">회의실</a>
+			        </li>
+			      </ul>
+			    </div>
+			
+			    <!-- 카드 본문 -->
+			    <div class="card-body pt-2 pb-3 px-3">
+			      <div class="tab-content small" id="resTabContent" style="height: 100px; overflow-y: auto;">
+			
+			        <!-- 차량 탭 -->
+			        <div class="tab-pane fade show active" id="tab-vehicle" role="tabpanel" aria-labelledby="vehicle-tab">
+			          <table class="table table-sm table-striped mb-0 text-center" style="font-size: 0.65rem;">
+			                  <colgroup>
+				          <col style="width: 33%;">
+				          <col style="width: 34%;">
+				          <col style="width: 33%;">
+				        	</colgroup>
+			            <thead>
+			              <tr>
+			                <th>차량</th>
+			                <th>예약자</th>
+			                <th>시간</th>
+			              </tr>
+			            </thead>
+			            <tbody>
+			              <tr th:if="${#lists.isEmpty(todayReservations)}">
+			                <td colspan="3">오늘 예약이 없습니다.</td>
+			              </tr>
+			              <tr th:each="res : ${todayReservations}">
+			                <td th:text="${res.vehicleName}"></td>
+			                <td th:text="${res.reserverName}"></td>
+			                <td>
+			                  <span th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span> ~
+			                  <span th:text="${#temporals.format(res.reservation_end, 'HH:mm')}"></span>
+			                </td>
+			              </tr>
+			            </tbody>
+			          </table>
+			        </div>
+			
+			        <!-- 회의실 탭 -->
+			        <div class="tab-pane fade" id="tab-room" role="tabpanel" aria-labelledby="room-tab">
+			          <table class="table table-sm table-striped mb-0 text-center" style="font-size: 0.65rem;">
+			                  <colgroup>
+					          <col style="width: 33%;">
+					          <col style="width: 34%;">
+					          <col style="width: 33%;">
+					        </colgroup>
+			            <thead>
+			              <tr>
+			                <th>회의실</th>
+			                <th>예약자</th>
+			                <th>시간</th>
+			              </tr>
+			            </thead>
+			            <tbody>
+			              <tr th:if="${#lists.isEmpty(todayRoomReservations)}">
+			                <td colspan="3">오늘 예약이 없습니다.</td>
+			              </tr>
+			              <tr th:each="res : ${todayRoomReservations}">
+			                <td th:text="${res.meetingRoomName}"></td>
+			                <td th:text="${res.reserverName}"></td>
+			                <td>
+			                  <span th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span> ~
+			                  <span th:text="${#temporals.format(res.reservation_end, 'HH:mm')}"></span>
+			                </td>
+			              </tr>
+			            </tbody>
+			          </table>
+			        </div>
+			
+			      </div>
+			    </div>
 			  </div>
-		
-		        <!-- 제목(왼쪽) + 탭버튼(오른쪽) -->
-		        <div class="d-flex justify-content-between align-items-center mb-2">
-		          <div class="fw-bold text-dark" style="font-size: 0.9rem;"></div>
-		          <ul class="nav nav-underline fs-9" id="resTab" role="tablist" style="margin-bottom: 0;">
-		            <li class="nav-item" role="presentation">
-		              <a class="nav-link active" id="vehicle-tab" data-bs-toggle="tab" href="#tab-vehicle"
-		                 role="tab" aria-controls="tab-vehicle" aria-selected="true">차량</a>
-		            </li>
-		            <li class="nav-item" role="presentation">
-		              <a class="nav-link" id="room-tab" data-bs-toggle="tab" href="#tab-room"
-		                 role="tab" aria-controls="tab-room" aria-selected="false">회의실</a>
-		            </li>
-		          </ul>
-		        </div>
-		
-		        <!-- 목록 테이블 중앙 정렬 -->
-		        <div class="tab-content small d-flex justify-content-center" id="resTabContent"
-		             style="font-size: 0.7rem; height: 110px; overflow-y: auto;">
-		          <div class="tab-pane fade show active w-100" id="tab-vehicle" role="tabpanel" aria-labelledby="vehicle-tab">
-		            <table class="table table-sm table-striped mb-0 text-center" style="font-size: 0.65rem;">
-		              <thead>
-		                <tr>
-		                  <th>차량</th>
-		                  <th>예약자</th>
-		                  <th>시간</th>
-		                </tr>
-		              </thead>
-		              <tbody>
-		                <tr th:if="${#lists.isEmpty(todayReservations)}">
-		                  <td colspan="3">🚗 없음</td>
-		                </tr>
-		                <tr th:each="res : ${todayReservations}">
-		                  <td th:text="${res.vehicleName}"></td>
-		                  <td th:text="${res.reserverName}"></td>
-		                  <td>
-		                    <span th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span> ~
-		                    <span th:text="${#temporals.format(res.reservation_end, 'HH:mm')}"></span>
-		                  </td>
-		                </tr>
-		              </tbody>
-		            </table>
-		          </div>
-		
-		          <div class="tab-pane fade w-100" id="tab-room" role="tabpanel" aria-labelledby="room-tab">
-		            <table class="table table-sm table-striped mb-0 text-center" style="font-size: 0.65rem;">
-		              <thead>
-		                <tr>
-		                  <th>회의실</th>
-		                  <th>예약자</th>
-		                  <th>시간</th>
-		                </tr>
-		              </thead>
-		              <tbody>
-		                <tr th:if="${#lists.isEmpty(todayRoomReservations)}">
-		                  <td colspan="3">🏢 없음</td>
-		                </tr>
-		                <tr th:each="res : ${todayRoomReservations}">
-		                  <td th:text="${res.meetingRoomName}"></td>
-		                  <td th:text="${res.reserverName}"></td>
-		                  <td>
-		                    <span th:text="${#temporals.format(res.reservation_start, 'HH:mm')}"></span> ~
-		                    <span th:text="${#temporals.format(res.reservation_end, 'HH:mm')}"></span>
-		                  </td>
-		                </tr>
-		              </tbody>
-		            </table>
-		          </div>
-		        </div>
-		    </div>
-		  </div>
+			</div>
 		</div>
 
 
@@ -495,9 +516,23 @@
         <div class="text-dark p-1">
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
-					<div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
-			          메일
-			        </div>
+				  <div class="card-header" style="text-align: center; font-size: 1.5rem; font-weight: bold; padding: 15px;">
+					<span>메일</span>
+			      </div>
+				  <div class="card-body text-center p-4" style="height: 207.81px;">
+				  	<a th:href="@{/mail/receiverTo}">
+		               	<i class="fas fa-envelope fa-3x mb-0 text-primary"></i>
+					</a>
+			  			<div>
+						  <span id="unreadMailCount" style="font-size: 1.5rem; color: red; font-weight: 700;">0</span>
+						  <span style="font-size: 1rem; color: gray;"> / </span>
+						  <span id="totalMailCount" style="font-size: 1rem; color: gray;">0</span>
+						</div>
+		                
+						<div style="font-size: 0.9rem; margin-top: 5px; color: #888;">
+		                    읽지 않은 메일 / 총 메일
+		                </div>
+				  </div>
 				</div>
 			</div>
         </div>
@@ -613,6 +648,7 @@
 			    const calendar = new FullCalendar.Calendar(calendarEl, {
 			      initialView: 'listDay',
 			      locale: 'ko',
+			      noEventsContent: '오늘 일정이 없습니다',
 			      headerToolbar: false,
 			      eventTimeFormat: {
 			    	    hour: '2-digit',
@@ -1190,7 +1226,36 @@ loadApprovalCarousel(
 		});
 		</script>
 	
-	
+	<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		  // 1. 페이지 로딩 시 처음 메일 개수 가져오기 (이미 구현된 fetch)
+		  fetch("/mail/counts")
+		    .then(response => response.json())
+		    .then(data => {
+		      document.getElementById("unreadMailCount").innerText = data.unread;
+		      document.getElementById("totalMailCount").innerText = data.total;
+		    });
+
+		  // 2. WebSocket 연결 추가 (URL은 네가 사용 중인 주소에 맞게 수정)
+		  const senderNo = document.getElementsByName("employeeNo")[0].value;
+		  const socket = new WebSocket("ws://localhost:8080/ws/mail?senderNo="+senderNo); // 실제 주소로 변경
+		  socket.onopen = () => {
+    	    };
+		  socket.onmessage = function (event) {
+		    const message = JSON.parse(event.data);
+
+		    // 3. 메일 수신 관련 메시지 수신 시 다시 fetch로 값 갱신
+		    if (message.type === "mail") {
+		      fetch("/mail/counts")
+		        .then(response => response.json())
+		        .then(data => {
+		          document.getElementById("unreadMailCount").innerText = data.unread;
+		          document.getElementById("totalMailCount").innerText = data.total;
+		        });
+		    }
+		  };
+		});
+	</script>
 	
   </div>
 </main>
