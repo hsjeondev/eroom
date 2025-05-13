@@ -401,7 +401,7 @@ public class ApprovalController {
 		// JSON String을 파싱해서 실제 객체로 변환해야 함
 	    ObjectMapper mapper = new ObjectMapper();
 
-	    Map<String, String> content = mapper.readValue(contentJson, new TypeReference<Map<String, String>>() {});
+	    Map<String, Object> content = mapper.readValue(contentJson, new TypeReference<Map<String, Object>>() {});
 	    List<Long> approverIds = mapper.readValue(approverIdsJson, new TypeReference<List<Long>>() {});
 	    List<Integer> approverSteps = mapper.readValue(approverStepsJson, new TypeReference<List<Integer>>() {});
 	    List<Long> agreerIds = mapper.readValue(agreerIdsJson, new TypeReference<List<Long>>() {});

@@ -485,11 +485,20 @@
 	        	      const inputFields = document.querySelectorAll(`#basic-form-edit [name="${key}"]`);
 
 	        	      inputFields.forEach((inputField) => {
-	        	        if (inputField.type === "radio") {
-	        	          // 라디오 버튼일 경우, value 값을 비교해서 체크하기
-	        	          if (inputField.value === approvalContent[key]) {
-	        	            inputField.checked = true;
+	        	        if (inputField.type === "radio" || inputField.type === "checkbox") {
+	        	          
+	        	          // 체크박스인 경우 배열로 전달될 수 있으므로 체크해야 함
+	        	          if (Array.isArray(approvalContent[key])) {
+	        	            if (approvalContent[key].includes(inputField.value)) {
+	        	              inputField.checked = true;
+	        	            }
+	        	          } else {
+	        	            // 일반 라디오 버튼처럼 단일 값인 경우
+	        	            if (inputField.value === approvalContent[key]) {
+	        	              inputField.checked = true;
+	        	            }
 	        	          }
+
 	        	        } else {
 	        	          // 일반 input일 경우
 	        	          inputField.value = approvalContent[key];
@@ -1315,30 +1324,49 @@ function handleHighlight(li) {
 		  const approvalContent = {};
 		  let hasEmpty = false;
 		
+		  // 체크박스 데이터 임시 저장
+		  const checkboxGroups = {};
+		  
 		  inputElements.forEach(el => {
 		    const name = el.name?.trim();
 		    const value = el.value?.trim();
 		
 		    if (!name) return;
-		    
-		    // ✅ [라디오 버튼 체크 여부 확인]
+
 		    if (el.type === "radio") {
+		      // [라디오 버튼 체크 여부 확인]
 		      if (el.checked) {
 		        approvalContent[name] = el.value;
 		      }
-		    } else{
-		    if (!value) {
-		      hasEmpty = true;
-		      el.classList.add("is-invalid");
-		      el.style.border = "1px solid red";
+		    } else if (el.type === "checkbox") {
+		      // [체크박스 처리 로직]
+		      if (!checkboxGroups[name]) {
+		        checkboxGroups[name] = [];
+		      }
+		      if (el.checked) {
+		        checkboxGroups[name].push(value);
+		      }
 		    } else {
-		      el.classList.remove("is-invalid");
-		      el.style.border = "";
-		      approvalContent[name] = value;
-		    }
+		      // [일반 input 처리]
+		      if (!value) {
+		        hasEmpty = true;
+		        el.classList.add("is-invalid");
+		        el.style.border = "1px solid red";
+		      } else {
+		        el.classList.remove("is-invalid");
+		        el.style.border = "";
+		        approvalContent[name] = value;
+		      }
 		    }
 		  });
-		
+
+		  // 체크박스 그룹을 최종적으로 approvalContent에 추가
+		  Object.keys(checkboxGroups).forEach(key => {
+		    if (checkboxGroups[key].length > 0) {
+		      approvalContent[key] = checkboxGroups[key];
+		    }
+		  });
+
 		  if (hasEmpty) {
 		    alert("결재서 내용을 모두 입력해주세요.");
 		    return;
