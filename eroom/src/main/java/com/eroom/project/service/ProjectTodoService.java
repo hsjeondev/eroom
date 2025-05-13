@@ -392,6 +392,7 @@ public class ProjectTodoService {
 		
 		try {
 			List<ProjectTodoList> projectTodoLists = projectTodoListRepository.findByProjectNoOrderByListSequenceAsc(projectNo);
+
 			
 			if(projectTodoLists.isEmpty()) {
 				ProjectTodoList newProjectTodoList = ProjectTodoList
@@ -400,6 +401,7 @@ public class ProjectTodoService {
 														.listName(listName)
 														.listColor(listColor)
 														.listSequence(1)
+														.visibleYn("Y")
 														.build();
 				projectTodoListRepository.save(newProjectTodoList);
 			} else {

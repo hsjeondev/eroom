@@ -328,6 +328,8 @@ public class ProjectService {
             
             dto.setProgress(findProject.getProgress());
             
+            dto.setVisible_yn("Y");
+            
             Project project = dto.toEntity();
             projectRepository.save(project);
 
