@@ -281,7 +281,7 @@
             });
             
             document.getElementById("draftBtn").addEventListener("click", function () {
-                if (confirm("작성 중인 메일을 임시저장하시겠습니까?"+"\n※수신자와 파일은 저장되지 않습니다.")) {
+                if (confirm("작성 중인 메일을 임시저장하시겠습니까?"+"\n※수신자는 저장되지 않습니다.")) {
                     tinymce.triggerSave();
                     const form = document.mail_create_form;
                     const payload = new FormData(form);
@@ -305,21 +305,20 @@
                         if (data.res_code == 200) {
                            // 수정해야함 지금은 그냥 보낸 메일로감
                            //location.href ='/mail/draft';
-                           location.href = '/mail/sent';
+                           location.href = '/mail/draft';
                         }
                     });
                 }
             });
             document.getElementById("sendBtn").addEventListener("click", function () {
-                if (confirm("메일을 발송하시겠습니까?")) {
-                    tinymce.triggerSave();
                     const form = document.mail_create_form;
                     const receiver = form.receiver_type.value;
                     if(!receiver){
-                    console.log(receiver);
                     alert("받는사람을 한 명 이상 지정해야 합니다.");
             	    return;
                     }
+                if (confirm("메일을 발송하시겠습니까?")) {
+                    tinymce.triggerSave();
                     const payload = new FormData(form);
                     payload.append("mail_draft_yn", "N"); // 발송할 때는 mail_status = N
 
@@ -408,10 +407,13 @@ function renderFilePreview() {
             : file.name;
 
         li.innerHTML = `
-            <span class="badge bg-light text-dark d-flex align-items-center justify-content-between px-2 py-1" style="font-size: 0.85rem; min-width: 180px;">
-                ${fileNameHtml} <small>(${(file.size / 1024).toFixed(1)} KB)</small>
-                <button type="button" class="btn btn-sm btn-outline-secondary ms-2 py-0 px-1" style="font-size: 0.7rem; line-height: 1;" onclick="removeSelectedFile(${index})">✕</button>
-            </span>
+        	<span class="badge bg-light text-dark d-flex align-items-center justify-content-between px-2 py-1"
+            style="font-size: 0.85rem; min-width: 180px;">
+        ${fileNameHtml} <small>(${(file.size / 1024).toFixed(1)} KB)</small>
+        
+                <button type="button" class="btn btn-sm btn-outline-danger ms-2 py-0 px-1"
+                    style="font-size: 0.7rem;" onclick="removeSelectedFile(${index})">✕</button>
+      </span>
         `;
         ul.appendChild(li);
     });

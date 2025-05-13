@@ -60,6 +60,21 @@ public class MailController {
 	@Value("${ffupload.location}")
 	 private String fileDir;
 	
+	@GetMapping("/mail/counts")
+	@ResponseBody
+	public Map<String, Integer> getMailCounts(@AuthenticationPrincipal EmployeeDetails employeeDetails) {
+	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	    int unreadCount = mailService.countUnreadMails(employeeNo);
+	    int totalCount = mailService.countAllReceivedMails(employeeNo);
+
+	    Map<String, Integer> response = new HashMap<>();
+	    response.put("unread", unreadCount);
+	    response.put("total", totalCount);
+	    return response;
+	}
+	
+	
+	
 	//test
 	@GetMapping("/mail/test")
 	public String test(Model model) {
@@ -335,7 +350,7 @@ public class MailController {
 	  model.addAttribute("mailStatusMap", mailStatusMap);
 	  return "mail/mailSent"; // 뷰 파일 이름 
 	  }
-	// 임시 저장 조회
+	// 임시저장 조회
 		@GetMapping("/mail/draft")
 		public String selectDraftMailAll(Model model,
 										@AuthenticationPrincipal EmployeeDetails employeeDetails,
