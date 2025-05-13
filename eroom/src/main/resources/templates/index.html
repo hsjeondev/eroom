@@ -516,9 +516,23 @@
         <div class="text-dark p-1">
 			<div class="attendance-card mx-auto">
 				<div class="card shadow-sm border-0">
-					<div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
-			          메일
-			        </div>
+				  <div class="card-header" style="text-align: center; font-size: 1.5rem; font-weight: bold; padding: 15px;">
+					<span>메일</span>
+			      </div>
+				  <div class="card-body text-center p-4" style="height: 207.81px;">
+				  	<a th:href="@{/mail/receiverTo}">
+		               	<i class="fas fa-envelope fa-3x mb-0 text-primary"></i>
+					</a>
+			  			<div>
+						  <span id="unreadMailCount" style="font-size: 1.5rem; color: red; font-weight: 700;">0</span>
+						  <span style="font-size: 1rem; color: gray;"> / </span>
+						  <span id="totalMailCount" style="font-size: 1rem; color: gray;">0</span>
+						</div>
+		                
+						<div style="font-size: 0.9rem; margin-top: 5px; color: #888;">
+		                    읽지 않은 메일 / 총 메일
+		                </div>
+				  </div>
 				</div>
 			</div>
         </div>
@@ -1212,7 +1226,36 @@ loadApprovalCarousel(
 		});
 		</script>
 	
-	
+	<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		  // 1. 페이지 로딩 시 처음 메일 개수 가져오기 (이미 구현된 fetch)
+		  fetch("/mail/counts")
+		    .then(response => response.json())
+		    .then(data => {
+		      document.getElementById("unreadMailCount").innerText = data.unread;
+		      document.getElementById("totalMailCount").innerText = data.total;
+		    });
+
+		  // 2. WebSocket 연결 추가 (URL은 네가 사용 중인 주소에 맞게 수정)
+		  const senderNo = document.getElementsByName("employeeNo")[0].value;
+		  const socket = new WebSocket("ws://localhost:8080/ws/mail?senderNo="+senderNo); // 실제 주소로 변경
+		  socket.onopen = () => {
+    	    };
+		  socket.onmessage = function (event) {
+		    const message = JSON.parse(event.data);
+
+		    // 3. 메일 수신 관련 메시지 수신 시 다시 fetch로 값 갱신
+		    if (message.type === "mail") {
+		      fetch("/mail/counts")
+		        .then(response => response.json())
+		        .then(data => {
+		          document.getElementById("unreadMailCount").innerText = data.unread;
+		          document.getElementById("totalMailCount").innerText = data.total;
+		        });
+		    }
+		  };
+		});
+	</script>
 	
   </div>
 </main>

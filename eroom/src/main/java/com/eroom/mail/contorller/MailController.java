@@ -60,6 +60,21 @@ public class MailController {
 	@Value("${ffupload.location}")
 	 private String fileDir;
 	
+	@GetMapping("/mail/counts")
+	@ResponseBody
+	public Map<String, Integer> getMailCounts(@AuthenticationPrincipal EmployeeDetails employeeDetails) {
+	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	    int unreadCount = mailService.countUnreadMails(employeeNo);
+	    int totalCount = mailService.countAllReceivedMails(employeeNo);
+
+	    Map<String, Integer> response = new HashMap<>();
+	    response.put("unread", unreadCount);
+	    response.put("total", totalCount);
+	    return response;
+	}
+	
+	
+	
 	//test
 	@GetMapping("/mail/test")
 	public String test(Model model) {
