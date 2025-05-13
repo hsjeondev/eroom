@@ -348,17 +348,17 @@
 		  return;
 		}
 
-	    // 3. 마감일이 현재 시간 이후인지 확인
-	    if (!deadlineValue || deadlineDate <= now) {
-		  focusTarget = deadlineInput;
-	      showValidationAlert("마감일 확인", "올바른 마감일을 선택해주세요.");
-	      return;
-	    }
-
-	    // 4. 참여 팀이 최소 1개 이상 선택되었는지 확인
+	    // 3. 참여 팀이 최소 1개 이상 선택되었는지 확인
 	    const teamCheckboxes = form.querySelectorAll('input[name="selectedTeamIds"]:checked');
 	    if (teamCheckboxes.length === 0) {
 	      showValidationAlert("투표자 확인", "투표 참여 팀을 하나 이상 선택해주세요.");
+	      return;
+	    }
+	    
+	    // 4. 마감일이 현재 시간 이후인지 확인
+	    if (!deadlineValue || deadlineDate <= now) {
+		  focusTarget = deadlineInput;
+	      showValidationAlert("마감일 확인", "올바른 마감일을 선택해주세요.");
 	      return;
 	    }
 

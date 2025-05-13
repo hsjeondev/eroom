@@ -18,8 +18,10 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
 	@Transactional
 	@Query("UPDATE Project p " +
 	       "SET p.proceed = :proceed " +
-	       "WHERE p.projectEnd = :projectEnd AND p.proceed <> '보류'")
-	int updateProceedByEndDate(@Param("proceed") String proceed, @Param("projectEnd") LocalDate projectEnd);
+	       "WHERE p.projectEnd < :projectEnd AND p.proceed <> '보류'")
+	int updateProceedByEndDate(@Param("proceed") String proceed,
+	                            @Param("projectEnd") LocalDate projectEnd);
+
 	
 	List<Project> findByProceed(String proceed);
 
@@ -37,6 +39,14 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
 	
 	@Query("SELECT COUNT(p) FROM Project p WHERE p.visibleYn = 'Y'")
 	Long countVisibleProjects();
+	
+	@Query("SELECT p FROM Project p JOIN p.projectMembers m " +
+		       "WHERE m.employee.employeeNo = :employeeNo " +
+		       "AND p.proceed = :proceed " +
+		       "AND p.visibleYn = 'Y'")
+		List<Project> findByEmployeeAndProceed(@Param("employeeNo") Long employeeNo,
+		                                       @Param("proceed") String proceed);
+
 
 
 

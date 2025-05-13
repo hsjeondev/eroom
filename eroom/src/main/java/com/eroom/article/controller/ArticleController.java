@@ -51,7 +51,7 @@ public class ArticleController {
 	@PostMapping("/article/notice/delete")
 	public String deleteArticleNotice(@RequestParam("articleNo") Long articleNo) {
 		articleService.deleteArticleNotice(articleNo);
-	    return "redirect:article/notice";
+	    return "redirect:/article/notice";
 	}
 	
 	// 게시글 수정중 기존 파일 삭제
@@ -86,7 +86,7 @@ public class ArticleController {
 	    
 	    if (result > 0) {
 	        resultMap.put("res_code", "200");
-	        resultMap.put("res_msg", "공지 수정 완료");
+	        resultMap.put("res_msg", "공지글이 수정 완료되었습니다.");
 	    }
 
 	    return resultMap;
@@ -193,7 +193,7 @@ public class ArticleController {
 	    
 	    if (result > 0) {
 	        resultMap.put("res_code", "200");
-	        resultMap.put("res_msg", "공지 작성 완료");
+	        resultMap.put("res_msg", "공지 작성 완료되었습니다.");
 	    }
 
 	    return resultMap;

@@ -12,7 +12,9 @@ import com.eroom.project.entity.ProjectTodoList;
 
 public interface ProjectTodoListRepository extends JpaRepository<ProjectTodoList, Long>, JpaSpecificationExecutor<ProjectTodoList> {
 
-	List<ProjectTodoList> findByProjectNoOrderByListSequenceAsc(Long projectNo);
+	@Query("SELECT p FROM ProjectTodoList p WHERE p.projectNo = :projectNo AND p.visibleYn = 'Y' ORDER BY p.listSequence ASC")
+	List<ProjectTodoList> findByProjectNoOrderByListSequenceAsc(@Param("projectNo") Long projectNo);
+
 	
 	@Query("SELECT DISTINCT l FROM ProjectTodoList l " +
 		       "LEFT JOIN FETCH l.projectTodoElements e " +

@@ -10,15 +10,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
     <div class="row align-items-center justify-content-between g-3 mb-4">
 		<!-- 상단 제목 -->
 		<div class="d-flex justify-content-start">
-			<span class="fw-bold fs-6"  >임시 저장</span>
+			<span class="fw-bold fs-6"  >임시 보관함</span>
 		</div>
 	</div>
    <div id="mailSummary" data-list='{"valueNames":["senderName", "mailTitle", "mailContent", "sendTime"], "page":6, "pagination":true}'>
       <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
             <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mailCreate}">메일 쓰기</a>
-              <button class="btn px-3 btn-phoenix-secondary text-body-tertiary d-lg-none" data-phoenix-toggle="offcanvas" data-phoenix-target="#emailSidebarColumn"><span class="fa-solid fa-bars"></span></button>
             </div>
-            <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" href="../../apps/email/compose.html"> <span class="d-none d-sm-inline-block">Compose</span><span class="d-sm-none fas fa-plus"></span></a></div>
+            <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" th:href="@{mailCreate}"> <span class="d-none d-sm-inline-block">메일 쓰기</span><span class="d-sm-none fas fa-plus"></span></a></div>
 	            <div class="col-auto flex-1">
 	            <!-- 절반 검색 기능  -->
 	              <div class="search-box w-100" style="max-width: 250px; position: absolute; right: 20px;">
