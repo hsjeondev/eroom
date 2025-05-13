@@ -372,26 +372,58 @@ public class MailService {
 //	        mailStatusMappingRepository.save(mapping);
         }
     }
-	public Map<Long, MailStatus> getStatusMapForMailRecevier(List<MailReceiver> mails) {
+	// 받은 메일 상태 조회
+	public Map<String, MailStatus> getStatusMapForMailRecevier(List<MailReceiver> mails) {
 	    List<Long> mailNos = mails.stream()
 	                              .map(mr -> mr.getMail().getMailNo())
 	                              .collect(Collectors.toList());
 
 	    List<MailStatus> statusList = mailStatusRepository.findByMailMailNoIn(mailNos);
-
-	    return statusList.stream()
-	            .collect(Collectors.toMap(ms -> ms.getMail().getMailNo(), Function.identity(), (oldval, newval) -> newval));
+	    // 멘토님이 수정해주신 코드
+	    
+	    
+//	    return statusList.stream()
+//	            .collect(Collectors.toMap(ms -> ms.getMail().getMailNo(), Function.identity(), (oldval, newval) -> newval));
+//	    Map<Long, MailStatus> mailStatusMap = statusList.stream()
+//	    	    .collect(Collectors.toMap(
+//	    	        ms -> ms.getEmployee().getEmployeeNo(), // 수신자 기준
+//	    	        Function.identity(),
+//	    	        (oldVal, newVal) -> newVal // 중복 시 새 값으로 덮어씀
+//	    	    ));
+	    
+	    Map<String, MailStatus> mailStatusMap = statusList.stream()
+	    	    .collect(Collectors.toMap(
+	    	        ms -> ms.getMail().getMailNo() + "_" + ms.getEmployee().getEmployeeNo(),
+	    	        Function.identity(),
+	    	        (oldVal, newVal) -> newVal
+	    	    ));
+	    return mailStatusMap;
 	}
 	
-	public Map<Long, MailStatus> getStatusMapForMails(List<Mail> mails) {
+	// 보낸 메일 상태 조회
+	public Map<String, MailStatus> getStatusMapForMails(List<Mail> mails) {
 	    List<Long> mailNos = mails.stream()
 	                              .map(Mail::getMailNo)
 	                              .collect(Collectors.toList());
 
 	    List<MailStatus> statusList = mailStatusRepository.findByMailMailNoIn(mailNos);
-
-	    return statusList.stream()
-	            .collect(Collectors.toMap(ms -> ms.getMail().getMailNo(), Function.identity()));
+	    // 멘토님이 추가한 코드 적용해보기
+//	    return statusList.stream()
+//	            .collect(Collectors.toMap(ms -> ms.getMail().getMailNo(), Function.identity()));
+//	    Map<Long, MailStatus> mailStatusMap = statusList.stream()
+//	    	    .collect(Collectors.toMap(
+//	    	        ms -> ms.getEmployee().getEmployeeNo(), // 수신자 기준
+//	    	        Function.identity(),
+//	    	        (oldVal, newVal) -> newVal // 중복 시 새 값으로 덮어씀
+//	    	    ));
+//	    return mailStatusMap;
+	    Map<String, MailStatus> mailStatusMap = statusList.stream()
+	    	    .collect(Collectors.toMap(
+	    	        ms -> ms.getMail().getMailNo() + "_" + ms.getEmployee().getEmployeeNo(),
+	    	        Function.identity(),
+	    	        (oldVal, newVal) -> newVal
+	    	    ));
+	    return mailStatusMap;
 	}
 	
 	@Transactional
