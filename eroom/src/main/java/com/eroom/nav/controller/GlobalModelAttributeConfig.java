@@ -34,7 +34,6 @@ public class GlobalModelAttributeConfig {
             List<NavMenuItemDto> nav = navService.getHierarchicalNav(user);
             model.addAttribute("navItems", nav);
         } else {
-            // 인증되지 않은 경우 빈 nav 항목 전달
             model.addAttribute("navItems", new ArrayList<>());
         }
 
