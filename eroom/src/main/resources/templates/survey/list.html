@@ -361,6 +361,8 @@
 	      showValidationAlert("마감일 확인", "올바른 마감일을 선택해주세요.");
 	      return;
 	    }
+	    
+	    form.querySelector('button[type="submit"]').disabled = true;
 
 	    // 모든 조건 통과 → 실제 폼 제출
 	    form.submit();

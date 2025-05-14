@@ -87,7 +87,7 @@ public class EmployeeService {
 	
 	// 부서 하위의 모든 팀 조회
 	public List<StructureDto> findTeams() {
-		return structureRepository.findBySeparatorCodeStartingWith("T")
+		return structureRepository.findVisibleBySeparatorCodeStartingWith("T")
                 .stream()
                 .map(entity -> StructureDto.toDto(entity))
                 .collect(Collectors.toList());
