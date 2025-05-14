@@ -956,8 +956,9 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
 			  if (isEditMode) {
 			    // --- 수정 모드 진입 ---
-			    editIcon.setAttribute('data-feather', 'check');
-			    feather.replace();
+			      editIcon.outerHTML = `<span id="editIcon"
+									          style="font-size: 12px; text-decoration: underline; cursor: pointer; position: relative; top: 2px;"
+									          onclick="toggleEditMode()">수정완료</span>`;
 
 			    document.querySelectorAll('#todoDetailUl li').forEach(li => {
 			      const checkbox = li.querySelector('input[type="checkbox"]');
@@ -995,12 +996,31 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			    `;
 			    todoDetailList.appendChild(addButtonWrapper);
 
+			    editIcon.outerHTML = `
+			        <i id="editIcon"
+			           data-feather="edit-2"
+			           style="width:16px; height:16px; cursor:pointer; position: relative; top: 2px;"
+			           data-bs-toggle="tooltip"
+			           data-bs-placement="top"
+			           title="세부 할 일 수정하기"
+			           onclick="toggleEditMode()"></i>
+			      `;
 			    // ✅ 추가한 feather 아이콘들 다시 변환
 			    feather.replace();
 
 			  } else {
 			    // --- 수정 모드 해제 ---
 			    editIcon.setAttribute('data-feather', 'edit-2');
+			    editIcon.outerHTML = `
+			        <i id="editIcon"
+			           data-feather="edit-2"
+			           style="width:16px; height:16px; cursor:pointer; position: relative; top: 2px;"
+			           data-bs-toggle="tooltip"
+			           data-bs-placement="top"
+			           title="세부 할 일 수정하기"
+			           onclick="toggleEditMode()"></i>
+			      `;
+			    // ✅ 추가한 feather 아이콘들 다시 변환
 			    feather.replace();
 
 			    document.querySelectorAll('#todoDetailUl li').forEach(li => {
