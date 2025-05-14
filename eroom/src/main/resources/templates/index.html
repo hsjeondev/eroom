@@ -58,7 +58,7 @@
       height: 64px;
     }
     .btn-wrap {
-      border-top: 1px dashed #dee2e6;
+      border-top: none; /* 1px dashed #dee2e6; */
       padding-top: 1rem;
       margin-top: 1rem;
     }
@@ -208,7 +208,7 @@
       <div class="custom-grid">
 
         <!-- 1행·1열: 출퇴근 카드 -->
-        <div class="text-white p-1">
+<!--         <div class="text-white p-1">
           <div class="attendance-card mx-auto">
             <div class="card shadow-sm border-0">
               <div class="card-body text-center p-4">
@@ -250,7 +250,58 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
+        <div class="text-white p-1">
+  <div class="attendance-card mx-auto">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <form id="attendanceForm" th:action="@{/log}" method="post" class="w-100">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf_token}">
+          <input type="hidden" th:value="${#authentication.principal.employee.employeeNo}" name="employeeNo">
+          <input type="hidden" name="attendanceType" id="attendanceType">
+
+          <!-- 상단 현재 시간 -->
+          <div id="currentTime" class="current-time fw-semibold text-center mb-3"></div>
+
+          <!-- 좌우 분리된 정보 블럭 -->
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+            <!-- 왼쪽: 프로필 + 이름/부서 -->
+            <div class="d-flex align-items-center">
+              <img id="profileImage" class="rounded-circle me-3 profile-img"
+                   src="" alt="프로필" style="display: none; height: 64px; width: 64px">
+              <div class="text-start">
+                <p class="fw-semibold fs-6 mb-1" th:text="${employee.employeeName}">이름</p>
+                <small th:if="${employee.structure != null}"
+                       th:text="|${employee.structure.codeName} / ${employee.employeePosition}|">
+                  부서 / 직급
+                </small>
+                <small th:if="${employee.structure == null}"
+                       th:text="|- / ${employee.employeePosition}|">
+                  부서 / 직급
+                </small>
+              </div>
+            </div>
+
+            <!-- 오른쪽: 출근/퇴근 버튼 + 시간 -->
+            <div class="btn-wrap d-flex flex-column align-items-end">
+              <button id="checkInBtn" class="btn btn-outline-primary btn-sm mb-2"
+                      th:attr="disabled=${attendanceStatus != 'notCheckedIn'} ? 'disabled' : null"
+                      th:text="${attendanceStatus == 'checkedIn' || attendanceStatus == 'checkedOut'} ? ${checkInTime} : '출근하기'">
+                출근하기
+              </button>
+              <button id="checkOutBtn" class="btn btn-primary btn-sm"
+                      th:attr="disabled=${attendanceStatus != 'checkedIn'} ? 'disabled' : null"
+                      th:text="${attendanceStatus == 'checkedOut'} ? ${checkOutTime} : '퇴근하기'">
+                퇴근하기
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
                  <!-- 1행·2열 결재 -->
         <div class="text-white p-1">
