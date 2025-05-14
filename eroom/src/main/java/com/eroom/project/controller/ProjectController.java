@@ -332,6 +332,7 @@ public class ProjectController {
 	    ProjectMemberDto pmDto = ProjectMemberDto.builder()
 	            .project_member(Employee.builder().employeeNo(pmEmployeeNo).build())
 	            .project_manager("Y")
+	            .visible_yn("Y")
 	            .build();
 	    memberDtos.add(pmDto);
 
@@ -342,6 +343,7 @@ public class ProjectController {
 	            ProjectMemberDto managerDto = ProjectMemberDto.builder()
 	                    .project_member(Employee.builder().employeeNo(managerId).build())
 	                    .is_manager("Y")  // 관리자 역할인 경우
+	                    .visible_yn("Y")
 	                    .build();
 	            memberDtos.add(managerDto);
 	        }
@@ -353,6 +355,7 @@ public class ProjectController {
 	            ProjectMemberDto participantDto = ProjectMemberDto.builder()
 	                    .project_member(Employee.builder().employeeNo(participantId).build())
 	                    .is_manager("N")
+	                    .visible_yn("Y")
 	                    .build();
 	            memberDtos.add(participantDto);
 	        }
