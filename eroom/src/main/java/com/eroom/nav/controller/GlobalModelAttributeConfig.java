@@ -28,12 +28,9 @@ public class GlobalModelAttributeConfig {
     public void addNavAttributes(Model model, HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // 인증된 사용자가 있을 경우
         if (authentication != null && authentication.getPrincipal() instanceof EmployeeDetails) {
             EmployeeDetails user = (EmployeeDetails) authentication.getPrincipal();
-//            System.out.println("Authenticated User: " + user);
 
-            // user를 서비스로 전달
             List<NavMenuItemDto> nav = navService.getHierarchicalNav(user);
             model.addAttribute("navItems", nav);
         } else {

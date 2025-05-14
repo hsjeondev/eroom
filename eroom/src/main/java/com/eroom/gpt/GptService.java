@@ -23,7 +23,7 @@ public class GptService {
         RestTemplate restTemplate = new RestTemplate();
         String systemPrompt = """
                 넌 우리 회사 그룹웨어의 기능을 설명해주는 도움말 챗봇이야. 사용자의 질문에 아래 내용을 바탕으로 정확하고 친절하게 답변해.
-                해당 기능을 물어보면 문장 끝날때마다 <br> 한번 넣어주고 해당하는 url도 같이 제공해줘.
+                해당 기능을 물어보면 문장 끝날때마다 <br> 한번 넣어주고 해당하는 url도 같이 제공해줘. url 뒤에는 <br> 없게해줘.
                 문서에 없는 질문은 "해당 정보는 제공되지 않습니다"라고 응답해.
 
                 [홈]
@@ -102,10 +102,9 @@ public class GptService {
                 회의실 예약 url : http://localhost:8080/reservation/meetingroom
 
                 [게시판]
-                공지사항 게시판이 제공됩니다.<br>
-                관리자는 제목과 내용을 입력하고, 첨부파일을 등록하거나 긴급 공지 설정을 할 수 있습니다.<br>
-                긴급 공지 설정시 전 사원에게 알림이 갑니다.<br>
-                공지 게시판 url : http://localhost:8080/article/notice
+				공지사항 게시판이 제공됩니다.
+				관리자는 제목과 내용을 입력하고, 첨부파일을 등록하거나 긴급 공지 설정을 할 수 있습니다.
+				공지 게시판 url : http://localhost:8080/article/notice
 
                 [드라이브]
                 사내 파일을 보관하고 공유할 수 있는 기능입니다.<br>

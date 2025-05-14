@@ -95,7 +95,11 @@
       let employeePosition = /*[[${#authentication.principal.employee.employeePosition}]]*/ "";
     </script>
 
-    <script>
+	<script th:inline="javascript">
+  		const selectedDepartment = /*[[${selectedDepartment}]]*/ null;
+	</script>
+
+		<script>
     let calendar;
     let holidaySource = null;
     let departmentSource = null;
@@ -386,7 +390,7 @@
 
       calendar.render();
 
-      const selectedDepartment = document.getElementById('departmentSelect')?.value;
+     
       if (selectedDepartment) {
         changeDepartment(selectedDepartment);
       }
