@@ -8,7 +8,10 @@ pipeline {
             }
             steps {
                 echo '배포: develop 서버로'
-                sh './deploy-dev.sh'
+
+                sh 'cp /mnt/env/.env ./springboot-docker/.env'
+
+                sh './springboot-docker/deploy-dev.sh'
             }
         }
 
