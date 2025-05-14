@@ -52,7 +52,7 @@ public class ProjectController {
 	public String allProjectView(Model model) {
 		
 		List<ProjectDto> projectList = projectService.findAllProject();
-		Long projectCount = projectService.getAllProjectCount(); 
+		Long projectCount = projectService.getAllProjectCount();
 		
 		model.addAttribute("projectList", projectList);
 		model.addAttribute("projectCount", projectCount);
