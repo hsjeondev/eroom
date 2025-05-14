@@ -31,7 +31,6 @@ public class GlobalModelAttributeConfig {
         if (authentication != null && authentication.getPrincipal() instanceof EmployeeDetails) {
             EmployeeDetails user = (EmployeeDetails) authentication.getPrincipal();
 
-            // user를 서비스로 전달
             List<NavMenuItemDto> nav = navService.getHierarchicalNav(user);
             model.addAttribute("navItems", nav);
         } else {
