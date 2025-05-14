@@ -265,8 +265,13 @@ td.name p {
 				        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
 				      </div>
 				      <div class="modal-body px-4 py-3">
+						<div id="loadingSpinnerSortOrderModal" style="display: block;" class="text-center py-3">
+	                      <div class="spinner-border" role="status">
+	                      	<span class="visually-hidden">로딩중...</span>
+	                      </div>
+	                    </div>
 				        <!-- 부서 및 팀 정렬 리스트 -->
-				        <ul id="departmentList" class="list-group" >
+				        <ul id="departmentList" class="list-group"  style="display: none;">
 				          <li class="list-group-item department-item" th:each="dept, deptStatus : ${departmentList}" th:attr="data-order=${deptStatus.count}">
 				            <div class="fw-bold department-header " th:text="${dept.codeName}">부서명</div>
 				            <ul class="list-group ms-3 sortable-team" th:attr="data-department-id=${dept.separatorCode}">
@@ -1303,6 +1308,19 @@ document.addEventListener('DOMContentLoaded', function () {
       console.log('부서 순서 변경됨');
     }
   });
+  // 2️⃣ 각 팀 리스트에 대해 Sortable + 교차 이동 허용
+  function initializeTeamSortable() {
+    document.querySelectorAll('.sortable-team').forEach(teamList => {
+      Sortable.create(teamList, {
+        group: 'teams',
+        animation: 150,
+        draggable: '.team-item',
+        onEnd: () => {
+          console.log('팀 위치 변경됨');
+        }
+      });
+    });
+  }
 
   // 2. 각 팀 리스트에 대해 Sortable + 교차 이동 허용
   document.querySelectorAll('.sortable-team').forEach(teamList => {
@@ -1315,6 +1333,70 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   });
+  
+  
+  
+  // ✅ 모달이 열릴 때 서버에서 데이터를 다시 받아와서 렌더링
+ document.getElementById('sortOrderModal').addEventListener('shown.bs.modal', function () {
+    //console.log("모달 열림: 데이터 로딩 시작");
+    document.getElementById('departmentList').style.display = 'none';
+    document.getElementById('loadingSpinnerSortOrderModal').style.display = 'block';
+
+    fetch('/admin/directory/getSortOrder')
+      .then(response => response.json())
+      .then(data => {
+        //console.log("서버에서 받아온 데이터: ", data);
+
+        // 💡 departmentList 초기화
+        departmentList.innerHTML = '';
+
+        // 💡 서버에서 받아온 부서 및 팀 정보 렌더링
+        data.forEach(department => {
+          const departmentItem = document.createElement('li');
+          departmentItem.classList.add('list-group-item', 'department-item');
+          departmentItem.setAttribute('data-order', department.order);
+
+          // 부서 헤더 생성
+          const header = document.createElement('div');
+          header.classList.add('fw-bold', 'department-header');
+          header.innerText = department.departmentName;
+          departmentItem.appendChild(header);
+
+          // 팀 리스트 생성
+          const teamList = document.createElement('ul');
+          teamList.classList.add('list-group', 'ms-3', 'sortable-team');
+          teamList.setAttribute('data-department-id', department.departmentId);
+
+          department.teams.forEach(team => {
+            const teamItem = document.createElement('li');
+            teamItem.classList.add('list-group-item', 'team-item');
+            teamItem.setAttribute('data-team-id', team.teamId);
+            teamItem.innerText = team.teamName;
+            teamList.appendChild(teamItem);
+          });
+
+          departmentItem.appendChild(teamList);
+          departmentList.appendChild(departmentItem);
+          
+        });
+
+        //console.log('sortable 불러오기 완료.');
+        document.getElementById('loadingSpinnerSortOrderModal').style.display = 'none';
+        document.getElementById('departmentList').style.display = 'block';
+        // 💡 Sortable 다시 초기화
+        initializeTeamSortable();
+      })
+      .catch(error => {
+        //console.error("데이터 로딩 실패: ", error);
+        alert('데이터를 불러오는 중 오류가 발생했습니다.');
+        document.getElementById('loadingSpinnerSortOrderModal').style.display = 'none';
+        document.getElementById('departmentList').style.display = 'block';
+      });
+	  
+  });
+  
+  
+  
 
   // 3. 저장 버튼 클릭 시 → 정렬된 데이터 추출
   document.getElementById('saveSortOrderBtn').addEventListener('click', function () {
