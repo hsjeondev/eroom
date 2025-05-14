@@ -9,7 +9,7 @@ pipeline {
             steps {
                 echo '배포: develop 서버로'
 
-                sh 'cp /home/eroom/springboot-docker/.env ./springboot-docker/.env'
+                sh 'cp /mnt/env/.env ./springboot-docker/.env'
 
                 sh './springboot-docker/deploy-dev.sh'
             }
