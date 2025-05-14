@@ -381,7 +381,6 @@ public class ProjectController {
 	@ResponseBody
 	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam(name = "separator_code") String separatorCode) {
 	String temp = separatorCode.substring(0,1);
-	System.out.println(temp + " | substring 자르기 1글자 나와야해");
 	if ("T".equals(temp)) {
 		// 팀(소속) 선택한 경우: separatorCode 기준 조회
 		return employeeService.findEmployeesByStructureName(separatorCode);
