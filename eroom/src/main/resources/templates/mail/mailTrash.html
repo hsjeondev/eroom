@@ -48,7 +48,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 					    전체 선택
 					  </label>
                   </div>
-                  <small class="text-muted ms-4">휴지통의 메일은 15일 후에 자동 삭제됩니다.</small>
+                  <small class="text-muted ms-4">🗑️휴지통의 메일은 15일 후에 자동 삭제됩니다.</small>
                   <div>
                     <button id="deleteBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="삭제"><span class="fas fa-trash fs-10"></span></button>
                   	<button id="removeBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="복구">
@@ -82,20 +82,20 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                     </div>
                     
                     <!-- 프로필 사진 이미지 부분  -->
-                    <div class="col-auto">
+                    <!-- <div class="col-auto">
                       <div class="avatar avatar-s  rounded-circle">
                         <img class="rounded-circle " src="../../assets/img/team/60.webp" alt="" />
 
                       </div>
-                    </div>
+                    </div> -->
                     <div class="col-auto">
-                    🗑️
-                    	
+                    <div class="text-body-emphasis fw-bold inbox-link fs-9">작성자 :
 					  <a class="inbox-link fs-9 senderName"
 					     th:href="@{/mail/detail/{id}(id=${trashMail.mailNo})}"
 					     th:text="${trashMail != null and trashMail.sender != null ? trashMail.sender.employeeName : '알 수 없음'}">
 					     보낸 사람
 					  </a>
+					</div>
 					</div>
                     <div class="col-auto ms-auto">
                        <!-- <div class="hover-actions end-0">

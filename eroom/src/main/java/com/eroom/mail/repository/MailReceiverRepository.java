@@ -12,7 +12,15 @@ import com.eroom.mail.entity.MailReceiver;
 
 public interface MailReceiverRepository extends JpaRepository<MailReceiver, Long>{
 
-	
+	@Query("SELECT mr FROM MailReceiver mr " +
+		       "JOIN FETCH mr.mail m " +
+		       "LEFT JOIN MailStatus s ON s.mail = m AND s.employee.employeeNo = :empNo " +
+		       "WHERE mr.receiver.employeeNo = :empNo " +
+		       "AND mr.mailReceiverVisibleYn = 'Y' " +
+		       "AND mr.mailReceiverReadYn = 'N' " +  // 읽지 않은 메일만 조회
+		       "AND (s IS NULL OR s.mailStatusDeletedYn <> 'Y' OR s.mailStatusDeletedYn IS NULL) " +  // 상태가 없으면 필터링하지 않도록 수정
+		       "ORDER BY m.mailSentTime DESC")
+		List<MailReceiver> findUnreadMailsByEmployeeNo(@Param("empNo") Long empNo);
 	// 오래된 순
 	/*
 	@Query("SELECT mr FROM MailReceiver mr JOIN FETCH mr.mail m WHERE mr.receiver.employeeNo = :empNo ORDER BY m.mailSentTime ASC")
