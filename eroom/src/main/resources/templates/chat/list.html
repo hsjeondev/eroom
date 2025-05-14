@@ -105,7 +105,7 @@
 										        class="text-body fw-normal name text-nowrap">채팅방 이름</h5>
 										
 										    <div class="d-flex flex-column align-items-end ms-2">
-										      <p th:text="${#temporals.format(chatroom.lastMessageRegDate, 'yy.MM.dd')}"
+										      <p th:text="${#temporals.format(chatroom.lastMessageRegDate, 'yy.MM.dd HH:mm')}"
 										         class="fs-10 text-body-tertiary text-opacity-85 mb-1 text-nowrap">
 										         마지막 메시지 시간
 										      </p>
@@ -261,7 +261,8 @@
 		let currentReceiverNo = null;
 		let isCreateMode = true; // 기본은 생성 모드
 		let lastSelectedChatroomName = null;
-
+		let currentChatroomNo = null;
+		
 		document.addEventListener("DOMContentLoaded", () => {
 		  bindModalReset(); // 모달 초기화
 		  bindChatroomPanelEvents(); // 채팅방 클릭 이벤트
@@ -428,6 +429,7 @@
 			}
 		
 		    const chatroomNo = target.dataset.roomNo;
+		    currentChatroomNo = chatroomNo; 
 		    const isGroup = target.dataset.group === "Y";
 		    const chatroomNameEl = target.querySelector('.name');
 		    const chatroomName = chatroomNameEl
@@ -799,6 +801,8 @@
 		  document.getElementById("chatroomNameBox").style.display = "none";
 		  document.getElementById("chatTypeGroup").style.display = "none";
 		
+		  document.querySelector('#createChatForm button[type="submit"]').innerText = "추가";
+		  
 		  let chatroomInput = document.getElementById("chatroomNoInput");
 		  if (!chatroomInput) {
 		    chatroomInput = document.createElement('input');
@@ -1158,6 +1162,7 @@ function loadChatroomDetail(chatroomNo) {
         .then(data => {
             const chatHistory = document.querySelector(".chat-history");
             if (!chatHistory) return;
+            if (chatroomNo !== currentChatroomNo) return;
 
             chatHistory.innerHTML = "<hr>"; // 초기화
 
