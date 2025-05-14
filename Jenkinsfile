@@ -4,7 +4,9 @@ pipeline {
     stages {
         stage('Build & Deploy') {
             when {
-                branch 'develop'
+                expression {
+                    return env.BRANCH_NAME == 'develop'
+                }
             }
             steps {
                 echo '배포: develop 서버로'
@@ -21,7 +23,9 @@ pipeline {
 
         stage('Build & Deploy Prod') {
             when {
-                branch 'master'
+                expression {
+                    return env.BRANCH_NAME == 'master'
+                }
             }
             steps {
                 echo '배포: production 서버로'
