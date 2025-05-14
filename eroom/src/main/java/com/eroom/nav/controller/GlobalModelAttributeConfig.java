@@ -28,7 +28,6 @@ public class GlobalModelAttributeConfig {
     public void addNavAttributes(Model model, HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // 인증된 사용자가 있을 경우
         if (authentication != null && authentication.getPrincipal() instanceof EmployeeDetails) {
             EmployeeDetails user = (EmployeeDetails) authentication.getPrincipal();
 
