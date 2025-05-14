@@ -332,6 +332,7 @@ public class ProjectController {
 	    ProjectMemberDto pmDto = ProjectMemberDto.builder()
 	            .project_member(Employee.builder().employeeNo(pmEmployeeNo).build())
 	            .project_manager("Y")
+	            .visible_yn("Y")
 	            .build();
 	    memberDtos.add(pmDto);
 
@@ -342,6 +343,7 @@ public class ProjectController {
 	            ProjectMemberDto managerDto = ProjectMemberDto.builder()
 	                    .project_member(Employee.builder().employeeNo(managerId).build())
 	                    .is_manager("Y")  // 관리자 역할인 경우
+	                    .visible_yn("Y")
 	                    .build();
 	            memberDtos.add(managerDto);
 	        }
@@ -353,6 +355,7 @@ public class ProjectController {
 	            ProjectMemberDto participantDto = ProjectMemberDto.builder()
 	                    .project_member(Employee.builder().employeeNo(participantId).build())
 	                    .is_manager("N")
+	                    .visible_yn("Y")
 	                    .build();
 	            memberDtos.add(participantDto);
 	        }
@@ -381,7 +384,6 @@ public class ProjectController {
 	@ResponseBody
 	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam(name = "separator_code") String separatorCode) {
 	String temp = separatorCode.substring(0,1);
-	System.out.println(temp + " | substring 자르기 1글자 나와야해");
 	if ("T".equals(temp)) {
 		// 팀(소속) 선택한 경우: separatorCode 기준 조회
 		return employeeService.findEmployeesByStructureName(separatorCode);
