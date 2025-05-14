@@ -64,6 +64,7 @@ public class DirectoryService {
 	    			.directory_team(team)
 	    			.directory_position(position)
 	    			.separator_code("A002")
+	    			.visible_yn("Y")
 	    			.directory_creator(creator.getEmployeeId())
 	    			.build();
 	    	Directory entity = dto.toEntity2();

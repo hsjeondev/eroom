@@ -26,6 +26,7 @@ import com.eroom.approval.repository.ApprovalLineRepository;
 import com.eroom.approval.repository.ApprovalRepository;
 import com.eroom.attendance.entity.AnnualLeave;
 import com.eroom.attendance.repository.AnnualLeaveRepository;
+import com.eroom.attendance.service.AnnualLeaveService;
 import com.eroom.calendar.dto.CompanyCalendarDto;
 import com.eroom.calendar.entity.CompanyCalendar;
 import com.eroom.calendar.repository.CompanyCalendarRepository;
@@ -45,6 +46,7 @@ public class ApprovalService {
 	private final EmployeeRepository employeeRepository;
 	private final ApprovalLineRepository approvalLineRepository;
 	private final AnnualLeaveRepository annualLeaveRepository;
+	private final AnnualLeaveService annualLeaveService;
 	private final CompanyCalendarRepository companyRepository;
 	private final DriveService driveService;
 	private final ApprovalWebSocketHandler approvalWebSocketHandler;
@@ -370,7 +372,10 @@ public class ApprovalService {
 							DateTimeFormatter dtfFull = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 							
 							// 연차 정보 수정 + 캘린더 추가
-							annualLeave = annualLeaveRepository.findByEmployee_EmployeeNo(approvalEmployee.getEmployeeNo());
+							Long targetYear = (long) LocalDateTime.now().getYear();
+//							annualLeave = annualLeaveRepository.findByEmployee_EmployeeNo(approvalEmployee.getEmployeeNo());
+							annualLeave = annualLeaveService.selectAnnualLeaveByEmployeeNoAndYear(approvalEmployee.getEmployeeNo(), targetYear);
+							
 							if(annualLeave != null) {
 								Double annualLeaveUsed = annualLeave.getAnnualLeaveUsed();
 //								annualLeaveDto = new AnnualLeaveDto().toDto(annualLeave);
@@ -494,11 +499,11 @@ public class ApprovalService {
 	}
 
 	// mainpage Approval 리스트 조회2
-	public List<Approval> getPendingApprovals(Long employeeNo) {
-		// 내가 합의나 결재 순번인 경우 가져와야하니 ApprovalLineService에 접근해보자.
-	    //return approvalRepository.findTop5ByStatusOrderByCreatedDateDesc("PENDING");
-		return null;
-	}
+//	public List<Approval> getPendingApprovals(Long employeeNo) {
+//		// 내가 합의나 결재 순번인 경우 가져와야하니 ApprovalLineService에 접근해보자.
+//	    //return approvalRepository.findTop5ByStatusOrderByCreatedDateDesc("PENDING");
+//		return null;
+//	}
 
 	// mainpage Approval 리스트 조회3
 	public List<Approval> getCompletedApprovals(Long employeeNo) {
