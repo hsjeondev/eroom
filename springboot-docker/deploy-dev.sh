@@ -16,8 +16,8 @@ fi
 
 # 2. 설정 파일 복사
 echo "[INFO] application.yml, application-secret.properties 복사 중..."
-cp ./springboot-docker/secrets/application.yml ./app/src/main/resources/
-cp ./springboot-docker/secrets/application-secret.properties ./app/src/main/resources/
+cp ./springboot-docker/secrets/application.yml ./src/main/resources/
+cp ./springboot-docker/secrets/application-secret.properties ./src/main/resources/
 
 # 3. 기존 컨테이너 종료
 echo "[INFO] 기존 컨테이너 종료 중..."
