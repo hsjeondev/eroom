@@ -24,6 +24,18 @@
 	display: flex;
 	flex-direction: column;
 }
+/* 출퇴근 카드 날짜부분 헤더 */
+.card-header.custom-header {
+  height: 56px; /* 💡 결재 카드 탭 높이에 맞춤 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+  border-bottom: 1px solid #dee2e6; /* 구분선 있으면 안정감 있음 */
+  font-size: 1.2rem; /* 날짜 폰트 크기 */
+  font-weight: 600;
+  color: #495057;
+}
 
 .card {
 	flex: 1;
@@ -47,10 +59,11 @@
 }
 
 .current-time {
-	font-size: 0.9rem;
+	font-size: 1.2rem;
 	color: #6c757d;
 	text-align: center;
-	margin-bottom: 0.5rem;
+	margin: 0;
+	/* margin-bottom: 0.5rem; */
 }
 
 .profile-img {
@@ -59,13 +72,28 @@
 }
 
 .btn-wrap {
-	border-top: 1px dashed #dee2e6;
-	padding-top: 1rem;
-	margin-top: 1rem;
+	border-top: none; /* 1px dashed #dee2e6; */
+	padding-top: 0;           /* 버튼과 위 요소 사이 여백 제거 */
+	margin-top: 0;            /* 버튼이 아래로 밀리지 않도록 */
+	align-self: center;       /* 왼쪽 프로필과 수직 기준 맞추기 */
+	margin-top: -3px;         /* 필요 시 약간 위로 올리기 (조정 가능) */
 }
 
 .btn-wrap .btn {
 	min-width: 120px;
+}
+
+.vertical-divider {
+  width: 1px;
+  height: 100px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #dee2e6,
+    #dee2e6 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  margin: 0 1rem;
 }
 
 /* 스크롤 커스터마이징 선택사항 */
@@ -120,11 +148,11 @@
 
 .fc-list-event-time {
 	width: 30% !important;
-	font-size: 11.5px;
+	font-size: 15px;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	text-align: left;
+	text-align: center;
 	padding-left: 6px;
 }
 
@@ -216,45 +244,59 @@
 					<!-- 1행·1열: 출퇴근 카드 -->
 					<div class="text-white p-1">
 						<div class="attendance-card mx-auto">
-							<div class="card shadow-sm border-0">
-								<div class="card-body text-center p-4">
-									<form id="attendanceForm" th:action="@{/log}" method="post">
-										<input type="hidden" th:name="${_csrf.parameterName}"
-											th:value="${_csrf_token}"> <input type="hidden"
-											th:value="${#authentication.principal.employee.employeeNo}"
-											name="employeeNo"> <input type="hidden"
-											name="attendanceType" id="attendanceType">
-
-										<div id="currentTime" class="current-time fw-semibold mb-2"></div>
-										<div class="d-flex justify-content-center mb-3">
-											<img id="profileImage"
-												class="rounded-circle me-3 profile-img" src="" alt="프로필"
-												style="display: none; height: 50px; width: 50px">
-											<div class="text-start">
-												<p class="fw-semibold fs-8 mb-0"
-													th:text="${employee.employeeName}">이름</p>
-												<small th:if="${employee.structure != null}"
-													th:text="|${employee.structure.codeName} / ${employee.employeePosition}|">
-													부서 / 직급 </small> <small th:if="${employee.structure == null}"
-													th:text="|- / ${employee.employeePosition}|"> 부서 /
-													직급 </small>
-											</div>
-										</div>
-
-										<div class="btn-wrap d-flex justify-content-center gap-2">
-											<button id="checkInBtn"
-												class="btn btn-outline-primary btn-sm"
-												th:attr="disabled=${attendanceStatus != 'notCheckedIn'} ? 'disabled' : null"
-												th:text="${attendanceStatus == 'checkedIn' || attendanceStatus == 'checkedOut'} ? ${checkInTime} : '출근하기'">
-												출근하기</button>
-											<button id="checkOutBtn" class="btn btn-primary btn-sm"
-												th:attr="disabled=${attendanceStatus != 'checkedIn'} ? 'disabled' : null"
-												th:text="${attendanceStatus == 'checkedOut'} ? ${checkOutTime} : '퇴근하기'">
-												퇴근하기</button>
-										</div>
-									</form>
-								</div>
+						  <div class="card shadow-sm border-0">
+						            <!-- 상단 현재 시간 -->
+							<div class="card-header custom-header">
+							        <div id="currentTime" class="current-time fw-semibold text-center"></div>
+							
 							</div>
+						    <div class="card-body p-4">
+						      <form id="attendanceForm" th:action="@{/log}" method="post" class="w-100">
+						        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf_token}">
+						        <input type="hidden" th:value="${#authentication.principal.employee.employeeNo}" name="employeeNo">
+						        <input type="hidden" name="attendanceType" id="attendanceType">
+						
+						
+						
+						        <!-- 좌우 분리된 정보 블럭 -->
+						        <div class="d-flex justify-content-center align-items-center flex-wrap gap-6">
+						
+						          <!-- 왼쪽: 프로필 + 이름/부서 -->
+						          <div class="d-flex align-items-center">
+						            <img id="profileImage" class="rounded-circle me-3 profile-img"
+						                 src="" alt="프로필" style="display: none; height: 64px; width: 64px">
+						            <div class="text-start">
+						              <p class="fw-semibold fs-6 mb-1" th:text="${employee.employeeName}">이름</p>
+						              <small th:if="${employee.structure != null}"
+						                     th:text="|${employee.structure.codeName} / ${employee.employeePosition}|">
+						                부서 / 직급
+						              </small>
+						              <small th:if="${employee.structure == null}"
+						                     th:text="|- / ${employee.employeePosition}|">
+						                부서 / 직급
+						              </small>
+						            </div>
+						          </div>
+						
+							<div class="vertical-divider"></div>
+						
+						          <!-- 오른쪽: 출근/퇴근 버튼 + 시간 -->
+						          <div class="btn-wrap d-flex flex-column align-items-end">
+						            <button id="checkInBtn" class="btn btn-outline-primary btn-sm mb-2"
+						                    th:attr="disabled=${attendanceStatus != 'notCheckedIn'} ? 'disabled' : null"
+						                    th:text="${attendanceStatus == 'checkedIn' || attendanceStatus == 'checkedOut'} ? ${checkInTime} : '출근하기'">
+						              출근하기
+						            </button>
+						            <button id="checkOutBtn" class="btn btn-primary btn-sm"
+						                    th:attr="disabled=${attendanceStatus != 'checkedIn'} ? 'disabled' : null"
+						                    th:text="${attendanceStatus == 'checkedOut'} ? ${checkOutTime} : '퇴근하기'">
+						              퇴근하기
+						            </button>
+						          </div>
+						        </div>
+						      </form>
+						    </div>
+						  </div>
 						</div>
 					</div>
 

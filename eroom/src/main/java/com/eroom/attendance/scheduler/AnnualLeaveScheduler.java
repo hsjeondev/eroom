@@ -25,7 +25,7 @@ public class AnnualLeaveScheduler {
 	/**
 	 *  매년 1월 1일 00시에 실행 (테스트용 : 매일 자정으로 설정)
 	 */
-	@Scheduled(cron = "0 8 12 12 5 *", zone= "Asia/Seoul") // 테스트용 : 5월 12일 00시
+	@Scheduled(cron = "0 17 10 14 5 *", zone= "Asia/Seoul") // 테스트용 : 5월 12일 00시
 	public void generateAnnualLeaves() {
 		// 오늘 날짜 기준 연도
 		int yearInt = LocalDate.now().getYear();

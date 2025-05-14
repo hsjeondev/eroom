@@ -78,18 +78,6 @@ public class SurveyController {
 
 	@PostMapping("/create")
 	public String createSurvey(SurveyDto surveyDto, SurveyItemDto surveyItemDto, @RequestParam("selectedTeamIds") List<String> selectedTeamIds) {
-		// SurveyDto 값 확인
-		System.out.println("제목: " + surveyDto.getSurveyTitle());
-		System.out.println("복수 선택: " + surveyDto.getAllowMultiple());
-		System.out.println("익명 투표: " + surveyDto.getAnonymousVote());
-		System.out.println("마감일: " + surveyDto.getDeadline());
-
-		// SurveyItemDto 값 확인
-		System.out.println("항목 리스트:");
-		for (String item : surveyItemDto.getItems()) {
-			System.out.println("- " + item);
-		}
-
 		// 현재 사용자의 이름 가져오기
 		EmployeeDetails userDetails = (EmployeeDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Employee employee = userDetails.getEmployee();

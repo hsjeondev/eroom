@@ -184,6 +184,22 @@
 	    </div>
 	  </div>
 	</div>
+	
+	      <div class="modal fade" id="completeModal" tabindex="-1" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered">
+	    <div class="modal-content border border-2 border-secondary-subtle shadow">
+	      <div class="modal-header">
+	        <h5 class="modal-title fw-semibold">등록 확인</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-primary btn-sm" id="completeSubmitBtn">확인</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
 
       <script>
         // 관리자 모달: 부서(소속) 목록을 fetch로 불러오기
@@ -545,8 +561,8 @@
 		      if (data.res_code === "200") {
 		        // 결과 저장하고 모달 띄우기
 		        redirectUrlAfterConfirm = "/project/detail/" + data.res_project_no + "/main";
-		        document.querySelector("#confirmModal .modal-body").textContent = data.res_msg;
-		        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+		        document.querySelector("#completeModal .modal-body").textContent = data.res_msg;
+		        const modal = new bootstrap.Modal(document.getElementById('completeModal'));
 		        modal.show();
 		      } else {
 		        alert(data.res_msg); // 실패 메시지는 그대로 alert
@@ -558,7 +574,7 @@
 		});
 		
 		// 모달 내 확인 버튼 클릭 시 이동
-		document.getElementById('confirmSubmitBtn').addEventListener('click', function () {
+		document.getElementById('completeSubmitBtn').addEventListener('click', function () {
 		  if (redirectUrlAfterConfirm) {
 		    location.href = redirectUrlAfterConfirm;
 		  }
