@@ -16,20 +16,20 @@ fi
 
 # 2. 설정 파일 복사
 echo "[INFO] application.yml, application-secret.properties 복사 중..."
-cp ./secrets/application.yml ./app/src/main/resources/
-cp ./secrets/application-secret.properties ./app/src/main/resources/
+cp ./springboot-docker/secrets/application.yml ./app/src/main/resources/
+cp ./springboot-docker/secrets/application-secret.properties ./app/src/main/resources/
 
 # 3. 기존 컨테이너 종료
 echo "[INFO] 기존 컨테이너 종료 중..."
-docker compose --env-file "$ENV_PATH" down
+docker-compose --env-file "$ENV_PATH" down
 
 # 4. 이미지 빌드
 echo "[INFO] 이미지 재빌드 중..."
-docker compose --env-file "$ENV_PATH" build --no-cache
+docker-compose --env-file "$ENV_PATH" build --no-cache
 
 # 5. 컨테이너 실행
 echo "[INFO] 컨테이너 재기동 중..."
-docker compose --env-file "$ENV_PATH" up -d
+docker-compose --env-file "$ENV_PATH" up -d
 
 # 6. 기존 cloudflared 컨테이너 제거
 if docker ps -a --format '{{.Names}}' | grep -q '^cloudflared$'; then
