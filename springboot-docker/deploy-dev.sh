@@ -16,6 +16,7 @@ fi
 
 # 2. 설정 파일 복사
 echo "[INFO] application.yml, application-secret.properties 복사 중..."
+mkdir -p ./src/main/resources/
 cp ./springboot-docker/secrets/application.yml ./src/main/resources/
 cp ./springboot-docker/secrets/application-secret.properties ./src/main/resources/
 
