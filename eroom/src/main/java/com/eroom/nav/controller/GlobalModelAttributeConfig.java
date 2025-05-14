@@ -37,6 +37,7 @@ public class GlobalModelAttributeConfig {
             model.addAttribute("navItems", new ArrayList<>());
         }
 
+        // 주석
         String url = request.getRequestURI();
         model.addAttribute("requestURI", url);
     }
