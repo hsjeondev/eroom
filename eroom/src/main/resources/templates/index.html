@@ -26,14 +26,14 @@
 }
 /* 출퇴근 카드 날짜부분 헤더 */
 .card-header.custom-header {
-  height: 56px; /* 💡 결재 카드 탭 높이에 맞춤 */
+  /* height: 56px; 
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 1rem;
-  border-bottom: 1px solid #dee2e6; /* 구분선 있으면 안정감 있음 */
-  font-size: 1.2rem; /* 날짜 폰트 크기 */
-  font-weight: 600;
+  border-bottom: 1px solid #dee2e6; 
+  font-size: 1.2rem; 
+  font-weight: 600; */
   color: #495057;
 }
 
@@ -246,7 +246,7 @@
 						<div class="attendance-card mx-auto">
 						  <div class="card shadow-sm border-0">
 						            <!-- 상단 현재 시간 -->
-							<div class="card-header custom-header">
+							<div class="card-header custom-header custom-header text-center py-3">
 							        <div id="currentTime" class="current-time fw-semibold text-center"></div>
 							
 							</div>
@@ -304,7 +304,7 @@
 					<div class="text-white p-1">
 						<div class="attendance-card mx-auto">
 							<div class="card shadow-sm border-0">
-								<div class="card-header"
+								<div class="card-header text-center py-3"
 									style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
 									결재</div>
 								<!-- Tab 메뉴 -->
@@ -470,7 +470,7 @@
 					<div class="text-white p-1">
 						<div class="attendance-card mx-auto">
 							<div class="card shadow-sm border-0">
-								<div class="card-header"
+								<div class="card-header text-center py-3"
 									style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
 									참여 프로젝트</div>
 								<!-- Tab 메뉴 -->
@@ -724,10 +724,9 @@
 						<div class="attendance-card mx-auto">
 							<div class="card shadow-sm border-0">
 								<div class="card-header"
-									style="text-align: center; font-size: 1.5rem; font-weight: bold; padding: 15px;">
-									<span>메일</span>
-								</div>
-								<div class="card-body text-center p-4" style="height: 207.81px;">
+									style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
+									메일</div>
+								<div class="card-body text-center" style="height: 207.81px;">
 									<a th:href="@{/mail/receiverTo}"> <i
 										class="fas fa-envelope fa-3x mb-0 text-primary"></i>
 									</a>

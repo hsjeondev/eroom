@@ -1,7 +1,10 @@
 <!-- approval/cardFragment.html -->
 							<!-- 카드1 thymeleaf 사용중 -->
 						<div th:if="${not #lists.isEmpty(resultList)}" th:fragment="cardFragment" class="col-12 col-xl-6 list" th:each="list, listStatus : ${resultList}">
-							<div class="card h-100">
+							<div class="card h-100"
+							     th:attr="data-href=@{/approval/{no}/detail(no=${list.approval_no})}" 
+							     onclick="window.location.href=this.dataset.href" 
+							     style="cursor: pointer;">
 								<div class="card-body">
 									<!-- 결재문서 이름/ 진행상태 / 작성자 이름 칸 -->
 									<div class="border-bottom border-translucent">
