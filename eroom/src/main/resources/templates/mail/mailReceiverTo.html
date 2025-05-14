@@ -49,7 +49,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                 <!-- 범용성 생각해서 일단 보류 -->
                 <div class="border-top border-translucent py-2 d-flex justify-content-between">
                   <div class="form-check mb-0 fs-8">
-                    <input class="form-check-input" type="checkbox" data-bulk-select-row="data-bulk-select-row" id="chechAll" />
+                    <input class="form-check-input" type="checkbox" data-bulk-select-row="data-bulk-select-row" id="checkAll"/>
                   </div>
                   <div>
                     <button id="deleteBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="휴지통"><span class="fas fa-trash fs-10"></span></button>
@@ -84,11 +84,12 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                       	<form th:action="@{/mail/status/important/{id}(id=${receiverMail.mail.mailNo})}" method="post">
 						    <input type="hidden" name="redirectUrl" value="/mail/receiverTo" />
 						    <button class="btn p-0" type="submit" onclick="event.stopPropagation()">
-						        <span th:classappend="${
-						            mailStatusMap[receiverMail.mail.mailNo]?.mailStatusImportantYn == 'Y' 
+						        <!-- <span th:classappend="${
+						            mailStatusMap[receiverMail.receiver.employeeNo]?.mailStatusImportantYn == 'Y' 
 						                ? 'fas text-warning fa-star' 
 						                : 'far fa-star'
-						        }"></span>
+						        }"></span> -->
+						        <span th:class="'fa-star ' + (${mailStatusMap[receiverMail.mail.mailNo + '_' + receiverMail.receiver.employeeNo]?.mailStatusImportantYn} == 'Y' ? 'fas text-warning fa-star' : 'far fa-star')"></span>
 						    </button>
 						</form>
                       </div>
@@ -196,7 +197,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
         	  pagination: true
         	});
          
-         const checkAll = document.getElementById('chechAll');
+         const checkAll = document.getElementById('checkAll');
          checkAll.addEventListener('change', function () {
            const isChecked = this.checked;
            const checkboxes = document.querySelectorAll('.mail_checkbox');

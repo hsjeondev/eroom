@@ -87,11 +87,13 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                         <form th:action="@{/mail/status/important/{id}(id=${sentMail.mailNo})}" method="post">
 						    <input type="hidden" name="redirectUrl" value="/mail/sent" />
 						    <button class="btn p-0" type="submit" onclick="event.stopPropagation()">
-						        <span th:classappend="${
+						        <!-- <span th:classappend="${
 						            mailStatusMap[sentMail.mailNo]?.mailStatusImportantYn == 'Y' 
 						                ? 'fas text-warning fa-star' 
 						                : 'far fa-star'
-						        }"></span>
+						        }"></span> -->
+						        <span th:class="'fa-star ' + (${mailStatusMap[sentMail.mailNo + '_' + sentMail.sender.employeeNo]?.mailStatusImportantYn} == 'Y' ? 'fas text-warning fa-star' : 'far fa-star')"></span>
+						    
 						    </button>
 						</form>
                       </div>
