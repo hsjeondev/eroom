@@ -94,22 +94,23 @@ public class DriveController {
 	// 팀 드라이브 
 	@GetMapping("/team")
 	public String selectDriveTeam(@AuthenticationPrincipal EmployeeDetails user, Model model) {
-		 Long employeeStructureNo = user.getEmployee().getStructure().getStructureNo();
-		 // 내 팀 이름 가져오기
-		 Structure team = structureService.getStructureById(employeeStructureNo);
-			if (team == null || team.getParentCode() == null) {
-				// 부모 코드가 없으면
-				return "error";
-			}
-		// 이 팀의 파일만 조회
-			List<DriveDto> fileList = driveService.findTeamDriveFiles(team.getSeparatorCode());
-			
-			model.addAttribute("fileList", fileList);
-			model.addAttribute("teamName", team.getCodeName());
-			
-			return "drive/team";
-		
+	    Long employeeStructureNo = user.getEmployee().getStructure().getStructureNo();
+	    Structure team = structureService.getStructureById(employeeStructureNo);
+
+	 // 팀 조건: 상위 조직이 존재해야 함 (즉, parent_code != null)
+	 if (team == null || team.getParentCode() == null) {
+	     model.addAttribute("message", "팀에 소속된 사용자만 팀 드라이브에 접근할 수 있습니다.");
+	     return "error/custom-message";
+	 }
+
+
+	    List<DriveDto> fileList = driveService.findTeamDriveFiles(team.getSeparatorCode());
+	    model.addAttribute("fileList", fileList);
+	    model.addAttribute("teamName", team.getCodeName());
+
+	    return "drive/team";
 	}
+
 	// 개인 드라이브
 	@GetMapping("/personal")
 	public String selectDrivePersonal(Model model, @AuthenticationPrincipal EmployeeDetails user) {
