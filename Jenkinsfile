@@ -5,31 +5,14 @@ pipeline {
         stage('Build & Deploy') {
             when {
                 expression {
+                    echo "BRANCH_NAME: ${env.BRANCH_NAME}"
                     return env.BRANCH_NAME == 'develop'
                 }
             }
             steps {
-                echo '배포: develop 서버로'
+                echo '✅ 이 메시지가 출력되면 sh 명령어 실행 가능 상태입니다'
 
-                sh 'cp /mnt/env/.env ./springboot-docker/.env'
-
-                sh 'mkdir -p ./springboot-docker/secrets'
-                sh 'cp /mnt/env/secrets/application.yml ./springboot-docker/secrets/'
-                sh 'cp /mnt/env/secrets/application-secret.properties ./springboot-docker/secrets/'
-
-                sh './springboot-docker/deploy-dev.sh'
-            }
-        }
-
-        stage('Build & Deploy Prod') {
-            when {
-                expression {
-                    return env.BRANCH_NAME == 'master'
-                }
-            }
-            steps {
-                echo '배포: production 서버로'
-                sh './deploy-prod.sh'
+                // 나머지 생략...
             }
         }
     }
