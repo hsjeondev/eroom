@@ -8,7 +8,7 @@ pipeline {
             }
             steps {
                 echo '배포: develop 서버로'
-                sh './deploy-dev.sh'
+                sh './springboot-docker/deploy-dev.sh'    // ✅ 경로 수정!
             }
         }
 
