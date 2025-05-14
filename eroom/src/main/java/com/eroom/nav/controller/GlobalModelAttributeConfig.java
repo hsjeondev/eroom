@@ -37,7 +37,6 @@ public class GlobalModelAttributeConfig {
             model.addAttribute("navItems", new ArrayList<>());
         }
 
-        // 현재 요청 URI를 가져옵니다.
         String url = request.getRequestURI();
         model.addAttribute("requestURI", url);
     }
