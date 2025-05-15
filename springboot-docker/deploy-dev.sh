@@ -75,17 +75,17 @@ fi
 
 # 3. 기존 컨테이너 종료
 echo "[STEP] ?? 기존 컨테이너 종료 중..."
-docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_PATH" down
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_PATH" down
 echo "[INFO] ? 컨테이너 종료 완료"
 
 # 4. Docker 이미지 재빌드
 echo "[STEP] ?? Docker 이미지 재빌드 중 (--no-cache)..."
-docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_PATH" build --no-cache
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_PATH" build --no-cache
 echo "[INFO] ? 이미지 재빌드 완료"
 
 # 5. 컨테이너 재기동
 echo "[STEP] ?? 컨테이너 재기동 중..."
-docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_PATH" up -d
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_PATH" up -d
 echo "[INFO] ? 컨테이너 기동 완료"
 
 # 6. 기존 cloudflared 제거
