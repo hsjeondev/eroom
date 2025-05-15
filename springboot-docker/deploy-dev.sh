@@ -7,12 +7,12 @@ echo "[INFO] CI/CD 배포 시작: $(date)"
 BRANCH_NAME=$BRANCH_NAME
 echo "[INFO] 현재 브랜치: $BRANCH_NAME"
 
-# 경로 설정
-ENV_PATH="/home/eroom/springboot-docker/.env"
-SOURCE_CODE_PATH="/home/eroom/springboot-docker/app/source_code"
-DEPLOY_PATH="/home/eroom/springboot-docker/app/deploy"
-SECRETS_PATH="/home/eroom/springboot-docker/secrets"
-COMPOSE_FILE="/home/eroom/springboot-docker/docker-compose.yml"
+# 컨테이너 내부 기준 경로
+ENV_PATH="/mnt/env/.env"
+SOURCE_CODE_PATH="/mnt/env/app/source_code"
+DEPLOY_PATH="/mnt/env/springboot-docker/deploy"
+SECRETS_PATH="/mnt/env/secrets"
+COMPOSE_FILE="/mnt/env/docker-compose.yml"
 
 echo "[INFO] 설정된 DEPLOY_PATH: $DEPLOY_PATH"
 echo "[INFO] 설정된 SOURCE_CODE_PATH: $SOURCE_CODE_PATH"
@@ -73,10 +73,10 @@ else
   echo "[INFO] ℹ️ 현재 브랜치는 $BRANCH_NAME. 빌드 스킵됨."
 fi
 
-# 3. 기존 컨테이너 종료
-echo "[STEP] 🛑 기존 컨테이너 종료 중..."
-docker compose -f "$COMPOSE_FILE" --env-file "$ENV_PATH" down
-echo "[INFO] ✅ 컨테이너 종료 완료"
+# 3. 기존 컨테이너 강제 종료 및 삭제
+echo "[STEP] 🔥 기존 컨테이너 강제 정리"
+docker rm -f eroom-app eroom-mariadb eroom-pdf eroom-node cloudflared 2>/dev/null || true
+echo "[INFO] ✅ 컨테이너 강제 삭제 완료"
 
 # 4. Docker 이미지 재빌드
 echo "[STEP] 🧱 Docker 이미지 재빌드 중 (--no-cache)..."
@@ -88,7 +88,7 @@ echo "[STEP] 🚀 컨테이너 재기동 중..."
 docker compose -f "$COMPOSE_FILE" --env-file "$ENV_PATH" up -d
 echo "[INFO] ✅ 컨테이너 기동 완료"
 
-# 6. 기존 cloudflared 제거
+# 6. cloudflared 컨테이너 제거
 if docker ps -a --format '{{.Names}}' | grep -q '^cloudflared$'; then
   echo "[STEP] 🌩️ cloudflared 컨테이너 제거"
   docker rm -f cloudflared

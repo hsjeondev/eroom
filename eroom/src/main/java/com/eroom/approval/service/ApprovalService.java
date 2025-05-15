@@ -316,8 +316,8 @@ public class ApprovalService {
 		int result = 0;
 		try {
 			Approval approval = approvalRepository.findById(approvalNo).orElse(null);
-			if (approval != null) {
-				if (!approval.getApprovalStatus().equals("F")) {
+			if (approval != null && approval.getApprovalStatus().equals("S")) {
+				if (approval.getApprovalStatus().equals("S")) {
 					approval.setApprovalStatus("F");
 					approvalRepository.save(approval);
 				}

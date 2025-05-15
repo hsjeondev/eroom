@@ -35,6 +35,9 @@
   .treeview-text:hover {
     background-color: #f0f4ff; /* 호버 시 살짝 색상 변화 */
   }
+  .modal-sm-plus {
+  max-width: 400px; /* sm은 300px, 기본은 500px, 중간은 400px */
+  }
 </style>
 <meta charset="UTF-8">
 <title>결재서 작성</title>
@@ -125,8 +128,8 @@
 									<span th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step == 0}" class="badge border text-dark d-flex justify-content-end align-items-center" style="background-color: rgb(248, 249, 250);">
 										<span th:text="${approveMember.employee.employeeName}"></span>
 										<button type="button" class="btn-close" aria-label="Remove" data-prefix="agreer" style="scale: 0.8;"></button>
-										<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}">
-										<input type="hidden" name="approverSteps" th:value="0">
+										<input type="hidden" name="agreerIds" th:value="${approveMember.employee.employeeNo}">
+										<input type="hidden" name="agreerSteps" th:value="0">
 									</span>					
 								</div>
 							</div>
@@ -152,8 +155,8 @@
 									<span th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step == -1}" class="badge border text-dark d-flex justify-content-end align-items-center" style="background-color: rgb(248, 249, 250);">
 										<span th:text="${approveMember.employee.employeeName}"></span>
 										<button type="button" class="btn-close" aria-label="Remove" data-prefix="referer" style="scale: 0.8;"></button>
-										<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}">
-										<input type="hidden" name="approverSteps" th:value="-1">
+										<input type="hidden" name="refererIds" th:value="${approveMember.employee.employeeNo}">
+										<input type="hidden" name="refererSteps" th:value="-1">
 									</span>										
 								</div>
 							</div>
@@ -447,9 +450,97 @@
   </div>
 </div>
       
-      
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 공통 저장 확인 모달 -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
 		
+<!-- 2차 모달 -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+	// 저장 확인 모달 (공통)
+	const confirmSaveModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+	// 알림 모달(공통)
+	const alertModal = new bootstrap.Modal(document.getElementById('alertMessageModal'));
+	// 공통 알림 모달
+	window.showAlert = function (message, callback){
+		document.getElementById('alertMessageContent').innerText = message;
+		alertModal.show();
 		
+		if(callback){
+			const modalEl = document.getElementById('alertMessageModal');
+			modalEl.addEventListener('hidden.bs.modal',function handler(){
+				callback();
+				modalEl.removeEventListener('hidden.bs.modal',handler);
+			});
+		}
+	}
+	// 공통 confirm 모달
+	window.showConfirmModal = function (message, onConfirm){
+		const msgElement = document.getElementById('confirmSaveModalMessage');
+		const confirmBtn = document.getElementById('confirmSaveBtn');
+		
+		msgElement.innerHTML = message;
+		const modalInstance = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+		modalInstance.show();
+		
+		const handler = function(){
+			modalInstance.hide();
+			onConfirm(); // 확인 클릭 시 실행할 콜백
+			confirmBtn.removeEventListener('click',handler); // 중복 방지
+		};
+		
+		confirmBtn.addEventListener('click',handler);
+	}
+	
+	window.reloadAfterAlert = function (){
+	      const modalEl = document.getElementById('alertMessageModal');
+	      modalEl.addEventListener('hidden.bs.modal', function(){
+	    	    location.reload();	
+    	});
+	};
+	window.moveAfterAlert = function (e){
+	      const modalEl = document.getElementById('alertMessageModal');
+	      modalEl.addEventListener('hidden.bs.modal', function(){
+	    	    location.href = e;
+    	});
+	};
+});
+</script>
 		
 		
 	<!-- 결재서 양식 선택시 + 해당 페이지 진입시, fetch로 결재서 양식 내용 가져오기 -->
@@ -884,11 +975,11 @@ function handleCheck(checkbox) {
   const li = checkbox.closest('li.treeview-list-item');
 
   // 결재자, 합의자인 경우 팀/부서/회사 선택 불가
-  if ((targetPrefix === 'approver' || targetPrefix === 'agreer') && type !== 'employee') {
+  /* if ((targetPrefix === 'approver' || targetPrefix === 'agreer') && type !== 'employee') {
     alert('결재자와 합의자는 사원만 선택 가능합니다.');
     checkbox.checked = false;
     return;
-  }
+  } */
 
   // 최대 5명 제한 체크
   const selectedCount = document.querySelectorAll('#selectedTags div').length;
@@ -1359,7 +1450,8 @@ function handleHighlight(li) {
 		  }
 		
 		  if (!isValid) {
-		    alert("제목과 양식을 모두 입력해주세요.");
+		    // alert("제목과 양식을 모두 입력해주세요.");
+		    showAlert('제목과 양식을 모두 입력해주세요.');
 		    return;
 		  }
 		
@@ -1412,7 +1504,7 @@ function handleHighlight(li) {
 		  });
 
 		  if (hasEmpty) {
-		    alert("결재서 내용을 모두 입력해주세요.");
+		    showAlert('결재서 내용을 모두 입력해주세요.');
 		    return;
 		  }
 		
@@ -1427,12 +1519,12 @@ function handleHighlight(li) {
 		
 //		  if (approverSteps.length === 0 && agreerSteps.length === 0 && refererSteps.length === 0) {
 		  if (approverSteps.length === 0 && agreerSteps.length === 0) {
-		    alert("결재자, 합의자를 한 명 이상 선택해주세요.");
+		    showAlert("결재자/합의자 선택이 필요합니다.");
+		    
 		    return;
 		  }
 		  if (approverSteps.length > 5 || agreerSteps.length > 5) {
-
-			  alert("결재자, 합의자는 각각 최대 5명까지 선택 가능합니다.");
+			showAlert("결재자/합의자는 최대 5명까지 선택 가능합니다.");
 		    return;
 		  }
 		
@@ -1441,7 +1533,7 @@ function handleHighlight(li) {
 		    agreerIds.length !== agreerSteps.length ||
 		    refererIds.length !== refererSteps.length
 		  ) {
-		    alert("결재자 정보가 올바르지 않습니다. 다시 선택해주세요.");
+		    showAlert("결재자/합의자 정보가 일치하지 않습니다.");
 		    return;
 		  }
 		
@@ -1541,15 +1633,21 @@ function handleHighlight(li) {
 		  .then(res => res.json())
 		  .then(data => {
 		    if (data.res_code === "200") {
-		      alert("결재서가 성공적으로 제출되었습니다.");
-		      location.href = '/approval/myRequestedApprovals';
+		      showAlert("결재서가 성공적으로 제출되었습니다.");
+		      moveAfterAlert('/approval/myRequestedApprovals');
+		      //location.href = '/approval/myRequestedApprovals';
 		    } else {
-		      alert("결재서 제출에 실패했습니다: " + data.res_msg);
+		      showAlert("결재서 제출에 실패했습니다: " + data.res_msg);
+		      reloadAfterAlert();
+		      // const modalEl = document.getElementById('alertMessageModal');
+		      // modalEl.addEventListener('hidden.bs.modal', location.href='/approval/myRequestedApprovals');
+		      
 		    }
 		  })
 		  .catch(err => {
 		    console.error(err);
-		    alert("요청 중 오류가 발생했습니다.");
+		    showAlert("요청 중 오류가 발생했습니다.");
+		    reloadAfterAlert();
 		  });
 		  
 		  
