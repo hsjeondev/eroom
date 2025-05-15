@@ -46,8 +46,10 @@ import com.eroom.drive.service.DriveService;
 import com.eroom.drive.service.ProfileService;
 import com.eroom.employee.dto.EmployeeDto;
 import com.eroom.employee.entity.Employee;
+import com.eroom.employee.entity.Structure;
 import com.eroom.employee.repository.EmployeeRepository;
 import com.eroom.employee.service.EmployeeService;
+import com.eroom.employee.service.StructureService;
 import com.eroom.security.EmployeeDetails;
 import com.eroom.websocket.ChatWebSocketHandler;
 
@@ -66,17 +68,19 @@ public class ChatController {
 	private final ChatWebSocketHandler webSocketHandler; 
 	private final ProfileService profileService;
 	private final DriveService driveService;
+	private final StructureService structureService;
 	
 	
 	@Value("${ffupload.location}")
 	private String fileDir;
 	
 	@GetMapping("/list")
-	public String selectChatRoomAll(@RequestParam(name = "department", required = false) String department, Model model) {
+	public String selectChatRoomAll(Model model) {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    EmployeeDetails employeeDetails = (EmployeeDetails) authentication.getPrincipal();
 	    Long myEmployeeNo = employeeDetails.getEmployee().getEmployeeNo();
 
+	    // 1. 채팅방 목록 + 프로필 이미지 처리
 	    List<ChatroomDto> chatroomDtos = chatroomService.selectChatRoomAll();
 	    for (ChatroomDto dto : chatroomDtos) {
 	        int unreadCount = chatAlarmRepository.countUnreadAlarms(myEmployeeNo, dto.getChatroomNo());
@@ -84,7 +88,6 @@ public class ChatController {
 
 	        Long targetEmployeeNo = null;
 	        if ("N".equals(dto.getChatIsGroupYn())) {
-	            // participantIds가 null인지 확인
 	            List<Long> participants = dto.getParticipantIds();
 	            if (participants != null) {
 	                for (Long no : participants) {
@@ -101,12 +104,72 @@ public class ChatController {
 	        String profileUrl = profileService.getProfileImageUrl(targetEmployeeNo);
 	        dto.setProfileImageUrl(profileUrl);
 	    }
-
 	    model.addAttribute("chatroomList", chatroomDtos);
-	    model.addAttribute("structureList", employeeService.findDistinctStructureNames());
+
+	    // 2. 부서 / 팀 / 사원 정보 트리 구조 세팅
+	    Map<String, List<EmployeeDto>> teamEmployeeMap = new HashMap<>();
+	    List<Employee> empEntityList = employeeService.findAllEmployee_EmployeeEmploymentYn();
+	    List<Structure> departmentList = structureService.selectDepartmentAll();
+	    Map<String, List<Structure>> teamMap = new HashMap<>();
+
+	    for (Structure dept : departmentList) {
+	        List<Structure> teamList = structureService.selectTeamAllByParentCode(dept.getSeparatorCode());
+	        teamMap.put(dept.getCodeName(), teamList);
+
+	        for (Structure team : teamList) {
+	            List<EmployeeDto> employees = new ArrayList<>();
+	            for (Employee emp : empEntityList) {
+	                if (emp.getStructure() != null &&
+	                    emp.getStructure().getSeparatorCode().equals(team.getSeparatorCode())) {
+	                    employees.add(new EmployeeDto().toDto(emp));
+	                }
+	            }
+	            teamEmployeeMap.put(team.getSeparatorCode(), employees);
+	        }
+	    }
+
+	    // 3. 무소속 사원 처리
+	    List<EmployeeDto> noTeamList = new ArrayList<>();
+	    for (Employee emp : empEntityList) {
+	        if (emp.getStructure() == null) {
+	            noTeamList.add(new EmployeeDto().toDto(emp));
+	        }
+	    }
+	    teamEmployeeMap.put("noTeam", noTeamList);
+
+	    // 4. 부서는 있지만 팀이 없는 사원 처리
+	    for (Structure dept : departmentList) {
+	        List<EmployeeDto> notAssignedList = new ArrayList<>();
+	        for (Employee emp : empEntityList) {
+	            Structure struct = emp.getStructure();
+	            if (struct == null) continue;
+
+	            if (struct.getSeparatorCode().equals(dept.getSeparatorCode())) {
+	                notAssignedList.add(new EmployeeDto().toDto(emp));
+	            } else if (struct.getParentCode() != null &&
+	                       struct.getParentCode().equals(dept.getSeparatorCode())) {
+	                List<Structure> teamList = teamMap.get(dept.getCodeName());
+	                boolean isTeam = teamList.stream()
+	                                         .anyMatch(t -> t.getSeparatorCode().equals(struct.getSeparatorCode()));
+	                if (!isTeam) {
+	                    notAssignedList.add(new EmployeeDto().toDto(emp));
+	                }
+	            }
+	        }
+
+	        if (!notAssignedList.isEmpty()) {
+	            teamEmployeeMap.put(dept.getSeparatorCode() + "_notAssigned", notAssignedList);
+	        }
+	    }
+
+	    // 5. 트리 데이터 전달
+	    model.addAttribute("departmentList", departmentList);
+	    model.addAttribute("teamMap", teamMap);
+	    model.addAttribute("teamEmployeeMap", teamEmployeeMap);
 
 	    return "chat/list";
 	}
+
 	@GetMapping("/employes")
 	@ResponseBody
 	public List<EmployeeDto> getEmployeesByDepartment(@RequestParam(name = "separator_code") String separatorCode) {
@@ -127,10 +190,21 @@ public class ChatController {
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "채팅방 생성을 실패하였습니다.");
 		
+		
+		Long creater = dto.getCreater();
+	    List<Long> original = dto.getParticipantIds();
+	    List<Long> cleanedList = new ArrayList<>();
+	    
+	    for (Long id : original) {
+	        if (!id.equals(creater) && !cleanedList.contains(id)) {
+	            cleanedList.add(id);
+	        }
+	    }
+	    dto.setParticipantIds(cleanedList);
 		// 채팅방 생성 시 참여자에 본인 ID가 포함되어 있을 경우
-		if (dto.getParticipantIds().contains(dto.getCreater())) {
-			resultMap.put("res_msg", "본인은 참여자로 선택할 수 없습니다.");
-			return resultMap;
+		if ("N".equals(dto.getChatIsGroupYn()) && dto.getParticipantIds().contains(dto.getCreater())) {
+		    resultMap.put("res_msg", "본인은 참여자로 선택할 수 없습니다.");
+		    return resultMap;
 		}
 		// 채팅방 생성 시 참여자 ID가 비어있을 경우
 		if ("N".equals(dto.getChatIsGroupYn())) {

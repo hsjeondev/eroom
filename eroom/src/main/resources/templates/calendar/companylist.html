@@ -285,6 +285,47 @@
 			</div>
 		</div>
 		
+		<div class="modal fade" id="messageModal" tabindex="-1"
+				aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered modal-sm">
+					<div
+						class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+						<div class="modal-header border-0">
+							<h5 class="modal-title text-dark" id="messageModalTitle">알림</h5>
+						</div>
+						<div class="modal-body text-center">
+							<p class="mb-0 text-body" id="messageModalBody">메시지 내용이
+								들어갑니다.</p>
+						</div>
+						<div class="modal-footer justify-content-center border-0">
+							<button type="button" class="btn btn-primary"
+								data-bs-dismiss="modal">확인</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<script>
+			  function showMessageModal(message, title = "알림", reloadOnClose = false) {
+				    document.getElementById("messageModalTitle").textContent = title;
+				    document.getElementById("messageModalBody").textContent = message;
+
+				    const modalEl = document.getElementById("messageModal");
+				    const modal = new bootstrap.Modal(modalEl);
+				    modal.show();
+
+				    const confirmBtn = modalEl.querySelector('button[data-bs-dismiss="modal"]');
+
+				    // 기존 이벤트 제거하고 새로 바인딩 (중복 방지)
+				    const newBtn = confirmBtn.cloneNode(true);
+				    confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+
+				    if (reloadOnClose) {
+				      newBtn.addEventListener("click", () => location.reload());
+				    }
+				  }
+			</script>
+		
 		<!-- 회사 일정에서 캘린더를 클릭하면 누구나 일정을 등록할수 있기에, 관리자 라는 값을 넘겨줌 dateClick속성-->  
 		<script th:inline="javascript">
 			let employeePosition = /*[[${#authentication.principal.employee.employeePosition}]]*/ "";
@@ -575,72 +616,95 @@
 		    
 		    //일정 수정한거를 저장
 			document.getElementById('saveEventButton').addEventListener('click', function(e) {
-			    e.preventDefault();
-			
-			    const updateForm = document.editEventForm;
-			    const updateData = new FormData(updateForm);
-			
-			    const startEditInput = document.getElementById("editStartTime");
-			    const endEditInput = document.getElementById("editEndTime");
-			
-			    // 유효성 검사
-			    const startTime = new Date(startEditInput.value);
-			    const endTime = new Date(endEditInput.value);
-			
-			    if (startTime > endTime) {
-			        endEditInput.setCustomValidity("종료시간은 시작시간 이후여야 합니다!");
-			        endEditInput.reportValidity();
-			        return;
-			    } else {
-			        endEditInput.setCustomValidity(""); // 정상일 때 초기화
-			    }
-			
-			    // 서버로 전송
-			    fetch("/companycalendar/update/" + selectedCalendarNo, {
-			        method: "POST",
-			        headers: {
-			            'header': document.querySelector('meta[name="_csrf_header"]').content,
-			            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-			        },
-			        body: updateData
-			    })
-			    .then(response => response.json())
-			    .then(data => {
-			        alert(data.res_msg);
-			        if (data.res_code == 200) {
-			            location.reload();
-			        }
-			    })
-			    .catch(error => {
-			        console.error("Error:", error);
-			        alert("이벤트 저장 중 오류가 발생했습니다.");
-			    });
-			});
+				    e.preventDefault();
+				    
+				    document.querySelectorAll(".modal.show").forEach(modalEl => {
+						  bootstrap.Modal.getInstance(modalEl)?.hide();
+						});
+				
+				    const updateForm = document.editEventForm;
+				    const updateData = new FormData(updateForm);
+				
+				    const startEditInput = document.getElementById("editStartTime");
+				    const endEditInput = document.getElementById("editEndTime");
+				
+				    // 유효성 검사
+				    const startTime = new Date(startEditInput.value);
+				    const endTime = new Date(endEditInput.value);
+				
+				    if (startTime > endTime) {
+				        endEditInput.setCustomValidity("종료시간은 시작시간 이후여야 합니다!");
+				        endEditInput.reportValidity();
+				        return;
+				    } else {
+				        endEditInput.setCustomValidity(""); // 초기화
+				    }
+				
+				    fetch("/companycalendar/update/" + selectedCalendarNo, {
+				        method: "POST",
+				        headers: {
+				            'header': document.querySelector('meta[name="_csrf_header"]').content,
+				            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+				        },
+				        body: updateData
+				    })
+				    .then(response => response.json())
+				    .then(data => {
+				    	showMessageModal(data.res_msg || "수정을 성공하였습니다!", "알림", true);
+				    })
+				    .catch(error => {
+				        console.error("Error:", error);
+				        showMessageModal("이벤트 저장 중 오류가 발생했습니다.", "오류"); // ✅ 모달 사용
+				    });
+				});
 		    
 		    
 			//일정 삭제 -> 사용여부를 Y 에서 N 으로!
-			document.getElementById('deleteEventBtn').addEventListener('click',function(){
-			const calendarNo = selectedCalendarNo;
-			//console.log(calendarNo);
-			const perMission = confirm('해당 일정을 삭제하시겠습니까?');
-			//console.log(perMission);
-			if(!perMission){
-				return;
-			}else{
-				fetch('/companycalendar/delete/'+calendarNo,{
-					method: 'post',
-					headers: {
-			            'header': document.querySelector('meta[name="_csrf_header"]').content,
-			            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-			        }
-				})
-				.then(response => response.json())
-				.then(data => {
-					alert(data.res_msg);
-					if(data.res_code == 200) location.reload();
-				})
-			}
-			
+			document.getElementById('deleteEventBtn').addEventListener('click', function () {
+				  const calendarNo = selectedCalendarNo;
+
+				  // ✅ 커스텀 확인 모달 띄우기
+				  const confirmModal = new bootstrap.Modal(document.getElementById("messageModal"));
+				  const modalTitle = document.getElementById("messageModalTitle");
+				  const modalBody = document.getElementById("messageModalBody");
+				  const modalBtn = document.querySelector("#messageModal .modal-footer button");
+
+				  modalTitle.textContent = "알림";
+				  modalBody.textContent = "해당 일정을 정말 삭제하시겠습니까?";
+
+				  // 기존 버튼 이벤트 제거 후 새로 바인딩
+				  const newBtn = modalBtn.cloneNode(true);
+				  modalBtn.parentNode.replaceChild(newBtn, modalBtn);
+
+				  newBtn.textContent = "확인"; // 버튼 텍스트 변경
+				  newBtn.className = "btn btn-primary"; // 스타일도 삭제용으로
+				  
+				  
+				  document.querySelectorAll(".modal.show").forEach(modalEl => {
+					  bootstrap.Modal.getInstance(modalEl)?.hide();
+					});
+
+				  newBtn.addEventListener("click", () => {
+				    fetch('/companycalendar/delete/' + calendarNo, {
+				      method: 'POST',
+				      headers: {
+				        'header': document.querySelector('meta[name="_csrf_header"]').content,
+				        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+				      }
+				    })
+				      .then(response => response.json())
+				      .then(data => {
+				        showMessageModal(data.res_msg || "삭제되었습니다.", "알림", true);
+				      })
+				      .catch(error => {
+				        console.error("삭제 실패:", error);
+				        showMessageModal("삭제 중 오류가 발생했습니다.", "삭제 실패");
+				      });
+
+				    confirmModal.hide();
+				  });
+
+				  confirmModal.show();		
 			});
 		    
 			
@@ -716,7 +780,7 @@
 		    const endTimeValue = Date.parse(form.calendar_end_time.value);
 		
 		    if (!form.company_title.value) {
-		      alert("제목을 입력해주세요!");
+		    	showMessageModal("제목을 입력해주세요!");
 		      submitBtn.disabled = false;
 		      return;
 		    }
@@ -730,29 +794,27 @@
 		    const payload = new FormData(form);
 		
 		    try {
-		      const response = await fetch("/companycalendar/add", {
-		        method: "POST",
-		        headers: {
-		          'header': document.querySelector('meta[name="_csrf_header"]').content,
-		          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-		        },
-		        body: payload
-		      });
-		
-		      const data = await response.json();
-		      if (data.res_code == 200) {
-		        alert(data.res_msg);
-		        location.reload();
-		      } else {
-		        alert(data.res_msg);
-		        submitBtn.disabled = false;
-		      }
-		    } catch (error) {
-		      console.error("등록 중 오류 발생:", error);
-		      alert("일정 등록에 실패했습니다.");
-		      submitBtn.disabled = false;
-		    }
-		  });
+			      const response = await fetch("/companycalendar/add", {
+			        method: "POST",
+			        headers: {
+			          'header': document.querySelector('meta[name="_csrf_header"]').content,
+			          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			        },
+			        body: payload
+			      });
+			
+			      const data = await response.json();
+			      showMessageModal(data.res_msg, "알림", data.res_code == 200);
+
+			      if (data.res_code != 200) {
+			        submitBtn.disabled = false;
+			      	}
+			      } catch (error) {
+			        console.error("등록 중 오류 발생:", error);
+			        showMessageModal("일정 등록에 실패했습니다.", "오류");
+			        submitBtn.disabled = false;
+			      }
+			  });
 		
 		  // 모달 열릴 때마다 현재시간 세팅
 		  if (modal) {

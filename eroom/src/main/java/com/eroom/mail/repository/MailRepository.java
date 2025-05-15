@@ -11,6 +11,14 @@ import com.eroom.mail.entity.Mail;
 
 public interface MailRepository extends JpaRepository<Mail, Long>{
 
+	@Query("SELECT m FROM Mail m " +
+		       "LEFT JOIN MailStatus s ON s.mail = m AND s.employee.employeeNo = :empNo " +
+		       "WHERE m.sender.employeeNo = :empNo " +
+		       "AND m.mailVisibleYn = 'Y' " +  // 보낸 메일이 삭제되지 않은 것만
+		       "AND (s IS NULL OR s.mailStatusDeletedYn <> 'Y' OR s.mailStatusDeletedYn IS NULL) " +
+		       "ORDER BY m.mailSentTime DESC")
+		List<Mail> findSentMailsBySenderNo(@Param("empNo") Long empNo);
+	
 //	List<Mail> findBySenderEmployeeNo(Long employeeNo);
 	// 최신순
 	//List<Mail> findBySenderEmployeeNoOrderByMailSentTimeDesc(Long employeeNo);

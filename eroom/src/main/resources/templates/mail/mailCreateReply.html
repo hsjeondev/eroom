@@ -278,6 +278,7 @@
             	    const checkbox = document.querySelector(`input[type="checkbox"][data-no="${senderNo}"]`);
             	    if (checkbox) checkbox.checked = true;
             	  }
+            	  updateReceiverInput();
             });
             
             document.getElementById("draftBtn").addEventListener("click", function () {
