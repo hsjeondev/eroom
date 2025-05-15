@@ -551,6 +551,7 @@
 		// 채팅방 목록 클릭
 		function bindChatroomPanelEvents() {
 		  document.addEventListener("click", function (e) {
+			  if (e.target.tagName != 'H4') {
 			const target = e.target.closest('[data-room-no]');
 
 		    if (!target) return;
@@ -573,6 +574,7 @@
 		    ? chatroomNameEl.innerText.trim()
 		    : target.innerText?.trim() || "채팅방"; 
 		    lastSelectedChatroomName = chatroomName;
+		    
 			// 기본 채팅 영역 숨기기
 		    const defaultArea = document.getElementById("default-chat-area");
 		    if (defaultArea) defaultArea.style.display = "none";
@@ -599,7 +601,6 @@
 			    fetch('/chat/receiver?chatroomNo=' + chatroomNo)
 			    .then(response => response.json())
 			    .then(data => {
-			        console.log("받아온 수신자 번호 : ", data.receiverNo);
 			        // 기존의 hidden input 제거
 			        const oldInput = document.getElementById("receiverNo");
 			        if (oldInput) {
@@ -623,37 +624,40 @@
 		            receiverInput.remove();
 		        }
 		    }
-		    fetch('/chat/read', {
-		    	  method: 'POST',
-		    	  headers: {
-		    	    'Content-Type': 'application/json',
-		    	    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-		    	  },
-		    	  body: JSON.stringify({
-		    	    chatroomNo: chatroomNo,
-		    	    senderNo: document.getElementById("myEmployeeNo").value
-		    	  })
-		    	})
-		    	.then(res => res.json())
-		    	.then(result => {
-		    	  console.log('✅ 읽음 처리 완료:', result);
-		    	  const sidebarItem = document.querySelector(`[data-room-no="${chatroomNo}"]`);
-		    	  if (sidebarItem) {
-		    	    sidebarItem.classList.remove('unread');
-		    	    sidebarItem.classList.add('read');
-		    	    const badge = sidebarItem.querySelector('.badge');
-		    	    if (badge) badge.remove();
-		    	  }
-		    	})
-		    	.catch(error => {
-		    	  console.error('❌ 읽음 처리 실패:', error);
-		    	});
-
 		    
-		    // 채팅 이력 불러오기
-		    setTimeout(() => {
-		    	  loadChatroomDetail(chatroomNo);
-		    	}, 0);
+			    fetch('/chat/read', {
+			    	  method: 'POST',
+			    	  headers: {
+			    	    'Content-Type': 'application/json',
+			    	    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			    	  },
+			    	  body: JSON.stringify({
+			    	    chatroomNo: chatroomNo,
+			    	    senderNo: document.getElementById("myEmployeeNo").value
+			    	  })
+			    	})
+			    	.then(res => res.json())
+			    	.then(result => {
+			    	  console.log('✅ 읽음 처리 완료:', result);
+			    	  const sidebarItem = document.querySelector(`[data-room-no="${chatroomNo}"]`);
+			    	  if (sidebarItem) {
+			    	    sidebarItem.classList.remove('unread');
+			    	    sidebarItem.classList.add('read');
+			    	    const badge = sidebarItem.querySelector('.badge');
+			    	    if (badge) badge.remove();
+			    	  }
+			    	})
+			    	.catch(error => {
+			    	  console.error('❌ 읽음 처리 실패:', error);
+			    	});
+	
+			    
+			    // 채팅 이력 불러오기
+			    setTimeout(() => {
+			    	  loadChatroomDetail(chatroomNo);
+			    	}, 0);
+		    }
+		    
 		  });
 
 		  document.addEventListener("click", function (e) {
@@ -1437,7 +1441,6 @@ function loadChatroomDetail(chatroomNo) {
 
 		function bindFilePreview() {
 			  const fileInput = document.getElementById("chatFileInput");
-			  console.log("📁 파일 미리보기 바인딩됨");
 			  if (!fileInput) return;
 			  
 			  fileInput.addEventListener("change", function (e) {
