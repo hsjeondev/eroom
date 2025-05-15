@@ -528,7 +528,25 @@ td.name p {
     </div>
   </div>
 </div>
-		
+<!-- 수정용 unsaved 모달 -->
+<div class="modal fade" id="unsavedEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          변경된 내용이 저장되지 않습니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmEditCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- 2차 모달 -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
