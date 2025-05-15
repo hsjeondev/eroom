@@ -342,6 +342,98 @@
     </div>
     
     
+    
+    
+    
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 공통 저장 확인 모달 -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+		
+<!-- 2차 모달 -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+	// 저장 확인 모달 (공통)
+	const confirmSaveModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+	// 알림 모달(공통)
+	const alertModal = new bootstrap.Modal(document.getElementById('alertMessageModal'));
+	// 공통 알림 모달
+	window.showAlert = function (message, callback){
+		document.getElementById('alertMessageContent').innerText = message;
+		alertModal.show();
+		
+		if(callback){
+			const modalEl = document.getElementById('alertMessageModal');
+			modalEl.addEventListener('hidden.bs.modal',function handler(){
+				callback();
+				modalEl.removeEventListener('hidden.bs.modal',handler);
+			});
+		}
+	}
+	// 공통 confirm 모달
+	window.showConfirmModal = function (message, onConfirm){
+		const msgElement = document.getElementById('confirmSaveModalMessage');
+		const confirmBtn = document.getElementById('confirmSaveBtn');
+		
+		msgElement.innerHTML = message;
+		const modalInstance = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+		modalInstance.show();
+		
+		const handler = function(){
+			modalInstance.hide();
+			onConfirm(); // 확인 클릭 시 실행할 콜백
+			confirmBtn.removeEventListener('click',handler); // 중복 방지
+		};
+		
+		confirmBtn.addEventListener('click',handler);
+	}
+	
+	window.reloadAfterAlert = function (){
+	      const modalEl = document.getElementById('alertMessageModal');
+	      modalEl.addEventListener('hidden.bs.modal', function(){
+	    	    location.reload();	
+    	});
+	};
+});
+</script>
+    
+    
+    
+    
 	<!-- Step 3: JS로 콤마 제거하고 보여주기 -->
 	<script>
 	  const refList = document.getElementById("referenceList").innerText;
@@ -372,7 +464,8 @@
 		if(deleteBtn){
 			document.getElementById("deleteBtn").addEventListener("click", function(){
 				const deleteNo = /*[[${approval.approval_no}]]*/ 0;
-				if(confirm('결재를 삭제하시겠습니까?')){
+				// if(confirm('결재를 삭제하시겠습니까?')){
+				function deleteApproval(){
 					fetch('/approval/' + deleteNo + '/delete',{
 						method : 'DELETE',
 						headers : {
@@ -383,14 +476,13 @@
 					})
 					.then(response => response.json())
 					.then(data =>{
-						alert(data.res_msg)
+						showAlert(data.res_msg)
 						if(data.res_code == 200){
 							location.href='/approval/myRequestedApprovals';
 						}
 					})
-				} else{
-					
 				}
+				showConfirmModal('결재를 삭제하시겠습니까?', deleteApproval);
 			});
 		}
 	
@@ -401,7 +493,8 @@
 		if(fallBackBtn){
 			document.getElementById("fallBackBtn").addEventListener("click", function(){
 				const fallBackNo = /*[[${approval.approval_no}]]*/ 0;
-				if(confirm('결재를 회수하시겠습니까?')){
+				// if(confirm('결재를 회수하시겠습니까?')){
+				function fallBackApproval(){
 					fetch('/approval/' + fallBackNo + '/fallBack',{
 						method : 'POST',
 						headers : {
@@ -412,14 +505,13 @@
 					})
 					.then(response => response.json())
 					.then(data =>{
-						alert(data.res_msg)
+						showAlert(data.res_msg)
 						if(data.res_code == 200){
 							location.href='/approval/myRequestedApprovals';
 						}
 					})
-				} else{
-					
 				}
+				showConfirmModal('결재를 회수하시겠습니까?', fallBackApproval);
 			});
 		}
 	
@@ -433,21 +525,25 @@
 				const employeeNo = /*[[${employee.employeeNo}]]*/ 0;
 				const status = this.dataset.approvalStatus;
 	
-				let con1 = false;
-				let con2 = false;
-				let delimeter = -1;
-	
 				if (this.id === 'approvalApproveBtn' || this.id === 'approvalDenyBtn') {
 					const actionText1 = status === 'A' ? '승인' : (status === 'D' ? '반려' : '처리');
-					con1 = confirm(`결재를 ${actionText1}하시겠습니까?`);
-					delimeter = 1;
+
+					// showConfirmModal 콜백에서 delimeter 값을 함수 인자로 전달
+					showConfirmModal(`결재를 ${actionText1}하시겠습니까?`, () => {
+						approvalDenyAggreement(approvalNo, employeeNo, status, 1);				
+					});
+
 				} else if (this.id === 'agreementApproveBtn' || this.id === 'agreementDenyBtn') {
 					const actionText2 = status === 'A' ? '합의' : (status === 'D' ? '반려' : '처리');
-					con2 = confirm(`결재를 ${actionText2}하시겠습니까?`);
-					delimeter = 0;
+
+					// showConfirmModal 콜백에서 delimeter 값을 함수 인자로 전달
+					showConfirmModal(`결재를 ${actionText2}하시겠습니까?`, () => {
+						approvalDenyAggreement(approvalNo, employeeNo, status, 0);
+					});
 				}
-			    
-				if(con1 == true || con2 == true){
+			});
+			});
+					/* function approvalDenyAggreement(status, delimeter){
 					fetch('/approvalLine/approveDenyAgreement', {
 						method: 'POST',
 						headers: {
@@ -464,17 +560,40 @@
 					})
 					.then(response => response.json())
 					.then(data => {
-						alert(data.res_msg)
+						showAlert(data.res_msg)
 						if (data.res_code == 200) {
 							location.reload();
 						}
 					});
 					
+				} */
+				
+				// 함수 정의: 매개변수로 필요한 값만 전달 받음
+				function approvalDenyAggreement(approvalNo, employeeNo, status, delimeter) {
+					fetch('/approvalLine/approveDenyAgreement', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+							'header': document.querySelector('meta[name="_csrf_header"]').content
+						},
+						body: JSON.stringify({
+							approval_no: approvalNo,
+							approval_line_status: status,
+							employee_no: employeeNo,
+							delimeter: delimeter
+						})
+					})
+					.then(response => response.json())
+					.then(data => {
+						showAlert(data.res_msg);
+						if (data.res_code == 200) {
+							reloadAfterAlert();
+						}
+					});
 				}
 				
 				
-			});
-		});
 
 	</script>
     <!-- 재기안 버튼 -->

@@ -59,6 +59,9 @@ td.name p {
     font-size: 14px;
     font-weight: 500;
 }
+  .modal-sm-plus {
+  max-width: 400px; /* sm은 300px, 기본은 500px, 중간은 400px */
+  }
 </style>
 </head>
 <body>
@@ -487,6 +490,101 @@ td.name p {
 				<!-- 이거 어디다 쓰려고 가져왔던거지? -->
 				<!-- ✅ 알림 영역 -->
 				<div id="alertContainer" class="mt-3" style="display: none;"></div>
+
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 공통 저장 확인 모달 -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+		
+<!-- 2차 모달 -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+	// 저장 확인 모달 (공통)
+	const confirmSaveModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+	// 알림 모달(공통)
+	const alertModal = new bootstrap.Modal(document.getElementById('alertMessageModal'));
+	// 공통 알림 모달
+	window.showAlert = function (message, callback){
+		document.getElementById('alertMessageContent').innerText = message;
+		alertModal.show();
+		
+		if(callback){
+			const modalEl = document.getElementById('alertMessageModal');
+			modalEl.addEventListener('hidden.bs.modal',function handler(){
+				callback();
+				modalEl.removeEventListener('hidden.bs.modal',handler);
+			});
+		}
+	}
+	// 공통 confirm 모달
+	window.showConfirmModal = function (message, onConfirm){
+		const msgElement = document.getElementById('confirmSaveModalMessage');
+		const confirmBtn = document.getElementById('confirmSaveBtn');
+		
+		msgElement.innerHTML = message;
+		const modalInstance = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+		modalInstance.show();
+		
+		const handler = function(){
+			modalInstance.hide();
+			onConfirm(); // 확인 클릭 시 실행할 콜백
+			confirmBtn.removeEventListener('click',handler); // 중복 방지
+		};
+		
+		confirmBtn.addEventListener('click',handler);
+	}
+	
+	window.reloadAfterAlert = function (){
+	      const modalEl = document.getElementById('alertMessageModal');
+	      modalEl.addEventListener('hidden.bs.modal', function(){
+	    	    location.reload();	
+    	});
+	};
+});
+</script>
+
+
+
+
+
+
+
+
+
 
 				<script>
 					function showConfirm() {
@@ -1227,7 +1325,7 @@ function showConfirm() {
 		// 부서 추가
 		const deptName = document.getElementById('deptName').value.trim();
 		if (!deptName) {
-			alert('부서명을 입력해주세요.');
+			showAlert('부서명을 입력해주세요.');
 			return;
 		}
 
@@ -1243,13 +1341,17 @@ function showConfirm() {
 		.then(res => res.ok ? res.json() : Promise.reject(res))
 		.then(data => {
 			if(data.res_code === '200'){
-				alert('부서가 등록되었습니다.');
+				showAlert('부서가 등록되었습니다.');
+			      reloadAfterAlert();
+			} else{
+				showAlert('부서 등록에 실패했습니다.')
+			      reloadAfterAlert();
 			}
-			location.reload();
 		})
 		.catch(err => {
 			console.error(err);
-			alert('부서 등록 실패');
+			showAlert('부서 등록 실패');
+		      reloadAfterAlert();
 		});
 		
 	} else {
@@ -1258,11 +1360,11 @@ function showConfirm() {
 		const teamName = document.getElementById('teamName').value.trim();
 
 		if (!parentDept || parentDept == '0') {
-			alert('상위 부서를 선택해주세요.');
+			showAlert('상위 부서를 선택해주세요.');
 			return;
 		}
 		if (!teamName) {
-			alert('팀명을 입력해주세요.');
+			showAlert('팀명을 입력해주세요.');
 			return;
 		}
 
@@ -1281,13 +1383,16 @@ function showConfirm() {
 		.then(res => res.ok ? res.json() : Promise.reject(res))
 		.then(data => {
 			if(data.res_code === '200'){
-				alert('팀이 등록되었습니다.');
+				showAlert('팀이 등록되었습니다.');
+			      reloadAfterAlert();
+			} else{
+				showAlert('팀 등록에 실패했습니다.')
+			      reloadAfterAlert();
 			}
-			location.reload();
 		})
 		.catch(err => {
 			console.error(err);
-			alert('팀 등록 실패');
+			showAlert('팀 등록 실패');
 		});
 	}
 }
@@ -1388,7 +1493,7 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .catch(error => {
         //console.error("데이터 로딩 실패: ", error);
-        alert('데이터를 불러오는 중 오류가 발생했습니다.');
+        showAlert('데이터를 불러오는 중 오류가 발생했습니다.');
         document.getElementById('loadingSpinnerSortOrderModal').style.display = 'none';
         document.getElementById('departmentList').style.display = 'block';
       });
@@ -1441,14 +1546,18 @@ document.addEventListener('DOMContentLoaded', function () {
     .then(res => res.json())
     .then(data => {
     	if(data.res_code == '200'){
-	      alert('정렬 정보가 저장되었습니다!');
-	      location.reload();
+    		showAlert('정렬 정보가 저장되었습니다.');
+		      reloadAfterAlert();
+    	} else{
+    		showAlert('정렬 정보 저장에 실패했습니다.');
+		      reloadAfterAlert();
     	}
     	console.log(data.res_msg);
     })
     .catch(err => {
       console.error('정렬 저장 오류:', err);
-      alert('오류가 발생했습니다.');
+      showAlert('오류가 발생했습니다.');
+      reloadAfterAlert();
     });
   });
 });
@@ -1501,7 +1610,7 @@ document.addEventListener('DOMContentLoaded', function () {
    		trigger02 = true;
    		
    		if(searchDeptSepCode == '0'){
-   			alert('부서를 선택해주세요.');
+   			showAlert('부서를 선택해주세요.');
    			return;
    		}
    		
@@ -1586,11 +1695,11 @@ document.addEventListener('DOMContentLoaded', function () {
    		
    		// trigger01 부서선택, trigger02 사원 조회.
    		if(!trigger01 || !trigger02){
-   			alert('부서/팀을 선택 후 \'사원 조회\' 버튼을 눌러주세요.');
+   			showAlert('부서/팀을 선택 후 \'사원 조회\' 버튼을 눌러주세요.');
    			return;
    		}
    		if(selectElement.value == '0' && employees.length != 0){
-   			alert('이동할 팀을 선택해주세요.');
+   			showAlert('이동할 팀을 선택해주세요.');
    			return;
    		}
    		
@@ -1611,14 +1720,14 @@ document.addEventListener('DOMContentLoaded', function () {
    		.then(response => response.json())
    		.then(data => {
    			if(data.res_code == '200'){
-   				alert('삭제가 완료되었습니다.');
-   				location.reload();
+   				showAlert('삭제가 완료되었습니다.');
+  		      reloadAfterAlert();
    			}
    			console.warn(`삭제 요청 실패: ${data.res_msg}`);
    		})
    	    .catch(err => {
      	      console.error('정렬 저장 오류:', err);
-     	      alert('오류가 발생했습니다.');
+     	     showAlert('오류가 발생했습니다.');
    	    });
    	};
    	
