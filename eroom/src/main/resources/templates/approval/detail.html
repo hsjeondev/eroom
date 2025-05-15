@@ -164,11 +164,18 @@
 						</svg>
                		</span>
                   </span>
-                  <span th:if="${line.approval_line_status == 'S'}">
+                  <span th:if="${line.approval_line_status == 'S' and approval.approval_status == 'S'}">
    		               	<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
-						  <!-- 반려 (빨간색) -->
+						  <!-- 대기 (초록색) -->
 						  <circle cx="20" cy="20" r="18" stroke="#28A745" stroke-width="1.5" fill="none"/>
 						  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#28A745" font-family="sans-serif">대기</text>
+						</svg>
+                  </span>
+                  <span th:if="${line.approval_line_status == 'S' and approval.approval_status != 'S'}">
+   		               	<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+						  <!-- 대기 (초록색) -->
+						  <circle cx="20" cy="20" r="18" stroke="#6c757d" stroke-width="1.5" fill="none"/>
+						  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#6c757d" font-family="sans-serif">대기</text>
 						</svg>
                   </span>
                   <span th:if="${line.approval_line_status == 'D'}">
@@ -205,10 +212,35 @@
                   	<img th:if="${line.base64URL != null}"
                   		th:src="|data:image/png;base64,${line.base64URL}|"
                   		style="display: block; width: 100%; height: 100%; object-fit: contain;" alt="서명 이미지"/>
-               		<span th:if="${line.base64URL == null}">합의</span>
+               		<span th:if="${line.base64URL == null}">
+	               		<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+						  <!-- 승인 (파란색) -->
+						  <circle cx="20" cy="20" r="18" stroke="#0099FF" stroke-width="1.5" fill="none"/>
+						  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#0099FF" font-family="sans-serif">합의</text>
+						</svg>
+               		</span>
                   </span>
-                  <span th:if="${line.approval_line_status == 'S'}" th:text="대기">대기</span>
-                  <span th:if="${line.approval_line_status == 'D'}" th:text="반려">반려</span>
+                  <span th:if="${line.approval_line_status == 'S' and approval.approval_status == 'S'}">
+   		               	<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+						  <!-- 대기 (초록색) -->
+						  <circle cx="20" cy="20" r="18" stroke="#28A745" stroke-width="1.5" fill="none"/>
+						  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#28A745" font-family="sans-serif">대기</text>
+						</svg>
+                  </span>
+                  <span th:if="${line.approval_line_status == 'S' and approval.approval_status != 'S'}">
+   		               	<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+						  <!-- 대기 (초록색) -->
+						  <circle cx="20" cy="20" r="18" stroke="#6c757d" stroke-width="1.5" fill="none"/>
+						  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#6c757d" font-family="sans-serif">대기</text>
+						</svg>
+                  </span>
+                  <span th:if="${line.approval_line_status == 'D'}">
+  		            <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+					  <!-- 반려 (빨간색) -->
+					  <circle cx="20" cy="20" r="18" stroke="#FF3333" stroke-width="1.5" fill="none"/>
+					  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#FF3333" font-family="sans-serif">반려</text>
+					</svg>
+                  </span>
                 </td>
               </tr>
             </tbody>
@@ -428,6 +460,18 @@ document.addEventListener("DOMContentLoaded", function() {
 	    	    location.reload();	
     	});
 	};
+	window.moveAfterAlert = function (e){
+	      const modalEl = document.getElementById('alertMessageModal');
+	      modalEl.addEventListener('hidden.bs.modal', function(){
+	    	    location.href = e;
+  		});
+	};
+	window.moveBackAfterAlert = function (){
+	      const modalEl = document.getElementById('alertMessageModal');
+	      modalEl.addEventListener('hidden.bs.modal', function(){
+	    	  history.back();
+  		});
+	};
 });
 </script>
     
@@ -476,14 +520,20 @@ document.addEventListener("DOMContentLoaded", function() {
 					})
 					.then(response => response.json())
 					.then(data =>{
-						showAlert(data.res_msg)
-						if(data.res_code == 200){
+						showAlert(data.res_msg);
+						moveBackAfterAlert();
+						/* if(data.res_code == 200){
 							location.href='/approval/myRequestedApprovals';
-						}
+						} */
 					})
 				}
 				showConfirmModal('결재를 삭제하시겠습니까?', deleteApproval);
-			});
+			})
+			  .catch(err => {
+				    console.error(err);
+				    showAlert("요청 중 오류가 발생했습니다.");
+				    reloadAfterAlert();
+				  });
 		}
 	
 	</script>
@@ -506,13 +556,19 @@ document.addEventListener("DOMContentLoaded", function() {
 					.then(response => response.json())
 					.then(data =>{
 						showAlert(data.res_msg)
-						if(data.res_code == 200){
+						moveBackAfterAlert();
+						/* if(data.res_code == 200){
 							location.href='/approval/myRequestedApprovals';
-						}
+						} */
 					})
 				}
 				showConfirmModal('결재를 회수하시겠습니까?', fallBackApproval);
-			});
+			})
+		  .catch(err => {
+		    console.error(err);
+		    showAlert("요청 중 오류가 발생했습니다.");
+		    reloadAfterAlert();
+		  });
 		}
 	
 	</script>

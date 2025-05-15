@@ -533,6 +533,12 @@ document.addEventListener("DOMContentLoaded", function() {
 	    	    location.reload();	
     	});
 	};
+	window.moveAfterAlert = function (e){
+	      const modalEl = document.getElementById('alertMessageModal');
+	      modalEl.addEventListener('hidden.bs.modal', function(){
+	    	    location.href = e;
+    	});
+	};
 });
 </script>
 		
@@ -1628,7 +1634,7 @@ function handleHighlight(li) {
 		  .then(data => {
 		    if (data.res_code === "200") {
 		      showAlert("결재서가 성공적으로 제출되었습니다.");
-		      reloadAfterAlert();
+		      moveAfterAlert('/approval/myRequestedApprovals');
 		      //location.href = '/approval/myRequestedApprovals';
 		    } else {
 		      showAlert("결재서 제출에 실패했습니다: " + data.res_msg);
