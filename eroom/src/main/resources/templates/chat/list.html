@@ -38,6 +38,7 @@
   padding: 5px 10px;
 }
 </style>
+
 <body>
 	<main class="main" id="top" layout:fragment="content">
 
@@ -253,28 +254,28 @@
   </li>
 </ul>
 </div>
-
-<div class="col-6 d-flex flex-column">
-  <!-- [1] 상단 고정 영역 -->
-  <div id="selectedResult"
-       class="border bg-white rounded p-2 mb-2 small"
-       style="position: sticky; top: 0; z-index: 2; background-color: white; ">
-    <strong>선택한 항목:</strong>
-    <div style="overflow-y: auto; max-height: 270px;" id="selectedTags" class="mt-1 flex-wrap gap-2"></div>
-  </div> 
-
-  <!-- [2] 중간: 빈 영역 (스크롤 여유) -->
-  <div class="flex-grow-1"></div>
-
-  <!-- [3] 하단 고정 영역 -->
-  <div class="text-end"
-       style="position: sticky; bottom: 0; z-index: 2; background-color: white;">
-    <button id="clearBtn" class="btn btn-light btn-sm" type="button">비우기</button>
-  </div>
-</div>
-
-
-</div>
+								
+								<div class="col-6 d-flex flex-column">
+								  <!-- [1] 상단 고정 영역 -->
+								  <div id="selectedResult"
+								       class="border bg-white rounded p-2 mb-2 small"
+								       style="position: sticky; top: 0; z-index: 2; background-color: white; ">
+								    <strong>선택한 항목:</strong>
+								    <div style="overflow-y: auto; max-height: 270px;" id="selectedTags" class="mt-1 flex-wrap gap-2"></div>
+								  </div> 
+								
+								  <!-- [2] 중간: 빈 영역 (스크롤 여유) -->
+								  <div class="flex-grow-1"></div>
+								
+								  <!-- [3] 하단 고정 영역 -->
+								  <div class="text-end"
+								       style="position: sticky; bottom: 0; z-index: 2; background-color: white;">
+								    <button id="clearBtn" class="btn btn-light btn-sm" type="button">비우기</button>
+								  </div>
+								</div>
+								
+								
+								</div>
 								 </div>
 								</div>
 							</div>
@@ -309,6 +310,34 @@
 					</div>
 				</div>
 			</div>
+			<template id="chat-pane-template">
+			  <div class="tab-pane h-100 fade show active d-flex flex-column">
+			    <div class="d-flex align-items-center justify-content-between px-4 pt-3">
+			      <h4 class="mb-0 chatroom-title cursor-pointer text-primary"
+			          data-group="" data-room-no=""></h4>
+			    </div>
+			    <div class="flex-grow-1 overflow-auto p-4">
+			      <div class="chat-history">
+			        <hr />
+			        <p>채팅 내용이 여기에 표시됩니다</p>
+			      </div>
+			    </div>
+			    <div class="chat-footer border-top p-3 d-flex align-items-center flex-column bg-white">
+			      <div class="d-flex w-100 align-items-center mb-2">
+			        <label for="chatFileInput" class="btn btn-light me-2">
+			          <i class="fa-solid fa-paperclip"></i>
+			        </label>
+			        <div class="input-group">
+			          <input type="text" class="form-control" placeholder="메시지를 입력하세요..." id="messageInput">
+			          <button class="btn btn-primary" type="button" id="sendBtn">보내기</button>
+			        </div>
+			      </div>
+			      <input type="file" id="chatFileInput" name="files" style="display: none;" multiple>
+			      <div id="chatFilePreview" class="d-flex flex-wrap gap-2 w-100"></div>
+			    </div>
+			  </div>
+			</template>
+			
 			<!-- 채팅방 상세 모달 -->
 			<div class="modal fade" id="chatroomDetailModal" tabindex="-1"
 				aria-labelledby="chatroomDetailModalLabel" aria-hidden="true">
@@ -322,11 +351,11 @@
 							<div id="group-only-options">
 								<input type="hidden" th:name="${_csrf.parameterName}"
 									th:value="${_csrf.token}" />
-								<ul class="list-unstyled mb-4">
-									<li data-action="rename" class="cursor-pointer">채팅방 이름 변경</li>
-									<li data-action="add" class="cursor-pointer">참여자 추가하기</li>
-									<li data-action="leave" class="cursor-pointer">채팅방 나가기</li>
-									<li data-action="delete" class="cursor-pointer d-none" id="deleteChatroomBtn">채팅방 삭제</li>
+								<ul class="list-unstyled mb-4" style="font-size: 14px;">
+								  <li data-action="rename" class="cursor-pointer chat-action-item">✏️ 채팅방 이름 변경</li>
+								  <li data-action="add" class="cursor-pointer chat-action-item">➕ 참여자 추가하기</li>
+								  <li data-action="leave" class="cursor-pointer chat-action-item">📤 채팅방 나가기</li>
+								  <li data-action="delete" id="deleteChatroomBtn" class="cursor-pointer chat-action-item d-none">🗑️ 채팅방 삭제</li>
 								</ul>
 
 							</div>
@@ -352,6 +381,10 @@
 							<a class="btn btn-link fs-10 p-0" id="loadMoreFilesBtn" href="#!">
 							  5개 더 보기 <i class="fa-solid fa-chevron-down ms-1"></i>
 							</a>
+							</div>
+						</div>
+					</div>
+				</div>
 		<script>
 	 	let socket = null; 
 		let currentReceiverNo = null;
@@ -559,41 +592,7 @@
 			      deleteBtn.classList.toggle("d-none", !isOwner);
 			    }
 			  });
-		    chatContent.innerHTML = `
-		    	  <div class="tab-pane h-100 fade show active d-flex flex-column">
-		    	    <div class="d-flex align-items-center justify-content-between px-4 pt-3">
-		    	      <h4 class="mb-0 chatroom-title cursor-pointer text-primary"
-		    	          data-group="${isGroup ? 'Y' : 'N'}" data-room-no="${chatroomNo}">
-		    	        ${lastSelectedChatroomName || "채팅방"}
-		    	      </h4>
-		    	    </div>
-		    	    <div class="flex-grow-1 overflow-auto p-4">
-		    	      <div class="chat-history">
-		    	        <hr>
-		    	        <p>채팅 내용이 여기에 표시됩니다</p>
-		    	      </div>
-		    	    </div>
-		    	    <div class="chat-footer border-top p-3 d-flex align-items-center flex-column bg-white">
-		    	    <div class="d-flex w-100 align-items-center mb-2">
-		    	      <label for="chatFileInput" class="btn btn-light me-2">
-		    	        <i class="fa-solid fa-paperclip"></i>
-		    	      </label>
-		    	      <input class="form-control flex-fill me-2" type="text" placeholder="메시지를 입력하세요..." id="messageInput">
-		    	      <button class="btn btn-primary" onclick="sendMessage()">보내기</button>
-		    	    </div>
-		    	    <input type="file" id="chatFileInput" name="files" style="display: none;" multiple>
-		    	    <div id="chatFilePreview" class="d-flex flex-wrap gap-2 w-100"></div>
-		    	  </div>
-
-		    	  </div>
-		    	`;
-		    	const messageInput = document.getElementById("messageInput");
-				messageInput?.addEventListener("keydown", function (e) {
-				  if (e.key === "Enter" && !e.shiftKey) {
-				    e.preventDefault();
-				    sendMessage();
-				  }
-				});
+			renderChatroomUI(chatroomNo, chatroomName, isGroup);
 		    	bindFilePreview();
 		    // 수신자 employeeNo 가져오기
 		    if (!isGroup) {
@@ -652,7 +651,9 @@
 
 		    
 		    // 채팅 이력 불러오기
-		    loadChatroomDetail(chatroomNo);
+		    setTimeout(() => {
+		    	  loadChatroomDetail(chatroomNo);
+		    	}, 0);
 		  });
 
 		  document.addEventListener("click", function (e) {
@@ -1021,7 +1022,6 @@
   const chatHistory = document.querySelector(".chat-history");
   const sidebarItem = document.querySelector(`[data-room-no="${data.chatroomNo}"]`);
   const isMyMessage = String(data.senderMember) === String(myEmployeeNo);
-
   if (!sidebarItem) return;
 
   // 다른 방일 경우 → unread badge 처리
@@ -1058,9 +1058,6 @@
 
     return;
   }
-
-  // 현재 방이라면 → chat-history에 메시지 렌더링
-  if (!chatHistory) return;
 
   const profileImageUrl = data.senderProfileImageUrl && data.senderProfileImageUrl.trim() !== ""
 	  ? data.senderProfileImageUrl
@@ -1332,9 +1329,8 @@ function loadChatroomDetail(chatroomNo) {
         .then(data => {
             const chatHistory = document.querySelector(".chat-history");
             if (!chatHistory) return;
-            if (chatroomNo !== currentChatroomNo) return;
 
-            chatHistory.innerHTML = "<hr>"; // 초기화
+            chatHistory.replaceChildren(document.createElement("hr"));
 
             if (data.messageList && data.messageList.length > 0) {
                 const myEmployeeNo = document.getElementById("myEmployeeNo").value;
@@ -1894,6 +1890,35 @@ function loadChatroomDetail(chatroomNo) {
 		      ul.classList.add('show');
 		    }
 		  });
+		}
+	function renderChatroomUI(chatroomNo, chatroomName, isGroup) {
+		  const chatContent = document.getElementById("chat-content");
+		  chatContent.innerHTML = ""; // 기존 내용 비우기
+
+		  const template = document.getElementById("chat-pane-template");
+		  const clone = template.content.cloneNode(true);
+
+		  const titleEl = clone.querySelector(".chatroom-title");
+		  titleEl.textContent = chatroomName;
+		  titleEl.dataset.group = isGroup ? "Y" : "N";
+		  titleEl.dataset.roomNo = chatroomNo;
+
+		  const messageInput = clone.querySelector("#messageInput");
+		  const sendBtn = clone.querySelector("#sendBtn");
+
+		  messageInput?.removeEventListener("keydown", messageKeyHandler);
+		  messageInput?.addEventListener("keydown", messageKeyHandler);
+		  sendBtn?.addEventListener("click", sendMessage);
+
+		  bindFilePreview();
+		  chatContent.appendChild(clone);
+		}
+
+		function messageKeyHandler(e) {
+		  if (e.key === "Enter" && !e.shiftKey) {
+		    e.preventDefault();
+		    sendMessage();
+		  }
 		}
 
 
