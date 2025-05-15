@@ -555,32 +555,7 @@
 				  }
 				}
 			
-			
-			
-			/* function addTag(label, code) {
-			  const tagWrap = document.getElementById("selectedTags");
-			  if (document.getElementById(`tag-${code}`)) return;
-			
-			  const tag = document.createElement("span");
-			  tag.className = "badge bg-primary text-white d-flex align-items-center";
-			  tag.id = `tag-${code}`;
-			  tag.name = `tag-${label}`;
-			  tag.innerHTML = `${label} <button type="button" class="btn-close btn-close-white btn-sm ms-1" onclick="removeTag('${code}', true)"></button>`;
-			  tagWrap.appendChild(tag);
-			}
-			
-				function removeTag(code, skipCheckbox = false) {
-				  const tag = document.getElementById(`tag-${code}`);
-				  if (tag) tag.remove();
-			
-				  if (!skipCheckbox) return;
-			
-				  const checkbox = document.querySelector(`input[type="checkbox"][data-no="${code}"]`);
-				  if (checkbox && checkbox.checked) {
-				    checkbox.checked = false;
-				    handleCheck(checkbox); // 연쇄 동기화
-				  }
-				} */
+
 				function addTag(label, code) {
 					  const tagWrap = document.getElementById("selectedTags");
 					  if (document.getElementById(`tag-${code}`)) return;
@@ -1069,7 +1044,7 @@
 											<!-- <button class="btn btn-subtle-secondary me-1 mb-1"
 						type="button" id="editVehicleBtn">수정</button> -->
 											<button class="btn btn-outline-info me-1 mb-1" type="button"
-												id="deleteVehicleBtn">삭제</button>
+												id="deleteVehicleBtn">예약취소</button>
 										</div>
 										<div>
 											<button class="btn btn-primary px-4" type="button"
@@ -1081,7 +1056,7 @@
 						</div>
 
 				<!-- 삭제 모달 -->
-							<div class="modal fade" id="confirmDeleteModal" tabindex="-1"
+			<!-- 				<div class="modal fade" id="confirmDeleteModal" tabindex="-1"
 								aria-hidden="true">
 								<div class="modal-dialog modal-dialog-centered modal-sm">
 									<div
@@ -1099,7 +1074,7 @@
 										</div>
 									</div>
 								</div>
-							</div>
+							</div> -->
 
 
 		
@@ -1205,49 +1180,58 @@
 			  });
 			
 			// 삭제 버튼 누르면 모달 띄우기
-			  document.getElementById("deleteVehicleBtn").addEventListener("click", function () {
-			    const confirmModalEl = document.getElementById("confirmDeleteModal");
-			    const confirmModal = new bootstrap.Modal(confirmModalEl);
-			    confirmModal.show();
-			  });
-
-			  // 삭제 확인 버튼 누르면 처리
-				document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
+			document.getElementById("deleteVehicleBtn").addEventListener("click", function () {
 			  const reservationNo = document.getElementById("detailReservationNo").value;
-			  const confirmModalEl = document.getElementById("confirmDeleteModal");
-			  const confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
 			
-			  console.log("🧨 삭제 요청 시작:", reservationNo);
+			  const modalEl = document.getElementById("messageModal");
+			  const modalTitle = document.getElementById("messageModalTitle");
+			  const modalBody = document.getElementById("messageModalBody");
+			  const modalBtn = document.querySelector("#messageModal .modal-footer button");
 			
-			  fetch('/meetingroom/delete/' + reservationNo, {
-			    method: "post",
-			    headers: {
-			      'header': document.querySelector('meta[name="_csrf_header"]').content,
-			      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-			    }
-			  })
-			    .then(response => response.json())
-			    .then(data => {
-			      const resultMsg = data.res_code == 200
-			        ? "예약을 취소하였습니다!"
-			        : (data.res_msg || "예약 취소에 실패했습니다.");
+			  // 1. 확인용 메시지 세팅
+			  modalTitle.textContent = "알림";
+			  modalBody.textContent = "정말 예약을 취소하시겠습니까?";
 			
-			      // ✅ confirmModal 닫기
-			      document.activeElement.blur();
-			      if (confirmModal) confirmModal.hide();
+			  // 2. 기존 버튼 초기화
+			  const newBtn = modalBtn.cloneNode(true);
+			  modalBtn.parentNode.replaceChild(newBtn, modalBtn);
+			  newBtn.textContent = "확인";
+			  newBtn.className = "btn btn-primary";
 			
-			      // ✅ alert로 메시지 띄우고 새로고침
-			      alert(resultMsg);
-			      if (data.res_code == 200) location.reload();
-			    })
-			    .catch(error => {
-			      console.error("❌ 삭제 중 오류:", error);
-			      if (confirmModal) confirmModal.hide();
-			      alert("삭제 중 오류가 발생했습니다. 다시 시도해주세요 😥");
-			    });
+			  // 3. 혹시 떠 있는 모달 있으면 닫기
+			  document.querySelectorAll(".modal.show").forEach(modalEl => {
+			    bootstrap.Modal.getInstance(modalEl)?.hide();
+			  });
+			
+			  // 4. 확인 버튼 클릭 시 → 모달 닫고 삭제 실행
+			  newBtn.addEventListener("click", () => {
+			    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+			    modalInstance.hide();
+			
+			    // 모달이 완전히 닫힌 후 삭제 요청
+			    modalEl.addEventListener("hidden.bs.modal", () => {
+			      fetch('/meetingroom/delete/' + reservationNo, {
+			        method: "POST",
+			        headers: {
+			          'header': document.querySelector('meta[name="_csrf_header"]').content,
+			          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			        }
+			      })
+			        .then(response => response.json())
+			        .then(data => {
+			          showMessageModal(data.res_msg || "취소가 완료되었습니다.", "알림", true); // 확인 후 새로고침
+			        })
+			        .catch(error => {
+			          console.error("❌ 삭제 중 오류:", error);
+			          showMessageModal("삭제 중 오류가 발생했습니다. 다시 시도해주세요.", "오류");
+			        });
+			    }, { once: true });
+			  });
+			
+			  // 5. 모달 띄우기
+			  const confirmModal = new bootstrap.Modal(modalEl);
+			  confirmModal.show();
 			});
-
-
 
 			
 			  setTimeout(() => {
