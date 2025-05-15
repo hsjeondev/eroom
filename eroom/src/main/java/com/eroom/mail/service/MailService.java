@@ -47,7 +47,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class MailService {
-
+	
 	private final MailRepository mailRepository;
 	private final MailReceiverRepository mailReceiverRepository;
 	private final EmployeeRepository employeeRepository;
@@ -70,6 +70,17 @@ public class MailService {
 	    String plainText = content.replaceAll("<[^>]*>", ""); // HTML 태그 제거
 	    return plainText.length() > 30 ? plainText.substring(0, 30) + "..." : plainText;
 	}
+	
+	// 홈 화면 카드 읽지 않은 메일 조회
+	public List<MailReceiver> getUnreadMails(Long employeeNo) {
+        // mail_receiver_read_yn이 'N'인 읽지 않은 메일을 조회
+        return mailReceiverRepository.findUnreadMailsByEmployeeNo(employeeNo);
+    }
+	
+	public List<Mail> getSenderMails(Long employeeNo){
+		return mailRepository.findSentMailsBySenderNo(employeeNo);
+	}
+	
 	
 	// 홈 화면 카드 읽지 않은 메일/ 받은 메일
 	public int countUnreadMails(Long employeeNo) {
@@ -423,6 +434,12 @@ public class MailService {
 	    	        Function.identity(),
 	    	        (oldVal, newVal) -> newVal
 	    	    ));
+		/*
+		 * for (Map.Entry<String, MailStatus> entry : mailStatusMap.entrySet()) {
+		 * System.out.println("Key: " + entry.getKey() + ", Value: " +
+		 * entry.getValue()); }
+		 */
+	    
 	    return mailStatusMap;
 	}
 	
