@@ -4,7 +4,37 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{include/layout}">
-	  
+<style>
+    .treeview-label-strong {
+      font-weight: bold;
+      text-decoration: underline;
+      color: #007bff;
+    }
+    .treeview-row {
+      pointer-events: none;
+    }
+    .treeview-text a {
+      text-decoration: none !important;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 5px 10px;
+    }
+
+    .treeview-text summary::marker,
+    .treeview-text a::before,
+    .treeview-text a::after {
+      display: none !important;
+      content: none !important;
+    }
+      .treeview-text {
+    cursor: pointer; /* 마우스 커서를 클릭 가능 모양으로 변경 */
+  }
+  
+  .treeview-text:hover {
+    background-color: #f0f4ff; /* 호버 시 살짝 색상 변화 */
+  }
+  </style>	  
   <body>
   
     <main class="main" id="top" layout:fragment="content">
@@ -458,7 +488,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			</li>
         </ul>
       </li>
-      <li class="treeview-list-item">
+      <!-- <li class="treeview-list-item">
         <p class="treeview-text ms-2">
           <input type="checkbox" class="form-check-input me-2" data-name="무소속" data-no="noTeam" onchange="handleCheck(this)">
           <a href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#noTeam">
@@ -475,7 +505,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             </p>
           </li>
         </ul>
-      </li>
+      </li> -->
     </ul>
   </li>
 </ul>
@@ -487,8 +517,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
        class="border bg-white rounded p-2 mb-2 small"
        style="position: sticky; top: 0; z-index: 2; background-color: white; ">
     <strong>선택한 항목:</strong>
-    <div style="overflow-y: auto; max-height: 270px;" id="selectedTags" class="mt-1 d-flex flex-wrap gap-2"></div>
-  </div>
+    <div style="overflow-y: auto; max-height: 270px;" id="selectedTags" class="mt-1 flex-wrap gap-2"></div>
+  </div> 
 
   <!-- [2] 중간: 빈 영역 (스크롤 여유) -->
   <div class="flex-grow-1"></div>

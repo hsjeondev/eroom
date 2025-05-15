@@ -24,6 +24,13 @@
       display: none !important;
       content: none !important;
     }
+    .treeview-text {
+    cursor: pointer; /* 마우스 커서를 클릭 가능 모양으로 변경 */
+  }
+  
+  .treeview-text:hover {
+    background-color: #f0f4ff; /* 호버 시 살짝 색상 변화 */
+  }
   </style>
 <script src="../../vendors/tinymce/tinymce.min.js"></script>
 
@@ -491,7 +498,7 @@ function removeSelectedFile(index) {
 
 
 
-					function addTag(label, code) {
+					/* function addTag(label, code) {
 					  const tagWrap = document.getElementById("selectedTags");
 					  if (document.getElementById(`tag-${code}`)) return;
 
@@ -513,7 +520,59 @@ function removeSelectedFile(index) {
 						    checkbox.checked = false;
 						    handleCheck(checkbox); // 연쇄 동기화
 						  }
-						}
+						} */
+						function addTag(label, code) {
+							  const tagWrap = document.getElementById("selectedTags");
+							  if (document.getElementById(`tag-${code}`)) return;
+
+							  // Card 생성
+							  const card = document.createElement("div");
+							  card.className = "card mb-2"; // 여기서 flex는 제거됨
+							  card.id = `tag-${code}`;
+							  card.name = `tag-${label}`;
+							  card.style.borderRadius = "5px";
+							  card.style.padding = "8px";
+							  card.style.backgroundColor = "#f8f9fa";
+							  card.style.display = "block"; // 한 줄씩 표시
+
+							  // 이름 라벨
+							  const labelElement = document.createElement("span");
+							  labelElement.textContent = label;
+							  card.appendChild(labelElement);
+
+							  // 삭제 버튼
+							  const button = document.createElement("button");
+							  button.type = "button";
+							  button.className = "btn-close";
+							  button.style.float = "right"; // 오른쪽 정렬
+							  button.setAttribute("aria-label", "Remove");
+							  button.addEventListener("click", () => {
+							    card.remove();
+							    removeTag(code, true);  // 태그 삭제 시 체크박스도 해제
+							  });
+
+							  card.appendChild(button);
+
+							  // Card를 선택된 태그 컨테이너에 추가
+							  tagWrap.appendChild(card);
+							}
+
+						
+						function removeTag(code, skipCheckbox = false) {
+							  const tag = document.getElementById(`tag-${code}`);
+							  if (tag) tag.remove();
+
+							  if (!skipCheckbox) return;
+
+							  const checkbox = document.querySelector(`input[type="checkbox"][data-no="${code}"]`);
+							  if (checkbox && checkbox.checked) {
+							    checkbox.checked = false;
+							    handleCheck(checkbox); // 연쇄 동기화
+							  }
+							}
+						
+						
+						
 						function updateReceiverInput() {
 							  const badges = document.querySelectorAll('#selectedEmployeeList .badge');
 							  const names = Array.from(badges).map(badge => badge.childNodes[0].textContent.trim());
