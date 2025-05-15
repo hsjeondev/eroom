@@ -51,7 +51,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                   </div>
                   <div>
                     <button id="deleteBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="휴지통"><span class="fas fa-trash fs-10"></span></button>
-                    <button id="starBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="중요"><span class="fas fa-star fs-10"></span></button>
+                    <!-- <button id="starBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="중요"><span class="fas fa-star fs-10"></span></button> -->
                   </div>
                 </div>
                 <!-- 범용성 생각해서 일단 보류 -->
@@ -187,6 +187,24 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						</div>
                 </div>
                 </div>
+                
+                <!-- 메일 선택 모달 -->
+                <div class="modal fade" id="selectMailAlertModal" tabindex="-1" aria-hidden="true">
+				  <div class="modal-dialog modal-dialog-centered modal-sm">
+				    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+				      <div class="modal-header border-0">
+				        <h5 class="modal-title text-dark">안내</h5>
+				      </div>
+				      <div class="modal-body text-center">
+				        <p class="mb-0 text-body">메일을 선택해주세요.</p>
+				      </div>
+				      <div class="modal-footer justify-content-center border-0">
+				        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+				<!-- 메일 선택 모달 끝-->
              <script>
              const checkAll = document.getElementById('chechAll');
              checkAll.addEventListener('change', function () {
@@ -205,11 +223,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
          	  function sendBulkUpdate(url) {
          	    const selected = getSelectedMailNos();
-         	    console.log(selected);	
-         	    if (selected.length === 0) {
-         	      alert("메일을 선택해주세요.");
-         	      return;
-         	    }
+         	   if (selected.length === 0) {
+       	        const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+       	        modal.show();
+       	        return;
+       	      }
 
          	    fetch(url, {
          	      method: 'POST',

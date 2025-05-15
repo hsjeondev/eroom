@@ -100,7 +100,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                   </div>
                 </div>
                 </div>
-                
+                <!-- 삭제 확인 모달  -->
                 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-sm">
 			<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
@@ -120,15 +120,35 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			</div>
 		</div>
 	</div>
+	<!-- 삭제 확인 모달 끝 -->
+	<!-- 삭제 완료 모달 -->
+	<div class="modal fade" id="deleteSuccessModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">삭제 완료</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">게시물이 성공적으로 삭제되었습니다.</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" id="goBackBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 삭제 완료 모달 끝 -->
 				<script>
 		let targetArticleNo = null;
-		
+		let confirmDeleteModalInstance = null;
 		  function openDeleteModal(element) {
 		    // targetArticleNo = element.getAttribute('data-article-no');
 		    targetArticleNo = document.getElementById('articleNo').value;
 		    console.log(targetArticleNo);
 		    const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
 		    modal.show();
+		    confirmDeleteModalInstance = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+		    confirmDeleteModalInstance.show();
 		  }
 		
 		  document.addEventListener('DOMContentLoaded', function () {
@@ -146,8 +166,14 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		          body: `articleNo=${targetArticleNo}`
 		        })
 		        .then(response => {
-		          if (response.redirected) {
-		            window.location.href = response.url;
+		          if (response.ok) {
+		        	  if (confirmDeleteModalInstance) {
+		                  confirmDeleteModalInstance.hide();
+		                }
+
+		        	  const deleteSuccessModal = new bootstrap.Modal(document.getElementById('deleteSuccessModal'));
+		              deleteSuccessModal.show();
+		            //window.location.href = response.url;
 		          } else {
 		            alert("삭제에 실패했습니다.");
 		          }
@@ -159,6 +185,9 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 		      }
 		    });
 		  });
+		  document.getElementById('goBackBtn').addEventListener('click', function () {
+			    window.location.href = '/article/notice'; // 여기를 게시판 목록 URL로 바꿔주세요
+			  });
 		</script>
     </main>
   </body>

@@ -192,8 +192,157 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 				</div>
            </div>
          </div>
+         
+         
+         <!-- 메일 선택 모달 -->
+                <div class="modal fade" id="selectMailAlertModal" tabindex="-1" aria-hidden="true">
+				  <div class="modal-dialog modal-dialog-centered modal-sm">
+				    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+				      <div class="modal-header border-0">
+				        <h5 class="modal-title text-dark">안내</h5>
+				      </div>
+				      <div class="modal-body text-center">
+				        <p class="mb-0 text-body">메일을 선택해주세요.</p>
+				      </div>
+				      <div class="modal-footer justify-content-center border-0">
+				        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+				<!-- 메일 선택 모달 끝-->
+				<!-- 삭제 확인 모달 -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">삭제 확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">선택한 메일을 영구 삭제하시겠습니까?</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">삭제</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 복구 확인 모달 -->
+<div class="modal fade" id="restoreConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">복구 확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">선택한 메일을 복구하시겠습니까?</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmRestoreBtn">복구</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 복구 확인 모달 끝 -->
+<!-- 확인 모달창 -->
+<div class="modal fade" id="completeAlertModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">완료</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">처리가 완료되었습니다.</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 확인 모달창 끝-->
          <script>
-         const checkAll = document.getElementById('chechAll');
+         document.addEventListener('DOMContentLoaded', function () {
+        	  const checkAll = document.getElementById('chechAll');
+        	  checkAll.addEventListener('change', function () {
+        	    const isChecked = this.checked;
+        	    const checkboxes = document.querySelectorAll('.mail_checkbox');
+        	    checkboxes.forEach(cb => cb.checked = isChecked);
+        	  });
+
+        	  function getSelectedMailNos() {
+        	    return Array.from(document.querySelectorAll('.mail_checkbox:checked'))
+        	      .map(cb => cb.value);
+        	  }
+
+        	  function sendBulkUpdate(url) {
+        	    const selected = getSelectedMailNos();
+        	    if (selected.length === 0) {
+        	      const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+        	      modal.show();
+        	      return;
+        	    }
+
+        	    fetch(url, {
+        	      method: 'POST',
+        	      headers: {
+        	        'Content-Type': 'application/json',
+        	        [document.querySelector('meta[name="_csrf_header"]').content]: document.querySelector('meta[name="_csrf"]').content
+        	      },
+        	      body: JSON.stringify(selected)
+        	    }).then(res => {
+        	    	if (res.ok) {
+        	    	      // 완료 모달 띄우기
+        	    	      const completeModal = new bootstrap.Modal(document.getElementById("completeAlertModal"));
+        	    	      completeModal.show();
+
+        	    	      // 1.5초 후 페이지 새로고침
+        	    	      setTimeout(() => {
+        	    	        location.reload();
+        	    	      }, 1500);
+        	    	    }
+        	      else alert("처리 중 오류가 발생했습니다.");
+        	    });
+        	  }
+
+        	  document.getElementById('deleteBtn').addEventListener('click', function () {
+        	    const selected = getSelectedMailNos();
+        	    if (selected.length === 0) {
+        	      const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+        	      modal.show();
+        	      return;
+        	    }
+        	    const modal = new bootstrap.Modal(document.getElementById("deleteConfirmModal"));
+        	    modal.show();
+        	  });
+
+        	  document.getElementById('removeBtn').addEventListener('click', function () {
+        	    const selected = getSelectedMailNos();
+        	    if (selected.length === 0) {
+        	      const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+        	      modal.show();
+        	      return;
+        	    }
+        	    const modal = new bootstrap.Modal(document.getElementById("restoreConfirmModal"));
+        	    modal.show();
+        	  });
+
+        	  document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+        	    const modal = bootstrap.Modal.getInstance(document.getElementById("deleteConfirmModal"));
+        	    modal.hide();
+        	    sendBulkUpdate('/mail/delete');
+        	  });
+
+        	  document.getElementById('confirmRestoreBtn').addEventListener('click', function () {
+        	    const modal = bootstrap.Modal.getInstance(document.getElementById("restoreConfirmModal"));
+        	    modal.hide();
+        	    sendBulkUpdate('/mail/trash');
+        	  });
+        	});
+         /* const checkAll = document.getElementById('chechAll');
          checkAll.addEventListener('change', function () {
            const isChecked = this.checked;
            const checkboxes = document.querySelectorAll('.mail_checkbox');
@@ -204,13 +353,13 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
         	      .map(cb => cb.value);
         	  }
 
-        	  function sendBulkUpdate(url) {
+        	   function sendBulkUpdate(url) {
         	    const selected = getSelectedMailNos();
-        	    console.log(selected);	
         	    if (selected.length === 0) {
-        	      alert("메일을 선택해주세요.");
-        	      return;
-        	    }
+           	        const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+           	        modal.show();
+           	        return;
+           	      }
 
         	    fetch(url, {
         	      method: 'POST',
@@ -232,7 +381,39 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
         	  document.getElementById('deleteBtn').addEventListener('click', function () {
         	    sendBulkUpdate('/mail/delete');
-        	  });
+        	  }); 
+        	  document.getElementById('deleteBtn').addEventListener('click', function () {
+        		  const selected = getSelectedMailNos();
+        		  if (selected.length === 0) {
+        		    const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+        		    modal.show();
+        		    return;
+        		  }
+        		  const modal = new bootstrap.Modal(document.getElementById("deleteConfirmModal"));
+        		  modal.show();
+        		});
+
+        		document.getElementById('removeBtn').addEventListener('click', function () {
+        		  const selected = getSelectedMailNos();
+        		  if (selected.length === 0) {
+        		    const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+        		    modal.show();
+        		    return;
+        		  }
+        		  const modal = new bootstrap.Modal(document.getElementById("restoreConfirmModal"));
+        		  modal.show();
+        		});
+        		document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+        			  const modal = bootstrap.Modal.getInstance(document.getElementById("deleteConfirmModal"));
+        			  modal.hide();
+        			  sendBulkUpdate('/mail/delete');
+        			});
+
+        			document.getElementById('confirmRestoreBtn').addEventListener('click', function () {
+        			  const modal = bootstrap.Modal.getInstance(document.getElementById("restoreConfirmModal"));
+        			  modal.hide();
+        			  sendBulkUpdate('/mail/trash');
+        			}); */
          </script>
     </main>
   </body>
