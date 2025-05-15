@@ -9,7 +9,7 @@ pipeline {
                 }
             }
             steps {
-                echo '배포: develop 서버로'
+                echo '배포: develop 서버로 고고'
 
                 sh './springboot-docker/deploy-dev.sh'
             }

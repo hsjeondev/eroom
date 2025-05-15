@@ -89,6 +89,48 @@
 				</div>
 			</div>
 		</div>
+		
+		<!--커스텀 메시지 모달 -->
+			<div class="modal fade" id="messageModal" tabindex="-1"
+				aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered modal-sm">
+					<div
+						class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+						<div class="modal-header border-0">
+							<h5 class="modal-title text-dark" id="messageModalTitle">알림</h5>
+						</div>
+						<div class="modal-body text-center">
+							<p class="mb-0 text-body" id="messageModalBody">메시지 내용이
+								들어갑니다.</p>
+						</div>
+						<div class="modal-footer justify-content-center border-0">
+							<button type="button" class="btn btn-primary"
+								data-bs-dismiss="modal">확인</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<script>
+			  function showMessageModal(message, title = "알림", reloadOnClose = false) {
+				    document.getElementById("messageModalTitle").textContent = title;
+				    document.getElementById("messageModalBody").textContent = message;
+
+				    const modalEl = document.getElementById("messageModal");
+				    const modal = new bootstrap.Modal(modalEl);
+				    modal.show();
+
+				    const confirmBtn = modalEl.querySelector('button[data-bs-dismiss="modal"]');
+
+				    // 기존 이벤트 제거하고 새로 바인딩 (중복 방지)
+				    const newBtn = confirmBtn.cloneNode(true);
+				    confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+
+				    if (reloadOnClose) {
+				      newBtn.addEventListener("click", () => location.reload());
+				    }
+				  }
+			</script>
 			
 
     <script th:inline="javascript">
@@ -365,28 +407,52 @@
       
       });
       
-		document.getElementById('deleteEventBtn').addEventListener('click',function(){
-			const calendarNo = selectedCalendarNo;
-			console.log(calendarNo);
-			const perMission = confirm('해당 일정을 삭제하시겠습니까?');
-			//console.log(perMission);
-			if(!perMission){
-				return;
-			}else{
-				fetch('/departmentcalendar/delete/'+calendarNo,{
-					method: 'post',
-					headers: {
-			            'header': document.querySelector('meta[name="_csrf_header"]').content,
-			            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-			        }
-				})
-				.then(response => response.json())
-				.then(data => {
-					alert(data.res_msg);
-					if(data.res_code == 200) location.reload();
-				})
-			}
-		});
+      document.getElementById('deleteEventBtn').addEventListener('click', function () {
+		  const calendarNo = selectedCalendarNo;
+
+		  // ✅ 커스텀 확인 모달 띄우기
+		  const confirmModal = new bootstrap.Modal(document.getElementById("messageModal"));
+		  const modalTitle = document.getElementById("messageModalTitle");
+		  const modalBody = document.getElementById("messageModalBody");
+		  const modalBtn = document.querySelector("#messageModal .modal-footer button");
+
+		  modalTitle.textContent = "알림";
+		  modalBody.textContent = "해당 일정을 정말 삭제하시겠습니까?";
+
+		  // 기존 버튼 이벤트 제거 후 새로 바인딩
+		  const newBtn = modalBtn.cloneNode(true);
+		  modalBtn.parentNode.replaceChild(newBtn, modalBtn);
+
+		  newBtn.textContent = "확인"; // 버튼 텍스트 변경
+		  newBtn.className = "btn btn-primary"; // 스타일도 삭제용으로
+		  
+		  document.querySelectorAll(".modal.show").forEach(modalEl => {
+			  bootstrap.Modal.getInstance(modalEl)?.hide();
+			});
+
+
+		  newBtn.addEventListener("click", () => {
+		    fetch('/departmentcalendar/delete/' + calendarNo, {
+		      method: 'POST',
+		      headers: {
+		        'header': document.querySelector('meta[name="_csrf_header"]').content,
+		        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+		      }
+		    })
+		      .then(response => response.json())
+		      .then(data => {
+		        showMessageModal(data.res_msg || "삭제되었습니다.", "알림", true);
+		      })
+		      .catch(error => {
+		        console.error("삭제 실패:", error);
+		        showMessageModal("삭제 중 오류가 발생했습니다.", "삭제 실패");
+		      });
+
+		    confirmModal.hide();
+		  });
+
+		  confirmModal.show();		
+	});
 
       calendar.render();
 
