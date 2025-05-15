@@ -10,7 +10,7 @@ echo "[INFO] 현재 브랜치: $BRANCH_NAME"
 # ✅ 컨테이너 내부 기준 경로로 수정
 ENV_PATH="/mnt/env/.env"
 SOURCE_CODE_PATH="/mnt/env/app/source_code"
-DEPLOY_PATH="/mnt/env/app/deploy"
+DEPLOY_PATH="/mnt/env/springboot-docker/deploy"  # ✅ Dockerfile 기준 경로로 수정
 SECRETS_PATH="/mnt/env/secrets"
 COMPOSE_FILE="/mnt/env/docker-compose.yml"
 
