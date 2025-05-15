@@ -42,9 +42,12 @@ if [ "$BRANCH_NAME" = "develop" ]; then
   cd "$SOURCE_CODE_PATH/eroom" || exit 1
   ./gradlew clean bootJar
 
-  echo "[STEP] ?? .jar 복사 → deploy 디렉터리"
-  mkdir -p "$DEPLOY_PATH"
-  cp build/libs/*.jar "$DEPLOY_PATH/"
+  echo "[STEP] ?? 기존 deploy 디렉터리 JAR 삭제"
+  rm -f "$DEPLOY_PATH"/*.jar
+
+  echo "[STEP] ?? .jar 복사 → deploy 디렉터리 (파일명 고정)"
+  cp build/libs/eroom-0.0.1-SNAPSHOT.jar "$DEPLOY_PATH/app.jar"
+
 
   echo "[INFO] ? JAR 생성 및 복사 완료: $(ls $DEPLOY_PATH/*.jar)"
 else
