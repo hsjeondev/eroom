@@ -191,11 +191,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
            </div>		
          </div>
          <script>
-         const mailList = new List('mailSummary', {
-        	  valueNames: ['senderName', 'mailTitle', 'mailContent', 'sendTime'],
-        	  page: 6,
-        	  pagination: true
-        	});
+         
          
          const checkAll = document.getElementById('checkAll');
          checkAll.addEventListener('change', function () {
@@ -238,7 +234,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
         	    sendBulkUpdate('/mail/important');
         	  });
          
-         
+        	  const mailList = new List('mailSummary', {
+            	  valueNames: ['senderName', 'mailTitle', 'mailContent', 'sendTime'],
+            	  page: 6,
+            	  pagination: true
+            	});
          document.addEventListener("DOMContentLoaded", function() {
         	 	const senderNo = document.getElementById("myEmployeeNo").value; 
         	    const socket = new WebSocket("ws://localhost:8080/ws/mail?senderNo="+senderNo);  // wss://로 수정 필요 시, 변경

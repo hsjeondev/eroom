@@ -60,6 +60,7 @@ public class MailController {
 	@Value("${ffupload.location}")
 	 private String fileDir;
 	
+	// 홈 카드 (읽지 않은 메일 / 전체 메일
 	@GetMapping("/mail/counts")
 	@ResponseBody
 	public Map<String, Integer> getMailCounts(@AuthenticationPrincipal EmployeeDetails employeeDetails) {
@@ -70,9 +71,27 @@ public class MailController {
 	    Map<String, Integer> response = new HashMap<>();
 	    response.put("unread", unreadCount);
 	    response.put("total", totalCount);
+	    
+	   // List<MailReceiver> received = mailService.getUnreadMails(employeeNo); 
+	    // List<Mail> sentMailList = mailService.getsentMails(employeeNo);
+	   // model.addAttribute("receivedList",received);
+	    
+	    //List<Mail> sentMailList = mailService.findMailsBySender(employeeNo,sortOrder);
+		//List<Mail> sentMailList = mailService.getSenderMails(employeeNo);
+		//model.addAttribute("sentMailList", sentMailList);
+	    
 	    return response;
 	}
-	
+	@GetMapping("/mail/listFragment")
+	public String getMailListFragment(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	    List<MailReceiver> received = mailService.getUnreadMails(employeeNo);
+	    List<Mail> sentMailList = mailService.getSenderMails(employeeNo);
+	    model.addAttribute("receivedList", received);
+	    model.addAttribute("sentMailList", sentMailList);
+
+	    return "mail/listFragment :: mailList";  // Thymeleaf fragment 이름
+	}
 	
 	
 	//test
@@ -153,17 +172,40 @@ public class MailController {
 		return "mail/test";
 	}
 	
-	// 트리구조 입혀보기
+	// 트리구조 입혀보기 홈 카드
 	@GetMapping("/mail/mailReceiverCc")
 	public String treeTest(Model model,
 		
 		@AuthenticationPrincipal EmployeeDetails employeeDetails) {
 			Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
-		    int unreadCount = mailService.countUnreadMails(employeeNo);
+			
+		    // 읽지 않은 메일 숫자
+			int unreadCount = mailService.countUnreadMails(employeeNo);
+			// 받은 메일 전체 숫자
 		    int totalCount = mailService.countAllReceivedMails(employeeNo);
-
+		    // 각각 세팅
 		    model.addAttribute("unreadMailCount", unreadCount);
 		    model.addAttribute("totalMailCount", totalCount);
+		    
+		    
+		    // 홍식님 
+		    List<MailReceiver> received = mailService.getUnreadMails(employeeNo); 
+		    // List<Mail> sentMailList = mailService.getsentMails(employeeNo);
+		    model.addAttribute("receivedList",received);
+		    
+		    //List<Mail> sentMailList = mailService.findMailsBySender(employeeNo,sortOrder);
+			List<Mail> sentMailList = mailService.getSenderMails(employeeNo);
+			model.addAttribute("sentMailList", sentMailList);
+			
+			
+		    /*
+		    for (Mail mailReceiver : sentMailList) {
+		        System.out.println("Mail Title: " + mailReceiver.getMailTitle());
+		        System.out.println("Receiver Name: " + mailReceiver.getReceivers(Employee.builder().employeeName().bu));
+		        System.out.println("Mail Read Status: " + mailReceiver.getMailReceiverReadYn());
+		    }*/
+		    
+		    
 		 Map<String, List<EmployeeDto>> teamEmployeeMap = new HashMap<>();
 		 List<Employee> empEntityList = employeeService.findAllEmployee();
 		 // 팀 조회
@@ -318,16 +360,15 @@ public class MailController {
 	    
 	    Map<String, MailStatus> mailStatusMap = mailService.getStatusMapForMailRecevier(received);
 
-	    for (Map.Entry<String, MailStatus> entry : mailStatusMap.entrySet()) {
-	        String test = entry.getKey();
-	        MailStatus status = entry.getValue();
-
-	        System.out.println("EmployeeNo: " + test);
-	        System.out.println("MailNo: " + status.getMail().getMailNo());
-	        System.out.println("중요 여부(importantYn): " + status.getMailStatusImportantYn());
-	        System.out.println("삭제 여부(deletedYn): " + status.getMailStatusDeletedYn());
-	        System.out.println("-------------");
-	    }
+		/*
+		 * for (Map.Entry<String, MailStatus> entry : mailStatusMap.entrySet()) { String
+		 * test = entry.getKey(); MailStatus status = entry.getValue();
+		 * 
+		 * System.out.println("EmployeeNo: " + test); System.out.println("MailNo: " +
+		 * status.getMail().getMailNo()); System.out.println("중요 여부(importantYn): " +
+		 * status.getMailStatusImportantYn()); System.out.println("삭제 여부(deletedYn): " +
+		 * status.getMailStatusDeletedYn()); System.out.println("-------------"); }
+		 */
 	    
 		model.addAttribute("mailStatusMap", mailStatusMap);
 	    model.addAttribute("receivedMails", received);
@@ -595,7 +636,7 @@ public class MailController {
 	@PostMapping("/mail/file/delete/{attachNo}")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> deleteAttachedFile(@PathVariable("attachNo") Long attachNo) {
-		System.out.println("attachNo received: " + attachNo);
+		// System.out.println("attachNo received: " + attachNo);
 		Map<String, Object> result = new HashMap<>();
 	    try {
 	    	mailService.markAsDeleted(attachNo);  // visibleYn = "N" 처리 등
@@ -618,7 +659,7 @@ public class MailController {
 		Map<String, String> resultMap = new HashMap<String, String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "삭제 실패");
-		System.out.println("Deleting file with attachNo: " + driveAttachNo);
+		// System.out.println("Deleting file with attachNo: " + driveAttachNo);
 		int result = driveService.deleteDriveFile(driveAttachNo);
 
 		if (result > 0) {
@@ -1015,7 +1056,6 @@ public class MailController {
 											 @RequestParam(name="mail_files") List<MultipartFile> mailFiles,
 											 @RequestParam(name="mail_draft_yn") String mailDraftYn
 											 ) {
-		System.out.println(mailDto);
 		Map<String, String> resultMap = new HashMap<String,String>();
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "메일 등록중 오류가 발생하였습니다.");
