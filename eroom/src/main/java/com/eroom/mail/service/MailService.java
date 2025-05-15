@@ -77,6 +77,11 @@ public class MailService {
         return mailReceiverRepository.findUnreadMailsByEmployeeNo(employeeNo);
     }
 	
+	public List<Mail> getSenderMails(Long employeeNo){
+		return mailRepository.findSentMailsBySenderNo(employeeNo);
+	}
+	
+	
 	// 홈 화면 카드 읽지 않은 메일/ 받은 메일
 	public int countUnreadMails(Long employeeNo) {
 	    return mailReceiverRepository.countByReceiverEmployeeNoAndMailReceiverReadYn(employeeNo, "N");

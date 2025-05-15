@@ -172,11 +172,17 @@ public class MailController {
 		    // 홍식님 
 		    List<MailReceiver> received = mailService.getUnreadMails(employeeNo); 
 		    // List<Mail> sentMailList = mailService.getsentMails(employeeNo);
-		    model.addAttribute("test",received);
+		    model.addAttribute("receivedList",received);
+		    
+		    //List<Mail> sentMailList = mailService.findMailsBySender(employeeNo,sortOrder);
+			List<Mail> sentMailList = mailService.getSenderMails(employeeNo);
+			model.addAttribute("sentMailList", sentMailList);
+			
+			
 		    /*
-		    for (MailReceiver mailReceiver : received) {
-		        System.out.println("Mail Title: " + mailReceiver.getMail().getMailTitle());
-		        System.out.println("Receiver Name: " + mailReceiver.getReceiver().getEmployeeName());
+		    for (Mail mailReceiver : sentMailList) {
+		        System.out.println("Mail Title: " + mailReceiver.getMailTitle());
+		        System.out.println("Receiver Name: " + mailReceiver.getReceivers(Employee.builder().employeeName().bu));
 		        System.out.println("Mail Read Status: " + mailReceiver.getMailReceiverReadYn());
 		    }*/
 		    

@@ -4,7 +4,9 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{include/layout}">
+	  
   <body>
+  
     <main class="main" id="top" layout:fragment="content">
 			
 			<!-- <div class="text-dark p-1">
@@ -245,7 +247,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
             <div class="tab-content mb-4" style="max-height: 300px; overflow-y: auto;">
                 <!-- 읽지 않은 메일 -->
                 <div class="tab-pane fade show active" id="unreadMailsTab">
-                    <table class="table table-striped text-center">
+                    <table class="table table-striped text-center" style="width: 100%; margin: 0 auto; table-layout: fixed; font-size: 0.65rem;">
                         <thead class="table-light sticky-top">
                             <tr>
                                 <th scope="col">발신자</th>
@@ -253,7 +255,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="mail : ${test}">
+                            <tr th:each="mail : ${receivedList}"
+                            	th:attr="onclick=|location.href='/mail/detail/${mail.Mail.mailNo}'|">
                                 <td th:text="${mail.Mail.sender.employeeName}"></td>
                                 <td th:text="${mail.Mail.mailTitle != null and !#strings.isEmpty(mail.Mail.mailTitle) ? mail.Mail.mailTitle : '( 제목 없음 )'}"></td>
                             </tr>
@@ -263,7 +266,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
                 <!-- 보낸 메일 -->
                 <div class="tab-pane fade" id="sentMailsTab">
-                    <table class="table table-striped text-center">
+                    <table class="table table-striped text-center" style="width: 100%; margin: 0 auto; table-layout: fixed; font-size: 0.65rem;">
                         <thead class="table-light sticky-top">
                             <tr>
                                 <th scope="col">수신자</th>
@@ -271,9 +274,18 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="mail : ${sentMails}">
-                                <td th:text="${mail.receiver.employeeName}"></td>
-                                <td th:text="${mail.mailTitle != null ? mail.mailTitle : '( 제목 없음 )'}"></td>
+                            <tr th:each="sentMail : ${sentMailList}"
+                            	th:attr="onclick=|location.href='/mail/detail/${sentMail.mailNo}'|">
+						        <td>
+						            <span th:with="size=${#lists.size(sentMail.receivers)}">
+						                <span th:if="${size == 1}" th:text="${sentMail.receivers[0].receiver.employeeName}"></span>
+						                <span th:if="${size > 1}">
+						                    <span th:text="${sentMail.receivers[0].receiver.employeeName}"></span>
+						                    <span th:text="' 외 ' + (${size} - 1) + '명'"></span>
+						                </span>
+						            </span>
+						        </td>
+                                <td th:text="${sentMail.mailTitle != null and !#strings.isEmpty(sentMail.mailTitle) ? sentMail.mailTitle : '( 제목 없음 )'}"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -282,6 +294,9 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
         </div>
     </div>
 </div>
+
+
+
 
 			<!--  -->
 			<!-- <div class="text-white p-1">
