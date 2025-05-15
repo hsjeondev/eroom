@@ -7,12 +7,12 @@ echo "[INFO] CI/CD 배포 시작: $(date)"
 BRANCH_NAME=$BRANCH_NAME
 echo "[INFO] 현재 브랜치: $BRANCH_NAME"
 
-# 경로 설정
-ENV_PATH="/home/eroom/springboot-docker/.env"
-SOURCE_CODE_PATH="/home/eroom/springboot-docker/app/source_code"
-DEPLOY_PATH="/home/eroom/springboot-docker/app/deploy"
-SECRETS_PATH="/home/eroom/springboot-docker/secrets"
-COMPOSE_FILE="/home/eroom/springboot-docker/docker-compose.yml"
+# ✅ 컨테이너 내부 기준 경로로 수정
+ENV_PATH="/mnt/env/.env"
+SOURCE_CODE_PATH="/mnt/env/app/source_code"
+DEPLOY_PATH="/mnt/env/app/deploy"
+SECRETS_PATH="/mnt/env/secrets"
+COMPOSE_FILE="/mnt/env/docker-compose.yml"
 
 echo "[INFO] 설정된 DEPLOY_PATH: $DEPLOY_PATH"
 echo "[INFO] 설정된 SOURCE_CODE_PATH: $SOURCE_CODE_PATH"
