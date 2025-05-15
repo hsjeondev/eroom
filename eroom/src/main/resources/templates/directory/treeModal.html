@@ -17,6 +17,10 @@
     }
     .treeview-text a {
       text-decoration: none !important;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 5px 10px;
     }
 
     .treeview-text summary::marker,
@@ -25,6 +29,13 @@
       display: none !important;
       content: none !important;
     }
+      .treeview-text {
+    cursor: pointer; /* 마우스 커서를 클릭 가능 모양으로 변경 */
+  }
+  
+  .treeview-text:hover {
+    background-color: #f0f4ff; /* 호버 시 살짝 색상 변화 */
+  }
   </style>
 </head>
 <body>
@@ -315,9 +326,14 @@ function updateParents(checkbox) {
 
 
 function confirmSelection() {
-  const selected = document.querySelectorAll("#selectedTags .badge");
+  const selected = document.querySelectorAll("#selectedTags .card");
   const resultCodeAndNum = Array.from(selected).map(el => el.id.replace('tag-', ''));
   const resultName = Array.from(selected).map(el => el.name.replace('tag-', ''));
+  const result = Array.from(selected).map((el, index) => ({
+	    code: el.id.replace('tag-', ''),
+	    name: el.name.replace('tag-', ''),
+	    step: index + 1 // 순서를 추가
+  }));
   // 여기서 result 데이터 가지고 쓰시면 됩니다
   // 여기서 result 데이터 가지고 쓰시면 됩니다
   // 여기서 result 데이터 가지고 쓰시면 됩니다
@@ -331,6 +347,7 @@ function confirmSelection() {
   // JSON으로 보내고 Controller에서는 @ResponseBody + 매개변수에는 @RequestBody List<String> 사용해서 받아서 쓰시면 됩니다. 
   console.log("확정된 선택 codeAndNo:", resultCodeAndNum);
   console.log("확정된 선택 name:", resultName);
+  console.log("확정된 선택 바구니:", result);
   // 부서, 팀은 separatorCode 그리고 사원은 employeeNo가 result에 담깁니다~
   // JSON으로 보내고 Controller에서는 @ResponseBody + 매개변수에는 @RequestBody List<String> 사용해서 받아서 쓰시면 됩니다. 
   // 여기서 result 데이터 가지고 쓰시면 됩니다
@@ -345,7 +362,8 @@ function confirmSelection() {
   bootstrap.Modal.getInstance(document.getElementById('treeModal')).hide();
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+// ver1
+/* document.addEventListener('DOMContentLoaded', function () {
   const tree = document.querySelector('#treeviewTree');
   tree.addEventListener('click', function (e) {
     if (e.target.tagName === 'INPUT') return;
@@ -354,7 +372,111 @@ document.addEventListener('DOMContentLoaded', function () {
 
     handleHighlight(clickedLi);
   });
-});
+}); */
+// ver2
+/* document.addEventListener('DOMContentLoaded', function () {
+	  const tree = document.querySelector('#treeviewTree');
+
+	  tree.addEventListener('click', function (e) {
+	    const clickedLi = e.target.closest('li.treeview-list-item');
+	    if (!clickedLi) return;
+
+	    // 🌟 클릭된 요소가 '사원명'(`emp-checkbox`)인 경우만 동작
+	    if (e.target.classList.contains('treeview-label-text')) {
+	      const checkbox = clickedLi.querySelector('input[type="checkbox"].emp-checkbox');
+	      if (checkbox) {
+	        checkbox.checked = !checkbox.checked; // 체크박스 상태 변경
+	        handleCheck(checkbox); // 상하위 동기화 처리
+	      }
+	    }
+
+	    // 🌟 클릭된 요소가 체크박스인 경우
+	    if (e.target.type === 'checkbox') {
+	      handleCheck(e.target);
+	    }
+	  });
+	}); */
+	// ver3
+	/* document.addEventListener('DOMContentLoaded', function () {
+		  const tree = document.querySelector('#treeviewTree');
+
+		  tree.addEventListener('click', function (e) {
+		    // 최상위 `li`인지 확인
+		    const clickedLi = e.target.closest('li.treeview-list-item');
+		    if (!clickedLi) return;
+
+		    // 클릭된 대상이 '이룸 컴퍼니'인지 확인
+		    const isRootCompany = clickedLi.querySelector('#eroomCompanySpan');
+		    if (isRootCompany) {
+		      e.stopPropagation(); // 🚫 이벤트 전파 방지
+		      return;
+		    }
+
+		    // 클릭된 요소가 체크박스인 경우
+		    if (e.target.type === 'checkbox') {
+		      handleCheck(e.target);
+		      e.stopPropagation(); // 🚫 이벤트 전파 방지
+		      return;
+		    }
+
+		    // 클릭된 요소가 '사원명'일 경우만 체크박스 토글
+		    if (e.target.classList.contains('treeview-label-text') || e.target.classList.contains('treeview-text')) {
+		      const checkbox = clickedLi.querySelector('input[type="checkbox"].emp-checkbox');
+		      if (checkbox) {
+		        checkbox.checked = !checkbox.checked; // 체크박스 상태 변경
+		        handleCheck(checkbox); // 상하위 동기화 처리
+		      }
+		    }
+
+		    // 🔎 클릭된 요소에 대해 강조 표시 처리 (handleHighlight 재사용)
+		    handleHighlight(clickedLi);
+		  });
+		}); */
+		// ver4
+		document.addEventListener('DOMContentLoaded', function () {
+	  const tree = document.querySelector('#treeviewTree');
+
+	  tree.addEventListener('click', function (e) {
+	    // 최상위 `li`인지 확인
+	    const clickedLi = e.target.closest('li.treeview-list-item');
+	    if (!clickedLi) return;
+
+	    // 클릭된 대상이 '이룸 컴퍼니'인지 확인
+	    const isRootCompany = clickedLi.querySelector('#eroomCompanySpan');
+	    if (isRootCompany) {
+	      e.stopPropagation(); // 🚫 이벤트 전파 방지
+	      return;
+	    }
+
+	    // 클릭된 요소가 체크박스인지 확인
+	    if (e.target.type === 'checkbox') {
+	      handleCheck(e.target);
+	      e.stopPropagation(); // 🚫 이벤트 전파 방지
+	      return;
+	    }
+
+	    // 클릭된 요소가 '사원명' 또는 'treeview-text'일 경우만 체크박스 토글
+	    if (e.target.classList.contains('treeview-label-text') || e.target.classList.contains('treeview-text')) {
+	      const checkbox = clickedLi.querySelector('input[type="checkbox"].emp-checkbox');
+
+	      // 숨겨진 체크박스일 경우 포인터 이벤트 차단
+	      if (checkbox && checkbox.offsetParent === null) {
+	        e.stopPropagation();
+	        return;
+	      }
+
+	      if (checkbox) {
+	        checkbox.checked = !checkbox.checked; // 체크박스 상태 변경
+	        handleCheck(checkbox); // 상하위 동기화 처리
+	      }
+	    }
+
+	    // 클릭된 요소에 대해 강조 표시 처리 (handleHighlight 재사용)
+	    handleHighlight(clickedLi);
+	  });
+	});
+
+
 </script>
 
 <!-- 비우기 버튼 -->

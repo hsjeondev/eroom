@@ -165,8 +165,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
           </div>
           <div class="modal-body text-center">
 				        <div class="canvas-wrapper" style="position: relative; width: 100%; max-width: 500px; margin: 0 auto;">
-				          <canvas id="signatureCanvas" style="border: 1px solid #000; background: #fff; width: 100%; height: auto;"></canvas>
-				        </div>            
+						  <canvas id="signatureCanvas" style="border: 1px solid #000; background: #fff; width: 100%; height: auto;"></canvas>
+						</div>    
 
             <div class="mt-3">
               <button type="button" class="btn btn-secondary" id="clearSignature">패드 초기화</button>
@@ -180,18 +180,92 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	<!-- Thymeleaf에서 base64 데이터 바인딩 -->
 	<input type="hidden" id="signatureImage" th:value="${approvalSignature}" />
 
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 공통 저장 확인 모달 -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+
+<!-- 2차 모달, 로딩스피너 -->
 <script>
-	document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() {
+
+	// 저장 확인 모달 (공통)
+	const confirmSaveModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+	// 알림 모달(공통)
+	const alertModal = new bootstrap.Modal(document.getElementById('alertMessageModal'));
+	// 공통 알림 모달
+	function showAlert(message, callback){
+		document.getElementById('alertMessageContent').innerText = message;
+		alertModal.show();
+		
+		if(callback){
+			const modalEl = document.getElementById('alertMessageModal');
+			modalEl.addEventListener('hidden.bs.modal',function handler(){
+				callback();
+				modalEl.removeEventListener('hidden.bs.modal',handler);
+			});
+		}
+	}
+	// 공통 confirm 모달
+	function showConfirmModal(message, onConfirm){
+		const msgElement = document.getElementById('confirmSaveModalMessage');
+		const confirmBtn = document.getElementById('confirmSaveBtn');
+		
+		msgElement.innerHTML = message;
+		const modalInstance = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+		modalInstance.show();
+		
+		const handler = function(){
+			modalInstance.hide();
+			onConfirm(); // 확인 클릭 시 실행할 콜백
+			confirmBtn.removeEventListener('click',handler); // 중복 방지
+		};
+		
+		confirmBtn.addEventListener('click',handler);
+	}
+
+		/* 로딩 스피너 */
 	   document.getElementById('loadingSpinner').style.display = 'none';
 	   document.getElementById('reports').style.display = 'block';
-	});
-</script>
 
-	<!-- 시그니처 모달 작동 스크립트 -->
-	<script>
-    window.addEventListener('load', function () {
-    	let initialCanvasData = null;
+
+	/* 시그니처 모달 작동 스크립트 */
+	
+   	let initialCanvasData = null;
       let signaturePad;
   		function lastSignature() {
   		    fetch('/approval/signature')
@@ -219,17 +293,23 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
       const deleteBtn = document.getElementById('deleteSignature');
 
       function initSignaturePad() {
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        canvas.width = 400 * ratio;
-        canvas.height = 200 * ratio;
-        const ctx = canvas.getContext('2d');
-        ctx.scale(ratio, ratio);
+    	  // Canvas의 실제 위치와 크기를 가져옴
+    	  const rect = canvas.getBoundingClientRect();
+    	  const ratio = Math.max(window.devicePixelRatio || 1, 1);
 
-        signaturePad = new SignaturePad(canvas, {
-          backgroundColor: 'rgb(255,255,255)',
-          penColor: 'black'
-        });
-      }
+    	  // 실제 크기와 해상도를 동기화
+    	  canvas.width = rect.width * ratio;
+    	  canvas.height = rect.height * ratio;
+
+    	  const ctx = canvas.getContext('2d');
+    	  ctx.scale(ratio, ratio);  // 비율 조정
+
+    	  // 시그니처 패드 초기화
+    	  signaturePad = new SignaturePad(canvas, {
+    	    backgroundColor: 'rgb(255,255,255)',
+    	    penColor: 'black'
+    	  });
+    	}
 
       const signatureModal = document.getElementById('signatureModal');
       signatureModal.addEventListener('shown.bs.modal', function () {
@@ -262,45 +342,54 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	        if (!signaturePad.isEmpty()) {
 	          const saveDataURL = signaturePad.toDataURL();
 	          console.log('서명 데이터 URL:', saveDataURL);
+	          showConfirmModal('서명을 저장하시겠습니까?', signatureCreate);
 	          
-	          fetch('/approval/signature/create', {
-	        	  method : 'POST',
-	        	  headers : {
-	      	        'Content-Type': 'application/json',
-	    	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
-	    	        'header': document.querySelector('meta[name="_csrf_header"]').content
-	        	  },
-	        	  body : JSON.stringify({
-	        		  signature_data_url : saveDataURL
-	        	  })
-	          })
-	          .then(response => response.json())
-	          .then(data => {
-	        		  alert(data.res_msg);
-	          })
+	          function signatureCreate(){
+		          fetch('/approval/signature/create', {
+		        	  method : 'POST',
+		        	  headers : {
+		      	        'Content-Type': 'application/json',
+		    	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+		    	        'header': document.querySelector('meta[name="_csrf_header"]').content
+		        	  },
+		        	  body : JSON.stringify({
+		        		  signature_data_url : saveDataURL
+		        	  })
+		          })
+		          .then(response => response.json())
+		          .then(data => {
+	        		  // alert(data.res_msg);
+	        	  	  showAlert('서명 저장 완료되었습니다.');
+		        	  const modalInstance = bootstrap.Modal.getInstance(signatureModal);
+		  	          modalInstance.hide();
+		          })
+	          }
 	          
-	          const modalInstance = bootstrap.Modal.getInstance(signatureModal);
-	          modalInstance.hide();
+	          
 	        } else {
 	       		// 서명 미입력시.
 	          //alert('서명이 없습니다!');
 	       		// 서명이 없는 경우 지워버리기
-	    	  fetch('/approval/signature/delete', {
-	    		  method : 'PUT',
-	        	  headers : {
-	      	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
-	      	        'header': document.querySelector('meta[name="_csrf_header"]').content
-	          	  }
-	    	  })
-	    	  .then(response => response.json())
-	    	  .then(data => {
-	    		  console.log(data.res_msg);
-	    	      location.reload();
-	    	  })
-	    	  .catch(error => {
-	    	        console.error('삭제 중 오류 발생:', error);
-	    	        alert('삭제 실패');
-	    	  });
+	       		showConfirmModal('서명 정보를 삭제하시겠습니까?', signatureDelete);
+	       		
+	       		function signatureDelete(){
+		    	  fetch('/approval/signature/delete', {
+		    		  method : 'PUT',
+		        	  headers : {
+		      	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+		      	        'header': document.querySelector('meta[name="_csrf_header"]').content
+		          	  }
+		    	  })
+		    	  .then(response => response.json())
+		    	  .then(data => {
+		    		  console.log(data.res_msg);
+		    	      location.reload();
+		    	  })
+		    	  .catch(error => {
+		    	        console.error('삭제 중 오류 발생:', error);
+		    	        alert('삭제 실패');
+		    	  });
+	       		}
 	       		
 	        }
 	      });
@@ -328,9 +417,8 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	      });
       } */
       
-      
-      
-    });
+});
+</script>
     
     
     </script>

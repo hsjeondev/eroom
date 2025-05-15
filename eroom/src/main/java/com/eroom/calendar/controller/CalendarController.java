@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,9 @@ import com.eroom.calendar.service.DepartmentCalendarService;
 import com.eroom.calendar.service.EmployeeCalendarService;
 import com.eroom.calendar.service.TeamCalendarService;
 import com.eroom.employee.dto.SeparatorDto;
+import com.eroom.employee.entity.Structure;
 import com.eroom.employee.service.EmployeeService;
+import com.eroom.security.EmployeeDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -62,8 +65,13 @@ public class CalendarController {
 	
 	//캘린더 마이팀일정 목록으로 화면 전환
 	@GetMapping("/calendar/myteam")
-	public String myTeamCalendarView() {
-		return "calendar/myteamlist";
+	public String myTeamCalendarView(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+		 Structure teamStructure = employeeDetails.getEmployee().getStructure();
+		 String teamName = teamStructure.getCodeName(); 
+
+		 model.addAttribute("teamName", teamName);
+		 
+		 return "calendar/myteamlist";
 	}
 
 	//캘린더 회사일정 목록으로 화면 전환
@@ -74,13 +82,28 @@ public class CalendarController {
 	
 	//부서만 조회
 	@GetMapping("/calendar/department")
-	public String departMentCalendarView(@RequestParam(value = "department", required = false) String department, Model model) {
-		List<SeparatorDto> structureList = employeeService.findOnlyDepartments();
-		
-		model.addAttribute("structureList", structureList);
-		model.addAttribute("selectedDepartment", department);
-		return "calendar/departlist";
+	public String departMentCalendarView(
+	        @RequestParam(value = "department", required = false) String department,
+	        Model model,
+	        @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+
+	    List<SeparatorDto> structureList = employeeService.findOnlyDepartments();
+	    model.addAttribute("structureList", structureList);
+
+	    if (department == null || department.isBlank()) {
+	        // 1. 팀 구조 가져오기
+	        Structure teamStructure = employeeDetails.getEmployee().getStructure();
+
+	        // 2. 팀의 상위 부서 코드 추출 (parentCode는 D001, D002 등)
+	        department = teamStructure.getParentCode(); // ✅ 이게 바로 부서 코드
+	    }
+
+	    //System.out.println("선택된 부서 (부서 코드): " + department);
+	    model.addAttribute("selectedDepartment", department);
+
+	    return "calendar/departlist";
 	}
+
 	
 
 	

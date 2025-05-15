@@ -312,8 +312,6 @@ public class ProjectTodoController {
 	    map.put("res_code", "500");
 	    map.put("res_msg", "세부 할 일 수정 중 오류가 발생하였습니다.");
 	    
-	    System.out.println("request" + request);
-
 	    try {
 	        projectTodoService.editTodoElementDetails(request);
 

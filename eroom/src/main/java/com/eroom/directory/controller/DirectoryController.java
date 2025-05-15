@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.eroom.directory.dto.AddDepartmentAndTeamDto;
 import com.eroom.directory.dto.DeleteDepartmentOrTeamDto;
 import com.eroom.directory.dto.DirectoryDto;
+import com.eroom.directory.dto.GetSortableDto;
+import com.eroom.directory.dto.GetSortableTaemDto;
 import com.eroom.directory.dto.UpdateSortOrderDto;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.service.DirectoryBookmarkService;
@@ -460,6 +462,41 @@ public class DirectoryController {
 		
 		return map;
 	}
+	// Sortable.js 정렬 불러오기 부서, 팀 정렬
+	@GetMapping("/admin/directory/getSortOrder")
+	@ResponseBody
+	public List<GetSortableDto> getSortOrderMethod(Authentication authentication) {
+	    List<Structure> departmentList = structureService.selectDepartmentAll();
+	    List<GetSortableDto> responseList = new ArrayList<>();
+
+	    for (int i = 0; i < departmentList.size(); i++) {
+	        Structure department = departmentList.get(i);
+
+	        // 팀 정보 조회
+	        List<Structure> teamList = structureService.selectTeamAllByParentCode(department.getSeparatorCode());
+	        List<GetSortableTaemDto> teamDtoList = new ArrayList<>();
+
+	        for (int j = 0; j < teamList.size(); j++) {
+	            Structure team = teamList.get(j);
+	            teamDtoList.add(GetSortableTaemDto.builder()
+	                    .teamId(team.getSeparatorCode())
+	                    .teamName(team.getCodeName())
+	                    .order(j + 1) // 순서 정보 추가
+	                    .build());
+	        }
+
+	        // 부서 + 팀 정보 DTO 생성
+	        responseList.add(GetSortableDto.builder()
+	            .departmentId(department.getSeparatorCode())
+	            .departmentName(department.getCodeName())
+	            .order(i + 1) // 부서 순서 추가
+	            .teams(teamDtoList)
+	            .build());
+	    }
+
+	    return responseList;
+	}
+
 	
 	// 부서, 팀 삭제
 //	@PutMapping("/admin/employee/delete")
