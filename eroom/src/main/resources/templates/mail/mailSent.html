@@ -98,23 +98,18 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						</form>
                       </div>
                     </div>
-                    <div class="col-auto">
+                    <!-- 프로필 부분 -->
+                    <!-- <div class="col-auto">
                       <div class="avatar avatar-s  rounded-circle">
                         <img class="rounded-circle " src="../../assets/img/team/60.webp" alt="" />
 
                       </div>
-                    </div>
+                    </div> -->
                     
                     
                     <div class="col-auto">
-                    	 <!-- <a class="text-body-emphasis fw-bold inbox-link fs-9 senderName"  href="../../apps/email/email-detail.html"
-                    	 th:text="${sentMail.sender != null ? sentMail.sender.employeeName : '알 수 없음'}"
-                    	> 
-                    	
-                    	 보낸 사람
-                    	 받은 사람 : (OOO) 으로 바꿀 예정
-                    	 </a> -->
-                    	 <div class="text-body-emphasis fw-bold inbox-link fs-9 senderName">받는 사람:
+                    	 
+                    	 <div class="text-body-emphasis fw-bold inbox-link fs-9 senderName">받는 사람 : 
                     	 	<span th:with="size=${#lists.size(sentMail.receivers)}">
                     	 	<span th:if="${size == 1}" th:text="${sentMail.receivers[0].receiver.employeeName}"></span>
 					        <span th:if="${size > 1}">
@@ -123,7 +118,10 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						      
 						    </span>
 						    </span>
+						    <!-- <span>|</span> -->
+						    
 					    </div>
+					    
                     </div>
                     <!-- 이메일 잘 나옴 -->
                     <!-- <p th:text="${sentMail.sender.directory.directoryEmail}"></p> -->

@@ -9,13 +9,7 @@ pipeline {
                 }
             }
             steps {
-                echo '배포: develop 서버로'
-
-                sh 'cp /mnt/env/.env ./springboot-docker/.env'
-
-                sh 'mkdir -p ./springboot-docker/secrets'
-                sh 'cp /mnt/env/secrets/application.yml ./springboot-docker/secrets/'
-                sh 'cp /mnt/env/secrets/application-secret.properties ./springboot-docker/secrets/'
+                echo '배포: develop 서버로 고고'
 
                 sh './springboot-docker/deploy-dev.sh'
             }
