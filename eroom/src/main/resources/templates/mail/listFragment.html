@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>메일 리스트 프래그먼트</title>
+    <style>
+    .tab-content {
+  max-height: 300px;  
+  overflow-y: auto;
+  height: 300px;
+  display: block;
+}
+.tab-content {
+  height: 100%;      /* 부모인 mailListContainer 높이 모두 차지 */
+  overflow-y: auto;  /* 스크롤 활성화 */
+  max-height: none;  /* 고정 최대 높이 없애기 */
+  display: block;
+}
+.tab-pane {
+  overflow: hidden;
+}
+table {
+  width: 100%;
+  table-layout: fixed;
+  font-size: 0.65rem;
+  border-collapse: collapse;
+}
+
+thead.sticky-top {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
+    </style>
+</head>
+
+<body>
+<div th:fragment="mailList">
+<div class="tab-content mb-4" style="height: 150px; overflow-y: auto;">
+    <!-- 읽지 않은 메일 -->
+    <div id="unreadMailsTab" class="tab-pane fade show active">
+        <table class="table table-striped text-center" style="width: 100%; margin: 0 auto; table-layout: fixed; font-size: 0.65rem;">
+            <thead class="table-light sticky-top">
+                <tr>
+                    <th scope="col">발신자</th>
+                    <th scope="col">제목</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="mail : ${receivedList}"
+                    th:attr="onclick=|location.href='/mail/detail/${mail.Mail.mailNo}'|">
+                    <td th:text="${mail.Mail.sender.employeeName}"></td>
+                    <td th:text="${mail.Mail.mailTitle != null and !#strings.isEmpty(mail.Mail.mailTitle) ? mail.Mail.mailTitle : '( 제목 없음 )'}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 보낸 메일 -->
+    <div id="sentMailsTab" class="tab-pane fade">
+        <table class="table table-striped text-center" style="width: 100%; margin: 0 auto; table-layout: fixed; font-size: 0.65rem;">
+            <thead class="table-light sticky-top">
+                <tr>
+                    <th scope="col">수신자</th>
+                    <th scope="col">제목</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="sentMail : ${sentMailList}"
+                    th:attr="onclick=|location.href='/mail/detail/${sentMail.mailNo}'|">
+                    <td>
+                        <span th:with="size=${#lists.size(sentMail.receivers)}">
+                            <span th:if="${size == 1}" th:text="${sentMail.receivers[0].receiver.employeeName}"></span>
+                            <span th:if="${size > 1}">
+                                <span th:text="${sentMail.receivers[0].receiver.employeeName}"></span>
+                                <span th:text="' 외 ' + (${size} - 1) + '명'"></span>
+                            </span>
+                        </span>
+                    </td>
+                    <td th:text="${sentMail.mailTitle != null and !#strings.isEmpty(sentMail.mailTitle) ? sentMail.mailTitle : '( 제목 없음 )'}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+</body>
+</html>

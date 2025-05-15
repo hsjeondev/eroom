@@ -60,6 +60,7 @@ public class MailController {
 	@Value("${ffupload.location}")
 	 private String fileDir;
 	
+	// 홈 카드 (읽지 않은 메일 / 전체 메일
 	@GetMapping("/mail/counts")
 	@ResponseBody
 	public Map<String, Integer> getMailCounts(@AuthenticationPrincipal EmployeeDetails employeeDetails) {
@@ -70,9 +71,27 @@ public class MailController {
 	    Map<String, Integer> response = new HashMap<>();
 	    response.put("unread", unreadCount);
 	    response.put("total", totalCount);
+	    
+	   // List<MailReceiver> received = mailService.getUnreadMails(employeeNo); 
+	    // List<Mail> sentMailList = mailService.getsentMails(employeeNo);
+	   // model.addAttribute("receivedList",received);
+	    
+	    //List<Mail> sentMailList = mailService.findMailsBySender(employeeNo,sortOrder);
+		//List<Mail> sentMailList = mailService.getSenderMails(employeeNo);
+		//model.addAttribute("sentMailList", sentMailList);
+	    
 	    return response;
 	}
-	
+	@GetMapping("/mail/listFragment")
+	public String getMailListFragment(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+	    Long employeeNo = employeeDetails.getEmployee().getEmployeeNo();
+	    List<MailReceiver> received = mailService.getUnreadMails(employeeNo);
+	    List<Mail> sentMailList = mailService.getSenderMails(employeeNo);
+	    model.addAttribute("receivedList", received);
+	    model.addAttribute("sentMailList", sentMailList);
+
+	    return "mail/listFragment :: mailList";  // Thymeleaf fragment 이름
+	}
 	
 	
 	//test

@@ -617,29 +617,37 @@
 
 
         <!-- 3행·1열 -->
-        <div class="text-dark p-1">
-			<div class="attendance-card mx-auto">
-				<div class="card shadow-sm border-0">
-				  <div class="card-header" style="text-align: center; font-size: 1.5rem; font-weight: bold; padding: 15px;">
-					<span>메일</span>
-			      </div>
-				  <div class="card-body text-center p-4" style="height: 207.81px;">
-				  	<a th:href="@{/mail/receiverTo}">
-		               	<i class="fas fa-envelope fa-3x mb-0 text-primary"></i>
-					</a>
-			  			<div>
-						  <span id="unreadMailCount" style="font-size: 1.5rem; color: red; font-weight: 700;">0</span>
-						  <span style="font-size: 1rem; color: gray;"> / </span>
-						  <span id="totalMailCount" style="font-size: 1rem; color: gray;">0</span>
-						</div>
-		                
-						<div style="font-size: 0.9rem; margin-top: 5px; color: #888;">
-		                    읽지 않은 메일 / 총 메일
-		                </div>
-				  </div>
-				</div>
-			</div>
-        </div>
+        <div class="text-white p-1">
+  <div class="attendance-card mx-auto" style="max-width: 600px; height: 300px; display: flex; flex-direction: column;">
+    <div class="card shadow-sm border-0" style="display: flex; flex-direction: column; height: 100%;">
+      
+      <!-- 헤더 -->
+      <div class="card-header text-center fw-bold" style="font-size: 1.2rem; padding: 15px; flex-shrink: 0;">
+        메일
+      </div>
+
+      <!-- 탭 메뉴 -->
+      <div class="d-flex justify-content-between align-items-center mb-2" style="flex-shrink: 0;">
+        <div class="fw-bold text-dark" style="font-size: 0.9rem;"></div>
+        <ul class="nav nav-underline fs-9 w-100 mb-0" id="mailTab" role="tablist">
+          <li class="nav-item flex-grow-1 text-center" role="presentation">
+            <a class="nav-link active" id="unreadMails-tab" data-bs-toggle="tab" href="#unreadMailsTab"
+               role="tab" aria-controls="unreadMailsTab" aria-selected="true">읽지 않은 메일</a>
+          </li>
+          <li class="nav-item flex-grow-1 text-center" role="presentation">
+            <a class="nav-link" id="sentMails-tab" data-bs-toggle="tab" href="#sentMailsTab"
+               role="tab" aria-controls="sentMailsTab" aria-selected="false">보낸 메일</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 탭 내용 영역: flex-grow로 남은 공간 모두 차지 + 스크롤 -->
+      <div id="mailListContainer" style="flex-grow: 1; min-height: 0; overflow-y: auto;">
+        <!-- 탭 내용 넣기 -->
+      </div>
+    </div>
+  </div>
+</div>
 
         <!-- 3행·2열: 날씨 카드 -->
 		<div class="text-white p-1">
@@ -1439,6 +1447,12 @@
 	<script>
 	document.addEventListener("DOMContentLoaded", function () {
 		  // 1. 페이지 로딩 시 처음 메일 개수 가져오기 (이미 구현된 fetch)
+		  fetch("/mail/listFragment")
+		    .then(response => response.text())
+		    .then(html => {
+		      document.getElementById("mailListContainer").innerHTML = html;
+		    });
+		  
 		  fetch("/mail/counts")
 		    .then(response => response.json())
 		    .then(data => {
