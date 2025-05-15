@@ -326,9 +326,14 @@ function updateParents(checkbox) {
 
 
 function confirmSelection() {
-  const selected = document.querySelectorAll("#selectedTags .badge");
+  const selected = document.querySelectorAll("#selectedTags .card");
   const resultCodeAndNum = Array.from(selected).map(el => el.id.replace('tag-', ''));
   const resultName = Array.from(selected).map(el => el.name.replace('tag-', ''));
+  const result = Array.from(selected).map((el, index) => ({
+	    code: el.id.replace('tag-', ''),
+	    name: el.name.replace('tag-', ''),
+	    step: index + 1 // 순서를 추가
+  }));
   // 여기서 result 데이터 가지고 쓰시면 됩니다
   // 여기서 result 데이터 가지고 쓰시면 됩니다
   // 여기서 result 데이터 가지고 쓰시면 됩니다
@@ -342,6 +347,7 @@ function confirmSelection() {
   // JSON으로 보내고 Controller에서는 @ResponseBody + 매개변수에는 @RequestBody List<String> 사용해서 받아서 쓰시면 됩니다. 
   console.log("확정된 선택 codeAndNo:", resultCodeAndNum);
   console.log("확정된 선택 name:", resultName);
+  console.log("확정된 선택 바구니:", result);
   // 부서, 팀은 separatorCode 그리고 사원은 employeeNo가 result에 담깁니다~
   // JSON으로 보내고 Controller에서는 @ResponseBody + 매개변수에는 @RequestBody List<String> 사용해서 받아서 쓰시면 됩니다. 
   // 여기서 result 데이터 가지고 쓰시면 됩니다
