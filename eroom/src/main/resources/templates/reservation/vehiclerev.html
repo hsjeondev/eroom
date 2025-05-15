@@ -358,7 +358,7 @@
 								<!-- <button class="btn btn-subtle-secondary me-1 mb-1"
 												type="button" id="editVehicleBtn">수정</button> -->
 								<button class="btn btn-outline-info me-1 mb-1" type="button"
-									id="deleteVehicleBtn">삭제</button>
+									id="deleteVehicleBtn">예약취소</button>
 							</div>
 							<div>
 								<button class="btn btn-primary px-4" type="button"
@@ -514,7 +514,7 @@
 
 		
 		<!-- 삭제 모달 -->
-		<div class="modal fade" id="confirmDeleteModal" tabindex="-1"
+<!-- 		<div class="modal fade" id="confirmDeleteModal" tabindex="-1"
 			aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered modal-sm">
 				<div
@@ -522,18 +522,18 @@
 			
 					<div class="modal-body text-center">
 						<p class="mb-0 text-body">
-							예약을 취소하시겠습니까?<br>취소 후 자동으로 새로고침됩니다.
+							정말 예약을 취소하시겠습니까?
 						</p>
 					</div>
 					<div class="modal-footer justify-content-center border-0">
 						<button type="button" class="btn btn-phoenix-secondary"
 							data-bs-dismiss="modal">취소</button>
-						<button type="button" class="btn btn-danger" id="confirmDeleteBtn">삭제</button>
+						<button type="button" class="btn btn-danger" id="confirmDeleteBtn">예약취소</button>
 					</div>
 				</div>
 			</div>
 		</div>
-
+ -->
 	
 
 
@@ -628,46 +628,57 @@
 			  });
 
 			  // 중첩 말고 여기서 바로 삭제 관련 이벤트 등록
-			 const deleteBtn = document.getElementById("deleteVehicleBtn");
-			const confirmModalEl = document.getElementById("confirmDeleteModal");
-			
-			if (deleteBtn && confirmModalEl) {
-			  deleteBtn.addEventListener("click", function () {
-			    const modal = new bootstrap.Modal(confirmModalEl);
-			    modal.show();
-			  });
-			}
-			
-			document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
+				document.getElementById("deleteVehicleBtn").addEventListener("click", function () {
 			  const reservationNo = document.getElementById("detailReservationNo").value;
 			
-			  fetch('/resvehicle/delete/' + reservationNo, {
-			    method: "post",
-			    headers: {
-			      'header': document.querySelector('meta[name="_csrf_header"]').content,
-			      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
-			    }
-			  })
-			    .then(response => response.json())
-			    .then(data => {
-			      const confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
-			      if (confirmModal) confirmModal.hide();
+			  const modalEl = document.getElementById("messageModal");
+			  const modalTitle = document.getElementById("messageModalTitle");
+			  const modalBody = document.getElementById("messageModalBody");
+			  const modalBtn = document.querySelector("#messageModal .modal-footer button");
 			
-			      if (data.res_code == 200) {
-			        // ✅ 모달 확인 버튼 눌렀을 때만 reload
-			        showMessageModal("예약이 취소되었습니다.", "알림", true);
-			      } else {
-			        showMessageModal(data.res_msg || "삭제에 실패했습니다.");
-			      }
-			    })
-			    .catch(error => {
-			      console.error("삭제 중 오류:", error);
+			  // 1. 확인용 메시지 세팅
+			  modalTitle.textContent = "알림";
+			  modalBody.textContent = "정말 예약을 취소하시겠습니까?";
 			
-			      const confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
-			      if (confirmModal) confirmModal.hide();
+			  // 2. 기존 버튼 초기화
+			  const newBtn = modalBtn.cloneNode(true);
+			  modalBtn.parentNode.replaceChild(newBtn, modalBtn);
+			  newBtn.textContent = "확인";
+			  newBtn.className = "btn btn-primary";
 			
-			      showMessageModal("삭제 중 오류가 발생했습니다. 다시 시도해주세요 😥");
-			    });
+			  // 3. 혹시 떠 있는 모달 있으면 닫기
+			  document.querySelectorAll(".modal.show").forEach(modalEl => {
+			    bootstrap.Modal.getInstance(modalEl)?.hide();
+			  });
+			
+			  // 4. 확인 버튼 클릭 시 → 모달 닫고 삭제 실행
+			  newBtn.addEventListener("click", () => {
+			    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+			    modalInstance.hide();
+			
+			    // 모달이 완전히 닫힌 후 삭제 요청
+			    modalEl.addEventListener("hidden.bs.modal", () => {
+			      fetch('/resvehicle/delete/' + reservationNo, {
+			        method: "POST",
+			        headers: {
+			          'header': document.querySelector('meta[name="_csrf_header"]').content,
+			          'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+			        }
+			      })
+			        .then(response => response.json())
+			        .then(data => {
+			          showMessageModal(data.res_msg || "취소가 완료되었습니다.", "알림", true); // 확인 후 새로고침
+			        })
+			        .catch(error => {
+			          console.error("❌ 삭제 중 오류:", error);
+			          showMessageModal("삭제 중 오류가 발생했습니다. 다시 시도해주세요.", "오류");
+			        });
+			    }, { once: true });
+			  });
+			
+			  // 5. 모달 띄우기
+			  const confirmModal = new bootstrap.Modal(modalEl);
+			  confirmModal.show();
 			});
 
 			  // 캘린더 렌더링은 마지막에!
