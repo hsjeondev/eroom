@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 echo "[INFO] CI/CD 배포 시작: $(date)"
 
@@ -7,13 +8,15 @@ BRANCH_NAME=$BRANCH_NAME
 echo "[INFO] 현재 브랜치: $BRANCH_NAME"
 
 # 경로 설정
-ENV_PATH="/mnt/env/.env"
-SOURCE_CODE_PATH="/mnt/env/app/source_code"
-DEPLOY_PATH="/mnt/env/app/deploy"
-SECRETS_PATH="/mnt/env/secrets"
+ENV_PATH="/home/eroom/springboot-docker/.env"
+SOURCE_CODE_PATH="/home/eroom/springboot-docker/app/source_code"
+DEPLOY_PATH="/home/eroom/springboot-docker/app/deploy"
+SECRETS_PATH="/home/eroom/springboot-docker/secrets"
+COMPOSE_FILE="/home/eroom/springboot-docker/docker-compose.yml"
 
 echo "[INFO] 설정된 DEPLOY_PATH: $DEPLOY_PATH"
 echo "[INFO] 설정된 SOURCE_CODE_PATH: $SOURCE_CODE_PATH"
+echo "[INFO] 설정된 COMPOSE_FILE: $COMPOSE_FILE"
 
 # 1. .env 파일 로딩
 if [ -f "$ENV_PATH" ]; then
@@ -72,17 +75,17 @@ fi
 
 # 3. 기존 컨테이너 종료
 echo "[STEP] 🛑 기존 컨테이너 종료 중..."
-docker compose -f /mnt/env/docker-compose.yml --env-file "$ENV_PATH" down
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_PATH" down
 echo "[INFO] ✅ 컨테이너 종료 완료"
 
 # 4. Docker 이미지 재빌드
 echo "[STEP] 🧱 Docker 이미지 재빌드 중 (--no-cache)..."
-docker compose -f /mnt/env/docker-compose.yml --env-file "$ENV_PATH" build --no-cache
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_PATH" build --no-cache
 echo "[INFO] ✅ 이미지 재빌드 완료"
 
 # 5. 컨테이너 재기동
 echo "[STEP] 🚀 컨테이너 재기동 중..."
-docker compose -f /mnt/env/docker-compose.yml --env-file "$ENV_PATH" up -d
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_PATH" up -d
 echo "[INFO] ✅ 컨테이너 기동 완료"
 
 # 6. 기존 cloudflared 제거
