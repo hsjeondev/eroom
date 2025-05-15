@@ -59,13 +59,15 @@ docker compose -f /mnt/env/docker-compose.yml --env-file "$ENV_PATH" up -d
 
 # 6. 기존 cloudflared 컨테이너 제거
 if docker ps -a --format '{{.Names}}' | grep -q '^cloudflared$'; then
-  echo "[INFO] 🧹 기존 cloudflared 컨테이너 제거"
+  echo "[INFO] ?? 기존 cloudflared 컨테이너 제거"
   docker rm -f cloudflared
 fi
 
-# 7. cloudflared tunnel 실행
-echo "[INFO] 🌐 cloudflared tunnel 실행 중..."
-docker run -d --name cloudflared cloudflare/cloudflared:latest \
-  tunnel --no-autoupdate run --token "$CLOUDFLARED_TOKEN"
+# 7. cloudflared tunnel 실행 (config.yml 기반)
+echo "[INFO] ?? cloudflared tunnel 실행 중..."
+docker run -d --name cloudflared \
+  -v ~/.cloudflared:/etc/cloudflared \
+  cloudflare/cloudflared:latest \
+  tunnel --config /etc/cloudflared/config.yml run
 
 echo "[SUCCESS] ✅ CI/CD 배포 완료: $(date)"
