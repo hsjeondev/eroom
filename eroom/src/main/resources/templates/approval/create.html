@@ -1193,26 +1193,34 @@ document.addEventListener('DOMContentLoaded', function () {
 	      return;
 	    }
 
-	    // 클릭된 요소가 체크박스인 경우
+	    // 클릭된 요소가 체크박스인지 확인
 	    if (e.target.type === 'checkbox') {
 	      handleCheck(e.target);
 	      e.stopPropagation(); // 🚫 이벤트 전파 방지
 	      return;
 	    }
 
-	    // 클릭된 요소가 '사원명'일 경우만 체크박스 토글
+	    // 클릭된 요소가 '사원명' 또는 'treeview-text'일 경우만 체크박스 토글
 	    if (e.target.classList.contains('treeview-label-text') || e.target.classList.contains('treeview-text')) {
 	      const checkbox = clickedLi.querySelector('input[type="checkbox"].emp-checkbox');
+
+	      // 숨겨진 체크박스일 경우 포인터 이벤트 차단
+	      if (checkbox && checkbox.offsetParent === null) {
+	        e.stopPropagation();
+	        return;
+	      }
+
 	      if (checkbox) {
 	        checkbox.checked = !checkbox.checked; // 체크박스 상태 변경
 	        handleCheck(checkbox); // 상하위 동기화 처리
 	      }
 	    }
 
-	    // 🔎 클릭된 요소에 대해 강조 표시 처리 (handleHighlight 재사용)
+	    // 클릭된 요소에 대해 강조 표시 처리 (handleHighlight 재사용)
 	    handleHighlight(clickedLi);
 	  });
 	});
+
 
 
 
