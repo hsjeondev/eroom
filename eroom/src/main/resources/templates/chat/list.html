@@ -333,8 +333,14 @@
 							<div id="participantListBox" class="mb-4">
 								<h6
 									class="fw-semibold border-bottom border-translucent pb-2 mb-2">참여자</h6>
-								<ul id="participantList" class="list-unstyled mb-0">
-									<!-- 참여자 이름들이 여기에 채워질거야 -->
+								<ul id="participantList" style="
+								  display: grid;
+								  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+								  gap: 8px 12px;
+								  padding: 8px 16px;
+								  list-style: none;
+								  margin: 0;
+								">
 								</ul>
 							</div>
 							<div id="shared-file-list-title" class="fw-semibold border-bottom border-translucent pb-2 mb-2">
@@ -352,6 +358,7 @@
 		let isCreateMode = true; // 기본은 생성 모드
 		let lastSelectedChatroomName = null;
 		let currentChatroomNo = null;
+		let existingParticipantIds = [];
 		
 		document.addEventListener("DOMContentLoaded", () => {
 		  bindModalReset(); // 모달 초기화
@@ -683,6 +690,18 @@
 		      data.forEach(p => {
 		        const li = document.createElement('li');
 		        li.textContent = p.employeeName;
+		        
+		        li.style.backgroundColor = '#f8f9fa';
+		        li.style.border = '1px solid #dee2e6';
+		        li.style.borderRadius = '8px';
+		        li.style.padding = '6px 10px';
+		        li.style.fontSize = '14px';
+		        li.style.textAlign = 'center';
+		        li.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+		        li.style.whiteSpace = 'nowrap';
+		        li.style.overflow = 'hidden';
+		        li.style.textOverflow = 'ellipsis';
+		        
 		        participantList.appendChild(li);
 		      });
 		    })
@@ -749,6 +768,9 @@
 		  form.addEventListener("submit", function (e) {
 		    e.preventDefault();
 		
+		    const submitBtn = form.querySelector('button[type="submit"]');
+		   
+		    
 		    if (isCreateMode) {
 		      const isGroupChat = document.querySelector('input[name="chatIsGroupYn"]:checked').value === 'Y';
 		      const chatroomName = document.getElementById("chatroomName").value.trim();
@@ -800,6 +822,7 @@
 		      alert("참여자를 선택해주세요.");
 		      return;
 		    }
+		    submitBtn.disabled = true;
 		
 		    const formData = new FormData(form);
 		    const url = isCreateMode ? '/chat/create' : '/chat/addParticipants';
@@ -815,11 +838,13 @@
 		        location.href = "/chat/list";
 		      } else {
 		        alert("오류: " + data.res_msg);
+		        submitBtn.disabled = false; 
 		      }
 		    })
 		    .catch(err => {
 		      console.error("요청 실패:", err);
 		      alert("서버 오류가 발생했습니다.");
+		      submitBtn.disabled = false;
 		    });
 		  });
 		}
@@ -919,33 +944,52 @@
         }
 		
 		// 참여자 추가 모달 열기
-		function openParticipantAddModal(chatroomNo) {
-		  isCreateMode = false;
-		  const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("createChatModal"));
-		  modal.show();
-		  document.querySelector("#createChatModal h3").innerText = "참여자 추가하기";
-		  document.getElementById("chatroomNameBox").style.display = "none";
-		  document.getElementById("chatTypeGroup").style.display = "none";
-		
-		  document.querySelector('#createChatForm button[type="submit"]').innerText = "추가";
-		  
-		  let chatroomInput = document.getElementById("chatroomNoInput");
-		  if (!chatroomInput) {
-		    chatroomInput = document.createElement('input');
-		    chatroomInput.type = 'hidden';
-		    chatroomInput.name = 'chatroomNo';
-		    chatroomInput.id = 'chatroomNoInput';
-		    document.getElementById("createChatForm").appendChild(chatroomInput);
-		  }
-		  chatroomInput.value = chatroomNo;
-		
-		  modal._element.addEventListener("hidden.bs.modal", () => {
-		    isCreateMode = true;
-		    document.querySelector("#createChatModal h3").innerText = "새 채팅방 만들기";
-		    document.getElementById("chatroomNameBox").style.display = "block";
-		    document.getElementById("chatTypeGroup").style.display = "block";
-		  }, { once: true });
-		}
+	function openParticipantAddModal(chatroomNo) {
+  isCreateMode = false;
+  const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("createChatModal"));
+  modal.show();
+
+  document.querySelector("#createChatModal h3").innerText = "참여자 추가하기";
+  document.getElementById("chatroomNameBox").style.display = "none";
+  document.getElementById("chatTypeGroup").style.display = "none";
+
+  // ✅ 채팅 유형 라디오 버튼을 강제로 'Y'로 설정
+  document.querySelector('input[name="chatIsGroupYn"][value="Y"]').checked = true;
+  document.querySelector('input[name="chatIsGroupYn"][value="Y"]').dispatchEvent(new Event("change"));
+
+  document.querySelector('#createChatForm button[type="submit"]').innerText = "추가";
+
+  let chatroomInput = document.getElementById("chatroomNoInput");
+  if (!chatroomInput) {
+    chatroomInput = document.createElement('input');
+    chatroomInput.type = 'hidden';
+    chatroomInput.name = 'chatroomNo';
+    chatroomInput.id = 'chatroomNoInput';
+    document.getElementById("createChatForm").appendChild(chatroomInput);
+  }
+  chatroomInput.value = chatroomNo;
+
+  // ✅ 기존 참여자 목록 저장
+  fetch(`/chat/participants?chatroomNo=${chatroomNo}`)
+    .then(res => res.json())
+    .then(data => {
+      window.existingParticipantIds = data.map(p => String(p.employeeNo)); // 전역에서 접근 가능하도록 저장
+    })
+    .catch(err => {
+      console.error("기존 참여자 조회 실패:", err);
+      window.existingParticipantIds = [];
+    });
+
+  // 상태 복구
+  modal._element.addEventListener("hidden.bs.modal", () => {
+    isCreateMode = true;
+    document.querySelector("#createChatModal h3").innerText = "새 채팅방 만들기";
+    document.getElementById("chatroomNameBox").style.display = "block";
+    document.getElementById("chatTypeGroup").style.display = "block";
+  }, { once: true });
+}
+
+
 		
 		
 		function connectWebSocket() {
@@ -1684,19 +1728,37 @@ function loadChatroomDetail(chatroomNo) {
 			}
 		function addTag(label, code) {
 			  const tagWrap = document.getElementById("selectedTags");
+			  const myCode = document.getElementById("myEmployeeNo")?.value;
+
+			  // 이미 존재하면 중복 방지
 			  if (document.getElementById(`tag-${code}`)) return;
+
+			  // ▶ 본인 직접 선택한 경우는 제외 (emp-checkbox만)
+			  const checkbox = document.querySelector(`input[data-no="${code}"]`);
+			  const isEmp = checkbox?.classList.contains("emp-checkbox");
+			  if (code === myCode && isEmp && isCreateMode) {
+			    alert("오류: 본인은 참여자로 선택할 수 없습니다.");
+			    if (checkbox) checkbox.checked = false; // 체크 해제
+			    return;
+			  }
+			  
+			  if (!isCreateMode && isEmp && window.existingParticipantIds?.includes(code)) {
+				    alert("이미 채팅방에 참여 중인 사원입니다.");
+				    if (checkbox) checkbox.checked = false;
+				    return;
+				  }
 
 			  // Card 생성
 			  const card = document.createElement("div");
-			  card.className = "card mb-2"; // 여기서 flex는 제거됨
+			  card.className = "card mb-2";
 			  card.id = `tag-${code}`;
 			  card.name = `tag-${label}`;
 			  card.style.borderRadius = "5px";
 			  card.style.padding = "8px";
 			  card.style.backgroundColor = "#f8f9fa";
-			  card.style.display = "block"; // 한 줄씩 표시
+			  card.style.display = "block";
 
-			  // 이름 라벨
+			  // 라벨
 			  const labelElement = document.createElement("span");
 			  labelElement.textContent = label;
 			  card.appendChild(labelElement);
@@ -1705,18 +1767,17 @@ function loadChatroomDetail(chatroomNo) {
 			  const button = document.createElement("button");
 			  button.type = "button";
 			  button.className = "btn-close";
-			  button.style.float = "right"; // 오른쪽 정렬
+			  button.style.float = "right";
 			  button.setAttribute("aria-label", "Remove");
 			  button.addEventListener("click", () => {
 			    card.remove();
-			    removeTag(code, true);  // 태그 삭제 시 체크박스도 해제
+			    removeTag(code, true);
 			  });
 
 			  card.appendChild(button);
-
-			  // Card를 선택된 태그 컨테이너에 추가
 			  tagWrap.appendChild(card);
 			}
+
 		function removeTag(code, skipCheckbox = false) {
 			  const tag = document.getElementById(`tag-${code}`);
 			  if (tag) tag.remove();

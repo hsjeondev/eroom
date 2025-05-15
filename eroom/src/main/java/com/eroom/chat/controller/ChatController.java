@@ -190,10 +190,21 @@ public class ChatController {
 		resultMap.put("res_code", "500");
 		resultMap.put("res_msg", "채팅방 생성을 실패하였습니다.");
 		
+		
+		Long creater = dto.getCreater();
+	    List<Long> original = dto.getParticipantIds();
+	    List<Long> cleanedList = new ArrayList<>();
+	    
+	    for (Long id : original) {
+	        if (!id.equals(creater) && !cleanedList.contains(id)) {
+	            cleanedList.add(id);
+	        }
+	    }
+	    dto.setParticipantIds(cleanedList);
 		// 채팅방 생성 시 참여자에 본인 ID가 포함되어 있을 경우
-		if (dto.getParticipantIds().contains(dto.getCreater())) {
-			resultMap.put("res_msg", "본인은 참여자로 선택할 수 없습니다.");
-			return resultMap;
+		if ("N".equals(dto.getChatIsGroupYn()) && dto.getParticipantIds().contains(dto.getCreater())) {
+		    resultMap.put("res_msg", "본인은 참여자로 선택할 수 없습니다.");
+		    return resultMap;
 		}
 		// 채팅방 생성 시 참여자 ID가 비어있을 경우
 		if ("N".equals(dto.getChatIsGroupYn())) {
