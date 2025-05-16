@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eroom.admin.dto.CreateEmployeeDto;
+import com.eroom.attendance.entity.AnnualLeave;
+import com.eroom.attendance.repository.AnnualLeaveRepository;
 import com.eroom.directory.entity.Directory;
 import com.eroom.directory.repository.DirectoryRepository;
 import com.eroom.employee.dto.EmployeeDto;
@@ -44,6 +46,7 @@ public class EmployeeService {
 	private final AuthorityRepository authorityRepository;
 	private final AuthorityMappingRepository authorityMappingRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final AnnualLeaveRepository annualLeaveRepository;
 	
 	// 전체 직원 조회
 	public List<Employee> findAllEmployee() {
@@ -208,7 +211,15 @@ public class EmployeeService {
 		
 		employeeDirectoryRepository.save(directory);
 		
-		// 권한 엔티티 조회(ROLE_USER)
+		int currentYear = LocalDate.now().getYear();
+		AnnualLeave annualLeave = AnnualLeave.builder()
+								.employee(employee)
+								.year((long)currentYear)
+								.annualLeaveTotal(0.0)
+								.annualLeaveUsed(0.0)
+								.build();
+		annualLeaveRepository.save(annualLeave);
+	    // 권한 엔티티 조회(ROLE_USER)
 		Authority userAuthority = authorityRepository.findById(1L).orElse(null);
 		// 권한 매핑 생성 및 저장
 		AuthorityMapping authorityMapping = AuthorityMapping.builder()
