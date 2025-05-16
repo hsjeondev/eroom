@@ -29,6 +29,7 @@
     word-wrap: break-word;
     text-align: center;
     width: 100px !important;
+    padding: 10px !important;
   }
 
   .myDataTable tbody td {
@@ -98,6 +99,13 @@
           <tr>
             <th class="table-light text-center" style="width: 150px;">서류번호</th>
             <td th:text="${approvalNoFormatted}">서류번호</td>
+          </tr>
+          <tr>
+            <th class="table-light text-center">결재 상태</th>
+            <td th:if="${approval.approval_status == 'A'}" class="text-success fw-bold">승인</td>
+            <td th:if="${approval.approval_status == 'S'}" class="text-primary fw-bold">진행</td>
+            <td th:if="${approval.approval_status == 'D'}" class="text-danger fw-bold">반려</td>
+            <td th:if="${approval.approval_status == 'F'}" class="text-warning fw-bold">회수</td>
           </tr>
           <tr>
             <th class="table-light text-center" style="width: 150px;">신청일</th>
