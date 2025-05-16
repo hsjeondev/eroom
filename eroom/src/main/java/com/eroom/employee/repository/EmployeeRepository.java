@@ -21,7 +21,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 	Optional<Employee> findByEmployeeId(@Param("employeeId") String employeeId);
 	
 	// 중복 제거 소속 목록
-	@Query("SELECT DISTINCT s FROM Structure s")
+	@Query("SELECT DISTINCT s FROM Structure s WHERE s.visibleYn = 'Y'")
 	List<Structure> findDistinctStructures();
 
 	// 부서(소속) 이름(codeName) 기준으로 조회하는 메서드
