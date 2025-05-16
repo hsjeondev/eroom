@@ -60,7 +60,11 @@ public class ArticleDto {
 	            .build();
 	}
 
-
+	public ArticleDto(String articleTitle, LocalDateTime articleRegDate, Long articleNo) {
+        this.article_title = articleTitle;
+        this.article_reg_date = articleRegDate;
+        this.article_no = articleNo;
+    }
 
 
     
