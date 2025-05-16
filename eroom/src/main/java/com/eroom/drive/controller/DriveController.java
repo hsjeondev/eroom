@@ -82,7 +82,7 @@ public class DriveController {
 
 	     if (departmentCode == null) return "error";
 
-	     List<DriveDto> fileList = driveService.findDepartmentAndChildDrives(departmentCode); // ✅ 핵심 변경
+	     List<DriveDto> fileList = driveService.findDepartmentDriveFiles(departmentCode); // ✅ 핵심 변경
 
 	     model.addAttribute("fileList", fileList);
 	     model.addAttribute("departmentName", structureService.getBySeparatorCode(departmentCode).getCodeName());
