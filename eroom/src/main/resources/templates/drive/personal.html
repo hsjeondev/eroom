@@ -7,6 +7,12 @@
 <main class="main" id="top" layout:fragment="content">
   <div class="mb-3">
     <h3 class="fw-bold mb-2" th:text="${userName} + '님 드라이브'">사용자 이름님 드라이브</h3>
+    <div class="mb-2" style="font-size: 0.9rem; color: #333;">
+  <span style="font-weight: bold; color: #0d6efd;">📁 업로드 가능 확장자:</span>
+  <span>.jpg, .png, .pdf, .xlsx, .docx, .zip .txt</span><br>
+  <span style="font-weight: bold; color: #0d6efd;">📦 최대 용량:</span>
+  <span>200MB / 파일당</span>
+</div>
     <button class="btn btn-primary btn-sm" type="button" id="toggle-upload-btn">파일 업로드</button>
   </div>
 
@@ -136,8 +142,10 @@
 		       th:src="@{/assets/img/icons/excel.png}" width="24" height="24" />
 		  <img th:if="${file.driveType == '.zip'}"
 		       th:src="@{/assets/img/icons/zip.com.png}" width="24" height="24" />
-		  <img th:if="${file.driveType != '.pdf' and file.driveType != '.jpg' and file.driveType != '.png' and file.driveType != '.docx' and file.driveType != '.xlsx' and file.driveType != '.zip'}"
-		       th:src="@{/assets/img/icons/file.png}" width="24" height="24" />
+		  <img th:if="${file.driveType == '.txt'}"
+			   th:src="@{/assets/img/icons/txt.png}" width="24" height="24" /> 
+		  <img th:if="${file.driveType != '.pdf' and file.driveType != '.jpg' and file.driveType != '.png' and file.driveType != '.docx' and file.driveType != '.xlsx' and file.driveType != '.zip' and file.driveType != '.txt'}"
+			       th:src="@{/assets/img/icons/file.png}" width="24" height="24" />
 		</td>
 	    <td class="align-middle filename" th:text="${file.driveOriName}">파일명</td>
 	    <td class="align-middle filesize" th:text="${file.formattedSize}">크기</td>
@@ -251,7 +259,7 @@
 	        paramName: "driveFiles",
 	        uploadMultiple: true,
 	        clickable: "#dropzone-multiple .dz-message",
-	        acceptedFiles: ".jpg,.png,.pdf,.xlsx,.docx,.zip",
+	        acceptedFiles: ".jpg,.png,.pdf,.xlsx,.docx,.zip,.txt",
 	        maxFilesize: 200,
 	        previewTemplate: `
 	        	<div class="card shadow-sm mb-2 p-2 border d-flex flex-row align-items-center" style="width: 100%; max-width: 720px;">
@@ -293,10 +301,11 @@
 	      dz.on("addedfile", function (file) {
 	    	  const ext = file.name.split('.').pop().toLowerCase();
 	    	  const iconMap = {
-	    	    pdf: "/assets/img/icons/pdf.png",
-	    	    docx: "/assets/img/icons/word.png",
-	    	    xlsx: "/assets/img/icons/excel.png",
-	    	    zip: "/assets/img/icons/zip.com.png"
+	    			pdf: "/assets/img/icons/pdf.png",
+	  	    	    docx: "/assets/img/icons/word.png",
+	  	    	    xlsx: "/assets/img/icons/excel.png",
+	  	    	    zip: "/assets/img/icons/zip.com.png",
+	  	    	    txt: "/assets/img/icons/txt.png"
 	    	  };
 
 	    	  if (!file.type.startsWith("image/") && iconMap[ext]) {
