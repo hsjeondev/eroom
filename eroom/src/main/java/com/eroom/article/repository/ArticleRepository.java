@@ -17,7 +17,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long>{
 	// 단일 조회
 	Optional<Article> findByArticleNoAndVisibleYn(Long articleNo, String visibleYn);
 
-	
+	List<Article> findByArticleEmergencyYnAndVisibleYnOrderByArticleRegDateDesc(String emergencyYn, String visibleYn);
+    List<Article> findByArticleEmergencyYnNotAndVisibleYnOrderByArticleRegDateDesc(String emergencyYn, String visibleYn);
 	// 공지 게시판 조회
 	 // List<Article> findBySeparatorCodeAndVisibleYnOrderByArticleRegDateDesc(String separatorCode, String visibleYn);
 	//List<Article> findBySeparatorCodeAndVisibleYnOrderByArticleEmergencyYnDescArticleRegDateDesc(String separatorCode, String visibleYn);

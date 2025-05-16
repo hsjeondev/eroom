@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -41,6 +42,32 @@ public class ArticleController {
 	private final ArticleService articleService;
 	@Value("${ffupload.location}")
 	 private String fileDir;
+	
+	// index 홈 카드 비동기
+	@GetMapping("/article/test-json")
+	@ResponseBody
+	public List<ArticleDto> getTestNotices() {
+	    List<Article> generalNotices = articleService.test2();
+
+	    // 엔티티를 그대로 JSON으로 노출하는 건 권장하지 않으니 DTO로 변환하세요.
+	    List<ArticleDto> dtoList = generalNotices.stream()
+	        .map(article -> new ArticleDto(article.getArticleTitle(), article.getArticleRegDate(),article.getArticleNo()))
+	        .collect(Collectors.toList());
+	    
+	    return dtoList;
+	}
+	
+	// 홈 카드 테스트
+	@GetMapping("/article/test")
+	public String test2(Model model){
+		List<Article> generalNotices = articleService.test2();
+		model.addAttribute("generalNotices", generalNotices);
+		
+		return "article/test";
+	}
+	
+	
+	
 	// 익명 게시판
 	@GetMapping("/article/anonymous")
 	public String selectBoardAnonymousAll() {

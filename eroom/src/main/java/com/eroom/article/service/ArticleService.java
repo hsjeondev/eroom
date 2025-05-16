@@ -32,6 +32,11 @@ public class ArticleService {
 	 @Value("${ffupload.location}")
 	 private String fileDir;
 	 
+	 public List<Article> test2(){
+		 return articleRepository.findByArticleEmergencyYnAndVisibleYnOrderByArticleRegDateDesc("Y", "Y");
+	 }
+	 
+	 
 	 // 게시글 수정 파일 삭제
 	 @Transactional
 	 public void markAsDeleted(Long attachNo) {
