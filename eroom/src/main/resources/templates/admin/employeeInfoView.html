@@ -193,15 +193,8 @@
     </div>
     <!-- 날짜 선택 -->
     <div>
-    <form th:action="@{/admin/employeeInfoView}" method="get" id="monthSelectForm" th:if="${monthList.size() > 0}">
-          <input type="hidden" name="employeeNo" th:value="${employee.employeeNo}"/>
-	      <select class="form-select form-select-sm" data-list-filter="data-list-filter" 
-	      	name="month" id="month" onchange="this.form.submit()">
-	        <option th:each="month : ${monthList}"
-	            th:value="${month}" th:text="${month}" 
-	        	th:selected="${month == selectedMonth}"></option>
-	      </select>
-      </form>
+      <input type="hidden" id="employeeNo" value="[[${employee.employeeNo}]]"/>
+      <select class="form-select form-select-sm" id="monthSelect"></select>
     </div>
 
   </div>
@@ -220,54 +213,12 @@
 					<th class="text-end-pe-0" th:if="${isAdmin}"></th>
 				</tr>
 			</thead>
-			<tbody class="list align-middle">
-				<tr th:if ="${!#lists.isEmpty(attendanceList)}"
-					th:each="attendance, attendanceStatus : ${attendanceList}">
-				  <td class="no" th:text="${attendanceStatus.count}">1</td>
-				  <td class="date" th:text="${#temporals.format(attendance.attendance_check_in_time, 'yyyy.MM.dd')}">연도.월.일</td>
-				  <td class="checkin" th:text="${#temporals.format(attendance.attendance_check_in_time, 'HH:mm:ss')}">출근 시간</td>
-				  <td class="checkout" th:text="${#temporals.format(attendance.attendance_check_out_time, 'HH:mm:ss')}">퇴근 시간</td>
-				  <td class="late" th:text="${attendance.attendance_late_yn == 'Y' ? '지각' : '-'}">지각</td>
-				  <td class="early" th:text="${attendance.attendance_early_leave_yn == 'Y' ? '조퇴' : '-'}">조퇴</td>
-				  <td class="text-end pe-0" th:if="${isAdmin}">
-					<div class="btn-reveal-trigger position-static">
-						<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
-						  <i class="fas fa-ellipsis fs-10"></i>
-						</button>
-						<div class="dropdown-menu dropdown-menu-end py-2">
-						  <a class="dropdown-item edit-attendance-btn"  href="#!"
-						  th:attr="data-attendance-no=${attendance.attendance_no}"
-						  	data-bs-toggle="modal" data-bs-target="#editAttendanceModal">
-						  	수정
-						  	</a>
-<!-- 						  <div class="dropdown-divider"></div>
-						  <a class="dropdown-item text-danger" href="#!">삭제</a> -->
-						</div>
-					</div>
-				 </td>
-				  
-				</tr>
-				<tr th:if="${#lists.isEmpty(attendanceList)}">
-				    <td colspan="5" class="text-center"> 근태 정보가 없습니다.</td>
-				</tr>
+			<tbody class="list align-middle" id="attendanceTableBody">
+			
 			</tbody>
 	    </table>
 	</div>
 
-  <!-- 페이징 -->
-<!-- 	<div class="row justify-content-center py-2 fs-9">
-	    <div class="col-auto d-flex">
-	      <button class="page-link disabled" data-list-pagination="prev" disabled>
-	        <i class="fas fa-chevron-left"></i>
-	      </button>
-	      <ul class="mb-0 pagination">
-	        <li class="active"><button class="page" type="button" data-i="1">1</button></li>
-	      </ul>
-	      <button class="page-link disabled" data-list-pagination="next" disabled>
-	        <i class="fas fa-chevron-right"></i>
-	      </button>
-	    </div>
-	</div> -->
 </div><!-- 근태현황 목록 테이블 끝 -->
 <br><br><br>
 
@@ -579,6 +530,104 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 	renderCharts();
 
+	initAdminAttendanceMonthSelect();
+	
+	function initAdminAttendanceMonthSelect(){
+		const employeeNo = document.getElementById('employeeNo').value;
+		const monthSelect = document.getElementById('monthSelect');
+		const tbody = document.getElementById('attendanceTableBody');
+
+		// 월 목록 가져오기
+		fetch(`/admin/monthList?employeeNo=${employeeNo}`)
+			.then(res => res.json())
+			.then(monthList => {
+				if (!monthList || monthList.length === 0) return;
+				monthList.forEach(month => {
+					const opt = document.createElement('option');
+					opt.value = month;
+					opt.textContent = month;
+					monthSelect.appendChild(opt);
+				});
+
+				const defaultMonth = monthList[0];
+				monthSelect.value = defaultMonth;
+
+				fetchAndRenderAttendance(defaultMonth);
+				monthSelect.addEventListener('change', function(){
+					fetchAndRenderAttendance(this.value);
+				});
+			})
+			.catch(err => {
+				console.error("월 목록 불러오기 실패:", err);
+			});
+
+		// 근태 데이터 가져오기
+		function fetchAndRenderAttendance(month){
+			fetch(`/admin/listData?month=${month}&employeeNo=${employeeNo}`)
+				.then(res => res.json())
+				.then(data => {
+					tbody.innerHTML = '';
+
+					if (!data || data.length === 0) {
+						tbody.innerHTML = `<tr><td colspan="7" class="text-center">근태 정보가 없습니다.</td></tr>`;
+						return;
+					}
+
+					data.forEach((record, index) => {
+						const checkIn = formatDateTime(record.attendance_check_in_time);
+						const checkOut = formatDateTime(record.attendance_check_out_time);
+						const late = record.attendance_late_yn === 'Y' ? '지각' : '-';
+						const early = record.attendance_early_leave_yn === 'Y' ? '조퇴' : '-';
+
+						const row = `
+							<tr>
+								<td class="no">${index + 1}</td>
+								<td class="date">${checkIn.date}</td>
+								<td class="checkin">${checkIn.time}</td>
+								<td class="checkout">${checkOut.time}</td>
+								<td class="late">${late}</td>
+								<td class="early">${early}</td>
+								<td class="text-end pe-0">
+								  <div class="btn-reveal-trigger position-static">
+									<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown">
+									  <i class="fas fa-ellipsis fs-10"></i>
+									</button>
+									<div class="dropdown-menu dropdown-menu-end py-2">
+									  <a class="dropdown-item edit-attendance-btn" href="#!" data-attendance-no="${record.attendance_no}" data-bs-toggle="modal" data-bs-target="#editAttendanceModal">
+										수정
+									  </a>
+									</div>
+								  </div>
+								</td>
+							</tr>
+						`;
+						tbody.insertAdjacentHTML('beforeend', row);
+					});
+				})
+				.catch(err => {
+					console.error("근태 데이터 불러오기 실패:", err);
+					tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">데이터 로딩 중 오류</td></tr>`;
+				});
+		}
+
+		// 날짜 변환 함수
+		function formatDateTime(dateStr){
+			const date = new Date(dateStr);
+			const yyyy = date.getFullYear();
+			const mm = String(date.getMonth() + 1).padStart(2, '0');
+			const dd = String(date.getDate()).padStart(2, '0');
+			const hh = String(date.getHours()).padStart(2, '0');
+			const mi = String(date.getMinutes()).padStart(2, '0');
+			const ss = String(date.getSeconds()).padStart(2, '0');
+			return {
+				date: `${yyyy}.${mm}.${dd}`,
+				time: `${hh}:${mi}:${ss}`
+			};
+		}
+	}
+	
+	
+	
   // 공통 모달 요소
 	const confirmModalEl = document.getElementById('confirmSaveModal');
 	const confirmModal = bootstrap.Modal.getOrCreateInstance(confirmModalEl);

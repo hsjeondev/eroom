@@ -81,6 +81,19 @@ public class DriveDto {
 				.param1(param1)
 				.build();
 	}
-	
+	public String getFormattedSize() {
+	    if (driveSize == null) return "0 KB";
+	    double size = driveSize; // byte 단위로 가정
+	    String[] units = {"KB", "MB", "GB", "TB"};
+	    int unitIndex = 0;
+	    size = size / 1024.0;
+
+	    while (size >= 1024 && unitIndex < units.length - 1) {
+	        size /= 1024;
+	        unitIndex++;
+	    }
+
+	    return String.format("%.1f %s", size, units[unitIndex]);
+	}
     
 }

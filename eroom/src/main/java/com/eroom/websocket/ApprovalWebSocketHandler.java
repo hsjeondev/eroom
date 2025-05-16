@@ -72,7 +72,7 @@ public class ApprovalWebSocketHandler extends TextWebSocketHandler {
             	saveNotificationToDatabase(receiverNo, message, approval);
 //            	alert 보기 싫으면 주석처리
 //            	if(session != null) {
-//            		session.sendMessage(new TextMessage(message));
+            		session.sendMessage(new TextMessage(message));
 //            	}
 //            	alert 보기 싫으면 주석처리
                 log.info("알림 전송 성공: employeeNo={}", receiverNo);

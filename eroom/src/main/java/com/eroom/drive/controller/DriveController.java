@@ -41,6 +41,7 @@ import com.eroom.drive.service.DriveService;
 import com.eroom.employee.entity.Separator;
 import com.eroom.employee.entity.Structure;
 import com.eroom.employee.repository.SeparatorRepository;
+import com.eroom.employee.repository.StructureRepository;
 import com.eroom.employee.service.StructureService;
 import com.eroom.security.EmployeeDetails;
 
@@ -55,6 +56,7 @@ public class DriveController {
 	private final StructureService structureService;
 	private final DriveRepository driveRepository;
 	private final SeparatorRepository separatorRepository;
+	private final StructureRepository structureRepository;
 	// 파일 저장 경로 
 		 @Value("${ffupload.location}")
 		 private String fileDir;
@@ -74,23 +76,21 @@ public class DriveController {
 	 }
 
 	// 부서 드라이브
-	@GetMapping("/department")
-	public String selectDriveDepartment(@AuthenticationPrincipal EmployeeDetails user, Model model) {
-	    // 현재 로그인한 사용자의 부서 코드
-	    String myDepartmentSeparatorCode = user.getEmployee().getStructure().getParentCode();
-	    
-	    if (myDepartmentSeparatorCode == null) {
-	        return "error"; // 부서 소속이 없는 경우 예외 처리
-	    }
+	 @GetMapping("/department")
+	 public String selectDriveDepartment(@AuthenticationPrincipal EmployeeDetails user, Model model) {
+	     String departmentCode = user.getEmployee().getStructure().getParentCode(); // D004 등
 
-	    List<DriveDto> fileList = driveService.findDepartmentDriveFiles(myDepartmentSeparatorCode);
+	     if (departmentCode == null) return "error";
 
-	    model.addAttribute("fileList", fileList);
-	    model.addAttribute("departmentName", structureService.getBySeparatorCode(myDepartmentSeparatorCode).getCodeName());
-	    model.addAttribute("user", user);
-	    
-	    return "drive/department"; 
-	}
+	     List<DriveDto> fileList = driveService.findDepartmentAndChildDrives(departmentCode); // ✅ 핵심 변경
+
+	     model.addAttribute("fileList", fileList);
+	     model.addAttribute("departmentName", structureService.getBySeparatorCode(departmentCode).getCodeName());
+	     model.addAttribute("user", user);
+
+	     return "drive/department";
+	 }
+
 	// 팀 드라이브 
 	@GetMapping("/team")
 	public String selectDriveTeam(@AuthenticationPrincipal EmployeeDetails user, Model model) {
@@ -178,10 +178,12 @@ public class DriveController {
 		
 		String myTeamSeparatorCode = user.getEmployee().getStructure().getSeparatorCode();
 		
-		Separator separator = separatorRepository.findBySeparatorCode(myTeamSeparatorCode)
-			     .orElseThrow(() -> new IllegalArgumentException("해당 separatorCode를 찾을 수 없습니다: " + myTeamSeparatorCode));
-		
-		String myDepartmentSeparatorCode = separator.getSeparatorParentCode();
+//		Separator separator = separatorRepository.findBySeparatorCode(myTeamSeparatorCode)
+//			     .orElseThrow(() -> new IllegalArgumentException("해당 separatorCode를 찾을 수 없습니다: " + myTeamSeparatorCode));
+//		System.out.println("세퍼레이터 " + separator);
+		Structure structure = structureRepository.findBySeparatorCode(myTeamSeparatorCode);
+		System.out.println("진짜 될까요? : " + structure);
+		String myDepartmentSeparatorCode = structure.getParentCode();
 		
 		driveDto.setSeparatorCode(myDepartmentSeparatorCode);
 
@@ -972,40 +974,38 @@ public class DriveController {
 	}
 	@GetMapping("/summary/department")
 	@ResponseBody
-	public Map<String, Object> getTeamDepartmentSummary(@AuthenticationPrincipal EmployeeDetails user) {
-	    String separatorCode = user.getEmployee().getStructure().getSeparatorCode();
-	    String driveCode = user.getEmployee().getStructure().getParentCode();
-	    List<Drive> drives = driveRepository.findByUploader_Structure_SeparatorCodeAndSeparatorCodeAndVisibleYn(separatorCode, driveCode, "Y");
+	public Map<String, Object> getDepartmentSummary(@AuthenticationPrincipal EmployeeDetails user) {
+	    String departmentCode = user.getEmployee().getStructure().getParentCode();
+
+	    List<String> codeList = structureService.getDepartmentAndTeamSeparatorCodes(departmentCode);
+	    codeList.add(departmentCode);
+
+	    List<Drive> drives = driveRepository.findBySeparatorCodeInAndVisibleYn(codeList, "Y");
 
 	    long totalFiles = 0;
 	    long totalDownloads = 0;
 	    long totalSizeKB = 0;
 	    LocalDateTime recentDate = null;
 
-	    Map<String, Long> fileTypeSizeMap = new HashMap<>();
-	    fileTypeSizeMap.put("pdf", 0L);
-	    fileTypeSizeMap.put("image", 0L);
-	    fileTypeSizeMap.put("docx", 0L);
-	    fileTypeSizeMap.put("xlsx", 0L);
-	    fileTypeSizeMap.put("zip", 0L);
-	    fileTypeSizeMap.put("etc", 0L);
+	    Map<String, Long> fileTypeSizeMap = new HashMap<>(Map.of(
+	        "pdf", 0L, "image", 0L, "docx", 0L, "xlsx", 0L, "zip", 0L, "etc", 0L
+	    ));
 
 	    for (Drive drive : drives) {
 	        totalFiles++;
 	        totalDownloads += drive.getDownloadCount();
 	        totalSizeKB += drive.getDriveSize();
 
-	        String type = drive.getDriveType();
-	        if (type == null) type = "";
-	        type = type.startsWith(".") ? type.toLowerCase() : "." + type.toLowerCase();
+	        String type = Optional.ofNullable(drive.getDriveType()).orElse("").toLowerCase();
+	        type = type.startsWith(".") ? type : "." + type;
 
 	        switch (type) {
-	            case ".pdf" -> fileTypeSizeMap.put("pdf", fileTypeSizeMap.get("pdf") + drive.getDriveSize());
-	            case ".jpg", ".png" -> fileTypeSizeMap.put("image", fileTypeSizeMap.get("image") + drive.getDriveSize());
-	            case ".docx" -> fileTypeSizeMap.put("docx", fileTypeSizeMap.get("docx") + drive.getDriveSize());
-	            case ".xlsx" -> fileTypeSizeMap.put("xlsx", fileTypeSizeMap.get("xlsx") + drive.getDriveSize());
-	            case ".zip" -> fileTypeSizeMap.put("zip", fileTypeSizeMap.get("zip") + drive.getDriveSize());
-	            default -> fileTypeSizeMap.put("etc", fileTypeSizeMap.get("etc") + drive.getDriveSize());
+	            case ".pdf" -> fileTypeSizeMap.compute("pdf", (k, v) -> v + drive.getDriveSize());
+	            case ".jpg", ".png" -> fileTypeSizeMap.compute("image", (k, v) -> v + drive.getDriveSize());
+	            case ".docx" -> fileTypeSizeMap.compute("docx", (k, v) -> v + drive.getDriveSize());
+	            case ".xlsx" -> fileTypeSizeMap.compute("xlsx", (k, v) -> v + drive.getDriveSize());
+	            case ".zip" -> fileTypeSizeMap.compute("zip", (k, v) -> v + drive.getDriveSize());
+	            default -> fileTypeSizeMap.compute("etc", (k, v) -> v + drive.getDriveSize());
 	        }
 
 	        if (recentDate == null || drive.getDriveRegDate().isAfter(recentDate)) {
@@ -1013,20 +1013,17 @@ public class DriveController {
 	        }
 	    }
 
-	    Map<String, Double> fileTypeUsage = new HashMap<>();
-	    for (Map.Entry<String, Long> entry : fileTypeSizeMap.entrySet()) {
-	        fileTypeUsage.put(entry.getKey(), entry.getValue() * 1.0); // KB 유지
-	    }
-
 	    Map<String, Object> result = new HashMap<>();
 	    result.put("totalFiles", totalFiles);
 	    result.put("totalDownloads", totalDownloads);
 	    result.put("recentUploadDate", recentDate != null ? recentDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : "-");
 	    result.put("totalUsedKB", totalSizeKB);
-	    result.put("fileTypeUsage", fileTypeUsage);
+	    result.put("fileTypeUsage", fileTypeSizeMap);
 
 	    return result;
 	}
+
+
 	@GetMapping("/summary/team")
 	@ResponseBody
 	public Map<String, Object> getTeamDriveSummary(@AuthenticationPrincipal EmployeeDetails user) {
