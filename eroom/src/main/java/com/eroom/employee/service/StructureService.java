@@ -221,11 +221,15 @@ public class StructureService {
 					// 팀 데이터 가져오기
 					TeamSortDto teamSortDto = teamDto.get(j);
 					Structure teamEntity = structureRepository.findBySeparatorCode(teamSortDto.getTeamSeparatorCode());
+					Separator separatorEntity = separatorRepository.findBySeparatorCode(teamSortDto.getTeamSeparatorCode()).orElse(null);
 					// 팀 정보 업데이트
 					teamEntity.setSortOrder(teamSortDto.getTeamSortOrder());
 					teamEntity.setParentCode(teamSortDto.getNewDepartmentSeparatorCode());
 					teamEntity.setEditor(employee.getEmployeeId());
+					separatorEntity.setSeparatorParentCode(teamSortDto.getNewDepartmentSeparatorCode());
+					separatorEntity.setSeparatorEditor(employee.getEmployeeId());
 					structureRepository.save(teamEntity);
+					separatorRepository.save(separatorEntity);
 				}
 			}
 			
@@ -303,6 +307,19 @@ public class StructureService {
 	public List<Structure> findOnlyTeamsVisibleY() {
 		return structureRepository.findOnlyTeamsVisibleY();
 	}
+	public List<String> getDepartmentAndTeamSeparatorCodes(String departmentCode) {
+	    List<String> codes = new ArrayList<>();
+	    codes.add(departmentCode); // 본인 부서
+
+	    List<Structure> teams = structureRepository.findByParentCodeAndVisibleYnOrderBySortOrderAsc(departmentCode, "Y");
+	    for (Structure team : teams) {
+	        codes.add(team.getSeparatorCode());
+	    }
+
+	    return codes;
+	}
+
 	
+
 
 }

@@ -61,7 +61,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    height: 100%;
+    max-height: 100%;
   }
 </style>
   
@@ -154,7 +154,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	      </div>
 	
 	      <div class="card-body chat p-0" style="height: 300px; overflow-y: auto;">
-	        <div id="chatMessages" class="d-flex flex-column scrollbar h-100 p-3">
+    		<div id="chatMessages" class="d-flex flex-column p-3" style="max-height: 100%; overflow-y: auto;">
 	          <!-- 대화 메시지 들어갈 영역 -->
 	          
 	          <div class="d-flex justify-content-start mb-2"><div class="chat-bubble gpt">안녕하세요! Eroom 챗봇입니다.<br>무엇을 도와 드릴까요? 😊</div></div>
@@ -315,7 +315,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	      approvalSocket.onopen = function() { console.log('결재 웹소켓 연결 성공!'); };
 	      approvalSocket.onmessage = function(event) { 
 	    	  // alert 보기 싫으면 주석처리
-	    	  alert(event.data); 
+	    	  // alert(event.data); 
 	    	  // alert 보기 싫으면 주석처리
 			  const notificationDot = document.getElementById('notificationDot');
 			  if (notificationDot) {

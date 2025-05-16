@@ -269,17 +269,9 @@
 					</div>
 					<div id="approvalCompletedCarousel" class="carousel slide" data-bs-ride="carousel">
 						<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
-						<div class="carousel-indicators" id="completedCarouselIndicators">
-						  <!-- <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
-						  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button> -->
-						</div>								
+						<div class="carousel-indicators" id="completedCarouselIndicators"></div>								
 						<div class="carousel-inner px-4 text-center" id="completedCarouselInner">
-							<!-- <div class="carousel-item active">
-							  <div class="border rounded p-3 bg-success-soft">
-							    <h6 class="mb-1">연차 신청서</h6>
-							    <p class="text-muted mb-0">2025-04-10</p>
-							  </div>
-							</div> -->
+
 						</div>
 						<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
 						        type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide="prev"
@@ -298,85 +290,77 @@
 	
 		<!--  프로젝트 슬라이드: 우측 50% -->
 		<div class="col-md-6">
-  <div class="card p-3 h-100">
-    <div class="d-flex justify-content-start mb-3">
-      <span class="fw-bold fs-8">프로젝트</span>
-    </div>
-
-    <!-- 진행 중인 프로젝트 -->
-    <div class="mb-4">
-      <div class="text-center mb-2">
-        <i class="fas fa-circle fs-10 text-primary mt-n1"></i>
-        <span class="fw-bold fs-9">진행 중인 프로젝트</span>
-      </div>
-      <div id="projectActiveCarousel" class="carousel slide" data-bs-ride="carousel">
-        <!-- 인디케이터 -->
-        <div class="carousel-indicators" id="activeProjectIndicators">
-          <!-- JS에서 동적으로 생성 -->
-        </div>
-        <!-- 슬라이드 -->
-        <div class="carousel-inner px-4 text-center" id="activeProjectInner">
-          <!-- JS에서 동적으로 삽입 -->
-        </div>
-        <!-- 이전 버튼 -->
-        <button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
-                type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="prev"
-                style="top: 60%; left: -10px; z-index: 2;">
-          <i class="fas fa-chevron-left fs-7"></i>
-        </button>
-        <!-- 다음 버튼 -->
-        <button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
-                type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="next"
-                style="top: 60%; right: -10px; z-index: 2;">
-          <i class="fas fa-chevron-right fs-7"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- 완료된 프로젝트 -->
-    <div class="mb-4">
-      <div class="text-center mb-2">
-        <i class="fas fa-circle fs-10 text-success mt-n1"></i>
-        <span class="fw-bold fs-9">완료한 프로젝트</span>
-      </div>
-      <div id="projectDoneCarousel" class="carousel slide" data-bs-ride="carousel">
-        <!-- 인디케이터 -->
-        <div class="carousel-indicators" id="doneProjectIndicators">
-          <!-- JS에서 동적으로 생성 -->
-        </div>
-        <!-- 슬라이드 -->
-        <div class="carousel-inner px-4 text-center" id="doneProjectInner">
-          <!-- JS에서 동적으로 삽입 -->
-        </div>
-        <!-- 이전 버튼 -->
-        <button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
-                type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="prev"
-                style="top: 60%; left: -10px; z-index: 2;">
-          <i class="fas fa-chevron-left fs-7"></i>
-        </button>
-        <!-- 다음 버튼 -->
-        <button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
-                type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="next"
-                style="top: 60%; right: -10px; z-index: 2;">
-          <i class="fas fa-chevron-right fs-7"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+		  <div class="card p-3 h-100">
+		    <div class="d-flex justify-content-start mb-3">
+		      <span class="fw-bold fs-8">프로젝트</span>
+		    </div>
+		
+		    <!-- 진행 중인 프로젝트 -->
+		    <div class="mb-4">
+		      <div class="text-center mb-2">
+		        <i class="fas fa-circle fs-10 text-primary mt-n1"></i>
+		        <span class="fw-bold fs-9">진행 중인 프로젝트</span>
+		      </div>
+		      <div id="projectActiveCarousel" class="carousel slide" data-bs-ride="carousel">
+		        <!-- 인디케이터 -->
+		        <div class="carousel-indicators" id="activeProjectIndicators">
+		          <!-- JS에서 동적으로 생성 -->
+		        </div>
+		        <!-- 슬라이드 -->
+		        <div class="carousel-inner px-4 text-center" id="activeProjectInner">
+		          <!-- JS에서 동적으로 삽입 -->
+		        </div>
+		        <!-- 이전 버튼 -->
+		        <button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+		                type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="prev"
+		                style="top: 60%; left: -10px; z-index: 2;">
+		          <i class="fas fa-chevron-left fs-7"></i>
+		        </button>
+		        <!-- 다음 버튼 -->
+		        <button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+		                type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="next"
+		                style="top: 60%; right: -10px; z-index: 2;">
+		          <i class="fas fa-chevron-right fs-7"></i>
+		        </button>
+		      </div>
+		    </div>
+		
+		    <!-- 완료된 프로젝트 -->
+		    <div class="mb-4">
+		      <div class="text-center mb-2">
+		        <i class="fas fa-circle fs-10 text-success mt-n1"></i>
+		        <span class="fw-bold fs-9">완료한 프로젝트</span>
+		      </div>
+		      <div id="projectDoneCarousel" class="carousel slide" data-bs-ride="carousel">
+		        <!-- 인디케이터 -->
+		        <div class="carousel-indicators" id="doneProjectIndicators">
+		          <!-- JS에서 동적으로 생성 -->
+		        </div>
+		        <!-- 슬라이드 -->
+		        <div class="carousel-inner px-4 text-center" id="doneProjectInner">
+		          <!-- JS에서 동적으로 삽입 -->
+		        </div>
+		        <!-- 이전 버튼 -->
+		        <button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+		                type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="prev"
+		                style="top: 60%; left: -10px; z-index: 2;">
+		          <i class="fas fa-chevron-left fs-7"></i>
+		        </button>
+		        <!-- 다음 버튼 -->
+		        <button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+		                type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="next"
+		                style="top: 60%; right: -10px; z-index: 2;">
+		          <i class="fas fa-chevron-right fs-7"></i>
+		        </button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
 
 	
 	</div><!-- row g-3 mt-4 슬라이드 구역 -->    
 </div>
-<!-- 					<div th:each="item, stat : ${carouselList}">
-					  <div class="carousel-item" th:classappend="${stat.index == 0} ? ' active'">
-					    <div class="border rounded p-3"
-					         th:classappend="${item.status == '진행중'} ? ' bg-primary-soft' : ' bg-success-soft'">
-					      <h6 class="mb-1" th:text="${item.title}">제목</h6>
-					      <p class="text-muted mb-0" th:text="${item.date}">2025-04-14</p>
-					    </div>
-					  </div>
-					</div> -->
+
 <hr>
 <!-- 근태 현황 목록 테이블 -->     
 <div id="attendanceTable" data-list='{"valueNames":["no","date","checkin","checkout","late","early"]}'><!-- ,"page":10,"pagination":true -->
@@ -411,23 +395,18 @@
   <div class="d-flex align-items-center gap-2">
     <!-- 엑셀 다운로드 버튼 -->
     <form th:action="@{/mypage/attendanceExcel}" method="get" class="me-2">
-    	<input type="hidden" name="month" th:value="${selectedMonth}" />
+    	<input type="hidden" name="month" id="excelMonth" value="" />
 		<button type="submit" 
 		  class="btn border bg-white d-flex align-items-center px-2 py-0" 
 		  style="height: 32px; font-size: 0.875rem; line-height: 1;">
 		  <img src="/assets/img/icons/excel-icon1.png" alt="엑셀 아이콘" width="16" height="16" class="me-1">
-		  <span class="fw-normal small" style="position: relative; top: 1px;">다운로드</span>
+		  <span class="fw-normal small" style="position: relative; top: 1px; white-space: nowrap;">다운로드</span>
 		</button>
 	</form>
-
     <!-- 월 선택 셀렉트 -->
-    <form th:action="@{/mypage/list}" method="get" id="monthSelectForm" th:if="${monthList != null}">
-      <select class="form-select form-select-sm" name="month" id="month" onchange="this.form.submit()">
-        <option th:each="month : ${monthList}"
-                th:value="${month}" th:text="${month}"
-                th:selected="${month == selectedMonth}"></option>
-      </select>
-    </form>
+    <select class="form-select form-select-sm" id="monthSelect">
+    	 <!-- JS가 <option> 추가 -->
+    </select>
   </div>
 </div>
 
@@ -444,37 +423,12 @@
 					<th class ="sort" data-sort="early" style="width:10%">조퇴</th>
 				</tr>
 			</thead>
-			<tbody class="list align-middle">
-				<tr th:if ="${!#lists.isEmpty(attendanceList)}"
-					th:each="attendance, attendanceStatus : ${attendanceList}">
-				  <td class="no" th:text="${attendanceStatus.count}">1</td>
-				  <td class="date" th:text="${#temporals.format(attendance.attendance_check_in_time, 'yyyy.MM.dd')}">연도.월.일</td>
-				  <td class="checkin" th:text="${#temporals.format(attendance.attendance_check_in_time, 'HH:mm:ss')}">출근 시간</td>
-				  <td class="checkout" th:text="${#temporals.format(attendance.attendance_check_out_time, 'HH:mm:ss')}">퇴근 시간</td>
-				  <td class="late" th:text="${attendance.attendance_late_yn == 'Y' ? '지각' : '-'}">지각</td>
-				  <td class="early" th:text="${attendance.attendance_early_leave_yn == 'Y' ? '조퇴' : '-'}">조퇴</td>
-				</tr>
-				<tr th:if="${#lists.isEmpty(attendanceList)}">
-				    <td colspan="5" class="text-center"> 근태 정보가 없습니다.</td>
-				</tr>
+			<tbody class="list align-middle" id="attendanceTableBody">
+				
 			</tbody>
 	    </table>
 	</div>
 
-  <!-- 페이징 -->
-<!-- 	<div class="row justify-content-center py-2 fs-9">
-	    <div class="col-auto d-flex">
-	      <button class="page-link disabled" data-list-pagination="prev" disabled>
-	        <i class="fas fa-chevron-left"></i>
-	      </button>
-	      <ul class="mb-0 pagination">
-	        <li class="active"><button class="page" type="button" data-i="1">1</button></li>
-	      </ul>
-	      <button class="page-link disabled" data-list-pagination="next" disabled>
-	        <i class="fas fa-chevron-right"></i>
-	      </button>
-	    </div>
-	</div> -->
 </div><!-- 근태현황 목록 테이블 끝 -->
 <br><br><br>    
 <!-- 프로필 사진 변경 모달 -->
@@ -780,6 +734,94 @@ async function renderCharts() {
 	});
 }
 renderCharts();
+
+initAttendanceMonthSelect();
+
+function initAttendanceMonthSelect(){
+	const monthSelect = document.getElementById('monthSelect'); // 월 선택 셀렉트
+	const excelMonthInput = document.getElementById('excelMonth'); // 엑셀 다운용 hidden input
+	const tbody = document.getElementById('attendanceTableBody'); // 근태 테이블 tbody
+	// 서버에서 사용 가능한 월 목록 가져오기
+	fetch('/mypage/monthList')
+		.then(response => response.json())
+		.then(months => {
+			if(!months || months.length === 0) return;
+			// select 요소에 월 option 추가
+			months.forEach(month => {
+				const opt = document.createElement('option');
+				opt.value = month;
+				opt.textContent = month;
+				monthSelect.appendChild(opt);
+			});
+			
+			// 초기 선택값 : 첫 번째 월(최신순)
+			const defaultMonth = months[0];
+			monthSelect.value = defaultMonth;
+			excelMonthInput.value = defaultMonth;
+			
+			// 최초 진입 시 근태 목록 표시
+			fetchAndRenderAttendance(defaultMonth);
+			// 월 변경시 이벤트 처리
+			monthSelect.addEventListener('change',function(){
+				const selected = this.value;
+				excelMonthInput.value = selected; // 엑셀 다운용 hidden input 갱신
+				fetchAndRenderAttendance(selected); // 근태 목록 다시 조회
+			});
+		})
+		.catch(error => {
+			console.error('월 목록 로딩 실패 : '+error);
+		});
+	
+	// 선택된 월 기준으로 근태 데이터를 서버에서 가져와 테이블에 출력
+	function fetchAndRenderAttendance(month){
+		fetch(`/mypage/listData?month=${month}`)
+			.then(response => response.json())
+			.then(data => {
+				tbody.innerHTML = ''; // 이전 내용 초기화
+				
+				if(!data || data.length === 0){
+			          tbody.innerHTML = `<tr><td colspan="6" class="text-center">근태 정보가 없습니다.</td></tr>`;
+			          return;					
+				}
+				
+				data.forEach((record, index) => {
+					const checkIn = formatDateTime(record.attendance_check_in_time);
+					const checkOut = formatDateTime(record.attendance_check_out_time);
+					
+					const tr = `
+			            <tr>
+			              <td class="no">${index + 1}</td>
+			              <td class="date">${checkIn.date}</td>
+			              <td class="checkin">${checkIn.time}</td>
+			              <td class="checkout">${checkOut.time}</td>
+			              <td class="late">${record.attendance_late_yn === 'Y' ? '지각' : '-'}</td>
+			              <td class="early">${record.attendance_early_leave_yn === 'Y' ? '조퇴' : '-'}</td>
+			            </tr>						
+					`;
+					tbody.insertAdjacentHTML('beforeend',tr);
+				});
+			})
+			.catch(error => {
+				console.error('근태 데이터 로딩 실패 : ', error);
+				tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>`;
+			});
+	}
+	
+	// 날짜 및 시간 형식 변환 함수
+  function formatDateTime(dateStr) {
+    const date = new Date(dateStr);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mi = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
+    return {
+      date: `${yyyy}.${mm}.${dd}`,
+      time: `${hh}:${mi}:${ss}`
+    };
+  }	
+}
 
 //저장 확인 모달 (공통)
 const confirmSaveModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));

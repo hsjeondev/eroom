@@ -715,37 +715,35 @@
 					</div>
 
         <!-- 3행·1열 -->
-        <div class="text-white p-1">
-  <div class="attendance-card mx-auto" style="max-width: 600px; height: 300px; display: flex; flex-direction: column;">
-    <div class="card shadow-sm border-0" style="display: flex; flex-direction: column; height: 100%;">
-      
-      <!-- 헤더 -->
-      <div class="card-header text-center fw-bold" style="font-size: 1.2rem; padding: 15px; flex-shrink: 0;">
-        메일
-      </div>
+		<div class="text-white p-1">
+		    <div class="attendance-card mx-auto">
+		        <div class="card shadow-sm border-0">
+		    <div class="card-header text-center py-3" style="font-size: 1.2rem; font-weight: bold;">
+			  긴급 공지글
+			</div>
+			  <table class="table table-sm  mb-0 text-center" style="font-size: 1rem;">
+			    <colgroup>
+			      <col style="width: 50%;">
+			      <col style="width: 50%;">
+			    </colgroup>
+			    
+			    </table>
+			    <div style="height: 200px; overflow-y: auto;">
+			    <table id="emergencyNoticeTable" class="table table-sm  mb-0 text-center" style="font-size: 1rem;">
+				     <colgroup>
+				     <col style="width: 50%;">
+				     <col style="width: 50%;">
+				   </colgroup>
+				   <tbody>
+			     
+			    </tbody>
+			  </table>
+			  </div>
+		</div>
+		</div>
+		</div>
 
-      <!-- 탭 메뉴 -->
-      <div class="d-flex justify-content-between align-items-center mb-2" style="flex-shrink: 0;">
-        <div class="fw-bold text-dark" style="font-size: 0.9rem;"></div>
-        <ul class="nav nav-underline fs-9 w-100 mb-0" id="mailTab" role="tablist">
-          <li class="nav-item flex-grow-1 text-center" role="presentation">
-            <a class="nav-link active" id="unreadMails-tab" data-bs-toggle="tab" href="#unreadMailsTab"
-               role="tab" aria-controls="unreadMailsTab" aria-selected="true">읽지 않은 메일</a>
-          </li>
-          <li class="nav-item flex-grow-1 text-center" role="presentation">
-            <a class="nav-link" id="sentMails-tab" data-bs-toggle="tab" href="#sentMailsTab"
-               role="tab" aria-controls="sentMailsTab" aria-selected="false">보낸 메일</a>
-          </li>
-        </ul>
-      </div>
-
-      <!-- 탭 내용 영역: flex-grow로 남은 공간 모두 차지 + 스크롤 -->
-      <div id="mailListContainer" style="flex-grow: 1; min-height: 0; overflow-y: auto;">
-        <!-- 탭 내용 넣기 -->
-      </div>
-    </div>
-  </div>
-</div>
+			
 
 					<!-- 3행·2열: 날씨 카드 -->
 					<div class="text-white p-1">
@@ -819,8 +817,11 @@
 											style="width: 100%; height: 160px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
 									</div> <!-- ✅ 내용: 제목과 설명 여백 정리 -->
 									<div class="px-3 pt-3 pb-2">
-										<h6 id="newsTitle" class="fw-semibold text-dark mb-1"
-											style="font-size: 1rem;">뉴스 제목</h6>
+										  <!-- 제목: 1줄 + 말줄임 -->
+									  <h6 id="newsTitle" class="fw-semibold text-dark mb-1"
+										    style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40ch;">
+										    뉴스 제목
+										</h6>
 										<p id="newsDescription" class="text-muted mb-0"
 										   style="font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
 										   뉴스 요약
@@ -1530,39 +1531,52 @@
 		</script>
 
 					<script>
-	document.addEventListener("DOMContentLoaded", function () {
-		  // 1. 페이지 로딩 시 처음 메일 개수 가져오기 (이미 구현된 fetch)
-		  fetch("/mail/listFragment")
-		    .then(response => response.text())
-		    .then(html => {
-		      document.getElementById("mailListContainer").innerHTML = html;
-		    });
-		  
-		  fetch("/mail/counts")
+	
+	
+	document.addEventListener('DOMContentLoaded', () => {
+		  fetch('/article/test-json')
 		    .then(response => response.json())
-		    .then(data => {
-		      document.getElementById("unreadMailCount").innerText = data.unread;
-		      document.getElementById("totalMailCount").innerText = data.total;
-		    });
+		    .then(notices => {
+		      const tbody = document.querySelector('#emergencyNoticeTable tbody');
+		      tbody.innerHTML = '';
 
-		  // 2. WebSocket 연결 추가 (URL은 네가 사용 중인 주소에 맞게 수정)
-		  const senderNo = document.getElementsByName("employeeNo")[0].value;
-		  const socket = new WebSocket("ws://localhost:8080/ws/mail?senderNo="+senderNo); // 실제 주소로 변경
-		  socket.onopen = () => {
-    	    };
-		  socket.onmessage = function (event) {
-		    const message = JSON.parse(event.data);
+		      if (notices.length === 0) {
+		        tbody.innerHTML = '<tr><td colspan="2">공지글이 없습니다.</td></tr>';
+		      } else {
+		        notices.forEach(notice => {
+		          const tr = document.createElement('tr');
 
-		    // 3. 메일 수신 관련 메시지 수신 시 다시 fetch로 값 갱신
-		    if (message.type === "mail") {
-		      fetch("/mail/counts")
-		        .then(response => response.json())
-		        .then(data => {
-		          document.getElementById("unreadMailCount").innerText = data.unread;
-		          document.getElementById("totalMailCount").innerText = data.total;
+		          const titleTd = document.createElement('td');
+		          titleTd.innerHTML = `<span class="badge bg-danger me-1">긴급</span>${notice.article_title}`;
+		          titleTd.style.textAlign = 'left';
+		          titleTd.style.paddingLeft = '35px';
+		          const dateTd = document.createElement('td');
+		          dateTd.style.paddingLeft = '20px';
+		          const date = new Date(notice.article_reg_date);
+		          if (!isNaN(date.getTime())) { // 날짜 유효성 체크
+		            const formattedDate = date.toISOString().split('T')[0];  // yyyy-MM-dd
+		            dateTd.textContent = formattedDate;
+		          } else {
+		            dateTd.textContent = '-';  // 유효하지 않은 날짜일 때 대체 텍스트
+		            console.warn('Invalid date:', notice.articleRegDate);
+		          }
+
+		          tr.appendChild(titleTd);
+		          tr.appendChild(dateTd);
+		          tr.style.cursor = 'pointer';  // 마우스 커서도 변경
+		          tr.addEventListener('click', () => {
+		            // 예: 상세 페이지 URL이 /article/detail/{article_no} 라고 가정
+		            window.location.href = `/article/notice/detail/${notice.article_no}`;
+		          });
+		          tbody.appendChild(tr);
 		        });
-		    }
-		  };
+		      }
+		    })
+		    .catch(error => {
+		      const tbody = document.querySelector('#emergencyNoticeTable tbody');
+		      tbody.innerHTML = '<tr><td colspan="2">오류가 발생했습니다.</td></tr>';
+		      console.error('Fetch error:', error);
+		    });
 		});
 	</script>
 
