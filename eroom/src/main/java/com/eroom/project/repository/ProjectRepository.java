@@ -30,12 +30,22 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
 
 	
 	@Query("""
-			SELECT p FROM Project p
-			WHERE p.visibleYn = 'Y'
-			AND (:proceed IS NULL OR p.proceed = :proceed)
-			ORDER BY p.projectNo ASC
-			""")
-			List<Project> findByVisibleYnAndOptionalProceed(@Param("proceed") String proceed);
+		    SELECT p FROM Project p
+		    WHERE p.visibleYn = 'Y'
+		    AND (:proceed IS NULL OR p.proceed = :proceed)
+		    ORDER BY 
+		        CASE 
+		            WHEN p.proceed = '진행 중' THEN 0
+		            WHEN p.proceed = '진행 예정' THEN 1
+		            WHEN p.proceed = '완료' THEN 2
+		            WHEN p.proceed = '보류' THEN 3
+		            ELSE 4
+		        END,
+		        p.projectStart ASC
+		""")
+		List<Project> findByVisibleYnAndOptionalProceed(@Param("proceed") String proceed);
+
+
 	
 	@Query("SELECT COUNT(p) FROM Project p WHERE p.visibleYn = 'Y'")
 	Long countVisibleProjects();
