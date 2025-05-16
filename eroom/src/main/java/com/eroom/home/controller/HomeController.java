@@ -206,6 +206,9 @@ public class HomeController {
 		}
 		resultApprovalList.sort((a1, a2) -> a2.getApprovalRegDate().compareTo(a1.getApprovalRegDate()));
 		for (Approval t : resultApprovalList) {
+			if(!t.getApprovalStatus().equals("S")){
+				continue;
+			}
 			ApprovalDto dto = new ApprovalDto();
 			dto = dto.toDto(t);
 			dto.setEmployee_name(t.getEmployee().getEmployeeName());
@@ -223,6 +226,9 @@ public class HomeController {
 	    		map.put("approval_toMe", true);
 	    		map.put("approval_writer", dto.getEmployee().getEmployeeName());
 	    		resultList.add(map);
+				if (resultList.size() >= 5) {
+					break;
+				}
 	    }
 	    return resultList;
 	}

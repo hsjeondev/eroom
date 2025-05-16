@@ -143,9 +143,137 @@
       </div>
     </div>
   </div>
+<!-- 등록 확인 모달 -->
+<div class="modal fade" id="submitConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">공지 등록</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">공지를 등록하시겠습니까?</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSubmitBtn">등록</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- 등록 완료 모달 -->
+<div class="modal fade" id="submitSuccessModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">등록 완료</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">공지사항이 등록되었습니다.</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="successCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+	
+	<!-- 제목 누락 모달 -->
+<div class="modal fade" id="alertTitleModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">입력 필요</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">제목을 입력해주세요.</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 내용 누락 모달 -->
+<div class="modal fade" id="alertContentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">입력 필요</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">내용을 입력해주세요.</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
   <script>
   document.getElementById("submitBtn").addEventListener("click", function () {
+	  const form = document.notice_create_form;
+	  const title = form.article_title.value.trim();
+	  const content = tinymce.get('notice_content').getContent().trim();
+
+	  if (!title) {
+		    new bootstrap.Modal(document.getElementById("alertTitleModal")).show();
+		    return;
+		  }
+
+		  if (!content || content === "<p>&nbsp;</p>" || content === "") {
+		    new bootstrap.Modal(document.getElementById("alertContentModal")).show();
+		    return;
+		  }
+
+	  let existingInput = document.querySelector('input[name="article_emergency_yn"]');
+	  if (existingInput) existingInput.remove();
+	  const emergencyInput = document.createElement('input');
+	  emergencyInput.type = 'hidden';
+	  emergencyInput.name = 'article_emergency_yn';
+	  emergencyInput.value = document.getElementById('checkImportant').checked ? 'Y' : 'N';
+	  form.appendChild(emergencyInput);
+
+	  const confirmModal = new bootstrap.Modal(document.getElementById("submitConfirmModal"));
+	  confirmModal.show();
+	});
+
+	document.getElementById("confirmSubmitBtn").addEventListener("click", function () {
+	  const confirmModal = bootstrap.Modal.getInstance(document.getElementById("submitConfirmModal"));
+	  confirmModal.hide();
+
+	  const form = document.notice_create_form;
+	  tinymce.triggerSave();
+
+	  const payload = new FormData(form);
+	  selectedFiles.forEach(file => {
+	    payload.append("article_files", file);
+	  });
+
+	  fetch("/article/create", {
+	    method: "POST",
+	    headers: {
+	      'header': document.querySelector('meta[name="_csrf_header"]').content,
+	      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+	    },
+	    body: payload
+	  })
+	  .then(response => response.json())
+	  .then(data => {
+	    if (data.res_code == 200) {
+	      const successModal = new bootstrap.Modal(document.getElementById("submitSuccessModal"));
+	      successModal.show();
+
+	      document.getElementById("successCloseBtn").addEventListener("click", function () {
+	        location.href = '/article/notice';
+	      });
+	    } else {
+	      alert(data.res_msg || "등록 중 오류가 발생했습니다.");
+	    }
+	  });
+	});
+  /* document.getElementById("submitBtn").addEventListener("click", function () {
 	  const form = document.notice_create_form;
 	  const title = form.article_title.value.trim();  // 제목
 	  const content = tinymce.get('notice_content').getContent().trim();  // 내용 (TinyMCE에서 가져옴)
@@ -196,7 +324,7 @@
 	      }
 	    });
 	  }
-	});
+	}); */
 
     const selectedFiles = [];
 

@@ -181,6 +181,23 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						</div>
                 </div>
                 </div>
+                <!-- 메일 선택 모달 -->
+                <div class="modal fade" id="selectMailAlertModal" tabindex="-1" aria-hidden="true">
+				  <div class="modal-dialog modal-dialog-centered modal-sm">
+				    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+				      <div class="modal-header border-0">
+				        <h5 class="modal-title text-dark">안내</h5>
+				      </div>
+				      <div class="modal-body text-center">
+				        <p class="mb-0 text-body">메일을 선택해주세요.</p>
+				      </div>
+				      <div class="modal-footer justify-content-center border-0">
+				        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+				<!-- 메일 선택 모달 끝-->
 	  <script>
 	  
 	  
@@ -198,11 +215,11 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 	
 	 	  function sendBulkUpdate(url) {
 	 	    const selected = getSelectedMailNos();
-	 	    console.log(selected);	
-	 	    if (selected.length === 0) {
-	 	      alert("메일을 선택해주세요.");
-	 	      return;
-	 	    }
+	 	   if (selected.length === 0) {
+   	        const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+   	        modal.show();
+   	        return;
+   	      }
 	
 	 	    fetch(url, {
 	 	      method: 'POST',
