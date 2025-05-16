@@ -59,6 +59,24 @@ public class MyPageController {
 	private final AnnualLeaveService annualLeaveService;
 	private final AnnualPolicyUtil annualPolicyUtil;
 	
+	// 근태 기록이 있는 월 목록 조회
+	@GetMapping("/monthList")
+	@ResponseBody
+	public List<String> getAttendanceMonthList(Authentication authentication){
+		EmployeeDetails employeeDetail = (EmployeeDetails) authentication.getPrincipal();
+		Long employeeNo = employeeDetail.getEmployee().getEmployeeNo();
+		return attendanceService.selectAttendanceMonthList(employeeNo);
+	}
+	
+	// 근태현황 월별 조회
+	@GetMapping("/listData")
+	@ResponseBody
+	public List<AttendanceDto> getAttendanceListData(@RequestParam("month") String month, Authentication authentication){
+		EmployeeDetails employeeDetail = (EmployeeDetails) authentication.getPrincipal();
+		Long employeeNo = employeeDetail.getEmployee().getEmployeeNo();
+		return attendanceService.selectAttendanceListByMonth(employeeNo, month);
+	}
+	
 	// 마이페이지
 	@GetMapping("/list")
 	public String myPageView(@RequestParam(name= "month",required = false) String month,Model model, Authentication authentication) {

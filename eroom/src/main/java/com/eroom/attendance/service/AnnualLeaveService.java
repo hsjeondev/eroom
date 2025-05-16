@@ -1,12 +1,11 @@
 package com.eroom.attendance.service;
 
-import java.time.LocalDate;
-
 import org.springframework.stereotype.Service;
 
 import com.eroom.attendance.dto.AnnualLeaveDto;
 import com.eroom.attendance.entity.AnnualLeave;
 import com.eroom.attendance.repository.AnnualLeaveRepository;
+import com.eroom.common.AnnualPolicyUtil;
 import com.eroom.employee.entity.Employee;
 import com.eroom.employee.service.EmployeeService;
 
@@ -17,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class AnnualLeaveService {
 	private final AnnualLeaveRepository annualLeaveRepository;
 	private final EmployeeService employeeService;
+	private final AnnualPolicyUtil annualPolicyUtil;
 
 	public AnnualLeave findByEmployeeNo(Long employeeNo) {
 		return annualLeaveRepository.findByEmployee_EmployeeNo(employeeNo);
@@ -28,7 +28,8 @@ public class AnnualLeaveService {
 	
 	// 연차 정보 수정
 	public AnnualLeaveDto updateAnnualLeave(Long employeeNo, double totalDelta, double usedDelta) {
-		AnnualLeave entity = annualLeaveRepository.findByEmployee_EmployeeNo(employeeNo);
+		Long targetYear = annualPolicyUtil.getTargetYearByPolicy();
+		AnnualLeave entity = annualLeaveRepository.findByEmployee_EmployeeNoAndYear(employeeNo, targetYear);
 		if(entity != null) {
 			double newTotal = entity.getAnnualLeaveTotal() + totalDelta;
 			double newUsed = entity.getAnnualLeaveUsed() + usedDelta;
