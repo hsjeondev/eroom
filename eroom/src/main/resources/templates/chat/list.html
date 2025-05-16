@@ -134,10 +134,10 @@
 										    </div>
 										  </div>
 										  <div class="d-flex justify-content-between">
-										    <p th:text="${chatroom.chatLastMessage}"
-										       class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">
-										       마지막메시지
-										    </p>
+										    <p th:text="${chatroom.chatLastMessage != null and !#strings.isEmpty(chatroom.chatLastMessage) ? chatroom.chatLastMessage : '[파일] 첨부됨'}"
+											   class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">
+											</p>
+
 										  </div>
 										</div>
 								</a></li>
@@ -638,7 +638,6 @@
 			    	})
 			    	.then(res => res.json())
 			    	.then(result => {
-			    	  console.log('✅ 읽음 처리 완료:', result);
 			    	  const sidebarItem = document.querySelector(`[data-room-no="${chatroomNo}"]`);
 			    	  if (sidebarItem) {
 			    	    sidebarItem.classList.remove('unread');
@@ -1019,7 +1018,6 @@
 		  };
 		  // 메시지 수신
 		socket.onmessage = function (event) {
-  console.log("📩 WebSocket 메시지 수신:", event.data);
   const data = JSON.parse(event.data);
   const myEmployeeNo = document.getElementById("myEmployeeNo").value;
   const currentChatroomNo = document.querySelector(".chatroom-title")?.dataset.roomNo;
@@ -1066,7 +1064,6 @@
   const profileImageUrl = data.senderProfileImageUrl && data.senderProfileImageUrl.trim() !== ""
 	  ? data.senderProfileImageUrl
 	  : "/assets/img/profile/default-profile.png";
-  console.log("프로필 URL:", data.senderProfileImageUrl);
   const senderDisplayName = isMyMessage ? "나" : data.senderName || "알 수 없음";
 
   const wrapper = document.createElement("div");
@@ -1267,7 +1264,6 @@ function sendMessage() {
     })
     .then(res => res.json())
     .then(data => {
-    	console.log("서버 응답:", data);
       if (data.res_code === "200") {
         const fileNames = data.fileNames;
         
@@ -1291,9 +1287,7 @@ function sendMessage() {
                 senderName: "나"
         	  };
 
-        	  console.log("📤 WebSocket 전송:", chatData);
         	  socket.send(JSON.stringify(chatData));
-        	  console.log("🚚 업로드 후 fileNames:", fileNames);
         	});
 
  	      fileInput.value = "";
@@ -1810,7 +1804,6 @@ function loadChatroomDetail(chatroomNo) {
 			    form.appendChild(input);
 			  });
 
-			  console.log("선택 결과:", result);
 			  bootstrap.Modal.getInstance(document.getElementById('treeModal')).hide();
 			}
 
