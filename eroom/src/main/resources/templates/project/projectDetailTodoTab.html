@@ -174,7 +174,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
 		
 		    <!-- 새 아이템 추가 -->
-		    <div class="py-3 px-4 kanban-add-task" data-bs-target="#kanbanAddTask">
+		    <div class="py-3 px-4 kanban-add-task" data-bs-target="#kanbanAddTask" th:if="${isMember == true and isManager == true}">
 			  <button class="btn bg-sm bg-body-tertiary me-2 px-0 w-100 h-100" data-bs-toggle="modal"
 			          data-bs-target="#kanbanAddTask" th:attr="data-list-no=${list.project_todo_list_no}, data-list-name=${list.list_name}">
 			    <svg class="svg-inline--fa fa-plus text-white dark__text-gray-400" 
