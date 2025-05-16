@@ -65,6 +65,20 @@ public class AdminController {
 	private final AnnualLeaveService annualLeaveService;
 	private final AnnualPolicyUtil annualPolicyUtil;
 	
+	// 근태 기록이 있는 월 목록 조회
+	@GetMapping("/monthList")
+	@ResponseBody
+	public List<String> getAttendanceMonthList(@RequestParam("employeeNo") Long employeeNo){
+		return attendanceService.selectAttendanceMonthList(employeeNo);
+	}
+	
+	// 근태현황 월별 조회
+	@GetMapping("/listData")
+	@ResponseBody
+	public List<AttendanceDto> getAttendanceListData(@RequestParam("month") String month, @RequestParam("employeeNo") Long employeeNo){
+		return attendanceService.selectAttendanceListByMonth(employeeNo, month);
+	}
+	
 	// 회의실 목록
 	@GetMapping("/meetingroom")
 	public String selectMeetingroomList(Model model) {
