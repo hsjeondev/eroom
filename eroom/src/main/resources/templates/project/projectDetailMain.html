@@ -77,70 +77,46 @@
 				</div>
 
 			</div>
-<div class="col-12 col-md-4 col-xl-3">
-  <!-- 최근 파일 카드 -->
-  <div class="card shadow-sm mb-4">
-    <div class="card-header fw-semibold py-2 px-3 bg-light">
-      📁 최근 파일
-    </div>
-    <div class="card-body p-0 overflow-hidden">
-      <table class="table table-sm table-hover table-borderless align-middle mb-0">
-        <tbody>
-          <tr th:each="file, stat : ${fileList}" th:if="${stat.count <= 5}" class="border-bottom">
-            <td style="width: 34px;" class="ps-3 py-2">
-              <img th:if="${file.driveType == '.pdf'}" th:src="@{/assets/img/icons/pdf.png}" width="20" height="20" />
-              <img th:if="${file.driveType == '.docx'}" th:src="@{/assets/img/icons/word.png}" width="20" height="20" />
-              <img th:if="${file.driveType == '.xlsx'}" th:src="@{/assets/img/icons/excel.png}" width="20" height="20" />
-              <img th:if="${file.driveType == '.jpg' or file.driveType == '.jpeg'}" th:src="@{/assets/img/icons/jpg.png}" width="20" height="20" />
-              <img th:if="${file.driveType == '.png'}" th:src="@{/assets/img/icons/png.png}" width="20" height="20" />
-              <img th:if="${file.driveType == '.zip'}" th:src="@{/assets/img/icons/zip.com.png}" width="20" height="20" />
-              <img th:if="${file.driveType != '.pdf' and file.driveType != '.docx' and file.driveType != '.xlsx' and file.driveType != '.jpg' and file.driveType != '.jpeg' and file.driveType != '.png' and file.driveType != '.zip'}" th:src="@{/assets/img/icons/file.png}" width="20" height="20" />
-            </td>
-            <td class="pe-2 py-2" style="max-width: 180px;">
-              <a th:href="@{/project/download/{id}(id=${file.driveAttachNo})}"
-                 class="d-block w-100 text-truncate text-dark fw-semibold text-decoration-none"
-                 th:text="${file.driveOriName}">파일명</a>
-            </td>
-            <td class="text-end pe-3 text-muted small" style="white-space: nowrap;"
-                th:text="${#numbers.formatDecimal(file.driveSize / 1024.0, 0, 1)} + ' KB'">
-              크기
-            </td>
-          </tr>
-          <tr th:if="${#lists.isEmpty(fileList)}">
-            <td colspan="3" class="text-center text-muted py-3 small">최근 업로드된 파일이 없습니다.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+			<div class="col-12 col-md-4 col-xl-3">
+				<!-- 최근 파일 카드 -->
+				<div class="card shadow-sm mb-4">
+					<div class="card-header fw-semibold py-2 px-3 bg-light">📁 최근 파일</div>
+					<div class="card-body p-0 overflow-hidden">
+						<table class="table table-sm table-hover table-borderless align-middle mb-0">
+							<tbody>
+								<tr th:each="file, stat : ${fileList}" th:if="${stat.count <= 5}" class="border-bottom">
+									<td style="width: 34px;" class="ps-3 py-2"><img th:if="${file.driveType == '.pdf'}" th:src="@{/assets/img/icons/pdf.png}" width="20" height="20" /> <img th:if="${file.driveType == '.docx'}" th:src="@{/assets/img/icons/word.png}" width="20" height="20" /> <img th:if="${file.driveType == '.xlsx'}" th:src="@{/assets/img/icons/excel.png}" width="20" height="20" /> <img th:if="${file.driveType == '.jpg' or file.driveType == '.jpeg'}" th:src="@{/assets/img/icons/jpg.png}" width="20" height="20" /> <img th:if="${file.driveType == '.png'}" th:src="@{/assets/img/icons/png.png}" width="20" height="20" /> <img th:if="${file.driveType == '.zip'}" th:src="@{/assets/img/icons/zip.com.png}" width="20" height="20" /> <img th:if="${file.driveType != '.pdf' and file.driveType != '.docx' and file.driveType != '.xlsx' and file.driveType != '.jpg' and file.driveType != '.jpeg' and file.driveType != '.png' and file.driveType != '.zip'}" th:src="@{/assets/img/icons/file.png}" width="20"
+										height="20"
+									/></td>
+									<td class="pe-2 py-2" style="max-width: 180px;"><a th:href="@{/project/download/{id}(id=${file.driveAttachNo})}" class="d-block w-100 text-truncate text-dark fw-semibold text-decoration-none" th:text="${file.driveOriName}">파일명</a></td>
+									<td class="text-end pe-3 text-muted small" style="white-space: nowrap;" th:text="${#numbers.formatDecimal(file.driveSize / 1024.0, 0, 1)} + ' KB'">크기</td>
+								</tr>
+								<tr th:if="${#lists.isEmpty(fileList)}">
+									<td colspan="3" class="text-center text-muted py-3 small">최근 업로드된 파일이 없습니다.</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
 
-  <!-- 최근 회의록 카드 -->
-  <div class="card shadow-sm">
-    <div class="card-header fw-semibold py-2 px-3 bg-light">
-      📝 최근 회의록
-    </div>
-    <div class="card-body p-0 overflow-hidden">
-      <table class="table table-sm table-hover table-borderless align-middle mb-0">
-        <tbody>
-          <tr th:each="minute, stat : ${minutes}" th:if="${stat.count <= 5}" class="border-bottom">
-            <td class="ps-3 py-2" style="max-width: 180px;">
-              <a th:href="@{/project/minute/detail(minuteNo=${minute.meetingMinuteNo}, projectNo=${project.project_no})}"
-                 class="d-block w-100 text-truncate text-dark fw-semibold text-decoration-none"
-                 th:text="${minute.meetingTitle}">회의 제목</a>
-            </td>
-            <td class="text-end pe-3 text-muted small" style="white-space: nowrap;"
-                th:text="${#temporals.format(minute.meetingDate, 'yyyy.MM.dd')}">
-              회의일
-            </td>
-          </tr>
-          <tr th:if="${#lists.isEmpty(minutes)}">
-            <td colspan="2" class="text-center text-muted py-3 small">최근 회의록이 없습니다.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+				<!-- 최근 회의록 카드 -->
+				<div class="card shadow-sm">
+					<div class="card-header fw-semibold py-2 px-3 bg-light">📝 최근 회의록</div>
+					<div class="card-body p-0 overflow-hidden">
+						<table class="table table-sm table-hover table-borderless align-middle mb-0">
+							<tbody>
+								<tr th:each="minute, stat : ${minutes}" th:if="${stat.count <= 5}" class="border-bottom">
+									<td class="ps-3 py-2" style="max-width: 180px;"><a th:href="@{/project/minute/detail(minuteNo=${minute.meetingMinuteNo}, projectNo=${project.project_no})}" class="d-block w-100 text-truncate text-dark fw-semibold text-decoration-none" th:text="${minute.meetingTitle}">회의 제목</a></td>
+									<td class="text-end pe-3 text-muted small" style="white-space: nowrap;" th:text="${#temporals.format(minute.meetingDate, 'yyyy.MM.dd')}">회의일</td>
+								</tr>
+								<tr th:if="${#lists.isEmpty(minutes)}">
+									<td colspan="2" class="text-center text-muted py-3 small">최근 회의록이 없습니다.</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
 
 		</div>
 	</main>
