@@ -257,8 +257,17 @@
                         <!-- <label class="btn btn-link py-0 px-2 text-body fs-9" for="emailPhotos"><span class="fa-solid fa-image"></span></label>
                         <input class="d-none" id="emailPhotos" type="file" accept="image/*" /> -->
                       </div>
-                      <div class="d-flex">
+                      <!-- <div class="d-flex">
                         <button class="btn btn-link text-body fs-10 text-decoration-none" type="button" id="draftBtn">임시저장</button>
+                        <button class="btn btn-primary fs-10" type="button" id="sendBtn">발송<span class="fa-solid fa-paper-plane ms-1"></span></button>
+                      </div> -->
+                      <div class="d-flex">
+                        <!-- <button class="btn btn-link text-body fs-10 text-decoration-none" type="button" id="draftBtn">임시저장</button> -->
+                        <button class="btn btn-link text-body fs-10 text-decoration-none" type="button"
+						        id="draftBtn"
+						        data-bs-toggle="modal" data-bs-target="#draftConfirmModal">
+						  임시저장
+						</button>
                         <button class="btn btn-primary fs-10" type="button" id="sendBtn">발송<span class="fa-solid fa-paper-plane ms-1"></span></button>
                       </div>
                     </div>
@@ -266,6 +275,67 @@
                 </div>
               </div>
             </div>
+            
+            <!-- 임시저장 모달  -->
+            <div class="modal fade" id="draftConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">임시저장 하시겠습니까?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 메일을 임시 저장합니다.<br>※ 수신자는 저장되지 않습니다.
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmDraftBtn">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+            <!-- 임시 저장 모달 끝 -->
+            <!-- 확인 모달  -->
+            <div class="modal fade" id="alertModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertModalMessage">완료되었습니다.</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+            <!-- 확인 모달 끝 -->
+            
+            <!-- 메일 발송 모달 -->
+            <div class="modal fade" id="sendConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">메일 발송</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          메일을 발송하시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSendBtn">발송</button>
+      </div>
+    </div>
+  </div>
+</div>
+            <!-- 메일 발송 모달 끝 -->
+            
+            
             <script>
             window.addEventListener('DOMContentLoaded', () => {
             	  const senderName = document.querySelector('input[name="receiver"]').value;
@@ -280,8 +350,110 @@
             	  }
             	  updateReceiverInput();
             });
+            function showAlertModal(message, callback) {
+                const modalMessage = document.getElementById("alertModalMessage");
+                modalMessage.textContent = message;
+
+                const modalElement = document.getElementById("alertModal");
+                const modalInstance = new bootstrap.Modal(modalElement);
+                modalInstance.show();
+
+                const confirmBtn = modalElement.querySelector(".btn-primary");
+
+                const handler = () => {
+                  if (callback) callback();
+                  confirmBtn.removeEventListener("click", handler); // 이벤트 중복 방지
+                };
+
+                confirmBtn.addEventListener("click", handler);
+              }
+            document.addEventListener("DOMContentLoaded", function () {
+                document.getElementById("confirmDraftBtn").addEventListener("click", function () {
+                  // 모달 닫기
+                  const modalEl = document.getElementById('draftConfirmModal');
+                  const modal = bootstrap.Modal.getInstance(modalEl);
+                  modal.hide();
+
+                  // 기존 임시저장 로직
+                  tinymce.triggerSave();
+                  const form = document.mail_create_form;
+                  const payload = new FormData(form);
+                  payload.append("mail_draft_yn", "Y");
+
+                  selectedFiles.forEach(file => {
+                    payload.append("mail_files", file);
+                  });
+
+                  fetch("/mail/draft", {
+                    method: "POST",
+                    headers: {
+                      'header': document.querySelector('meta[name="_csrf_header"]').content,
+                      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+                    },
+                    body: payload
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                    //alert(data.res_msg || "임시저장 완료");
+                    if (data.res_code == 200) {
+                    	showAlertModal(data.res_msg || "임시저장 완료", function () {
+                    	    location.href = '/mail/draft';
+                    	  });
+                      //location.href = '/mail/draft';
+                    }
+                  });
+                });
+              });
             
-            document.getElementById("draftBtn").addEventListener("click", function () {
+            document.getElementById("sendBtn").addEventListener("click", function () {
+                const form = document.mail_create_form;
+                const receiver = form.receiver_type.value;
+
+                if (!receiver) {
+                    showAlertModal("받는 사람을 한 명 이상 지정해야 합니다.");
+                    return;
+                }
+
+                // 확인 모달 보여주기
+                const sendModal = new bootstrap.Modal(document.getElementById("sendConfirmModal"));
+                sendModal.show();
+            });
+            document.getElementById("confirmSendBtn").addEventListener("click", function () {
+                // 모달 닫기
+                const modalEl = document.getElementById('sendConfirmModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+
+                // 메일 발송 로직
+                const form = document.mail_create_form;
+                tinymce.triggerSave();
+                const payload = new FormData(form);
+                payload.append("mail_draft_yn", "N");
+
+                selectedFiles.forEach(file => {
+                    payload.append("mail_files", file);
+                });
+
+                fetch("/mail/create", {
+                    method: "POST",
+                    headers: {
+                        'header': document.querySelector('meta[name="_csrf_header"]').content,
+                        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+                    },
+                    body: payload
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.res_code == 200) {
+                        showAlertModal(data.res_msg || "발송 완료", function () {
+                            location.href = '/mail/sent';
+                        });
+                    } else {
+                        showAlertModal(data.res_msg || "발송 실패");
+                    }
+                });
+            });
+            /* document.getElementById("draftBtn").addEventListener("click", function () {
                 if (confirm("작성 중인 메일을 임시저장하시겠습니까?"+"\n※수신자는 저장되지 않습니다.")) {
                     tinymce.triggerSave();
                     const form = document.mail_create_form;
@@ -344,7 +516,7 @@
                         }
                     });
                 }
-            });
+            }); */
             	
             	const selectedFiles = [];
 
