@@ -63,7 +63,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						<td class="no" th:text="${status.count}">번호</td>
 						<td class="vehicle" th:text="${vehicle.facilityName}">차량명</td>
 						<td class="passengers" th:text="|${vehicle.facilityCapacity}명|">탑승 정원</td>
-						<td class="regDate" th:text="${#temporals.format(vehicle.facilityRegDate, 'yy.MM.dd')}">등록일</td>
+						<td class="regDate" th:text="${#temporals.format(vehicle.facilityRegDate, 'yyyy.MM.dd')}">등록일</td>
 						<td class="regDate" th:text="${vehicle.facilityModDate != null} ? ${#temporals.format(vehicle.facilityModDate, 'yyyy.MM.dd')} : '-'">수정일</td>
 						<td class="text-end pe-0">
 							<div class="btn-reveal-trigger position-static">

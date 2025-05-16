@@ -436,6 +436,8 @@ public class AdminController {
 		// 반환용 DTO리스트
 		List<EmployeeManageDto> manageDtoList = new ArrayList<>();
 	
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+		
 		for(Employee employee : employeeList) {
 			// 사원 dto
 			EmployeeDto employeeDto = new EmployeeDto().toDto(employee);
@@ -495,8 +497,8 @@ public class AdminController {
 					annualLeaveDto,
 					departmentName,
 					teamName,
-					employeeDto.getEmployee_hire_date() != null ? employeeDto.getEmployee_hire_date().toLocalDate().toString() : "-",
-					employeeDto.getEmployee_end_date() != null?  employeeDto.getEmployee_end_date().toLocalDate().toString() : "-",
+					employeeDto.getEmployee_hire_date() != null ? employeeDto.getEmployee_hire_date().toLocalDate().format(formatter) : "-",
+					employeeDto.getEmployee_end_date() != null?  employeeDto.getEmployee_end_date().toLocalDate().format(formatter) : "-",
 					profileImageUrl
 					);
 			
