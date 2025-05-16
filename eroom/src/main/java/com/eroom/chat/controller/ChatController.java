@@ -104,6 +104,11 @@ public class ChatController {
 	        String profileUrl = profileService.getProfileImageUrl(targetEmployeeNo);
 	        dto.setProfileImageUrl(profileUrl);
 	    }
+	    chatroomDtos.sort((a, b) -> {
+	        if (a.getLastMessageRegDate() == null) return 1;
+	        if (b.getLastMessageRegDate() == null) return -1;
+	        return b.getLastMessageRegDate().compareTo(a.getLastMessageRegDate());
+	    });
 	    model.addAttribute("chatroomList", chatroomDtos);
 
 	    // 2. 부서 / 팀 / 사원 정보 트리 구조 세팅
