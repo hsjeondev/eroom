@@ -497,15 +497,17 @@ public class ProjectController {
 	    }
 
 	    // 3) 참가자
-	    if (participantIds != null) {
-	        for (Long participantId : participantIds) {
-	            ProjectMemberDto participantDto = ProjectMemberDto.builder()
-	                    .project_member(Employee.builder().employeeNo(participantId).build())
-	                    .is_manager("N")
-	                    .build();
-	            memberDtos.add(participantDto);
-	        }
+	    for (Long participantId : participantIds) {
+	        // PM과 중복인 경우 제외
+	        if (participantId.equals(pmEmployeeNo)) continue;
+
+	        ProjectMemberDto participantDto = ProjectMemberDto.builder()
+	                .project_member(Employee.builder().employeeNo(participantId).build())
+	                .is_manager("N")
+	                .build();
+	        memberDtos.add(participantDto);
 	    }
+
 
 	    // 서비스 호출: 수정 로직 수행
 	    Long result = projectService.updateProject(projectDto, memberDtos);
