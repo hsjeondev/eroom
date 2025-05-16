@@ -307,6 +307,19 @@ public class StructureService {
 	public List<Structure> findOnlyTeamsVisibleY() {
 		return structureRepository.findOnlyTeamsVisibleY();
 	}
+	public List<String> getDepartmentAndTeamSeparatorCodes(String departmentCode) {
+	    List<String> codes = new ArrayList<>();
+	    codes.add(departmentCode); // 본인 부서
+
+	    List<Structure> teams = structureRepository.findByParentCodeAndVisibleYnOrderBySortOrderAsc(departmentCode, "Y");
+	    for (Structure team : teams) {
+	        codes.add(team.getSeparatorCode());
+	    }
+
+	    return codes;
+	}
+
 	
+
 
 }

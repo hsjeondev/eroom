@@ -142,7 +142,7 @@
 			       th:src="@{/assets/img/icons/file.png}" width="24" height="24" />
 			</td>
 		    <td class="align-middle filename" th:text="${file.driveOriName}">파일명</td>
-		    <td class="align-middle filesize" th:text="${#numbers.formatDecimal(file.driveSize / 1024.0, 0, 1)} + ' KB'">크기</td>
+		    <td class="align-middle filesize" th:text="${file.formattedSize}">크기</td>
 		    <td class="align-middle description" th:text="${file.driveDescription} ?: '-'">파일설명</td>
 		    <td class="align-middle writer" th:text="${file.driveEditor != null ? file.driveEditor : file.uploaderName}">작성자</td>
 		    <td class="align-middle date" th:text="${#temporals.format(file.driveRegDate, 'yyyy-MM-dd')}">등록일</td>
@@ -519,8 +519,8 @@
 	      document.getElementById('totalDownloads').innerText = data.totalDownloads + '회';
 	      document.getElementById('recentUploadDate').innerText = data.recentUploadDate;
 
-	      const usedKB = data.totalUsedKB;
-	      const maxCapacityKB = 50 * 1024 * 1024; 
+	      const usedKB = data.totalUsedKB / 1024; 
+	      const maxCapacityKB = 50 * 1024 * 1024;
 	      const percent = Math.round((usedKB / maxCapacityKB) * 100);
 
 	      document.getElementById('usedGB').innerText = formatFromKB(usedKB);
