@@ -53,11 +53,11 @@
                           	data-list='{"valueNames":["articleNo","articleTitle","name","articleRegDate"], "page":6, "pagination":true}'>
                             <thead>
                               <tr>
-                                <th class="sort border-top border-translucent ps-0" data-sort="articleNo">번호</th>
+                                <th class="sort border-top border-translucent ps-0" data-sort="articleNo" style="width: 5%;">번호</th>
                                 <th class="sort border-top">긴급</th>
                                 <th class="sort border-top" data-sort="articleTitle">제목</th>
                                 <th class="sort border-top" data-sort="name">작성자</th>
-                                <th class="sort text-center  align-middle pe-0 border-top" scope="col" data-sort="articleRegDate">작성 시간</th>
+                                <th class="sort text-center  align-middle pe-0 border-top" scope="col" data-sort="articleRegDate">등록일</th>
                               </tr>
                             </thead>
                             <tbody class="list">
@@ -88,7 +88,7 @@
 						            </div> -->
 						        </td>
 							    <td class="align-middle age" >관리자</td>
-							    <td class="align-middle white-space-nowrap text-center  pe-0" th:text="${#temporals.format(notice.articleRegDate, 'yyyy.MM.dd HH:mm')}">2025-05-03 14:00</td>
+							    <td class="align-middle white-space-nowrap text-center  pe-0" th:text="${#temporals.format(notice.articleRegDate, 'yyyy.MM.dd')}">2025.05.03</td>
 							  </tr>
 							</tbody>
                           </table>
