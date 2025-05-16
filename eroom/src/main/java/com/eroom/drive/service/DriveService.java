@@ -632,6 +632,12 @@ public class DriveService {
 
 	    return result;
 	}
+	public List<DriveDto> findDepartmentAndChildDrives(String departmentCode) {
+	    List<String> codeList = structureService.getDepartmentAndTeamSeparatorCodes(departmentCode); // ✅ 부서 + 팀 코드
+	    List<Drive> drives = driveRepository.findBySeparatorCodeInAndVisibleYn(codeList, "Y");
+	    return drives.stream().map(DriveDto::toDto).toList();
+	}
+
 
 
 

@@ -90,5 +90,7 @@ public interface DriveRepository extends JpaRepository<Drive, Long>{
 	// 프로젝트 메인 최근 파일 5개 조회
 	@Query("SELECT d FROM Drive d WHERE d.param1 = :projectNo AND d.separatorCode LIKE 'FL006%' ORDER BY d.driveRegDate DESC")
 	List<Drive> findTop5RecentFilesByProject(@Param("projectNo") Long projectNo);
+	List<Drive> findBySeparatorCodeInAndVisibleYn(List<String> codeList, String string);
+	
 
 }
