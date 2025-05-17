@@ -131,7 +131,7 @@ public class AdminController {
 	    try {
 	        facilityService.createMeetingroom(dto);
 	        resultMap.put("res_code", 200);
-	        resultMap.put("res_msg", "회의실 등록이 성공적으로 완료되었습니다.");
+	        resultMap.put("res_msg", "회의실 등록이 성공적으로 완료되었습니다."); 
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	        resultMap.put("res_code", 500);
