@@ -6,10 +6,10 @@
 ---
 
 ## 🔗 프로젝트 링크  
-GitHub: [https://github.com/yourteam/eroom](https://github.com/yourteam/eroom)
-요구사항 정의서 : [https://docs.google.com/spreadsheets/d/1w7BuOShIZBw-MbzxRealUGnAmTkDN9zuUwkbWGjalkE/edit?gid=0#gid=0](https://docs.google.com/spreadsheets/d/1w7BuOShIZBw-MbzxRealUGnAmTkDN9zuUwkbWGjalkE/edit?gid=0#gid=0)
-화면 설계서 : [https://www.figma.com/design/o4UqCm1Q2Fwuk7Gh2jfFCK/Eroom-IT-%ED%9A%8C%EC%82%AC-%EA%B7%B8%EB%A3%B9%EC%9B%A8%EC%96%B4--%ED%99%94%EB%A9%B4-%EC%A0%95%EC%9D%98%EC%84%9C?node-id=1248-35561&t=14geTLj39bS1ykkJ-1](https://www.figma.com/design/o4UqCm1Q2Fwuk7Gh2jfFCK/Eroom-IT-%ED%9A%8C%EC%82%AC-%EA%B7%B8%EB%A3%B9%EC%9B%A8%EC%96%B4--%ED%99%94%EB%A9%B4-%EC%A0%95%EC%9D%98%EC%84%9C?node-id=1248-35561&t=14geTLj39bS1ykkJ-1)
-테이블 정의서 : [https://docs.google.com/spreadsheets/d/1q5LjIvu9inH75tKSUmEjuYY-0p3ne0m57-tAbesTU2s/edit?gid=0#gid=0](https://docs.google.com/spreadsheets/d/1q5LjIvu9inH75tKSUmEjuYY-0p3ne0m57-tAbesTU2s/edit?gid=0#gid=0)
+- GitHub: [https://github.com/yourteam/eroom](https://github.com/yourteam/eroom)
+- 요구사항 정의서 : [https://docs.google.com/spreadsheets/d/1w7BuOShIZBw-MbzxRealUGnAmTkDN9zuUwkbWGjalkE/edit?gid=0#gid=0](https://docs.google.com/spreadsheets/d/1w7BuOShIZBw-MbzxRealUGnAmTkDN9zuUwkbWGjalkE/edit?gid=0#gid=0)
+- 화면 설계서 : [https://www.figma.com/design/o4UqCm1Q2Fwuk7Gh2jfFCK/Eroom-IT-%ED%9A%8C%EC%82%AC-%EA%B7%B8%EB%A3%B9%EC%9B%A8%EC%96%B4--%ED%99%94%EB%A9%B4-%EC%A0%95%EC%9D%98%EC%84%9C?node-id=1248-35561&t=14geTLj39bS1ykkJ-1](https://www.figma.com/design/o4UqCm1Q2Fwuk7Gh2jfFCK/Eroom-IT-%ED%9A%8C%EC%82%AC-%EA%B7%B8%EB%A3%B9%EC%9B%A8%EC%96%B4--%ED%99%94%EB%A9%B4-%EC%A0%95%EC%9D%98%EC%84%9C?node-id=1248-35561&t=14geTLj39bS1ykkJ-1)
+- 테이블 정의서 : [https://docs.google.com/spreadsheets/d/1q5LjIvu9inH75tKSUmEjuYY-0p3ne0m57-tAbesTU2s/edit?gid=0#gid=0](https://docs.google.com/spreadsheets/d/1q5LjIvu9inH75tKSUmEjuYY-0p3ne0m57-tAbesTU2s/edit?gid=0#gid=0)
 
 ---
 
