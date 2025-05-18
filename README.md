@@ -1,19 +1,19 @@
-📘 Eroom 그룹웨어
+**📘 Eroom 그룹웨어**
 IT 기업에 최적화된 통합 업무 시스템으로, 개발자 중심의 협업 환경을 고려해 설계한 그룹웨어입니다.
 주소록, 이메일, 채팅, 결재, 프로젝트 관리, 캘린더, 예약, 게시판, 드라이브, 마이페이지, 알림, 설문조사, 챗봇 등
 총 14개의 통합 메뉴 + 로그인 시스템 + 관리자 기능을 제공합니다.
 
-🔗 프로젝트 링크
+**🔗 프로젝트 링크**
 GitHub: https://github.com/hsjeondev/eroom
 
-🧩 개요
+**🧩 개요**
 Eroom은 IT 기업 조직의 실무 흐름을 기준으로 기획된 통합 그룹웨어입니다.
 
 단순한 일정 관리나 게시판 기능을 넘어서, PR 및 코드 품질 분석, 회의록 자동 요약, 근태 관리 및 연차 처리, WebSocket 기반 실시간 채팅/알림, PDF 문서화 결재 시스템, 자동 로그인 및 관리자 기능 등 개발 조직 특화 기능이 포함되어 있습니다.
 
 리눅스 서버 기반 Docker 배포, Jenkins CI/CD, cloudflared를 통한 HTTPS 도메인 연결까지 포함된 실제 서비스 수준의 배포 경험을 반영하였습니다.
 
-🛠 기술 스택
+**🛠 기술 스택**
 구분	기술	설명
 백엔드	Java, Spring Boot, Spring MVC, Spring Security, MyBatis, JPA	REST API 설계, 로그인 인증, DB 연동
 프론트엔드	Thymeleaf, JavaScript, Bootstrap	반응형 UI, 서버 템플릿 렌더링
@@ -22,7 +22,7 @@ Eroom은 IT 기업 조직의 실무 흐름을 기준으로 기획된 통합 그�
 배포/운영	Linux, Docker, Jenkins, cloudflared	CI/CD 자동화, 도메인 설정, 리버스 프록시 구성
 기타	GitHub API, SonarCloud API, TMAP API, ChatGPT API	외부 서비스 연동 및 자동화 처리
 
-🚀 주요 기능
+**🚀 주요 기능**
 메뉴 / 영역	기능 설명
 🔐 로그인	Spring Security 기반 로그인, 자동 로그인(remember-me), 권한 기반 접근 제어
 🧑‍💼 관리자 페이지	사원 정보 관리, 차량 등록/수정/삭제, 회의실 등록/수정/삭제 등 관리자 기능 제공
@@ -41,5 +41,5 @@ Eroom은 IT 기업 조직의 실무 흐름을 기준으로 기획된 통합 그�
 📋 설문조사	익명 투표, 복수 선택 투표 기능
 💬 Eroom 챗봇	프로젝트 관련 질문에 대해 ChatGPT 기반 자동 응답 제공 (시스템 메시지 기반 커스터마이징)
 
-📧 문의
+**📧 문의**
 Email: hsjeondev@gmail.com (대표자 또는 팀장 이메일 입력)
