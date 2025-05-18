@@ -46,16 +46,16 @@
       <!-- 1행: 프로필 + 근태 요약 -->
       <div class="col-md-4">
         <div class="card">
-          <div class="card-body d-flex align-items-center">
+          <div class="card-body d-flex align-items-center gap-5" style="margin-left: 85px;">
 			<!-- 관리자일 때 -->
 			<div class="profile-wrapper me-3" >
 			  <img id="profileImage" class="rounded-circle" th:src="@{${profileImageUrl}}" alt="프로필">
 			</div>
 			
 
-            <div class="text-start">
+            <div class="text-start mt-2">
               <div class="fw-bold fs-7" th:text="${employee.employeeName}">이름</div>
-              <div class="text-body-secondary" th:text="${employee.employeePosition}">직급</div>
+              <div class="text-body-secondary mt-2" th:text="${employee.employeePosition}">직급</div>
             </div>
           </div>
           <div class="card-footer border-top border-dashed pt-3">

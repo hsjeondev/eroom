@@ -3,6 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <title>공지 게시판</title>
+<style>
+  .fixed-row-height td {
+    height: 42px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+</style>
 <script src="../../vendors/tinymce/tinymce.min.js"></script>
 </head>
 <body>
@@ -54,13 +63,13 @@
                             <thead>
                               <tr>
                                 <th class="sort border-top border-translucent ps-0" data-sort="articleNo" style="width: 5%;">번호</th>
-                                <th class="sort border-top">긴급</th>
-                                <th class="sort border-top" data-sort="articleTitle">제목</th>
-                                <th class="sort border-top" data-sort="name">작성자</th>
-                                <th class="sort text-center  align-middle pe-0 border-top" scope="col" data-sort="articleRegDate">등록일</th>
+                                <th class="sort border-top" style="width: 15%;"></th>
+                                <th class="sort border-top" data-sort="articleTitle" style="width: 40%;">제목</th>
+                                <th class="sort border-top" data-sort="name" style="width: 20%;">작성자</th>
+                                <th class="sort text-center  align-middle pe-0 border-top" scope="col" data-sort="articleRegDate" style="width: 20%;">등록일</th>
                               </tr>
                             </thead>
-                            <tbody class="list">
+                            <tbody class="list fixed-row-height">
                             	<tr th:if="${#lists.isEmpty(noticeList)}">
 								  <td colspan="4" class="text-center py-4 text-secondary fs-6">
 								    <i class="fa-solid fa-circle-info me-2 text-secondary"></i> 공지사항이 없습니다.

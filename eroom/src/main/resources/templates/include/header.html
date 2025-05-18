@@ -200,10 +200,13 @@
             </div>
           </li>
             <li class="nav-item dropdown"><a class="nav-link lh-1 pe-0" id="navbarDropdownUser" href="#!" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false">
-                <div class="avatar avatar-l ">
-                  <img id="headerProfileImg" class="rounded-circle " src="" alt="" style="display: none;" />
-
+                <div class="d-flex align-items-center">
+	                <div class="avatar avatar-l d-flex align-items-center">
+	                  <img id="headerProfileImg" class="rounded-circle " src="" alt="" style="display: none;" />
+	                </div>
+	                <span class="text-secondary fw-bold ms-2 d-none d-md-inline" style="font-weight: 900; position: relative; top: 2px;" sec:authentication="principal.employee.employeeName">이름</span>	
                 </div>
+                
               </a>
               <div class="dropdown-menu dropdown-menu-end navbar-dropdown-caret py-0 dropdown-profile shadow border" aria-labelledby="navbarDropdownUser">
                 <div class="card position-relative border-0">
@@ -211,7 +214,7 @@
                     <div class="text-center pt-4 pb-3">
                       <div class="avatar avatar-xl ">
                         <img id="dropdownProfileImg" class="rounded-circle " src="" alt="" style="display: none;" />
-
+						
                       </div>
                       	<th:block sec:authorize="isAuthenticated()">
     				  		<h6 class="mt-2 text-body-emphasis" sec:authentication="principal.employee.employeeName"></h6>
@@ -220,7 +223,7 @@
                   </div>
                   <div class="overflow-auto scrollbar" style="height: 3rem;">
                     <ul class="nav d-flex flex-column mb-2 pb-1">
-                      <li class="nav-item"><a class="nav-link px-3 d-block" href="#!"> <span class="me-2 text-body align-bottom" data-feather="user"></span><span>Profile</span></a></li>
+                      <li class="nav-item"><a class="nav-link px-3 d-block" th:href="@{/mypage/list}"> <span class="me-2 text-body align-bottom" data-feather="user"></span><span>마이페이지</span></a></li>
                     </ul>
                   </div>
                   <div class="card-footer p-0 border-top border-translucent">
