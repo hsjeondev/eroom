@@ -358,6 +358,7 @@ public class DirectoryController {
 		EmployeeDetails employeeDetails = (EmployeeDetails)authentication.getPrincipal();
 		Employee employee = employeeDetails.getEmployee();
 		
+		
 		Map<String, String> map = new HashMap<String, String>();
 		if(dto == null) {
 			map.put("res_code", "500");
