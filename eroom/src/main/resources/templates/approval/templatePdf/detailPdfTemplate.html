@@ -119,6 +119,7 @@ ul li {
 	<div class="container">
 		<div class="header" style="display: flex; justify-content: center;">
 			<h2>결재서</h2>
+			<hr>
 		</div>
 
 
@@ -132,12 +133,19 @@ ul li {
 						<th>서류번호</th>
 						<td th:text="${approvalNoFormatted}">서류번호</td>
 					</tr>
+			          <tr>
+			            <th class="table-light text-center">결재 상태</th>
+				            <td th:if="${approval.approval_status == 'A'}" style="color: #28a745; font-weight: bold;">승인</td>
+							<td th:if="${approval.approval_status == 'S'}" style="color: #007bff; font-weight: bold;">진행</td>
+							<td th:if="${approval.approval_status == 'D'}" style="color: #dc3545; font-weight: bold;">반려</td>
+							<td th:if="${approval.approval_status == 'F'}" style="color: #ffc107; font-weight: bold;">회수</td>
+			          </tr>
 					<tr>
 						<th>신청일</th>
 						<td th:text="${approval.reg_date}">-</td>
 					</tr>
 					<tr>
-						<th>신청일</th>
+						<th>완료일</th>
 						<td th:text="${approval.completed_date}">-</td>
 					</tr>
 					<tr>
@@ -145,7 +153,7 @@ ul li {
 						<td th:text="${approval.employee.employeeName}">신청자</td>
 					</tr>
 					<tr>
-						<th>부서</th>
+						<th>소속</th>
 						<td th:text="${approval.employee.structure.codeName}">팀</td>
 					</tr>
 					<tr>
@@ -173,10 +181,35 @@ ul li {
 			                  	<img th:if="${line.base64URL != null}"
 			                  		th:src="|data:image/png;base64,${line.base64URL}|"
 			                  		style="display: block; width: 100%; height: 100%; object-fit: contain;" alt="서명 이미지"/>
-			               		<span th:if="${line.base64URL == null}">승인</span>
+			               		<span th:if="${line.base64URL == null}" class="d-inline-block my-1">
+				               		<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+									  <!-- 승인 (파란색) -->
+									  <circle cx="20" cy="20" r="18" stroke="#0099FF" stroke-width="1.5" fill="none"/>
+									  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#0099FF" font-family="sans-serif">승인</text>
+									</svg>
+			               		</span>
 			                  </span>
-			                  <span th:if="${line.approval_line_status == 'S'}" th:text="대기">대기</span>
-			                  <span th:if="${line.approval_line_status == 'D'}" th:text="반려">반려</span>
+			                  <span th:if="${line.approval_line_status == 'S' and approval.approval_status == 'S'}">
+			   		               	<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+									  <!-- 대기 (초록색) -->
+									  <circle cx="20" cy="20" r="18" stroke="#28A745" stroke-width="1.5" fill="none"/>
+									  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#28A745" font-family="sans-serif">대기</text>
+									</svg>
+			                  </span>
+			                  <span th:if="${line.approval_line_status == 'S' and approval.approval_status != 'S'}">
+			   		               	<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+									  <!-- 대기 (초록색) -->
+									  <circle cx="20" cy="20" r="18" stroke="#6c757d" stroke-width="1.5" fill="none"/>
+									  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#6c757d" font-family="sans-serif">대기</text>
+									</svg>
+			                  </span>
+			                  <span th:if="${line.approval_line_status == 'D'}">
+			  		            <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+								  <!-- 반려 (빨간색) -->
+								  <circle cx="20" cy="20" r="18" stroke="#FF3333" stroke-width="1.5" fill="none"/>
+								  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#FF3333" font-family="sans-serif">반려</text>
+								</svg>
+			                  </span>
 			                </td>
 			              </tr>
 						</tbody>
@@ -201,10 +234,35 @@ ul li {
 			                  	<img th:if="${line.base64URL != null}"
 			                  		th:src="|data:image/png;base64,${line.base64URL}|"
 			                  		style="display: block; width: 100%; height: 100%; object-fit: contain;" alt="서명 이미지"/>
-			               		<span th:if="${line.base64URL == null}">합의</span>
+			               		<span th:if="${line.base64URL == null}">
+				               		<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+									  <!-- 승인 (파란색) -->
+									  <circle cx="20" cy="20" r="18" stroke="#0099FF" stroke-width="1.5" fill="none"/>
+									  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#0099FF" font-family="sans-serif">합의</text>
+									</svg>
+			               		</span>
 			                  </span>
-			                  <span th:if="${line.approval_line_status == 'S'}" th:text="대기">대기</span>
-			                  <span th:if="${line.approval_line_status == 'D'}" th:text="반려">반려</span>
+			                  <span th:if="${line.approval_line_status == 'S' and approval.approval_status == 'S'}">
+			   		               	<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+									  <!-- 대기 (초록색) -->
+									  <circle cx="20" cy="20" r="18" stroke="#28A745" stroke-width="1.5" fill="none"/>
+									  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#28A745" font-family="sans-serif">대기</text>
+									</svg>
+			                  </span>
+			                  <span th:if="${line.approval_line_status == 'S' and approval.approval_status != 'S'}">
+			   		               	<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+									  <!-- 대기 (초록색) -->
+									  <circle cx="20" cy="20" r="18" stroke="#6c757d" stroke-width="1.5" fill="none"/>
+									  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#6c757d" font-family="sans-serif">대기</text>
+									</svg>
+			                  </span>
+			                  <span th:if="${line.approval_line_status == 'D'}">
+			  		            <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+								  <!-- 반려 (빨간색) -->
+								  <circle cx="20" cy="20" r="18" stroke="#FF3333" stroke-width="1.5" fill="none"/>
+								  <text x="50%" y="63%" text-anchor="middle" font-size="15" font-weight="bold" fill="#FF3333" font-family="sans-serif">반려</text>
+								</svg>
+			                  </span>
 			                </td>
 			              </tr>
 						</tbody>
@@ -310,7 +368,7 @@ ul li {
 		
 		
 
-		<div class="footer-text" th:text="${approval.approval_reg_date}">2025-04-24</div>
+		<!-- <div class="footer-text" th:text="${approval.approval_reg_date}">2025-04-24</div> -->
 
 		<div class="section-title">첨부 파일</div>
 		<!-- 첨부 파일 -->
