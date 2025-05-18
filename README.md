@@ -63,4 +63,4 @@
 ---
 
 ## 📧 문의  
-Email: yourteam@example.com *(대표자 또는 팀장 이메일 입력)*
+Email: hsjeondev@gmail.com
