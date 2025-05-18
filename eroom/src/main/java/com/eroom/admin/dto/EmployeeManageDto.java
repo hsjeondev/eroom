@@ -1,5 +1,6 @@
 package com.eroom.admin.dto;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import com.eroom.attendance.dto.AnnualLeaveDto;
@@ -85,6 +86,7 @@ public class EmployeeManageDto {
     public static EmployeeManageDto toDto(EmployeeDto employeeDto, DirectoryDto directoryDto, StructureDto structureDto,
     		List<AttendanceDto> attendanceList, AnnualLeaveDto annualLeaveDto,
     		String departmentName, String teamName, String formattedHireDate, String formattedEndDate,String profileImageUrl) {
+    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
     		return EmployeeManageDto.builder() 
 					.employee(employeeDto)
 					.directory(directoryDto)
@@ -94,9 +96,9 @@ public class EmployeeManageDto {
 					.department_name(departmentName)
 					.team_name(teamName)
 					.formatted_hire_date(employeeDto.getEmployee_hire_date() != null ? 
-							employeeDto.getEmployee_hire_date().toLocalDate().toString() : "-")
+							employeeDto.getEmployee_hire_date().toLocalDate().format(formatter) : "-")
 					.formatted_end_date(employeeDto.getEmployee_end_date() != null ? 
-							employeeDto.getEmployee_end_date().toLocalDate().toString() : "-")
+							employeeDto.getEmployee_end_date().toLocalDate().format(formatter) : "-")
 					.profile_image_url(profileImageUrl)
 					.build();
     }
