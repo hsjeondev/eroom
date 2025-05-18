@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -173,14 +174,17 @@ public class ArticleController {
 	// 파일 조회
 	@GetMapping("/article/notice/detail/{id}")
 	public String selectArticleNoticeOne(@PathVariable("id") Long id,
-	                              Model model
-	                              ) {
+										Authentication autentication, Model model) {
 	    
 	    Article articleNotice = articleService.selectArticleNoticeOne(id); // 공지사항 하나 조회
 	    model.addAttribute("articleNotice", articleNotice);
 	    List<Drive> attachArticleNoticeList = articleService.findArticleAttaNoticechments(id);
 	    model.addAttribute("attachArticleNoticeList", attachArticleNoticeList);
-	    return "article/articleDetail"; // Thymeleaf 템플릿 경로
+	    // 로그인한 사용자
+		EmployeeDetails employeeDetails = (EmployeeDetails) autentication.getPrincipal();
+		String employeeName = employeeDetails.getEmployee().getEmployeeName();
+		model.addAttribute("loginUser", employeeName);
+	    return "article/articleDetail"; // Thymeleaf 템플릿 경로	
 	}
 	
 	

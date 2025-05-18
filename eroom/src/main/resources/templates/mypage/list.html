@@ -86,7 +86,7 @@
 		<div class="col-md-4">
 		  <!-- 기존 프로필 카드 그대로 삽입 -->
 			<div class="card">
-				<div class="card-body d-flex align-items-center">
+				<div class="card-body d-flex align-items-center gap-5" style="margin-left: 85px;">
 					<!-- 프로필 이미지 + 카메라 오버레이 -->
 					<div id="openProfileUploadModalBtn" class="profile-wrapper me-3" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
 						<img id="profileImage" class="rounded-circle" alt="프로필"
@@ -102,9 +102,9 @@
 						</div>
 					</div>
 					 <!-- 프로필 상단 -->
-					<div class="text-start">
+					<div class="text-start mt-2">
 						<div class="fw-bold fs-7" th:text="${employee.employeeName}">이름</div>
-						<div class="text-body-secondary" th:text="${employee.employeePosition}">직급</div>
+						<div class="text-body-secondary mt-2" th:text="${employee.employeePosition}">직급</div>
 					</div>
 				</div><!-- card-body -->	
 				
