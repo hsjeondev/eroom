@@ -45,7 +45,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 						
 						  <!-- 오른쪽 관리자 + 메뉴 -->
 						  <div class="d-flex justify-content-end align-items-center">
-						    <span class="me-2">관리자</span>
+						    <span th:text="'작성자 : ' + ${articleNotice.employee.employeeName} + ' | 등록일 : ' + ${#temporals.format(articleNotice.articleRegDate, 'yyyy.MM.dd HH:mm')}"></span>
 						    <div class="btn-reveal-trigger"
 						    th:if="${#authentication.principal.employee.employeeNo == 51}">
 						      <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none d-flex btn-reveal"

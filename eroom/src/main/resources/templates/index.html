@@ -232,6 +232,13 @@
 	background-color: #6c757d; /* secondary 진한 색 */
 }
 /* 결재 관련 스타일 태그 */
+#emergencyNoticeTable tbody td {
+  white-space: nowrap;       /* 줄바꿈 방지 */
+  overflow: hidden;          /* 넘치면 숨김 */
+  text-overflow: ellipsis;   /* 말줄임표 */
+  height: 40px;              /* td에도 높이 줌 */
+  vertical-align: middle;    /* 가운데 정렬 */
+}
 </style>
 
 </head>
@@ -719,20 +726,20 @@
 		    <div class="attendance-card mx-auto">
 		        <div class="card shadow-sm border-0">
 		    <div class="card-header text-center py-3" style="font-size: 1.2rem; font-weight: bold;">
-			  긴급 공지글
+			  긴급 공지
 			</div>
 			  <table class="table table-sm  mb-0 text-center" style="font-size: 1rem;">
 			    <colgroup>
-			      <col style="width: 50%;">
-			      <col style="width: 50%;">
+			      <col style="width: 70%;">
+			      <col style="width: 30%;">
 			    </colgroup>
 			    
 			    </table>
 			    <div style="height: 200px; overflow-y: auto;">
 			    <table id="emergencyNoticeTable" class="table table-sm  mb-0 text-center" style="font-size: 1rem;">
 				     <colgroup>
-				     <col style="width: 50%;">
-				     <col style="width: 50%;">
+				     <col style="width: 70%;">
+				     <col style="width: 30%;">
 				   </colgroup>
 				   <tbody>
 			     
@@ -1554,7 +1561,12 @@
 		          dateTd.style.paddingLeft = '20px';
 		          const date = new Date(notice.article_reg_date);
 		          if (!isNaN(date.getTime())) { // 날짜 유효성 체크
-		            const formattedDate = date.toISOString().split('T')[0];  // yyyy-MM-dd
+		        	const year = date.getFullYear(); 
+		          	const month = String(date.getMonth() + 1).padStart(2, '0');
+		          	const day = String(date.getDate()).padStart(2, '0');
+		          	
+		            //const formattedDate = date.toISOString().split('T')[0];  // yyyy-MM-dd
+		            const formattedDate = `${year}.${month}.${day}`;  // yyyy.MM.dd
 		            dateTd.textContent = formattedDate;
 		          } else {
 		            dateTd.textContent = '-';  // 유효하지 않은 날짜일 때 대체 텍스트

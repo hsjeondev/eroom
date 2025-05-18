@@ -131,7 +131,7 @@ public class AdminController {
 	    try {
 	        facilityService.createMeetingroom(dto);
 	        resultMap.put("res_code", 200);
-	        resultMap.put("res_msg", "회의실 등록이 성공적으로 완료되었습니다.");
+	        resultMap.put("res_msg", "회의실 등록이 성공적으로 완료되었습니다."); 
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	        resultMap.put("res_code", 500);
@@ -436,6 +436,8 @@ public class AdminController {
 		// 반환용 DTO리스트
 		List<EmployeeManageDto> manageDtoList = new ArrayList<>();
 	
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+		
 		for(Employee employee : employeeList) {
 			// 사원 dto
 			EmployeeDto employeeDto = new EmployeeDto().toDto(employee);
@@ -495,8 +497,8 @@ public class AdminController {
 					annualLeaveDto,
 					departmentName,
 					teamName,
-					employeeDto.getEmployee_hire_date() != null ? employeeDto.getEmployee_hire_date().toLocalDate().toString() : "-",
-					employeeDto.getEmployee_end_date() != null?  employeeDto.getEmployee_end_date().toLocalDate().toString() : "-",
+					employeeDto.getEmployee_hire_date() != null ? employeeDto.getEmployee_hire_date().toLocalDate().format(formatter) : "-",
+					employeeDto.getEmployee_end_date() != null?  employeeDto.getEmployee_end_date().toLocalDate().format(formatter) : "-",
 					profileImageUrl
 					);
 			

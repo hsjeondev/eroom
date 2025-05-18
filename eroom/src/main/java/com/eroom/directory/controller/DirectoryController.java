@@ -126,59 +126,6 @@ public class DirectoryController {
 	// 트리 선택시 비동기 방식으로 회원 리스트 조회
 	@GetMapping("/directory/employeeList")
 	public String getEmployeeListFragment(@RequestParam("separatorCode") String separatorCode, Model model, @AuthenticationPrincipal EmployeeDetails user) {
-//	    List<DirectoryDto> employeeList = new ArrayList<DirectoryDto>();
-//		List<Directory> temp = directoryService.selectDirectoryEmployeeAllBySeparatorCode();
-//		
-//		// 직원 리스트를 가져와서 DTO로 변환
-//		for(Directory t : temp) {
-//			DirectoryDto dto = new DirectoryDto().toDto(t);
-//			if (t.getEmployee().getStructure() != null) {
-//			    Structure structure = t.getEmployee().getStructure();
-//			    if (structure.getParentCode() != null) {
-//			    	// 팀이라는 뜻이니까 code_name을 가져오면 팀명
-//			        dto.setTeam_name(structure.getCodeName());
-//			        // 부서 있다는 뜻이니까 부서 parent_code=separator_code 조회해서 code_name을 가져오면 부서명
-//			        Structure parent = structureService.selectStructureCodeNameByParentCodeEqualsSeparatorCode(structure.getParentCode());
-//			        dto.setDepartment_name(parent != null ? parent.getCodeName() : "-");
-//			    } else {
-//			    	// 부서라는 뜻이니까 code_name을 바로 가져오면 부서명
-//			        dto.setDepartment_name(structure.getCodeName() != null ? structure.getCodeName() : "-");
-//			        dto.setTeam_name("-");
-//			    }
-//			} else {
-//			    dto.setDepartment_name("-");
-//			    dto.setTeam_name("-");
-//			}
-//			// 재직중인 사람만 리스트에 추가
-//			Structure targetStructure = structureService.getBySeparatorCode(separatorCode);
-//			String targetCodeName = targetStructure != null ? targetStructure.getCodeName() : null;
-//			if (t.getEmployee().getEmployeeEmploymentYn().equals("Y")
-//				    && targetCodeName != null
-//				    && (targetCodeName.equals(dto.getTeam_name()) || targetCodeName.equals(dto.getDepartment_name()))) {
-//				employeeList.add(dto);
-//			} else if(t.getEmployee().getEmployeeEmploymentYn().equals("Y")
-//				    && separatorCode.equals("selectAll")) {
-//				employeeList.add(dto);
-//				
-//			}
-//		}
-//		
-//		// 부서 리스트와 팀 리스트를 가져와서 Map에 저장
-//		List<Structure> departmentList = new ArrayList<Structure>();
-//		Map<String, List<Structure>> teamMap = new HashMap<String, List<Structure>>();
-//		departmentList = structureService.selectDepartmentAll();
-//		for (Structure s : departmentList) {
-//			// 부서명으로 팀 리스트를 가져와서 Map에 저장
-//			List<Structure> teamList = new ArrayList<Structure>();
-//			// separator_code로 팀 리스트를 조회 후 <부서명, 팀리스트> 형태로 Map에 저장
-//			teamList = structureService.selectTeamAll(s.getSeparatorCode());
-//			teamMap.put(s.getCodeName(), teamList);
-//		}
-//		
-//		
-//		model.addAttribute("departmentList", departmentList);
-//		model.addAttribute("teamMap", teamMap);
-//		model.addAttribute("employeeList", employeeList);
 		
 		try {
 			getEmployeeListBySeparatorCodeMethod(separatorCode, model, user);
@@ -411,6 +358,7 @@ public class DirectoryController {
 		EmployeeDetails employeeDetails = (EmployeeDetails)authentication.getPrincipal();
 		Employee employee = employeeDetails.getEmployee();
 		
+		
 		Map<String, String> map = new HashMap<String, String>();
 		if(dto == null) {
 			map.put("res_code", "500");
@@ -498,37 +446,6 @@ public class DirectoryController {
 	}
 
 	
-	// 부서, 팀 삭제
-//	@PutMapping("/admin/employee/delete")
-//	@ResponseBody
-//	public Map<String, String> deleteDepartmentTeamMethod(@RequestBody AddDepartmentAndTeamDto dto, @AuthenticationPrincipal EmployeeDetails user){
-//		Employee employee = user.getEmployee();
-//		
-//		Map<String, String> map = new HashMap<String, String>();
-//		if(dto == null) {
-//			map.put("res_code", "500");
-//			map.put("res_msg", "잘못된 요청입니다.");
-//			return map;
-//		}
-//		
-//		
-//		String type = (dto.getParentCode() == null) ? "부서" : "팀";
-//		
-//		map.put("res_code", "500");
-//		map.put("res_msg", type + " 삭제 실패했습니다.");
-//		
-//		
-//		int result = 0;
-//		result = structureService.deleteDepartmentOrTeam(dto, employee);
-//		
-//		if(result > 0) {
-//			map.put("res_code", "200");
-//			map.put("res_msg", type + " 삭제가 완료됐습니다.");
-//		}
-//		
-//		
-//		return map;
-//	}
 	
 	@PutMapping("/admin/directory/deleteDepartmentOrTeam")
 	@ResponseBody
