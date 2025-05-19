@@ -12,11 +12,11 @@
     <th:block th:each="auth : ${user.employee.authorities}">
 	  <th:block th:if="${auth.authorityName == 'ROLE_ADMIN'}">
 	  <div class="mb-2" style="font-size: 0.9rem; color: #333;">
-  <span style="font-weight: bold; color: #0d6efd;">📁 업로드 가능 확장자:</span>
-  <span>.jpg, .png, .pdf, .xlsx, .docx, .zip .txt</span><br>
-  <span style="font-weight: bold; color: #0d6efd;">📦 최대 용량:</span>
-  <span>200MB / 파일당</span>
-</div>
+	   <span style="font-weight: bold; color: #0d6efd;">📁 업로드 가능 확장자:</span>
+	   <span>.jpg, .png, .pdf, .xlsx, .docx, .zip .txt</span><br>
+	   <span style="font-weight: bold; color: #0d6efd;">📦 최대 용량:</span>
+	  <span>200MB / 파일당</span>
+	 </div>
 	    <button class="btn btn-primary" type="button" id="toggle-upload-btn">파일 올리기</button>
 	  </th:block>
 	</th:block>
