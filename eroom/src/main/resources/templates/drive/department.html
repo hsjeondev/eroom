@@ -477,7 +477,7 @@
  		      document.getElementById('recentUploadDate').innerText = data.recentUploadDate;
 
  		     const usedKB = data.totalUsedKB / 1024; // ✔ Byte → KB 변환
- 		     const maxCapacityKB = 50 * 1024 * 1024;
+ 		     const maxCapacityKB = 1024 * 1024; 
  		     const percent = Math.round((usedKB / maxCapacityKB) * 100);
  			
  		      document.getElementById('usedGB').innerText = formatFromKB(usedKB);
