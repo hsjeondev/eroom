@@ -134,10 +134,10 @@
 										    </div>
 										  </div>
 										  <div class="d-flex justify-content-between">
-										    <p th:text="${chatroom.chatLastMessage != null and !#strings.isEmpty(chatroom.chatLastMessage) ? chatroom.chatLastMessage : '[파일] 첨부됨'}"
-											   class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">
-											</p>
-
+										    <p th:text="${chatroom.chatLastMessage}"
+										       class="fs-9 mb-0 line-clamp-1 text-body-tertiary text-opacity-85 message">
+										       마지막메시지
+										    </p>
 										  </div>
 										</div>
 								</a></li>
