@@ -106,7 +106,7 @@ public class ApprovalPdfController {
 		}
 		sb.append(strTemp);
 		String approvalNoFormatted = "FL-007-" + sb.toString();
-		context.setVariable("approvalNoFormatted", approvalNoFormatted);
+		context.setVariable("approvalNoFormatted", approvalNoFormatted); 
 		
 //		파일 조회 - 해당 결재글이 드라이브의 param1에 들어있어야함.
 		List<DriveDto> driveList = driveService.findApprovalDriveFiles(approvalNo);
