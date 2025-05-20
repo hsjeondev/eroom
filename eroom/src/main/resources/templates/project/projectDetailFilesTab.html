@@ -384,31 +384,6 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 			      .catch(err => { alert('오류 발생'); console.error(err); });
 			    });
 
-			    // g) 팀 요약 정보 fetch
-			    fetch('/drive/summary/team')
-			      .then(res => res.json())
-			      .then(data => {
-			        function fmt(kb) {
-			          if (kb === 0) return '0 KB';
-			          const u = ['KB','MB','GB','TB'], i = Math.floor(Math.log(kb)/Math.log(1024));
-			          return `${(kb/Math.pow(1024,i)).toFixed(1)} ${u[i]}`;
-			        }
-			        document.getElementById('totalFiles').innerText = data.totalFiles+'개';
-			        document.getElementById('totalDownloads').innerText = data.totalDownloads+'회';
-			        document.getElementById('recentUploadDate').innerText = data.recentUploadDate;
-			        document.getElementById('usedGB').innerText = fmt(data.totalUsedKB);
-			        const pct = Math.round(data.totalUsedKB/(50*1024*1024)*100);
-			        document.getElementById('usagePercent').innerText = pct+'%';
-			        document.querySelector('.progress-bar').style.width = pct+'%';
-			        const usage = data.fileTypeUsage||{};
-			        document.getElementById('sizeZip').innerText = fmt(usage.zip||0);
-			        document.getElementById('sizeImage').innerText = fmt(usage.image||0);
-			        document.getElementById('sizeWord').innerText = fmt(usage.docx||0);
-			        document.getElementById('sizeExcel').innerText = fmt(usage.xlsx||0);
-			        document.getElementById('sizeEtc').innerText = fmt(usage.etc||0);
-			        document.getElementById('totalCapacity').innerText = fmt(50*1024*1024);
-			      })
-			      .catch(err => console.error('요약정보 실패:', err));
 			  });
 
 			  // ——————————————————————————
