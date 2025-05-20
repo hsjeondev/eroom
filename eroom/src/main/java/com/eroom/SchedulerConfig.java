@@ -49,7 +49,7 @@ public class SchedulerConfig {
 	    // System.out.println("매달 1일 00시에 실행됨!");
 	}
 	// 연차부여
-	@Scheduled(cron = "0 17 10 14 5 *", zone = "Asia/Seoul") // 테스트용 : 5월 12일 
+	@Scheduled(cron = "0 0 0 1 1 *", zone = "Asia/Seoul") 
 	public void grantAnnualLeaveToAllEmployees() {
 		// 현재 연도 가져오기
 		Long currentYear = Long.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")).getYear());
