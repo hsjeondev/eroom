@@ -13,7 +13,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Long> {
 
 	Survey findBySurveyNo(Long surveyId);
 	
-	@Query("SELECT s FROM Survey s WHERE s.visible = 'Y'")
+	@Query("SELECT s FROM Survey s WHERE s.visible = 'Y' ORDER BY s.deadline ASC")
 	List<Survey> findAllVisibleSurvey();
 	
 	@Modifying
