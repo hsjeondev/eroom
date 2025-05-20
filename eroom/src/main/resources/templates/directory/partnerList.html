@@ -24,7 +24,7 @@ lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-sha
 
 
 
-  <div class="col" id="directoryEmployeeTable" data-list='{"valueNames":["no", "name", "companyName", "email", "phone", "department", "team", "position"], "page": 5, "pagination": true}'>
+  <div class="col" id="directoryEmployeeTable" data-list='{"valueNames":["no", "name", "companyName", "email", "phone", "department", "team", "position"], "page": 10, "pagination": true}'>
     
 <!-- 검색창 + 추가 버튼 영역 -->
 <div class="position-relative mb-3" style="min-height: 38px;"> <!-- 버튼 높이 확보 -->
@@ -417,77 +417,78 @@ document.getElementById("submitBtn").addEventListener('click', function(e){
 
 <!-- edit 메소드 -->
 <script>
-// 수정 모달 채우기
-document.querySelectorAll('.edit-btn').forEach(btn => {
-	  btn.addEventListener('click', () => {
-	    document.getElementById('editNo').value = btn.dataset.partnerNo;
-	    document.getElementById('editName').value = btn.dataset.name;
-	    document.getElementById('editCompanyName').value = btn.dataset.companyName;
-	    document.getElementById('editEmail').value = btn.dataset.email;
-	    document.getElementById('editPhone').value = btn.dataset.phone;
-	    document.getElementById('editDepartment').value = btn.dataset.department;
-	    document.getElementById('editTeam').value = btn.dataset.team;
-	    document.getElementById('editPosition').value = btn.dataset.position;
+document.addEventListener('DOMContentLoaded', () => {
+	  // 모달 인스턴스 생성
+	  const editModal = new bootstrap.Modal(document.getElementById('editPartnerDirectoryModal'));
 
-	    new bootstrap.Modal(document.getElementById('editPartnerDirectoryModal')).show();
+	  // 수정 모달 채우기
+	  document.querySelectorAll('.edit-btn').forEach(btn => {
+	    btn.addEventListener('click', () => {
+	      // 데이터 채우기
+	      document.getElementById('editNo').value = btn.dataset.partnerNo;
+	      document.getElementById('editName').value = btn.dataset.name;
+	      document.getElementById('editCompanyName').value = btn.dataset.companyName;
+	      document.getElementById('editEmail').value = btn.dataset.email;
+	      document.getElementById('editPhone').value = btn.dataset.phone;
+	      document.getElementById('editDepartment').value = btn.dataset.department;
+	      document.getElementById('editTeam').value = btn.dataset.team;
+	      document.getElementById('editPosition').value = btn.dataset.position;
+
+	      // 모달 열기
+	      editModal.show();
+	    });
 	  });
-	});
 
+	  // 수정 버튼 클릭 시
+	  document.getElementById("editPartnerBtn").addEventListener('click', function(e) {
+	    e.preventDefault(); // 기본 제출 막기
+	    let formDataEdit = {};
 
+	    const fieldEdit = [
+	      { idEdit: "editNo" },
+	      { idEdit: "editName", message: "이름을 입력해주세요." },
+	      { idEdit: "editCompanyName", message: "회사명을 입력해주세요." },
+	      { idEdit: "editEmail", message: "이메일을 입력해주세요." },
+	      { idEdit: "editPhone", message: "연락처를 입력해주세요." },
+	      { idEdit: "editDepartment", message: "부서명을 입력해주세요." },
+	      { idEdit: "editTeam", message: "팀명을 입력해주세요." },
+	      { idEdit: "editPosition", message: "직급을 입력해주세요." }
+	    ];
 
-document.getElementById("editPartnerBtn").addEventListener('click', function(e){
-    e.preventDefault(); // 기본 제출 막기
-    let formDataEdit = {};
+	    // 연락처 유효성 검사
+	    const phoneInputEdit = document.getElementById('editPhone');
+	    const phoneRegexEdit = /^010-\d{4}-\d{4}$/; // 010-숫자4자리-숫자4자리
 
-    const fieldEdit = [
-    	  { idEdit: "editNo" },
-    	  { idEdit: "editName", message: "이름을 입력해주세요." },
-    	  { idEdit: "editCompanyName", message: "회사명을 입력해주세요." },
-    	  { idEdit: "editEmail", message: "이메일을 입력해주세요." },
-    	  { idEdit: "editPhone", message: "연락처를 입력해주세요." },
-    	  { idEdit: "editDepartment", message: "부서명을 입력해주세요." },
-    	  { idEdit: "editTeam", message: "팀명을 입력해주세요." },
-    	  { idEdit: "editPosition", message: "직급을 입력해주세요." }
-    ];
-    
-    
- // 연락처 유효성 검사
-	const phoneInputEdit = document.getElementById('editPhone');
-	const phoneValueEdit = phoneInputEdit.value.trim();
-	
-	const phoneRegexEdit = /^010-\d{4}-\d{4}$/; // 010-숫자4자리-숫자4자리
+	    let isValidEdit = true;
 
-    let isValidEdit = true;
+	    // 폼 데이터 유효성 검사
+	    fieldEdit.forEach(field => {
+	      const input = document.getElementById(field.idEdit);
+	      const value = input.value.trim();
 
-	
-    fieldEdit.forEach(fieldEdit => {
-        const inputEdit = document.getElementById(fieldEdit.idEdit);
-        const valueEdit = inputEdit.value.trim();
+	      if (!value) {
+	        if (isValidEdit) {
+	          showAlert(field.message);
+	          input.focus();
+	        }
+	        input.style.border = "1px solid red";
+	        isValidEdit = false;
+	      } else if (field.idEdit === 'editPhone' && !phoneRegexEdit.test(value)) {
+	        if (isValidEdit) {
+	          showAlert("연락처는 010-1234-5678 형식으로 입력해주세요.");
+	          input.focus();
+	        }
+	        input.style.border = "1px solid red";
+	        isValidEdit = false;
+	      } else {
+	        input.style.border = "";
+	        formDataEdit[field.idEdit] = value;
+	      }
+	    });
 
-        if (!valueEdit) {
-            if (isValidEdit) {
-            	showAlert(fieldEdit.message);
-                inputEdit.focus();
-            }
-            inputEdit.style.border = "1px solid red";
-            isValidEdit = false;
-        } else if (fieldEdit.idEdit === 'phone' && !phoneRegexEdit.test(valueEdit)) {
-            if (isValidEdit) {
-            	showAlert("연락처는 010-1234-5678 형식으로 입력해주세요.");
-                inputEdit.focus();
-            }
-            inputEdit.style.border = "1px solid red";
-            isValidEdit = false;
-        } else {
-            inputEdit.style.border = "";
-            formDataEdit[fieldEdit.idEdit] = valueEdit;
-        }
-    });
-    
-    
-    
-    if(isValidEdit){
-	    fetch('/directory/partner/update', {
+	    // 유효성 통과 시 fetch 전송
+	    if (isValidEdit) {
+	      fetch('/directory/partner/update', {
 	        method: 'PUT',
 	        headers: {
 	          'Content-Type': 'application/json',
@@ -498,30 +499,28 @@ document.getElementById("editPartnerBtn").addEventListener('click', function(e){
 	      })
 	      .then(res => res.json())
 	      .then(data => {
-	    	  if(data.res_code == '200'){
-	    		  showAlert(data.res_msg);
-		        // location.reload();
-		        reloadAfterAlert();
-	    	  }
+	        if (data.res_code == '200') {
+	          showAlert(data.res_msg);
+	          reloadAfterAlert();
+	        }
 	      })
 	      .catch(err => {
 	        console.error(err);
 	        showAlert("수정 중 오류 발생");
 	      });
-    }
-    
-});
+	    }
+	  });
 
+	  // 모달 취소 버튼 클릭 시 모달 수동 닫기
+	  document.getElementById('modalCancelButton').addEventListener('click', function () {
+	    editModal.hide();  // Bootstrap 인스턴스 수동으로 닫기
 
-//모달 취소 버튼 클릭 시 모달 수동 닫기
-document.getElementById('modalCancelButton').addEventListener('click', function () {
-    const editModal = bootstrap.Modal.getInstance(document.getElementById('editPartnerDirectoryModal'));
-    editModal.hide();  // Bootstrap 인스턴스 수동으로 닫기
+	    // 혹시 남아있는 backdrop 강제로 제거
+	    const backdrops = document.querySelectorAll('.modal-backdrop');
+	    backdrops.forEach(backdrop => backdrop.remove());
+	  });
+	});
 
-    // 혹시 남아있는 backdrop 강제로 제거
-    const backdrops = document.querySelectorAll('.modal-backdrop');
-    backdrops.forEach(backdrop => backdrop.remove());
-});
 
 </script>
 
