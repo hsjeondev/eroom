@@ -29,7 +29,7 @@
 						<div class="card-header bg-light fw-bold d-flex justify-content-between align-items-center py-2">
 							<span>회의록 목록</span>
 							<th:block th:if="${isProjectMember}">
-								<button type="button" class="btn btn-secondary" th:onclick="|location.href='/project/minute/create-page?projectNo=${project.project_no}'|">회의록 작성</button>
+								<button type="button" class="btn btn-primary" th:onclick="|location.href='/project/minute/create-page?projectNo=${project.project_no}'|">회의록 작성</button>
 							</th:block>
 						</div>
 						<div class="table-responsive scrollbar ms-n1 ps-1">

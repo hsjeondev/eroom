@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{include/layout}">
 <th:block layout:fragment="content">
-<head>
+	<head>
 <meta charset="UTF-8">
 <title>전체 설문조사</title>
-	<style>
+<style>
 /* 삭제 버튼 css */
 .item-wrapper {
 	position: relative;
@@ -21,7 +21,7 @@
 	transform: translateY(-50%);
 }
 </style>
-</head>
+	</head>
 	<link href="vendors/choices/choices.min.css" rel="stylesheet" />
 	<script src="vendors/choices/choices.min.js"></script>
 	<main class="main" id="top">
@@ -560,6 +560,7 @@
 
 	    const voteCount = document.createElement('span');
 	    voteCount.textContent = item.count + '표';
+	    voteCount.style.cursor = 'default';
 
 	    if (hasVoted) {
 	      // 이미 투표했을 경우 결과 표시
