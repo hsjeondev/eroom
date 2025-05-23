@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{include/layout}">
+<head>
+<meta charset="UTF-8">
+<title>회사 주소록</title>
+<style>
+/* .avatar img {
+	max-width: 32px;
+	height: auto;
+} */
+
+td.name p {
+	max-width: 150px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.table-responsive table {
+	table-layout: fixed;
+	width: 100%;
+}
+
+.table td {
+	overflow: hidden;
+}
+
+.profile-wrapper {
+	position: relative;
+	width: 128px;
+	height: 128px;
+}
+
+.profile-wrapper img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.treeview-label-strong {
+  font-weight: bold;
+  text-decoration: underline;
+  color: #007bff;  /* 진한 파랑 계열 (Bootstrap의 primary 색상) */
+}
+.treeview-row {
+  pointer-events: none;
+}
+#searchEmployeeList {
+    white-space: nowrap; /* 줄바꿈 없이 한 줄로 정렬 */
+    overflow-x: auto;    /* 넘치면 가로 스크롤 */
+    display: flex;       /* 플렉스 레이아웃으로 정렬 */
+    gap: 10px;           /* 요소 간격 */
+    padding: 5px;        /* 약간의 패딩 */
+}
+.employee-list {
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    padding: 5px 10px;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 500;
+}
+  .modal-sm-plus {
+  max-width: 400px; /* sm은 300px, 기본은 500px, 중간은 400px */
+  }
+</style>
+</head>
+<body>
+	<main class="main" id="top" layout:fragment="content">
+		<div class="d-flex justify-content-start align-items-center mb-5">
+			<i class="fas fa-user-tie text-secondary me-2"></i> <span class="fw-bold fs-7">회사 주소록</span>
+		</div>
+		<div class="mb-9" data-collapse-filemanager-sidebar="data-collapse-filemanager-sidebar">
+			<div class="row gx-4">
+
+				<!-- 트리구조 -->
+				<div class="col-auto file-manager-sidebar">
+					<div class="phoenix-offcanvas phoenix-offcanvas-fixed bg-body scrollbar overflow-x-hidden" id="fileManagerSideBar" data-breakpoint="lg">
+						<div class="d-flex flex-between-center">
+							<h5 class="mb-2">회사 주소록</h5>
+							<button class="btn p-0 fs-8 d-lg-none" data-phoenix-dismiss="offcanvas">
+								<span class="fa-solid fa-xmark" data-fa-transform="up-3"></span>
+							</button>
+						</div>
+						<ul class="mb-0 treeview" id="treeviewExample">
+							<li class="treeview-list-item"><a id="companyRoot" href="javascript:void(0);" role="button" aria-expanded="true">
+									<p class="treeview-text text-nowrap">
+										<span class="fa-solid fa-folder treeview-icon text-info-light"></span> <span class="treeview-label-text treeview-label-strong">이룸 컴퍼니</span>
+									</p>
+							</a>
+								<ul class="collapse treeview-list" id="treeviewExample-1-1" data-show="true">
+
+									<li th:each="dept, deptStatus : ${departmentList}" class="treeview-list-item"><a class="treeview-dept" th:attr="data-deptSeparatorCode=${dept.separatorCode}" data-bs-toggle="collapse" th:href="'#treeview-dept-' + ${deptStatus.index}" role="button" aria-expanded="false">
+											<p class="treeview-text text-nowrap">
+												<span class="fa-solid fa-folder treeview-icon"></span> <span class="treeview-label-text" 
+																											th:text="${dept.codeName}"
+																											>부서명</span>
+
+											</p>
+									</a>
+
+										<ul class="collapse treeview-list" th:id="'treeview-dept-' + ${deptStatus.index}" data-show="false">
+											<li th:each="team, teamStatus : ${teamMap[dept.codeName]}" class="treeview-list-item">
+												<div class="treeview-item treeview-team" th:attr="data-teamSeparatorCode=${team.separatorCode}">
+													<a class="flex-1 ps-2 ms-2" href="#!">
+														<p class="treeview-text text-nowrap">
+															<span class="treeview-icon fa-solid fa-file-lines"></span> <span class="treeview-label-text" 
+																															th:text="${team.codeName}"
+																															>팀명</span>
+														</p>
+													</a>
+												</div>
+											</li>
+										</ul></li>
+
+								</ul></li>
+
+						</ul>
+
+					</div>
+				</div>
+
+
+
+
+
+
+
+
+				<div class="col" id="employeeTable" data-list='{"valueNames":["no","mail","name","phone", "job", "dept", "team", "date"], "page": 10, "pagination": true}'>
+
+					<!-- 검색, 필터, 버튼 -->
+					<div class="mb-4">
+						<div class="row g-3">
+							<div class="col-auto">
+								<!-- 검색 -->
+								<div class="search-box">
+										<input id="searchInput" class="form-control search-input search" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
+										<svg style="height: 40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+											<path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path></svg>
+										<!-- <span class="fas fa-search search-box-icon"></span> Font Awesome fontawesome.com -->
+								</div>
+							</div>
+
+							<!-- 부서/팀 필터 -->
+							<!-- <div class="col-auto scrollbar overflow-hidden-y flex-grow-1">
+								<div class="btn-group position-static" role="group">
+									<div class="btn-group position-static text-nowrap">
+										<button style="height: 37.55px;" class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+											부서<svg style="height: 70%;" class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+												<path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg>
+											<span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com
+										</button>
+										<ul class="dropdown-menu" id="deptDropdown">
+											<li ><a class="dropdown-item active" href="#" >전체</a></li>
+											<li  th:each="dept, deptStatus : ${departmentList}"><a class="dropdown-item" href="#"  th:text="${dept.codeName}">부서명</a></li>
+										</ul>
+									</div>
+									<div class="btn-group position-static text-nowrap">
+										<button style="height: 37.55px;" class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+											팀<svg style="height: 70%;" class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+												<path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg>
+											<span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com
+										</button>
+										<ul class="dropdown-menu" id="teamDropdown">
+										  <li><a class="dropdown-item active" href="#">전체</a></li>
+										</ul>
+									</div>
+								</div>
+							</div> -->
+							<!-- 부서/팀 필터 -->
+							<div id="problemBtn" class="col-auto scrollbar overflow-hidden-y flex-grow-1" style="display: none;">
+							  <div class="btn-group position-static" role="group">
+							    <!-- 부서 드롭다운 -->
+							    <div class="btn-group position-static text-nowrap">
+							      <button id="deptDropdownBtn" class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							        <span>부서</span>
+							        <svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" viewBox="0 0 448 512">
+							          <path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/>
+							        </svg>
+							      </button>
+							      <ul class="dropdown-menu" id="deptDropdown">
+							        <li><a class="dropdown-item active" href="#" data-separatorCode='selectAll'>전체</a></li>
+							        <li th:each="dept : ${departmentList}">
+							          <a class="dropdown-item" href="#" th:text="${dept.codeName}"  th:attr="data-separatorCode=${dept.separatorCode}" >부서명</a>
+							        </li>
+							      </ul>
+							    </div>
+							
+							    <!-- 팀 드롭다운 -->
+							    <div class="btn-group position-static text-nowrap">
+							      <button id="teamDropdownBtn" class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							        <span>팀</span>
+							        <svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" viewBox="0 0 448 512">
+							          <path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/>
+							        </svg>
+							      </button>
+							      <ul class="dropdown-menu" id="teamDropdown">
+							        <li><a class="dropdown-item active" href="#" data-teamname="전체">전체</a></li>
+							        <!-- 팀 항목은 부서 선택 시 비동기로 추가됨 -->
+							      </ul>
+							    </div>
+							  </div>
+							</div>
+
+
+							<!-- 부서/팀 추가 버튼 -->
+							<div th:if="${#authentication.authorities.?[authority == 'ROLE_ADMIN'].size() > 0}" class="col-auto">
+								<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sortOrderModal">부서/팀 정렬</button>
+								<button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addDepartmentAndTeamModal">부서/팀 추가</button>
+								<button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteDepartmentAndTeamModal">부서/팀 삭제</button>
+							</div>
+
+
+
+
+
+
+						</div>
+					</div>
+
+					<!-- 회원 목록 테이블 -->
+					<div class="bg-body-emphasis border-top border-bottom">
+					
+					<div id="employeeListInsert" style="display: none;">
+						<div th:replace="~{directory/employeeListFragment :: employeeListFragment}"></div>
+					</div>	
+					<div id="loadingSpinner" class="text-center py-3">
+                      <div class="spinner-border" role="status">
+                      	<span class="visually-hidden">로딩중...</span>
+                      </div>
+                    </div>
+                    
+						
+						
+						
+						
+
+						<!-- 페이징 -->
+						<div class="row align-items-center justify-content-center py-2 pe-0 fs-9">
+							<div class="col-auto d-flex">
+								<button class="page-link disabled" data-list-pagination="prev" disabled>
+									<i class="fas fa-chevron-left"></i>
+								</button>
+								<ul class="mb-0 pagination">
+									<li class="active"><button class="page" type="button" data-i="1">1</button></li>
+									<!-- <li><button class="page" type="button" data-i="2">2</button></li> -->
+								</ul>
+								<button class="page-link" data-list-pagination="next">
+									<i class="fas fa-chevron-right"></i>
+								</button>
+							</div>
+						</div>
+						
+						
+						
+					</div>
+
+				</div>
+				<!-- employeeTable -->
+
+
+				<!-- Sortable JS 모달 -->
+				<div class="modal fade" id="sortOrderModal" tabindex="-1" aria-labelledby="sortOrderModalLabel" aria-hidden="true">
+				  <div class="modal-dialog modal-dialog-centered">
+				    <div class="modal-content border border-secondary" style="height: 100%;">
+				      <div class="modal-header bg-light">
+				        <h5 class="modal-title" id="sortOrderModalLabel">부서 및 팀 정렬</h5>
+				        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+				      </div>
+				      <div class="modal-body px-4 py-3">
+						<div id="loadingSpinnerSortOrderModal" style="display: block;" class="text-center py-3">
+	                      <div class="spinner-border" role="status">
+	                      	<span class="visually-hidden">로딩중...</span>
+	                      </div>
+	                    </div>
+				        <!-- 부서 및 팀 정렬 리스트 -->
+				        <ul id="departmentList" class="list-group"  style="display: none;">
+				          <li class="list-group-item department-item" th:each="dept, deptStatus : ${departmentList}" th:attr="data-order=${deptStatus.count}">
+				            <div class="fw-bold department-header " th:text="${dept.codeName}">부서명</div>
+				            <ul class="list-group ms-3 sortable-team" th:attr="data-department-id=${dept.separatorCode}">
+				              <li th:each="team, teamStatus : ${teamMap[dept.codeName]}" class="list-group-item team-item" th:attr="data-team-id=${team.separatorCode}" th:text="${team.codeName}">팀명</li>
+				            </ul>
+				          </li>
+				        </ul>
+				      </div>
+				      <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+				        <button class="btn btn-light" data-bs-dismiss="modal">닫기</button>
+				        <button class="btn btn-primary" id="saveSortOrderBtn">저장</button>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+				
+				
+				
+				
+				
+
+				
+				<!-- 부서, 팀 추가 모달 -->
+		<div class="modal fade" id="addDepartmentAndTeamModal" tabindex="-1" aria-labelledby="addDepartmentAndTeamModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+				<div class="modal-content border border-secondary">
+					<div class="modal-header bg-light">
+						<h5 class="modal-title" id="addDepartmentAndTeamModalLabel">부서/팀 추가</h5>
+						<button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
+					</div>
+					<div class="modal-body px-4 py-3">
+						<!-- 라디오 전환 -->
+						<div class="mb-3">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="addType" id="addDept" value="dept" checked>
+								<label class="form-check-label" for="addDept">부서 추가</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="addType" id="addTeam" value="team">
+								<label class="form-check-label" for="addTeam">팀 추가</label>
+							</div>
+						</div>
+		
+						<!-- 폼 -->
+						<form id="addForm">
+							<!-- 부서명 -->
+							<div id="deptInput" class="mb-3">
+								<label for="deptName" class="form-label fw-semibold">부서명</label>
+								<input type="text" class="form-control form-control-sm" id="deptName" placeholder="예: 기술부">
+							</div>
+		
+							<!-- 팀 선택 + 팀명 -->
+							<div id="teamInputs" class="mb-3" style="display: none;">
+								<label for="parentDept" class="form-label fw-semibold">상위 부서</label>
+								<select class="form-select form-select-sm mb-2" id="parentDept">
+									<option selected disabled value="0">선택</option>
+									<option th:each="dept : ${departmentList}" th:text="${dept.codeName}" th:value="${dept.separatorCode}">기술부</option>
+								</select>
+								<label for="teamName" class="form-label fw-semibold">팀명</label>
+								<input type="text" class="form-control form-control-sm" id="teamName" placeholder="예: 개발 1팀">
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+						<button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
+						<button type="submit" class="btn btn-primary btn-sm" onclick="showConfirm()">등록</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
+		
+		<!-- 부서, 팀 삭제 모달 -->
+		<div class="modal fade" id="deleteDepartmentAndTeamModal" tabindex="-1" aria-labelledby="deleteDepartmentAndTeamModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+				<div class="modal-content border border-secondary">
+					<div class="modal-header bg-light">
+						<h5 class="modal-title" id="deleteDepartmentAndTeamModalLabel">부서/팀 삭제</h5>
+						<button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="닫기"></button>
+					</div>
+					<div class="modal-body px-4 py-3">
+						<!-- 폼 -->
+						<form id="deleteForm">
+							<!-- 팀 선택 + 팀명 -->
+							<div id="teamInputs" class="mb-3">
+								<label for="parentDept" class="form-label fw-semibold">부서</label>
+								<select class="form-select form-select-sm mb-2" id="parentDeptDelete">
+									<option selected disabled value="0">선택</option>
+									<option th:each="dept : ${departmentList}" th:text="${dept.codeName}" th:value="${dept.separatorCode}">ㅇㅇ부</option>
+								</select>
+								<label for="teamDelete" class="form-label fw-semibold">팀명</label>
+								<select class="form-select form-select-sm mb-2" id="teamDelete">
+									<option selected value="0">선택</option>
+								</select>
+							</div>
+								<button type="button" style="width: 100%;" class="btn btn-primary mb-3" onclick="searchRemainEmployee()">사원 조회</button>
+							<label for="searchEmployeeListDiv" class="form-label fw-semibold">삭제 부서/팀의 사원 목록</label>
+							<div id="searchEmployeeListDiv" class="d-flex justify-content-center align-items-center border rounded mb-2">
+								<span id="searchEmployeeList">　</span>
+							</div>
+							<label for="teamRemain" class="form-label fw-semibold">이동할 팀</label>
+							<select class="form-select form-select-sm mb-2" id="teamRemain">
+								<option selected value="0">선택</option>
+								<option th:each="team : ${teamList}" th:text="${team.codeName}" th:value="${team.separatorCode}">ㅇㅇ팀</option>
+							</select>
+						</form>
+					</div>
+					<div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+						<button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
+						<button type="submit" class="btn btn-danger btn-sm" onclick="deleteConfirm()">삭제</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+				<!--  Confirm Modal -->
+				<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content border border-2 border-secondary-subtle shadow">
+							<div class="modal-header">
+								<h5 class="modal-title fw-semibold">등록 확인</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">정말 등록하시겠습니까?</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
+								<button type="button" class="btn btn-primary btn-sm" id="confirmSubmitBtn">확인</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- (이름 클릭시)회원 정보 모달 -->
+				<!-- 프로필 카드/상세 모달 -->
+				<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content p-4 position-relative">
+
+							<!-- 닫기 & 별표 버튼 -->
+							<div class="position-absolute top-0 end-0 mt-2 me-2 d-flex gap-2">
+								<span>
+									<a id="bookmarkATag" href="#" class="text-warning" title="즐겨찾기"> 
+										<!-- <i class="far fa-star"></i>
+										<i class="fas fa-star"></i> -->
+									</a>
+								</span>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+
+							<!-- 프로필 정보 -->
+							<div class="text-center mb-4">
+								<img id="profileCardProfileImage" src="/assets/img/team/23.webp" alt="프로필" class="rounded-circle mb-2" style="width: 100px; height: 100px;">
+								<h5 id="modalName" class="fw-bold mb-0 profile-name">강성관</h5>
+								<p class="text-muted small mb-0 profile-dept-team">운영부 (경영지원팀)</p>
+								<input id="modalDept" type="hidden" class="profile-dept">
+								<input id="modalTeam" type="hidden" class="profile-team">
+								<input id="modalDirectoryNo" type="hidden" class="profile-directoryNo">
+							</div>
+
+							<!-- 전화번호 / 이메일 / 직급 -->
+							<div class="border rounded p-3 mb-4 bg-light-subtle">
+								<div class="mb-2">
+									<label class="form-label fw-semibold mb-0">연락처</label>
+									<div id="modalPhone" class="ps-2 profile-phone">010-1234-1234</div>
+								</div>
+								<div class="mb-2">
+									<label class="form-label fw-semibold mb-0">이메일</label>
+									<div id="modalEmail" class="ps-2 profile-email">goodee24@gmail.com</div>
+								</div>
+								<div>
+									<label class="form-label fw-semibold mb-0">직급</label>
+									<div id="modalPosition" class="ps-2 profile-position">대표</div>
+								</div>
+							</div>
+
+							<!-- 메모 -->
+							<div class="mb-3">
+								<label for="memo" class="form-label fw-semibold">메모</label>
+								<textarea id="memo" class="form-control" rows="4" placeholder="이 메모는 본인에게만 보입니다."></textarea>
+							</div>
+
+							<!-- 저장 버튼 -->
+							<div class="d-grid mb-3">
+								<button id="profileModalSubmitBtn" type="button" class="btn btn-primary">메모 저장</button>
+							</div>
+
+							<!-- 하단 버튼 영역 -->
+							<div class="d-flex justify-content-between">
+								<a href="#" id="startChatBtn" class="btn btn-outline-primary flex-fill me-2">
+								  <i class="fas fa-paper-plane me-1"></i> 1:1 채팅하기
+								</a>
+								<a href="#" id="startEmailBtn" class="btn btn-outline-secondary flex-fill"> <i class="fas fa-envelope me-1"></i> 이메일 보내기
+								</a>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+		</div>
+
+
+
+
+
+
+
+
+
+				<!-- 이거 어디다 쓰려고 가져왔던거지? -->
+				<!-- ✅ 알림 영역 -->
+				<div id="alertContainer" class="mt-3" style="display: none;"></div>
+
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 공통 저장 확인 모달 -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 수정용 unsaved 모달 -->
+<div class="modal fade" id="unsavedEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          변경된 내용이 저장되지 않습니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmEditCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 2차 모달 -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+	// 저장 확인 모달 (공통)
+	const confirmSaveModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+	// 알림 모달(공통)
+	const alertModal = new bootstrap.Modal(document.getElementById('alertMessageModal'));
+	// 공통 알림 모달
+	window.showAlert = function (message, callback){
+		document.getElementById('alertMessageContent').innerText = message;
+		alertModal.show();
+		
+		if(callback){
+			const modalEl = document.getElementById('alertMessageModal');
+			modalEl.addEventListener('hidden.bs.modal',function handler(){
+				callback();
+				modalEl.removeEventListener('hidden.bs.modal',handler);
+			});
+		}
+	}
+	// 공통 confirm 모달
+	window.showConfirmModal = function (message, onConfirm){
+		const msgElement = document.getElementById('confirmSaveModalMessage');
+		const confirmBtn = document.getElementById('confirmSaveBtn');
+		
+		msgElement.innerHTML = message;
+		const modalInstance = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+		modalInstance.show();
+		
+		const handler = function(){
+			modalInstance.hide();
+			onConfirm(); // 확인 클릭 시 실행할 콜백
+			confirmBtn.removeEventListener('click',handler); // 중복 방지
+		};
+		
+		confirmBtn.addEventListener('click',handler);
+	}
+	
+	window.reloadAfterAlert = function (){
+	      const modalEl = document.getElementById('alertMessageModal');
+	      modalEl.addEventListener('hidden.bs.modal', function(){
+	    	    location.reload();	
+    	});
+	};
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+				<script>
+					function showConfirm() {
+						const modal = new bootstrap.Modal(document
+								.getElementById('confirmModal'));
+						modal.show();
+					}
+
+					document
+							.getElementById('confirmSubmitBtn')
+							.addEventListener(
+									'click',
+									function() {
+										const confirmModal = bootstrap.Modal
+												.getInstance(document
+														.getElementById('confirmModal'));
+										confirmModal.hide();
+
+										// 비동기 처리나 유효성 검사 후 결과에 따라 성공/실패 처리
+										const isSuccess = Math.random() > 0.5; // 예시: 랜덤 성공/실패 처리
+										const alertContainer = document
+												.getElementById('alertContainer');
+
+										alertContainer.style.display = 'block';
+										alertContainer.innerHTML = isSuccess ? '<div class="alert alert-subtle-primary" role="alert">등록이 완료되었습니다!</div>'
+												: '<div class="alert alert-subtle-danger" role="alert">등록에 실패했습니다. 다시 시도해주세요.</div>';
+									});
+					
+				</script>
+				<!-- 기존 버전 트리 구조 -->
+				<!-- <script>
+				  document.addEventListener('DOMContentLoaded', function () {
+				    const tree = document.querySelector('#treeviewExample');
+				
+				    tree.addEventListener('click', function (e) {
+				      // 클릭된 li.treeview-list-item을 찾음
+				      const clickedLi = e.target.closest('li.treeview-list-item');
+				      if (!clickedLi) return;
+				
+				      // 아이콘 요소 추출
+				      const clickedIcon = clickedLi.querySelector('.treeview-icon');
+				      if (!clickedIcon) return;
+				
+				      // 기존 모든 아이콘에서 파란색 제거
+				      document.querySelectorAll('.treeview-icon.text-info-light')
+				        .forEach(el => el.classList.remove('text-info-light'));
+				
+				      // 클릭된 아이콘에 파란색 추가
+				      clickedIcon.classList.add('text-info-light');
+				
+				      // 상위 폴더들도 파란색 적용
+				      let currentLi = clickedLi.parentElement;
+				      while (currentLi && currentLi.classList.contains('treeview-list')) {
+				        const parentLi = currentLi.closest('li.treeview-list-item');
+				        const parentIcon = parentLi?.querySelector('.treeview-icon');
+				        if (parentIcon) parentIcon.classList.add('text-info-light');
+				        currentLi = parentLi?.parentElement;
+				      }
+				    });
+				  });
+				</script> -->
+				<!-- 글자 색상, 밑줄 추가한 트리구조 -->
+				<script>
+				  document.addEventListener('DOMContentLoaded', function () {
+				    const tree = document.querySelector('#treeviewExample');
+				
+				    tree.addEventListener('click', function (e) {
+				      const clickedLi = e.target.closest('li.treeview-list-item');
+				      if (!clickedLi) return;
+				
+				      const clickedIcon = clickedLi.querySelector('.treeview-icon');
+				      if (!clickedIcon) return;
+				
+				      // 기존 아이콘 강조 제거
+				      document.querySelectorAll('.treeview-icon.text-info-light')
+				        .forEach(el => el.classList.remove('text-info-light'));
+				
+				      clickedIcon.classList.add('text-info-light');
+				
+				      // 기존 텍스트 강조 제거
+				      document.querySelectorAll('.treeview-label-text')
+				        .forEach(el => el.classList.remove('treeview-label-strong'));
+				
+				      // 현재 클릭된 li 안의 텍스트 span에 강조 클래스 추가
+				      const clickedLabel = clickedLi.querySelector('.treeview-label-text');
+				      if (clickedLabel) clickedLabel.classList.add('treeview-label-strong');
+				
+				   	  // 상위 폴더의 아이콘과 글자에도 강조
+				      let currentLi = clickedLi.parentElement;
+				      while (currentLi && currentLi.classList.contains('treeview-list')) {
+				        const parentLi = currentLi.closest('li.treeview-list-item');
+				        if (!parentLi) break;
+				
+				        // 아이콘 강조
+				        const parentIcon = parentLi.querySelector('.treeview-icon');
+				        if (parentIcon) parentIcon.classList.add('text-info-light');
+				
+				        // 글자(span.treeview-label-text)도 강조
+				        const parentLabel = parentLi.querySelector('.treeview-label-text');
+				        if (parentLabel) parentLabel.classList.add('treeview-label-strong');
+				
+				        currentLi = parentLi.parentElement;
+				      }
+				    });
+				  });
+				</script>
+
+				
+				<!-- 프로필카드 - 해당 사원의 이름을 클릭시 해당 사원의 데이터를 모달 안으로 전달해주는 JS -->
+				<script>
+					document.addEventListener('DOMContentLoaded', function () {
+					  const modal = document.getElementById('profileModal');
+					  
+					  
+					  modal.addEventListener('show.bs.modal', function (event) {
+					    const trigger = event.relatedTarget; // 클릭한 <a> 요소
+						
+					    const targetEmpNo = trigger.getAttribute('data-targetEmpNo') || null;
+					    const name = trigger.getAttribute('data-name') || '이름없음';
+					    const dept = trigger.getAttribute('data-dept') || '-';
+					    const team = trigger.getAttribute('data-team') || '-';
+					    const phone = trigger.getAttribute('data-phone') || '-';
+					    const email = trigger.getAttribute('data-email') || '-';
+					    const position = trigger.getAttribute('data-position') || '-';
+					    const memberDirectoryNo = trigger.getAttribute('data-memberDirectoryNo') || '-';
+					    const profileImageUrl = trigger.getAttribute('data-profileImageUrl') || '-';
+					    const bookmark = trigger.getAttribute('data-bookmark') || '-';
+					    const bookmarkATag = document.getElementById('bookmarkATag');
+					    
+					    // 프로필카드에서
+					    // 1대1 채팅하기
+					    const chatBtn = modal.querySelector('#startChatBtn');
+					    if (chatBtn && targetEmpNo) {
+					      chatBtn.setAttribute('href', `/chat/room/${targetEmpNo}`);
+					    }
+					    // 프로필카드에서
+					    // 메일 보내기
+					    const emailBtn = modal.querySelector('#startEmailBtn');
+					    if (emailBtn && targetEmpNo) {
+					    	emailBtn.setAttribute('href', `/mail/write/${targetEmpNo}`);
+					    }
+					    
+						
+					    // 사원 메모 조회 (AJAX GET)
+					    if (targetEmpNo) {
+					      fetch(`/directoryMemo/${targetEmpNo}`)
+					        .then(res => res.json())
+					        .then(data => {
+					          if (data.res_code === '200') {
+					            modal.querySelector('#memo').value = data.memo || '';
+					          } else {
+					            modal.querySelector('#memo').value = '';
+					          }
+					        })
+					        .catch(() => {
+					          modal.querySelector('#memo').value = '';
+					        });
+					    // 북마크 조회
+					    myBookmark(targetEmpNo);
+					    }
+					    
+
+					    
+					    // 모달 안의 요소에 값 넣기
+					    modal.querySelector('.profile-name').textContent = name;
+					    modal.querySelector('.profile-dept-team').textContent = `${dept} / ${team}`;
+					    modal.querySelector('.profile-dept').value = dept;
+					    modal.querySelector('.profile-team').value = team;
+					    modal.querySelector('.profile-directoryNo').value = memberDirectoryNo;
+					    modal.querySelector('.profile-phone').textContent = phone;
+					    modal.querySelector('.profile-email').textContent = email;
+					    modal.querySelector('.profile-position').textContent = position;
+					    modal.querySelector('#profileCardProfileImage').src = profileImageUrl;
+					    
+					    
+					  });
+					  
+					    // 모달 메모 저장 버튼 클릭 이벤트
+						  document.getElementById('profileModalSubmitBtn').addEventListener('click', function(){
+							  const memo = document.getElementById('memo').value;
+							  const modalDirectoryNo = document.getElementById('modalDirectoryNo').value;
+							  const modalTeam = document.getElementById('modalTeam').value;
+							  const modalDept = document.getElementById('modalDept').value;
+							  const modalName = document.getElementById('modalName').textContent;
+							  const modalPhone = document.getElementById('modalPhone').textContent;
+							  const modalEmail = document.getElementById('modalEmail').textContent;
+							  const modalPosition = document.getElementById('modalPosition').textContent;
+							  // 여기서 값들 새로 설정하고 해야할듯
+							  /* console.log(modalTeam);
+							  console.log(modalDept);
+							  console.log(modalName);
+							  console.log(modalPhone);
+							  console.log(modalName);
+							  console.log(modalEmail);
+							  console.log(modalPosition);
+							  console.log(memo); 
+							  console.log(modalDirectoryNo); */
+							  
+							  fetch('/directoryMemo/create',{
+								  method: 'POST',
+								  headers: {
+								    'Content-Type': 'application/json',
+								    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+								    'header': document.querySelector('meta[name="_csrf_header"]').content
+								  },
+								  body : JSON.stringify({
+									  directory_memo_content : memo,
+									  directory_no : modalDirectoryNo
+								  })
+							  })
+							  .then(res => res.json())
+							  .then(data => {
+								  console.log(data.res_code);
+								  // location.reload();
+							  })
+							  .catch(err =>{
+								  console.error(err);
+								  console.log('요청 중 오류가 발생했습니다.');
+							  })
+						  });
+					    
+					    
+					    
+					      // 북마크 변경
+						  bookmarkATag.addEventListener('click', function(){
+							  const modalDirectoryNo = document.getElementById('modalDirectoryNo').value;
+							  console.log(modalDirectoryNo);
+							  
+							  fetch('/directoryBookmark/change',{
+								  method: 'POST',
+								  headers: {
+								    'Content-Type': 'application/json',
+								    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+								    'header': document.querySelector('meta[name="_csrf_header"]').content
+								  },
+								  body : JSON.stringify({
+									  directory_no : modalDirectoryNo
+								  })
+							  })
+							  .then(res => res.json())
+							  .then(data => {
+								  console.log(data.res_code);
+								  myBookmark(data.targetEmployeeNo);
+							  })
+							  .catch(err =>{
+								  console.error(err);
+								  console.log('요청 중 오류가 발생했습니다..');
+							  })
+						  });
+					    
+					    
+					    
+					    
+					    
+					    
+					});
+				</script>
+				<script>
+				    // 사원 북마크 조회
+				    const modal = document.getElementById('profileModal');
+				    function myBookmark(targetEmpNo){
+				      fetch(`/directoryBookmark/${targetEmpNo}`)
+				        .then(res => res.json())
+				        .then(data => {
+				        	if(data.bookmark === 'Y'){
+				        		modal.querySelector('#bookmarkATag').innerHTML = `
+						    		<i class="fas fa-star"></i>
+						    	`;
+						    } else{
+						    	modal.querySelector('#bookmarkATag').innerHTML = `
+						    		<i class="far fa-star"></i>
+						    	`;
+						    }
+						    
+				        })
+				        .catch(() => {
+				          // modal.querySelector('#memo').value = '';
+				        });
+				    };
+				</script>
+				
+				<!-- 트리구조 최상위 클릭시 전 사원 조회 -->
+				<script>
+					document.addEventListener("DOMContentLoaded", function () {
+					  const companyRoot = document.getElementById("companyRoot");
+					  if (companyRoot) {
+					    companyRoot.addEventListener("click", function (e) {
+					      e.preventDefault();
+					      //console.log("a태그 직접 클릭됨");
+					      treeSelectEmployee("selectAll");
+					    });
+					  }
+					});
+				</script>
+
+
+
+
+
+				
+				<!-- 트리구조 선택시 비동기 방식으로 직원 조회 -->
+				<script>
+					  let selectedDeptSeparatorCode = null;
+				document.addEventListener("DOMContentLoaded", function () {
+					  const deptDropdown = document.getElementById('deptDropdown');
+					  const teamDropdown = document.getElementById('teamDropdown');
+					  const deptBtn = deptDropdown.closest('.btn-group')?.querySelector('button span');
+					  const teamBtn = teamDropdown.closest('.btn-group')?.querySelector('button span');
+
+					  
+					  // 부서 클릭 이벤트 등록
+					  document.querySelectorAll('.treeview-dept').forEach(item => {
+					    item.addEventListener('click', function (e) {
+					      const deptEl = e.target.closest('.treeview-dept');
+					      if (!deptEl) return;
+
+					      const deptSeparatorCode = deptEl.getAttribute('data-deptSeparatorCode');
+					      treeSelectEmployee(deptSeparatorCode);
+					      selectedDeptSeparatorCode = deptSeparatorCode;
+					      
+
+					      // 부서명으로 드롭다운 값 동기화
+					      const deptName = deptEl.querySelector('.treeview-label-text')?.textContent?.trim();
+					      const deptDropdownItems = deptDropdown.querySelectorAll('.dropdown-item');
+
+					      if (deptName && deptDropdownItems && deptBtn) {
+					        deptDropdownItems.forEach(el => {
+					          el.classList.remove('active');
+					          if (el.textContent.trim() === deptName) {
+					            el.classList.add('active');
+					            deptBtn.textContent = deptName;
+					            el.setAttribute('data-separatorcode', deptSeparatorCode); // 추가된 부분
+					          }
+					        });
+					      }
+					      
+
+					      // 팀 드롭다운 초기화 및 조회
+					      if (deptSeparatorCode !== '전체') {
+					        fetch(`/directory/teams?separatorCode=${encodeURIComponent(deptSeparatorCode)}`)
+					          .then(res => res.json())
+					          .then(data => {
+					            teamDropdown.innerHTML = '';
+					            const all = document.createElement('li');
+					            all.innerHTML = `<a class="dropdown-item active" href="#" data-separatorcode="전체">전체</a>`;
+					            teamDropdown.appendChild(all);
+					            teamBtn.textContent = '전체';
+
+					            data.forEach(team => {
+					              const li = document.createElement('li');
+					              li.innerHTML = `<a class="dropdown-item" href="#" data-separatorcode="${team.separatorCode}">${team.codeName}</a>`;
+					              teamDropdown.appendChild(li);
+					            });
+					          });
+					      } else {
+					        teamDropdown.innerHTML = `<li><a class="dropdown-item active" href="#" data-separatorcode="전체">전체</a></li>`;
+					        teamBtn.textContent = '전체';
+					      }
+					    });
+					  });
+
+					  // 팀 클릭 이벤트 등록
+					  document.querySelectorAll('.treeview-team').forEach(item => {
+					    item.addEventListener('click', function (e) {
+					      const teamEl = e.currentTarget;
+					      const teamSeparatorCode = teamEl.getAttribute('data-teamseparatorcode');
+					      if (!teamSeparatorCode) return;
+
+					      const teamName = teamEl.querySelector('.treeview-label-text')?.textContent?.trim();
+					      const parentDeptA = teamEl.closest('ul.treeview-list')?.previousElementSibling;
+					      if (!parentDeptA || !parentDeptA.classList.contains('treeview-dept')) return;
+
+					      const deptName = parentDeptA.querySelector('.treeview-label-text')?.textContent?.trim();
+					      const deptSeparatorCode = parentDeptA.getAttribute('data-deptSeparatorcode');
+
+					      // 부서 드롭다운에서 선택 적용
+					      deptBtn.textContent = deptName;
+					      deptDropdown.querySelectorAll('.dropdown-item').forEach(el => {
+					        el.classList.remove('active');
+					        if (el.textContent.trim() === deptName) {
+					          el.classList.add('active');
+					          el.setAttribute('data-separatorcode', deptSeparatorCode); // 추가된 부분
+					        }
+					      });
+
+					      // 팀 드롭다운 갱신
+					      if (deptSeparatorCode) {
+					        fetch(`/directory/teams?separatorCode=${encodeURIComponent(deptSeparatorCode)}`)
+					          .then(res => res.json())
+					          .then(data => {
+					            teamDropdown.innerHTML = '';
+					            const all = document.createElement('li');
+					            all.innerHTML = `<a class="dropdown-item" href="#" data-separatorcode="전체">전체</a>`;
+					            teamDropdown.appendChild(all);
+
+					            data.forEach(team => {
+					              const li = document.createElement('li');
+					              li.innerHTML = `<a class="dropdown-item" href="#" data-separatorcode="${team.separatorCode}">${team.codeName}</a>`;
+					              teamDropdown.appendChild(li);
+
+					              if (team.separatorCode === teamSeparatorCode) {
+					                li.querySelector('a').classList.add('active');
+					                teamBtn.textContent = team.codeName;
+					              }
+					            });
+
+					            // 드롭다운이 갱신된 후에 직원 리스트 불러오기
+					            treeSelectEmployee(teamSeparatorCode);
+					          });
+					      }
+					    });
+					  });
+					  
+
+
+
+					  // 검색창 초기화 함수
+					  const resetSearchInput = function () {
+					    document.getElementById('searchInput').value = '';
+					  };
+					});
+				
+				
+
+
+</script>
+
+<!-- 직원 리스트 불러오기 -->
+<script>
+// 스피너 필요하시면 이 부분 참고하세요
+// 스피너 필요하시면 이 부분 참고하세요
+// 스피너 필요하시면 이 부분 참고하세요
+	function toggleEmployeeTableDisplay(isLoading) {
+		  const employeeTable = document.getElementById('employeeTable');
+		  const problemBtn = document.getElementById('problemBtn');
+		  if (!employeeTable) return;
+	
+		  if (isLoading) {
+		    // 로딩 중일 때
+		    employeeTable.style.display = 'none';
+		    document.getElementById('loadingSpinner').style.display = 'block';
+			  document.getElementById('problemBtn').style.display = 'none';
+			  document.getElementById('employeeListInsert').style.display = 'none';
+		  } else {
+		    // 로딩이 완료되었을 때
+		    employeeTable.style.display = 'block';
+		    document.getElementById('loadingSpinner').style.display = 'none';
+			  document.getElementById('problemBtn').style.display = 'block';
+			  document.getElementById('employeeListInsert').style.display = 'block';
+		  }
+	};
+	
+	
+	document.addEventListener("DOMContentLoaded", function() {
+			
+	        toggleEmployeeTableDisplay(false);
+	    	resetSearchInput();
+	
+	});
+// 스피너 필요하시면 이 부분 참고하세요
+// 스피너 필요하시면 이 부분 참고하세요
+// 스피너 필요하시면 이 부분 참고하세요
+	
+
+
+
+	// 직원 리스트 비동기 호출 함수
+	window.treeSelectEmployee = function (separatorCode) {
+		  // 로딩 중 UI
+		  document.getElementById('loadingSpinner').style.display = 'block';
+		  document.getElementById('employeeListInsert').style.display = 'none';
+	      
+		  
+		  
+	  fetch(`/directory/employeeList?separatorCode=${separatorCode}`)
+	    .then(response => response.text())
+	    .then(html => {
+	      document.getElementById('employeeListInsert').innerHTML = html;
+			
+	      const targetEl = document.getElementById('employeeTable');
+	      if (!targetEl) return;
+			
+	      // List.js 페이징 초기화
+	      if (targetEl.listjsInstance && typeof targetEl.listjsInstance.destroy === 'function') {
+	        targetEl.listjsInstance.destroy();
+	        delete targetEl.listjsInstance;
+	      }
+	
+	      const options = JSON.parse(targetEl.getAttribute('data-list'));
+	      const newList = new List(targetEl, options);
+	      targetEl.listjsInstance = newList;
+	
+	      
+	      
+	      // 3️⃣ 페이징 완료되면 UI 전환
+	      setTimeout(() => {
+	        document.getElementById('loadingSpinner').style.display = 'none';
+	        document.getElementById('employeeListInsert').style.display = 'block';
+		      resetSearchInput();
+	      }, 1); // 0.3초 딜레이 후 전환
+	      
+	      
+	    })
+	    .catch(err => {
+	      console.error('직원 리스트 불러오기 실패:', err);
+	    });
+	};
+
+</script>
+
+				
+<script th:inline="javascript">
+document.addEventListener("DOMContentLoaded", function () {
+  const deptDropdown = document.getElementById('deptDropdown');
+  const teamDropdown = document.getElementById('teamDropdown');
+  const deptBtn = deptDropdown.closest('.btn-group').querySelector('button span');
+  const teamBtn = teamDropdown.closest('.btn-group').querySelector('button span');
+
+  selectedDeptSeparatorCode = null;
+
+  // 부서 드롭다운 클릭
+  deptDropdown.addEventListener('click', function (e) {
+    const target = e.target.closest('.dropdown-item');
+    if (!target) return;
+    e.preventDefault();
+
+    const deptSeparatorCode = target.getAttribute('data-separatorcode') || target.textContent.trim();
+    if (!deptSeparatorCode) return;
+
+    selectedDeptSeparatorCode = deptSeparatorCode;
+
+    // 드롭다운 표시 갱신
+    deptBtn.textContent = target.textContent.trim();
+    [...deptDropdown.querySelectorAll('.dropdown-item')].forEach(el => el.classList.remove('active'));
+    target.classList.add('active');
+
+    // 직원 리스트 비동기 호출
+    fetchAndRenderEmployees(deptSeparatorCode);
+    
+
+    
+ 	// 트리뷰에서 해당 부서를 자동으로 열고 강조
+    const treeDeptAnchor = document.querySelector(`.treeview-dept[data-deptseparatorcode="${deptSeparatorCode}"]`);
+    if (treeDeptAnchor) {
+      const collapseEl = document.querySelector(treeDeptAnchor.getAttribute('href'));
+      if (collapseEl && !collapseEl.classList.contains('show')) {
+        new bootstrap.Collapse(collapseEl, { toggle: true }); // 열기
+      }
+
+      // 강조 효과 적용
+      document.querySelectorAll('.treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
+      document.querySelectorAll('.treeview-label-text.treeview-label-strong').forEach(el => el.classList.remove('treeview-label-strong'));
+      restoreCompanyRootHighlight();
+	
+      
+      
+      const icon = treeDeptAnchor.querySelector('.treeview-icon');
+      const label = treeDeptAnchor.querySelector('.treeview-label-text');
+      if (icon) icon.classList.add('text-info-light');
+      if (label) label.classList.add('treeview-label-strong');
+      
+
+      
+      
+    }
+
+    // 팀 드롭다운 초기화 및 조회
+    if (deptSeparatorCode === 'selectAll') {
+    	  // selectAll인 경우 → 강조 제거 + 드롭다운 초기화
+    	  document.querySelectorAll('.treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
+    	  document.querySelectorAll('.treeview-label-text.treeview-label-strong').forEach(el => el.classList.remove('treeview-label-strong'));
+    	  restoreCompanyRootHighlight();
+
+    	  teamDropdown.innerHTML = `<li><a class="dropdown-item active" href="#" data-separatorcode="전체">전체</a></li>`;
+    	  teamBtn.textContent = '전체';
+
+    	} else if (deptSeparatorCode !== '전체') {
+      fetch(`/directory/teams?separatorCode=${encodeURIComponent(deptSeparatorCode)}`)
+        .then(res => res.json())
+        .then(data => {
+          teamDropdown.innerHTML = '';
+          const all = document.createElement('li');
+          all.innerHTML = `<a class="dropdown-item active" href="#" data-separatorcode="전체">전체</a>`;
+          teamDropdown.appendChild(all);
+          teamBtn.textContent = '전체';
+
+          data.forEach(team => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a class="dropdown-item" href="#" data-separatorcode="${team.separatorCode}">${team.codeName}</a>`;
+            teamDropdown.appendChild(li);
+          });
+        });
+    } else {
+      teamDropdown.innerHTML = `<li><a class="dropdown-item active" href="#" data-separatorcode="전체">전체</a></li>`;
+      teamBtn.textContent = '전체';
+    }
+  });
+
+  // 팀 드롭다운 클릭
+  teamDropdown.addEventListener('click', function (e) {
+    const target = e.target.closest('.dropdown-item');
+    if (!target) return;
+    e.preventDefault();
+
+    const teamSeparatorCode = target.getAttribute('data-separatorcode') || target.textContent.trim();
+    if (!teamSeparatorCode) return;
+
+    teamBtn.textContent = target.textContent.trim();
+    [...teamDropdown.querySelectorAll('.dropdown-item')].forEach(el => el.classList.remove('active'));
+    target.classList.add('active');
+
+      
+   		 if (teamSeparatorCode === '전체') {
+    	  if (selectedDeptSeparatorCode && selectedDeptSeparatorCode !== '전체') {
+    	    fetchAndRenderEmployees(selectedDeptSeparatorCode);  // 해당 부서의 전체 팀
+    	  } else {
+    	    fetchAndRenderEmployees('selectAll'); // 모든 사원
+    	  }
+    	  // 트리뷰에서 팀 강조 제거
+    	  document.querySelectorAll('.treeview-team .treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
+    	  document.querySelectorAll('.treeview-team .treeview-label-text.treeview-label-strong').forEach(el => el.classList.remove('treeview-label-strong'));
+
+    	} else {
+    	  fetchAndRenderEmployees(teamSeparatorCode); // 특정 팀
+    	}
+
+      
+ 	  // 트리뷰에서 해당 팀을 자동으로 열고 강조
+      const teamDiv = document.querySelector(`.treeview-team[data-teamseparatorcode="${teamSeparatorCode}"]`);
+      if (teamDiv) {
+        const teamAnchor = teamDiv.querySelector('a');
+        const label = teamAnchor?.querySelector('.treeview-label-text');
+        const icon = teamAnchor?.querySelector('.treeview-icon');
+
+        // 강조 초기화
+        document.querySelectorAll('.treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
+        document.querySelectorAll('.treeview-label-text.treeview-label-strong').forEach(el => el.classList.remove('treeview-label-strong'));
+        restoreCompanyRootHighlight();
+
+        // 강조 적용
+        if (icon) icon.classList.add('text-info-light');
+        if (label) label.classList.add('treeview-label-strong');
+
+        // 상위 collapse (부서) 열기
+        const parentCollapse = teamDiv.closest('ul.treeview-list');
+        if (parentCollapse && !parentCollapse.classList.contains('show')) {
+          new bootstrap.Collapse(parentCollapse, { toggle: true });
+        }
+
+        // 상위 부서 라벨/아이콘도 강조
+        const deptAnchor = parentCollapse?.previousElementSibling;
+        if (deptAnchor?.classList.contains('treeview-dept')) {
+          const deptIcon = deptAnchor.querySelector('.treeview-icon');
+          const deptLabel = deptAnchor.querySelector('.treeview-label-text');
+          if (deptIcon) deptIcon.classList.add('text-info-light');
+          if (deptLabel) deptLabel.classList.add('treeview-label-strong');
+        }
+      }
+
+      
+      
+      
+    
+  });
+
+  function fetchAndRenderEmployees(separatorCode) {
+    fetch(`/directory/employeeList?separatorCode=${encodeURIComponent(separatorCode)}`)
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('employeeListInsert').innerHTML = html;
+
+        const targetEl = document.getElementById('employeeTable');
+        if (!targetEl) return;
+
+        if (targetEl.listjsInstance && typeof targetEl.listjsInstance.destroy === 'function') {
+          targetEl.listjsInstance.destroy();
+          delete targetEl.listjsInstance;
+        }
+
+        const options = JSON.parse(targetEl.getAttribute('data-list'));
+        const newList = new List(targetEl, options);
+        targetEl.listjsInstance = newList;
+      })
+      .catch(err => console.error("직원 리스트 비동기 로딩 실패:", err));
+
+    	resetSearchInput();
+  }
+});
+</script>
+
+<!-- 검색어 초기화 -->
+<script>
+	const resetSearchInput = function(){
+		document.getElementById('searchInput').value = '';
+	}
+</script>
+<!-- 최상위 트리구조 강조 복구 -->
+<script>
+	
+
+	function restoreCompanyRootHighlight() {
+	  const companyRoot = document.getElementById('companyRoot');
+	  if (!companyRoot) return;
+
+	  const icon = companyRoot.querySelector('.treeview-icon');
+	  const label = companyRoot.querySelector('.treeview-label-text');
+
+	  if (icon) icon.classList.add('text-info-light');
+	  if (label) label.classList.add('treeview-label-strong');
+	}
+
+</script>
+
+<!-- 부서,팀 추가 모달 이벤트 처리 -->
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const deptInput = document.getElementById('deptInput');
+		const teamInputs = document.getElementById('teamInputs');
+		const radios = document.querySelectorAll('input[name="addType"]');
+	
+		radios.forEach(radio => {
+			radio.addEventListener('change', () => {
+				if (radio.value === 'dept') {
+					deptInput.style.display = 'block';
+					teamInputs.style.display = 'none';
+				} else {
+					deptInput.style.display = 'none';
+					teamInputs.style.display = 'block';
+				}
+			});
+		});
+	});
+	
+function showConfirm() {
+	const addType = document.querySelector('input[name="addType"]:checked').value;
+
+	if (addType === 'dept') {
+		// 부서 추가
+		const deptName = document.getElementById('deptName').value.trim();
+		if (!deptName) {
+			showAlert('부서명을 입력해주세요.');
+			return;
+		}
+
+		fetch('/admin/directory/addDepartmentOrTeam', {
+			method: 'POST',
+			headers: {
+			    'Content-Type': 'application/json',
+			    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+			    'header': document.querySelector('meta[name="_csrf_header"]').content
+			},
+			body: JSON.stringify({ codeName: deptName })
+		})
+		.then(res => res.ok ? res.json() : Promise.reject(res))
+		.then(data => {
+			if(data.res_code === '200'){
+				showAlert('부서가 등록되었습니다.');
+			      reloadAfterAlert();
+			} else{
+				showAlert('부서 등록에 실패했습니다.')
+			      reloadAfterAlert();
+			}
+		})
+		.catch(err => {
+			console.error(err);
+			showAlert('부서 등록 실패');
+		      reloadAfterAlert();
+		});
+		
+	} else {
+		// 팀 추가
+		const parentDept = document.getElementById('parentDept').value;
+		const teamName = document.getElementById('teamName').value.trim();
+
+		if (!parentDept || parentDept == '0') {
+			showAlert('상위 부서를 선택해주세요.');
+			return;
+		}
+		if (!teamName) {
+			showAlert('팀명을 입력해주세요.');
+			return;
+		}
+
+		fetch('/admin/directory/addDepartmentOrTeam', {
+			method: 'POST',
+			headers: {
+			    'Content-Type': 'application/json',
+			    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+			    'header': document.querySelector('meta[name="_csrf_header"]').content
+			},
+			body: JSON.stringify({
+				parentCode: parentDept,
+				codeName: teamName
+			})
+		})
+		.then(res => res.ok ? res.json() : Promise.reject(res))
+		.then(data => {
+			if(data.res_code === '200'){
+				showAlert('팀이 등록되었습니다.');
+			      reloadAfterAlert();
+			} else{
+				showAlert('팀 등록에 실패했습니다.')
+			      reloadAfterAlert();
+			}
+		})
+		.catch(err => {
+			console.error(err);
+			showAlert('팀 등록 실패');
+		});
+	}
+}
+</script>
+
+<!-- Sortable.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js" integrity="sha512-zYXldzJsDrNKV+odAwFYiDXV2Cy37cwizT+NkuiPGsa9X1dOz04eHvUWVuxaJ299GvcJT31ug2zO4itXBjFx4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // 1. 부서 정렬 Sortable
+  const departmentList = document.getElementById('departmentList');
+  Sortable.create(departmentList, {
+    animation: 150,
+    handle: '.department-header',
+    draggable: '.department-item',
+    onEnd: () => {
+      console.log('부서 순서 변경됨');
+    }
+  });
+  // 2️⃣ 각 팀 리스트에 대해 Sortable + 교차 이동 허용
+  function initializeTeamSortable() {
+    document.querySelectorAll('.sortable-team').forEach(teamList => {
+      Sortable.create(teamList, {
+        group: 'teams',
+        animation: 150,
+        draggable: '.team-item',
+        onEnd: () => {
+          console.log('팀 위치 변경됨');
+        }
+      });
+    });
+  }
+
+  // 2. 각 팀 리스트에 대해 Sortable + 교차 이동 허용
+  document.querySelectorAll('.sortable-team').forEach(teamList => {
+    Sortable.create(teamList, {
+      group: 'teams', // 동일 그룹이면 드래그 간 이동 가능
+      animation: 150,
+      draggable: '.team-item',
+      onEnd: () => {
+        console.log('팀 위치 변경됨');
+      }
+    });
+  });
+  
+  
+  
+  // ✅ 모달이 열릴 때 서버에서 데이터를 다시 받아와서 렌더링
+ document.getElementById('sortOrderModal').addEventListener('shown.bs.modal', function () {
+    //console.log("모달 열림: 데이터 로딩 시작");
+    document.getElementById('departmentList').style.display = 'none';
+    document.getElementById('loadingSpinnerSortOrderModal').style.display = 'block';
+
+    fetch('/admin/directory/getSortOrder')
+      .then(response => response.json())
+      .then(data => {
+        //console.log("서버에서 받아온 데이터: ", data);
+
+        // 💡 departmentList 초기화
+        departmentList.innerHTML = '';
+
+        // 💡 서버에서 받아온 부서 및 팀 정보 렌더링
+        data.forEach(department => {
+          const departmentItem = document.createElement('li');
+          departmentItem.classList.add('list-group-item', 'department-item');
+          departmentItem.setAttribute('data-order', department.order);
+
+          // 부서 헤더 생성
+          const header = document.createElement('div');
+          header.classList.add('fw-bold', 'department-header');
+          header.innerText = department.departmentName;
+          departmentItem.appendChild(header);
+
+          // 팀 리스트 생성
+          const teamList = document.createElement('ul');
+          teamList.classList.add('list-group', 'ms-3', 'sortable-team');
+          teamList.setAttribute('data-department-id', department.departmentId);
+
+          department.teams.forEach(team => {
+            const teamItem = document.createElement('li');
+            teamItem.classList.add('list-group-item', 'team-item');
+            teamItem.setAttribute('data-team-id', team.teamId);
+            teamItem.innerText = team.teamName;
+            teamList.appendChild(teamItem);
+          });
+
+          departmentItem.appendChild(teamList);
+          departmentList.appendChild(departmentItem);
+          
+        });
+
+        //console.log('sortable 불러오기 완료.');
+        document.getElementById('loadingSpinnerSortOrderModal').style.display = 'none';
+        document.getElementById('departmentList').style.display = 'block';
+        // 💡 Sortable 다시 초기화
+        initializeTeamSortable();
+      })
+      .catch(error => {
+        //console.error("데이터 로딩 실패: ", error);
+        showAlert('데이터를 불러오는 중 오류가 발생했습니다.');
+        document.getElementById('loadingSpinnerSortOrderModal').style.display = 'none';
+        document.getElementById('departmentList').style.display = 'block';
+      });
+	  
+  });
+  
+  
+  
+
+  // 3. 저장 버튼 클릭 시 → 정렬된 데이터 추출
+  document.getElementById('saveSortOrderBtn').addEventListener('click', function () {
+    const result = [];
+
+    document.querySelectorAll('#departmentList > .department-item').forEach((deptEl, deptIndex) => {
+      const departmentOrder = deptIndex + 1;
+      const departmentName = deptEl.querySelector('.department-header').innerText.trim();
+      const departmentId = deptEl.querySelector('.sortable-team').getAttribute('data-department-id');
+
+      const teamList = [];
+      deptEl.querySelectorAll('.team-item').forEach((teamEl, teamIndex) => {
+        teamList.push({
+        	teamSeparatorCode: teamEl.getAttribute('data-team-id'),
+        	teamCodeName: teamEl.innerText.trim(),
+        	teamSortOrder: teamIndex + 1,
+        	newDepartmentSeparatorCode: departmentId
+        });
+      });
+
+      result.push({
+    	  departmentSeparatorCode: departmentId,
+    	  departmentCodeName: departmentName,
+    	  departmentSortOrder: departmentOrder,
+        teams: teamList
+      });
+    });
+
+    console.log('저장 데이터:', result);
+
+    fetch('/admin/directory/updateSortOrder', {
+      method: 'PUT',
+      headers: {
+	    'Content-Type': 'application/json',
+	    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+	    'header': document.querySelector('meta[name="_csrf_header"]').content
+      },
+      body: JSON.stringify({
+    	  sortData: result
+    	  })
+    })
+    .then(res => res.json())
+    .then(data => {
+    	if(data.res_code == '200'){
+    		showAlert('정렬 정보가 저장되었습니다.');
+		      reloadAfterAlert();
+    	} else{
+    		showAlert('정렬 정보 저장에 실패했습니다.');
+		      reloadAfterAlert();
+    	}
+    	console.log(data.res_msg);
+    })
+    .catch(err => {
+      console.error('정렬 저장 오류:', err);
+      showAlert('오류가 발생했습니다.');
+      reloadAfterAlert();
+    });
+  });
+});
+</script>
+<!-- 부서, 팀 이름 바꾸기 -->
+<!-- <script>
+	const editNameDeptSeparatorCode = deptEl.getAttribute('data-deptSeparatorCode');
+	const editNameTeamSeparatorCode = teamEl.getAttribute('data-teamseparatorcode');
+</script> -->
+<!-- 부서, 팀 삭제 -->
+<script th:inline="javascript">
+	let trigger01 = false;
+	let trigger02 = false;
+	
+    document.getElementById('parentDeptDelete').addEventListener('change', function() {
+        const deleteSeparatorCode = this.value;
+        trigger01 = true;
+        trigger02 = false;
+
+        // 팀 셀렉트박스 초기화
+        const teamSelect = document.getElementById('teamDelete');
+        teamSelect.innerHTML = '<option selected value="0">선택</option>';
+
+        if (deleteSeparatorCode !== '0') {
+            fetch(`/directory/teams?separatorCode=${encodeURIComponent(deleteSeparatorCode)}`)
+                .then(response => response.json())
+                .then(data => {
+                	console.log('123');
+                    data.forEach(team => {
+                        const option = document.createElement('option');
+                        option.value = team.separatorCode;
+                        option.textContent = team.codeName;
+                        teamSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    });
+    
+
+
+    // 사원 조회
+   	function searchRemainEmployee(){
+   		const searchDeptSepCode = document.getElementById('parentDeptDelete').value;
+   		const searchTeamSepCode = document.getElementById('teamDelete').value;
+   		const employeeListSpan = document.getElementById('searchEmployeeList');
+   		//console.log(deleteDeptSepCode);
+   		//console.log(deleteTeamSepCode);
+   		let searchCode;
+   		trigger02 = true;
+   		
+   		if(searchDeptSepCode == '0'){
+   			showAlert('부서를 선택해주세요.');
+   			return;
+   		}
+   		
+   		if(searchTeamSepCode == '0'){
+   			// 부서만 선택
+   			// console.log('부서만');
+   			searchCode = searchDeptSepCode;
+   		} else if(searchTeamSepCode != '0'){
+   			// 부서+팀 선택
+   			// console.log('팀까지');
+   			searchCode = searchTeamSepCode;
+   		}
+   		console.log(searchCode);
+   		
+   		// 삭제할 팀 disabled 처리
+   		const selectElement = document.getElementById("teamRemain");
+   		Array.from(selectElement.options).forEach(option => {
+   		    if (option.value === searchCode) {
+   		        option.disabled = true;
+   		     	option.style.backgroundColor = "#d3d3d3"; // 비활성화 시 배경색 변경
+   		    } else{
+   		    	option.disabled = false;
+	   		    option.style.backgroundColor = "#FFFFFF"; // 비활성화 시 배경색 변경
+   		    }
+   		    if(searchCode && option.value == '0'){
+   		    	option.disabled = true;
+   		     	option.style.backgroundColor = "#d3d3d3"; // 비활성화 시 배경색 변경
+   		    }
+   		});
+   		
+   		
+   		
+	   	 fetch(`/directory/searchEmployeeList?separatorCode=${encodeURIComponent(searchCode)}`)
+	     .then(response => response.json())
+	     .then(data => {
+	         if (data.res_code == '200') {
+	        	// 데이터를 제대로 받아왔는지 확인
+	        	 const employeeList = data.result.searchRemainEmployee;
+	        	 console.log(employeeList);
+
+	        	 // 요소를 담을 부모 엘리먼트 선택
+	        	 const employeeListSpan = document.getElementById('searchEmployeeList');
+
+	        	 // 기존 내용 초기화
+	        	 employeeListSpan.innerHTML = '';
+
+	        	 // 이름들을 반복문으로 하나씩 추가
+	        	/*  employeeList.forEach(name => {
+	        	     const span = document.createElement('span');
+	        	     span.className = 'employee-list';
+	        	     span.textContent = name;
+	        	     employeeListSpan.appendChild(span);
+	        	 }); */
+	        	 employeeList.forEach(emp => {
+        		    const span = document.createElement('span');
+        		    span.className = 'employee-list';
+        		    span.textContent = emp.employee_name;
+        		    span.setAttribute('data-emp-no', emp.employee_no);
+        		    employeeListSpan.appendChild(span);
+        		});
+	        	 
+	         } else {
+	             console.log(data.res_code);
+	             console.log(data.res_msg);
+	             employeeListSpan.textContent = "조회에 실패했습니다.";
+	         }
+	     })
+	     .catch(err => {
+	         console.error("직원 리스트 비동기 로딩 실패:", err);
+	         employeeListSpan.textContent = "로딩 중 오류가 발생했습니다.";
+	     });
+   	};
+   	
+   	// 삭제버튼
+   	function deleteConfirm(){
+   		const searchDeptSepCode = document.getElementById('parentDeptDelete').value;
+   		const searchTeamSepCode = document.getElementById('teamDelete').value;
+   		const selectElement = document.getElementById("teamRemain");
+   		const employees = document.querySelectorAll('.employee-list');
+   		// 각 사원들의 data-emp-no 값을 배열로 반환
+   		const employeeNos = Array.from(employees).map(span => span.getAttribute('data-emp-no'));
+   		
+   		// trigger01 부서선택, trigger02 사원 조회.
+   		if(!trigger01 || !trigger02){
+   			showAlert('부서/팀을 선택 후 \'사원 조회\' 버튼을 눌러주세요.');
+   			return;
+   		}
+   		if(selectElement.value == '0' && employees.length != 0){
+   			showAlert('이동할 팀을 선택해주세요.');
+   			return;
+   		}
+   		
+   		fetch('/admin/directory/deleteDepartmentOrTeam',{
+   			method: 'PUT',
+   			headers: {
+   	   		    'Content-Type': 'application/json',
+   	   		    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+   	   		    'header': document.querySelector('meta[name="_csrf_header"]').content
+   			},
+   			body: JSON.stringify({
+   				deleteDeptCode : searchDeptSepCode,
+   				deleteTeamCode : searchTeamSepCode,
+   				remainTeamCode : selectElement.value,
+   				employeeNoList : employeeNos
+   			})
+   		})
+   		.then(response => response.json())
+   		.then(data => {
+   			if(data.res_code == '200'){
+   				showAlert('삭제가 완료되었습니다.');
+  		      reloadAfterAlert();
+   			}
+   			console.warn(`삭제 요청 실패: ${data.res_msg}`);
+   		})
+   	    .catch(err => {
+     	      console.error('정렬 저장 오류:', err);
+     	     showAlert('오류가 발생했습니다.');
+   	    });
+   	};
+   	
+
+</script>
+
+								
+
+
+
+
+
+
+
+
+	</main>
+	
+	
+
+</body>
+</html>

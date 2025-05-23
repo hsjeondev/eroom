@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{include/layout}">
+<head>
+<style>
+.custom-table td, .custom-table th {
+	padding: 0.5rem !important;
+	min-width: 75px;
+}
+</style>
+<meta charset="UTF-8">
+<title>결재서 작성</title>
+</head>
+<body>
+	<main class="main" id="top" layout:fragment="content">
+		<div class="col-8 mx-auto">
+			<!-- <h2 class="mb-2 mx-auto">결재서 양식을 선택해주세요.</h2> -->
+			<div class="d-flex justify-content-start">
+				<span th:if="${mode == 'create'}" class="fw-bold fs-7" id="approvalPageTitle">결재서 양식을 선택해주세요.</span>
+				<span th:if="${mode == 'edit'}" th:text="|${approval.approval_format.approvalFormatTitle} 결재서 작성|" class="fw-bold fs-7" id="approvalPageTitle">결재서 양식을 선택해주세요.</span>
+			</div>
+			
+			<form id="approvalWriter">
+				<div class="row">
+					<div class="col-5">
+						<div class="mb-1">
+							<label class="form-label" for="basic-form-date">신청일</label>
+							<div id="basic-form-date" class="form-control" th:text="${now}"></div>
+						</div>
+						<div class="mb-1">
+							<label class="form-label" for="basic-form-department_name">부서</label>
+							<div id="basic-form-department_name" class="form-control" th:text="${departmentName}"></div>
+						</div>
+						<div class="mb-1">
+							<label class="form-label" for="basic-form-team_name">팀명</label>
+							<div id="basic-form-team_name" class="form-control" th:text="${teamName}"></div>
+						</div>
+						<div class="mb-1">
+							<label class="form-label" for="basic-form-employee_position">직급</label>
+							<div id="basic-form-employee_position" class="form-control" th:text="${employee.employeePosition}"></div>
+						</div>
+						<div class="mb-1">
+							<label class="form-label" for="basic-form-employee_name">신청자</label>
+							<div id="basic-form-employee_name" class="form-control" th:text="${employee.employeeName}"></div>
+						</div>
+					</div>
+					<div class="col-7">
+						
+						<!-- 결재자 추가 -->
+						<!-- <div class="gap-2 mb-3 ms-right-2 d-flex justify-content-end">
+							<span>결재자 : </span>
+							<div th:each="approveMember, approveMemberStatus : ${approvalLineList}" class="text-end text-body-secondary fs-8 mt-1" th:id="|approveLine${approveMemberStatus.count}|">
+								<span th:text="${approveMember.employee.employeeName}" class="badge bg-info text-dark me-2 mb-2">결재자이름
+									<button type="button" class="btn-close btn-close-white ms-1" aria-label="Remove"></button>
+									<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}">
+									<input type="hidden" name="approverSteps" th:value="${approveMemberStatus.count}">
+								</span>
+							</div>
+						</div> -->
+						<div class="gap-2 mb-3 ms-right-2 d-flex justify-content-end">
+							<span>결재자 : </span>
+							<div class="text-end text-body-secondary fs-8 mt-1" id="approveLine1">
+								<!-- 결재자 불러오기 -->
+								<div th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step >= 1}" class="position-relative me-2 mb-2 d-inline">
+									<span th:text="${approveMember.employee.employeeName}" class="badge bg-info text-dark pe-4"> </span>
+									<button type="button" class="btn-close btn-close-white position-absolute top-0 end-0" th:attr="data-idx=${stat.count}"
+										aria-label="Remove" style="scale: 0.8;">
+									</button>
+									<input type="hidden" name="approverIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="approverSteps" th:value="${approveMember.approval_line_step}">
+								</div>
+							</div>
+						</div>
+
+
+						<div class="gap-2 mb-3 ms-right-2 d-flex justify-content-end">
+							<span>합의자 : </span>
+							<div class="text-end text-body-secondary fs-8 mt-1" id="approveLine2">
+								<!-- 합의자 불러오기 -->
+								<div th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step == 0}" class="position-relative me-2 mb-2 d-inline">
+									<span th:text="${approveMember.employee.employeeName}" class="badge bg-info text-dark pe-4"> </span>
+									<button type="button" class="btn-close btn-close-white position-absolute top-0 end-0" th:attr="data-idx=${stat.count}"
+										aria-label="Remove" style="scale: 0.8;">
+									</button>
+									<input type="hidden" name="agreerIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="agreerSteps" th:value="0">
+								</div>							
+							</div>
+						</div>
+						<div class="gap-2 mb-3 ms-right-2 d-flex justify-content-end">
+							<span>참조자 : </span>
+								<div class="text-end text-body-secondary fs-8 mt-1" id="approveLine3">
+									<!-- 합의자 불러오기 -->
+									<div th:each="approveMember, stat : ${approvalLineList}" th:if="${approveMember.approval_line_step == -1}" class="position-relative me-2 mb-2 d-inline">
+										<span th:text="${approveMember.employee.employeeName}" class="badge bg-info text-dark pe-4"> </span>
+										<button type="button" class="btn-close btn-close-white position-absolute top-0 end-0" th:attr="data-idx=${stat.count}"
+											aria-label="Remove" style="scale: 0.8;">
+										</button>
+										<input type="hidden" name="refererIds" th:value="${approveMember.employee.employeeNo}"> <input type="hidden" name="refererSteps" th:value="-1">
+									</div>							
+								</div>
+							</div>
+						
+						<!-- 추가 버튼 -->
+						<div class="gap-2 mb-3 ms-right-2 d-flex justify-content-end" id="approveLineModalDiv">
+							<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#selectApproveLine1Modal">결재자 선택</button>
+							<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#selectApproveLine2Modal">합의자 선택</button>
+							<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#selectApproveLine3Modal">참조자 선택</button>
+						</div>
+
+					</div>
+
+
+				</div>
+
+
+				<div class="mb-3">
+					<label class="form-label" for="basic-form-title">제목</label>
+					<input th:if="${mode == 'create'}" class="form-control" id="basic-form-title" type="text" placeholder="제목">
+					<input th:if="${mode == 'edit'}" th:value="${approval.approval_title}" class="form-control" id="basic-form-title" type="text" placeholder="제목">
+					
+					<label class="form-label" for="basic-select-format">양식 선택</label>
+					<!-- create의 경우 + edit의 경우 select -->
+					<select class="form-select" id="basic-select-format" aria-label="Default select example">
+					  <option th:if="${mode == 'create'}" value="0" selected disabled>양식을 선택해주세요.</option>
+					  <option th:each="formList : ${approvalFormatList}"
+					          th:value="${formList.approval_format_no}"
+					          th:text="${formList.approval_format_title}"
+					          th:selected="${mode == 'edit' and formList.approval_format_no == approval.approval_format.approvalFormatNo}">
+					  </option>
+					</select>
+
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label" for="basic-form-textarea">결재 작성</label>
+					<div th:if="${mode == 'create'}" class="form-control" id="basic-form-edit"></div>
+					<div th:if="${mode == 'edit'}" th:utext="${approval.approval_format.approvalFormatContent}" class="form-control" id="basic-form-edit"></div>
+				</div>
+
+				<div class="mb-3" th:if="${mode == 'edit'}">
+					<h6 class="mb-2">기존 첨부 파일</h6>
+					<ul class="ps-3">
+						<li th:each="approvalAttachFile : ${driveList}">
+							<a th:href="@{'/drive/download/approval/' + ${approvalAttachFile.driveAttachNo}}" th:text="${approvalAttachFile.driveOriName}" class="text-primary text-decoration-underline" onmouseover="this.style.textDecoration='none'" onmouseout="this.style.textDecoration='underline'">첨부된 파일이 없습니다.
+							</a>
+							<input type="hidden" name="approvalAttachFileIds" th:value="${approvalAttachFile.driveAttachNo}">
+							<!-- 삭제 뱃지 넣을 곳 -->
+						    <span class="badge bg-danger ms-2" style="cursor: pointer;" onclick="removeFile(this)">
+						      삭제
+						    </span>
+							<!-- 삭제 뱃지 넣을 곳 -->
+						</li>
+						<li th:if="${#lists.isEmpty(driveList)}" class="text-muted">기존 첨부 파일이 없습니다.</li>
+					</ul>
+					
+				</div>
+				<div class="mb-3">
+					<label class="form-label">파일 업로드</label> <input id="approvalAttachFiles" class="form-control" type="file" multiple>
+				</div>
+				<button type="button" class="btn btn-light" onclick="history.back()">취소</button>
+				<button id="approvalSubmitBtn" class="btn btn-primary" type="submit">등록</button>
+			</form>
+			
+			
+		</div>
+		
+		<!-- 결재자 생성 모달 -->
+      <div class="modal fade" id="selectApproveLine1Modal" tabindex="-1"
+        aria-labelledby="selectApproveLine1ModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>결재자 추가</h3>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="닫기"></button>
+            </div>
+            <form id="createApprovalLineForm1">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <div class="modal-body">
+                <!-- 소속 선택 -->
+                <div class="mb-3">
+                  <label class="form-label">소속</label>
+                  <select class="form-select" id="approver-departmentSelect">
+                    <option disabled selected>-- 소속 선택 --</option>
+                    <option th:each="dept : ${structureList}" 
+                      th:value="${dept.separator_code}" 
+                      th:text="${dept.separator_name}" 
+                      th:selected="${dept.separator_name == param.department}">
+                    </option>
+                  </select>
+                </div>
+                <!-- 참여자 선택 -->
+                <div class="mb-3">
+                  <label class="form-label">참여자 선택</label>
+                  <div class="d-flex">
+                    <select id="approver-employeeSelect" class="form-select me-2" style="flex:1;">
+                      <option disabled selected>-- 참여자 선택 --</option>
+                    </select>
+                    <button type="button" class="btn btn-outline-primary" data-action="addParticipant">추가</button>
+                  </div>
+                </div>
+                <!-- 선택된 참여자 표시 -->
+                <div class="mb-3">
+                  <label class="form-label">선택된 참여자</label>
+                  <div id="approver-selectedParticipants">
+                    <!-- badge 형태로 추가 -->
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="submit" class="btn btn-primary">추가</button>
+              </div>
+              <div>
+                <input type="hidden" name="creater" th:value="${#authentication.principal.employee.employeeNo}">
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 합의자 생성 모달 -->
+<div class="modal fade" id="selectApproveLine2Modal" tabindex="-1"
+  aria-labelledby="selectApproveLine2ModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>합의자 추가</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="닫기"></button>
+      </div>
+      <form id="createApprovalLineForm2">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">소속</label>
+            <select class="form-select" id="agreer-departmentSelect">
+              <option disabled selected>-- 소속 선택 --</option>
+              <option th:each="dept : ${structureList}" 
+                th:value="${dept.separator_code}" 
+                th:text="${dept.separator_name}" 
+                th:selected="${dept.separator_name == param.department}"></option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">참여자 선택</label>
+            <div class="d-flex">
+              <select id="agreer-employeeSelect" class="form-select me-2" style="flex:1;">
+                <option disabled selected>-- 참여자 선택 --</option>
+              </select>
+              <button type="button" class="btn btn-outline-primary" data-action="addParticipant">추가</button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">선택된 참여자</label>
+            <div id="agreer-selectedParticipants"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="submit" class="btn btn-primary">추가</button>
+        </div>
+        <input type="hidden" name="creater" th:value="${#authentication.principal.employee.employeeNo}">
+      </form>
+    </div>
+  </div>
+</div>
+      
+      
+      
+      <!-- 참조자 생성 모달 -->
+<div class="modal fade" id="selectApproveLine3Modal" tabindex="-1"
+  aria-labelledby="selectApproveLine3ModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>참조자 추가</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="닫기"></button>
+      </div>
+      <form id="createApprovalLineForm3">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">소속</label>
+            <select class="form-select" id="referer-departmentSelect" >
+              <option disabled selected>-- 소속 선택 --</option>
+              <option th:each="dept : ${structureList}" 
+                th:value="${dept.separator_code}" 
+                th:text="${dept.separator_name}" 
+                th:selected="${dept.separator_name == param.department}"></option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">참여자 선택</label>
+            <div class="d-flex">
+              <select id="referer-employeeSelect" class="form-select me-2" style="flex:1;">
+                <option disabled selected>-- 참여자 선택 --</option>
+              </select>
+              <button type="button" class="btn btn-outline-primary" data-action="addParticipant">추가</button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">선택된 참여자</label>
+            <div id="referer-selectedParticipants"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="submit" class="btn btn-primary">추가</button>
+        </div>
+        <input type="hidden" name="creater" th:value="${#authentication.principal.employee.employeeNo}">
+      </form>
+    </div>
+  </div>
+</div>
+      
+      
+		
+		
+		
+		
+	<!-- 결재서 양식 선택시 + 해당 페이지 진입시, fetch로 결재서 양식 내용 가져오기 -->
+	<script th:inline="javascript">
+	  function loadApprovalFormat() {
+	    const select = document.getElementById("basic-select-format");
+	    const selectedValue = select.value;
+	    const edit_approval_no = /*[[${approval?.approval_no}]]*/ null;
+		
+	    fetch("/approval/format", {
+	      method: 'POST',
+	      headers: {
+	        'Content-Type': 'application/json',
+	        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+	        'header': document.querySelector('meta[name="_csrf_header"]').content
+	      },
+	      body: JSON.stringify({
+	        approval_format_no: selectedValue,
+	        edit_approval_no: edit_approval_no
+	      })
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	      if (data.res_code == "200") {
+	        document.getElementById("basic-form-edit").innerHTML = data.approvalFormatContent;
+	        document.getElementById("approvalPageTitle").innerText = data.approvalFormatTitle + ' 결재서 작성';
+	
+	        const mode = data.mode;
+	        const approvalContent = data.approvalContent;
+	
+	        if (mode === 'edit' && approvalContent) {
+	          setTimeout(() => {
+	            for (const key in approvalContent) {
+	              const inputField = document.querySelector(`#basic-form-edit [name="${key}"]`);
+	              if (inputField) {
+	                inputField.value = approvalContent[key];
+	              }
+	            }
+	            
+	          }, 0);
+	        }
+	        
+	        
+
+			const selectedFormValue = document.getElementById("basic-select-format").value;
+			if(selectedFormValue == '5') {
+				const dateInput = document.querySelector('[name="issuedDate"]');
+				if(dateInput){
+				const today = new Date().toISOString().split('T')[0];
+				dateInput.value = today;
+				}
+			}
+	        
+	        
+	        
+	      } else {
+	        // alert("양식 불러오기에 실패했습니다.");
+	      }
+	    });
+	    
+
+	    
+	  }
+	
+	  // 페이지 로드시 + 양식 선택시 각각 실행
+	  document.addEventListener('DOMContentLoaded', loadApprovalFormat);
+	  document.getElementById("basic-select-format").addEventListener("change", loadApprovalFormat);
+	</script>
+
+
+	
+	<!-- 결재자 추가 스크립트 -->
+	<script>
+	
+	let isCreateMode = true; // 기본은 생성 모드
+	
+	document.addEventListener("DOMContentLoaded", () => {
+		  bindModalEvents("approver", "#selectApproveLine1Modal", "#approveLine1");
+		  bindModalEvents("agreer", "#selectApproveLine2Modal", "#approveLine2");
+		  bindModalEvents("referer", "#selectApproveLine3Modal", "#approveLine3");
+	});
+	
+	function bindModalEvents(prefix, modalId, outputContainerId) {
+		  const modal = document.querySelector(modalId);
+		  const form = modal.querySelector("form");
+		  const departmentSelect = modal.querySelector(`#${prefix}-departmentSelect`);
+		  const employeeSelect = modal.querySelector(`#${prefix}-employeeSelect`);
+		  const selectedContainer = modal.querySelector(`#${prefix}-selectedParticipants`);
+		  const outputContainer = document.querySelector(outputContainerId);
+
+		  // 모달 초기화
+		  modal.addEventListener("shown.bs.modal", () => {
+		    selectedContainer.innerHTML = "";
+		    departmentSelect.selectedIndex = 0;
+		    employeeSelect.innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
+	    	// 기존 hidden input 제거
+	    	document.querySelectorAll(`input[name="${prefix}Ids"]`).forEach(e => e.remove());
+		    document.querySelectorAll(`input[name="${prefix}Steps"]`).forEach(e => e.remove());
+
+		  });
+
+		  // 부서 선택 시 직원 로드
+		  departmentSelect.addEventListener("change", () => {
+		    const deptId = departmentSelect.value;
+		    fetch(`/approval/employes?separator_code=${encodeURIComponent(deptId)}`)
+		      .then(res => res.json())
+		      .then(data => {
+		        employeeSelect.innerHTML = '<option disabled selected>-- 참여자 선택 --</option>';
+		        data.forEach(emp => {
+		          const opt = document.createElement("option");
+		          opt.value = emp.employee_no;
+		          opt.textContent = emp.employee_name;
+		          employeeSelect.appendChild(opt);
+		        });
+		      });
+		  });
+
+		  // 참여자 추가
+		  modal.querySelector("button[data-action='addParticipant']").addEventListener("click", () => {
+		    const selectedOptions = Array.from(employeeSelect.selectedOptions);
+		    selectedOptions.forEach(opt => {
+		      const id = opt.value;
+		      const name = opt.textContent;
+
+		      if (selectedContainer.querySelector(`#${prefix}-participant-${id}`)) return;
+
+		      const badge = document.createElement("span");
+		      badge.className = "badge badge-phoenix badge-phoenix-secondary me-2 mb-2";
+		      badge.id = `${prefix}-participant-${id}`;
+		      badge.dataset.id = id;
+		      badge.innerHTML = `${name} <button type="button" class="btn-close ms-1" style="font-size:0.6rem;" onclick="this.parentElement.remove();"></button>`;
+		      selectedContainer.appendChild(badge);
+		    });
+		    employeeSelect.selectedIndex = -1;
+		  });
+
+		  // 모달 submit 시 출력에 뱃지 및 hidden input 추가
+		  form.addEventListener("submit", e => {
+		    e.preventDefault();
+		    outputContainer.innerHTML = "";
+		    form.querySelectorAll(`input[name="${prefix}Ids"]`).forEach(e => e.remove());
+
+		    const selectedIds = [...selectedContainer.querySelectorAll('span[data-id]')].map(el => el.dataset.id);
+		    selectedIds.forEach((id, index) => {
+		      const name = selectedContainer.querySelector(`#${prefix}-participant-${id}`)?.textContent.replace("✕", "") || "이름없음";
+
+		      const badge = document.createElement("span");
+		      badge.className = 'badge bg-info text-dark me-2 mb-2';
+		      badge.innerHTML = `${name} <button type="button" class="btn-close btn-close-white ms-1" aria-label="Remove"></button>`;
+		      badge.querySelector("button").addEventListener("click", () => badge.remove());
+		      outputContainer.appendChild(badge);
+
+		      const hiddenId = document.createElement("input");
+		      hiddenId.type = "hidden";
+		      hiddenId.name = prefix + "Ids";
+		      hiddenId.value = id;
+		      badge.appendChild(hiddenId);
+		      
+		      const hiddenStep = document.createElement("input");
+		      hiddenStep.type = "hidden";
+		      hiddenStep.name = prefix + "Steps";
+		      hiddenStep.value = index + 1;
+		      badge.appendChild(hiddenStep);
+		    });
+
+		    bootstrap.Modal.getInstance(modal)?.hide();
+		  });
+		}
+
+	</script>
+
+	<script th:inline="javascript">
+		document.getElementById('approvalSubmitBtn').addEventListener('click', function (event) {
+		  event.preventDefault(); // 기본 제출 방지
+		
+		  // [1] 제목 & 양식 유효성 검사
+		  const approvalTitle = document.getElementById("basic-form-title")?.value?.trim();
+		  const formatSelect = document.getElementById("basic-select-format");
+		  const approvalFormatNo = formatSelect?.value;
+		  let isValid = true;
+		  const approvalAttachFiles = document.getElementById("approvalAttachFiles");
+		
+		  if (!approvalTitle) {
+		    document.getElementById("basic-form-title").style.border = "1px solid red";
+		    isValid = false;
+		  } else {
+		    document.getElementById("basic-form-title").style.border = "";
+		  }
+		
+		  if (!approvalFormatNo || formatSelect.value == 0) {
+		    formatSelect.style.border = "1px solid red";
+		    isValid = false;
+		  } else {
+		    formatSelect.style.border = "";
+		  }
+		
+		  if (!isValid) {
+		    alert("제목과 양식을 모두 입력해주세요.");
+		    return;
+		  }
+		
+		  // [2] 양식 입력 필드 유효성 검사 및 데이터 수집
+		  const inputElements = document.querySelectorAll("#basic-form-edit [name]");
+		  const approvalContent = {};
+		  let hasEmpty = false;
+		
+		  inputElements.forEach(el => {
+		    const name = el.name?.trim();
+		    const value = el.value?.trim();
+		
+		    if (!name) return;
+		
+		    if (!value) {
+		      hasEmpty = true;
+		      el.classList.add("is-invalid");
+		      el.style.border = "1px solid red";
+		    } else {
+		      el.classList.remove("is-invalid");
+		      el.style.border = "";
+		      approvalContent[name] = value;
+		    }
+		  });
+		
+		  if (hasEmpty) {
+		    alert("결재서 내용을 모두 입력해주세요.");
+		    return;
+		  }
+		
+		  // [3] 결재선 유효성 검사
+		  const approverIds = Array.from(document.querySelectorAll('input[name="approverIds"]')).map(el => el.value);
+		  const approverSteps = Array.from(document.querySelectorAll('input[name="approverSteps"]')).map(el => parseInt(el.value));
+		  const agreerIds = Array.from(document.querySelectorAll('input[name="agreerIds"]')).map(el => el.value);
+		  const agreerSteps = Array.from(document.querySelectorAll('input[name="agreerSteps"]')).map(el => parseInt(el.value));
+		  const refererIds = Array.from(document.querySelectorAll('input[name="refererIds"]')).map(el => el.value);
+		  const refererSteps = Array.from(document.querySelectorAll('input[name="refererSteps"]')).map(el => parseInt(el.value));
+		  
+		
+//		  if (approverSteps.length === 0 && agreerSteps.length === 0 && refererSteps.length === 0) {
+		  if (approverSteps.length === 0 && agreerSteps.length === 0) {
+		    alert("결재자, 합의자를 한 명 이상 선택해주세요.");
+		    return;
+		  }
+		  if (approverSteps.length > 5 || agreerSteps.length > 5) {
+
+			  alert("결재자, 합의자는 각각 최대 5명까지 선택 가능합니다.");
+		    return;
+		  }
+		
+		  if (
+		    approverIds.length !== approverSteps.length ||
+		    agreerIds.length !== agreerSteps.length ||
+		    refererIds.length !== refererSteps.length
+		  ) {
+		    alert("결재자 정보가 올바르지 않습니다. 다시 선택해주세요.");
+		    return;
+		  }
+		
+		  // [4] 작성자 정보 수집
+		  const writerFields = ["date", "department_name", "team_name", "employee_position", "employee_name"];
+		  const writerData = {};
+		  let editApprovalNo = null;
+		  // edit모드일 경우 approval 객체에서 값 가져오기
+			if(/*[[${mode}]]*/ null == 'edit') {
+				editApprovalNo = /*[[${approval.approval_no}]]*/ null;
+			}
+		  
+		  writerFields.forEach(field => {
+		    const el = document.getElementById(`basic-form-${field}`);
+		    writerData[field] = el ? (el.value ?? el.textContent.trim()) : null;
+		  });
+		  
+		
+		  // [5] 서버 전송
+		  /* fetch('/approval/create', {
+		    method: 'POST',
+		    headers: {
+		      'Content-Type': 'application/json',
+		      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+		      'header': document.querySelector('meta[name="_csrf_header"]').content
+		    },
+		    body: JSON.stringify({
+		      writer: writerData,
+		      title: approvalTitle,
+		      format_no: approvalFormatNo,
+		      content: approvalContent,
+		      approverIds,
+		      approverSteps,
+		      agreerIds,
+		      agreerSteps,
+		      refererIds,
+		      refererSteps,
+		      approvalAttachFiles,
+		      editApprovalNo : editApprovalNo
+		    })
+		  })
+		  .then(res => res.json())
+		  .then(data => {
+		    if (data.res_code === "200") {
+		      alert("결재서가 성공적으로 제출되었습니다.");
+		      location.href = '/approval/myRequestedApprovals';
+		    } else {
+		      alert("결재서 제출에 실패했습니다: " + data.res_msg);
+		    }
+		  })
+		  .catch(err => {
+		    console.error(err);
+		    alert("요청 중 오류가 발생했습니다.");
+		  }); */
+		  
+		  
+		  
+
+		  // 파일 기능 추가를 위한 formData 추가 버전
+		  const fileFormData = new FormData();
+		  // 기본 데이터
+		  fileFormData.append("title", approvalTitle);
+		  fileFormData.append("format_no", approvalFormatNo);
+		  fileFormData.append("editApprovalNo", editApprovalNo ?? '');
+
+		  // 작성자 정보
+		  fileFormData.append("writer", new Blob([JSON.stringify(writerData)], { type: "application/json" }));
+
+		  // 본문 내용
+		  fileFormData.append("content", new Blob([JSON.stringify(approvalContent)], { type: "application/json" }));
+
+		  // 결재선 정보
+		  fileFormData.append("approverIds", new Blob([JSON.stringify(approverIds)], { type: "application/json" }));
+		  fileFormData.append("approverSteps", new Blob([JSON.stringify(approverSteps)], { type: "application/json" }));
+		  fileFormData.append("agreerIds", new Blob([JSON.stringify(agreerIds)], { type: "application/json" }));
+		  fileFormData.append("agreerSteps", new Blob([JSON.stringify(agreerSteps)], { type: "application/json" }));
+		  fileFormData.append("refererIds", new Blob([JSON.stringify(refererIds)], { type: "application/json" }));
+		  fileFormData.append("refererSteps", new Blob([JSON.stringify(refererSteps)], { type: "application/json" }));
+
+		  // 기존 첨부파일 추가
+		  const approvalAttachFileIds = Array.from(document.querySelectorAll('input[name="approvalAttachFileIds"]')).map(el => parseInt(el.value));
+		  fileFormData.append("approvalAttachFileIds", new Blob([JSON.stringify(approvalAttachFileIds)], { type: "application/json" }));
+		  // 새 첨부파일 추가
+		  for (const file of approvalAttachFiles.files) {
+			  fileFormData.append("files", file); // name="files"가 DTO랑 맞아야 해
+		  }
+
+		  // [3] 서버 전송
+		  fetch('/approval/create', {
+		    method: 'POST',
+		    headers: {
+		      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content,
+		      'header': document.querySelector('meta[name="_csrf_header"]').content
+		    },
+		    body: fileFormData
+		  })
+		  .then(res => res.json())
+		  .then(data => {
+		    if (data.res_code === "200") {
+		      alert("결재서가 성공적으로 제출되었습니다.");
+		      location.href = '/approval/myRequestedApprovals';
+		    } else {
+		      alert("결재서 제출에 실패했습니다: " + data.res_msg);
+		    }
+		  })
+		  .catch(err => {
+		    console.error(err);
+		    alert("요청 중 오류가 발생했습니다.");
+		  });
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		});
+	</script>
+	
+    <!-- edit모드로 들어왔을 때 결재자 삭제 스크립트 -->	
+	<script>
+	  document.addEventListener("DOMContentLoaded", function () {
+	    const closeButtons = document.querySelectorAll(".btn-close");
+	
+	    closeButtons.forEach(btn => {
+	      btn.addEventListener("click", function () {
+	        const target = btn.closest("div");
+	        target.remove();
+	      });
+	    });
+	  });
+	</script>
+	<!-- 기존 파일 삭제 뱃지 -->
+	<script>
+	function removeFile(element) {
+	  const li = element.closest('li');
+	  if (li) {
+	    li.remove();
+	  }
+	}
+	</script>
+
+
+
+	</main>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html 
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{include/layout}">
+<head>
+<meta charset="UTF-8">
+<title>mailDetail</title>
+</head>
+<body>
+<main class="main" id="top" layout:fragment="content">
+	<div class="card-body overflow-hidden">
+                  <div class="d-flex flex-between-center pb-3 border-bottom border-translucent mb-4"><a class="btn btn-link p-0 text-body-secondary me-3" href="javascript:history.back()"><span class="fa-solid fa-angle-left fw-bolder fs-8"></span></a>
+                    <h3 class="flex-1 mb-0 lh-sm line-clamp-1"
+                    	th:text="${mail.mailTitle}">메일 제목</h3>
+                    <!-- <div class="btn-reveal-trigger">
+                      <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none d-flex btn-reveal" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fas fa-ellipsis-h"></span></button>
+                      <div class="dropdown-menu dropdown-menu-end py-2">
+                      <a class="dropdown-item" href="#!">Edit</a>
+                      <a class="dropdown-item text-danger" href="#!">Delete</a>
+                      <a class="dropdown-item" href="#!">Download</a>
+                      <a class="dropdown-item" href="#!">Report abuse</a></div>
+                    </div> -->
+                  </div>
+                  <div class="overflow-x-hidden scrollbar email-detail-content">
+                    <div class="row align-items-center gy-3 gx-0 mb-10">
+                      <!-- <div class="col-12 col-sm-auto d-flex order-sm-1">
+                        <button class="btn p-0 me-4 me-lg-3 me-xl-4" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="휴지통"><span class="fa-solid fa-trash-can text-body-quaternary"></span></button>
+                        <button class="btn p-0" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="중요 메일"><span class="fa-regular fa-star text-body-quaternary"></span></button>
+                      </div>  -->
+                      <div class="col-auto"></div>
+                      <div class="col-auto flex-1">
+                        <div class="d-flex mb-1">
+                          <h5 class="mb-0 text-body-highlight me-2" th:text="${mail.sender.employeeName}">작성자</h5>
+                          <p class="mb-0 lh-sm text-body-tertiary fs-9 d-none d-md-block text-nowrap" th:text="${mail.sender.directory.directoryEmail}">&#60; 작성자 이메일 &#62;</p>
+                        </div>
+                        <p class="mb-0 fs-9"><span class="text-body-tertiary"></span><span class="fw-bold text-body-secondary"></span><span class="text-body-highlight fw-semibold fs-10" th:text="${#temporals.format(mail.mailSentTime, 'yyyy.MM.dd HH:mm:ss')}">년도 </span>
+                        <!-- 별 표시  -->
+                        <!-- <span class="fa-regular fa-star text-body-quaternary"></span> -->
+                        
+                        </p>
+                      </div>
+                    </div>
+                    <div class="text-body-highlight fs-9 w-100 w-md-75 mb-8">
+                    <!-- 내용 -->
+                      <p th:utext="${mail.mailContent}"></p>
+                      
+                    <!-- 내용 -->
+                    </div>
+                    <div class="d-flex align-items-center mb-5">
+                      <button class="btn btn-link text-body-highlight fs-8 text-decoration-none p-0" type="button">
+				        <span class="fa-solid fa-paperclip me-2"></span>
+				        <span th:text="${#lists.size(attachments)} + ' 첨부 파일'"></span>
+				    </button>
+                    </div>
+                    <div class="row pb-11 border-bottom mb-4 gx-0 gy-2 border-translucent">
+					    <div th:each="attachment : ${attachments}" class="col-auto me-3">
+					        <a class="text-decoration-none d-flex align-items-center" th:href="@{'/mail/file/download/' + ${attachment.driveAttachNo}}">
+					            <!-- 파일 아이콘 -->
+					            <div class="btn-icon btn-icon-xl border rounded-3 text-body-quaternary text-opacity-75 flex-column me-2">
+					                <span class="fa-solid fa-file fs-8 mb-1"></span>
+					            </div>
+					            <div>
+					                <!-- 파일명과 크기 표시 -->
+					                <h6 class="text-body-highlight" th:text="${attachment.driveOriName}"></h6>
+					                 <p class="fs-9 mb-0 text-body-tertiary lh-1"
+									   th:text="${#numbers.formatInteger(attachment.driveSize / 1024, 1)} + ' KB'">
+									</p>
+					            </div>
+					        </a>
+					    </div>
+					</div>
+                    <div class="d-flex justify-content-between">
+                      <!-- <button class="btn btn-phoenix-secondary me-1 text-nowrap px-2 px-sm-4">전달<span class="fa-solid fa-reply ms-2 fs-10"></span></button>
+                      <button class="btn btn-phoenix-secondary me-1 text-nowrap px-2 px-sm-4">Reply All<span class="fa-solid fa-reply-all ms-2 fs-10"></span></button>
+                       -->
+                      <a class="btn btn-phoenix-secondary ms-auto text-nowrap px-2 px-sm-4" 
+					        th:href="@{/mail/mailCreateReply/{id}(id=${mail.mailNo})}">답장
+					    <span class="fa-solid fa-share ms-2 fs-10"></span>
+					</a>
+                    </div>
+                  </div>
+                </div>
+</main>
+
+</body>
+</html>

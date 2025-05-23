@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{include/layout}">
+<head>
+<meta charset="UTF-8">
+<title>회의록 작성</title>
+</head>
+<body>
+	<main class="main" id="top" layout:fragment="content">
+		<div class="d-flex align-items-center gap-2">
+			<a th:href="@{/project/detail/{projectNo}/minutes(projectNo=${projectNo})}" class="text-decoration-none text-dark me-2"> <i class="uil uil-angle-left-b fs-4"></i>
+			</a>
+			<h1 class="text-body mb-0 fs-4">회의록 작성</h1>
+		</div>
+		<br>
+
+		<!-- 본문 -->
+		<div class="tab-content">
+			<div class="tab-pane active" role="tabpanel" aria-labelledby="create-minute" id="create-minute">
+				<form id="createMinute" method="post" th:action="@{/project/minute/create}" novalidate>
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> <input type="hidden" name="projectNo" th:value="${projectNo}" />
+					<!-- 제목 -->
+					<div class="form-floating">
+						<input class="form-control" type="text" name="meetingTitle" id="create-minute-name" placeholder="제목을 입력해주세요." /> <label for="create-minute-name">회의록 제목</label>
+					</div>
+					<!-- 회의 참여자 선택 -->
+					<div class="form-floating mt-4">
+						<p class="mb-2 text-body-tertiary">
+							<b>회의 참여자</b>
+						</p>
+						<div class="d-flex flex-wrap gap-3">
+							<!-- 전체 선택 -->
+							<div class="form-check">
+								<input class="form-check-input participant-checkbox" type="checkbox" id="select-all" /> <label class="form-check-label ms-1 fw-semibold" for="select-all">전체 선택</label>
+							</div>
+							<!-- 부서 인원 -->
+							<div class="form-check" th:each="emp : ${projectEmployees}">
+								<input type="checkbox" class="form-check-input participant-checkbox" th:id="'emp-' + ${emp.employeeNo}" th:name="participants" th:value="${emp.employeeNo}" /> <label class="form-check-label ms-1" th:for="'emp-' + ${emp.employeeNo}" th:text="${emp.employeeName}">이름</label>
+							</div>
+						</div>
+					</div>
+					<!-- 회의일 -->
+					<div class="form-floating mt-4 w-25">
+						<input class="form-control" type="datetime-local" name="meetingDate" id="create-minute-date" /> <label for="create-minute-date">회의일</label>
+					</div>
+					<!-- 내용 -->
+					<div class="form-floating mt-4">
+						<textarea class="form-control" placeholder="내용을 작성해주세요." name="meetingContent" id="create-minute-content" style="height: 400px"></textarea>
+						<label for="create-minute-content">회의 내용</label>
+					</div>
+					<div class="mt-4 d-flex justify-content-end">
+						<button type="submit" class="btn btn-primary">작성</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<script>
+		  document.addEventListener("DOMContentLoaded", () => {
+		    const form = document.getElementById("createMinute");
+		    const titleInput = document.getElementById("create-minute-name");
+		    const contentInput = document.getElementById("create-minute-content");
+		    const dateInput = document.getElementById("create-minute-date");
+		    const selectAll = document.getElementById("select-all");
+		    const checkboxes = document.querySelectorAll(".participant-checkbox:not(#select-all)");
+		    const confirmButton = document.querySelector("#validationModal .btn[data-bs-dismiss]");
+		
+		    let focusElement = null;
+		    let isDirty = false;
+		
+		    // 입력 필드 변경 시 dirty 상태로 표시
+		    const inputs = document.querySelectorAll("#createMinute input, #createMinute textarea");
+		    inputs.forEach(input => {
+		      input.addEventListener("input", () => {
+		        isDirty = true;
+		      });
+		    });
+		
+		    // 작성 버튼 클릭 시 유효성 검사
+		    form.addEventListener("submit", (e) => {
+		      if (!titleInput.value.trim()) {
+		        e.preventDefault();
+		        showValidationModal("title", "제목을 입력해주세요.");
+		        return;
+		      }
+		
+		      if (!contentInput.value.trim()) {
+		        e.preventDefault();
+		        showValidationModal("content", "내용을 입력해주세요.");
+		        return;
+		      }
+		
+		      const isAnyChecked = Array.from(checkboxes).some(cb => cb.checked);
+		      if (!isAnyChecked) {
+		        e.preventDefault();
+		        showValidationModal("none", "참여자를 최소 1명 이상 선택해주세요.");
+		        return;
+		      }
+		
+		      if (!dateInput.value.trim()) {
+		        e.preventDefault();
+		        showValidationModal("none", "회의일을 선택해주세요.");
+		        return;
+		      }
+		
+		      // 유효성 통과 시 dirty 상태 해제
+		      isDirty = false;
+		    });
+		
+		    // 유효성 경고 모달 표시
+		    function showValidationModal(type, message) {
+		      document.getElementById("validationModalTitle").textContent = "입력 확인";
+		      document.getElementById("validationModalMessage").textContent = message;
+		      focusElement = type;
+		
+		      const modal = new bootstrap.Modal(document.getElementById("validationModal"));
+		      modal.show();
+		    }
+		
+		    // 모달 닫기 버튼 클릭 시 포커스 이동
+		    confirmButton.addEventListener("click", () => {
+		      if (focusElement === "title") {
+		        setTimeout(() => titleInput.focus(), 300);
+		      } else if (focusElement === "content") {
+		        setTimeout(() => contentInput.focus(), 300);
+		      }
+		    });
+		
+		    // 전체 선택 체크박스 동작
+		    selectAll.addEventListener("change", () => {
+		      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+		      isDirty = true;
+		    });
+		
+		    // 내부 링크 클릭 시 dirty 상태일 경우 경고 모달 표시
+		    document.querySelectorAll("a").forEach(link => {
+		      link.addEventListener("click", function (e) {
+		        const href = this.getAttribute("href");
+		
+		        if (isDirty && href && !href.startsWith("#") && !this.hasAttribute("data-bs-toggle")) {
+		          e.preventDefault();
+		          const confirmModal = new bootstrap.Modal(document.getElementById("confirmCloseModal"));
+		          confirmModal.show();
+		
+		          const confirmBtn = document.getElementById("confirmCloseBtn");
+		          confirmBtn.onclick = function () {
+		            confirmModal.hide();
+		            isDirty = false;
+		            window.location.href = href;
+		          };
+		        }
+		      });
+		    });
+		
+		    // 브라우저 뒤로가기 또는 새로고침 시 경고
+		    window.addEventListener("beforeunload", function (e) {
+		      if (isDirty) {
+		        e.preventDefault();
+		        e.returnValue = "";
+		      }
+		    });
+		  });
+		</script>
+
+		<!-- 유효성 검사 확인창 -->
+		<div class="modal fade" id="validationModal" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-sm">
+				<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+					<div class="modal-header border-0">
+						<h5 class="modal-title text-dark" id="validationModalTitle">입력 확인</h5>
+					</div>
+					<div class="modal-body text-center">
+						<p class="mb-0 text-body" id="validationModalMessage">필수 항목을 모두 입력해주세요.</p>
+					</div>
+					<div class="modal-footer justify-content-center border-0">
+						<button type="button" class="btn btn-phoenix-secondary bg-primary text-white" data-bs-dismiss="modal">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 회의록 작성 중 나가기 경고창 -->
+		<div class="modal fade" id="confirmCloseModal" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-sm">
+				<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+					<div class="modal-header border-0">
+						<h5 class="modal-title text-dark">주의</h5>
+					</div>
+					<div class="modal-body text-center">
+						<p class="mb-0 text-body">
+							작성중인 내용은 저장되지 않습니다.<br>정말 나가시겠습니까?
+						</p>
+					</div>
+					<div class="modal-footer justify-content-center border-0">
+						<button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+						<button type="button" class="btn btn-danger" id="confirmCloseBtn">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</main>
+</body>
+</html>

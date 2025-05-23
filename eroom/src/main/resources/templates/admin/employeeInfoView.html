@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="ko-KR" dir="ltr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{include/layout}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+  <title>회원 근태 상세</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .profile-wrapper {
+      position: relative;
+      width: 120px;
+      height: 120px;
+    }
+    .profile-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .row > [class^="col"] {
+      display: flex;
+    }
+    .card {
+      flex: 1 1 auto;
+    }
+
+  </style>
+</head>
+<body>
+<main class="main" id="top" layout:fragment="content">
+  <div class="mb-9">
+  	<!-- 현재 페이지의 회원 정보 -->
+  	<input type="hidden" id="employeeNo" th:value="${employee.employeeNo}"/>
+    
+    <div class="d-flex justify-content-between align-items-center mb-2 position-relative"
+        th:if="${isAdmin}">
+      <span class="fw-bold fs-7">근태 / 회원 정보 수정</span>
+
+    </div>
+
+    <!-- 카드 그룹: 프로필 + 근태요약 / 주소록 + 근무시간 -->
+    <div class="row g-3">
+      <!-- 1행: 프로필 + 근태 요약 -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body d-flex align-items-center gap-5" style="margin-left: 85px;">
+			<!-- 관리자일 때 -->
+			<div class="profile-wrapper me-3" >
+			  <img id="profileImage" class="rounded-circle" th:src="@{${profileImageUrl}}" alt="프로필">
+			</div>
+			
+
+            <div class="text-start mt-2">
+              <div class="fw-bold fs-7" th:text="${employee.employeeName}">이름</div>
+              <div class="text-body-secondary mt-2" th:text="${employee.employeePosition}">직급</div>
+            </div>
+          </div>
+          <div class="card-footer border-top border-dashed pt-3">
+   			<div class="d-flex align-items-center mb-2" th:if="${isAdmin}">
+				<!--  연차 수정 버튼 -->
+				<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0 edit-annual-btn" id="editAnnualLeaveBtn"
+				        data-bs-toggle="modal" data-bs-target="#annualLeaveEditModal"
+				        th:attr="data-employee-no=${employee.employeeNo}">
+					<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
+					     focusable="false" data-prefix="fas" data-icon="pen" role="img"
+					     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+						<path fill="currentColor"
+					        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
+					</svg>
+				</button>
+			</div> 
+            <div class="d-flex justify-content-around">
+              <div>
+                <div class="fw-bold fs-8 text-center">총 연차</div>
+                <div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annual_leave_total}">12</div>
+              </div>
+              <div>
+                <div class="fw-bold fs-8 text-center">사용 연차</div>
+                <div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annual_leave_used}">2</div>
+              </div>
+              <div>
+                <div class="fw-bold fs-8 text-center">잔여 연차</div>
+                <div class="fs-7 text-body-primary text-center" th:text="${annualLeave.annual_leave_remain}">10</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-body">
+            <div class="fw-bold fs-8 mb-3 text-secondary">이번 달 근태 요약</div>
+            <div class="row text-center">
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold">출근일수</div>
+                <div class="text-primary fw-bold" th:text="${summaryData.checkinDays} + '일'">O일</div>
+              </div>
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold">지각</div>
+                <div class="text-danger fw-bold" th:text="${summaryData.lateCount} + '회'">OO회</div>
+              </div>
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold">조퇴</div>
+                <div class="text-warning fw-bold" th:text="${summaryData.earlyLeaveCount} + '회'">OO회</div>
+              </div>
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold">평균 출근</div>
+                <div class="text-success fw-bold" th:text="${summaryData.averageCheckInTime}">00:00</div>
+              </div>
+              <div class="col text-center d-flex flex-column align-items-center">
+                <div class="fw-semibold">출근률</div>
+                <div class="text-info fw-bold" th:text="${summaryData.attendanceRate}">00%</div>
+              </div>
+            </div>
+            <div class="mini-chart-wrapper mt-4">
+              <canvas id="miniAttendanceChart" height="47"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2행: 주소록 + 근무시간 차트 -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body fs-9">
+            <h5 class="text-body-secondary">사번</h5>
+            <p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
+
+			<h5 class="text-body-secondary">소속</h5>
+			<p class="text-body-secondary" 
+			   th:text="${(departmentName != null ? departmentName : '-') + ' / ' + (teamName != null ? teamName : '-')}">
+			   부서 / 팀
+			</p>           
+            
+            <div class="mb-3">
+              <h5 class="text-body-secondary">Email</h5>
+              <a href="mailto:email@email.com" id="emailValue" th:text="${directory != null and directory.directory_email != null ? directory.directory_email : '-'}">email@email.com</a>
+            </div>
+            
+            <h5 class="text-body-secondary">연락처</h5>
+            <p class="text-body-secondary" id="phoneValue" th:text="${directory != null and directory.directory_phone != null ? directory.directory_phone : '-'}">010-0000-0000</p>
+ 			
+ 			<h5 class="text-body-secondary">주소</h5>
+			<p class="text-body-secondary" id="addressValue"
+			   th:text="${directory != null and directory.directory_zipcode != null and directory.directory_address != null 
+			             ? '(' + directory.directory_zipcode + ') ' + directory.directory_address 
+			             : '-'}">
+			  (00000) 주소정보
+			</p>
+          
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card p-3">
+          <div class="card-title d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold fs-8 text-secondary">근무시간 통합 차트</span>
+            <p class="text-muted mb-0">이번 달 총 근무시간: <strong class="text-primary" th:text="${totalWorkTime}">000시간 00분</strong></p>
+          </div>
+          <canvas id="workTimeMixedChart" height="260"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>       
+
+<hr><!-- 상단/하단 구분선 -->
+	
+<!-- 근태 현황 목록 테이블 -->     
+<div id="attendanceTable" data-list='{"valueNames":["no","date","checkin","checkout","late","early"]}'>
+  <!-- 상단: 날짜 선택 + 검색창 -->
+  <div class="d-flex justify-content-between align-items-center mb-3 px-3 gap-2 flex-wrap">
+     <div class="row g-2 mb-4">
+		<div class="d-flex justify-content-start align-items-center mb-2">
+			<!-- <i class="fas fa-user-tie text-secondary me-2"></i> -->
+			<span class="fw-bold fs-7">근태 현황</span>
+		</div>
+	</div>
+        <!-- 검색창 -->
+    <div class="flex-grow-1 d-flex justify-content-center">
+      <div class="search-box w-50">
+        <form class="position-relative">
+          <input class="form-control form-control-sm search-input search" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
+          <svg style="height:40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+          </svg>
+        </form>
+      </div>
+    </div>
+    <!-- 날짜 선택 -->
+    <div>
+      <input type="hidden" id="employeeNo" value="[[${employee.employeeNo}]]"/>
+      <select class="form-select form-select-sm" id="monthSelect"></select>
+    </div>
+
+  </div>
+
+  <!-- 테이블 -->
+	<div class="table-responsive">
+	    <table class="table table-striped table-sm fs-9 mb-0 text-center">
+			<thead class="text-center align-middle">
+				<tr class="table-light">
+					<th class="sort" data-sort="no" style="width:5%;">번호</th>
+					<th class="sort" data-sort="date" style="width:25%;">근무일</th>
+					<th class="sort" data-sort="checkin" style="width:25%;">출근 시간</th>
+					<th class="sort" data-sort="checkout" style="width:25%;">퇴근 시간</th>
+					<th class ="sort" data-sort="late" style="width:10%">지각</th>
+					<th class ="sort" data-sort="early" style="width:10%">조퇴</th>
+					<th class="text-end-pe-0" th:if="${isAdmin}"></th>
+				</tr>
+			</thead>
+			<tbody class="list align-middle" id="attendanceTableBody">
+			
+			</tbody>
+	    </table>
+	</div>
+
+</div><!-- 근태현황 목록 테이블 끝 -->
+<br><br><br>
+
+<!-- 근태 정보 수정 모달 -->
+<div class="modal fade" id="editAttendanceModal" tabindex="-1" aria-labelledby="editAttendanceModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+	  <div class="modal-content border border-secondary">
+	    <form id="editAttendanceForm" autocomplete="off" name="editAttendanceForm">
+	
+	      <!-- 헤더 -->
+	      <div class="modal-header bg-light">
+	        <h5 class="modal-title" id="editAttendanceModalLabel">근태 정보 수정</h5>
+	        <button class="btn-close btn-close-secondary" type="button" aria-label="Close"></button>
+	      </div>
+	
+	      <!-- 바디 -->
+	      <div class="modal-body px-4 py-2">
+			<input type="hidden" id="employeeNo" name="employeeNo" th:value="${employee.employeeNo}"/>
+			<input type="hidden" id="attendanceNo" name="attendance_no"/>
+			<!-- 출근일시 + 지각 -->
+			<div class="mb-3">
+			  <label for="editCheckInTime" class="form-label fw-semibold">출근일시</label>
+			  <div class="d-flex align-items-center">
+			    <input type="datetime-local" class="form-control" id="editCheckInTime"
+			           name="attendance_check_in_time" style="width: 70%;" step="1">
+			    <span id="lateStatus" class="text-danger small fw-semibold ms-7" style="margin-left: 8px;"></span>
+			  </div>
+			</div>
+			
+			<!-- 퇴근일시 + 조퇴 -->
+			<div class="mb-3">
+			  <label for="editCheckOutTime" class="form-label fw-semibold">퇴근일시</label>
+			  <div class="d-flex align-items-center">
+			    <input type="datetime-local" class="form-control" id="editCheckOutTime"
+			           name="attendance_check_out_time" style="width: 70%;" step="1">
+			    <span id="earlyLeaveStatus" class="text-danger small fw-semibold ms-7" style="margin-left: 8px;"></span>
+			  </div>
+			</div>
+	
+	      </div>
+	
+	      <!-- 푸터 -->
+	      <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+	        <button type="button" class="btn btn-light me-2" id="cancelEditBtn">취소</button>
+	        <button type="button" class="btn btn-primary" id="editSubmitBtn">수정하기</button>
+	      </div>
+	    </form>
+	  </div>
+	</div>
+</div>
+<!-- 연차 정보 수정 모달 -->
+<div class="modal fade" id="annualLeaveEditModal" tabindex="-1" aria-labelledby="annualLeaveEditModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
+    <div class="modal-content border border-secondary">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="annualLeaveEditModalLabel">연차 정보 수정</h5>
+        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body px-4 py-3">
+        <form id="annualLeaveEditForm">
+          <input type="hidden" id="editAnnualEmployeeNo" name="employeeNo"/>
+
+			<!-- 총 연차 -->
+			<div class="mb-3">
+			  <label class="form-label">총 연차 (현재: <span id="currentTotalDays">15</span>일)</label>
+			  <div class="input-group">
+			    <button class="btn btn-outline-secondary" type="button" id="btnTotalMinus">-</button>
+			    <input type="number" class="form-control text-center" name="annualLeaveTotalDelta" id="annualLeaveTotalDelta" value="0">
+			    <button class="btn btn-outline-secondary" type="button" id="btnTotalPlus">+</button>
+			  </div>
+			</div>
+			
+			<!-- 사용 연차 -->
+			<div class="mb-3">
+			  <label class="form-label">사용 연차 (현재: <span id="currentUsedDays">3</span>일)</label>
+			  <div class="input-group">
+			    <button class="btn btn-outline-secondary" type="button" id="btnUsedMinus">-</button>
+			    <input type="number" class="form-control text-center" name="annualLeaveUsedDelta" id="annualLeaveUsedDelta" value="0">
+			    <button class="btn btn-outline-secondary" type="button" id="btnUsedPlus">+</button>
+			  </div>
+			</div>
+			
+			<!-- 잔여 연차 -->
+			<div class="mb-3">
+			  <label class="form-label">
+			  	잔여 연차
+			 	<small class="text-muted" id="remainPreviewText">(10 → 11)</small>
+			  </label>
+			  <input type="number" class="form-control" id="annualLeaveRemain" readonly>
+			</div>
+        </form>
+      </div>
+
+      <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+        <button type="button" class="btn btn-light w-45" id="cancelAnnualBtn">취소</button>
+        <button type="button" class="btn btn-primary w-45" id="saveAnnualLeaveBtn">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- confirm Modal -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">수정 확인</h5>
+       <!--  <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button> -->
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+          수정 하시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" id="cancelSaveBtn" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alert Modal (닫기 경고용) -->
+<div class="modal fade" id="unsavedAlertModal" tabindex="-1" aria-labelledby="unsavedAlertModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="unsavedAlertModalLabel">창닫기</h5>
+       <!--  <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button> -->
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" id="stayModalBtn" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 퇴근시간 유효성 경고 모달 -->
+<div class="modal fade" id="invalidCheckOutModal" tabindex="-1" aria-labelledby="invalidCheckOutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="invalidCheckOutModalLabel">입력 오류</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          퇴근 시간은 출근 시간보다 늦어야 합니다.<br>다시 선택해 주세요.
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 알림 모달 (성공/실패 공통) -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 서버 응답 메시지가 들어갈 자리 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	// 차트 데이터를 받아서 각 차트를 렌더링하는 함수
+	async function renderCharts() {
+		
+		const employeeNo = document.getElementById('employeeNo').value;
+		console.log(employeeNo); // 디버깅용 콘솔 출력
+		// 1. API 호출
+		const response = await fetch(`/admin/employeeChartData?employeeNo=${employeeNo}`);
+		const data = await response.json();
+		console.log(data); // 디버깅용 콘솔 출력
+		console.log(data.checkinDays,data.lateCount,data.earlyLeaveCount); // 디버깅용 콘솔 출력
+
+		/* --------------- 근태 요약 차트 (Bar Chart) ----------------- */
+		const miniCtx = document.getElementById('miniAttendanceChart').getContext('2d');
+		console.log(miniCtx); // 디버깅용 콘솔 출력
+		new Chart(miniCtx, {
+			type: 'bar',
+			data: {
+				labels: ['출근일수', '지각', '조퇴'],
+				datasets: [{
+					label: '횟수',
+					data: [
+						data.checkinDays || 0,
+						data.lateCount || 0,
+						data.earlyLeaveCount || 0
+					],
+					backgroundColor: [
+						'rgba(13, 110, 253, 0.7)',   // 출근: 파랑
+						'rgba(220, 53, 69, 0.7)',    // 지각: 빨강
+						'rgba(255, 193, 7, 0.7)'     // 조퇴: 노랑
+					]
+				}]
+			},
+			options: {
+				plugins: {
+					legend: { display: false }
+				},
+				scales: {
+					y: {
+						beginAtZero: true,
+						ticks: { stepSize: 1 }
+					}
+				}
+			}
+		});
+
+		/* --------------- 근무시간 통합 차트 (Mixed: Line + Bar) ----------------- */
+		const mixedCtx = document.getElementById('workTimeMixedChart').getContext('2d');
+		const workTimePerDay = data.workTimePerDay || {};
+		const weekdayAvg = data.weekdayAvg || {};
+
+		// (1) 날짜별 근무시간 차트용 데이터 변환
+		const dailyLabels = Object.keys(workTimePerDay).map(dateStr => {
+			const [year, month, day] = dateStr.split('-');
+			return `${month}/${day}`;
+		});
+		const dailyData = Object.values(workTimePerDay);
+
+		// (2) 요일별 평균 근무시간 변환 및 정렬
+		const dayMap = {
+			'MONDAY': '월', 'TUESDAY': '화', 'WEDNESDAY': '수',
+			'THURSDAY': '목', 'FRIDAY': '금'
+		};
+		const weekdayOrder = ['월', '화', '수', '목', '금'];
+		const weekdayData = weekdayOrder.map(kor => {
+			const eng = Object.keys(dayMap).find(key => dayMap[key] === kor);
+			return weekdayAvg[eng] ?? null;
+		});
+
+		// (3) 차트 생성
+		new Chart(mixedCtx, {
+			type: 'bar',
+			data: {
+				labels: [...dailyLabels, ...weekdayOrder],
+				datasets: [
+					{
+						type: 'line',
+						label: '일별 근무시간',
+						data: [...dailyData, ...new Array(weekdayOrder.length).fill(null)],
+						borderColor: '#0d6efd',
+						backgroundColor: '#0d6efd55',
+						yAxisID: 'y',
+						tension: 0.3,
+						spanGaps: true
+					},
+					{
+						type: 'bar',
+						label: '요일별 평균 근무시간',
+						data: [...new Array(dailyLabels.length).fill(null), ...weekdayData],
+						backgroundColor: 'rgba(255, 99, 132, 0.6)',
+						yAxisID: 'y1'
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				plugins: {
+					tooltip: {
+						callbacks: {
+							label: function (context) {
+								const label = context.dataset.label;
+								const val = context.raw;
+								return label + ': ' + (val !== null ? val.toFixed(2) + '시간' : '');
+							}
+						}
+					},
+					legend: { position: 'top' }
+				},
+				scales: {
+					y: {
+						type: 'linear',
+						position: 'left',
+						title: { display: true, text: '일별 근무시간' },
+						beginAtZero: true,
+						suggestedMax: 10
+					},
+					y1: {
+						type: 'linear',
+						position: 'right',
+						title: { display: true, text: '요일별 평균' },
+						grid: { drawOnChartArea: false },
+						beginAtZero: true,
+						suggestedMax: 10
+					}
+				}
+			}
+		});
+	}
+	renderCharts();
+
+	initAdminAttendanceMonthSelect();
+	
+	function initAdminAttendanceMonthSelect(){
+		const employeeNo = document.getElementById('employeeNo').value;
+		const monthSelect = document.getElementById('monthSelect');
+		const tbody = document.getElementById('attendanceTableBody');
+
+		// 월 목록 가져오기
+		fetch(`/admin/monthList?employeeNo=${employeeNo}`)
+			.then(res => res.json())
+			.then(monthList => {
+				if (!monthList || monthList.length === 0) return;
+				monthList.forEach(month => {
+					const opt = document.createElement('option');
+					opt.value = month;
+					opt.textContent = month;
+					monthSelect.appendChild(opt);
+				});
+
+				const defaultMonth = monthList[0];
+				monthSelect.value = defaultMonth;
+
+				fetchAndRenderAttendance(defaultMonth);
+				monthSelect.addEventListener('change', function(){
+					fetchAndRenderAttendance(this.value);
+				});
+			})
+			.catch(err => {
+				console.error("월 목록 불러오기 실패:", err);
+			});
+
+		// 근태 데이터 가져오기
+		function fetchAndRenderAttendance(month){
+			fetch(`/admin/listData?month=${month}&employeeNo=${employeeNo}`)
+				.then(res => res.json())
+				.then(data => {
+					tbody.innerHTML = '';
+
+					if (!data || data.length === 0) {
+						tbody.innerHTML = `<tr><td colspan="7" class="text-center">근태 정보가 없습니다.</td></tr>`;
+						return;
+					}
+
+					data.forEach((record, index) => {
+						const checkIn = formatDateTime(record.attendance_check_in_time);
+						const checkOut = formatDateTime(record.attendance_check_out_time);
+						const late = record.attendance_late_yn === 'Y' ? '지각' : '-';
+						const early = record.attendance_early_leave_yn === 'Y' ? '조퇴' : '-';
+
+						const row = `
+							<tr>
+								<td class="no">${index + 1}</td>
+								<td class="date">${checkIn.date}</td>
+								<td class="checkin">${checkIn.time}</td>
+								<td class="checkout">${checkOut.time}</td>
+								<td class="late">${late}</td>
+								<td class="early">${early}</td>
+								<td class="text-end pe-0">
+								  <div class="btn-reveal-trigger position-static">
+									<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown">
+									  <i class="fas fa-ellipsis fs-10"></i>
+									</button>
+									<div class="dropdown-menu dropdown-menu-end py-2">
+									  <a class="dropdown-item edit-attendance-btn" href="#!" data-attendance-no="${record.attendance_no}" data-bs-toggle="modal" data-bs-target="#editAttendanceModal">
+										수정
+									  </a>
+									</div>
+								  </div>
+								</td>
+							</tr>
+						`;
+						tbody.insertAdjacentHTML('beforeend', row);
+					});
+				})
+				.catch(err => {
+					console.error("근태 데이터 불러오기 실패:", err);
+					tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">데이터 로딩 중 오류</td></tr>`;
+				});
+		}
+
+		// 날짜 변환 함수
+		function formatDateTime(dateStr){
+			const date = new Date(dateStr);
+			const yyyy = date.getFullYear();
+			const mm = String(date.getMonth() + 1).padStart(2, '0');
+			const dd = String(date.getDate()).padStart(2, '0');
+			const hh = String(date.getHours()).padStart(2, '0');
+			const mi = String(date.getMinutes()).padStart(2, '0');
+			const ss = String(date.getSeconds()).padStart(2, '0');
+			return {
+				date: `${yyyy}.${mm}.${dd}`,
+				time: `${hh}:${mi}:${ss}`
+			};
+		}
+	}
+	
+	
+	
+  // 공통 모달 요소
+	const confirmModalEl = document.getElementById('confirmSaveModal');
+	const confirmModal = bootstrap.Modal.getOrCreateInstance(confirmModalEl);
+	const unsavedAlertModal = new bootstrap.Modal(document.getElementById('unsavedAlertModal')); // 닫기 확인용 모달
+	const invalidModal = new bootstrap.Modal(document.getElementById('invalidCheckOutModal')); // 시간 유효성 확인 모달
+	//서버 응답 메시지를 모달에 표시하고 확인 시 콜백 실행
+	function showAlertModal(message, callback) {
+	  // 메시지를 알림 모달 본문에 삽입
+	  document.getElementById('alertMessageContent').textContent = message;
+	  // 알림 모달 인스턴스 생성 또는 가져오기
+	  const alertModalEl = document.getElementById('alertMessageModal');
+	  const alertModal = bootstrap.Modal.getOrCreateInstance(alertModalEl);
+	  alertModal.show();
+	  // 확인 버튼 클릭 시 실행할 콜백 등록
+	  const confirmBtn = alertModalEl.querySelector('.btn-primary');
+	  // 한 번만 실행되도록 리스너 등록
+	  const handler = () => {
+	    if (callback) callback(); // 예: location.reload()
+	    confirmBtn.removeEventListener('click', handler); // 중복 방지
+	  };
+	  confirmBtn.addEventListener('click', handler);
+	}
+  
+	// 근태수정
+	const editModal = document.getElementById('editAttendanceModal');
+	const bsEditModal = bootstrap.Modal.getOrCreateInstance(editModal); // 모달 인스턴스 가져오기 or 생성
+	const checkInInput = document.getElementById('editCheckInTime');
+	const checkOutInput = document.getElementById('editCheckOutTime');
+	// 수정 모드 설정
+	let currentMode = ''; // 'attendanceEdit' | 'annualLeaveEdit'
+	// 수정 여부 감지
+	let isAttendanceEdited = false; // 근태정보 수정 여부
+	// 원래 값을 저장하여 모달 닫기 전 비교용으로 사용
+	let originalData = {checkInTime: '', checkOutTime: ''};
+
+	// 수정 버튼 클릭 시 해당 attendanceNo 기반으로 데이터 fetch
+
+	document.getElementById('attendanceTableBody').addEventListener('click', function(e) {
+		  const target = e.target.closest('.edit-attendance-btn');
+		  if (!target) return;
+
+		  currentMode = 'attendanceEdit';
+		  const attendanceNo = target.getAttribute('data-attendance-no');
+
+		  document.getElementById('attendanceNo').value = attendanceNo;
+
+		  fetch(`/admin/attendanceDetail?attendanceNo=${attendanceNo}`)
+		    .then(res => res.json())
+		    .then(data => {
+		      const checkIn = data.attendance_check_in_time?.replace(' ', 'T') || '';
+		      const checkOut = data.attendance_check_out_time?.replace(' ', 'T') || '';
+
+		      checkInInput.value = checkIn;
+		      checkOutInput.value = checkOut;
+
+		      originalData.checkInTime = checkIn;
+		      originalData.checkOutTime = checkOut;
+
+		      isAttendanceEdited = false;
+
+		      document.getElementById('lateStatus').textContent =
+		        data.attendance_late_yn === 'Y' ? '지각' : '';
+		      document.getElementById('earlyLeaveStatus').textContent =
+		        data.attendance_early_leave_yn === 'Y' ? '조퇴' : '';
+		    });
+		});
+
+	// 퇴근시간이 출근시간보다 이전이면 오류 모달 표시
+	checkOutInput.addEventListener('change', () => {
+	  const inTime = checkInInput.value;
+	  const outTime = checkOutInput.value;
+	
+	  if (inTime && outTime && new Date(outTime) < new Date(inTime)) {
+	    // 유효하지 않은 경우 경고 모달 표시, 입력값 초기화 
+	    invalidModal.show();
+	    checkOutInput.value = ''; // 퇴근시간 초기화
+	  }
+	});
+
+	// 근태 수정 모달 닫기 또는 취소 시 변경 여부 확인
+	const attendanceCloseBtns = [
+		editModal.querySelector('.btn-close'), // 모달 상단의 X버튼
+		document.getElementById('cancelEditBtn') // 푸터의 취소 버튼
+	];
+	// 근태 수정 모달에서 닫기 버튼 클릭시
+	attendanceCloseBtns.forEach(btn => {
+	  btn.addEventListener('click', (e) => {
+	    e.preventDefault(); // 기본 닫기 방지
+	    // 초 단위를 제거해서 datetime 값을 비교하기 위한 헬퍼 함수
+	    // datetime-local input의 값은 'yyyy-MM-ddTHH:mm' 형식이며, 일부 상황에서 초(:ss)까지 붙는 경우가 있음
+	    // substring(0, 16)을 사용하면 'yyyy-MM-ddTHH:mm'까지만 잘라서 비교할 수 있음
+	    const trimSeconds = (datetimeStr) => datetimeStr.length >= 16 ? datetimeStr.substring(0, 16) : datetimeStr;
+	    // 현재 입력된 출근 시간과 퇴근 시간을 input에서 가져와 초 단위를 제거한 문자열로 변환
+	    const nowIn = trimSeconds(checkInInput.value);
+	    const nowOut = trimSeconds(checkOutInput.value);
+	    
+	    const originalIn = trimSeconds(originalData.checkInTime);
+	    const originalOut = trimSeconds(originalData.checkOutTime);     
+	   // 초 단위 차이(예: 09:00:00 vs 09:00)로 인해 false positives를 방지
+	  const isModified = (nowIn !== originalIn || nowOut !== originalOut);
+	    if (isModified) {
+	  	  // e.preventDefault(); // 기본 동작 방지
+	  	// 변경 내역이 있을 경우 경고 모달 표시  
+	      unsavedAlertModal.show();
+	      // 현재 editModal에 prevent-close 클래스를 추가하여 닫기 방지
+	      editModal.classList.add('prevent-close');
+	    } else {
+	  	// 변경 없으면 모달 닫기
+	      bsEditModal.hide();
+	    }
+	  });
+	});
+
+  // 경고 모달 "예" → 닫기 실행
+	document.getElementById('confirmCloseBtn').addEventListener('click', () => {
+		unsavedAlertModal.hide();
+	   if (currentMode === 'attendanceEdit') {
+	     bsEditModal.hide();
+	     editModal.classList.remove('prevent-close');
+	   } else if (currentMode === 'annualLeaveEdit') {
+	     annualEditModal.hide();
+	     annualEditModalEl.classList.remove('prevent-close');
+	   }
+	});
+	
+  // 경고 모달 "아니오" → 수정 모달 유지
+	document.getElementById('stayModalBtn').addEventListener('click', () => {
+		unsavedAlertModal.hide();
+	   if (currentMode === 'attendanceEdit') {
+	     bsEditModal.show();
+	     editModal.classList.remove('prevent-close');
+	   } else if (currentMode === 'annualLeaveEdit') {
+	     annualEditModal.show();
+	     annualEditModalEl.classList.remove('prevent-close');
+	   }
+	});
+	  // ====================== 저장 버튼 핸들러 ======================
+	  document.getElementById('editSubmitBtn').addEventListener('click', e => {
+	    e.preventDefault();
+	    currentMode = 'attendanceEdit';
+	    confirmModal.show();
+	  });
+
+	  document.getElementById('saveAnnualLeaveBtn').addEventListener('click', e => {
+	    e.preventDefault();
+	    currentMode = 'annualLeaveEdit';
+	    confirmModal.show();
+	  });
+	// confirm모달 취소 버튼 클릭 시 confirm 모달만 닫기
+	document.getElementById('cancelSaveBtn').addEventListener('click', function () {
+	  confirmModal.hide();
+	 // bsEditModal.hide(); // 수정 모달도 함께 닫기
+	});
+	
+	// confirm모달 확인 버튼 클릭 -> fetch요청
+	document.getElementById('confirmSaveBtn').addEventListener('click', e => {
+		e.preventDefault();
+		confirmModal.hide();
+		if (currentMode === 'attendanceEdit') {
+		  sendAttendanceUpdate();
+		} else if (currentMode === 'annualLeaveEdit') {
+		  sendAnnualLeaveUpdate();
+		}
+	});
+	// 수정하기 버튼 클릭 시 폼 제출
+	function sendAttendanceUpdate(){
+		// confirm 모달 닫기
+		confirmModal.hide();
+		
+		const form = document.getElementById('editAttendanceForm');
+		const payload = new FormData(form);
+		console.log("폼 데이터:", [...payload.entries()]);
+		fetch('/admin/attendanceUpdate',{
+			method: 'POST',
+			headers:{
+			      'header': document.querySelector('meta[name="_csrf_header"]').content,
+			      'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content			
+			},
+			body: payload
+		})
+		.then(response => response.json())
+		.then(data => {
+			  console.log(data);
+			// 알림 메세지 모달에 서버응답(res_msg) 출력
+			showAlertModal(data.res_msg, function(){
+				if(data.res_code == 200){
+					const employeeNo = document.getElementById('employeeNo').value;
+					location.reload(); // 페이지 새로고침
+				}
+			});
+		})
+		.catch(error => {
+			console.error('Error:', error);
+			showAlertModal("정보 수정 중 오류가 발생했습니다.");
+		});
+	}	
+	// 연차 수정 모달 요소
+	const annualEditModalEl = document.getElementById('annualLeaveEditModal');
+	const annualEditModal = bootstrap.Modal.getInstance(annualEditModalEl) || new bootstrap.Modal(annualEditModalEl);
+	// 현재 연차 값 저장용
+	let annualOrigin = {total : 0, used : 0};
+	let isAnnualEdited = false;
+	// 연차 수정 버튼 클릭 시 employeeNo 가져와서 모달 오픈
+	document.querySelectorAll('.edit-annual-btn').forEach(btn => {
+		btn.addEventListener('click', function () {
+		  currentMode = 'annualLeaveEdit';	// 연차 수정 모드 설정
+		  const employeeNo = this.getAttribute('data-employee-no');
+		  openAnnualLeaveModal(employeeNo);
+		});
+	});
+	// 연차 정보 조회 -> 모달 열기 + 현재값 출력 + 입력 초기화
+	function openAnnualLeaveModal(employeeNo){
+		fetch(`/admin/getAnnualLeave?employeeNo=${employeeNo}`)
+			.then(response => {
+				if(!response.ok) throw new Error('서버 응답 오류');
+				return response.json();
+			})
+			.then(data => {
+				if(data.res_code == 200){
+					// origin 값 저장
+					annualOrigin.total = data.annual_leave_total || 0;
+					annualOrigin.used = data.annual_leave_used || 0;
+					// 현재값 표시(라벨용)
+					document.getElementById('currentTotalDays').textContent = annualOrigin.total;
+					document.getElementById('currentUsedDays').textContent = annualOrigin.used;
+					// delta 입력 초기화
+					document.getElementById('annualLeaveTotalDelta').value = 0;
+					document.getElementById('annualLeaveUsedDelta').value = 0;
+					document.getElementById('editAnnualEmployeeNo').value = employeeNo;
+					
+					// 잔여 연차 초기값 계산 함수 호출
+					updateAnnualRemain();
+					// 모달 열기
+					annualEditModal.show();
+				}else{
+					showAlertModal(data.res_msg);
+				}
+			})
+			.catch(error => {
+				console.error(error);
+				showAlertModal("연차 정보 조회 중 오류가 발생했습니다.");
+			})
+	}
+	// delta 값 입력 시 잔여 연차 자동 계산
+	function updateAnnualRemain(){
+		const deltaTotal = parseFloat(document.getElementById('annualLeaveTotalDelta').value) || 0;
+		const deltaUsed = parseFloat(document.getElementById('annualLeaveUsedDelta').value) || 0;
+		
+		const newTotal = annualOrigin.total + deltaTotal;
+		const newUsed = annualOrigin.used + deltaUsed;
+		const newRemain = newTotal - newUsed;
+		const oldRemain = annualOrigin.total - annualOrigin.used;
+		// 잔여 연차 input에 값 설정
+		const remainInput = document.getElementById('annualLeaveRemain')
+		remainInput.value = newRemain;
+		// 미리보기 텍스트
+		const remainText = document.getElementById('remainPreviewText');
+		remainText.textContent = `(${oldRemain} ⇒ ${newRemain})`;
+		// 음수일 경우 메시지 표시
+		remainInput.classList.toggle('text-danger', newRemain < 0);
+	    remainText.classList.toggle('text-danger', newRemain < 0);
+	    if (newRemain < 0) remainText.textContent += '  ※ 잔여 연차가 음수입니다 (선사용 중)';
+
+	    isAnnualEdited = deltaTotal !== 0 || deltaUsed !== 0;
+	}
+	// + - 버튼 클릭 시 delta 값 조정
+	function adjustDelta(type,amount){
+		const inputId = type === 'total' ? 'annualLeaveTotalDelta' : 'annualLeaveUsedDelta';
+		const input = document.getElementById(inputId);
+		let current = parseFloat(input.value) || 0;
+		input.value = current + amount;
+		updateAnnualRemain(); // 값 변경되면 잔여 연차 재계산
+	}
+	// + - 버큰 클릭시 이벤트
+	document.getElementById('btnTotalPlus').addEventListener('click', () => adjustDelta('total', 1));
+	document.getElementById('btnTotalMinus').addEventListener('click', () => adjustDelta('total', -1));
+	document.getElementById('btnUsedPlus').addEventListener('click', () => adjustDelta('used', 1));
+	document.getElementById('btnUsedMinus').addEventListener('click', () => adjustDelta('used', -1));
+	// 직접 입력해도 계산되도록 input 이벤트 추가
+	document.getElementById('annualLeaveTotalDelta').addEventListener('input',updateAnnualRemain);
+	document.getElementById('annualLeaveUsedDelta').addEventListener('input',updateAnnualRemain);
+	// 연차 수정에서 닫기 버튼
+	const annualCloseBtns = [
+	   annualEditModalEl.querySelector('.btn-close'),
+	   document.getElementById('cancelAnnualBtn') // cancel button
+	 ];
+	
+	 annualCloseBtns.forEach(btn => {
+	   btn.addEventListener('click', e => {
+	     e.preventDefault();
+	     if (isAnnualEdited) {
+	    	 unsavedAlertModal.show();
+	       annualEditModalEl.classList.add('prevent-close');
+	     } else {
+	       annualEditModal.hide();
+	     }
+	   });
+	});	
+	// 연차 수정 요청 함수
+	function sendAnnualLeaveUpdate() {
+	   const formData = new FormData(document.getElementById('annualLeaveEditForm'));
+	   fetch('/admin/annualLeaveUpdate', {
+	     method: 'POST',
+	     headers: {
+	       'header': document.querySelector('meta[name="_csrf_header"]').content,
+	       'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+	     },
+	     body: formData
+	   })
+	     .then(response => response.json())
+	     .then(data => {
+	       showAlertModal(data.res_msg, () => {
+	         if (data.res_code === 200) location.reload();
+	       });
+	     })
+	     .catch(err => {
+	       console.error(err);
+	       showAlertModal('정보 수정 중 오류가 발생했습니다.');
+	     });
+	}	
+	
+});
+</script>                         
+
+</main>
+</body>
+</html>

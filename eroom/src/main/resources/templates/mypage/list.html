@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="ko-KR" dir="ltr" data-navigation-type="default"
+	data-navbar-horizontal-shape="default"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{include/layout}">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<meta charset="UTF-8">
+<title>마이페이지</title>
+<style>
+    .profile-wrapper {
+      position: relative;
+      width: 120px;
+      height: 120px;
+    }
+
+    .profile-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .row > [class^="col"] {
+      display: flex;
+    }
+    .card {
+      flex: 1 1 auto;
+    }        
+
+    .camera-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      opacity: 0;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .profile-wrapper:hover .camera-overlay {
+      opacity: 1;
+    }
+ 
+   .bg-primary-soft {
+    background-color: rgba(13, 110, 253, 0.1); /* Bootstrap primary with 투명도 */
+  }
+  .bg-success-soft {
+    background-color: rgba(25, 135, 84, 0.1); /* Bootstrap success with 투명도 */
+  }   
+
+	.carousel-indicators {
+	  bottom: -26px; /* ✅ 기본보다 아래로 내림 */
+	  justify-content: center; /* ✅ 가운데 정렬 (기본) */
+	} 
+	
+	.carousel-indicators [data-bs-target] {
+	  width: 10px;
+	  height: 3px;
+	/*   background-color: rgba(13, 110, 253, 0.5); */ /* 반투명 primary */
+	  background-color: rgba(108, 117, 125, 0.5); /* secondary 반투명 */  
+	  border: none;
+	}
+	
+	.carousel-indicators .active {
+	 /*  background-color: #0d6efd; */ /* 활성화된 점 */
+	  background-color: #6c757d; /* secondary 진한 색 */  
+	}
+
+</style>
+</head>
+<body>
+<main class="main" id="top" layout:fragment="content">
+<div class="mb-9">
+	<!-- 상단 제목 -->
+	<div class="d-flex justify-content-between align-items-center mb-2 position-relative">
+	  <span class="fw-bold fs-7">마이페이지</span>
+	</div>
+
+	<div class="row g-3">
+		<!-- 1열: 프로필 -->
+		<div class="col-md-4">
+		  <!-- 기존 프로필 카드 그대로 삽입 -->
+			<div class="card">
+				<div class="card-body d-flex align-items-center gap-5" style="margin-left: 85px;">
+					<!-- 프로필 이미지 + 카메라 오버레이 -->
+					<div id="openProfileUploadModalBtn" class="profile-wrapper me-3" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
+						<img id="profileImage" class="rounded-circle" alt="프로필"
+							th:src="${profileImage}">
+						<div class="camera-overlay">
+							<svg class="svg-inline--fa fa-camera fs-4" aria-hidden="true" focusable="false"
+							  data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg"
+							  viewBox="0 0 512 512" style="width: 24px; height: 24px;">
+								 <path fill="currentColor"
+								  d="M149.1 64.3c7.8-14.3 22.9-23.1 39.4-23.1h134.9c16.5 0 31.6 8.9 39.4 23.1l14.9 27.4H464c26.5 0 48 21.5 48 48v272c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V139.7c0-26.5 21.5-48 48-48h86.1l14.9-27.4zM256 408c66.3 0 120-53.7 120-120s-53.7-120-120-120s-120 53.7-120 120s53.7 120 120 120zm0-48a72 72 0 1 0 0-144 72 72 0 1 0 0 144z">
+								</path>
+							</svg>
+						</div>
+					</div>
+					 <!-- 프로필 상단 -->
+					<div class="text-start mt-2">
+						<div class="fw-bold fs-7" th:text="${employee.employeeName}">이름</div>
+						<div class="text-body-secondary mt-2" th:text="${employee.employeePosition}">직급</div>
+					</div>
+				</div><!-- card-body -->	
+				
+				<!-- 하단 정보 -->
+				<div class="card-footer border-top border-dashed pt-3">
+					<div class="d-flex justify-content-around">
+						<div>
+							<div class="fw-bold fs-8 text-center">총 연차</div>
+							<div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annual_leave_total}">12</div>
+						</div>
+						<div>
+							<div class="fw-bold fs-8 text-center">사용 연차</div>
+							<div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annual_leave_used}">2</div>
+						</div>
+						<div>
+							<div class="fw-bold fs-8 text-center">잔여 연차</div>
+							<div class="fs-7 text-body-primary text-center" th:text="${annualLeave.annual_leave_remain}">10</div>
+						</div>
+					</div>
+				</div>
+			</div><!-- card  -->		  
+		</div>			
+	
+	    <!-- 2열: 근태요약 -->
+	    <div class="col-md-8">
+	      <!-- 차트 카드 -->
+	        <div class="card">
+	          <div class="card-body">
+	            <div class="fw-bold fs-8 mb-3 text-secondary">이번 달 근태 요약</div>
+	            <div class="row text-center">
+	              <div class="col text-center d-flex flex-column align-items-center">
+	                <div class="fw-semibold">출근일수</div>
+	                <div class="text-primary fw-bold" th:text="|${summaryData.checkinDays}일|">O일</div>
+	              </div>
+	              <div class="col text-center d-flex flex-column align-items-center">
+	                <div class="fw-semibold">지각</div>
+	                <div class="text-danger fw-bold" th:text="|${summaryData.lateCount}회|">OO회</div>
+	              </div>
+	              <div class="col text-center d-flex flex-column align-items-center">
+	                <div class="fw-semibold">조퇴</div>
+	                <div class="text-warning fw-bold" th:text="|${summaryData.earlyLeaveCount}회|">OO회</div>
+	              </div>
+	              <div class="col text-center d-flex flex-column align-items-center">
+	                <div class="fw-semibold">평균 출근</div>
+	                <div class="text-success fw-bold" th:text="${summaryData.averageCheckInTime}">00:00</div>
+	              </div>
+	              <div class="col text-center d-flex flex-column align-items-center">
+	                <div class="fw-semibold">출근률</div>
+	                <div class="text-info fw-bold" th:text="${summaryData.attendanceRate}">00%</div>
+	              </div>
+	            </div>
+	            <div class="mini-chart-wrapper mt-4">
+	              <canvas id="miniAttendanceChart" height="47"></canvas>
+	            </div>
+	          </div>
+	        </div>
+	    </div>	
+	
+	    <!-- 3열: 주소록 -->
+	    <div class="col-md-4">
+	      <!--  주소록 카드 (사번, 직급, 이메일 등) -->
+			<div class="card h-100 position-relative">
+				<div class="card-body fs-9">
+					<div class="d-flex align-items-center mb-2">
+						<!--  수정 버튼 -->
+						<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
+						        data-bs-toggle="modal" data-bs-target="#editEmployeeModal" id="openEditModalBtn"
+						        th:attr="data-employee-no=${employee.employeeNo}">
+							<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
+							     focusable="false" data-prefix="fas" data-icon="pen" role="img"
+							     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+								<path fill="currentColor"
+							        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
+							</svg>
+						</button>
+					</div>
+				
+					<!-- 기본 정보 -->
+					<h5 class="text-body-secondary">사번</h5>
+					<p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
+
+					<h5 class="text-body-secondary">소속</h5>
+					<p class="text-body-secondary" 
+					   th:text="${(departmentName != null ? departmentName : '-') + ' / ' + (teamName != null ? teamName : '-')}">
+					   부서 / 팀
+					</p>
+					
+					<div class="mb-3">
+					  <h5 class="text-body-secondary">Email</h5>
+					  <a href="mailto:shatinon@jeemail.com" id="emailValue" th:text="${directory != null and directory.directory_email != null ? directory.directory_email : '-'}">Email</a>
+					</div>
+					
+					<h5 class="text-body-secondary">연락처</h5>
+					<p class="text-body-secondary" id="phoneValue" th:text="${directory != null and directory.directory_phone != null ? directory.directory_phone : '-'}">01000000000</p>
+					
+					<h5 class="text-body-secondary">주소</h5>
+					<p class="text-body-secondary" id="addressValue"
+					   th:text="${directory != null and directory.directory_zipcode != null and directory.directory_address != null 
+					             ? '(' + directory.directory_zipcode + ') ' + directory.directory_address 
+					             : '-'}">
+					  (00000) 주소정보
+					</p>
+				</div><!-- card-body -->
+			</div><!-- card h-100 -->	      
+	    </div>	
+	
+	    <!-- 4열: 근무시간 통합 차트 -->
+        <div class="col-md-8">
+	        <div class="card p-3">
+	          <div class="card-title d-flex justify-content-between align-items-center mb-3">
+	            <span class="fw-bold fs-8 text-secondary">근무시간 통합 차트</span>
+	            <p class="text-muted mb-0">이번 달 총 근무시간: <strong class="text-primary" th:text="${totalWorkTime}">000시간 00분</strong></p>
+	          </div>
+	          <canvas id="workTimeMixedChart" height="260"></canvas>
+	        </div>
+        </div>
+	</div><!-- row g-3 -->
+</div><!-- mb-9 --> 
+
+<hr>
+<div class="mb-9">
+	<!-- 결재 / 프로젝트 관련 슬라이드 -->
+	<div class="row g-3 mt-4">
+	  <!-- 결재 문서: 좌측 50% -->
+		<div class="col-md-6">
+	    	<div class="card p-3 h-100">
+				<div class="d-flex justify-content-start mb-3">
+				  <span class="fw-bold fs-8">결재 문서</span>
+				</div>
+        		<!-- 진행 중 결재 슬라이드 -->
+				<div class="mb-4">
+					<div class="text-center mb-2">
+						<i class="fas fa-circle fs-10 text-primary me-1"></i>
+						<span class="fw-bold fs-9">진행 중인 결재</span>
+					</div>
+					<!-- <h6 class="fw-bold mb-2">📌 진행 중인 결재</h6> -->
+					<div id="approvalPendingCarousel" class="carousel slide" data-bs-ride="carousel">
+						<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+						<div class="carousel-indicators" id="pendingCarouselIndicators">
+							<!-- JS 호출 -->
+						</div>								
+						<div class="carousel-inner px-4 text-center" id="pendingCarouselInner">
+							<!-- JS 호출 -->
+						</div>
+						<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+						        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="prev"
+						        style="top: 60%; left: -10px; z-index: 2;">
+							<i class="fas fa-chevron-left fs-7"></i>
+						</button>
+						<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+						        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="next"
+						        style="top: 60%; right: -10px; z-index: 2;">
+							<i class="fas fa-chevron-right fs-7"></i>
+						</button>
+					</div>
+				</div>	
+       			 <!-- 승인 완료 결재 슬라이드 -->
+				<div class="mb-4">
+					<div class="text-center mb-2">
+						<i class="fas fa-circle fs-10 text-success mt-n1"></i>
+						<span class="fw-bold fs-9">승인된 결재</span>
+					</div>
+					<div id="approvalCompletedCarousel" class="carousel slide" data-bs-ride="carousel">
+						<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+						<div class="carousel-indicators" id="completedCarouselIndicators"></div>								
+						<div class="carousel-inner px-4 text-center" id="completedCarouselInner">
+
+						</div>
+						<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+						        type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide="prev"
+						        style="top: 60%; left: -10px; z-index: 2;">
+							<i class="fas fa-chevron-left fs-7"></i>
+						</button>
+						<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+						        type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide="next"
+						        style="top: 60%; right: -10px; z-index: 2;">
+								<i class="fas fa-chevron-right fs-7"></i>
+						</button>
+					</div>
+				</div>	
+	    	</div><!-- card p-3 h-100 -->
+		</div><!-- 좌측 슬라이드 끝 col-md-6 -->
+	
+		<!--  프로젝트 슬라이드: 우측 50% -->
+		<div class="col-md-6">
+		  <div class="card p-3 h-100">
+		    <div class="d-flex justify-content-start mb-3">
+		      <span class="fw-bold fs-8">프로젝트</span>
+		    </div>
+		
+		    <!-- 진행 중인 프로젝트 -->
+		    <div class="mb-4">
+		      <div class="text-center mb-2">
+		        <i class="fas fa-circle fs-10 text-primary mt-n1"></i>
+		        <span class="fw-bold fs-9">진행 중인 프로젝트</span>
+		      </div>
+		      <div id="projectActiveCarousel" class="carousel slide" data-bs-ride="carousel">
+		        <!-- 인디케이터 -->
+		        <div class="carousel-indicators" id="activeProjectIndicators">
+		          <!-- JS에서 동적으로 생성 -->
+		        </div>
+		        <!-- 슬라이드 -->
+		        <div class="carousel-inner px-4 text-center" id="activeProjectInner">
+		          <!-- JS에서 동적으로 삽입 -->
+		        </div>
+		        <!-- 이전 버튼 -->
+		        <button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+		                type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="prev"
+		                style="top: 60%; left: -10px; z-index: 2;">
+		          <i class="fas fa-chevron-left fs-7"></i>
+		        </button>
+		        <!-- 다음 버튼 -->
+		        <button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+		                type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="next"
+		                style="top: 60%; right: -10px; z-index: 2;">
+		          <i class="fas fa-chevron-right fs-7"></i>
+		        </button>
+		      </div>
+		    </div>
+		
+		    <!-- 완료된 프로젝트 -->
+		    <div class="mb-4">
+		      <div class="text-center mb-2">
+		        <i class="fas fa-circle fs-10 text-success mt-n1"></i>
+		        <span class="fw-bold fs-9">완료한 프로젝트</span>
+		      </div>
+		      <div id="projectDoneCarousel" class="carousel slide" data-bs-ride="carousel">
+		        <!-- 인디케이터 -->
+		        <div class="carousel-indicators" id="doneProjectIndicators">
+		          <!-- JS에서 동적으로 생성 -->
+		        </div>
+		        <!-- 슬라이드 -->
+		        <div class="carousel-inner px-4 text-center" id="doneProjectInner">
+		          <!-- JS에서 동적으로 삽입 -->
+		        </div>
+		        <!-- 이전 버튼 -->
+		        <button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+		                type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="prev"
+		                style="top: 60%; left: -10px; z-index: 2;">
+		          <i class="fas fa-chevron-left fs-7"></i>
+		        </button>
+		        <!-- 다음 버튼 -->
+		        <button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+		                type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="next"
+		                style="top: 60%; right: -10px; z-index: 2;">
+		          <i class="fas fa-chevron-right fs-7"></i>
+		        </button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+	
+	</div><!-- row g-3 mt-4 슬라이드 구역 -->    
+</div>
+
+<hr>
+<!-- 근태 현황 목록 테이블 -->     
+<div id="attendanceTable" data-list='{"valueNames":["no","date","checkin","checkout","late","early"]}'><!-- ,"page":10,"pagination":true -->
+  <!-- 상단: 날짜 선택 + 검색창 -->
+<!-- 상단: 제목 + 검색 + 월선택 + 엑셀버튼 -->
+<div class="d-flex justify-content-between align-items-center mb-3 px-3 gap-2 flex-wrap">
+
+  <!-- 왼쪽: 제목 -->
+  <div class="row g-2 mb-4">
+    <div class="d-flex justify-content-start align-items-center mb-2">
+      <span class="fw-bold fs-7">근태 현황</span>
+    </div>
+  </div>
+
+  <!-- 가운데: 검색창 -->
+  <div class="flex-grow-1 d-flex justify-content-center">
+    <div class="search-box w-50">
+      <form class="position-relative">
+        <input class="form-control form-control-sm search-input search" type="search"
+               placeholder="검색어를 입력하세요." aria-label="Search">
+        <svg style="height:40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true"
+             focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img"
+             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <path fill="currentColor"
+                d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/>
+        </svg>
+      </form>
+    </div>
+  </div>
+
+  <!-- 오른쪽: 엑셀 버튼 + 월 선택 -->
+  <div class="d-flex align-items-center gap-2">
+    <!-- 엑셀 다운로드 버튼 -->
+    <form th:action="@{/mypage/attendanceExcel}" method="get" class="me-2">
+    	<input type="hidden" name="month" id="excelMonth" value="" />
+		<button type="submit" 
+		  class="btn border bg-white d-flex align-items-center px-2 py-0" 
+		  style="height: 32px; font-size: 0.875rem; line-height: 1;">
+		  <img src="/assets/img/icons/excel-icon1.png" alt="엑셀 아이콘" width="16" height="16" class="me-1">
+		  <span class="fw-normal small" style="position: relative; top: 1px; white-space: nowrap;">다운로드</span>
+		</button>
+	</form>
+    <!-- 월 선택 셀렉트 -->
+    <select class="form-select form-select-sm" id="monthSelect">
+    	 <!-- JS가 <option> 추가 -->
+    </select>
+  </div>
+</div>
+
+  <!-- 테이블 -->
+	<div class="table-responsive">
+	    <table class="table table-striped table-sm fs-9 mb-0 text-center">
+			<thead class="text-center align-middle">
+				<tr class="table-light">
+					<th class="sort" data-sort="no" style="width:5%;">번호</th>
+					<th class="sort" data-sort="date" style="width:25%;">근무일</th>
+					<th class="sort" data-sort="checkin" style="width:25%;">출근 시간</th>
+					<th class="sort" data-sort="checkout" style="width:25%;">퇴근 시간</th>
+					<th class ="sort" data-sort="late" style="width:10%">지각</th>
+					<th class ="sort" data-sort="early" style="width:10%">조퇴</th>
+				</tr>
+			</thead>
+			<tbody class="list align-middle" id="attendanceTableBody">
+				
+			</tbody>
+	    </table>
+	</div>
+
+</div><!-- 근태현황 목록 테이블 끝 -->
+<br><br><br>    
+<!-- 프로필 사진 변경 모달 -->
+<div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
+    <div class="modal-content border border-secondary">
+      <!-- 헤더 -->
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="profileUploadModalLabel">프로필 사진 변경</h5>
+        <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- 바디 -->
+      <div class="modal-body px-4 py-3">
+        <!-- 현재 프로필 사진 -->
+        <div class="d-flex justify-content-center mb-3">
+          <div class="profile-wrapper">
+            <img id="previewProfileImage" class="rounded-circle" alt="프로필 미리보기"
+            	th:src="${profileImage}">
+          </div>
+        </div>
+
+        <!-- 기본 적용 및 업로드 -->
+        <div class="d-flex flex-column align-items-center gap-2">
+          <button class="btn btn-outline-primary w-75" id="setDefaultProfileBtn">기본 프로필로 변경</button>
+          <label class="btn btn-primary w-75 mb-0" for="profileUploadInput">프로필 사진 업로드</label>
+          <input type="file" id="profileUploadInput" class="d-none" accept="image/*">
+        </div>
+      </div>
+
+      <!-- 푸터 -->
+      <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+        <button type="button" class="btn btn-light w-45" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary w-45" id="saveProfileImageBtn">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--주소록 정보 수정 모달 -->
+<div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+    <div class="modal-content border border-secondary">
+      <form id="editEmployeeForm" autocomplete="off">
+        <!-- 헤더 -->
+        <div class="modal-header bg-light">
+          <h5 class="modal-title" id="editEmployeeModalLabel">회원 정보 수정</h5>
+          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- 바디 -->
+        <div class="modal-body px-4 py-3">
+
+          <!-- 이름 -->
+          <div class="mb-3">
+            <label for="editEmployeeName" class="form-label fw-semibold">이름</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="editEmployeeName" name="employee_name" required>
+              <button type="button" class="btn btn-outline-secondary" id="editCheckNameBtn">중복확인</button>
+            </div>
+            <small id="editNameCheckMsg" class="form-text d-none"></small>
+          </div>
+
+          <!-- 연락처 -->
+          <div class="mb-3">
+            <label for="editDirectoryPhone" class="form-label fw-semibold">연락처</label>
+            <input type="text" class="form-control" id="editDirectoryPhone" name="directory_phone" required placeholder="010-0000-0000">
+          </div>
+
+		  <!-- 주소 -->
+		  <div class="mb-3">
+			<label class="form-label fw-semibold">주소</label>
+			<div class="input-group mb-2">
+			  <input type="text" class="form-control" id="editDirectoryZipcode" name="directory_zipcode" placeholder="우편번호">
+			  <button type="button" class="btn btn-outline-secondary" onclick="execDaumPostcodeForEdit()">주소 검색</button>
+			</div>
+			<input type="text" class="form-control mb-2" id="editDirectoryAddress" name="directory_address" placeholder="주소">
+		  </div>
+
+        </div>
+
+        <!-- 푸터 -->
+        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="saveEditEmployeeBtn">저장</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+<!-- 공통 저장 확인 모달 -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="unsavedEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 회원 수정 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" id="cancelEditCloseBtn" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmEditCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+//주소 API 실행 함수(회원 수정용)
+function execDaumPostcodeForEdit() {
+  new daum.Postcode({
+    oncomplete: function(data) {
+    	const zipcodeInput = document.getElementById('editDirectoryZipcode');
+        const addressInput = document.getElementById('editDirectoryAddress');
+
+        zipcodeInput.value = data.zonecode;
+        addressInput.value = data.roadAddress;
+
+        // 수동으로 input 이벤트 발생시켜서 수정 감지되도록 함
+        zipcodeInput.dispatchEvent(new Event('input', { bubbles: true }));
+        addressInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }).open();
+}
+
+document.addEventListener('DOMContentLoaded', function (){
+
+	document.addEventListener('click', function (e) {
+		  console.log("document click 감지됨", e.target);
+
+		  if (e.target && e.target.id === 'saveProfileImageBtn') {
+		    console.log("저장 버튼 클릭됨 - 위임 방식");
+		   //  alert("위임 방식으로 버튼 눌림");
+		    if (!isProfileEdited) {
+		      showAlert("변경된 내용이 없습니다.");
+		      return;
+		    }
+		    showConfirmModal("정말 저장하시겠습니까?", sendProfileUpload);
+		  }
+		});
+	
+// 차트 데이터를 받아서 각 차트를 렌더링하는 함수
+async function renderCharts() {
+	// 1. API 호출
+	const response = await fetch('/mypage/chartData');
+	const data = await response.json();
+	console.log(data); // 디버깅용 콘솔 출력
+	console.log(data.checkinDays,data.lateCount,data.earlyLeaveCount); // 디버깅용 콘솔 출력
+
+	/* --------------- 근태 요약 차트 (Bar Chart) ----------------- */
+	const miniCtx = document.getElementById('miniAttendanceChart').getContext('2d');
+	console.log(miniCtx); // 디버깅용 콘솔 출력
+	new Chart(miniCtx, {
+		type: 'bar',
+		data: {
+			labels: ['출근일수', '지각', '조퇴'],
+			datasets: [{
+				label: '횟수',
+				data: [
+					data.checkinDays || 0,
+					data.lateCount || 0,
+					data.earlyLeaveCount || 0
+				],
+				backgroundColor: [
+					'rgba(13, 110, 253, 0.7)',   // 출근: 파랑
+					'rgba(220, 53, 69, 0.7)',    // 지각: 빨강
+					'rgba(255, 193, 7, 0.7)'     // 조퇴: 노랑
+				]
+			}]
+		},
+		options: {
+			plugins: {
+				legend: { display: false }
+			},
+			scales: {
+				y: {
+					beginAtZero: true,
+					ticks: { stepSize: 1 }
+				}
+			}
+		}
+	});
+
+	/* --------------- 근무시간 통합 차트 (Mixed: Line + Bar) ----------------- */
+	const mixedCtx = document.getElementById('workTimeMixedChart').getContext('2d');
+	const workTimePerDay = data.workTimePerDay || {};
+	const weekdayAvg = data.weekdayAvg || {};
+
+	// (1) 날짜별 근무시간 차트용 데이터 변환
+	const dailyLabels = Object.keys(workTimePerDay).map(dateStr => {
+		const [year, month, day] = dateStr.split('-');
+		return `${month}/${day}`;
+	});
+	const dailyData = Object.values(workTimePerDay);
+
+	// (2) 요일별 평균 근무시간 변환 및 정렬
+	const dayMap = {
+		'MONDAY': '월', 'TUESDAY': '화', 'WEDNESDAY': '수',
+		'THURSDAY': '목', 'FRIDAY': '금'
+	};
+	const weekdayOrder = ['월', '화', '수', '목', '금'];
+	const weekdayData = weekdayOrder.map(kor => {
+		const eng = Object.keys(dayMap).find(key => dayMap[key] === kor);
+		return weekdayAvg[eng] ?? null;
+	});
+
+	// (3) 차트 생성
+	new Chart(mixedCtx, {
+		type: 'bar',
+		data: {
+			labels: [...dailyLabels, ...weekdayOrder],
+			datasets: [
+				{
+					type: 'line',
+					label: '일별 근무시간',
+					data: [...dailyData, ...new Array(weekdayOrder.length).fill(null)],
+					borderColor: '#0d6efd',
+					backgroundColor: '#0d6efd55',
+					yAxisID: 'y',
+					tension: 0.3,
+					spanGaps: true
+				},
+				{
+					type: 'bar',
+					label: '요일별 평균 근무시간',
+					data: [...new Array(dailyLabels.length).fill(null), ...weekdayData],
+					backgroundColor: 'rgba(255, 99, 132, 0.6)',
+					yAxisID: 'y1'
+				}
+			]
+		},
+		options: {
+			responsive: true,
+			plugins: {
+				tooltip: {
+					callbacks: {
+						label: function (context) {
+							const label = context.dataset.label;
+							const val = context.raw;
+							return label + ': ' + (val !== null ? val.toFixed(2) + '시간' : '');
+						}
+					}
+				},
+				legend: { position: 'top' }
+			},
+			scales: {
+				y: {
+					type: 'linear',
+					position: 'left',
+					title: { display: true, text: '일별 근무시간' },
+					beginAtZero: true,
+					suggestedMax: 10
+				},
+				y1: {
+					type: 'linear',
+					position: 'right',
+					title: { display: true, text: '요일별 평균' },
+					grid: { drawOnChartArea: false },
+					beginAtZero: true,
+					suggestedMax: 10
+				}
+			}
+		}
+	});
+}
+renderCharts();
+
+initAttendanceMonthSelect();
+
+function initAttendanceMonthSelect(){
+	const monthSelect = document.getElementById('monthSelect'); // 월 선택 셀렉트
+	const excelMonthInput = document.getElementById('excelMonth'); // 엑셀 다운용 hidden input
+	const tbody = document.getElementById('attendanceTableBody'); // 근태 테이블 tbody
+	// 서버에서 사용 가능한 월 목록 가져오기
+	fetch('/mypage/monthList')
+		.then(response => response.json())
+		.then(months => {
+			if(!months || months.length === 0) return;
+			// select 요소에 월 option 추가
+			months.forEach(month => {
+				const opt = document.createElement('option');
+				opt.value = month;
+				opt.textContent = month;
+				monthSelect.appendChild(opt);
+			});
+			
+			// 초기 선택값 : 첫 번째 월(최신순)
+			const defaultMonth = months[0];
+			monthSelect.value = defaultMonth;
+			excelMonthInput.value = defaultMonth;
+			
+			// 최초 진입 시 근태 목록 표시
+			fetchAndRenderAttendance(defaultMonth);
+			// 월 변경시 이벤트 처리
+			monthSelect.addEventListener('change',function(){
+				const selected = this.value;
+				excelMonthInput.value = selected; // 엑셀 다운용 hidden input 갱신
+				fetchAndRenderAttendance(selected); // 근태 목록 다시 조회
+			});
+		})
+		.catch(error => {
+			console.error('월 목록 로딩 실패 : '+error);
+		});
+	
+	// 선택된 월 기준으로 근태 데이터를 서버에서 가져와 테이블에 출력
+	function fetchAndRenderAttendance(month){
+		fetch(`/mypage/listData?month=${month}`)
+			.then(response => response.json())
+			.then(data => {
+				tbody.innerHTML = ''; // 이전 내용 초기화
+				
+				if(!data || data.length === 0){
+			          tbody.innerHTML = `<tr><td colspan="6" class="text-center">근태 정보가 없습니다.</td></tr>`;
+			          return;					
+				}
+				
+				data.forEach((record, index) => {
+					const checkIn = formatDateTime(record.attendance_check_in_time);
+					const checkOut = formatDateTime(record.attendance_check_out_time);
+					
+					const tr = `
+			            <tr>
+			              <td class="no">${index + 1}</td>
+			              <td class="date">${checkIn.date}</td>
+			              <td class="checkin">${checkIn.time}</td>
+			              <td class="checkout">${checkOut.time}</td>
+			              <td class="late">${record.attendance_late_yn === 'Y' ? '지각' : '-'}</td>
+			              <td class="early">${record.attendance_early_leave_yn === 'Y' ? '조퇴' : '-'}</td>
+			            </tr>						
+					`;
+					tbody.insertAdjacentHTML('beforeend',tr);
+				});
+			})
+			.catch(error => {
+				console.error('근태 데이터 로딩 실패 : ', error);
+				tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>`;
+			});
+	}
+	
+	// 날짜 및 시간 형식 변환 함수
+  function formatDateTime(dateStr) {
+    const date = new Date(dateStr);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mi = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
+    return {
+      date: `${yyyy}.${mm}.${dd}`,
+      time: `${hh}:${mi}:${ss}`
+    };
+  }	
+}
+
+//저장 확인 모달 (공통)
+const confirmSaveModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+// 알림 모달(공통)
+const alertModal = new bootstrap.Modal(document.getElementById('alertMessageModal'));	
+// 수정 모달
+const editModalElement = document.getElementById('editEmployeeModal');
+const editModal = bootstrap.Modal.getInstance(editModalElement) || new bootstrap.Modal(editModalElement);
+	// 수정 모달 닫기 확인
+const unsavedEditModalElement = document.getElementById('unsavedEditModal');
+const unsavedEditModal = bootstrap.Modal.getInstance(unsavedEditModalElement) || new bootstrap.Modal(unsavedEditModalElement);
+
+const checkNameBtn = document.getElementById('checkNameBtn');
+// const nameCheckMsg = document.getElementById('nameCheckMsg');
+const nameCheckMsg = document.getElementById('editNameCheckMsg');
+
+let isNameChecked = false; // 이름 중복 확인 완료 여부
+let isEditFormEdited = false; // 회원 수정 폼 수정 여부
+let currentMode = '';
+// 공통 알림 모달
+function showAlert(message, callback){
+	document.getElementById('alertMessageContent').innerText = message;
+	alertModal.show();
+	
+	if(callback){
+		const modalEl = document.getElementById('alertMessageModal');
+		modalEl.addEventListener('hidden.bs.modal',function handler(){
+			callback();
+			modalEl.removeEventListener('hidden.bs.modal',handler);
+		});
+	}
+}
+
+// 공통 confirm 모달
+function showConfirmModal(message, onConfirm){
+	const msgElement = document.getElementById('confirmSaveModalMessage');
+	const confirmBtn = document.getElementById('confirmSaveBtn');
+	
+	msgElement.innerHTML = message;
+	//const modalInstance = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+	//modalInstance.show();
+	confirmSaveModal.show();
+	
+	const handler = function(){
+		confirmSaveModal.hide();
+		onConfirm(); // 확인 클릭 시 실행할 콜백
+		confirmBtn.removeEventListener('click',handler); // 중복 방지
+	};
+	
+	confirmBtn.addEventListener('click',handler);
+}
+
+// 이름 중복 확인 버튼 클릭(수정용)
+editCheckNameBtn.addEventListener('click',function(){
+const name = document.getElementById('editEmployeeName').value.trim();
+
+// 기존 이름과 같다면 중복 확인 불필요
+if (name === originalData.employee_name) {
+    document.getElementById('editNameCheckMsg').textContent = '기존 이름과 동일합니다.';
+    document.getElementById('editNameCheckMsg').className = 'form-text text-success';
+    return;
+}
+
+fetch(`/admin/checkNameDuplicate?name=${encodeURIComponent(name)}`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.duplicate) {
+            document.getElementById('editNameCheckMsg').textContent = '이미 존재하는 이름입니다.';
+            document.getElementById('editNameCheckMsg').className = 'form-text text-danger';
+        } else {
+            document.getElementById('editNameCheckMsg').textContent = '사용 가능한 이름입니다.';
+            document.getElementById('editNameCheckMsg').className = 'form-text text-success';
+        }
+    })
+    .catch(() => {
+        showAlert('이름 중복 확인 중 오류가 발생했습니다.');
+    });
+});
+
+	// 수정폼 입력 감지
+	document.getElementById('editEmployeeForm').addEventListener('input', function () {
+		isEditFormEdited = true;
+	});
+	
+	// 모달 닫기 방지 (회원 수정 모달)
+	editModalElement.addEventListener('hide.bs.modal', function (e) {
+		// const isConfirmVisible = document.getElementById('confirmSaveModal').classList.contains('show');
+		const confirmSaveModalElement = document.getElementById('confirmSaveModal');
+		const isConfirmVisible = confirmSaveModalElement && confirmSaveModalElement.classList.contains('show');
+		if (isEditFormEdited && !isConfirmVisible) {
+			e.preventDefault();
+			unsavedEditModal.show();
+		}
+	});
+	// 수정 모달 닫힐때
+	editModalElement.addEventListener('hidden.bs.modal', function () {
+		//const nameCheckMsg = document.getElementById('editNameCheckMsg');
+		nameCheckMsg.classList.add('d-none');
+		nameCheckMsg.textContent = '';
+		nameCheckMsg.className = 'form-text';
+	});
+	
+	// 수정용 모달 계속 닫기
+	document.getElementById('confirmEditCloseBtn').addEventListener('click', function () {
+		isEditFormEdited = false;
+		unsavedEditModal.hide();
+		unsavedEditModalElement.addEventListener('hidden.bs.modal', function handler() {
+			editModal.hide();
+			nameCheckMsg.classList.add('d-none');
+			nameCheckMsg.textContent = '';
+			nameCheckMsg.className = 'form-text';
+			unsavedEditModalElement.removeEventListener('hidden.bs.modal', handler);
+		});
+	});
+	
+	// saveEditEmployeeBtn 클릭 시 (회원 수정 요청 전 확인 모달 띄우기)
+	saveEditEmployeeBtn.addEventListener('click', function () {
+		const editEmployeeName = document.getElementById('editEmployeeName').value;
+		if (!editEmployeeName.trim()) {
+			showAlert("수정할 회원 정보를 먼저 불러오세요.");
+			return;
+		}
+		// 유효성
+ 		const phoneInput = document.getElementById('editDirectoryPhone');
+		const phoneValue = phoneInput.value.trim();
+		
+		const phoneRegex = /^010-\d{4}-\d{4}$/;
+		if(!phoneRegex.test(phoneValue)){
+			showAlert('연락처는 010-0000-0000 형식으로 입력해주세요.');
+			return;
+		}	
+		currentMode = 'edit';
+		showConfirmModal('정말 수정하시겠습니까?',sendUpdateEmployee);
+	});	
+
+	let originalData = {}; // 값을 저장할 변수
+// 회원 수정 버튼 클릭시 정보 가져오기
+document.getElementById('openEditModalBtn').addEventListener('click',function(e){
+	e.preventDefault();
+	const employeeNo = this.getAttribute('data-employee-no');
+	console.log("선택한 사원번호:", employeeNo);
+	
+	fetch(`/mypage/getEmployeeDetail?employeeNo=${employeeNo}`)
+	.then(response => response.json())
+	.then(data => {
+		if(data.res_code == 200){
+			document.getElementById('editEmployeeName').value = data.employee_name || '';
+			document.getElementById('editDirectoryPhone').value = data.directory_phone || '';
+			document.getElementById('editDirectoryZipcode').value = data.directory_zipcode || '';
+			document.getElementById('editDirectoryAddress').value = data.directory_address || '';
+			
+			// originalData 저장
+			originalData ={
+					employee_name : data.employee_name || '',
+					directory_phone : data.directory_phone || '',
+					directory_zipcode : data.directory_zipcode || '',
+					directory_address : data.directory_address || ''
+			};
+			
+			// 모달 열기
+			editModal.show();
+		}else{
+			showAlert('회원 정보를 불러올 수 없습니다.');
+		}
+	})
+	.catch(error => {
+		console.error(error);
+		showAlert('회원 정보 조회 중 오류가 발생했습니다.');
+	})
+});
+
+// 회원 정보 수정 요청 보내기
+function sendUpdateEmployee() {
+	console.log("수정 함수 호출됨.");
+  const name = document.getElementById('editEmployeeName').value.trim();
+  const phone = document.getElementById('editDirectoryPhone').value.trim();
+  const zipcode = document.getElementById('editDirectoryZipcode').value.trim();
+  const address = document.getElementById('editDirectoryAddress').value.trim();
+
+  const payload = {};
+
+  if (name !== originalData.employee_name && name !== '') payload.employee_name = name;
+  if (phone !== originalData.directory_phone && phone !== '') payload.directory_phone = phone;
+  if (zipcode !== originalData.directory_zipcode && zipcode !== '') payload.directory_zipcode = zipcode;
+  if (address !== originalData.directory_address && address !== '') payload.directory_address = address;
+
+  // 실제로 바뀐 값이 없으면 전송하지 않음
+  if (Object.keys(payload).length === 0) {
+    showAlert('수정된 내용이 없습니다.');
+    return;
+  }
+
+  fetch('/mypage/updateEmployee', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN' : document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+	  'X-CSRF-HEADER' : document.querySelector('meta[name="_csrf_header"]').getAttribute('content')
+    },
+    body: JSON.stringify(payload)
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.res_code === 200) {
+    	  originalData = {
+	          employee_name: name,
+	          directory_phone: phone,
+	          directory_zipcode: zipcode,
+	          directory_address: address
+   		 }; 
+		showAlert(data.res_msg,function(){
+			isEditFormEdited = false;
+			editModal.hide();
+			nameCheckMsg.classList.add('d-none');
+			nameCheckMsg.textContent = '';
+			nameCheckMsg.className = 'form-text';
+			location.reload();
+		});
+      } else {
+        showAlert(data.res_msg);
+      }
+    })
+    .catch(error => {
+      console.error('오류 발생:', error);
+      showAlert('서버 요청 중 오류가 발생했습니다.');
+    });
+}
+
+	// 원본 이미지 src 저장용 (변경 감지)
+	let isProfileEdited = false;
+	let originalProfileSrc = '';
+	
+	const profileImageElement = document.getElementById('profileImage'); // 메인 이미지
+	const previewImageElement = document.getElementById('previewProfileImage'); // 모달 안 이미지
+	const profileUploadInput = document.getElementById('profileUploadInput'); // 파일 input
+	const profileUploadModalElement = document.getElementById('profileUploadModal'); 
+	const profileUploadModal = bootstrap.Modal.getInstance(profileUploadModalElement) || new bootstrap.Modal(profileUploadModalElement);
+	
+	// 프로필 모달 오픈시 초기화
+	document.getElementById('openProfileUploadModalBtn').addEventListener('click',function(){
+		// 현재 이미지 src 저장
+		originalProfileSrc = profileImageElement.src;
+		previewImageElement.src = originalProfileSrc;
+		profileUploadInput.value = '';
+		isProfileEdited = false;
+		
+		profileUploadModal.show();
+	});
+	// 기본 이미지로 변경
+	document.getElementById('setDefaultProfileBtn').addEventListener('click',function(){
+		const defaultSrc = '/assets/img/team/avatar.webp';
+		previewImageElement.src = defaultSrc;
+		isProfileEdited = true;
+	});
+	
+	// 파일 업로드 시 이미지 미리보기
+	profileUploadInput.addEventListener('change',function(e){
+		const file = e.target.files[0];
+		if(file){
+			const newPreview = URL.createObjectURL(file);
+			previewImageElement.src = newPreview;
+			isProfileEdited = true;
+		}
+	});
+	
+	// 프로필 모달 닫을 때 수정감지 -> 경고 모달
+	profileUploadModalElement.addEventListener('hide.bs.modal',function(e){
+		const confirmVisible = document.getElementById('confirmSaveModal').classList.contains('show');
+		if(isProfileEdited && !confirmVisible){
+			e.preventDefault();
+			unsavedEditModal.show();
+		}
+	});
+	
+	// 계속 닫기
+	document.getElementById('confirmEditCloseBtn').addEventListener('click',function(){
+		isProfileEdited = false;
+		unsavedEditModal.hide();
+		profileUploadModal.hide();
+	});
+	
+	// 취소 (경고 모달만 닫기)
+	document.getElementById('cancelEditCloseBtn').addEventListener('click',function(){
+		unsavedEditModal.hide();
+	});
+	
+	// 저장 버튼 클릭 -> 확인 모달 -> fetch 요청
+	
+	function sendProfileUpload(){
+		const file = profileUploadInput.files[0];
+		const formData = new FormData();
+		
+		if(file){
+			formData.append('driveFiles',file); // 드라이브 DTO의 필드명과 맞춰야함
+		}else{
+			// 기본 이미지로 변경 -> 서버에서 처리 필요(예 : default 값으로 등록)
+			formData.append('resetDefault','true');
+		}
+		
+		fetch('/mypage/upload/profile',{
+			method : 'POST',
+			body : formData,
+			headers : {
+				 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+			        'X-CSRF-HEADER': document.querySelector('meta[name="_csrf_header"]').getAttribute('content')
+			}
+		})
+		.then(response => response.json())
+		.then(data => {
+			if(data.res_code == '200'){
+				showAlert('프로필이 성공적으로 변경되었습니다', () => {
+					isProfileEdited = false;
+					profileUploadModal.hide();
+					profileImageElement.src = previewImageElement.src;
+					
+					// 헤더 이미지 즉시 반영
+					const headerImg = document.getElementById('headerProfileImg');
+					if(headerImg) headerImg.src = previewImageElement.src;
+					
+					const dropdownImg = document.getElementById('dropdownProfileImg');
+					if(dropdownImg) dropdownImg.src = previewImageElement.src;
+				});
+			}else{
+				showAlert('업로드 실패:'+data.res_msg);
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			showAlert('서버 오류가 발생했습니다.');
+		});
+		
+	}
+	
+	// 진행중인 결재 슬라이드 요소
+	let pendingCarouselInner = document.getElementById('pendingCarouselInner'); // 캐러셀 안의 슬라이드 항목 감싸는 요소
+	let pendingCarouselIndicators = document.getElementById('pendingCarouselIndicators'); // 하단 인디케이터 버튼 들어가는 요소
+	let approvalPendingCarousel = document.getElementById('approvalPendingCarousel'); // 전체 캐러셀 래퍼(좌우 버튼 포함)
+	// 진행중인 결재 목록 가져오는 함수
+	async function loadApprovalCarouselPending(){
+		try{
+			const res = await fetch('/mypage/approval/ongoing');
+			
+			if(!res.ok){
+				throw new Error('서버 오류:'+res.status);
+			}
+			
+			const text = await res.text();
+			// console.log('응답 원문:',text);
+			// const data = await res.json();	
+			const data = JSON.parse(text);
+			// 초기화
+			pendingCarouselInner.innerHTML = '';
+			pendingCarouselIndicators.innerHTML = '';
+			if(!data || !Array.isArray(data) || data.length === 0){
+				// 데이터가 없거나 비정상일 경우 안내 슬라이드 1장 출력
+				pendingCarouselInner.innerHTML = `
+					<div class="carousel-item active">
+						<div class="border rounded p-4 bg-light text-center">
+							<p class="mb-0 text-muted">진행 중인 결재 문서가 없습니다.</p>
+						</div>
+					</div>	
+				`;
+				// 인디케이터도 하나만 표시
+				pendingCarouselIndicators.innerHTML = `
+					<button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="0"
+						class="active" aria-current="true" aria-label="슬라이드 1"></button>
+				`;
+				return;
+			}
+			
+			// 데이터가 존재할 경우 슬라이드 생성
+			data.forEach((item,index) => {
+				const approvalTitle = item.approval_title ?? '제목 없음'; // 결재 제목
+				const approvalNo = item.approval_no ?? 0; // 상세 페이지 이동용 ID
+				const displayDate = item.approval_display_date ?? '-'; // 등록일
+				
+				// 슬라이드 항목
+				pendingCarouselInner.innerHTML += `
+					<div class="carousel-item ${index === 0 ? 'active' : ''}">
+						<div class="border rounded p-3 bg-primary-soft cursor-pointer"
+							onclick="location.href='/approval/${approvalNo}/detail'">
+							<h5 class="mb-1 fw-bold text-dark text-decoration-none">
+							  ${approvalTitle}
+							</h5>
+							<p class="mb-0 text-muted fs-9">기안일 : ${displayDate}</p>
+						</div>
+					</div>	
+				`;
+				
+				// 인디케이터 항목
+				pendingCarouselIndicators.innerHTML += `
+					<button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="${index}"
+					  ${index === 0 ? 'class="active" aria-current="true"' : ''} aria-label="슬라이드 ${index + 1}"></button>
+				`;
+			});
+			
+		}catch(error){
+			console.error('진행 중 결재 로딩 오류:',error);
+			
+			pendingCarouselInner.innerHTML = `
+			  <div class="carousel-item active">
+		        <div class="border rounded p-4 bg-light text-center">
+		          <p class="mb-0 text-danger">결재 데이터를 불러오지 못했습니다.</p>
+		        </div>
+		      </div>				
+			`;
+			
+		    pendingCarouselIndicators.innerHTML = `
+		      <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="0"
+		        class="active" aria-current="true" aria-label="슬라이드 1"></button>
+		   `;			
+		}
+	};
+	
+	// 승인된 결재 목록 슬라이드 요소
+	let completedCarouselInner = document.getElementById('completedCarouselInner');
+	let completedCarouselIndicators = document.getElementById('completedCarouselIndicators');
+	let approvalCompletedCarousel = document.getElementById('approvalCompletedCarousel');
+	// 승인된 결재 목록 가져오기
+	async function loadApprovalCarouselCompleted(){
+		try{
+			const res = await fetch('/mypage/approval/completed');
+			if(!res.ok) throw new Error('서버 오류:'+res.status);
+			const text = await res.text();
+			const data = JSON.parse(text);
+			// 초기화
+			completedCarouselInner.innerHTML = '';
+			completedCarouselIndicators.innerHTML = '';
+			// 데이터가 없을 경우
+			if(!data || !Array.isArray(data) || data.length === 0){
+				completedCarouselInner.innerHTML = `
+					<div class="carousel-item active">
+						<div class="border rounded p-4 bg-light text-center">
+							<p class="mb-0 text-muted">승인된 결재 문서가 없습니다.</p>
+						</div>
+					</div>
+				`;
+				completedCarouselIndicators.innerHTML = `
+					<button type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide-to="0"
+						class="active" aria-current="true" aria-label="슬라이드 1"></button>
+				`;
+				return;				
+			}
+			// 슬라이드 항목 생성
+			data.forEach((item, index) => {
+				const approvalTitle = item.approval_title ?? '제목 없음';
+				const approvalNo = item.approval_no ?? 0;
+				const displayDate = item.approval_display_date ?? '-';
+
+				completedCarouselInner.innerHTML += `
+					<div class="carousel-item ${index === 0 ? 'active' : ''}">
+						<div class="border rounded p-3 bg-success-soft cursor-pointer"
+							onclick="location.href='/approval/${approvalNo}/detail'">
+							<h5 class="mb-1 fw-bold text-dark text-decoration-none">
+								${approvalTitle}
+							</h5>
+							<p class="mb-0 text-muted fs-9">승인일 : ${displayDate}</p>
+						</div>
+					</div>
+				`;
+
+				completedCarouselIndicators.innerHTML += `
+					<button type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide-to="${index}"
+						${index === 0 ? 'class="active" aria-current="true"' : ''} aria-label="슬라이드 ${index + 1}"></button>
+				`;
+			});			
+		}catch(error){
+			console.error('승인된 결재 로딩 오류:', error);
+
+			completedCarouselInner.innerHTML = `
+				<div class="carousel-item active">
+					<div class="border rounded p-4 bg-light text-center">
+						<p class="mb-0 text-danger">결재 데이터를 불러오지 못했습니다.</p>
+					</div>
+				</div>
+			`;
+
+			completedCarouselIndicators.innerHTML = `
+				<button type="button" data-bs-target="#approvalCompletedCarousel" data-bs-slide-to="0"
+					class="active" aria-current="true" aria-label="슬라이드 1"></button>
+			`;			
+		}
+	};
+	// 모든 모달 닫힌 후 강제로 스크롤/백드롭 초기화
+	document.addEventListener('hidden.bs.modal', function () {
+	  setTimeout(() => {
+	    const isAnyModalOpen = document.querySelector('.modal.show');
+	    if (!isAnyModalOpen) {
+	      document.body.classList.remove('modal-open');
+	      document.body.style.removeProperty('padding-right');
+
+	      // 남아있는 백드롭 제거
+	      document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+	    }
+	  }, 300); // Bootstrap 트랜지션 시간 고려
+	});
+	
+	loadApprovalCarouselPending(); // 진행중 결재 목록 함수 호출
+	loadApprovalCarouselCompleted(); // 승인된 결재 목록 함수 호출
+});
+</script>                
+
+<script>
+// 내 프로젝트 불러오기
+  const activeContainer = document.querySelector('#projectActiveCarousel .carousel-inner');
+  const doneContainer = document.querySelector('#projectDoneCarousel .carousel-inner');
+  const activeIndicators = document.querySelector('#projectActiveCarousel .carousel-indicators');
+  const doneIndicators = document.querySelector('#projectDoneCarousel .carousel-indicators');
+
+  const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+  const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}.${month}.${day}`;
+  }
+
+  fetch('/project/projectMypage', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      [csrfHeader]: csrfToken
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    const { activeProjects = [], doneProjects = [] } = data;
+
+    const renderCarousel = (list, container, indicators, carouselId, bgClass, isDone) => {
+    	  container.innerHTML = '';
+    	  indicators.innerHTML = '';
+
+    	  if (!list || list.length === 0) {
+    	    container.innerHTML = `
+    	      <div class="carousel-item active">
+    	        <div class="border rounded p-4 bg-light text-center">
+    	          <p class="mb-0 text-muted">프로젝트가 없습니다.</p>
+    	        </div>
+    	      </div>
+    	    `;
+    	    indicators.innerHTML = `
+    	      <button type="button" data-bs-target="#${carouselId}" data-bs-slide-to="0"
+    	        class="active" aria-current="true" aria-label="슬라이드 1"></button>
+    	    `;
+    	    return;
+    	  }
+
+    	  list.forEach((project, index) => {
+    	    const date = isDone ? formatDate(project.project_end) : formatDate(project.project_start);
+    	    const dateLabel = isDone ? '종료일' : '시작일';
+
+    	    const item = document.createElement('div');
+    	    item.className = `carousel-item ${index === 0 ? 'active' : ''}`;
+    	    item.innerHTML = `
+    	    	  <a href="/project/detail/${project.project_no}/main" class="text-decoration-none text-dark">
+    	    	    <div class="border rounded p-3 ${bgClass}">
+    	    	      <h5 class="mb-1 fw-bold">${project.project_name || ''}</h5>
+    	    	      <p class="mb-0 text-muted fs-9">${dateLabel} : ${date}</p>
+    	    	    </div>
+    	    	  </a>
+    	    	`;
+    	    container.appendChild(item);
+
+    	    const indicator = document.createElement('button');
+    	    indicator.type = 'button';
+    	    indicator.setAttribute('data-bs-target', `#${carouselId}`);
+    	    indicator.setAttribute('data-bs-slide-to', index.toString());
+    	    indicator.setAttribute('aria-label', `슬라이드 ${index + 1}`);
+    	    if (index === 0) {
+    	      indicator.className = 'active';
+    	      indicator.setAttribute('aria-current', 'true');
+    	    }
+    	    indicators.appendChild(indicator);
+    	  });
+    	};
+
+
+    renderCarousel(activeProjects, activeContainer, activeIndicators, 'projectActiveCarousel', 'bg-primary-soft', false);
+    renderCarousel(doneProjects, doneContainer, doneIndicators, 'projectDoneCarousel', 'bg-success-soft', true);
+  })
+  .catch(err => {
+    console.error('프로젝트 데이터 로딩 실패:', err);
+    activeContainer.innerHTML = `
+      <div class="carousel-item active">
+        <div class="border rounded p-4 bg-light text-center">
+          <p class="mb-0 text-danger">진행 중인 프로젝트 데이터를 불러올 수 없습니다.</p>
+        </div>
+      </div>
+    `;
+    doneContainer.innerHTML = `
+      <div class="carousel-item active">
+        <div class="border rounded p-4 bg-light text-center">
+          <p class="mb-0 text-danger">완료한 프로젝트 데이터를 불러올 수 없습니다.</p>
+        </div>
+      </div>
+    `;
+    activeIndicators.innerHTML = `
+      <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="0"
+        class="active" aria-current="true" aria-label="슬라이드 1"></button>
+    `;
+    doneIndicators.innerHTML = `
+      <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="0"
+        class="active" aria-current="true" aria-label="슬라이드 1"></button>
+    `;
+  });
+</script>
+
+
+			
+</main>
+</body>
+</html>

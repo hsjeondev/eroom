@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{include/layout}">
+<head>
+<meta charset="UTF-8">
+<title>휴지통</title>
+</head>
+  <body>
+    <main class="main" id="top" layout:fragment="content">
+      <div class="row align-items-center justify-content-between g-3 mb-4">
+		<!-- 상단 제목 -->
+		<div class="d-flex justify-content-start">
+			<span class="fw-bold fs-6">휴지통</span>
+		</div>
+	</div>
+	<div id="mailSummary" data-list='{"valueNames":["senderName", "mailTitle", "mailContent", "sendTime"], "page":6, "pagination":true}'>   
+      <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
+            <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mailCreate}">메일 쓰기</a>
+            </div>
+            <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" th:href="@{mailCreate}"> <span class="d-none d-sm-inline-block">메일 쓰기</span><span class="d-sm-none fas fa-plus"></span></a></div>
+            <div class="col-auto flex-1">
+              <div class="search-box w-100" style="max-width: 250px; position: absolute; right: 20px;">
+              <form class="position-relative">
+                <input class="form-control search-input search" type="search" placeholder="검색" aria-label="Search" />
+                <span class="fas fa-search search-box-icon"></span>
+              </form>
+            </div>	
+            </div>
+       </div>
+       <div class="px-lg-1">
+                <div class="d-flex align-items-center flex-wrap position-sticky pb-2 bg-body z-2 email-toolbar inbox-toolbar">
+                  <div class="d-flex align-items-center flex-1 me-2">
+                    <button class="btn btn-sm p-0 me-2" type="button" onclick="location.reload()"><span class="text-primary fas fa-redo fs-10"></span></button>
+                    <p class="fw-semibold fs-10 text-body-tertiary text-opacity-85 mb-0 lh-sm text-nowrap">새로 고침</p>
+                  </div>
+                  <div class="d-flex">
+                  	<select class="form-control search-input search" onchange="location = this.value;">
+                  		<option disabled selected>정렬 선택</option>
+					    <option value="?sortOrder=latest" th:selected="${sortOrder == 'latest'}">최신순</option>
+					    <option value="?sortOrder=oldest" th:selected="${sortOrder == 'oldest'}">오래된순</option>
+					</select>
+                  </div>
+                </div>
+                <!-- 범용성 생각해서 일단 보류 -->
+                <div class="border-top border-translucent py-2 d-flex justify-content-between">
+                  <div class="form-check mb-0 fs-8">
+                    <input class="form-check-input" type="checkbox" data-bulk-select-row="data-bulk-select-row" id="chechAll"/>
+	                    <label class="form-check-label ms-2 text-muted" for="checkAll">
+					    전체 선택
+					  </label>
+                  </div>
+                  <small class="text-muted ms-4">🗑️휴지통의 메일은 15일 후에 자동 삭제됩니다.</small>
+                  <div>
+                    <button id="deleteBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="삭제"><span class="fas fa-trash fs-10"></span></button>
+                  	<button id="removeBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="복구">
+					  <span class="fas fa-undo fs-10"></span>
+					</button>
+                  </div>
+                </div>
+                <!-- 범용성 생각해서 일단 보류 -->
+                
+                <!-- 메일 목록 스타트부분 -->
+                <div th:if="${#lists.isEmpty(trashMailList)}">
+               		 <div class="col-12">
+							<div class="alert alert-light text-center border border-secondary-light rounded py-4 fs-6 fw-semibold text-body-secondary">
+								<i class="fa-solid fa-circle-info me-2 text-secondary"></i>메일이 없습니다.
+							</div>
+						</div>
+                </div>
+                <div class="list">
+                 <div class="border-top border-translucent hover-actions-trigger py-3"
+                 		th:if="${!#lists.isEmpty(trashMailList)}"
+                 		th:each="trashMail : ${trashMailList}"
+                 		th:onclick="|location.href='@{/mail/detail/{id}(id=${trashMail.mailNo})}'|">
+                  <div class="row align-items-sm-center gx-2">
+                    <div class="col-auto">
+                      <div class="d-flex flex-column flex-sm-row">
+                        <input class="form-check-input mb-2 m-sm-0 me-sm-2 mail_checkbox" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" 
+                        	th:value="${trashMail.mailNo}" onclick="event.stopPropagation()"/>
+                        <!-- 별 박스 -->
+                        <!-- <button class="btn p-0"><span class="fas text-warning fa-star"></span></button> -->
+                      </div>
+                    </div>
+                    
+                    <!-- 프로필 사진 이미지 부분  -->
+                    <!-- <div class="col-auto">
+                      <div class="avatar avatar-s  rounded-circle">
+                        <img class="rounded-circle " src="../../assets/img/team/60.webp" alt="" />
+
+                      </div>
+                    </div> -->
+                    <div class="col-auto">
+                    <div class="text-body-emphasis fw-bold inbox-link fs-9">작성자 :
+					  <a class="inbox-link fs-9 senderName"
+					     th:href="@{/mail/detail/{id}(id=${trashMail.mailNo})}"
+					     th:text="${trashMail != null and trashMail.sender != null ? trashMail.sender.employeeName : '알 수 없음'}">
+					     보낸 사람
+					  </a>
+					</div>
+					</div>
+                    <div class="col-auto ms-auto">
+                       <!-- <div class="hover-actions end-0">
+                        <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
+                        <div class="dropdown-menu dropdown-menu-end py-2">
+                       <a class="dropdown-item" href="#!">중요 표시 여기서도 이거 처리해야 되나</a>
+                        
+                        <form th:action="@{/mail/trash/{id}(id=${trashMail.mailNo})}" method="post">
+                        	<input type="hidden" name="redirectUrl" value="/mail/trash"/>
+						  <button type="submit" class="dropdown-item">받은 메일로 이동하는걸로 바꿀 예정</button>
+						</form>
+						
+                        <form th:action="@{/mail/delete/{id}(id=${trashMail.mailNo})}" method="post" th:id="'deleteForm-' + ${trashMail.mailNo}">
+						  <input type="hidden" name="redirectUrl" value="/mail/trash"/>
+						  <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" 
+						          th:data-bs-target="'#confirmDeleteModal-' + ${trashMail.mailNo}">🗑️ 삭제</button>
+						</form>
+                      <form th:action="@{/mail/trash/{id}(id=${trashMail.mailNo})}" method="post">
+                        	<input type="hidden" name="redirectUrl" value="/mail/trash"/>
+						  <button type="submit" class="dropdown-item">복구</button>
+						</form>
+                        </div>
+                      </div> -->
+                      
+                      <!-- 04/17 나중에 시간 남으면 좀 더 구성해보기 일단 전체 시간 다 보이게 설정함 -->
+                       <span class="fs-10 fw-bold sendTime"
+					      th:text="${#temporals.format(trashMail.mailSentTime, 'yyyy.MM.dd HH:mm:ss')}">
+					  </span> 
+					
+                    </div>
+                  </div>
+                  <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11">
+					  <a class="d-block inbox-link"
+					     th:href="@{/mail/detail/{id}(id=${trashMail.mailNo})}"
+					     th:data-receiver-id="${#authentication.principal.employee.employeeNo}">
+					     
+					     <span class="fs-9 line-clamp-1 mailTitle"
+					           th:text="${trashMail.mailTitle}">
+					     </span>
+					
+					     <span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"
+					           th:utext="${trashMail.mailContent}">
+					     </span>
+					  </a>
+					</div>
+					<!-- 삭제 여부 모달 -->
+					<div class="modal fade" th:id="'confirmDeleteModal-' + ${trashMail.mailNo}" tabindex="-1" aria-hidden="true">
+						  <div class="modal-dialog modal-dialog-centered modal-sm">
+						    <div class="modal-content bg-dark text-white rounded-3 shadow-lg border border-white">
+						      <div class="modal-header border-0">
+						        <h5 class="modal-title text-light">정말 삭제할까요?</h5>
+						        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="닫기"></button>
+						      </div>
+						      <div class="modal-body text-center">
+						        <p class="mb-0">삭제한 메일은 복구할 수 없습니다.<br>정말 삭제하시겠습니까?</p>
+						      </div>
+						      <div class="modal-footer justify-content-center border-0">
+						        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">취소</button>
+						        <button type="button" class="btn btn-danger btn-sm"
+						                th:onclick="'document.getElementById(\'deleteForm-' + ${trashMail.mailNo} + '\').submit();'">삭제</button>
+						      </div>
+						    </div>
+						  </div>
+					</div>
+                </div>
+                </div>
+            	<!-- <nav aria-label="Page navigation example">
+					  <ul class="pagination justify-content-center">
+					    <li class="page-item"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
+					    <li class="page-item"><a class="page-link" href="#">1</a></li>
+					    <li class="page-item"><a class="page-link" href="#">2</a></li>
+					    <li class="page-item"><a class="page-link" href="#">3</a></li>
+					    <li class="page-item active" aria-current="page"><a class="page-link" href="#">4</a></li>
+					    <li class="page-item"><a class="page-link" href="#">5</a></li>
+					    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+					  </ul>
+					</nav> -->
+	           	<div class="d-flex justify-content-center mt-3">
+					<div class="d-flex">
+						<button class="page-link disabled" data-list-pagination="prev"
+							disabled>
+							<i class="fas fa-chevron-left"></i>
+						</button>
+						<ul class="mb-0 pagination">
+							<li class="active">
+								<button class="page" type="button" data-i="1" data-page="5">1</button>
+							</li>
+						</ul>
+						<button class="page-link pe-0" data-list-pagination="next"
+							disabled>
+							<i class="fas fa-chevron-right"></i>
+						</button>
+					</div>
+				</div>
+           </div>
+         </div>
+         
+         
+         <!-- 메일 선택 모달 -->
+                <div class="modal fade" id="selectMailAlertModal" tabindex="-1" aria-hidden="true">
+				  <div class="modal-dialog modal-dialog-centered modal-sm">
+				    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+				      <div class="modal-header border-0">
+				        <h5 class="modal-title text-dark">안내</h5>
+				      </div>
+				      <div class="modal-body text-center">
+				        <p class="mb-0 text-body">메일을 선택해주세요.</p>
+				      </div>
+				      <div class="modal-footer justify-content-center border-0">
+				        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+				<!-- 메일 선택 모달 끝-->
+				<!-- 삭제 확인 모달 -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">삭제 확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">선택한 메일을 영구 삭제하시겠습니까?</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">삭제</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 복구 확인 모달 -->
+<div class="modal fade" id="restoreConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">복구 확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">선택한 메일을 복구하시겠습니까?</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmRestoreBtn">복구</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 복구 확인 모달 끝 -->
+<!-- 확인 모달창 -->
+<div class="modal fade" id="completeAlertModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">완료</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">처리가 완료되었습니다.</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 확인 모달창 끝-->
+         <script>
+         document.addEventListener('DOMContentLoaded', function () {
+        	  const checkAll = document.getElementById('chechAll');
+        	  checkAll.addEventListener('change', function () {
+        	    const isChecked = this.checked;
+        	    const checkboxes = document.querySelectorAll('.mail_checkbox');
+        	    checkboxes.forEach(cb => cb.checked = isChecked);
+        	  });
+
+        	  function getSelectedMailNos() {
+        	    return Array.from(document.querySelectorAll('.mail_checkbox:checked'))
+        	      .map(cb => cb.value);
+        	  }
+
+        	  function sendBulkUpdate(url) {
+        	    const selected = getSelectedMailNos();
+        	    if (selected.length === 0) {
+        	      const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+        	      modal.show();
+        	      return;
+        	    }
+
+        	    fetch(url, {
+        	      method: 'POST',
+        	      headers: {
+        	        'Content-Type': 'application/json',
+        	        [document.querySelector('meta[name="_csrf_header"]').content]: document.querySelector('meta[name="_csrf"]').content
+        	      },
+        	      body: JSON.stringify(selected)
+        	    }).then(res => {
+        	    	if (res.ok) {
+        	    	      // 완료 모달 띄우기
+        	    	      const completeModal = new bootstrap.Modal(document.getElementById("completeAlertModal"));
+        	    	      completeModal.show();
+
+        	    	      // 1.5초 후 페이지 새로고침
+        	    	      setTimeout(() => {
+        	    	        location.reload();
+        	    	      }, 1500);
+        	    	    }
+        	      else alert("처리 중 오류가 발생했습니다.");
+        	    });
+        	  }
+
+        	  document.getElementById('deleteBtn').addEventListener('click', function () {
+        	    const selected = getSelectedMailNos();
+        	    if (selected.length === 0) {
+        	      const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+        	      modal.show();
+        	      return;
+        	    }
+        	    const modal = new bootstrap.Modal(document.getElementById("deleteConfirmModal"));
+        	    modal.show();
+        	  });
+
+        	  document.getElementById('removeBtn').addEventListener('click', function () {
+        	    const selected = getSelectedMailNos();
+        	    if (selected.length === 0) {
+        	      const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+        	      modal.show();
+        	      return;
+        	    }
+        	    const modal = new bootstrap.Modal(document.getElementById("restoreConfirmModal"));
+        	    modal.show();
+        	  });
+
+        	  document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+        	    const modal = bootstrap.Modal.getInstance(document.getElementById("deleteConfirmModal"));
+        	    modal.hide();
+        	    sendBulkUpdate('/mail/delete');
+        	  });
+
+        	  document.getElementById('confirmRestoreBtn').addEventListener('click', function () {
+        	    const modal = bootstrap.Modal.getInstance(document.getElementById("restoreConfirmModal"));
+        	    modal.hide();
+        	    sendBulkUpdate('/mail/trash');
+        	  });
+        	});
+         /* const checkAll = document.getElementById('chechAll');
+         checkAll.addEventListener('change', function () {
+           const isChecked = this.checked;
+           const checkboxes = document.querySelectorAll('.mail_checkbox');
+           checkboxes.forEach(cb => cb.checked = isChecked);
+         });
+         function getSelectedMailNos() {
+        	    return Array.from(document.querySelectorAll('.mail_checkbox:checked'))
+        	      .map(cb => cb.value);
+        	  }
+
+        	   function sendBulkUpdate(url) {
+        	    const selected = getSelectedMailNos();
+        	    if (selected.length === 0) {
+           	        const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+           	        modal.show();
+           	        return;
+           	      }
+
+        	    fetch(url, {
+        	      method: 'POST',
+        	      headers: { 
+						'Content-Type': 'application/json' ,
+						'header': document.querySelector('meta[name="_csrf_header"]').content,
+                        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+						},
+        	      body: JSON.stringify(selected)
+        	    }).then(res => {
+        	      if (res.ok) location.reload();
+        	      else alert("처리 중 오류가 발생했습니다.");
+        	    });
+        	  }
+
+        	  document.getElementById('removeBtn').addEventListener('click', function () {
+        	    sendBulkUpdate('/mail/trash');
+        	  });
+
+        	  document.getElementById('deleteBtn').addEventListener('click', function () {
+        	    sendBulkUpdate('/mail/delete');
+        	  }); 
+        	  document.getElementById('deleteBtn').addEventListener('click', function () {
+        		  const selected = getSelectedMailNos();
+        		  if (selected.length === 0) {
+        		    const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+        		    modal.show();
+        		    return;
+        		  }
+        		  const modal = new bootstrap.Modal(document.getElementById("deleteConfirmModal"));
+        		  modal.show();
+        		});
+
+        		document.getElementById('removeBtn').addEventListener('click', function () {
+        		  const selected = getSelectedMailNos();
+        		  if (selected.length === 0) {
+        		    const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+        		    modal.show();
+        		    return;
+        		  }
+        		  const modal = new bootstrap.Modal(document.getElementById("restoreConfirmModal"));
+        		  modal.show();
+        		});
+        		document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+        			  const modal = bootstrap.Modal.getInstance(document.getElementById("deleteConfirmModal"));
+        			  modal.hide();
+        			  sendBulkUpdate('/mail/delete');
+        			});
+
+        			document.getElementById('confirmRestoreBtn').addEventListener('click', function () {
+        			  const modal = bootstrap.Modal.getInstance(document.getElementById("restoreConfirmModal"));
+        			  modal.hide();
+        			  sendBulkUpdate('/mail/trash');
+        			}); */
+         </script>
+    </main>
+  </body>
+</html>

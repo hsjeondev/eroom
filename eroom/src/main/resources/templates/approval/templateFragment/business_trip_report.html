@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="business_trip_report">
+  <form th:object="${approval}">
+      <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle mb-0">
+          <colgroup><col style="width: 25%;" /><col style="width: 75%;" /></colgroup>
+          <tbody>
+            <tr>
+              <th class="bg-light">출장목적</th>
+              <td th:text="*{approval_content['tripPurpose']}" style="white-space: pre-wrap;"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">출장기간</th>
+              <td th:text="|*{approval_content['tripStartTime']} ~ *{approval_content['tripEndTime']}|"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">출장지역</th>
+              <td th:text="*{approval_content['tripRegion']}"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">출장인원</th>
+              <td th:text="|*{approval_content['tripPeopleCount']} 명|"></td>
+            </tr>
+            <tr>
+              <th class="bg-light">출장결과</th>
+              <td th:text="*{approval_content['tripResult']}" style="white-space: pre-wrap;"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  </form>
+</th:block>
+</html>

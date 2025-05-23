@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ko-KR" dir="ltr" data-navigation-type="default"
+	data-navbar-horizontal-shape="default"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{include/layout}">
+<head>
+<meta charset="UTF-8">
+<title>마이페이지</title>
+<style>
+    .profile-wrapper {
+      position: relative;
+      width: 128px;
+      height: 128px;
+    }
+
+    .profile-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .camera-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      opacity: 0;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .profile-wrapper:hover .camera-overlay {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+<main class="main" id="top" layout:fragment="content">
+<div class="mb-9">
+	<!-- 상단 제목 -->
+	<div class="d-flex justify-content-between align-items-center mb-2 position-relative">
+	  <span class="fw-bold fs-7">마이페이지</span>
+	</div>
+
+	<div class="row g-3">
+	
+		<!-- 1열: 프로필 -->
+		<div class="col-md-4">
+		  <!-- 기존 프로필 카드 그대로 삽입 -->
+			<div class="card">
+				<div class="card-body d-flex align-items-center">
+					<div class="profile-wrapper" data-bs-toggle="modal" data-bs-target="#profileUploadModal">
+						<img id="profileImage" class="rounded-circle" src="/assets/img/team/15.webp" alt="프로필">
+						<div class="camera-overlay">
+							<svg class="svg-inline--fa fa-camera fs-4" aria-hidden="true" focusable="false"
+							  data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg"
+							  viewBox="0 0 512 512" style="width: 24px; height: 24px;">
+								 <path fill="currentColor"
+								  d="M149.1 64.3c7.8-14.3 22.9-23.1 39.4-23.1h134.9c16.5 0 31.6 8.9 39.4 23.1l14.9 27.4H464c26.5 0 48 21.5 48 48v272c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V139.7c0-26.5 21.5-48 48-48h86.1l14.9-27.4zM256 408c66.3 0 120-53.7 120-120s-53.7-120-120-120s-120 53.7-120 120s53.7 120 120 120zm0-48a72 72 0 1 0 0-144 72 72 0 1 0 0 144z">
+								</path>
+							</svg>
+						</div>
+					</div>
+					 <!-- 프로필 상단 -->
+					<div class="text-start">
+						<div class="fw-bold fs-7" th:text="${employee.employeeName}">이름</div>
+						<div class="text-body-secondary" th:text="${employee.employeePosition}">직급</div>
+					</div>
+					
+				</div><!-- card-body -->	
+				<!-- 하단 정보 -->
+				<div class="card-footer border-top border-dashed pt-3">
+					<div class="d-flex justify-content-around">
+						<div>
+							<div class="fw-bold fs-8 text-center">총 연차</div>
+							<div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annual_leave_total}">12</div>
+						</div>
+						<div>
+							<div class="fw-bold fs-8 text-center">사용 연차</div>
+							<div class="fs-7 text-body-secondary text-center" th:text="${annualLeave.annual_leave_used}">2</div>
+						</div>
+						<div>
+							<div class="fw-bold fs-8 text-center">잔여 연차</div>
+							<div class="fs-7 text-body-primary text-center" th:text="${annualLeave.annual_leave_remain}">10</div>
+						</div>
+					</div>
+				</div>
+			</div><!-- card  -->		  
+		 <!-- ✅ profile-wrapper + Following/Projects/Completion 포함된 카드 -->
+		</div>			
+	
+	
+	    <!-- 2열: 근태요약 -->
+	    <div class="col-md-8">
+	      <!-- 차트 카드 -->
+	        <div class="card">
+	          <div class="card-body">
+	            <div class="fw-bold fs-8 mb-3 text-secondary">근태 요약</div>
+	            <div class="row text-center">
+	              <div class="col text-center d-flex flex-column align-items-center">
+	                <div class="fw-semibold mb-2">출근일수</div>
+	                <div class="text-primary fw-bold" th:text="${summaryData.checkinDays} + '일'">O일</div>
+	              </div>
+	              <div class="col text-center d-flex flex-column align-items-center">
+	                <div class="fw-semibold">지각</div>
+	                <div class="text-danger fw-bold" th:text="${summaryData.lateCount} + '회'">OO회</div>
+	              </div>
+	              <div class="col text-center d-flex flex-column align-items-center">
+	                <div class="fw-semibold">조퇴</div>
+	                <div class="text-warning fw-bold" th:text="${summaryData.earlyLeaveCount} + '회'">OO회</div>
+	              </div>
+	              <div class="col text-center d-flex flex-column align-items-center">
+	                <div class="fw-semibold">평균 출근</div>
+	                <div class="text-success fw-bold" th:text="${summaryData.averageCheckInTime}">00:00</div>
+	              </div>
+	              <div class="col text-center d-flex flex-column align-items-center">
+	                <div class="fw-semibold">출근률</div>
+	                <div class="text-info fw-bold" th:text="${summaryData.attendanceRate}">00%</div>
+	              </div>
+	            </div>
+	            <div class="mini-chart-wrapper mt-4">
+	              <canvas id="miniAttendanceChart" height="47"></canvas>
+	            </div>
+	          </div>
+	        </div>
+	    </div>	
+	
+	
+	    <!-- 3열: 주소록 -->
+	    <div class="col-md-4">
+	      <!-- ✅ 주소록 카드 (사번, 직급, 이메일 등) -->
+			<div class="card h-100 position-relative">
+				<div class="card-body fs-9">
+					<div class="d-flex align-items-center mb-2">
+						<!-- <span class="fw-semibold text-black fs-8 me-1 mb-0">00000001</span> -->
+						
+						<!--  수정 버튼 -->
+						<button class="btn btn-link position-absolute top-0 end-0 mt-2 me-2 p-0"
+						        data-bs-toggle="modal" data-bs-target="#editInfoModal">
+							<svg class="svg-inline--fa fa-pen fs-9 ms-2 text-body-quaternary" aria-hidden="true"
+							     focusable="false" data-prefix="fas" data-icon="pen" role="img"
+							     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+								<path fill="currentColor"
+							        d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"></path>
+							</svg>
+						</button>
+					</div>
+				
+					<!-- 기본 정보 -->
+					<h5 class="text-body-secondary">사번</h5>
+					<p class="text-body-secondary" th:text="${employee.employeeId}">사번</p>
+
+					<h5 class="text-body-secondary">직급</h5>
+					<p class="text-body-secondary" th:text="${employee.employeePosition}">직급</p>
+					
+					<h5 class="text-body-secondary">부서</h5>
+					<p class="text-body-secondary" th:text="${departmentName != null ? departmentName : '-'}">부서</p>
+					
+					<div class="mb-3">
+					  <h5 class="text-body-secondary">Email</h5>
+					  <a href="mailto:shatinon@jeemail.com" id="emailValue" th:text="${directory != null and directory.directory_email != null ? directory.directory_email : '-'}">Email</a>
+					</div>
+					
+					<h5 class="text-body-secondary">Phone</h5>
+					<p class="text-body-secondary" id="phoneValue" th:text="${directory != null and directory.directory_phone != null ? directory.directory_phone : '-'}">01000000000</p>
+					
+					<!-- <h5 class="text-body-secondary">주소</h5>
+					<p class="text-body-secondary" id="addressValue">서울특별시 금천구 가산디지털2로 95</p> -->
+				</div><!-- card-body -->
+			</div><!-- card h-100 -->	      
+	      
+	    </div>	
+	
+	
+	    <!-- 4열: 근무시간 통합 차트 -->
+        <div class="col-md-8">
+	        <div class="card p-3 shadow-sm">
+	          <div class="card-title d-flex justify-content-between align-items-center mb-3">
+	            <span class="fw-bold fs-8 text-secondary">근무시간 통합 차트</span>
+	            <p class="text-muted mb-0">이번달 총 근무시간: <strong class="text-primary" th:text="${totalWorkTime}">000시간 00분</strong></p>
+	          </div>
+	          <canvas id="workTimeMixedChart" height="260"></canvas>
+	        </div>
+        </div>
+	</div><!-- row g-3 -->
+	
+</div><!-- mb-9 --> 
+
+<hr>
+<div class="mb-9">
+	<!-- 결재 / 프로젝트 관련 슬라이드 -->
+	<div class="row g-3 mt-4">
+	  
+	  <!-- ✅ 결재 문서: 좌측 50% -->
+		<div class="col-md-6">
+	    	<div class="card p-3 h-100">
+				<div class="d-flex justify-content-start mb-3">
+				  <span class="fw-bold fs-8">결재 문서</span>
+				</div>
+				<div class="row g-3">
+	        		<!-- 진행 중 결재 슬라이드 -->
+					<div class="col-md-6 position-relative">
+						<div class="d-flex justify-content-center align-items-center gap-2">
+							<i class="fas fa-circle fs-10 text-primary mt-n1"></i>
+							<span class="fw-bold fs-9">진행 중인 결재</span>
+						</div>
+						<!-- <h6 class="fw-bold mb-2">📌 진행 중인 결재</h6> -->
+						<div id="approvalPendingCarousel" class="carousel slide" data-bs-ride="carousel">
+							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+							<div class="carousel-indicators">
+							  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+							  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+							  <button type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+							</div>								
+							<div class="carousel-inner px-4">
+								<div class="carousel-item active">
+								  <div class="border rounded p-3 bg-primary-soft">
+								    <h6 class="mb-1">회의실 예약 요청</h6>
+								    <p class="text-muted mb-0">2025-04-14</p>
+								  </div>
+								</div>
+								<div class="carousel-item">
+								  <div class="border rounded p-3 bg-primary-soft">
+								    <h6 class="mb-1">출장 신청서</h6>
+								    <p class="text-muted mb-0">2025-04-13</p>
+								  </div>
+								</div>
+							</div>
+							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="prev"
+							        style="top: 60%; left: -10px; z-index: 2;">
+								<i class="fas fa-chevron-left fs-7"></i>
+							</button>
+							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#approvalPendingCarousel" data-bs-slide="next"
+							        style="top: 60%; right: -10px; z-index: 2;">
+								<i class="fas fa-chevron-right fs-7"></i>
+							</button>
+						</div>
+					</div><!-- 진행중 결재 슬라이드 끝 -->        
+	       			 <!-- 승인 완료 결재 슬라이드 -->
+					<div class="col-md-6 position-relative">
+						<div class="d-flex justify-content-center align-items-center gap-2">
+							<i class="fas fa-circle fs-10 text-success mt-n1"></i>
+							<span class="fw-bold fs-9">승인된 결재</span>
+						</div>
+					<!-- <h6 class="fw-bold mb-2">✅ 승인된 결재</h6> -->
+						<div id="approvalApprovedCarousel" class="carousel slide" data-bs-ride="carousel">
+							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+							<div class="carousel-indicators">
+							  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+							  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+							  <button type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+							</div>								
+							<div class="carousel-inner px-4">
+								<div class="carousel-item active">
+								  <div class="border rounded p-3 bg-success-soft">
+								    <h6 class="mb-1">연차 신청서</h6>
+								    <p class="text-muted mb-0">2025-04-10</p>
+								  </div>
+								</div>
+								<div class="carousel-item">
+								  <div class="border rounded p-3 bg-success-soft">
+								    <h6 class="mb-1">출장 보고서</h6>
+								    <p class="text-muted mb-0">2025-04-08</p>
+								  </div>
+								</div>
+							</div>
+							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="prev"
+							        style="top: 60%; left: -10px; z-index: 2;">
+								<i class="fas fa-chevron-left fs-7"></i>
+							</button>
+							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#approvalApprovedCarousel" data-bs-slide="next"
+							        style="top: 60%; right: -10px; z-index: 2;">
+									<i class="fas fa-chevron-right fs-7"></i>
+							</button>
+						</div>
+					</div><!-- 승인 완료 결재 슬라이즈 -->       
+	      		</div><!-- row g-3 -->
+	    	</div><!-- card p-3 h-100 -->
+		</div><!-- 좌측 슬라이드 끝 col-md-6 -->
+	
+		<!-- ✅ 프로젝트 슬라이드: 우측 50% -->
+		<div class="col-md-6">
+			<div class="card p-3 h-100">
+				<div class="d-flex justify-content-start mb-3">
+				  <span class="fw-bold fs-8">프로젝트</span>
+				</div>
+				<div class="row g-3">
+				  <!-- 진행 중 프로젝트 슬라이드 -->
+					<div class="col-md-6 position-relative">
+						<div class="d-flex justify-content-center align-items-center gap-2">
+							<i class="fas fa-circle fs-10 text-primary mt-n1"></i>
+							<span class="fw-bold fs-9">진행 중인 프로젝트</span>
+						</div>
+						<!-- <h6 class="fw-bold mb-2">참여 중인 프로젝트</h6> -->
+						<div id="projectActiveCarousel" class="carousel slide" data-bs-ride="carousel">
+							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+							<div class="carousel-indicators">
+							  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+							  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+							  <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+							</div>
+							<!-- 예시 -->
+							<!-- <div class="carousel-indicators">
+							  <th:block th:each="slide, i : ${slideList}">
+							    <button type="button"
+							            th:data-bs-target="#myCarousel"
+							            th:data-bs-slide-to="${i.index}"
+							            th:classappend="${i.index == 0} ? 'active'"
+							            th:aria-label="'슬라이드 ' + ${i.index + 1}">
+							    </button>
+							  </th:block>
+							</div> -->
+							
+							<div class="carousel-inner px-4">
+								<div class="carousel-item active">
+								  <div class="border rounded p-3 bg-primary-soft">
+								    <h6 class="mb-1">Flowlog</h6>
+								    <p class="mb-0 text-muted">실시간 근태 차트 및 자동 연차 계산</p>
+								  </div>
+								</div>
+								<div class="carousel-item">
+								  <div class="border rounded p-3 bg-primary-soft">
+								    <h6 class="mb-1">click click</h6>
+								    <p class="mb-0 text-muted">회원가입/로그인, WebSocket</p>
+								  </div>
+								</div>
+							</div>
+							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="prev"
+							        style="top: 60%; left: -10px; z-index: 2;">
+								<i class="fas fa-chevron-left fs-7"></i>
+							</button>
+							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#projectActiveCarousel" data-bs-slide="next"
+							        style="top: 60%; right: -10px; z-index: 2;">
+								<i class="fas fa-chevron-right fs-7"></i>
+							</button>
+						</div>
+					</div>			  
+				  <!-- 완료된 프로젝트 슬라이드 -->
+					<div class="col-md-6 position-relative">
+						<div class="d-flex justify-content-center align-items-center gap-2">
+							<i class="fas fa-circle fs-10 text-success mt-n1"></i>
+							<span class="fw-bold fs-9">완료한 프로젝트</span>
+						</div>
+						<!-- <h6 class="fw-bold mb-2">완료한 프로젝트</h6> -->
+						<div id="projectDoneCarousel" class="carousel slide" data-bs-ride="carousel">
+							<!-- 인디케이터 (슬라이드 수만큼 li 생성) -->
+							<div class="carousel-indicators">
+							  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="슬라이드 1"></button>
+							  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="1" aria-label="슬라이드 2"></button>
+							  <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="2" aria-label="슬라이드 3"></button>
+							</div>								
+							<div class="carousel-inner px-4">
+								<div class="carousel-item active">
+								  <div class="border rounded p-3 bg-success-soft">
+								    <h6 class="mb-1">Portfolio Page</h6>
+								    <p class="mb-0 text-muted">Notion 기반 포트폴리오</p>
+								  </div>
+								</div>
+								<div class="carousel-item">
+								  <div class="border rounded p-3 bg-success-soft">
+								    <h6 class="mb-1">KDT Diary</h6>
+								    <p class="mb-0 text-muted">Java 기반 할일관리 앱, 페이징</p>
+								  </div>
+							  </div>
+							</div>
+							<button class="position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="prev"
+							        style="top: 60%; left: -10px; z-index: 2;">
+								<i class="fas fa-chevron-left fs-7"></i>
+							</button>
+							<button class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-secondary"
+							        type="button" data-bs-target="#projectDoneCarousel" data-bs-slide="next"
+							        style="top: 60%; right: -10px; z-index: 2;">
+								<i class="fas fa-chevron-right fs-7"></i>
+							</button>
+						</div>
+					</div>			  
+				  <!-- 기존 코드 유지 -->
+				</div>
+			</div>
+		</div>
+	
+	</div><!-- row g-3 mt-4 슬라이드 구역 -->    
+</div>
+<!-- 					<div th:each="item, stat : ${carouselList}">
+					  <div class="carousel-item" th:classappend="${stat.index == 0} ? ' active'">
+					    <div class="border rounded p-3"
+					         th:classappend="${item.status == '진행중'} ? ' bg-primary-soft' : ' bg-success-soft'">
+					      <h6 class="mb-1" th:text="${item.title}">제목</h6>
+					      <p class="text-muted mb-0" th:text="${item.date}">2025-04-14</p>
+					    </div>
+					  </div>
+					</div> -->
+<hr>
+<!-- 근태 현황 목록 테이블 -->     
+<div id="attendanceTable" data-list='{"valueNames":["no","date","checkin","checkout","late","early"],"page":10,"pagination":true}'>
+  <!-- 상단: 날짜 선택 + 검색창 -->
+  <div class="d-flex justify-content-between align-items-center mb-3 px-3 gap-2 flex-wrap">
+     <div class="row g-2 mb-4">
+		<div class="d-flex justify-content-start align-items-center mb-2">
+			<!-- <i class="fas fa-user-tie text-secondary me-2"></i> -->
+			<span class="fw-bold fs-7">근태 현황</span>
+		</div>
+	</div>
+        <!-- 검색창 -->
+    <div class="flex-grow-1 d-flex justify-content-center">
+      <div class="search-box w-50">
+        <form class="position-relative">
+          <input class="form-control form-control-sm search-input search" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
+          <svg style="height:40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+          </svg>
+        </form>
+      </div>
+    </div>
+    <!-- 날짜 선택 -->
+    <div>
+    <form th:action="@{/mypage/list}" method="get" id="monthSelectForm" th:if="${monthList != null}">
+	      <select class="form-select form-select-sm" data-list-filter="data-list-filter" 
+	      	name="month" id="month" onchange="this.form.submit()">
+	        <option th:each="month : ${monthList}"
+	            th:value="${month}" th:text="${month}" 
+	        	th:selected="${month == selectedMonth}"></option>
+	      </select>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- 테이블 -->
+	<div class="table-responsive">
+	    <table class="table table-striped table-sm fs-9 mb-0 text-center">
+			<thead class="text-center align-middle">
+				<tr class="table-light">
+					<th class="sort" data-sort="no" style="width:5%;">번호</th>
+					<th class="sort" data-sort="date" style="width:25%;">근무일</th>
+					<th class="sort" data-sort="checkin" style="width:25%;">출근 시간</th>
+					<th class="sort" data-sort="checkout" style="width:25%;">퇴근 시간</th>
+					<th class ="sort" data-sort="late" style="width:10%">지각</th>
+					<th class ="sort" data-sort="early" style="width:10%">조퇴</th>
+				</tr>
+			</thead>
+			<tbody class="list align-middle">
+				<tr th:if ="${!#lists.isEmpty(attendanceList)}"
+					th:each="attendance, attendanceStatus : ${attendanceList}">
+				  <td class="no" th:text="${attendanceStatus.count}">1</td>
+				  <td class="date" th:text="${#temporals.format(attendance.attendance_check_in_time, 'yyyy.MM.dd')}">연도.월.일</td>
+				  <td class="checkin" th:text="${#temporals.format(attendance.attendance_check_in_time, 'HH:mm:ss')}">출근 시간</td>
+				  <td class="checkout" th:text="${#temporals.format(attendance.attendance_check_out_time, 'HH:mm:ss')}">퇴근 시간</td>
+				  <td class="late" th:text="${attendance.attendance_late_yn == 'Y' ? '지각' : '-'}">지각</td>
+				  <td class="early" th:text="${attendance.attendance_early_leave_yn == 'Y' ? '조퇴' : '-'}">조퇴</td>
+				</tr>
+				<tr th:if="${#lists.isEmpty(attendanceList)}">
+				    <td colspan="5" class="text-center"> 근태 정보가 없습니다.</td>
+				</tr>
+			</tbody>
+	    </table>
+	</div>
+
+  <!-- 페이징 -->
+	<div class="row justify-content-center py-2 fs-9">
+	    <div class="col-auto d-flex">
+	      <button class="page-link disabled" data-list-pagination="prev" disabled>
+	        <i class="fas fa-chevron-left"></i>
+	      </button>
+	      <ul class="mb-0 pagination">
+	        <li class="active"><button class="page" type="button" data-i="1">1</button></li>
+	      </ul>
+	      <button class="page-link disabled" data-list-pagination="next" disabled>
+	        <i class="fas fa-chevron-right"></i>
+	      </button>
+	    </div>
+	</div>
+</div><!-- 근태현황 목록 테이블 끝 -->
+    
+ 
+ 
+<!--프로필 변경 모달 -->
+<div class="modal fade" id="profileUploadModal" tabindex="-1" aria-labelledby="profileUploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="profileUploadModalLabel">프로필 사진 변경</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body text-center">
+        <button class="btn btn-outline-primary mb-3" onclick="setDefaultProfile()">
+          기본 프로필 적용하기
+        </button>
+        <br>
+        <label class="btn btn-primary" for="profileUploadInput">
+          프로필 사진 업로드하기
+        </label>
+        <input type="file" id="profileUploadInput" class="d-none" accept="image/*" onchange="previewProfileImage(event)">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--주소록 정보 수정 모달 -->
+<div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editInfoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editInfoModalLabel">정보 수정</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editInfoForm">
+          <div class="mb-3">
+            <label for="emailInput" class="form-label">이메일</label>
+            <input type="email" class="form-control" id="emailInput" required>
+          </div>
+          <div class="mb-3">
+            <label for="phoneInput" class="form-label">전화번호</label>
+            <input type="text" class="form-control" id="phoneInput" required>
+          </div>
+          <div class="mb-3">
+            <label for="addressInput" class="form-label">주소</label>
+            <input type="text" class="form-control" id="addressInput" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light" data-bs-dismiss="modal">취소</button>
+        <button class="btn btn-primary" onclick="saveInfo()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 차트 데이터를 받아서 각 차트를 렌더링하는 함수
+async function renderCharts() {
+	// 1. API 호출
+	const response = await fetch('/mypage/chartData');
+	const data = await response.json();
+	console.log(data); // 디버깅용 콘솔 출력
+	console.log(data.checkinDays,data.lateCount,data.earlyLeaveCount); // 디버깅용 콘솔 출력
+
+	/* --------------- 근태 요약 차트 (Bar Chart) ----------------- */
+	const miniCtx = document.getElementById('miniAttendanceChart').getContext('2d');
+	console.log(miniCtx); // 디버깅용 콘솔 출력
+	new Chart(miniCtx, {
+		type: 'bar',
+		data: {
+			labels: ['출근일수', '지각', '조퇴'],
+			datasets: [{
+				label: '횟수',
+				data: [
+					data.checkinDays || 0,
+					data.lateCount || 0,
+					data.earlyLeaveCount || 0
+				],
+				backgroundColor: [
+					'rgba(13, 110, 253, 0.7)',   // 출근: 파랑
+					'rgba(220, 53, 69, 0.7)',    // 지각: 빨강
+					'rgba(255, 193, 7, 0.7)'     // 조퇴: 노랑
+				]
+			}]
+		},
+		options: {
+			plugins: {
+				legend: { display: false }
+			},
+			scales: {
+				y: {
+					beginAtZero: true,
+					ticks: { stepSize: 1 }
+				}
+			}
+		}
+	});
+
+	/* --------------- 근무시간 통합 차트 (Mixed: Line + Bar) ----------------- */
+	const mixedCtx = document.getElementById('workTimeMixedChart').getContext('2d');
+	const workTimePerDay = data.workTimePerDay || {};
+	const weekdayAvg = data.weekdayAvg || {};
+
+	// (1) 날짜별 근무시간 차트용 데이터 변환
+	const dailyLabels = Object.keys(workTimePerDay).map(dateStr => {
+		const [year, month, day] = dateStr.split('-');
+		return `${month}/${day}`;
+	});
+	const dailyData = Object.values(workTimePerDay);
+
+	// (2) 요일별 평균 근무시간 변환 및 정렬
+	const dayMap = {
+		'MONDAY': '월', 'TUESDAY': '화', 'WEDNESDAY': '수',
+		'THURSDAY': '목', 'FRIDAY': '금'
+	};
+	const weekdayOrder = ['월', '화', '수', '목', '금'];
+	const weekdayData = weekdayOrder.map(kor => {
+		const eng = Object.keys(dayMap).find(key => dayMap[key] === kor);
+		return weekdayAvg[eng] ?? null;
+	});
+
+	// (3) 차트 생성
+	new Chart(mixedCtx, {
+		type: 'bar',
+		data: {
+			labels: [...dailyLabels, ...weekdayOrder],
+			datasets: [
+				{
+					type: 'line',
+					label: '일별 근무시간',
+					data: [...dailyData, ...new Array(weekdayOrder.length).fill(null)],
+					borderColor: '#0d6efd',
+					backgroundColor: '#0d6efd55',
+					yAxisID: 'y',
+					tension: 0.3,
+					spanGaps: true
+				},
+				{
+					type: 'bar',
+					label: '요일별 평균 근무시간',
+					data: [...new Array(dailyLabels.length).fill(null), ...weekdayData],
+					backgroundColor: 'rgba(255, 99, 132, 0.6)',
+					yAxisID: 'y1'
+				}
+			]
+		},
+		options: {
+			responsive: true,
+			plugins: {
+				tooltip: {
+					callbacks: {
+						label: function (context) {
+							const label = context.dataset.label;
+							const val = context.raw;
+							return label + ': ' + (val !== null ? val.toFixed(2) + '시간' : '');
+						}
+					}
+				},
+				legend: { position: 'top' }
+			},
+			scales: {
+				y: {
+					type: 'linear',
+					position: 'left',
+					title: { display: true, text: '일별 근무시간' },
+					beginAtZero: true,
+					suggestedMax: 10
+				},
+				y1: {
+					type: 'linear',
+					position: 'right',
+					title: { display: true, text: '요일별 평균' },
+					grid: { drawOnChartArea: false },
+					beginAtZero: true,
+					suggestedMax: 10
+				}
+			}
+		}
+	});
+}
+renderCharts();
+
+const activeContainer = document.querySelector('#projectActiveCarousel .carousel-inner');
+const doneContainer = document.querySelector('#projectDoneCarousel .carousel-inner');
+const activeIndicators = document.querySelector('#projectActiveCarousel .carousel-indicators');
+const doneIndicators = document.querySelector('#projectDoneCarousel .carousel-indicators');
+
+const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}.${month}.${day}`;
+}
+
+fetch('/project/projectMypage', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    [csrfHeader]: csrfToken
+  }
+})
+.then(res => res.json())
+.then(data => {
+  const { activeProjects = [], doneProjects = [] } = data;
+
+  const renderCarousel = (list, container, indicators, carouselId, bgClass, isDone) => {
+  	  container.innerHTML = '';
+  	  indicators.innerHTML = '';
+
+  	  if (!list || list.length === 0) {
+  	    container.innerHTML = `
+  	      <div class="carousel-item active">
+  	        <div class="border rounded p-4 bg-light text-center">
+  	          <p class="mb-0 text-muted">프로젝트가 없습니다.</p>
+  	        </div>
+  	      </div>
+  	    `;
+  	    indicators.innerHTML = `
+  	      <button type="button" data-bs-target="#${carouselId}" data-bs-slide-to="0"
+  	        class="active" aria-current="true" aria-label="슬라이드 1"></button>
+  	    `;
+  	    return;
+  	  }
+
+  	  list.forEach((project, index) => {
+  	    const date = isDone ? formatDate(project.project_end) : formatDate(project.project_start);
+  	    const dateLabel = isDone ? '종료일' : '시작일';
+
+  	    const item = document.createElement('div');
+  	    item.className = `carousel-item ${index === 0 ? 'active' : ''}`;
+  	    item.innerHTML = `
+  	    	  <a href="/project/detail/${project.project_no}/main" class="text-decoration-none text-dark">
+  	    	    <div class="border rounded p-3 ${bgClass}">
+  	    	      <h5 class="mb-1 fw-bold">${project.project_name || ''}</h5>
+  	    	      <p class="mb-0 text-muted fs-9">${dateLabel} : ${date}</p>
+  	    	    </div>
+  	    	  </a>
+  	    	`;
+  	    container.appendChild(item);
+
+  	    const indicator = document.createElement('button');
+  	    indicator.type = 'button';
+  	    indicator.setAttribute('data-bs-target', `#${carouselId}`);
+  	    indicator.setAttribute('data-bs-slide-to', index.toString());
+  	    indicator.setAttribute('aria-label', `슬라이드 ${index + 1}`);
+  	    if (index === 0) {
+  	      indicator.className = 'active';
+  	      indicator.setAttribute('aria-current', 'true');
+  	    }
+  	    indicators.appendChild(indicator);
+  	  });
+  	};
+
+
+  renderCarousel(activeProjects, activeContainer, activeIndicators, 'projectActiveCarousel', 'bg-primary-soft', false);
+  renderCarousel(doneProjects, doneContainer, doneIndicators, 'projectDoneCarousel', 'bg-success-soft', true);
+})
+.catch(err => {
+  console.error('프로젝트 데이터 로딩 실패:', err);
+  activeContainer.innerHTML = `
+    <div class="carousel-item active">
+      <div class="border rounded p-4 bg-light text-center">
+        <p class="mb-0 text-danger">진행 중인 프로젝트 데이터를 불러올 수 없습니다.</p>
+      </div>
+    </div>
+  `;
+  doneContainer.innerHTML = `
+    <div class="carousel-item active">
+      <div class="border rounded p-4 bg-light text-center">
+        <p class="mb-0 text-danger">완료한 프로젝트 데이터를 불러올 수 없습니다.</p>
+      </div>
+    </div>
+  `;
+  activeIndicators.innerHTML = `
+    <button type="button" data-bs-target="#projectActiveCarousel" data-bs-slide-to="0"
+      class="active" aria-current="true" aria-label="슬라이드 1"></button>
+  `;
+  doneIndicators.innerHTML = `
+    <button type="button" data-bs-target="#projectDoneCarousel" data-bs-slide-to="0"
+      class="active" aria-current="true" aria-label="슬라이드 1"></button>
+  `;
+});
+</script>                
+			
+</main>
+</body>
+</html>

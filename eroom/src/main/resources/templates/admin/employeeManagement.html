@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{include/layout}">
+<head>
+	<meta charset="UTF-8">
+	<title>회원관리</title>
+	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<style>
+		td.name p {
+			max-width: 150px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		.table-responsive table {
+			table-layout: fixed;
+			width: 100%;
+		}
+		.table td {
+			overflow: hidden;
+		}
+	</style>
+</head>
+<body>
+<main class="main" id="top" layout:fragment="content">
+<div class="mb-9">
+
+	<div class="row g-2 mb-4">
+		<div class="d-flex justify-content-start align-items-center mb-2">
+			<i class="fas fa-user-tie text-secondary me-2"></i>
+			<span class="fw-bold fs-7">회원 관리</span>
+		</div>
+	</div>
+
+	<div id="employeeTable" data-list='{"valueNames":["no","mail","name","phone", "job", "dept", "team", "date"], "page": 10, "pagination": true}'>
+
+		<!-- 검색, 필터, 버튼 -->
+		<div class="mb-4">
+			<div class="row g-3">
+				<div class="col-auto">
+					<!-- 검색 -->
+					<div class="search-box">
+						<form class="position-relative">
+							<input class="form-control search-input search" type="search" placeholder="검색어를 입력하세요." aria-label="Search">
+							<svg style="height:40%;" class="svg-inline--fa fa-magnifying-glass search-box-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path></svg><!-- <span class="fas fa-search search-box-icon"></span> Font Awesome fontawesome.com -->
+						</form>
+					</div>
+				</div>
+			
+				<!-- 부서/팀 필터 -->
+				<div class="col-auto scrollbar overflow-hidden-y flex-grow-1">
+					<div class="btn-group position-static" role="group">
+						<div class="btn-group position-static text-nowrap">
+							<button class="btn btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+							  	  <span th:text="${deptLabel}">부서</span>
+								  <svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+								  	<path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path>
+								  </svg><!-- <span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com -->
+							  </button>
+							<ul class="dropdown-menu">
+							  <li>
+							  	<a class="dropdown-item" th:href="@{/admin/employeeManagement}" th:classappend="${deptId == null} ? 'active'">전체</a>
+							  </li>
+							  <li th:each="dept : ${deptList}">
+							  	<a class="dropdown-item" th:href="@{/admin/employeeManagement(deptId=${dept.structureNo})}"
+							  		th:text="${dept.codeName}" th:classappend="${dept.structureNo == deptId} ? 'active' : ''">부서명</a>
+							  </li>
+							</ul>
+						</div>
+						<div class="btn-group position-static text-nowrap">
+							<button class="btn btn-sm btn-phoenix-secondary px-7 flex-shrink-0" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+							  <span th:text="${teamLabel}">팀</span>
+							  <svg class="svg-inline--fa fa-angle-down ms-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+							  	<path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path>
+							  </svg><!-- <span class="fas fa-angle-down ms-2"></span> Font Awesome fontawesome.com -->
+							</button>
+							<ul class="dropdown-menu">
+							  <li>
+							  	<a class="dropdown-item" th:href="@{/admin/employeeManagement(deptId=${deptId})}" th:classappend="${teamId == null} ? 'active'">전체</a>
+							  </li>
+							  <li th:each="team : ${teamList}">
+							 	 <a class="dropdown-item" th:href="@{/admin/employeeManagement(deptId=${deptId},teamId=${team.structureNo})}"
+							 	 th:text="${team.codeName}" th:classappend="${team.structureNo == teamId} ? 'active' : ''">
+							 	 	팀명
+							 	 </a>
+							  </li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			
+				<!-- 회원 생성 버튼 -->
+				<div class="col-auto">
+					<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEmployeeModal">회원 등록</button>
+				</div>
+			             
+			</div>
+		</div>
+
+		<!-- 회원 목록 테이블 -->
+		<div class="bg-body-emphasis border-top border-bottom">
+			<div class="table-responsive">
+				<table class="table table-striped table-sm fs-9 mb-0 text-center">
+					<thead class="text-center align-middle">
+						<tr>
+							<th class="sort" data-sort="no" style="width:5%;">번호</th>
+							<th class="sort" data-sort="name" style="width:15%;">이름</th>
+							<th class="sort" data-sort="mail" style="width:15%;">Email</th>
+							<th class="sort" data-sort="phone" style="width:15%;">Phone</th>
+							<th class="sort" data-sort="job" style="width:10%;">직급</th>
+							<th class="sort" data-sort="dept" style="width:10%;">부서</th>
+							<th class="sort" data-sort="team" style="width:10%;">팀</th>
+							<th class="sort" data-sort="date" style="width:15%;">입사일</th>
+							<th style="width:5%"></th>
+						</tr>
+					</thead>
+					<tbody class="list align-middle" id="customers-table-body">
+						<tr th:each="employeeManage, employeeStatus : ${employeeList}">
+							<td class="no" th:text="${employeeStatus.count}">1</td>
+							<td class="name">
+								<a class="d-flex align-items-center text-body-emphasis ps-5" th:href="@{/admin/employeeInfoView(employeeNo=${employeeManage.employee.employee_no})}">
+									<div class="avatar avatar-m me-2">
+										<img class="rounded-circle" th:src="@{${employeeManage.profile_image_url}}" alt="">
+									</div>
+									<p class="mb-0 fw-bold text-truncate">
+									<span th:text="${employeeManage.employee.employee_name}">이름</span>
+									<small th:if="${employeeManage.employee.employee_employment_yn == 'N'}" class="text-danger ms-1">(퇴사)</small>
+									</p>
+								</a>
+							</td>
+							<td class="mail"><a class="fw-semibold" href="mailto:annac34@gmail.com" 
+							th:text="${employeeManage.directory != null? employeeManage.directory.directory_email : '-'}">이메일</a></td>
+							<td class="phone" th:text="${employeeManage.directory != null? employeeManage.directory.directory_phone : '-'}">연락처</td>
+							<td class="job" th:text="${employeeManage.employee.employee_position}">직급</td>
+							<td class="dept" th:text="${employeeManage.department_name}">부서</td>
+							<td class="team" th:text="${employeeManage.team_name}">팀</td>
+							<td class="date" th:text="${employeeManage.formatted_hire_date}">입사일</td>
+							 <td class="text-end pe-0">
+								<div class="btn-reveal-trigger position-static">
+									<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+									  <i class="fas fa-ellipsis fs-10"></i>
+									</button>
+									<div class="dropdown-menu dropdown-menu-end py-2">
+									  <a class="dropdown-item editEmployeeBtn" href="#!"
+									  	th:attr="data-employee-no=${employeeManage.employee.employee_no}">수정</a>
+									  <div class="dropdown-divider" th:if="${employeeManage.employee.employee_employment_yn == 'Y'}"></div>
+									  <a class="dropdown-item text-danger deleteEmployeeBtn" href="#!"
+									  	th:attr="data-employee-no=${employeeManage.employee.employee_no}"
+									  	th:if="${employeeManage.employee.employee_employment_yn == 'Y'}">삭제</a>
+									</div>
+								</div>
+							 </td>
+						</tr>
+					</tbody>
+				</table>
+			</div><!-- table-responsive -->
+
+			<!-- 페이징 -->
+			<div class="row align-items-center justify-content-center py-2 pe-0 fs-9">
+				<div class="col-auto d-flex">
+					<button class="page-link disabled" data-list-pagination="prev" disabled>
+						<i class="fas fa-chevron-left"></i>
+					</button>
+					<ul class="mb-0 pagination">
+						<li class="active"><button class="page" type="button" data-i="1">1</button></li>
+						<li><button class="page" type="button" data-i="2">2</button></li>
+					</ul>
+					<button class="page-link" data-list-pagination="next">
+						<i class="fas fa-chevron-right"></i>
+					</button>
+				</div>
+			</div>
+		</div><!-- bg-body-emphasis border-top border-bottom -->
+
+	</div><!-- employeeTable -->
+	
+<!-- 회원 생성 모달 -->
+<div class="modal fade" id="createEmployeeModal" tabindex="-1" aria-labelledby="createEmployeeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+    <div class="modal-content border border-secondary">
+      <form id="createEmployeeForm" autocomplete="off">
+        <!-- 헤더 -->
+        <div class="modal-header bg-light">
+        	<!-- 제목 -->
+          <h5 class="modal-title" id="createEmployeeModalLabel">회원 생성</h5>
+          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- 바디 -->
+        <div class="modal-body px-4 py-3">
+		<!-- 바디 안에 원하는 입력 값 input 넣으시면 됩니다~  -->
+          <!-- 이름 + 중복 확인 -->
+          <div class="row mb-3">
+            <div class="col">
+              <label for="employeeName" class="form-label fw-semibold">이름</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="employeeName" name="employee_name" placeholder="이름을 입력하세요" required>
+                <button type="button" class="btn btn-outline-secondary" id="checkNameBtn">중복확인</button>
+              </div>
+              <small id="nameCheckMsg" class="form-text d-none"></small>
+            </div>
+
+            <div class="col">
+              <label for="employeePosition" class="form-label fw-semibold">직급</label>
+              <select class="form-select" id="employeePosition" name="employee_position" required>
+                <option value="" disabled selected>직급 선택</option>
+                <option value="사원">사원</option>
+                <option value="대리">대리</option>
+                <option value="과장">과장</option>
+                <option value="차장">차장</option>
+                <option value="부장">부장</option>
+                <option value="직접 입력">직접 입력</option>
+              </select>
+              <input type="text" class="form-control mt-2 d-none" id="customPositionInput" placeholder="직접 입력" name="custom_position">
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col">
+              <label for="departmentSelect" class="form-label fw-semibold">부서</label>
+              <select class="form-select" id="departmentSelect" name="department_no" required>
+                <option value="" disabled selected>부서 선택</option>
+                <option th:each="dept : ${deptList}" th:value="${dept.structureNo}" th:text="${dept.codeName}">부서명</option>
+                <!-- 옵션은 JS로 채움 -->
+              </select>
+            </div>
+            <div class="col">
+              <label for="teamSelect" class="form-label fw-semibold">팀</label>
+              <select class="form-select" id="teamSelect" name="team_no">
+                <option value="">팀 선택</option>
+                <option value="">선택안함</option>
+                <option th:each="team : ${teamList}" th:value="${team.structureNo}" th:text="${team.codeName}">팀 명</option>
+                <!-- 옵션은 JS로 채움 -->
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="directoryPhone" class="form-label fw-semibold">연락처</label>
+            <input type="text" class="form-control" id="directoryPhone" name="directory_phone" required placeholder="010-1234-5678">
+          </div>
+
+		  <div class="mb-3">
+			<label for="directoryAddress" class="form-label fw-semibold">주소</label>
+			<div class="input-group mb-2">
+			  <input type="text" class="form-control" id="directoryZipcode" name="directory_zipcode" placeholder="우편번호" readonly required>
+			  <button type="button" class="btn btn-outline-secondary" onclick="execDaumPostcode()">주소 검색</button>
+			</div>
+			<input type="text" class="form-control mb-2" id="directoryAddress" name="directory_address" placeholder="주소" readonly required>
+			<!-- <input type="text" class="form-control" id="addressDetail" name="address_detail" placeholder="상세 주소 입력"> -->
+		  </div>	
+
+          <div class="mb-3">
+            <label for="employeeBirth" class="form-label fw-semibold">생년월일</label>
+            <input type="date" class="form-control" id="employeeBirth" name="employee_birth" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="employeeHireDate" class="form-label fw-semibold">입사일</label>
+            <input type="date" class="form-control" id="employeeHireDate" name="employee_hire_date" required>
+          </div>
+        </div>
+
+        <!-- 푸터 / 취소, 확인 버튼 있는 곳-->
+        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="createEmployeeBtn">회원 생성</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 회원 수정 모달 -->
+<div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+    <div class="modal-content border border-secondary">
+      <form id="editEmployeeForm" autocomplete="off">
+        <!-- 헤더 -->
+        <div class="modal-header bg-light">
+          <h5 class="modal-title" id="editEmployeeModalLabel">회원 수정</h5>
+          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- 바디 -->
+        <div class="modal-body px-4 py-3">
+
+          <!-- 이름 -->
+          <div class="mb-3">
+            <label for="editEmployeeName" class="form-label fw-semibold">이름</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="editEmployeeName" name="employee_name" required>
+              <button type="button" class="btn btn-outline-secondary" id="editCheckNameBtn">중복확인</button>
+            </div>
+            <small id="editNameCheckMsg" class="form-text d-none"></small>
+          </div>
+
+			<!-- 직급 -->
+			<div class="row mb-3">
+			  <div class="col-6">
+			    <label class="form-label fw-semibold">직급</label>
+			    <input type="text" class="form-control" id="currentEmployeePosition" readonly>
+			  </div>
+			  <div class="col-6">
+			    <label for="editEmployeePosition" class="form-label fw-semibold">직급 선택</label>
+			    <select class="form-select" id="editEmployeePosition" name="employee_position" required>
+			      <option value="" disabled selected>직급 선택</option>
+			      <option value="사원">사원</option>
+			      <option value="대리">대리</option>
+			      <option value="과장">과장</option>
+			      <option value="차장">차장</option>
+			      <option value="부장">부장</option>
+			      <option value="직접 입력">직접 입력</option>
+			    </select>
+			   <input type="text" class="form-control mt-2 d-none" id="editCustomPositionInput" placeholder="직접 입력" name="custom_position">
+			  </div>
+			</div>
+
+			<!-- 부서 -->
+			<div class="row mb-3">
+			  <div class="col-6">
+			    <label class="form-label fw-semibold">소속 부서</label>
+			    <input type="text" class="form-control" id="currentDepartment" readonly>
+			  </div>
+			  <div class="col-6">
+			    <label for="editDepartmentSelect" class="form-label fw-semibold">부서 선택</label>
+			    <select class="form-select" id="editDepartmentSelect" name="department_no" required>
+			      <option value="">부서 선택</option>
+			      <!-- 옵션은 JS로 채움 -->
+			    </select>
+			  </div>
+			</div>
+
+			<!-- 팀 -->
+			<div class="row mb-3">
+			  <div class="col-6">
+			    <label class="form-label fw-semibold">소속 팀</label>
+			    <input type="text" class="form-control" id="currentTeam" readonly>
+			  </div>
+			  <div class="col-6">
+			    <label for="editTeamSelect" class="form-label fw-semibold">팀 선택</label>
+			    <select class="form-select" id="editTeamSelect" name="team_no">
+			      <option value="">팀 선택</option>
+			      <!-- 옵션은 JS로 채움 -->
+			    </select>
+			  </div>
+			</div>
+
+          <!-- 연락처 -->
+          <div class="mb-3">
+            <label for="editDirectoryPhone" class="form-label fw-semibold">연락처</label>
+            <input type="text" class="form-control" id="editDirectoryPhone" name="directory_phone" required placeholder="010-0000-0000">
+          </div>
+
+		  <!-- 주소 -->
+		  <div class="mb-3">
+			<label class="form-label fw-semibold">주소</label>
+			<div class="input-group mb-2">
+			  <input type="text" class="form-control" id="editDirectoryZipcode" name="directory_zipcode" placeholder="우편번호" readonly>
+			  <button type="button" class="btn btn-outline-secondary" onclick="execDaumPostcodeForEdit()">주소 검색</button>
+			</div>
+			<input type="text" class="form-control mb-2" id="editDirectoryAddress" name="directory_address" placeholder="주소" readonly>
+		  </div>
+
+          <!-- 생년월일 -->
+          <div class="mb-3">
+            <label for="editEmployeeBirth" class="form-label fw-semibold">생년월일</label>
+            <input type="date" class="form-control" id="editEmployeeBirth" name="employee_birth" required>
+          </div>
+
+          <!-- 입사일 -->
+          <div class="mb-3">
+            <label for="editEmployeeHireDate" class="form-label fw-semibold">입사일</label>
+            <input type="date" class="form-control" id="editEmployeeHireDate" name="employee_hire_date" required>
+          </div>
+
+          <!-- (퇴사자인 경우만) 퇴사일, 재직여부 -->
+          <div id="retiredFields" class="d-none">
+            <div class="mb-3">
+              <label for="editEmployeeEndDate" class="form-label fw-semibold">퇴사일</label>
+              <input type="date" class="form-control" id="editEmployeeEndDate" name="employee_end_date">
+            </div>
+            <div class="mb-3">
+              <label for="editEmployeeEmploymentYn" class="form-label fw-semibold">재직 여부</label>
+              <select class="form-select" id="editEmployeeEmploymentYn" name="employee_employment_yn">
+                <option value="Y">재직</option>
+                <option value="N">퇴사</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 푸터 -->
+        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="saveEditEmployeeBtn">저장</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+<!-- 회원 삭제 모달 -->
+<div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+    <div class="modal-content border border-secondary">
+      <form id="deleteEmployeeForm" autocomplete="off">
+        <!-- 헤더 -->
+        <div class="modal-header bg-light">
+          <h5 class="modal-title" id="deleteEmployeeModalLabel">회원 삭제</h5>
+          <button type="button" class="btn-close btn-close-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- 바디 -->
+        <div class="modal-body px-4 py-3">
+          <!-- 이름 -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">이름</label>
+            <input type="text" class="form-control" id="deleteEmployeeName" readonly>
+          </div>
+
+          <!-- 직급 -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">직급</label>
+            <input type="text" class="form-control" id="deleteEmployeePosition" readonly>
+          </div>
+
+          <!-- 부서 -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">부서</label>
+            <input type="text" class="form-control" id="deleteEmployeeDepartment" readonly>
+          </div>
+
+          <!-- 팀 -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">팀</label>
+            <input type="text" class="form-control" id="deleteEmployeeTeam" readonly>
+          </div>
+
+          <!-- 입사일 -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">입사일</label>
+            <input type="date" class="form-control" id="deleteEmployeeHireDate" readonly>
+          </div>
+
+          <!-- 퇴사일 -->
+          <div class="mb-3">
+            <label for="deleteEmployeeEndDate" class="form-label fw-semibold">퇴사일</label>
+            <input type="date" class="form-control" id="deleteEmployeeEndDate" name="employee_end_date">
+          </div>
+        </div>
+
+        <!-- 푸터 -->
+        <div class="modal-footer px-4 py-3 border-0 d-flex justify-content-end">
+          <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-danger" id="deleteEmployeeBtn">회원 삭제</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 공통 저장 확인 모달 -->
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="confirmSaveModalLabel">확인</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="confirmSaveModalMessage">
+          <!-- 상황별 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertMessageModal" tabindex="-1" aria-labelledby="alertMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark" id="alertMessageModalLabel">알림</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body" id="alertMessageContent">
+          <!-- 메시지가 여기에 들어감 -->
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 생성용 unsaved 모달 -->
+<div class="modal fade" id="unsavedCreateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 회원 생성 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmCreateCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 수정용 unsaved 모달 -->
+<div class="modal fade" id="unsavedEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 회원 수정 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmEditCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 삭제용 unsaved 모달 -->
+<div class="modal fade" id="unsavedDeleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">정말 닫을까요?</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">
+          작성 중인 퇴사 정보가 사라집니다.<br>정말 닫으시겠습니까?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+let isEditFormEdited = false; // 회원 수정 폼 수정 여부
+// 주소 API 실행 함수 (회원 생성용)
+function execDaumPostcode() {
+  new daum.Postcode({
+    oncomplete: function(data) {
+      // 기본 주소 + 우편번호 세팅
+      document.getElementById('directoryZipcode').value = data.zonecode;
+      document.getElementById('directoryAddress').value = data.roadAddress;
+    }
+  }).open();
+}
+
+// 주소 API 실행 함수(회원 수정용)
+function execDaumPostcodeForEdit() {
+  new daum.Postcode({
+    oncomplete: function(data) {
+      document.getElementById('editDirectoryZipcode').value = data.zonecode;
+      document.getElementById('editDirectoryAddress').value = data.roadAddress;
+      isEditFormEdited = true;
+    }
+  }).open();
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+	// 요소 가져오기
+	const createForm = document.getElementById('createEmployeeForm');
+	const createBtn = document.getElementById('createEmployeeBtn');
+	const checkNameBtn = document.getElementById('checkNameBtn');
+	const nameInput = document.getElementById('employeeName');
+	const nameCheckMsg = document.getElementById('nameCheckMsg');
+	const positionSelect = document.getElementById('employeePosition');
+	const customPositionInput = document.getElementById('customPositionInput');
+	const deptSelect = document.getElementById('departmentSelect');
+	const teamSelect = document.getElementById('teamSelect');
+	
+	const saveEditEmployeeBtn = document.getElementById('saveEditEmployeeBtn');
+	
+	const editEmployeePositionSelect = document.getElementById('editEmployeePosition');
+	const editCustomPositionInput = document.getElementById('editCustomPositionInput');
+	
+	// 생성 모달
+	const createModalElement = document.getElementById('createEmployeeModal');
+	const createModal = bootstrap.Modal.getInstance(createModalElement) || new bootstrap.Modal(createModalElement);
+	// 수정 모달
+	const editModalElement = document.getElementById('editEmployeeModal');
+	const editModal = bootstrap.Modal.getInstance(editModalElement) || new bootstrap.Modal(editModalElement);
+	// 삭제 모달
+	const deleteModalElement = document.getElementById('deleteEmployeeModal');
+	const deleteModal = bootstrap.Modal.getInstance(deleteModalElement) || new bootstrap.Modal(deleteModalElement);
+	// 생성 모달 닫기 확인
+	const unsavedCreateModalElement = document.getElementById('unsavedCreateModal');
+	const unsavedCreateModal = bootstrap.Modal.getInstance(unsavedCreateModalElement) || new bootstrap.Modal(unsavedCreateModalElement);
+ 	// 수정 모달 닫기 확인
+	const unsavedEditModalElement = document.getElementById('unsavedEditModal');
+	const unsavedEditModal = bootstrap.Modal.getInstance(unsavedEditModalElement) || new bootstrap.Modal(unsavedEditModalElement);
+	// 삭제 모달 닫기 확인
+	const unsavedDeleteModalElement = document.getElementById('unsavedDeleteModal');
+	const unsavedDeleteModal = bootstrap.Modal.getInstance(unsavedDeleteModalElement) || new bootstrap.Modal(unsavedDeleteModalElement);
+	
+	// 저장 확인 모달 (공통)
+	const confirmSaveModal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+	// 알림 모달(공통)
+	const alertModal = new bootstrap.Modal(document.getElementById('alertMessageModal'));	
+	
+	let isNameChecked = false; // 이름 중복 확인 완료 여부
+	let isFormEdited = false; // 회원 생성 폼 수정 여부
+
+	let isDeleteFormEdited = false; // 회원 삭제 폼 수정 여부
+	
+	let currentMode = ''; // 'create' or 'edit' or 'delete'
+	
+	let editingEmployeeNo = null; // 수정할 대상 employeeNo를 저장할 변수
+	
+	// 공통 알림 모달
+	function showAlert(message, callback){
+		document.getElementById('alertMessageContent').innerText = message;
+		alertModal.show();
+		
+		if(callback){
+			const modalEl = document.getElementById('alertMessageModal');
+			modalEl.addEventListener('hidden.bs.modal',function handler(){
+				callback();
+				modalEl.removeEventListener('hidden.bs.modal',handler);
+			});
+		}
+	}
+	
+	// 공통 confirm 모달
+	function showConfirmModal(message, onConfirm){
+		const msgElement = document.getElementById('confirmSaveModalMessage');
+		const confirmBtn = document.getElementById('confirmSaveBtn');
+		
+		msgElement.innerHTML = message;
+		const modalInstance = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+		modalInstance.show();
+		
+		const handler = function(){
+			modalInstance.hide();
+			onConfirm(); // 확인 클릭 시 실행할 콜백
+			confirmBtn.removeEventListener('click',handler); // 중복 방지
+		};
+		
+		confirmBtn.addEventListener('click',handler);
+	}
+	
+		const today = new Date();
+		const year = today.getFullYear();
+		const month = String(today.getMonth() + 1).padStart(2,'0');
+		const day = String(today.getDate()).padStart(2,'0');
+		const formattedToday = `${year}-${month}-${day}`;
+	// 오늘 날짜 입사일 input에 기본값으로 세팅 - 회원 생성 모달
+	const hireDateInput = document.getElementById('employeeHireDate');
+	if(hireDateInput){
+		hireDateInput.value = formattedToday;
+	}
+	
+	// 오늘 날짜 퇴사일 input에 기본값으로 세팅 - 회원 삭제 모달
+	const endDateInput = document.getElementById('deleteEmployeeEndDate');
+	if(endDateInput){
+		const today = new Date();
+		const year = today.getFullYear();
+		const month = String(today.getMonth() + 1).padStart(2,'0');
+		const day = String(today.getDate()).padStart(2,'0');
+		const formattedToday = `${year}-${month}-${day}`;
+		endDateInput.value = formattedToday;
+	}
+
+	// 부서 선택시 팀 목록 가져오기 (회원 생성 모달용)
+	deptSelect.addEventListener('change', function () {
+		loadTeamsByDepartment(this.value, teamSelect);
+	});	
+
+	// 수정모달 부서선택 시 팀 변경
+	const editDepartmentSelect = document.getElementById('editDepartmentSelect');
+	const editTeamSelect = document.getElementById('editTeamSelect');
+
+	editDepartmentSelect.addEventListener('change', function () {
+		loadTeamsByDepartment(this.value, editTeamSelect);
+	});
+
+	function loadTeamsByDepartment(deptId, teamSelectElement) {
+		if (!deptId) {
+			teamSelectElement.innerHTML = '<option value="">(선택안함)</option>';
+			return;
+		}
+
+		fetch(`/admin/findTeamsByDeptId?deptId=${deptId}`)
+			.then(response => response.json())
+			.then(teams => {
+				teamSelectElement.innerHTML = '<option value="">(선택안함)</option>';
+				teams.forEach(team => {
+					const option = document.createElement('option');
+					option.value = team.structure_no;
+					option.textContent = team.code_name;
+					teamSelectElement.appendChild(option);
+				});
+			})
+			.catch(() => {
+				showAlert('팀 목록을 가져오는 중 오류가 발생했습니다.');
+			});
+	}
+	
+	// 직급 선택이 '직접 입력'인 경우 텍스트 인풋 표시(회원 생성용)
+	positionSelect.addEventListener('change',function(){
+		if(this.value == '직접 입력'){
+			customPositionInput.classList.remove('d-none');
+			customPositionInput.required = true;
+		}else{
+			customPositionInput.classList.add('d-none');
+			customPositionInput.required = false;
+		}
+	});
+	
+	// 직급 선택이 '직접 입력'인 경우 텍스트 인풋 표시 (회원 수정용)
+	editEmployeePositionSelect.addEventListener('change', function () {
+		if (this.value === '직접 입력') {
+			editCustomPositionInput.classList.remove('d-none');
+			editCustomPositionInput.required = true;
+			editCustomPositionInput.value = '';
+			editCustomPositionInput.focus();
+		} else {
+			editCustomPositionInput.classList.add('d-none');
+			editCustomPositionInput.required = false;
+			editCustomPositionInput.value = '';
+		}
+	});	
+
+	
+	// 이름 중복 확인 버튼 클릭(생성용)
+	checkNameBtn.addEventListener('click',function(){
+		const name = nameInput.value.trim();
+		if(!name){
+			showAlert('이름을 입력해주세요.');
+			return;
+		}
+		
+		fetch(`/admin/checkNameDuplicate?name=${encodeURIComponent(name)}`)
+			.then(response => response.json())
+			.then(data => {
+				if(data.duplicate){
+					nameCheckMsg.textContent = '이미 존재하는 이름입니다.';
+					nameCheckMsg.className = 'form-text text-danger';
+					// isNameChecked = false;
+				}else{
+					nameCheckMsg.textContent = '사용 가능한 이름입니다.';
+					nameCheckMsg.className = 'form-text text-success';
+					isNameChecked = true;
+				}
+				nameCheckMsg.classList.remove('d-none');
+			})
+			.catch(() => {
+				showAlert('이름 중복 확인 중 오류가 발생했습니다.');
+			});
+		
+	});
+	
+	// 이름 중복 확인 버튼 클릭(수정용)
+	editCheckNameBtn.addEventListener('click',function(){
+    const name = document.getElementById('editEmployeeName').value.trim();
+    
+    // 기존 이름과 같다면 중복 확인 불필요
+    if (name === originalData.employee_name) {
+        document.getElementById('editNameCheckMsg').textContent = '기존 이름과 동일합니다.';
+        document.getElementById('editNameCheckMsg').className = 'form-text text-success';
+        return;
+    }
+
+    fetch(`/admin/checkNameDuplicate?name=${encodeURIComponent(name)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.duplicate) {
+                document.getElementById('editNameCheckMsg').textContent = '이미 존재하는 이름입니다.';
+                document.getElementById('editNameCheckMsg').className = 'form-text text-danger';
+            } else {
+                document.getElementById('editNameCheckMsg').textContent = '사용 가능한 이름입니다.';
+                document.getElementById('editNameCheckMsg').className = 'form-text text-success';
+            }
+        })
+        .catch(() => {
+            showAlert('이름 중복 확인 중 오류가 발생했습니다.');
+        });
+	})
+	
+	// 생성폼 입력 감지 
+	createForm.addEventListener('input',function(){
+		isFormEdited = true;
+	});
+	
+	// 수정폼 입력 감지
+	document.getElementById('editEmployeeForm').addEventListener('input', function () {
+		isEditFormEdited = true;
+	});	
+	
+	// 삭젶폼 입력 감지
+	document.getElementById('deleteEmployeeForm').addEventListener('input',function(){
+		isDeleteFormEdited = true;
+	});
+	
+	// 모달 닫은 뒤 입력값 초기화(생성 모달만 해당)
+	createModalElement.addEventListener('hidden.bs.modal', function () {
+		// 입력값 초기화
+		createForm.reset();
+		hireDateInput.value = formattedToday;
+		// 커스텀 포지션 필드 숨기기
+		customPositionInput.classList.add('d-none');
+		customPositionInput.required = false;
+	
+		// 중복확인 메시지 숨기기
+		nameCheckMsg.classList.add('d-none');
+		nameCheckMsg.textContent = '';
+		nameCheckMsg.className = 'form-text';
+	
+		// 팀 select 초기화
+		teamSelect.innerHTML = '<option value="">팀 선택</option>';
+	
+		// 중복 확인 상태 초기화
+		isNameChecked = false;
+	
+		// 수정 감지 플래그 초기화
+		isFormEdited = false;
+	});	
+
+	
+	// 모달 닫기 방지 (회원 생성 모달) ======================
+	createModalElement.addEventListener('hide.bs.modal', function (e) {
+		if (isFormEdited) {
+			e.preventDefault();
+			unsavedCreateModal.show();
+		}
+	});
+	
+	// 회원 생성용 모달 계속 닫기
+	document.getElementById('confirmCreateCloseBtn').addEventListener('click', function () {
+		isFormEdited = false;
+		unsavedCreateModal.hide();
+		unsavedCreateModalElement.addEventListener('hidden.bs.modal', function handler() {
+			createModal.hide();
+			unsavedCreateModalElement.removeEventListener('hidden.bs.modal', handler);
+		});
+	});
+	
+	// 모달 닫기 방지 (회원 수정 모달)
+	editModalElement.addEventListener('hide.bs.modal', function (e) {
+		const isConfirmVisible = document.getElementById('confirmSaveModal').classList.contains('show');
+		if (isEditFormEdited && !isConfirmVisible) {
+			e.preventDefault();
+			unsavedEditModal.show();
+		}
+	});
+	// 수정용 모달 계속 닫기
+	document.getElementById('confirmEditCloseBtn').addEventListener('click', function () {
+		isEditFormEdited = false;
+		unsavedEditModal.hide();
+		unsavedEditModalElement.addEventListener('hidden.bs.modal', function handler() {
+			editModal.hide();
+			unsavedEditModalElement.removeEventListener('hidden.bs.modal', handler);
+		});
+	});
+	
+	// 삭제용 모달 닫기 방지(회원 삭제 모달)
+	deleteModalElement.addEventListener('hide.bs.modal',function(e){
+		const isConfirmVisible = document.getElementById('confirmSaveModal').classList.contains('show');
+		if(isDeleteFormEdited && !isConfirmVisible){
+			e.preventDefault();
+			console.log('[모달 닫기] 삭제 취소 모달 띄움');
+			unsavedDeleteModal.show();
+		}
+	});
+	
+	// 삭제용 모달 계속 닫기
+	document.getElementById('confirmDeleteCloseBtn').addEventListener('click',function(){
+		isDeleteFormEdited = false;
+		unsavedDeleteModal.hide();
+		unsavedDeleteModalElement.addEventListener('hidden.bs.modal',function handler(){
+			deleteModal.hide();
+			unsavedDeleteModalElement.removeEventListener('hidden.bs.modal',handler);
+		});
+	});
+	
+	// =========== 모달 내부의 수정/삭제버튼 누를시 confirmSaveModal 띄우기 =================
+		
+	// saveEditEmployeeBtn 클릭 시 (회원 수정 요청 전 확인 모달 띄우기)
+	saveEditEmployeeBtn.addEventListener('click', function () {
+		const editEmployeeName = document.getElementById('editEmployeeName').value;
+		if (!editEmployeeName.trim()) {
+			showAlert("수정할 회원 정보를 먼저 불러오세요.");
+			return;
+		}
+
+		currentMode = 'edit';
+		//confirmSaveModal.show();
+		showConfirmModal('정말 수정하시겠습니까?',sendUpdateEmployee);
+	});
+	
+	// 회원 삭제 요청 전 확인 모달
+	document.getElementById('deleteEmployeeBtn').addEventListener('click',function(){
+		const deleteEmployeeName = document.getElementById('deleteEmployeeName').value;
+		if(!deleteEmployeeName.trim()){
+			showAlert("회원 정보를 먼저 불러오세요.");
+			return;
+		}
+		currentMode = 'delete';
+		//confirmSaveModal.show();
+		showConfirmModal('정말 삭제하시겠습니까?',sendDeleteEmployee);
+	});	
+	
+	// 페이지의 회원 생성 요청 전 확인
+	createBtn.addEventListener('click',function(){
+		let isValid = true; // 폼 유효 여부 플래그
+		let message = '';
+		  const fallbackLabels = {
+				    'employeeName': '이름',
+				    'employeePosition': '직급',
+				    'departmentSelect': '부서',
+				    'directoryPhone': '연락처',
+				    'directoryZipcode': '주소',
+				    'directoryAddress': '주소',
+				    'employeeBirth': '생년월일',
+				    'employeeHireDate': '입사일'
+				  };
+		// required 속성이 붙은 모든 input, select 가져옴
+		const requiredFields = createForm.querySelectorAll('input[required], select[required]');
+		
+		// requiredFields라는 리스트 안에 있는 요소 하나씩 변수에 담아 반복
+		// const field는 반복할 때마다 각각의 input,select요소 하나를 가리킴
+		for(const field of requiredFields){
+			// 주소검색 자동 입력 구조에서는 우편번호는 생략
+		    if (field.id === 'directoryZipcode') continue;
+			if(!field.value.trim()){
+				// field의 입력값이 비어있으면 공백 제거
+				isValid = false; 
+				
+				const label = createForm.querySelector(`label[for="${field.id}"]`);
+				// 현재 필드와 연결된 label 태그를 id기준으로 찾음
+
+				message = (label ? label.innerText : fallbackLabels[field.id] || '필수 입력') + '을(를) 입력해주세요.';
+				// 라벨이 존재하면 라벨 텍스트, 없으면 기본 문구로 에러 메세지 설정
+				break; // 처음 발견한 비어있는 필드만 검사하고 나머지 무시
+			}
+		}
+		if(!isValid){
+			// 필수 항목 중 하나라도 비어있으면 에러 메세지를 모달로 띄워줌
+			showAlert(message);
+			return; // 회원 생성 흐름 중단
+		}
+		
+		// 연락처 유효성 검사
+		const phoneInput = document.getElementById('directoryPhone');
+		const phoneValue = phoneInput.value.trim();
+		
+		const phoneRegex = /^010-\d{4}-\d{4}$/; // 010-숫자4자리-숫자4자리
+		if(!phoneRegex.test(phoneValue)){
+			showAlert('연락처는 010-0000-0000 형식으로 입력해주세요.');
+			return;
+		}
+		// 주소 유효성 검사(우편번호 + 주소는 필수, 상세주소는 선택)
+		const directoryZipcode = document.getElementById('directoryZipcode').value.trim();
+		const directoryAddress = document.getElementById('directoryAddress').value.trim();
+		if(!directoryZipcode || !directoryAddress){
+			showAlert('주소 검색을 통해 우편번호와 주소를 입력해주세요.');
+			return;
+		}
+		
+		if(!isNameChecked){
+			showAlert('이름 중복 확인을 해주세요.');
+			return;
+		}
+		// 모든 검증 통과시 등록 확인 모달 띄움
+		currentMode = 'create'; // 회원 생성 모드 설정
+		isFormEdited = true; // 폼 수정 감지
+		// confirmSaveModal.show(); // 등록 확인 모달 띄우기
+		showConfirmModal('정말 등록하시겠습니까?',sendCreateEmployee);
+	});
+	
+	
+	// confirmSaveModal의 확인 버튼 ============================================= 확인필요
+/* 	document.getElementById('confirmSaveBtn').addEventListener('click', function (e) {
+		e.preventDefault();
+		confirmSaveModal.hide();
+
+		if (currentMode == 'create') {
+			sendCreateEmployee(); // 생성 함수 호출
+		} else if (currentMode == 'edit') {
+			sendUpdateEmployee(); // 수정 함수 호출
+		} else if(currentMode == 'delete'){
+			sendDeleteEmployee(); // 삭제 함수 호출
+		}
+	}); */
+	
+	// ============ 목록의 회원 수정 버튼 클릭 ==============
+	let originalData = {}; // 값을 저장할 변수
+		
+	// 회원 수정 버튼 클릭시 fetch로 회원 정보 가져오기
+	document.querySelectorAll('.editEmployeeBtn').forEach(function(btn){
+		btn.addEventListener('click',function(e){
+			e.preventDefault(); 
+			
+			editingEmployeeNo = this.getAttribute('data-employee-no');
+			// 서버에서 회원 상세 정보 가져오기
+			fetch(`/admin/getEmployeeDetail?employeeNo=${editingEmployeeNo}`)
+				.then(response => response.json())
+				.then(data => {
+					if(data.res_code === 200){
+						
+						// 가져온 데이터로 모달 세팅
+						document.getElementById('editEmployeeName').value = data.employee_name || ''; // 이름
+						document.getElementById('editEmployeePosition').value = data.employee_position || ''; // 직급 select
+						document.getElementById('currentEmployeePosition').value = data.employee_position || ''; // 현재 직급
+						
+						document.getElementById('editDirectoryPhone').value = data.directory_phone || ''; // 연락처
+						document.getElementById('editEmployeeBirth').value = data.employee_birth || ''; // 생년월일
+						document.getElementById('editEmployeeHireDate').value = data.employee_hire_date || ''; // 입사일
+						
+						document.getElementById('editDirectoryZipcode').value = data.directory_zipcode || '';
+						document.getElementById('editDirectoryAddress').value = data.directory_address || '';
+						//originalData 문자열로 저장 
+						originalData = {
+							employee_name : data.employee_name || '' ,
+							employee_position : data.employee_position || '',
+							department_no : data.department_no ? String(data.department_no) : '',
+							team_no : data.team_no ? String(data.team_no) : '',
+							directory_phone : data.directory_phone || '',
+							employee_birth : (data.employee_birth || '').replaceAll('-',''), // 생일은 - 제거해서 저장
+							employee_hire_date : data.employee_hire_date ? data.employee_hire_date.substring(0,10) : '',
+							employee_end_date : data.employee_end_date ? data.employee_end_date.split('T')[0] : '',
+							employee_employment_yn : data.employee_employment_yn || '',
+							directory_zipcode: data.directory_zipcode || '',
+							directory_address: data.directory_address || ''
+						};
+					
+						// 퇴사자일 경우 퇴사일, 재직여부 입력칸 열기
+						if(data.employee_employment_yn === 'N'){
+							document.getElementById('retiredFields').classList.remove('d-none'); // 퇴사자 폼 표시
+							document.getElementById('editEmployeeEndDate').value = data.employee_end_date ? data.employee_end_date.split('T')[0] : '';
+							document.getElementById('editEmployeeEmploymentYn').value = 'N';
+						}else{
+							document.getElementById('retiredFields').classList.add('d-none'); // 퇴사자 폼 숨기기
+							document.getElementById('editEmployeeEndDate').value = '';
+							document.getElementById('editEmployeeEmploymentYn').value = 'Y';
+						}
+						
+						// 부서 select + 현재 부서 input 세팅
+						const departmentSelect = document.getElementById('editDepartmentSelect');
+						const currentDepartmentInput = document.getElementById('currentDepartment');
+						departmentSelect.innerHTML = '<option value="">부서 선택</option>'; // 초기화
+						currentDepartmentInput.value = ''; // 초기화
+						data.department_list.forEach(dept => {
+							const option = document.createElement('option');
+							option.value = dept.structure_no;
+							option.textContent = dept.code_name;
+							if(dept.structure_no == data.department_no){
+								option.selected = true;
+								currentDepartmentInput.value = dept.code_name; // 현재 부서 표시
+							}
+							departmentSelect.appendChild(option);
+						});
+						// 팀 select + 현재 팀 input 세팅
+						const teamSelect = document.getElementById('editTeamSelect');
+						const currentTeamInput = document.getElementById('currentTeam');
+						teamSelect.innerHTML = '<option value="">팀 선택</option>'; // 초기화
+						currentTeamInput.value = '';
+						data.team_list.forEach(team => {
+							const option = document.createElement('option');
+							option.value = team.structure_no;
+							option.textContent = team.code_name;
+							if(team.structure_no == data.team_no){
+								option.selected = true;
+								currentTeamInput.value = team.code_name;
+							}
+							teamSelect.appendChild(option);
+						});
+						
+						// 직급이 '직접 입력'이면 직접입력 필드 보이게 하기
+						if(data.employee_position === '직접 입력'){
+							// document.getElementById('editCustomPositionInput').classList.remove('d-none'); // 직접 입력 input 보이게
+							// document.getElementById('currentEmployeePosition').readOnly = false; // 편집 가능하도록 readonly 해제
+							// document.getElementById('currentEmployeePosition').value = ''; // 비워두기
+							document.getElementById('editCustomPositionInput').classList.remove('d-none');
+							document.getElementById('editCustomPositionInput').required = true;
+						} else{
+							// document.getElementById('editCustomPositionInput').classList.add('d-none'); // 직접 입력 input 숨기기
+							// document.getElementById('currentEmployeePosition').readOnly = true; // 읽기 전용
+							document.getElementById('editCustomPositionInput').classList.add('d-none');
+							document.getElementById('editCustomPositionInput').required = false;
+						}
+							// 수정 모달 열기
+							editModal.show();
+					}else{
+							showAlert(data.res_msg);
+					}
+				})
+				.catch(error => {
+					console.error('회원 정보 불러오기 실패',error);
+					showAlert('회원 정보를 불러오는 데 실패했습니다.');
+				});
+		});
+	});
+	
+	// ============ 목록의 삭제 버튼 클릭시 ===================
+	let deleteEmployeeNo;
+	// structure_no로 코드명 매핑
+	function getStructureNameByNo(targetNo, structureList){
+		if(!targetNo || !structureList) return '';
+		const match = structureList.find(item => item.structure_no == targetNo);
+		return match ? match.code_name : '';
+	}
+	// 회원 삭제 버튼 클릭시 fetch로 회원 정보 가져오기
+	document.querySelectorAll('.deleteEmployeeBtn').forEach(btn => {
+		btn.addEventListener('click',function(){
+			deleteEmployeeNo = this.getAttribute('data-employee-no');
+			if(!deleteEmployeeNo) return;
+			
+			fetch(`/admin/getEmployeeDetail?employeeNo=${deleteEmployeeNo}`)
+				.then(response => response.json())
+				.then(data => {
+					if(data.res_code == 200){
+						// 값 채우기
+						document.getElementById('deleteEmployeeName').value = data.employee_name || '';
+						document.getElementById('deleteEmployeePosition').value = data.employee_position || '';
+						document.getElementById('deleteEmployeeDepartment').value = getStructureNameByNo(data.department_no, data.department_list);
+						document.getElementById('deleteEmployeeTeam').value = getStructureNameByNo(data.team_no,data.team_list);
+						document.getElementById('deleteEmployeeHireDate').value = data.employee_hire_date || '';
+						
+						// 삭제 모달 열기
+						deleteModal.show();
+					}else{
+						showAlert(data.res_msg);
+					}
+				})
+				.catch(error => {
+					console.error("Error",error);
+					showAlert("회원 정보 조회 중 오류가 발생했습니다.");
+				});
+		});
+	});
+	
+	// =================== 회원 생성 함수 =========================
+	function sendCreateEmployee(){
+		
+		const formData = new FormData(createForm);
+		const payload = {}; // JSON으로 변환할 데이터
+		for(const [key,value] of formData.entries()){
+			payload[key] = value;
+		}
+		if(payload.employee_position === '직접 입력'){  
+			payload.employee_position = payload.custom_position; 
+		}
+		delete payload.custom_position; // 커스텀 포지션 삭제
+		
+		fetch('/admin/createEmployee',{
+			method: 'POST',
+			headers : {
+				'Content-Type' : 'application/json',
+				'X-CSRF-TOKEN' : document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+				'X-CSRF-HEADER' : document.querySelector('meta[name="_csrf_header"]').getAttribute('content')
+			},
+			body : JSON.stringify(payload)
+		})
+		.then(response => response.json())
+		.then(data => {
+			if(data.res_code == 200) {
+				isFormEdited = false; // 수정 여부 모달 뜨지 않게 함
+				showAlert(data.res_msg,function(){
+					createModal.hide();
+					location.reload(); // 페이지 새로고침
+				});
+            }else{
+                showAlert(data.res_msg);
+            }
+		})
+		.catch(() => {
+			showAlert('회원 생성 중 오류가 발생했습니다.');
+		});
+	}
+	
+	// ================= 회원 수정 ====================
+	const hireDate = document.getElementById('editEmployeeHireDate').value;
+	const endDate = document.getElementById('editEmployeeEndDate').value;
+		// 회원 수정 함수
+		function sendUpdateEmployee(){
+			console.log("수정 함수 호출됨.");
+			const selectedPosition = document.getElementById('editEmployeePosition').value;
+			const customPosition = document.getElementById('editCustomPositionInput').value.trim();
+			
+			let finalPosition = selectedPosition;
+			if(selectedPosition === '직접 입력' && customPosition !== ''){
+				finalPosition = customPosition; // 직접 입력한 값으로 대체
+			}
+			
+			const departmentNo = document.getElementById('editDepartmentSelect').value;
+			const teamNo = document.getElementById('editTeamSelect').value;
+			const structureNo = teamNo || departmentNo; // 팀이 있으면 팀, 없으면 부서
+			
+			const currentData  = {
+					employee_name : document.getElementById('editEmployeeName').value.trim(),
+					employee_position : finalPosition.trim(),
+					// directory_phone : document.getElementById('editDirectoryPhone').value,
+					employee_birth : document.getElementById('editEmployeeBirth').value.replaceAll('-',''), // 하이픈 제거
+					employee_hire_date: document.getElementById('editEmployeeHireDate').value,
+					employee_end_date: document.getElementById('editEmployeeEndDate').value,
+					employee_employment_yn : document.getElementById('editEmployeeEmploymentYn') ? 
+							document.getElementById('editEmployeeEmploymentYn').value : originalData.employee_employment_yn, // input 없으면 원본값으로
+					structure_no : structureNo ? parseInt(structureNo) : null,
+					directory_zipcode : document.getElementById('editDirectoryZipcode').value.trim(),
+					directory_address : document.getElementById('editDirectoryAddress').value.trim()
+			};
+			
+			const payload = {employee_no : editingEmployeeNo};
+			
+			// 연락처가 null이 아닌 경우에만 추가
+			const phoneValue = document.getElementById('editDirectoryPhone').value.trim(); // 연락처 요소
+			if(phoneValue){
+				currentData.directory_phone = phoneValue; // 빈 문자열이 아닌 경우에만 추가
+			}
+			// 재직여부, structure정보
+			if(!payload.hasOwnProperty('employee_employment_yn')){
+				payload.employee_employment_yn = currentData.employee_employment_yn;
+			}
+			if(!payload.hasOwnProperty('structure_no')){
+				payload.structure_no = currentData.structure_no;
+			}
+			
+			// 생년월일이 수정된 경우, employee_pw도 추가
+			if(payload.employee_birth){
+				payload.employee_pw = currentData.employee_birth;
+			}
+			
+			// 날짜 필드 변환
+			if(currentData.employee_hire_date){
+				payload.employee_hire_date = currentData.employee_hire_date;
+			}
+			if(currentData.employee_end_date){
+				payload.employee_end_date = currentData.employee_end_date;
+			}
+			
+			for(const key in currentData){
+				// 수정된 값이면서 값이 비어있지 않은 경우만 payload에 추가
+				if(currentData[key] !== originalData[key] && currentData[key] !== '' && currentData[key] !== null && currentData[key] != undefined){
+					payload[key] = currentData[key];
+				}
+			}
+			
+			// 수정한게 하나도 없으면 경고
+			if(Object.keys(payload).length === 1){ // employee_no만 있을 경우
+				showAlert("변경된 내용이 없습니다.");
+				return;
+			}
+
+			console.log("payload 확인");
+			console.log(payload);
+			
+			// 서버로 수정 요청 보내기
+			fetch('/admin/updateEmployee',{
+				method : 'POST',
+				headers : {
+					'Content-Type' : 'application/json',
+					'X-CSRF-TOKEN' : document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+					'X-CSRF-HEADER' : document.querySelector('meta[name="_csrf_header"]').getAttribute('content')
+				},
+				body : JSON.stringify(payload)
+			})
+			.then(response => response.json())
+			.then(data => {
+				if(data.res_code == 200){
+					showAlert(data.res_msg,function(){
+						isEditFormEdited = false;
+						editModal.hide();
+						location.reload();
+					});
+				}else{
+					showAlert(data.res_msg);
+				}
+			})
+			.catch(error => {
+				console.error('회원 수정 실패',error);
+				showAlert('회원 수정 중 오류가 발생했습니다.');
+			});
+		}
+		
+		// ======================= 회원 삭제 기능 ====================================
+		// 회원 삭제 함수
+		function sendDeleteEmployee(){
+			if(!deleteEmployeeNo){
+				showAlert('삭제할 회원 정보가 없습니다.'); return;
+			}
+			// 퇴사일 input에서 값 가져오기
+			const endDate = document.getElementById('deleteEmployeeEndDate').value;
+			if(!endDate){
+				showAlert('퇴사일을 선택해주세요.'); return;
+			}
+			
+			// payload에 필요한 데이터 담기
+			const payload = {
+					employee_no : deleteEmployeeNo,
+					employee_end_date : endDate,
+					employee_employment_yn : 'N', // 퇴사 처리
+					visible_yn : 'N' // 주소록 숨김 처리
+			};
+			
+			fetch('/admin/deleteEmployee',{
+				method : 'POST',
+				headers : {
+				      'Content-Type': 'application/json',
+				      'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+				      'X-CSRF-HEADER': document.querySelector('meta[name="_csrf_header"]').getAttribute('content')					
+				},
+				body : JSON.stringify(payload)
+			})
+			.then(response => response.json())
+			.then(data => {
+				if(data.res_code == 200){
+					isDeleteFormEdited = false;
+					showAlert(data.res_msg,function(){
+						deleteModal.hide();
+						location.reload();
+					});
+				}else{
+					showAlert(data.res_msg);
+				}
+			})
+			.catch(error => {
+				console.error('회원 삭제 실패',error);
+				showAlert('회원 삭제 중 오류가 발생했습니다.');
+			})
+		};
+});
+</script>
+	
+</div><!-- mb-9 -->
+</main>
+</body>
+</html>

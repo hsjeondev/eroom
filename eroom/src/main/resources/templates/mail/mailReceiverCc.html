@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{include/layout}">
+<style>
+    .treeview-label-strong {
+      font-weight: bold;
+      text-decoration: underline;
+      color: #007bff;
+    }
+    .treeview-row {
+      pointer-events: none;
+    }
+    .treeview-text a {
+      text-decoration: none !important;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 5px 10px;
+    }
+
+    .treeview-text summary::marker,
+    .treeview-text a::before,
+    .treeview-text a::after {
+      display: none !important;
+      content: none !important;
+    }
+      .treeview-text {
+    cursor: pointer; /* 마우스 커서를 클릭 가능 모양으로 변경 */
+  }
+  
+  .treeview-text:hover {
+    background-color: #f0f4ff; /* 호버 시 살짝 색상 변화 */
+  }
+  </style>	  
+  <body>
+  
+    <main class="main" id="top" layout:fragment="content">
+			
+			<!-- <div class="text-dark p-1">
+			    <div class="attendance-card mx-auto">
+			        <div class="card shadow-sm border-0">
+			            <div class="card-body text-center p-4 d-flex flex-column justify-content-center align-items-center" style="height: 207.81px;">
+			                
+			                메일 아이콘
+			                <a th:href="@{/mail/receiverTo}">
+			                	<i class="fas fa-envelope fa-3x mb-3 text-primary"></i>
+							</a>
+			                숫자 표현
+			                <div>
+			                    <span style="font-size: 1.5rem; color: red; font-weight: 700;" th:text="${unreadMailCount}">0</span>
+			                    <span style="font-size: 1rem; color: gray;"> / </span>
+			                    <span style="font-size: 1rem; color: gray;" th:text="${totalMailCount}">0</span>
+			                </div>
+			                
+			                설명
+			                <div style="font-size: 0.9rem; margin-top: 5px; color: #888;">
+			                    읽지 않은 메일 / 총 메일
+			                </div>
+			
+			            </div>
+			        </div>
+			    </div>
+			</div>
+			<div class="col-md-4 mb-4">
+  <div class="card border-0 shadow-sm rounded-4 h-100">
+    <div class="card-body text-center d-flex flex-column justify-content-center">
+      <a th:href="@{/mail/receiverTo}" class="text-decoration-none">
+        <div class="mb-3">
+          <i class="fas fa-envelope fa-3x text-primary"></i>
+        </div>
+        <h5 class="fw-bold text-dark mb-1">메일함</h5>
+        <div class="d-flex justify-content-center align-items-center gap-2 mb-1">
+          <span class="fs-4 fw-bold text-danger" th:text="${unreadMailCount}">0</span>
+          <span class="fs-6 text-muted">/</span>
+          <span class="fs-6 text-muted" th:text="${totalMailCount}">0</span>
+        </div>
+        <div class="fs-6 text-secondary">읽지 않은 메일 / 전체</div>
+      </a>
+    </div>
+  </div>
+</div>
+		<div class="text-dark p-1">
+			<div class="attendance-card mx-auto">
+				<div class="card shadow-sm border-0">
+				  <div class="card-header" style="text-align: center; font-size: 1.5rem; font-weight: bold; padding: 15px;">
+					<span>메일</span>
+			      </div>
+				  <div class="card-body text-center p-4" style="height: 207.81px;">
+				  	<a th:href="@{/mail/receiverTo}">
+		               	<i class="fas fa-envelope fa-3x mb-0 text-primary"></i>
+					</a>
+			  			<div>
+		                    <span style="font-size: 1.5rem; color: red; font-weight: 700;" th:text="${unreadMailCount}">0</span>
+		                    <span style="font-size: 1rem; color: gray;"> / </span>
+		                    <span style="font-size: 1rem; color: gray;" th:text="${totalMailCount}">0</span>
+		                </div>
+		                
+						<div style="font-size: 0.9rem; margin-top: 5px; color: #888;">
+		                    읽지 않은 메일 / 총 메일
+		                </div>
+				  </div>
+				</div>
+			</div>
+        </div>
+			
+			<div class="card shadow-sm border-0 rounded-4">
+  <div class="card-header bg-light text-center py-3">
+    <h5 class="mb-0 fw-bold">📬 메일</h5>
+  </div>
+  <div class="card-body">
+    <div class="row text-center">
+      <div class="col">
+        <a th:href="@{/mail/receiverTo}" class="text-decoration-none">
+          <div class="fs-5 fw-bold text-danger" th:text="${unreadMailCount}">0</div>
+          <div class="text-muted">읽지 않은 메일</div>
+        </a>
+      </div>
+      <div class="col">
+        <a th:href="@{/mail/senderFrom}" class="text-decoration-none">
+          <div class="fs-5 fw-bold text-primary" th:text="${sentMailCount}">0</div>
+          <div class="text-muted">보낸 메일</div>
+        </a>
+      </div>
+      필요하면 더 추가
+      
+      <div class="col">
+        <a th:href="@{/mail/trash}" class="text-decoration-none">
+          <div class="fs-5 fw-bold text-secondary" th:text="${trashMailCount}">0</div>
+          <div class="text-muted">휴지통</div>
+        </a>
+      </div>
+     
+    </div>
+  </div>
+</div>
+			
+			<div class="card shadow-sm border-0 rounded-4">
+  <div class="card-header bg-light text-center py-3">
+    <h5 class="mb-0 fw-bold">📬 메일</h5>
+  </div>
+  <div class="card-body p-3">
+    <div class="d-flex justify-content-between text-muted mb-2">
+      <span>읽지 않은 메일</span>
+      <a th:href="@{/mail/receiverTo}" class="small text-decoration-none">더보기 &raquo;</a>
+    </div>
+    
+    <div th:each="mail, iterStat : ${unreadMails}" th:if="${iterStat.index < 3}">
+      <a th:href="@{/mail/detail/{id}(id=${mail.mailNo})}" class="d-block text-decoration-none mb-2">
+        <div class="text-dark fw-semibold text-truncate" th:text="${mail.mailTitle}">(제목 없음)</div>
+        <div class="text-muted fs-9 text-truncate" th:text="${mail.mailContent}">(내용 없음)</div>
+      </a>
+    </div>
+  </div>
+</div>
+			
+			<div class="card shadow-sm border-0 rounded-4">
+  <div class="card-header bg-light text-center py-3">
+    <h5 class="mb-0 fw-bold">📬 메일</h5>
+  </div>
+  <div class="card-body p-3">
+    <table class="table table-sm table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th scope="col" class="text-start">보낸 사람</th>
+          <th scope="col">제목</th>
+          <th scope="col" class="text-end">날짜</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="mail, iterStat : ${unreadMails}" th:if="${iterStat.index < 5}">
+          <td class="text-start" th:text="${mail.sender != null ? mail.sender.employeeName : '알 수 없음'}">홍길동</td>
+          <td>
+            <a th:href="@{/mail/detail/{id}(id=${mail.mailNo})}" class="text-decoration-none text-dark text-truncate d-block"
+               th:text="${!#strings.isEmpty(mail.mailTitle) ? mail.mailTitle : '(제목없음)'}">
+              메일 제목
+            </a>
+          </td>
+          <td class="text-end text-muted fs-9" th:text="${#temporals.format(mail.mailSentTime, 'MM.dd HH:mm')}">05.14 09:23</td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(unreadMails)}">
+          <td colspan="3" class="text-center text-muted">읽지 않은 메일이 없습니다.</td>
+        </tr>
+      </tbody>
+    </table> -->
+			
+			<!--  -->
+			<!-- <div class="text-white p-1">
+    <div class="attendance-card mx-auto">
+        <div class="card shadow-sm border-0">
+            <div class="card-header" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px;">
+                메일
+            </div>
+            Tab 메뉴
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-bold text-dark" style="font-size: 0.9rem;"></div>
+                <ul class="nav nav-underline fs-9 w-100" id="mailTab" role="tablist" style="margin-bottom: 0;">
+                    <li class="nav-item flex-grow-1 text-center" role="presentation">
+                        <a class="nav-link active" id="unreadMails-tab" data-bs-toggle="tab" href="#unreadMailsTab"
+                           role="tab" aria-controls="unreadMailsTab" aria-selected="true">읽지 않은 메일</a>
+                    </li>
+                    <li class="nav-item flex-grow-1 text-center" role="presentation">
+                        <a class="nav-link" id="sentMails-tab" data-bs-toggle="tab" href="#sentMailsTab"
+                           role="tab" aria-controls="sentMailsTab" aria-selected="false">보낸 메일</a>
+                    </li>
+                </ul>
+            </div>
+            
+            탭 내용
+            <div class="tab-content mb-4">
+                읽지 않은 메일
+                <div class="tab-pane fade show active" id="unreadMailsTab">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">수신자</th>
+                                <th scope="col">제목</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="mail : ${test}">
+                                <td th:text="${mail.Mail.sender.employeeName}"></td>
+                                <td th:text="${mail.Mail.mailTitle}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                보낸 메일
+                <div class="tab-pane fade" id="sentMailsTab">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">수신자</th>
+                                <th scope="col">제목</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="mail : ${sentMails}">
+                                <td th:text="${mail.receiver.employeeName}"></td>
+                                <td th:text="${mail.mailTitle}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+			<!-- 카드 시작 -->
+<div class="text-white p-1">
+    <div class="attendance-card mx-auto">
+        <div class="card shadow-sm border-0">
+            <!-- 헤더 -->
+            <div class="card-header text-center fw-bold" style="font-size: 1.2rem; padding: 15px;">
+                메일
+            </div>
+
+            <!-- 탭 메뉴 -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-bold text-dark" style="font-size: 0.9rem;"></div>
+                <ul class="nav nav-underline fs-9 w-100" id="mailTab" role="tablist" style="margin-bottom: 0;">
+                    <li class="nav-item flex-grow-1 text-center" role="presentation">
+                        <a class="nav-link active" id="unreadMails-tab" data-bs-toggle="tab" href="#unreadMailsTab"
+                           role="tab" aria-controls="unreadMailsTab" aria-selected="true">읽지 않은 메일</a>
+                    </li>
+                    <li class="nav-item flex-grow-1 text-center" role="presentation">
+                        <a class="nav-link" id="sentMails-tab" data-bs-toggle="tab" href="#sentMailsTab"
+                           role="tab" aria-controls="sentMailsTab" aria-selected="false">보낸 메일</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 스크롤 가능한 콘텐츠 영역 -->
+            <div class="tab-content mb-4" style="max-height: 300px; overflow-y: auto;">
+                <!-- 읽지 않은 메일 -->
+                <div class="tab-pane fade show active" id="unreadMailsTab">
+                    <table class="table table-striped text-center" style="width: 100%; margin: 0 auto; table-layout: fixed; font-size: 0.65rem;">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th scope="col">발신자</th>
+                                <th scope="col">제목</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="mail : ${receivedList}"
+                            	th:attr="onclick=|location.href='/mail/detail/${mail.Mail.mailNo}'|">
+                                <td th:text="${mail.Mail.sender.employeeName}"></td>
+                                <td th:text="${mail.Mail.mailTitle != null and !#strings.isEmpty(mail.Mail.mailTitle) ? mail.Mail.mailTitle : '( 제목 없음 )'}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 보낸 메일 -->
+                <div class="tab-pane fade" id="sentMailsTab">
+                    <table class="table table-striped text-center" style="width: 100%; margin: 0 auto; table-layout: fixed; font-size: 0.65rem;">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th scope="col">수신자</th>
+                                <th scope="col">제목</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="sentMail : ${sentMailList}"
+                            	th:attr="onclick=|location.href='/mail/detail/${sentMail.mailNo}'|">
+						        <td>
+						            <span th:with="size=${#lists.size(sentMail.receivers)}">
+						                <span th:if="${size == 1}" th:text="${sentMail.receivers[0].receiver.employeeName}"></span>
+						                <span th:if="${size > 1}">
+						                    <span th:text="${sentMail.receivers[0].receiver.employeeName}"></span>
+						                    <span th:text="' 외 ' + (${size} - 1) + '명'"></span>
+						                </span>
+						            </span>
+						        </td>
+                                <td th:text="${sentMail.mailTitle != null and !#strings.isEmpty(sentMail.mailTitle) ? sentMail.mailTitle : '( 제목 없음 )'}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- index 홈 카드 폐기된거 -->
+<!-- <div class="text-white p-1">
+  <div class="attendance-card mx-auto" style="max-width: 600px; height: 300px; display: flex; flex-direction: column;">
+    <div class="card shadow-sm border-0" style="display: flex; flex-direction: column; height: 100%;">
+      
+      헤더
+      <div class="card-header text-center fw-bold" style="font-size: 1.2rem; padding: 15px; flex-shrink: 0;">
+        메일
+      </div>
+
+      탭 메뉴
+      <div class="d-flex justify-content-between align-items-center mb-2" style="flex-shrink: 0;">
+        <div class="fw-bold text-dark" style="font-size: 0.9rem;"></div>
+        <ul class="nav nav-underline fs-9 w-100 mb-0" id="mailTab" role="tablist">
+          <li class="nav-item flex-grow-1 text-center" role="presentation">
+            <a class="nav-link active" id="unreadMails-tab" data-bs-toggle="tab" href="#unreadMailsTab"
+               role="tab" aria-controls="unreadMailsTab" aria-selected="true">읽지 않은 메일</a>
+          </li>
+          <li class="nav-item flex-grow-1 text-center" role="presentation">
+            <a class="nav-link" id="sentMails-tab" data-bs-toggle="tab" href="#sentMailsTab"
+               role="tab" aria-controls="sentMailsTab" aria-selected="false">보낸 메일</a>
+          </li>
+        </ul>
+      </div>
+
+      탭 내용 영역: flex-grow로 남은 공간 모두 차지 + 스크롤
+      <div id="mailListContainer" style="flex-grow: 1; min-height: 0; overflow-y: auto;">
+        탭 내용 넣기
+      </div>
+    </div>
+  </div>
+</div> -->
+
+			<!--  -->
+			<!-- <div class="text-white p-1">
+  <div class="attendance-card mx-auto">
+    <div class="card shadow-sm border-0">
+
+      상단 제목
+      <div class="card-header text-center py-3" style="font-size: 1.2rem; font-weight: bold;">
+        메일
+      </div>
+
+      탭 버튼
+      <div class="d-flex justify-content-between align-items-center px-3 pt-2">
+        <div class="fw-bold text-dark" style="font-size: 0.9rem;"></div>
+        <ul class="nav nav-underline fs-9 w-100" role="tablist">
+          <li class="nav-item flex-grow-1 text-center" role="presentation">
+            <a class="nav-link active" data-bs-toggle="tab" href="#tab-vehicle" role="tab" aria-selected="true">읽지 않은 메일</a>
+          </li>
+          <li class="nav-item flex-grow-1 text-center" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#tab-room" role="tab" aria-selected="false">보낸 메일</a>
+          </li>
+        </ul>
+      </div>
+
+      카드 본문
+      <div class="card-body pt-2 pb-3 px-3">
+        <div class="tab-content small" style="height: 100px; overflow-y: auto;">
+
+          차량 탭
+          <div class="tab-pane fade show active" id="tab-vehicle" role="tabpanel">
+            <table class="table table-sm table-striped mb-0 text-center" style="font-size: 0.65rem;">
+              <colgroup>
+                <col style="width: 33%;">
+                <col style="width: 34%;">
+                <col style="width: 33%;">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>보낸 사람</th>
+                  <th>제목</th>
+                  <th>시간</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="3">오늘 예약이 없습니다.</td>
+                </tr>
+                반복될 차량 예약 항목 예시
+                <tr>
+                  <td>쏘나타</td>
+                  <td>홍길동</td>
+                  <td>09:00 ~ 10:00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          회의실 탭
+          <div class="tab-pane fade" id="tab-room" role="tabpanel">
+            <table class="table table-sm table-striped mb-0 text-center" style="font-size: 0.65rem;">
+              <colgroup>
+                <col style="width: 33%;">
+                <col style="width: 34%;">
+                <col style="width: 33%;">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>회의실</th>
+                  <th>예약자</th>
+                  <th>시간</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="3">오늘 예약이 없습니다.</td>
+                </tr>
+                반복될 회의실 예약 항목 예시
+                <tr>
+                  <td>A회의실</td>
+                  <td>김민수</td>
+                  <td>14:00 ~ 15:30</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->
+			
+			
+			
+			
+			
+			
+			<!--  -->
+			<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#treeModal">트리 테스트</button>
+
+<div class="modal fade" id="treeModal" tabindex="-1" aria-labelledby="treeModalLabel" aria-hidden="true" data-bs-focus="false">
+  <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 550px; height: 400px;">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="treeModalLabel">조직도 선택</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+
+      <div class="modal-body px-4" style="height: 400px; overflow-y: auto;">
+<div class="row" style="height: 100%;">
+<div class="col-6">
+<ul class="treeview" id="treeviewTree">
+  <li class="treeview-list-item">
+    <p class="treeview-text">
+      <input type="checkbox" class="form-check-input me-2 root-checkbox" data-name="이룸 컴퍼니" data-no="root" onchange="handleCheck(this)">
+      <a href="javascript:void(0);"  data-bs-target="#tree-company" >
+        <span class="fa-solid fa-folder treeview-icon text-info-light"></span>
+        <span id="eroomCompanySpan" class="treeview-label-text fw-bold treeview-label-strong">이룸 컴퍼니</span>
+      </a>
+    </p>
+    <ul class="collapse show treeview-list" id="tree-company">
+      <li class="treeview-list-item" th:each="dept : ${departmentList}">
+        <p class="treeview-text ms-2">
+          <input type="checkbox" class="form-check-input me-2 dept-checkbox" th:attr="data-name=${dept.codeName}, data-no=${dept.separatorCode}" onchange="handleCheck(this)">
+          <a href="javascript:void(0);" th:attr="data-bs-toggle='collapse', data-bs-target='#dept-'+${dept.separatorCode}">
+            <span class="fa-solid fa-folder treeview-icon"></span>
+            <span class="treeview-label-text" th:text="${dept.codeName}">부서명</span>
+          </a>
+        </p>
+        <ul class="collapse treeview-list" th:id="'dept-'+${dept.separatorCode}">
+          <li class="treeview-list-item" th:each="team : ${teamMap[dept.codeName]}">
+            <p class="treeview-text ms-3">
+              <input type="checkbox" class="form-check-input me-2 team-checkbox" th:attr="data-name=${team.codeName}, data-no=${team.separatorCode}" onchange="handleCheck(this)">
+              <a href="javascript:void(0);" th:attr="data-bs-toggle='collapse', data-bs-target='#team-'+${team.separatorCode}">
+                <span class="fa-solid fa-file-lines treeview-icon"></span>
+                <span class="treeview-label-text" th:text="${team.codeName}">팀명</span>
+              </a>
+            </p>
+            <ul class="collapse treeview-list" th:id="'team-'+${team.separatorCode}">
+              <li class="treeview-list-item" th:each="emp : ${teamEmployeeMap[team.separatorCode]}">
+                <p class="treeview-text ms-4">
+                  <input type="checkbox" class="form-check-input me-2 emp-checkbox" th:attr="data-name=${emp.employee_name}, data-no=${emp.employee_no}" onchange="handleCheck(this)">
+                  <span class="fa-solid fa-user treeview-icon"></span>
+                  <span class="treeview-label-text" th:text="${emp.employee_name}">사원명</span>
+                </p>
+              </li>
+            </ul>
+          </li>
+          	<!-- 부서는 있지만 팀 없는 사람 -->
+			<li class="treeview-list-item" 
+			    th:each="emp : ${teamEmployeeMap[dept.separatorCode + '_notAssigned']}">
+			  <p class="treeview-text ms-3"> <!-- ← ms-4 에서 ms-3으로 맞춰줌 -->
+			    <input type="checkbox" class="form-check-input me-2 emp-checkbox"
+			           th:attr="data-name=${emp.employee_name}, data-no=${emp.employee_no}"
+			           onchange="handleCheck(this)">
+			    <span class="fa-solid fa-user treeview-icon"></span>
+			    <span class="treeview-label-text" th:text="${emp.employee_name}">사원명</span>
+			  </p>
+			</li>
+        </ul>
+      </li>
+      <!-- <li class="treeview-list-item">
+        <p class="treeview-text ms-2">
+          <input type="checkbox" class="form-check-input me-2" data-name="무소속" data-no="noTeam" onchange="handleCheck(this)">
+          <a href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#noTeam">
+            <span class="fa-solid fa-folder treeview-icon"></span>
+            <span class="treeview-label-text">무소속</span>
+          </a>
+        </p>
+        <ul class="collapse treeview-list" id="noTeam">
+          <li class="treeview-list-item" th:each="emp : ${teamEmployeeMap['noTeam']}">
+            <p class="treeview-text ms-4">
+              <input type="checkbox" class="form-check-input me-2 emp-checkbox" th:attr="data-name=${emp.employee_name}, data-no=${emp.employee_no}" onchange="handleCheck(this)">
+              <span class="fa-solid fa-user treeview-icon"></span>
+              <span class="treeview-label-text" th:text="${emp.employee_name}">사원명</span>
+            </p>
+          </li>
+        </ul>
+      </li> -->
+    </ul>
+  </li>
+</ul>
+</div>
+
+<div class="col-6 d-flex flex-column">
+  <!-- [1] 상단 고정 영역 -->
+  <div id="selectedResult"
+       class="border bg-white rounded p-2 mb-2 small"
+       style="position: sticky; top: 0; z-index: 2; background-color: white; ">
+    <strong>선택한 항목:</strong>
+    <div style="overflow-y: auto; max-height: 270px;" id="selectedTags" class="mt-1 flex-wrap gap-2"></div>
+  </div> 
+
+  <!-- [2] 중간: 빈 영역 (스크롤 여유) -->
+  <div class="flex-grow-1"></div>
+
+  <!-- [3] 하단 고정 영역 -->
+  <div class="text-end"
+       style="position: sticky; bottom: 0; z-index: 2; background-color: white;">
+    <button id="clearBtn" class="btn btn-light btn-sm" type="button">비우기</button>
+  </div>
+</div>
+
+
+</div>
+      </div>
+
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="confirmSelection()">선택 완료</button>
+      </div>
+    </div>
+  </div>
+</div>
+	<script>
+function handleCheck(checkbox) {
+  const name = checkbox.getAttribute('data-name');
+  const code = checkbox.getAttribute('data-no');
+  const li = checkbox.closest('li.treeview-list-item');
+
+  if (checkbox.checked) {
+    addTag(name, code);
+    handleHighlight(li);
+  } else {
+    removeTag(code);
+  }
+
+  updateChildren(checkbox, checkbox.checked);
+  updateParents(checkbox);
+}
+
+function updateChildren(checkbox, isChecked) {
+	  const li = checkbox.closest('li.treeview-list-item');
+	  if (!li) return;
+
+	  const descendants = li.querySelectorAll('input[type="checkbox"]');
+	  descendants.forEach(child => {
+	    if (child !== checkbox) {
+	      child.checked = isChecked;
+
+	      // 하위 태그 제거 (상위 클릭 시 기존 하위 태그 남는 문제 해결)
+	      const code = child.getAttribute('data-no');
+	      removeTag(code);
+	    }
+	  });
+	}
+
+
+function updateParents(checkbox) {
+	  let li = checkbox.closest('li.treeview-list-item');
+
+	  while (li) {
+	    const parentLi = li.parentElement.closest('li.treeview-list-item');
+	    if (!parentLi) break;
+
+	    const parentCheckbox = parentLi.querySelector(':scope > .treeview-text input[type="checkbox"]');
+	    const childCheckboxes = Array.from(parentLi.querySelectorAll(':scope > ul > li.treeview-list-item > .treeview-text input[type="checkbox"]'));
+
+	    const allChecked = childCheckboxes.length > 0 && childCheckboxes.every(cb => cb.checked);
+	    const someChecked = childCheckboxes.some(cb => cb.checked);
+
+	    if (parentCheckbox) {
+	      if (allChecked) {
+	        parentCheckbox.checked = true;
+
+	        // 상위만 tag
+	        const pname = parentCheckbox.getAttribute('data-name');
+	        const pcode = parentCheckbox.getAttribute('data-no');
+	        addTag(pname, pcode);
+
+	        // 하위 tag 제거
+	        childCheckboxes.forEach(cb => removeTag(cb.getAttribute('data-no')));
+
+	      } else if (someChecked) {
+	        parentCheckbox.checked = false;
+
+	        // 상위 tag 제거
+	        const pcode = parentCheckbox.getAttribute('data-no');
+	        removeTag(pcode);
+
+	        // 하위 중 체크된 것만 tag 추가
+	        childCheckboxes.forEach(cb => {
+	          const cname = cb.getAttribute('data-name');
+	          const ccode = cb.getAttribute('data-no');
+	          if (cb.checked) addTag(cname, ccode);
+	          else removeTag(ccode);
+	        });
+
+	      } else {
+	        parentCheckbox.checked = false;
+
+	        // 전부 제거
+	        const pcode = parentCheckbox.getAttribute('data-no');
+	        removeTag(pcode);
+	      }
+	    }
+
+	    li = parentLi;
+	  }
+	}
+
+
+
+function addTag(label, code) {
+  const tagWrap = document.getElementById("selectedTags");
+  if (document.getElementById(`tag-${code}`)) return;
+
+  const tag = document.createElement("span");
+  tag.className = "badge bg-primary text-white d-flex align-items-center";
+  tag.id = `tag-${code}`;
+  tag.innerHTML = `${label} <button type="button" class="btn-close btn-close-white btn-sm ms-1" onclick="removeTag('${code}', true)"></button>`;
+  tagWrap.appendChild(tag);
+}
+
+	function removeTag(code, skipCheckbox = false) {
+	  const tag = document.getElementById(`tag-${code}`);
+	  if (tag) tag.remove();
+
+	  if (!skipCheckbox) return;
+
+	  const checkbox = document.querySelector(`input[type="checkbox"][data-no="${code}"]`);
+	  if (checkbox && checkbox.checked) {
+	    checkbox.checked = false;
+	    handleCheck(checkbox); // 연쇄 동기화
+	  }
+	}
+
+
+function confirmSelection() {
+  const selected = document.querySelectorAll("#selectedTags .badge");
+  const result = Array.from(selected).map(el => el.id.replace('tag-', ''));
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 부서, 팀은 separatorCode 그리고 사원은 employeeNo가 result에 담깁니다~
+  // JSON으로 보내고 Controller에서는 @ResponseBody + 매개변수에는 @RequestBody List<String> 사용해서 받아서 쓰시면 됩니다. 
+  console.log("확정된 선택:", result);
+  // 부서, 팀은 separatorCode 그리고 사원은 employeeNo가 result에 담깁니다~
+  // JSON으로 보내고 Controller에서는 @ResponseBody + 매개변수에는 @RequestBody List<String> 사용해서 받아서 쓰시면 됩니다. 
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  // 여기서 result 데이터 가지고 쓰시면 됩니다
+  bootstrap.Modal.getInstance(document.getElementById('treeModal')).hide();
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  const tree = document.querySelector('#treeviewTree');
+  tree.addEventListener('click', function (e) {
+    if (e.target.tagName === 'INPUT') return;
+    const clickedLi = e.target.closest('li.treeview-list-item');
+    if (!clickedLi) return;
+
+    handleHighlight(clickedLi);
+  });
+});
+</script>
+
+<!-- 비우기 버튼 -->
+<script>
+	document.getElementById('clearBtn').addEventListener('click', resetTree);
+	
+	function resetTree() {
+		  // 1. 선택된 태그 비우기
+		  document.getElementById('selectedTags').innerHTML = '';
+
+		  // 2. 모든 체크박스 해제
+		  const checkboxes = document.querySelectorAll('#treeviewTree input[type="checkbox"]');
+		  checkboxes.forEach(cb => {
+		    cb.checked = false;
+		  });
+
+		  // 3. 강조 스타일 제거 (이룸 컴퍼니 제외)
+		  document.querySelectorAll('.treeview-icon.text-info-light').forEach(el => {
+		    // 이룸 컴퍼니 제외
+		    if (!el.closest('a')?.querySelector('#eroomCompanySpan')) {
+		      el.classList.remove('text-info-light');
+		    }
+		  });
+
+		  document.querySelectorAll('.treeview-label-text.treeview-label-strong').forEach(el => {
+		    if (el.id !== 'eroomCompanySpan') {
+		      el.classList.remove('treeview-label-strong');
+		    }
+		  });
+
+		  // 4. 트리 접기 (이룸 컴퍼니 제외)
+		  document.querySelectorAll('.treeview-list.collapse').forEach(ul => {
+		    if (ul.id !== 'tree-company') {
+		      ul.classList.remove('show');
+		    } else {
+		      ul.classList.add('show');
+		    }
+		  });
+		}
+
+
+</script>
+
+<!-- 색상 강조 -->
+<script>
+function handleHighlight(li) {
+	  if (!li) return; // ❗예외 처리
+
+	  // 기존 강조 제거
+	  document.querySelectorAll('.treeview-icon.text-info-light').forEach(el => el.classList.remove('text-info-light'));
+	  document.querySelectorAll('.treeview-label-text.treeview-label-strong').forEach(el => el.classList.remove('treeview-label-strong'));
+
+	  // 현재 강조
+	  const icon = li.querySelector('.treeview-icon');
+	  const label = li.querySelector('.treeview-label-text');
+	  if (icon) icon.classList.add('text-info-light');
+	  if (label) label.classList.add('treeview-label-strong');
+
+	  // 상위 강조
+	  let currentUl = li.parentElement;
+	  while (currentUl && currentUl.classList.contains('treeview-list')) {
+	    const parentLi = currentUl.closest('li.treeview-list-item');
+	    if (!parentLi) break;
+
+	    const parentIcon = parentLi.querySelector('.treeview-icon');
+	    const parentLabel = parentLi.querySelector('.treeview-label-text');
+	    if (parentIcon) parentIcon.classList.add('text-info-light');
+	    if (parentLabel) parentLabel.classList.add('treeview-label-strong');
+
+	    currentUl = parentLi.parentElement;
+	  }
+	}
+
+</script>
+				<!-- index 메일 카드 폐기된거 -->
+			<!-- <script >
+			document.addEventListener("DOMContentLoaded", function () {
+				  // 1. 페이지 로딩 시 처음 메일 개수 가져오기 (이미 구현된 fetch)
+				  fetch("/mail/listFragment")
+				    .then(response => response.text())
+				    .then(html => {
+				      document.getElementById("mailListContainer").innerHTML = html;
+				    });
+				  
+				  fetch("/mail/counts")
+				    .then(response => response.json())
+				    .then(data => {
+				      document.getElementById("unreadMailCount").innerText = data.unread;
+				      document.getElementById("totalMailCount").innerText = data.total;
+				    });
+
+				  // 2. WebSocket 연결 추가 (URL은 네가 사용 중인 주소에 맞게 수정)
+				  const senderNo = document.getElementsByName("employeeNo")[0].value;
+				  const socket = new WebSocket("ws://localhost:8080/ws/mail?senderNo="+senderNo); // 실제 주소로 변경
+				  socket.onopen = () => {
+		    	    };
+				  socket.onmessage = function (event) {
+				    const message = JSON.parse(event.data);
+
+				    // 3. 메일 수신 관련 메시지 수신 시 다시 fetch로 값 갱신
+				    if (message.type === "mail") {
+				      fetch("/mail/counts")
+				        .then(response => response.json())
+				        .then(data => {
+				          document.getElementById("unreadMailCount").innerText = data.unread;
+				          document.getElementById("totalMailCount").innerText = data.total;
+				        });
+				    }
+				  };
+				});
+			</script> -->
+	     
+    </main>
+  </body>
+</html>

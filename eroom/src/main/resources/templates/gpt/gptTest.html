@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko-KR" dir="ltr"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{include/layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<style>
+.support-chat-container {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  max-width: 360px;
+  width: 100%;
+}
+
+.support-chat-container.show-chat .support-chat {
+  display: block;
+}
+
+
+.support-chat {
+  display: none;
+}
+
+.btn-support-chat {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 10000;
+  border-radius: 50%;
+  padding: 14px 16px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+</style>
+
+<body>
+<main class="main" id="top">
+<div layout:fragment="content">
+
+
+<!-- Chat Widget -->
+<div class="support-chat-container">
+  <div class="container-fluid support-chat">
+    <div class="card bg-body-emphasis">
+      <div class="card-header d-flex flex-between-center px-4 py-3 border-bottom border-translucent">
+        <h5 class="mb-0 d-flex align-items-center gap-2">GPT Chat</h5>
+        <button type="button" class="btn btn-sm btn-outline-secondary btn-chat-close ms-auto">
+		  <i class="fa-solid fa-xmark"></i>
+		</button>
+      </div>
+
+      <div class="card-body chat p-0">
+        <div class="d-flex flex-column-reverse scrollbar h-100 p-3" id="chatBox">
+          <!-- 메시지가 여기에 쌓임 -->
+        </div>
+      </div>
+
+      <div class="card-footer d-flex align-items-center gap-2 border-top border-translucent ps-3 pe-4 py-3">
+        <div class="d-flex align-items-center flex-1 gap-3 border border-translucent rounded-pill px-4">
+          <input id="gptInput" class="form-control border-0 fs-9 px-0" type="text" placeholder="메시지를 입력하세요">
+        </div>
+        <button id="gptSendBtn" class="btn p-0 border-0 send-btn">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="btn btn-support-chat p-0 border border-translucent" id="chatToggleBtn">
+  <span class="fs-8 btn-text text-primary text-nowrap">Chat</span>
+  <span class="ping-icon-wrapper">
+    <span class="ping-icon-bg"></span>
+    <i class="fa-solid fa-circle ping-icon text-primary"></i>
+  </span>
+  <i class="fa-solid fa-headset text-primary fs-8"></i>
+</button>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const chatContainer = document.querySelector(".support-chat-container");
+  const toggleBtn = document.getElementById("chatToggleBtn");
+  const closeBtn = document.querySelector(".btn-chat-close");
+  const sendBtn = document.getElementById("gptSendBtn");
+  const input = document.getElementById("gptInput");
+
+  // 채팅창 열기/닫기 토글
+    toggleBtn.addEventListener("click", () => {
+      chatContainer.classList.toggle("show-chat");
+    });
+
+  // 닫기 버튼으로도 닫기 가능
+  if (closeBtn && chatContainer) {
+    closeBtn.addEventListener("click", () => {
+      chatContainer.classList.remove("show-chat");
+    });
+  }
+
+  // 메시지 전송 버튼 클릭
+  if (sendBtn && input) {
+    sendBtn.addEventListener("click", async () => {
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendMessage("user", text);
+      input.value = "";
+
+      appendMessage("loading", "...");
+      try {
+        const res = await fetch(`/gpt/ask?prompt=${encodeURIComponent(text)}`);
+        const data = await res.text();
+        removeLoading();
+        appendMessage("gpt", data);
+      } catch (e) {
+        removeLoading();
+        appendMessage("gpt", "⚠️ 오류: " + e.message);
+      }
+    });
+
+    // Enter 키 입력 시 전송
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+  }
+
+  // 메시지 UI 추가 함수
+  function appendMessage(role, content) {
+    const chatBox = document.getElementById("chatBox");
+    if (!chatBox) return;
+
+    const div = document.createElement("div");
+
+    if (role === "user") {
+      div.className = "text-end mt-2";
+      div.innerHTML = `<div class="d-inline-block bg-primary text-white rounded-pill py-2 px-3">${content}</div>`;
+    } else if (role === "gpt") {
+      div.className = "text-start mt-2";
+      div.innerHTML = `<div class="d-inline-block bg-light border rounded-pill py-2 px-3">${content}</div>`;
+    } else if (role === "loading") {
+      div.className = "text-start mt-2 loading";
+      div.innerHTML = `<div class="d-inline-block bg-light border rounded-pill py-2 px-3">${content}</div>`;
+    }
+
+    chatBox.prepend(div);
+  }
+
+  // 로딩 메시지 제거 함수
+  function removeLoading() {
+    const el = document.querySelector(".loading");
+    if (el) el.remove();
+  }
+});
+</script>
+
+
+
+
+
+</div>
+
+</main>
+
+
+</body>
+</html>

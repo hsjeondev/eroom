@@ -1,16 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java,windows,macos,intellij,eclipse,visualstudiocode,gradle,maven
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,windows,macos,intellij,eclipse,visualstudiocode,gradle,maven
 
-# static
-*.png
-*.webp
-*.jpeg
-*.svg
-*.jpg
-*.pdf
-*.ico
-*.mp4
-
 application-secret.properties
 .env
 HELP.md
@@ -20,6 +10,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+*application.yml
 
 ### Eclipse ###
 .metadata

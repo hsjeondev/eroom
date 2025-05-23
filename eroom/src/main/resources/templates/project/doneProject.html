@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{include/layout}">
+<head>
+<meta charset="UTF-8">
+<title>완료 프로젝트</title>
+</head>
+  <body>
+    <main class="main" id="top" layout:fragment="content">
+		        <div class="mb-9">
+          <div id="projectSummary" data-list='{"valueNames":["projectName","assignees","start","deadline","task","projectprogress","status","action"],"page":6,"pagination":true}'>
+            <div class="row mb-4 gx-6 gy-3 align-items-center">
+              <div class="col-auto">
+                <h2 class="mb-0">완료 프로젝트<span class="fw-normal text-body-tertiary ms-3" th:text="|(${projectCount})|">프로젝트 개수</span></h2>
+              </div>
+              <div class="col-auto"><a class="btn btn-primary px-5" th:href="@{/project/create}">프로젝트 생성</a></div>
+            </div>
+            <div class="table-responsive scrollbar">
+              <table class="table fs-9 mb-0 border-top border-translucent">
+                <thead>
+                  <tr>
+                    <th class="sort white-space-nowrap align-middle ps-0" scope="col" data-sort="projectName" style="width:30%;">프로젝트명</th>
+                    <th class="sort align-middle ps-3" scope="col" data-sort="assignees" style="width:10%;">PM</th>
+                    <th class="sort align-middle ps-3" scope="col" data-sort="start" style="width:10%;">시작일</th>
+                    <th class="sort align-middle ps-3" scope="col" data-sort="deadline" style="width:15%;">종료일</th>
+                    <th class="sort align-middle ps-3" scope="col" data-sort="task" style="width:12%;">진행도 </th>
+                    <th class="sort align-middle text-end" scope="col" data-sort="statuses" style="width:10%;">진행여부</th>
+                    <th class="sort align-middle text-end" scope="col" style="width:10%;"></th>
+                  </tr>
+                </thead>
+                <tbody class="list" id="project-list-table-body">
+                  <tr th:if="${#lists.isEmpty(projectList)}">
+				    <td colspan="7" class="text-center py-5 text-muted">
+				      완료된 프로젝트가 없습니다.
+				    </td>
+				  </tr>
+                
+                  <tr class="position-static" th:each="project : ${projectList}">
+                    <td class="align-middle time white-space-nowrap ps-0 projectName py-4"><a class="fw-bold fs-8" th:href="@{/project/detail/{id}/main(id=${project.project_no})}" 
+                    	th:text="${project.project_name}">프로젝트명</a></td>
+                    <td class="align-middle white-space-nowrap start ps-3 py-4">
+					<th:block th:each="member : ${project.project_members}">
+					    <p class="mb-0 fs-9 text-body"
+					       th:if="${member.project_manager == 'Y'}"
+					       th:text="${member.project_member.employeeName}">
+					      PM 이름
+					    </p>
+					  </th:block>
+					</td>
+                    <td class="align-middle white-space-nowrap start ps-3 py-4">
+                      <p class="mb-0 fs-9 text-body" th:text="${#temporals.format(project.project_start, 'yyyy.MM.dd')}">시작일</p>
+                    </td>
+                    <td class="align-middle white-space-nowrap deadline ps-3 py-4">
+                      <p class="mb-0 fs-9 text-body" th:text="${#temporals.format(project.project_end, 'yyyy.MM.dd')}">종료일</p>
+                    </td>
+                    <td class="align-middle white-space-nowrap ps-3 projectprogress">
+					  <p class="text-body-secondary fs-10 mb-0"
+					     th:text="|${project.progress} / 100|">진행도 / 100</p>
+					  <div class="progress" style="height:3px;">
+					    <div
+					      class="progress-bar bg-success"
+					      role="progressbar"
+					      th:style="'width:' + ${project.progress} + '%;'"
+					      th:aria-valuenow="${project.progress}"
+					      aria-valuemin="0"
+					      aria-valuemax="100">
+					    </div>
+					  </div>
+					</td>
+
+                    <td class="align-middle white-space-nowrap text-end statuses">
+					  <span
+					    class="badge badge-phoenix fs-10"
+					    th:classappend="${ 
+					      project.proceed == '진행 중' ? ' badge-phoenix-success' :
+					      project.proceed == '완료'     ? ' badge-phoenix-primary' :
+					      project.proceed == '보류'     ? ' badge-phoenix-secondary' :
+					      project.proceed == '진행 예정' ? ' badge-phoenix-warning' :
+					      '' 
+					    }"
+					    th:text="${project.proceed}">
+					    상태
+					  </span>
+					</td>
+
+                    <td class="align-middle text-end white-space-nowrap pe-0 action">
+                      <div class="btn-reveal-trigger position-static"
+					     th:if="${#lists.contains(
+					              project.project_members.?[is_manager == 'Y' or project_manager == 'Y']
+					                                       .![project_member.employeeNo],
+					              #authentication.principal.employee.employeeNo)}">
+					  <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs-10"
+					          type="button" data-bs-toggle="dropdown" data-boundary="window"
+					          aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+					    <span class="fas fa-ellipsis-h fs-10"></span>
+					  </button>
+					  <div class="dropdown-menu dropdown-menu-end py-2">
+					    <a class="dropdown-item text-danger"
+						   th:attr="onclick=|deleteProject(${project.project_no})|">
+						  삭제
+						</a>
+
+					  </div>
+					</div>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+            <div class="d-flex flex-wrap align-items-center justify-content-between py-3 pe-0 fs-9 border-bottom border-translucent">
+              <div class="d-flex">
+                <p class="mb-0 d-none d-sm-block me-3 fw-semibold text-body" data-list-info="data-list-info"></p><a class="fw-semibold" href="#!" data-list-view="*">전체 보기<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a><a class="fw-semibold d-none" href="#!" data-list-view="less">View Less<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a>
+              </div>
+              <div class="d-flex">
+                <button class="page-link" data-list-pagination="prev"><span class="fas fa-chevron-left"></span></button>
+                <ul class="mb-0 pagination"></ul>
+                <button class="page-link pe-0" data-list-pagination="next"><span class="fas fa-chevron-right"></span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <script>
+        function deleteProject(projectNo) {
+        	  if (!confirm("정말 이 프로젝트를 삭제하시겠습니까?")) return;
+        	  
+        	  console.log(projectNo);
+
+        	  fetch("/project/delete", {
+        	    method: "POST",
+        	    headers: {
+        	      "Content-Type": "application/json",
+        	      [document.querySelector('meta[name="_csrf_header"]').content]:
+        	        document.querySelector('meta[name="_csrf"]').content
+        	    },
+        	    body: JSON.stringify({ projectNo: projectNo })
+        	  })
+        	    .then(res => res.json())
+        	    .then(data => {
+        	      alert(data.res_msg);
+        	      if (data.res_code === "200") {
+        	        location.reload();
+        	      }
+        	    })
+        	    .catch(() => {
+        	      alert("프로젝트 삭제 중 오류가 발생하였습니다.");
+        	    });
+        	}
+
+        </script>
+    </main>
+  </body>
+</html>

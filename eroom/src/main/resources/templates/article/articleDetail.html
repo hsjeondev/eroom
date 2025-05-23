@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{include/layout}">
+  <body>
+    <main class="main" id="top" layout:fragment="content" style="background-color: #f8f9fa; min-height: 100vh; overflow-x: hidden;">
+    	<!-- <div class="card-body overflow-hidden"> -->
+    	<!-- <div class="row align-items-center justify-content-between g-3 mb-4">
+			상단 제목
+			<div class="d-flex justify-content-start">
+				<span class="fw-bold fs-6">공지 게시판</span>
+			</div>
+			<input type="hidden" id="myEmployeeNo"
+				th:value="${#authentication.principal.employee.employeeNo}">
+		</div> -->
+		<div class="d-flex flex-between-center pb-3 border-bottom border-translucent mb-4"><a class="btn btn-link p-0 text-body-secondary me-3" href="javascript:history.back()"><span class="fa-solid fa-angle-left fw-bolder fs-8"></span></a>
+                    <h3 class="flex-1 mb-0 lh-sm line-clamp-1"
+                    	>공지 게시판</h3>
+                  </div>
+    	<div class="container d-flex justify-content-center py-0">
+    	<div class="bg-white shadow rounded-3 p-4" style="width: 100%; max-width: 1400px; min-width: 800px; border: 1px solid #dee2e6;">
+                  <!-- <div class="d-flex flex-between-center pb-3 border-bottom border-translucent mb-4"><a class="btn btn-link p-0 text-body-secondary me-3" href="../../apps/email/inbox.html"><span class="fa-solid fa-angle-left fw-bolder fs-8"></span></a>
+                    <h3 class="flex-1 mb-0 lh-sm line-clamp-1">공지 게시판</h3>
+                    <div class="btn-reveal-trigger">
+                      <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none d-flex btn-reveal" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fas fa-ellipsis-h"></span></button>
+                      <div class="dropdown-menu dropdown-menu-end py-2">
+	                      <a class="dropdown-item" href="#!">수정</a>
+	                      <a class="dropdown-item text-danger" href="#!">삭제</a>
+	                      <a class="dropdown-item" href="#!">Download</a>
+	                      <a class="dropdown-item" href="#!">Report abuse</a>
+                      </div>
+                    </div>
+                  </div> -->
+                  <div class="overflow-x-hidden scrollbar email-detail-content">
+                    <div class="d-grid mb-3" style="grid-template-columns: 1fr auto 1fr; align-items: center;">
+						  <!-- 왼쪽 빈공간 -->
+						  <div><span th:if="${articleNotice.articleEmergencyYn == 'Y'}" class="badge bg-danger ms-2">긴급</span></div>
+						<input type="hidden" id="articleNo" th:value="${articleNotice.articleNo}" />
+						  <!-- 가운데 제목 -->
+						  <h4 class="text-center mb-5" 
+						  		th:text="${articleNotice.articleTitle}">게시글 제목
+						  	</h4> 
+						
+						  <!-- 오른쪽 관리자 + 메뉴 -->
+						  <div class="d-flex justify-content-end align-items-center">
+						    <span th:text="'작성자 : ' + ${articleNotice.employee.employeeName} + ' | 등록일 : ' + ${#temporals.format(articleNotice.articleRegDate, 'yyyy.MM.dd HH:mm')}"></span>
+						    <div class="btn-reveal-trigger"
+						    th:if="${#authentication.principal.employee.employeeNo == 51}">
+						      <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none d-flex btn-reveal"
+						              type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						        <span class="fas fa-ellipsis-h"></span>
+						      </button>
+						      <div class="dropdown-menu dropdown-menu-end py-2">
+						        <a class="dropdown-item" th:href="@{'/article/articleEdit/' + ${articleNotice.articleNo}}">수정</a>
+						        <a class="dropdown-item text-danger"
+									   
+									   onclick="openDeleteModal(this)">
+									   삭제
+									</a>
+						      </div>
+						    </div>
+						  </div>
+						</div>
+                    <div class="text-body-highlight fs-9 w-100 w-md-75 mb-8">
+					  <p class="mt-4 fs-7 lh-lg "
+					  	th:utext="${articleNotice.articleContent}">
+					    내용
+					  </p>
+					</div>
+                    <div class="d-flex align-items-center mb-5">
+                      <button class="btn btn-link text-body-highlight fs-8 text-decoration-none p-0" type="button">
+				        <span class="fa-solid fa-paperclip me-2"></span>
+				        <span th:text="${#lists.size(attachArticleNoticeList)} + ' 첨부 파일'"></span>
+				    </button>
+                    </div>
+                    <div class="row pb-11 border-bottom mb-4 gx-0 gy-2 border-translucent">
+					    <div th:each="attachment : ${attachArticleNoticeList}" class="col-auto me-3">
+					        <a class="text-decoration-none d-flex align-items-center" th:href="@{'/article/notice/file/download/' + ${attachment.driveAttachNo}}">
+					            <!-- 파일 아이콘 -->
+					            <div class="btn-icon btn-icon-xl border rounded-3 text-body-quaternary text-opacity-75 flex-column me-2">
+					                <span class="fa-solid fa-file fs-8 mb-1"></span>
+					            </div>
+					            <div>
+					                <!-- 파일명과 크기 표시 -->
+					                <h6 class="text-body-highlight" th:text="${attachment.driveOriName}"></h6>
+					                 <p class="fs-9 mb-0 text-body-tertiary lh-1"
+									   th:text="${#numbers.formatInteger(attachment.driveSize / 1024, 1)} + ' KB'">
+									</p>
+					            </div>
+					        </a>
+					    </div>
+					</div>
+                    <!-- <div class="d-flex justify-content-between">
+                      <button class="btn btn-phoenix-secondary me-1 text-nowrap px-2 px-sm-4">Reply<span class="fa-solid fa-reply ms-2 fs-10"></span></button>
+                      <button class="btn btn-phoenix-secondary me-1 text-nowrap px-2 px-sm-4">Reply All<span class="fa-solid fa-reply-all ms-2 fs-10"></span></button>
+                      <button class="btn btn-phoenix-secondary ms-auto text-nowrap px-2 px-sm-4">Forward<span class="fa-solid fa-share ms-2 fs-10"></span></button>
+                    </div> -->
+                  </div>
+                </div>
+                </div>
+                <!-- 삭제 확인 모달  -->
+                <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+				<div class="modal-header border-0">
+					<h5 class="modal-title text-dark">정말 삭제할까요?</h5>
+				</div>
+				<div class="modal-body text-center">
+					<p class="mb-0 text-body">
+						게시물을 삭제하시겠습니까?
+						
+					</p>
+				</div>
+				<div class="modal-footer justify-content-center border-0">
+					<button type="button" class="btn btn-phoenix-secondary" data-bs-dismiss="modal">취소</button>
+					<button type="button" class="btn btn-danger" id="confirmDeleteBtn">삭제</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 삭제 확인 모달 끝 -->
+	<!-- 삭제 완료 모달 -->
+	<div class="modal fade" id="deleteSuccessModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-dark">삭제 완료</h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-0 text-body">게시물이 성공적으로 삭제되었습니다.</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-primary" id="goBackBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 삭제 완료 모달 끝 -->
+				<script>
+		let targetArticleNo = null;
+		let confirmDeleteModalInstance = null;
+		  function openDeleteModal(element) {
+		    // targetArticleNo = element.getAttribute('data-article-no');
+		    targetArticleNo = document.getElementById('articleNo').value;
+		    console.log(targetArticleNo);
+		    const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+		    modal.show();
+		    confirmDeleteModalInstance = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+		    confirmDeleteModalInstance.show();
+		  }
+		
+		  document.addEventListener('DOMContentLoaded', function () {
+		    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+		
+		    confirmDeleteBtn.addEventListener('click', function () {
+		      if (targetArticleNo) {
+		        fetch('/article/notice/delete', {
+		          method: 'POST',
+		          headers: {
+		            'Content-Type': 'application/x-www-form-urlencoded',
+	            	'header': document.querySelector('meta[name="_csrf_header"]').content,
+                    'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+		          },
+		          body: `articleNo=${targetArticleNo}`
+		        })
+		        .then(response => {
+		          if (response.ok) {
+		        	  if (confirmDeleteModalInstance) {
+		                  confirmDeleteModalInstance.hide();
+		                }
+
+		        	  const deleteSuccessModal = new bootstrap.Modal(document.getElementById('deleteSuccessModal'));
+		              deleteSuccessModal.show();
+		            //window.location.href = response.url;
+		          } else {
+		            alert("삭제에 실패했습니다.");
+		          }
+		        })
+		        .catch(error => {
+		          console.error('삭제 요청 실패:', error);
+		          alert("오류가 발생했습니다.");
+		        });
+		      }
+		    });
+		  });
+		  document.getElementById('goBackBtn').addEventListener('click', function () {
+			    window.location.href = '/article/notice'; // 여기를 게시판 목록 URL로 바꿔주세요
+			  });
+		</script>
+    </main>
+  </body>
+  
+</html>

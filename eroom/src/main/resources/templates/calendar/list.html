@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{include/layout}">
+<head>
+  <title>전체 일정</title>
+
+<style>
+.fc-event-main::after {
+  display: none !important;
+}
+</style>
+
+</head>
+<body>
+  <main class="main" id="top" layout:fragment="content">
+    <div class="row g-0 mb-4 align-items-center">
+      <div class="col-5 col-md-6">
+        <h4 class="mb-0 text-body-emphasis fw-bold fs-md-6">전체 일정</h4>
+      </div>
+    </div>
+
+		<div class="calendar-outline mt-6 mb-9" id="appCalendar"></div>
+    
+    <button class="btn btn-primary" type="button" data-bs-toggle="modal"
+			data-bs-target="#tooltipModal" style="display: none;"
+			id="modalButton"></button>
+
+		<!-- 모달 창 -->
+		<div class="modal fade" id="tooltipModal" tabindex="-1"
+			aria-labelledby="tooltipModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content border border-translucent">
+					<div class="modal-header px-card border-0 position-relative">
+						<h5 class="mb-0 lh-sm text-body-highlight" id="tooltipModalLabel">부서 일정
+							상세조회</h5>
+						<button class="btn-close position-absolute top-0 end-0 mt-2 me-2"
+							type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body p-card py-0">
+						<input type="hidden" name="calendar_no" value="">
+						<div class="mb-3">
+							<strong>팀:</strong> <span id="eventTeam"></span>
+						</div>
+						<div class="mb-3">
+							<strong>일정:</strong> <span id="eventTitle"></span>
+						</div>
+						<div class="mb-3">
+							<strong>시작 시간:</strong> <span id="eventDate"></span>
+						</div>
+						<div class="mb-3">
+							<strong>종료 시간:</strong> <span id="eventEndDate"></span>
+						</div>
+						<div class="mb-3">
+							<strong>장소:</strong> <span id="eventLocation"></span>
+						</div>
+						<div class="mb-3">
+							<strong>설명:</strong> <span id="eventDescription"></span>
+						</div>
+					</div>
+					<div
+						class="modal-footer d-flex justify-content-between align-items-center border-0" >
+						<div class="d-flex">
+							
+						</div>
+						<div>
+							<button class="btn btn-primary px-4" type="button"
+								data-bs-dismiss="modal">확인</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+			
+
+    <script th:inline="javascript">
+      let employeePosition = /*[[${#authentication.principal.employee.employeePosition}]]*/ "";
+    </script>
+
+
+
+		<script>
+		document.addEventListener('DOMContentLoaded', function () {
+		    const calendarEl = document.getElementById('appCalendar'); 
+		    let selectedCalendarNo = null;
+			
+		    
+		    //WEEKVIEW는 NO Monthview만 나오게 설정, 한국어 , 왼쪽 상단에 저번달,다음달로 가는 화살표, 가운데는 년도,월
+		    const calendar = new FullCalendar.Calendar(calendarEl, {
+		      initialView: 'dayGridMonth',
+		      locale: 'ko',
+		      headerToolbar: {
+		        left: 'prev,next today',
+		        center: 'title',
+		        right: ''
+		      },
+		      buttonText: {
+		    	    today: '오늘' 
+		    	  },
+		      dayMaxEventRows: true,
+		      views: {
+		        dayGridMonth: {
+		          dayMaxEventRows: 3,
+		          moreLinkText: "더보기"		       
+		          }
+		      },
+		      eventDisplay: 'block',
+		      dayCellContent: function (info) {
+		        return info.date.getDate();
+		      },
+		      
+		      //일정 등록이 안되어있는 날을 클릭하면 일정을 등록할수 있게 하는 event
+		      dateClick: function (info) {
+		    	  
+		    	  if (employeePosition.trim() !== '관리자') {
+		    		  return;
+		    		}
+		      
+		        const dateStr = info.dateStr + "T09:00";
+		        document.getElementById('calendarStartTime').value = dateStr;
+		        document.getElementById('calendarEndTime').value = info.dateStr + "T18:00";
+
+		        const addEventModal = new bootstrap.Modal(document.getElementById('addEventModal'));
+		        addEventModal.show();
+		      },
+		      		    		        
+		      //등록된 일정을 클릭하면 상세조회가 나오는 fullcalendar의 event
+			eventClick: function (info) {
+			  const calendarNo = info.event.extendedProps.calendar_no;
+			  console.log("제발 가져와 !!!!!!!!! " + calendarNo);
+			
+			  // 날짜 포맷팅 옵션
+			  const options = {
+			    year: 'numeric',
+			    month: 'long',
+			    day: 'numeric',
+			    weekday: 'short',
+			    hour: '2-digit',
+			    minute: '2-digit',
+			    hour12: true
+			  };
+			  
+			  //관리자만 상세조회에서 수정/삭제 버튼이 보일 수 있게 설정
+			
+			
+			  // 1. 일정, 시간, 장소, 설명을 가져옵니다
+			  const title = info.event.title || '';
+			  const start = info.event.start; // 한 번만 선언
+			  const end = info.event.end || '';
+			  const location = info.event.extendedProps.location || '';
+			  const description = info.event.extendedProps.description || '';
+			  const teamName = info.event.extendedProps.teamName || '';
+			  document.getElementById('eventTeam').textContent = teamName;
+			
+			  // 날짜 포맷팅
+			  const date = start ? new Intl.DateTimeFormat('ko-KR', options).format(start) : '';
+			  const endDate = end ? new Intl.DateTimeFormat('ko-KR', options).format(end) : '';
+			
+			  // 2. 각각 항목을 채우고, 값이 없으면 해당 항목을 숨깁니다
+			  const eventTitleElement = document.getElementById('eventTitle');
+			  if (eventTitleElement) {
+			    if (title) {
+			      eventTitleElement.textContent = title;
+			    } else {
+			      eventTitleElement.parentElement.style.display = 'none'; // 제목 숨기기
+			    }
+			  }
+			  
+			  const teamElement = document.getElementById('eventTeam');
+			  if (teamElement) {
+			    const teamName = info.event.extendedProps.teamName || '';
+			    if (teamName) {
+			      teamElement.textContent = teamName;
+			    } else {
+			      teamElement.parentElement.style.display = 'none'; // 팀 숨기기
+			    }
+			  }
+			
+			  const eventDateElement = document.getElementById('eventDate');
+			  if (eventDateElement) {
+			    if (date) {
+			      eventDateElement.textContent = date;
+			    } else {
+			      eventDateElement.parentElement.style.display = 'none'; // 시작 시간 숨기기
+			    }
+			  }
+			
+			  const eventEndDateElement = document.getElementById('eventEndDate');
+			  if (eventEndDateElement) {
+			    if (endDate) {
+			      eventEndDateElement.textContent = endDate;
+			    } else {
+			      eventEndDateElement.parentElement.style.display = 'none'; // 종료 시간 숨기기
+			    }
+			  }
+			
+			  const eventLocationElement = document.getElementById('eventLocation');
+			  if (eventLocationElement) {
+			    if (location) {
+			      eventLocationElement.textContent = location;
+			    } else {
+			      eventLocationElement.parentElement.style.display = 'none'; // 장소 숨기기
+			    }
+			  }
+			
+			  const eventDescriptionElement = document.getElementById('eventDescription');
+			  if (eventDescriptionElement) {
+			    if (description) {
+			      eventDescriptionElement.textContent = description;
+			    } else {
+			      eventDescriptionElement.parentElement.style.display = 'none'; // 설명 숨기기
+			    }
+			  }
+					
+		    selectedCalendarNo = calendarNo;
+		
+		    const modalButton = document.getElementById('modalButton');
+		    if (modalButton) {
+		        modalButton.click(); // 모달 버튼 클릭하여 모달 열기
+		    } else {
+		        console.error('modalButton not found');
+		    }
+		},
+
+				
+		      //일정의 색상을 정해주는 event, E001 -> 개인 캘린더는 연한 연두색으로 지정
+		 	eventDidMount: function (info) {
+			  const separator = info.event.extendedProps.separator || "";
+			  const isHoliday = info.event.extendedProps?.type === 'holiday';
+			   //console.log(" separator 확인:", separator);
+			   const event = info.event;
+			   const teamName = event.extendedProps.teamName || '';
+			   const title = event.title;
+			
+			   // [팀명] 붙이기
+			   if (teamName && title && !title.startsWith(`[${teamName}]`)) {
+			    event.setProp("title", `[${teamName}] ${title}`);
+			   }
+			
+			  if (isHoliday) {
+			    const el = info.el;
+			    el.style.setProperty("background-color", "#FFF8B3", "important");
+			    el.style.setProperty("border", "1px solid #F5E79E", "important");
+			    el.style.setProperty("color", "#4B4B4B", "important");
+			    el.style.setProperty("pointer-events", "none", "important");
+			    el.style.setProperty("opacity", "1", "important");
+			    return;
+			  }
+			
+			  let backgroundColor = "#DDDDDD";
+			  let borderColor = "#CCCCCC";
+			  let textColor = "#000000";
+			
+			  // 회사 일정
+			  if (separator.startsWith("A")) {
+			    backgroundColor = "#F8D7DA";
+			    borderColor = "#F5C6CB";
+			    textColor = "#721C24";
+			  }
+			
+			  // 부서 일정
+			  if (separator.startsWith("T")) {
+			    backgroundColor = "#BDE0FE";  // 원하는 부서 색
+			    borderColor = "#7FBFFF";
+			    textColor = "#003366";
+			  }
+			
+			  const el = info.el;
+			  el.style.setProperty("background-color", backgroundColor, "important");
+			  el.style.setProperty("border", `1px solid ${borderColor}`, "important");
+			  el.style.setProperty("color", textColor, "important");
+			
+			  // 추가 스타일 보완 
+			  el.style.setProperty("border-radius", "8px", "important");
+			  el.style.setProperty("padding", "4px 8px", "important");
+			  el.style.setProperty("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.1)", "important");
+			  el.style.setProperty("font-weight", "500", "important");
+			  el.style.setProperty("font-size", "14px", "important");
+			
+			  const eventMain = el.querySelector(".fc-event-main");
+			  if (eventMain) {
+			    eventMain.style.setProperty("background-color", backgroundColor, "important");
+			    eventMain.style.setProperty("border-color", borderColor, "important");
+			    eventMain.style.setProperty("color", textColor, "important");
+			    eventMain.style.setProperty("border-radius", "8px", "important");
+			  }
+			}
+		});
+
+		    
+		    //부서와 회사 캘린더의 정보를 가져옴
+		    //공휴일도 추가
+		    calendar.addEventSource({
+		    	  url: '/calendar/list/all',
+		    	  method: 'GET',
+		    	  failure: () => console.error('불러오기 실패'),
+		    	});
+		    	calendar.addEventSource({
+		    		  events: function (fetchInfo, successCallback, failureCallback) {
+		    			    console.log("✅ 공휴일 fetch 함수 실행됨");
+
+		    		    const apiKey = 'AIzaSyCjXiu1ShbhE0XenBtciLx8ezU-mcZI0R0';
+		    		    const calendarId = 'ko.south_korea%23holiday@group.v.calendar.google.com';
+		    		    const timeMin = new Date(fetchInfo.start).toISOString();
+		    		    const timeMax = new Date(fetchInfo.end).toISOString();
+		    		    const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${timeMin}&timeMax=${timeMax}&orderBy=startTime&singleEvents=true`;
+
+		    		    fetch(url)
+		    		      .then(response => response.json())
+		    		      .then(data => {
+		    		        //console.log("공휴일 API 응답 확인:", data); 
+		    		        const holidays = data.items.map(item => ({
+		    		          title: item.summary,
+		    		          start: item.start.date,
+		    		          allDay: true,
+		    		          extendedProps: { type: 'holiday' }
+		    		        }));
+		    		        successCallback(holidays);
+		    		      })
+		    		      .catch(error => {
+		    		        //console.error("공휴일 불러오기 실패 😢", error);
+		    		        failureCallback(error);
+		    		      });
+		    		  }
+		    		});
+
+		 	
+		
+
+		
+		    
+		
+		    
+			
+			calendar.render();
+		
+		})
+  	
+    	</script>
+  </main>
+</body>
+</html>

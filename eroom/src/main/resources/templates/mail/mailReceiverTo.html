@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html 
+lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{include/layout}">
+	  
+<head>
+<meta charset="UTF-8">
+<title>받은 메일함</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+</head>
+  <body>
+    <main class="main" id="top" layout:fragment="content">
+      <div class="row align-items-center justify-content-between g-3 mb-4">
+		<!-- 상단 제목 -->
+		<div class="d-flex justify-content-start">
+			<span class="fw-bold fs-6">받은 메일함</span>
+		</div>
+		<input type="hidden" id="myEmployeeNo"
+			th:value="${#authentication.principal.employee.employeeNo}">
+	</div>
+   <div id="mailSummary" data-list='{"valueNames":["senderName", "mailTitle", "mailContent", "sendTime"], "page":6, "pagination":true}'>   
+      <div class="row gx-lg-6 gx-3 py-4 z-2 position-sticky bg-body email-header">
+            <div class="col-auto"><a class="btn btn-primary email-sidebar-width d-none d-lg-block" th:href="@{mailCreate}">메일 쓰기</a>
+            </div> 
+            <div class="col-auto d-lg-none"><a class="btn btn-primary px-3 px-sm-4" th:href="@{mailCreate}"> <span class="d-none d-sm-inline-block">메일 쓰기</span><span class="d-sm-none fas fa-plus"></span></a></div>
+            <div class="col-auto flex-1">
+              
+              <div class="search-box w-100" style="max-width: 250px; position: absolute; right: 20px;">
+              <form class="position-relative">
+                <input class="form-control search-input search" type="search" placeholder="검색" aria-label="Search" />
+                <span class="fas fa-search search-box-icon"></span>
+              </form>
+            </div>
+            </div>
+       </div>
+       <div class="px-lg-1">
+                <div class="d-flex align-items-center flex-wrap position-sticky pb-2 bg-body z-2 email-toolbar inbox-toolbar">
+                  <div class="d-flex align-items-center flex-1 me-2">
+                    <button class="btn btn-sm p-0 me-2" type="button" onclick="location.reload()"><span class="text-primary fas fa-redo fs-10"></span></button>
+                    <p class="fw-semibold fs-10 text-body-tertiary text-opacity-85 mb-0 lh-sm text-nowrap">새로 고침</p>
+                  </div>
+                  <div class="d-flex">
+                  	<select class="form-control search-input search" onchange="location = this.value;">
+                  		<option disabled selected>정렬 선택</option>
+					    <option value="?sortOrder=latest" th:selected="${sortOrder == 'latest'}">최신순</option>
+					    <option value="?sortOrder=oldest" th:selected="${sortOrder == 'oldest'}">오래된순</option>
+					</select>
+                  </div>
+                </div>
+                <!-- 범용성 생각해서 일단 보류 -->
+                <div class="border-top border-translucent py-2 d-flex justify-content-between">
+                  <div class="form-check mb-0 fs-8">
+                    <input class="form-check-input" type="checkbox" data-bulk-select-row="data-bulk-select-row" id="checkAll"/>
+                  </div>
+                  <div>
+                    <button id="deleteBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="휴지통"><span class="fas fa-trash fs-10"></span></button>
+                    <button id="starBtn" class="btn p-0 me-2 text-body-quaternary hover text-body-tertiary text-opacity-85" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="중요"><span class="fas fa-star fs-10"></span></button>
+                  </div>
+                </div>
+                <!-- 범용성 생각해서 일단 보류 -->
+                
+                <!-- 메일 목록 스타트부분 -->
+                
+                <div th:if="${#lists.isEmpty(receivedMails)}">
+                	<div class="col-12">
+							<div class="alert alert-light text-center border border-secondary-light rounded py-4 fs-6 fw-semibold text-body-secondary">
+								<i class="fa-solid fa-circle-info me-2 text-secondary"></i>메일이 없습니다.
+							</div>
+						</div>
+                </div>
+                <div class="list">
+                 <div class="border-top border-translucent hover-actions-trigger py-3"
+                 		th:if="${!#lists.isEmpty(receivedMails)}"
+                 		th:each="receiverMail : ${receivedMails}"
+                 		th:onclick="|location.href='@{/mail/detail/{id}(id=${receiverMail.mail.mailNo})}'|"
+                 		th:classappend="${receiverMail.mailReceiverReadYn == 'N'} ? 'bg-primary-subtle text-primary-emphasis' : ''">
+                  <div class="row align-items-sm-center gx-2">
+                    <div class="col-auto">
+                      <div class="d-flex flex-column flex-sm-row">
+                        <input class="form-check-input mb-2 m-sm-0 me-sm-2 mail_checkbox" type="checkbox" id="checkbox-1" data-bulk-select-row="data-bulk-select-row" 
+                        		th:value="${receiverMail.mail.mailNo}"
+                        		onclick="event.stopPropagation()"/>
+                        <!-- 별 박스 -->
+                        <!-- <button class="btn p-0"><span class="fas text-warning fa-star"></span></button> -->
+                      	<form th:action="@{/mail/status/important/{id}(id=${receiverMail.mail.mailNo})}" method="post">
+						    <input type="hidden" name="redirectUrl" value="/mail/receiverTo" />
+						    <button class="btn p-0" type="submit" onclick="event.stopPropagation()">
+						        <!-- <span th:classappend="${
+						            mailStatusMap[receiverMail.receiver.employeeNo]?.mailStatusImportantYn == 'Y' 
+						                ? 'fas text-warning fa-star' 
+						                : 'far fa-star'
+						        }"></span> -->
+						        <span th:class="'fa-star ' + (${mailStatusMap[receiverMail.mail.mailNo + '_' + receiverMail.receiver.employeeNo]?.mailStatusImportantYn} == 'Y' ? 'fas text-warning fa-star' : 'far fa-star')"></span>
+						    </button>
+						</form>
+                      </div>
+                    </div>
+                    
+                    <!-- 프로필 사진 이미지 부분  -->
+                    <!-- <div class="col-auto">
+                      <div class="avatar avatar-s  rounded-circle">
+                        <img class="rounded-circle " src="../../assets/img/team/60.webp" alt="" />
+				
+                      </div>
+                    </div> -->
+                    <!-- <div class="col-auto" th:each="profiles : ${profiles}">
+    <div class="avatar avatar-s rounded-circle" 
+         th:if="${profiles.mail_receiver_no == receiverMail.mailReceiverNo}">
+        프로필 이미지 URL을 동적으로 설정
+        <p th:text="${profiles.profile_image_url}"></p>
+        <img th:src="@{${profiles.profile_image_url}}" alt="수신자 프로필 이미지" class="rounded-circle" />
+    </div>
+</div> -->
+                    <div class="col-auto">
+					  <a class="inbox-link fs-9 senderName"
+					     th:href="@{/mail/detail/{id}(id=${receiverMail.mail.mailNo})}"
+					     th:classappend="${receiverMail.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
+					     th:text="${receiverMail.mail != null and receiverMail.mail.sender != null ? receiverMail.mail.sender.employeeName : '알 수 없음'}">
+					     보낸 사람
+					  </a>
+					  <!-- 조금 떨어져 있으면 좋겠음  -->
+					  <span>|</span>
+					  <!-- <span class="inbox-link fs-9"
+					  		th:classappend="${receiverMail.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
+					        th:text="${receiverMail.mail.mailTitle}">
+					  </span> -->
+					  <span 
+					  		th:classappend="${receiverMail.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
+					  		class="inbox-link fs-9 text-body-emphasis mailTitle" th:text="${receiverMail.mail.mailTitle != null and !#strings.isEmpty(receiverMail.mail.mailTitle) ? receiverMail.mail.mailTitle : '(제목없음)'}">
+					 </span>
+					</div>
+                    <div class="col-auto ms-auto">
+                      <!-- <div class="hover-actions end-0">
+                        <button class="btn btn-phoenix-secondary btn-icon dropdown-toggle dropdown-caret-none" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fa-solid fa-ellipsis"></span></button>
+                        <div class="dropdown-menu dropdown-menu-end py-2">
+                        <form th:action="@{/mail/status/important/{id}(id=${receiverMail.mail.mailNo})}" method="post">
+						  <input type="hidden" name="redirectUrl" value="/mail/receiverTo" />
+						  <button type="submit" class="dropdown-item">⭐중요 표시</button>
+						</form>
+                        <form th:action="@{/mail/trash/{id}(id=${receiverMail.mail.mailNo})}" method="post">
+                        	<input type="hidden" name="redirectUrl" value="/mail/receiverTo"/>
+						  <button type="submit" class="dropdown-item">🗑️휴지통</button>
+						</form>
+						
+                        <a class="dropdown-item text-danger" href="#!">삭제</a>
+                        </div>
+                      </div> -->
+                      
+                      
+                      <!-- 04/17 나중에 시간 남으면 좀 더 구성해보기 일단 전체 시간 다 보이게 설정함 -->
+                       <span class="fs-10 fw-bold sendTime"
+					      th:text="${#temporals.format(receiverMail.mail.mailSentTime, 'yyyy.MM.dd HH:mm:ss')}">
+					  </span> 
+					
+                    </div>
+                  </div>
+                  <div class="ms-4 mt-n3 mt-sm-0 ms-sm-11">
+					  <div class="d-block inbox-link"
+					     
+					     th:data-receiver-id="${#authentication.principal.employee.employeeNo}">
+					     
+					     <!-- <span class="fs-9 line-clamp-1 mailTitle"
+					           th:classappend="${receiverMail.mailReceiverReadYn == 'N'} ? 'fw-bold text-body-emphasis' : 'text-body-secondary'"
+					           th:text="${receiverMail.mail.mailTitle}">
+					     </span> -->
+						<span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent" th:utext="${receiverMail.mail.mailContent != null and !#strings.isEmpty(receiverMail.mail.mailContent) ? receiverMail.mail.mailContent : '(내용없음)'}"></span>
+					     <!-- <span class="fs-9 ps-0 text-body-tertiary mb-0 line-clamp-2 mailContent"
+					           th:utext="${receiverMail.mail.mailContent}">
+					     </span> -->
+					  </div>
+					</div>
+                </div>
+                
+                </div>
+                		<div class="d-flex justify-content-center mt-3">
+							<div class="d-flex">
+								<button class="page-link disabled" data-list-pagination="prev"
+									disabled>
+									<i class="fas fa-chevron-left"></i>
+								</button>
+								<ul class="mb-0 pagination">
+									<li class="active">
+										<button class="page" type="button" data-i="1" data-page="5">1</button>
+									</li>
+								</ul>
+								<button class="page-link pe-0" data-list-pagination="next"
+									disabled>
+									<i class="fas fa-chevron-right"></i>
+								</button>
+							</div>
+						</div>
+           </div>		
+         </div>
+         <!-- 메일 선택 모달  -->
+         <div class="modal fade" id="selectMailAlertModal" tabindex="-1" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered modal-sm">
+		    <div class="modal-content bg-light text-body rounded-3 shadow-lg border border-secondary-light">
+		      <div class="modal-header border-0">
+		        <h5 class="modal-title text-dark">안내</h5>
+		      </div>
+		      <div class="modal-body text-center">
+		        <p class="mb-0 text-body">메일을 선택해주세요.</p>
+		      </div>
+		      <div class="modal-footer justify-content-center border-0">
+		        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+      <!-- 메일 선택 모달 끝 -->
+         <script>
+         
+         
+         const checkAll = document.getElementById('checkAll');
+         checkAll.addEventListener('change', function () {
+           const isChecked = this.checked;
+           const checkboxes = document.querySelectorAll('.mail_checkbox');
+           checkboxes.forEach(cb => cb.checked = isChecked);
+         });
+         function getSelectedMailNos() {
+        	    return Array.from(document.querySelectorAll('.mail_checkbox:checked'))
+        	      .map(cb => cb.value);
+        	  }
+
+        	  function sendBulkUpdate(url) {
+        	    const selected = getSelectedMailNos();
+        	    if (selected.length === 0) {
+        	        const modal = new bootstrap.Modal(document.getElementById("selectMailAlertModal"));
+        	        modal.show();
+        	        return;
+        	      }
+
+        	    fetch(url, {
+        	      method: 'POST',
+        	      headers: { 
+						'Content-Type': 'application/json' ,
+						'header': document.querySelector('meta[name="_csrf_header"]').content,
+                        'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+						},
+        	      body: JSON.stringify(selected)
+        	    }).then(res => {
+        	      if (res.ok) location.reload();
+        	      else alert("처리 중 오류가 발생했습니다.");
+        	    });
+        	  }
+
+        	  document.getElementById('deleteBtn').addEventListener('click', function () {
+        	    sendBulkUpdate('/mail/trash');
+        	  });
+
+        	  document.getElementById('starBtn').addEventListener('click', function () {
+        	    sendBulkUpdate('/mail/important');
+        	  });
+         
+        	  const mailList = new List('mailSummary', {
+            	  valueNames: ['senderName', 'mailTitle', 'mailContent', 'sendTime'],
+            	  page: 6,
+            	  pagination: true
+            	});
+         document.addEventListener("DOMContentLoaded", function() {
+        	 	const senderNo = document.getElementById("myEmployeeNo").value; 
+        	    const socket = new WebSocket("ws://localhost:8080/ws/mail?senderNo="+senderNo);  // wss://로 수정 필요 시, 변경
+
+        	    socket.onopen = () => {
+        	      console.log("메일 웹소켓 연결 성공");
+        	    };
+
+        	    socket.onmessage = (event) => {
+        	      const data = JSON.parse(event.data);
+        	      if (data.type === "mail") {
+        	        console.log("새 메일 도착", data);
+        	        fetchNewMails(); // 새 메일 도착 시 받은 메일 목록 Ajax로 갱신
+        	      }
+        	    };
+
+        	    socket.onerror = (error) => {
+        	      console.error("웹소켓 오류:", error);
+        	    };
+
+        	    socket.onclose = () => {
+        	      console.log("웹소켓 연결 종료");
+        	    };
+
+        	    // 새로운 메일을 갱신하는 함수
+        	    function fetchNewMails() {
+        	      fetch('/mail/receiverTo/fragment')
+        	        .then(response => response.text())
+        	        .then(html => {
+        	          // 갱신된 HTML로 mailSummary 콘텐츠 변경
+        	          const mailSummary = document.querySelector('#mailSummary');
+        	          mailSummary.innerHTML = "";
+        	          mailSummary.innerHTML = html;
+        	          // 해결 방법 찾다가 시간 너무 써서 일단 리로드로 해결
+        	          location.reload();
+        	          // List.js 재초기화
+        	          initializeListJs();
+        	        })
+        	        .catch(error => console.error('메일 목록 갱신 실패:', error));
+        	    }
+
+        	    // List.js 초기화 함수
+        	    function initializeListJs() {
+        	      const options = {
+        	        valueNames: ["senderName", "mailTitle", "mailContent", "sendTime"],
+        	        page: 6,
+        	        pagination: true
+        	      };
+
+        	      // 기존 List.js 인스턴스를 초기화 후 새로 생성
+        	      if (window.mailList && typeof window.mailList.destroy === "function") {
+            			window.mailList.destroy();  // 기존 인스턴스가 있다면 제거
+        			}
+
+        	      window.mailList = new List('mailSummary', options);  // 'mailSummary'를 List.js에 연결
+        	    }
+
+        	    // 초기 List.js 설정 (페이지 로딩 시 초기화)
+        	    initializeListJs();
+        	});
+         </script>
+    </main>
+  </body>
+</html>

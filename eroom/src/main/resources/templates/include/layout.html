@@ -2,38 +2,111 @@
 <html xmlns:th="http://www.thymeleaf.org" 
 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+  /* 채팅 열기/닫기 버튼 고정 */
+  .btn-support-chat {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1050;
+    border-radius: 2rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+
+  /* 채팅창 고정 위치 */
+  .support-chat-container {
+    position: fixed;
+    bottom: 80px; /* 버튼 위쪽에 배치 */
+    right: 24px;
+    width: 350px;
+    max-height: 600px;
+    z-index: 1060;
+    display: none;
+  }
+
+  .support-chat-container.show {
+    display: block;
+  }
+
+  /* 반응형 보완 (작은 화면에서 자동 숨김 처리 등은 필요시 추가 가능) */
+  @media (max-width: 576px) {
+    .support-chat-container {
+      width: 90%;
+      right: 5%;
+      bottom: 90px;
+    }
+  }
+    .chat-bubble {
+    max-width: 75%;
+    padding: 10px 14px;
+    margin: 6px 0;
+    border-radius: 20px;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+
+  .chat-bubble.user {
+    align-self: flex-end;
+    background-color: #dbeafe; /* 연한 파랑 */
+    color: #1e3a8a;
+  }
+
+  .chat-bubble.gpt {
+    align-self: flex-start;
+    background-color: #f3f4f6; /* 연한 회색 */
+    color: #111827;
+  }
+
+  #chatMessages {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 100%;
+  }
+</style>
+  
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <!-- 화면 전화 때는 고려할 필요 없지만 post, put, delete에서는 csrf 설정 필요 -->
 	<!-- 모든 화면에 적용되는 layout이기에 여기에 사용자 브라우저 정보를 가지고 있는 _csrf 설정 -->
-	<!-- <meta id="_csrf" name="_csrf" th:attr="content=${_csrf.token}">
-	<meta id="_csrf_header" name="_csrf_header" th:attr="content=${_csrf.headerName}"> -->
+	<meta id="_csrf" name="_csrf" th:attr="content=${_csrf.token}"/>
+	<meta id="_csrf_header" name="_csrf_header" th:attr="content=${_csrf.headerName}"/>
 
     <!--    Document Title-->
     <title>Eroom</title>
 
     <!--    Favicons-->
-    <link rel="apple-touch-icon" sizes="180x180" th:href="@{assets/img/favicons/apple-touch-icon.png}">
-    <link rel="icon" type="image/png" sizes="32x32" th:href="@{assets/img/favicons/favicon-32x32.png}">
-    <link rel="icon" type="image/png" sizes="16x16" th:href="@{assets/img/favicons/favicon-16x16.png}">
-    <link rel="shortcut icon" type="image/x-icon" th:href="@{assets/img/favicons/favicon.ico}">
-    <link rel="manifest" th:href="@{assets/img/favicons/manifest.json}">
-    <meta name="msapplication-TileImage" th:content="@{assets/img/favicons/mstile-150x150.png}">
-    <meta name="theme-color" content="#ffffff">
-    <script th:src="@{vendors/simplebar/simplebar.min.js}"></script>
-    <script th:src="@{assets/js/config.js}"></script>
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/assets/img/favicons/apple-touch-icon.png}"/>
+    <link rel="icon" type="image/png" sizes="32x32" th:href="@{/assets/img/favicons/favicon-32x32.png}"/>
+    <link rel="icon" type="image/png" sizes="16x16" th:href="@{/assets/img/favicons/favicon-16x16.png}"/>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicons/favicon.ico}"/>
+    <link rel="manifest" th:href="@{/assets/img/favicons/manifest.json}"/>
+    <meta name="msapplication-TileImage" th:content="@{/assets/img/favicons/mstile-150x150.png}"/>
+    <meta name="theme-color" content="#ffffff"/>
+    <script th:src="@{/vendors/simplebar/simplebar.min.js}"></script>
+    <script th:src="@{/assets/js/config.js}"></script>
 
     <!--    Stylesheets-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&amp;display=swap" rel="stylesheet">
-    <link th:href="@{vendors/simplebar/simplebar.min.css}" rel="stylesheet">
-    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
-    <link th:href="@{assets/css/theme-rtl.min.css}" type="text/css" rel="stylesheet" id="style-rtl">
-    <link th:href="@{assets/css/theme.min.css}" type="text/css" rel="stylesheet" id="style-default">
-    <link th:href="@{assets/css/user-rtl.min.css}" type="text/css" rel="stylesheet" id="user-style-rtl">
-    <link th:href="@{assets/css/user.min.css}" type="text/css" rel="stylesheet" id="user-style-default">
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+    <link th:href="@{/vendors/simplebar/simplebar.min.css}" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css"/>
+    <link th:href="@{/assets/css/theme-rtl.min.css}" type="text/css" rel="stylesheet" id="style-rtl"/>
+    <link th:href="@{/assets/css/theme.min.css}" type="text/css" rel="stylesheet" id="style-default"/>
+    <link th:href="@{/assets/css/user-rtl.min.css}" type="text/css" rel="stylesheet" id="user-style-rtl"/>
+    <link th:href="@{/assets/css/user.min.css}" type="text/css" rel="stylesheet" id="user-style-default"/>
+    
+	<!--  SignaturePad 라이브러리 -->
+	<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
+    <!-- 커서 깜빡임 제거 -->
+    <!-- <style>
+    	* {
+    		caret-color: transparent;
+		}
+    </style> -->
+    
     <script>
       var phoenixIsRTL = window.config.config.phoenixIsRTL;
       if (phoenixIsRTL) {
@@ -49,9 +122,9 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
         userLinkRTL.setAttribute('disabled', true);
       }
     </script>
-    <link th:href="@{vendors/leaflet/leaflet.css}" rel="stylesheet">
-    <link th:href="@{vendors/leaflet.markercluster/MarkerCluster.css}" rel="stylesheet">
-    <link th:href="@{vendors/leaflet.markercluster/MarkerCluster.Default.css}" rel="stylesheet">
+    <link th:href="@{/vendors/leaflet/leaflet.css}" rel="stylesheet"/>
+    <link th:href="@{/vendors/leaflet.markercluster/MarkerCluster.css}" rel="stylesheet"/>
+    <link th:href="@{/vendors/leaflet.markercluster/MarkerCluster.Default.css}" rel="stylesheet"/>
   </head>
 	<body>
 	<main class="main" id="top">
@@ -61,36 +134,317 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	<th:block layout:fragment="content"></th:block>
 	<!-- <th:block th:replace="~{include/footer :: footerLayout}"></th:block> -->
 	</div>
-	</main>
-	<script>
-        var navbarTopStyle = window.config.config.phoenixNavbarTopStyle;
-        var navbarTop = document.querySelector('.navbar-top');
-        if (navbarTopStyle === 'darker') {
-          navbarTop.setAttribute('data-navbar-appearance', 'darker');
-        }
-
-        var navbarVerticalStyle = window.config.config.phoenixNavbarVerticalStyle;
-        var navbarVertical = document.querySelector('.navbar-vertical');
-        if (navbarVertical && navbarVerticalStyle === 'darker') {
-          navbarVertical.setAttribute('data-navbar-appearance', 'darker');
-        }
-      </script>
 	
-	<script th:src="@{vendors/popper/popper.min.js}"></script>
-    <script th:src="@{vendors/bootstrap/bootstrap.min.js}"></script>
-    <script th:src="@{vendors/anchorjs/anchor.min.js}"></script>
-    <script th:src="@{vendors/is/is.min.js}"></script>
-    <script th:src="@{vendors/fontawesome/all.min.js}"></script>
-    <script th:src="@{vendors/lodash/lodash.min.js}"></script>
-    <script th:src="@{vendors/list.js/list.min.js}"></script>
-    <script th:src="@{vendors/feather-icons/feather.min.js}"></script>
-    <script th:src="@{vendors/dayjs/dayjs.min.js}"></script>
-    <script th:src="@{vendors/leaflet/leaflet.js}"></script>
-    <script th:src="@{vendors/leaflet.markercluster/leaflet.markercluster.js}"></script>
-    <script th:src="@{vendors/leaflet.tilelayer.colorfilter/leaflet-tilelayer-colorfilter.min.js}"></script>
-    <script th:src="@{assets/js/phoenix.js}"></script>
-    <script th:src="@{vendors/echarts/echarts.min.js}"></script>
-    <script th:src="@{assets/js/dashboards/ecommerce-dashboard.js}"></script>
+	</main>
+	<!-- 웹소켓 연결(현재 approval 페이지 들어갈때만 웹소켓 연결 해뒀음) -->
+	<input type="hidden" id="separator" name="separator" th:value="${#authentication.principal.employee.structure.separatorCode}" /> 
+	
+	<!-- GPT Chat Widget -->
+	<div class="support-chat-container show" style="position: fixed; bottom: 20px; right: 20px; z-index: 1050;">
+	  <div class="container-fluid support-chat">
+	    <div class="card bg-body-emphasis shadow-sm rounded-3">
+	      <div class="card-header d-flex flex-between-center px-4 py-3 border-bottom border-translucent">
+	        <h5 class="mb-0 d-flex align-items-center gap-2">
+	          Eroom 챗봇
+	          <svg class="svg-inline--fa fa-circle text-success fs-11" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+	            <path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
+	          </svg>
+	        </h5>
+	        <button id="closeChatBtn" type="button" class="btn btn-sm btn-link p-0"><i class="fa-solid fa-xmark"></i></button>
+	      </div>
+	
+	      <div class="card-body chat p-0" style="height: 300px; overflow-y: auto;">
+    		<div id="chatMessages" class="d-flex flex-column p-3" style="max-height: 100%; overflow-y: auto;">
+	          <!-- 대화 메시지 들어갈 영역 -->
+	          
+	          <div class="d-flex justify-content-start mb-2"><div class="chat-bubble gpt">안녕하세요! Eroom 챗봇입니다.<br>무엇을 도와 드릴까요? 😊</div></div>
+	          
+	          
+	        </div>
+	      </div>
+	
+	      <div class="card-footer d-flex align-items-center gap-2 border-top border-translucent ps-3 pe-4 py-3">
+	        <div class="d-flex align-items-center flex-1 gap-3 border border-translucent rounded-pill px-4">
+	          <input id="chatInput" class="form-control outline-none border-0 flex-1 fs-9 px-0" type="text" placeholder="메시지를 입력하세요">
+	        </div>
+	        <button class="btn p-0 border-0 send-btn">
+	          <svg class="svg-inline--fa fa-paper-plane fs-9" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paper-plane" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+	            <path fill="currentColor" d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480V396.4c0-4 1.5-7.8 4.2-10.7L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z"></path>
+	          </svg>
+	        </button>
+	      </div>
+	    </div>
+	  </div>
+	<!-- 채팅창 닫혀 있을 때 버튼 -->
+	<button id="chatToggleBtn" class="btn btn-support-chat p-0 border border-translucent">
+	  <span class="fs-8 btn-text text-primary text-nowrap">Eroom 챗봇</span>
+	  <span class="ping-icon-wrapper mt-n4 ms-n6 mt-sm-0 ms-sm-2 position-absolute position-sm-relative">
+	    <span class="ping-icon-bg"> </span>
+	    <i class="fas fa-circle ping-icon text-primary fs-9"></i>
+	  </span>
+	  <i class="fas fa-headset text-primary fs-8 d-sm-none"></i>
+	  <i class="fas fa-chevron-down text-primary fs-7" id="chatToggleIcon"></i>
+	</button>
+	  
+	</div>
+
+
+<!-- GPT 관련 스크립트 -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const chatContainer = document.querySelector('.support-chat-container');
+    const toggleBtn = document.getElementById('chatToggleBtn');
+    const toggleIcon = document.getElementById('chatToggleIcon');
+    const chatCloseXBtn = document.getElementById('closeChatBtn');
+    const input = document.getElementById('chatInput');
+    const messages = document.getElementById('chatMessages');
+    const sendBtn = document.querySelector('.send-btn');
+
+    // 채팅창 토글
+    toggleBtn.addEventListener('click', () => {
+      const isOpen = chatContainer.classList.contains('show');
+      chatContainer.classList.toggle('show');
+
+      // 아이콘 방향도 바꾸기
+      toggleIcon.classList.toggle('fa-chevron-down', !isOpen);
+      toggleIcon.classList.toggle('fa-chevron-up', isOpen);
+    });
+
+    // X 버튼 닫기
+	chatCloseXBtn.addEventListener('click', () => {
+	  toggleBtn.click(); 
+	});
+
+    // 메시지 전송 (Enter 키)
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // 메시지 전송 (버튼 클릭)
+    sendBtn.addEventListener('click', sendMessage);
+
+    function sendMessage() {
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      appendMessage('나', msg, 'end');
+      input.value = '';
+      const loadingBubble = appendMessage('GPT', '✍️ 답변을 작성 중입니다... ✍️', 'start');
+      
+      
+      fetch(`/gpt/ask?prompt=${encodeURIComponent(msg)}`)
+        .then(res => res.text())
+        .then(res => {
+        	let parsedResponse = res.replaceAll(/\[(.*?)\]\((http[s]?:\/\/[^\s]+)\)/g, `<a href="$2" target="_blank">$1</a>`);
+        	parsedResponse = parsedResponse.replaceAll(/(http[s]?:\/\/[^\s]+)/g, `<a href="$1" target="_blank">$1</a>`);
+        	loadingBubble.innerHTML = parsedResponse;
+       	})
+        .catch(() => {
+        	loadingBubble.innerHTML = '❗ 오류가 발생했습니다. ❗';
+        });
+    }
+
+    function appendMessage(sender, text) {
+    	  const wrapper = document.createElement('div');
+    	  wrapper.className = `d-flex justify-content-${sender === '나' ? 'end' : 'start'} mb-2`;
+
+    	  const bubble = document.createElement('div');
+    	  bubble.className = `chat-bubble ${sender === '나' ? 'user' : 'gpt'}`;
+    	  bubble.innerHTML = text;
+
+    	  wrapper.appendChild(bubble);
+    	  messages.appendChild(wrapper);
+    	  messages.scrollTop = messages.scrollHeight;
+
+    	  return bubble;
+   	}
+  });
+</script>
+
+
+	<input type="hidden" id="myEmployeeNo" th:value="${#authentication.principal.employee.employeeNo}" />
+	<!-- 종 메일 표시 -->	
+	<script>
+	const employeeNo = document.getElementById("myEmployeeNo")?.value;
+	const mailSocket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/mail?senderNo=' + employeeNo);
+	console.log(employeeNo);
+	mailSocket.onopen = function() {
+		console.log('📬 메일 웹소켓 연결 성공!');
+	};
+	mailSocket.onmessage = function(event) {
+	    const data = JSON.parse(event.data);
+	    console.log(data); // 받은 데이터 확인
+	    if (data.type === "mail") {
+	        notificationDot.style.display = 'block';
+	        // 새 메일 알림 처리
+	    }
+	};
+	mailSocket.onclose = function() {
+		console.log('📬 메일 웹소켓 연결 종료');
+	};
+	mailSocket.onerror = function(error) {
+		console.error('📬 메일 웹소켓 에러 발생:', error);
+	};
+	</script>
+	<!-- 채팅 메시지 등록시 header에 있는 종에 빨간점 표시 -->
+
+	<script>
+		const senderNo = document.getElementById("myEmployeeNo")?.value;
+		
+		const chatAlarmSocket = new WebSocket(
+		  (location.protocol === 'https:' ? 'wss://' : 'ws://') +
+		  location.host + '/ws/chat?senderNo=' + senderNo
+		);
+		
+		chatAlarmSocket.onmessage = function (event) {
+		  const data = JSON.parse(event.data);
+		  console.log("알림 데이터:", data);
+		  if (data.type === "alarm") {
+		    const dot = document.getElementById("notificationDot");
+		    if (dot) dot.style.display = "block";
+		  }
+		};
+	</script>
+	<!-- 결재 등록시 header에 있는 종에 빨간점 표시 -->
+	<script>
+    	const approvalSocket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/approval');
+
+	      approvalSocket.onopen = function() { console.log('결재 웹소켓 연결 성공!'); };
+	      approvalSocket.onmessage = function(event) { 
+	    	  // alert 보기 싫으면 주석처리
+	    	  // alert(event.data); 
+	    	  // alert 보기 싫으면 주석처리
+			  const notificationDot = document.getElementById('notificationDot');
+			  if (notificationDot) {
+			    notificationDot.style.display = 'block'; // 빨간 점 표시
+			  }
+	    	  
+	      };
+	      approvalSocket.onclose = function() { console.log('결재 웹소켓 연결 종료'); };
+	      approvalSocket.onerror = function(error) { console.error('결재 웹소켓 에러 발생:', error); };
+	</script>
+	
+	<!-- 회사 캘린더 등록시 header에 있는 종에 빨간점 표시 -->
+	<script>
+	 	// ===== 회사 일정 웹소켓 연결 =====
+		const companySocket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/company');
+		
+		companySocket.onopen = function() {
+		  console.log('회사 웹소켓 연결 성공');
+		};
+		
+		companySocket.onmessage = function(event) {
+		  console.log('회사 알림 도착:', event.data);
+		
+		  const notificationDot = document.getElementById('notificationDot');
+		  if (notificationDot) {
+		    notificationDot.style.display = 'block'; // 빨간 점 표시
+		  }
+		  
+		};
+		
+		companySocket.onclose = function() {
+		  console.log('회사 웹소켓 연결 종료');
+		};
+		
+		companySocket.onerror = function(error) {
+		  console.error('회사 웹소켓 에러 발생:', error);
+		};
+		
+		  // ===== 팀 일정 웹소켓 연결 =====
+		 document.addEventListener("DOMContentLoaded", function () {
+		  const teamCode = document.getElementById("separator")?.value;
+		
+		  if (teamCode) {
+		    const teamSocket = new WebSocket(
+		      (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/team?team=' + teamCode
+		    );
+		
+		    teamSocket.onopen = () => console.log('✅ 팀 웹소켓 연결 성공');
+		
+		    teamSocket.onmessage = (event) => {
+		      console.log('📢 팀 일정 알림:', event.data);
+		
+		      const notificationDot = document.getElementById('notificationDot');
+		      if (notificationDot) {
+		        notificationDot.style.display = 'block'; // ✅여기에서 빨간 점 표시
+		      }
+		
+		      /* if (typeof fetchTeamCalendarEvents === 'function') {
+		        fetchTeamCalendarEvents(); // 팀 캘린더 새로고침
+		      } */
+		    };
+		
+		    teamSocket.onclose = () => console.log('팀 웹소켓 연결 종료');
+		    teamSocket.onerror = (error) => console.error('웹소켓 에러:', error);
+		  } else {
+		    console.warn('⚠teamCode 없음. 팀 웹소켓 연결 생략');
+		  }
+		});
+		
+		// 종 아이콘 클릭하면 빨간 점 없애기
+		document.addEventListener('DOMContentLoaded', function() {
+		  const notificationButton = document.querySelector('a.nav-link[role="button"][data-bs-toggle="dropdown"]');
+		  const notificationDot = document.getElementById('notificationDot');
+		
+		  if (notificationButton && notificationDot) {
+		    notificationButton.addEventListener('click', function() {
+		      notificationDot.style.display = 'none'; // 빨간 점 끄기
+		    });
+		  }
+		});
+		
+		const teamCode = document.getElementById('separator').value;
+		console.log(teamCode);
+		document.addEventListener('DOMContentLoaded', function () {
+			  const notificationDot = document.getElementById('notificationDot');
+			  
+			  if (notificationDot) {
+			    fetch("/notification/data")
+			      .then(response => response.json())
+			      .then(data => {
+			        if (data.length > 0) {
+			          notificationDot.style.display = "block";  // 읽지 않은 알림 있으면 빨간 점 켜기
+			        } else {
+			          notificationDot.style.display = "none";   // 없으면 빨간 점 끄기
+			        }
+			      })
+			      .catch(error => console.error('초기 알림 조회 실패:', error));
+			  }
+			});
+		</script>
+	
+
+	
+	
+	
+	<script th:src="@{/vendors/popper/popper.min.js}"></script>
+	<script th:src="@{/vendors/bootstrap/bootstrap.min.js}"></script>
+	<script th:src="@{/vendors/anchorjs/anchor.min.js}"></script>
+	<script th:src="@{/vendors/is/is.min.js}"></script>
+	<script th:src="@{/vendors/fontawesome/all.min.js}"></script>
+	<script th:src="@{/vendors/lodash/lodash.min.js}"></script>
+	<script th:src="@{/vendors/list.js/list.min.js}"></script>
+	<script th:src="@{/vendors/feather-icons/feather.min.js}"></script>
+	<script th:src="@{/vendors/dayjs/dayjs.min.js}"></script>
+	<script th:src="@{/vendors/leaflet/leaflet.js}"></script>
+	<script th:src="@{/vendors/leaflet.markercluster/leaflet.markercluster.js}"></script>
+	<script th:src="@{/vendors/leaflet.tilelayer.colorfilter/leaflet-tilelayer-colorfilter.min.js}"></script>
+	<script th:src="@{/assets/js/phoenix.js}"></script>
+	<script th:src="@{/vendors/echarts/echarts.min.js}"></script>
+	<script th:src="@{/assets/js/dashboards/ecommerce-dashboard.js}"></script>
+	<script th:src="@{/vendors/fullcalendar/index.global.min.js}"></script>
+	<script th:src="@{/vendors/flatpickr/flatpickr.min.js}"></script>
+	<script th:src="@{/assets/js/pages/calendar.js}"></script>
+	<script th:src="@{/assets/js/pages/kanban.js}"></script>
+    <script th:src="@{/vendors/sortablejs/Sortable.min.js}"></script>
+    <script th:src="@{/vendors/dropzone/dropzone-min.js}"></script>
+   
     
+   	<!--  SignaturePad 라이브러리 -->
+	<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
 </body>
 </html>
